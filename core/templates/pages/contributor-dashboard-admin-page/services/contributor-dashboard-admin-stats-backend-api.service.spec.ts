@@ -87,10 +87,25 @@ describe('Contribution Admin dashboard stats service', () => {
   };
 
   let responseDictionaries = {
+    classroom_id: 'mathid',
     name: 'Math',
+    url_fragment: 'math',
     topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered',
+    teaser_text: 'learn math',
+    is_published: true,
+    public_classrooms_count: 1,
+    thumbnail_data: {
+      filename: 'thumbnail.svg',
+      size_in_bytes: 100,
+      bg_color: 'transparent',
+    },
+    banner_data: {
+      filename: 'banner.png',
+      size_in_bytes: 100,
+      bg_color: 'transparent',
+    },
   };
 
   let sampleClassroomDataObject: ClassroomData;
@@ -184,10 +199,17 @@ describe('Contribution Admin dashboard stats service', () => {
 
     // Sample topic object returnable from the backend.
     sampleClassroomDataObject = ClassroomData.createFromBackendData(
+      responseDictionaries.classroom_id,
       responseDictionaries.name,
+      responseDictionaries.url_fragment,
       responseDictionaries.topic_summary_dicts,
       responseDictionaries.course_details,
-      responseDictionaries.topic_list_intro
+      responseDictionaries.topic_list_intro,
+      responseDictionaries.teaser_text,
+      responseDictionaries.is_published,
+      responseDictionaries.thumbnail_data,
+      responseDictionaries.banner_data,
+      responseDictionaries.public_classrooms_count
     );
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {

@@ -40,7 +40,7 @@ Makefile
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
 # We exclude some of the scripts that are not directly imported in order to
 # reduce deployed file count.
-# TODO(sll): Find a more structured way of doing this.
+# TODO(#20275): Find a more structured way of doing this.
 #
 # Please do not remove line below this, as it is used for testing purpose.
 # Third party files:

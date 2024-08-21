@@ -62,6 +62,10 @@ export class AnswerGroup extends BaseTranslatableObject {
     return [this.outcome, ...this.rules];
   }
 
+  getContentIdToHtml(): {[contentId: string]: string} {
+    return this.outcome.getContentIdToHtml();
+  }
+
   toBackendDict(): AnswerGroupBackendDict {
     return {
       rule_specs: this.rules.map(rule => rule.toBackendDict()),

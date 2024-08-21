@@ -29,6 +29,8 @@ from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import taskqueue_services
@@ -266,7 +268,12 @@ def delete_users_pending_to_be_deleted() -> None:
         )
 
     email_subject = 'User Deletion job result'
-    if feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if server_can_send_emails:
         email_manager.send_mail_to_admin(email_subject, email_message)
 
 
@@ -293,7 +300,12 @@ def check_completion_of_user_deletion() -> None:
         # or 'FAILURE'.
         completion_status = run_user_deletion_completion(
             pending_deletion_request)
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_message += '\n-----------------------------------\n'
             email_message += (
                 'PendingDeletionRequestModel ID: %s\n'
@@ -355,14 +367,24 @@ def run_user_deletion_completion(
         if pending_deletion_request.normalized_long_term_username is not None:
             user_services.save_deleted_username(
                 pending_deletion_request.normalized_long_term_username)
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_manager.send_account_deleted_email(
                 pending_deletion_request.user_id,
                 pending_deletion_request.email
             )
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_manager.send_account_deletion_failed_email(
                 pending_deletion_request.user_id,
                 pending_deletion_request.email

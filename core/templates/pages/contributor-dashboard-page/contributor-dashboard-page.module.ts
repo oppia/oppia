@@ -43,7 +43,6 @@ import {
   platformFeatureInitFactory,
   PlatformFeatureService,
 } from 'services/platform-feature.service';
-import {TranslationModalComponent} from './modal-templates/translation-modal.component';
 import {TranslationOpportunitiesComponent} from './translation-opportunities/translation-opportunities.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MyHammerConfig, toastrConfig} from 'pages/oppia-root/app.module';
@@ -84,7 +83,6 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
-    TranslationModalComponent,
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
     ContributorDashboardPageComponent,
@@ -104,7 +102,6 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
-    TranslationModalComponent,
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
     ContributorDashboardPageComponent,

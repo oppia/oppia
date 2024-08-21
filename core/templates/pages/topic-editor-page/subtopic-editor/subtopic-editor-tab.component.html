@@ -6,7 +6,14 @@
     <span>Back to Topic</span>
   </p>
   <div class="subtopic-header-text">
-    <span class="topic-name" (click)="navigateToTopicEditor()" tabindex="0" role="button" [attr.aria-label]="'Navigate back to ' + topic?.getName()" (keydown.enter)="navigateToTopicEditor()">{{ topic?.getName() }} / </span>
+    <span class="topic-name"
+          (click)="navigateToTopicEditor()"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="'Navigate back to ' + topic?.getName()"
+          (keydown.enter)="navigateToTopicEditor()">
+      {{ topic?.getName() + ' / ' }}
+    </span>
     <span class="subtopic-name">{{ editableTitle }}</span>
   </div>
   <div class="subtopic-content-box">
@@ -65,6 +72,11 @@
                      aria-label="Input field to add Subtopic URL"
                      [ngModelOptions]="{standalone: true}"
                      [maxlength]="maxCharsInSubtopicUrlFragment">
+              <div class="oppia-input-box-subtitle text-danger" [hidden]="editableUrlFragment === '' || subtopicUrlFragmentIsValid">
+                <b>
+                  Please use only lowercase letters, optionally separated by hyphen.
+                </b>
+              </div>
               <span class="oppia-input-box-subtitle">
                 <em>
                   The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ maxCharsInSubtopicUrlFragment }} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".

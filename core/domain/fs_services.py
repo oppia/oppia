@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import image_services
+from core.domain import image_validation_services
 from core.platform import models
 
 from typing import Dict, List, Optional
@@ -43,7 +45,8 @@ ALLOWED_ENTITY_NAMES: List[str] = [
     feconf.ENTITY_TYPE_SKILL,
     feconf.ENTITY_TYPE_STORY,
     feconf.ENTITY_TYPE_QUESTION,
-    feconf.ENTITY_TYPE_USER
+    feconf.ENTITY_TYPE_USER,
+    feconf.ENTITY_TYPE_CLASSROOM
 ]
 ALLOWED_SUGGESTION_IMAGE_CONTEXTS: List[str] = [
     feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
@@ -403,3 +406,57 @@ def copy_images(
             ('image/%s' % compressed_image_filename))
         destination_fs.copy(
             source_fs.assets_path, ('image/%s' % micro_image_filename))
+
+
+def validate_and_save_image(
+    raw_image: bytes,
+    filename: str,
+    filename_prefix: str,
+    entity_type: str,
+    entity_id: str
+) -> None:
+    """Validates and saves image.
+
+    Args:
+        raw_image: bytes. The image data.
+        filename: str. The image filename.
+        filename_prefix: str. The prefix for image.
+        entity_type: str. The entity type of the image.
+        entity_id: str. The entity id of the image.
+
+    Raises:
+        ValidationError. Image or filename supplied fails one of the
+            validation checks.
+    """
+    validated_file_format = (
+        image_validation_services.validate_image_and_filename(
+        raw_image, filename, entity_type
+    ))
+    is_compressible = validated_file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
+    save_original_and_compressed_versions_of_image(
+        filename, entity_type, entity_id, raw_image,
+        filename_prefix, is_compressible
+    )
+
+
+def get_static_asset_url(filepath: str) -> str:
+    """Returns the URL for the static assets that differ between
+    deployment.
+
+    Args:
+        filepath: str. The filepath to the file for which the URL
+            should be returned.
+
+    Returns:
+        str. The URL of the file.
+    """
+    if constants.EMULATOR_MODE:
+        # By using assetsstatic the app returns the requested
+        # files in assets folder by that it bypasses
+        # the handlers that call this method, thus preventing
+        # loop.
+        return 'http://localhost:8181/assetsstatic/%s' % (
+            filepath
+        )
+    return 'https://storage.googleapis.com/%s-static/%s' % (
+        feconf.OPPIA_PROJECT_ID, filepath)

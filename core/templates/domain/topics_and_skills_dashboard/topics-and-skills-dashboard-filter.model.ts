@@ -58,7 +58,7 @@ export class TopicsAndSkillsDashboardFilter {
     this.classroom =
       TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL;
     this.keywords = [];
-    this.sort = ETopicSortOptions.IncreasingCreatedOn;
+    this.sort = ETopicSortOptions.IncreasingUpdatedOn;
     this.status = ETopicPublishedOptions.All;
   }
 
@@ -70,7 +70,7 @@ export class TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(
       TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL,
       [],
-      ETopicSortOptions.IncreasingCreatedOn,
+      ETopicSortOptions.IncreasingUpdatedOn,
       ETopicPublishedOptions.All
     );
   }

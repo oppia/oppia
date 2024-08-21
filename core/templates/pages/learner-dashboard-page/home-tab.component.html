@@ -1,5 +1,5 @@
 <div class="home-tab">
-  <ng-container *ngIf="!featureFlag">
+  <ng-container *ngIf="!redesignFeatureFlag">
     <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
       {{ getTimeOfDay() | translate }}, {{ username }}!
     </div>
@@ -26,7 +26,7 @@
             <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
                  class="story-summary-tile">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-                [topicName]="topicSummaryTile.name">
+                [topicName]="topicSummaryTile.name" (click)="registerClassroomInProgressLessonEvent(topicSummaryTile.classroom, topicSummaryTile.name)">
               </oppia-learner-story-summary-tile>
             </div>
           </div>
@@ -44,7 +44,7 @@
           <div class="topic-summary-tile-scroll">
             <div class="topic-summary-tile-section d-flex"
               [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile">
+              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile" (click)="registerNewClassroomLessonEvent(item.key, topicSummaryTile.name)">
                 <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
                 </oppia-learner-topic-summary-tile>
               </div>
@@ -84,7 +84,7 @@
     </div>
   </ng-container>
 
-  <div *ngIf="featureFlag">
+  <div *ngIf="redesignFeatureFlag">
     <p class="oppia-learner-dash-greeting mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
     <div class="oppia-learner-dash-section" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
       <p class="oppia-learner-dash-section-heading">
@@ -95,43 +95,49 @@
           ) | translate
         }}
       </p>
-      <div [ngStyle]="{'min-width': 'fit-content'}">
-        <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles">
-          <p class="oppia-learner-dash-section-heading mb-0">
-            {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
-          </p>
-          <a id="setting-a-goal-link" class="d-inline-block mb-0" (click)="changeActiveSection()">
-            {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate }}
-          </a>
-          <ng-template #continueTiles>
-            <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
-              <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts" class="gap-4 w-100">
-                <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-                  [topicName]="topicSummaryTile.name">
-                </oppia-learner-story-summary-tile>
-              </div>
+      <div class="d-flex flex-wrap justify-content-between w-100">
+        <!--TODO(#18384): Replace with all lessons in progress data (only contains classroom cards); affects ngIf, numCards, ng-content-->
+        <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" [numCards]="1" [tabType]="'home'">
+          <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
+            <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
+              <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [displayArea]="'homeTab'"
+                [topicName]="topicSummaryTile.name">
+              </oppia-learner-story-summary-tile>
             </ng-container>
-          </ng-template>
-        </ng-container>
+          </ng-container>
+        </oppia-card-display>
+        <!--TODO(#18384): Replace with recommended lessons data (placeholder with explorations); affects numCards and ng-content-->
+        <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
+        <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
+          <ng-container *ngFor="let lesson of incompleteExplorationsList">
+            <lesson-card [story]="lesson"></lesson-card>
+          </ng-container>
+        </oppia-card-display>
       </div>
     </div>
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+      <!--TODO(#18384): Add search bar -->
+      <!--TODO(#18384): Replace with classroom topic data, only untracked topics at the moment; affects heading-->
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
-        <p *ngIf="item.value.length !== 0" class="oppia-learner-dash-section-subheading"> {{ 'I18N_LEARNER_DASHBOARD_CLASSROOM_TITLE' | translate: {classroomName: item.key} }} </p>
-        <hr width="100%" color="#00645c" class="mt-2" size="2">
-        <div class="oppia-learner-dash-classes d-flex gap-4 mt-4 overflow-hidden w-100">
-          <ng-container *ngFor="let topicSummaryTile of item.value.slice(0,3)">
-            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [featureFlag]="featureFlag">
+        <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION'" [numCards]="item.value.length" [tabType]="'homeFull'" [cardWidth]="226">
+          <ng-container *ngFor="let topicSummaryTile of item.value">
+            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
             </oppia-learner-topic-summary-tile>
           </ng-container>
-        </div>
+        </oppia-card-display>
         <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-           class="align-items-center d-inline-flex justify-content-center mt-4 oppia-learner-dash-home-button text-center">
-          <span class="fa fa-arrow-right mr-2"></span>
-          {{ 'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key} }}
+           class="align-items-center d-inline-flex justify-content-center mb-4 oppia-learner-dash-home-button text-center">
+          <span class="fas fa-arrow-right mr-2"></span>
+          {{ 'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION_LINK' | translate }}
         </a>
       </ng-container>
+       <!--TODO(#18384): Replace with saved lessons data (placeholder with explorations); affects numCards and ng-content-->
+      <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [tabType]="'homeFull'" [numCards]="incompleteExplorationsList.length">
+        <ng-container *ngFor="let lesson of incompleteExplorationsList">
+          <lesson-card [story]="lesson"></lesson-card>
+        </ng-container>
+      </oppia-card-display>
     </div>
     <div class="oppia-learner-dash-section px-3 py-4 w-100"
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">

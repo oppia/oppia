@@ -24,6 +24,9 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
   providedIn: 'root',
 })
 export class AccessValidationBackendApiService {
+  SUBTOPIC_VIEWER_PAGE_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>';
+
   CLASSROOM_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_classroom_page';
 
@@ -64,10 +67,34 @@ export class AccessValidationBackendApiService {
   COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
+  COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/' +
+    'can_access_collection_editor_page/<collection_id>';
+
+  CLASSROOMS_PAGE_ACCESS_VALIDATION =
+    '/access_validation_handler/can_access_classrooms_page';
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  validateAccessToSubtopicViewerPage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    subtopicUrlFragment: string
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.SUBTOPIC_VIEWER_PAGE_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+        subtopic_url_fragment: subtopicUrlFragment,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
+  }
 
   validateAccessToClassroomPage(classroomUrlFragment: string): Promise<void> {
     return this.http
@@ -76,6 +103,12 @@ export class AccessValidationBackendApiService {
           classroom_url_fragment: classroomUrlFragment,
         },
       })
+      .toPromise();
+  }
+
+  validateAccessToClassroomsPage(): Promise<void> {
+    return this.http
+      .get<void>(this.CLASSROOMS_PAGE_ACCESS_VALIDATION)
       .toPromise();
   }
 
@@ -175,6 +208,17 @@ export class AccessValidationBackendApiService {
       this.DOES_LEARNER_GROUP_EXIST,
       {
         learner_group_id: learnerGroupId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessCollectionEditorPage(collectionId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR,
+      {
+        collection_id: collectionId,
       }
     );
 

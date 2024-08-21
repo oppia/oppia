@@ -37,6 +37,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary!: StorySummary;
   @Input() displayArea!: string;
   @Input() topicName!: string;
+  @Input() redesignFeatureFlag!: boolean;
   nodeCount!: number;
   completedNodeCount!: number;
   storyProgress!: number;
@@ -94,6 +95,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
         }
       }
     }
+
     return this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE,
       {

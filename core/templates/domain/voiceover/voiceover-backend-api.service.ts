@@ -22,6 +22,10 @@ import {Injectable} from '@angular/core';
 
 import {VoiceoverDomainConstants} from './voiceover-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {
+  EntityVoiceovers,
+  EntityVoiceoversBackendDict,
+} from './entity-voiceovers.model';
 
 interface VoiceoverAdminDataBackendDict {
   language_accent_master_list: {
@@ -34,6 +38,10 @@ interface VoiceoverAdminDataBackendDict {
       [languageAccentCode: string]: boolean;
     };
   };
+}
+
+interface EntityVoiceoversBulkBackendDict {
+  entity_voiceovers_list: EntityVoiceoversBackendDict[];
 }
 
 interface ExplorationIdToFilenamesBackendDict {
@@ -85,6 +93,7 @@ interface VoiceArtistMetaDataBackendDict {
     [voiceArtistId: string]: string;
   };
 }
+
 export interface VoiceArtistMetadataResponse {
   voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping;
   voiceArtistIdToVoiceArtistName: VoiceArtistIdToVoiceArtistName;
@@ -207,6 +216,46 @@ export class VoiceoverBackendApiService {
         .then(
           response => {
             resolve(response.exploration_id_to_filenames);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
+    });
+  }
+
+  async fetchEntityVoiceoversByLanguageCodeAsync(
+    entityType: string,
+    entitytId: string,
+    entityVersion: number,
+    languageCode: string
+  ): Promise<EntityVoiceovers[]> {
+    let entityVoiceoversBulkHandlerUrl =
+      this.urlInterpolationService.interpolateUrl(
+        VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS_BULK,
+        {
+          entity_type: entityType,
+          entity_id: entitytId,
+          entity_version: String(entityVersion),
+          language_code: languageCode,
+        }
+      );
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<EntityVoiceoversBulkBackendDict>(entityVoiceoversBulkHandlerUrl)
+        .toPromise()
+        .then(
+          response => {
+            let entityVoiceoversList = [];
+            for (let entityVoiceoverBackendDict of response.entity_voiceovers_list) {
+              entityVoiceoversList.push(
+                EntityVoiceovers.createFromBackendDict(
+                  entityVoiceoverBackendDict
+                )
+              );
+            }
+            resolve(entityVoiceoversList);
           },
           errorResponse => {
             reject(errorResponse?.error);

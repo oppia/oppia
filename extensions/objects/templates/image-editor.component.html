@@ -29,9 +29,11 @@
     <div class="filepath-editor-image-container"
          [attr.style]="getImageContainerDynamicStyles()">
       <div *ngIf="isNoImageUploaded()">
-        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
-                              [allowedImageFormats]="allowedImageFormats">
-        </oppia-image-uploader>
+        <oppia-image-receiver (fileChanged)="onFileChanged($event)"
+                              [allowedImageFormats]="allowedImageFormats"
+                              [maxImageSizeInKB]="100"
+                              >
+        </oppia-image-receiver>
       </div>
       <div *ngIf="isImageUploaded()"
            class="filepath-editor-image-crop-container"

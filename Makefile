@@ -6,7 +6,7 @@ ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angu
 
 OS_NAME := $(shell uname)
 
-FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
+FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps use_firebase_localhost
 
 sharding_instances := 3
 
@@ -116,6 +116,10 @@ check.dev-container-healthy:
 		exit 1; \
 	fi
 
+run-dsadmin: ## Runs DSAdmin inside the dev-server container.
+	@docker exec oppia-cloud-datastore /bin/sh -c '../dsadmin --project=dev-project-id --datastore-emulator-host=localhost:8089 &';
+	@echo 'Please visit http://localhost:8080 to access the DSAdmin.';
+
 logs.%: ## Shows the logs of the given docker service. Example: make logs.datastore
 	docker compose logs -f $*
 
@@ -167,6 +171,7 @@ run_tests.check_backend_associated_tests: ## Runs the backend associate tests
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 ## Flag for Acceptance tests
 ## suite: The suite to run the acceptance tests
+## MOBILE: Run acceptance test in mobile viewport.
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -175,6 +180,8 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	else \
 		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
+# Adding env variable for mobile view
+	@export MOBILE=${MOBILE:-false}
 # Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
@@ -184,7 +191,8 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 		rm -rf ./core/tests/puppeteer-acceptance-tests/build; \
 	fi
 	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/spec/$(suite).spec.js
+	cp -r ./core/tests/puppeteer-acceptance-tests/data ./core/tests/puppeteer-acceptance-tests/build/
+	SPEC_NAME=$(suite) ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/puppeteer-acceptance-tests/specs/$(suite).spec.js
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
@@ -231,26 +239,14 @@ run_tests.check_e2e_tests_are_captured_in_ci: ## Runs the check to ensure that a
 run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
 ## Flag for Lighthouse test
 ## shard: The shard number to run the lighthouse tests
-## RECORD_SCREEN: Record the lighthouse test
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
-# Adding node to the path.
-	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
-	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
-	fi
 # Starting the development server for the lighthouse tests.
-	$(MAKE) start-devserver
+	$(MAKE) start-devserver use_firebase_endpoint=true
 	@echo '-----------------------------------------------------------------------'
-	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
+	@echo '  Starting Lighthouse Accessibility tests  '
 	@echo '-----------------------------------------------------------------------'
-	@if [ "$(RECORD_SCREEN)" = "true" ]; then \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js ../lhci-puppeteer-video/video.mp4; \
-	else \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
-	fi
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
+	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode accessibility $(PYTHON_ARGS)"
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
@@ -259,26 +255,14 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for the parsed shard
 ## Flag for Lighthouse test
 ## shard: The shard number to run the lighthouse tests
-## RECORD_SCREEN: Record the lighthouse test
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
-# Adding node to the path.
-	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
-	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
-	fi
 # Starting the development server for the lighthouse tests.
-	$(MAKE) start-devserver
+	$(MAKE) start-devserver use_firebase_endpoint=true
 	@echo '-----------------------------------------------------------------------'
-	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
+	@echo '  Starting Lighthouse Performance tests  '
 	@echo '-----------------------------------------------------------------------'
-	@if [ "$(RECORD_SCREEN)" = "true" ]; then \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js ../lhci-puppeteer-video/video.mp4; \
-	else \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
-	fi
-	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
+	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode performance $(PYTHON_ARGS)""
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'

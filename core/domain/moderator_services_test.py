@@ -18,13 +18,18 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.domain import moderator_services
+from core.domain import platform_parameter_list
 from core.tests import test_utils
 
 
 class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
     """Test that flag-exploration-email-tasks works as expected."""
+
+    email_footer = (
+        'You can change your email preferences via the '
+        '<a href="http://localhost:8181/preferences">Preferences</a> page.'
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -47,8 +52,13 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
 
         self.report_text = 'AD'
 
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, email_footer),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'moderator')
+        ]
+    )
     def test_that_flag_exploration_emails_are_correct(self) -> None:
 
         expected_email_html_body = (
@@ -78,14 +88,13 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx:
-            moderator_services.enqueue_flag_exploration_email_task(
-                self.exploration.id, self.report_text, self.new_user_id)
+        moderator_services.enqueue_flag_exploration_email_task(
+            self.exploration.id, self.report_text, self.new_user_id)
 
-            self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_tasks()
 
-            # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-            self.assertEqual(messages[0].body, expected_email_text_body)
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].html, expected_email_html_body)
+        self.assertEqual(messages[0].body, expected_email_text_body)

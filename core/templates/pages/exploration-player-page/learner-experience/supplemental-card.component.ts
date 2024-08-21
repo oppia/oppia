@@ -43,6 +43,8 @@ import {PlayerPositionService} from '../services/player-position.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 import './supplemental-card.component.css';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
 @Component({
   selector: 'oppia-supplemental-card',
@@ -83,12 +85,14 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private urlInterpolationService: UrlInterpolationService,
+    private platformFeatureService: PlatformFeatureService,
+    private voiceoverPlayerService: VoiceoverPlayerService,
     private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
     this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
 
@@ -182,9 +186,21 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
     }
   }
 
+  isVoiceoverContributionWithAccentEnabled(): boolean {
+    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
+  }
+
   // This function returns null if audio is not available.
   getFeedbackAudioHighlightClass(): string | null {
     if (
+      this.isVoiceoverContributionWithAccentEnabled() &&
+      this.voiceoverPlayerService.getActiveComponentName() ===
+        AppConstants.COMPONENT_NAME_FEEDBACK &&
+      this.audioPlayerService.isPlaying()
+    ) {
+      return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
+    } else if (
+      !this.isVoiceoverContributionWithAccentEnabled() &&
       this.audioTranslationManagerService.getCurrentComponentName() ===
         AppConstants.COMPONENT_NAME_FEEDBACK &&
       (this.audioPlayerService.isPlaying() ||

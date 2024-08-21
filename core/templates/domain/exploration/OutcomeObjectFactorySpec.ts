@@ -90,4 +90,13 @@ describe('Outcome object factory', () => {
       missing_prerequisite_skill_id: '2',
     });
   });
+
+  it('should be able to get contentId to html of an outcome', () => {
+    const testOutcome = oof.createNew('A', 'feedback_1', 'feedback', []);
+    let contentIdToHtml = testOutcome.getContentIdToHtml();
+
+    expect(contentIdToHtml).toEqual({
+      feedback_1: 'feedback',
+    });
+  });
 });

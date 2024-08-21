@@ -219,6 +219,10 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       30: {
+        text: 'inapplicable_skill_misconception_ids: []',
+        highlighted: false,
+      },
+      31: {
         text: '',
         highlighted: false,
       },
@@ -418,6 +422,10 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       49: {
+        text: 'inapplicable_skill_misconception_ids: []',
+        highlighted: false,
+      },
+      50: {
         text: '',
         highlighted: false,
       },
@@ -458,6 +466,7 @@ describe('Exploration history', function () {
       '    ca_buttonText_5: {}\n' +
       'solicit_answer_details: false\n' +
       'card_is_checkpoint: false\n' +
+      'inapplicable_skill_misconception_ids: []\n' +
       '';
 
     var expectedHistoryStates = [
@@ -605,7 +614,7 @@ describe('Exploration history', function () {
       'tags: []\n' +
       "blurb: ''\n" +
       "author_notes: ''\n" +
-      'states_schema_version: 55\n' +
+      'states_schema_version: 56\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -621,7 +630,7 @@ describe('Exploration history', function () {
       'tags: []\n' +
       "blurb: ''\n" +
       "author_notes: ''\n" +
-      'states_schema_version: 55\n' +
+      'states_schema_version: 56\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +

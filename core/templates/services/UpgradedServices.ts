@@ -374,6 +374,7 @@ import {
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {QuestionValidationService} from './question-validation.service';
 import {MathInteractionsService} from './math-interactions.service';
+import {EntityVoiceoversService} from './entity-voiceovers.services';
 
 interface UpgradedServicesDict {
   // Type 'unknown' is used here because we don't know the exact type of
@@ -435,6 +436,9 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
+    upgradedServices['EntityVoiceoversService'] = new EntityVoiceoversService(
+      upgradedServices['VoiceoverBackendApiService']
+    );
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
@@ -691,7 +695,8 @@ export class UpgradedServices {
         upgradedServices['SubtitledUnicodeObjectFactory']
       );
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
-      upgradedServices['WindowRef']
+      upgradedServices['WindowRef'],
+      upgradedServices['LocalStorageService']
     );
     upgradedServices['StateEditorService'] = new StateEditorService(
       upgradedServices['SolutionValidityService']
@@ -1172,7 +1177,9 @@ export class UpgradedServices {
       upgradedServices['AssetsBackendApiService'],
       upgradedServices['AudioTranslationLanguageService'],
       upgradedServices['ComputeGraphService'],
-      upgradedServices['ContextService']
+      upgradedServices['ContextService'],
+      upgradedServices['PlatformFeatureService'],
+      upgradedServices['EntityVoiceoversService']
     );
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(

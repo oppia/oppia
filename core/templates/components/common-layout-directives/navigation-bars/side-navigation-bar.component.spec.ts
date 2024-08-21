@@ -30,14 +30,16 @@ import {RouterModule} from '@angular/router';
 
 import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {SideNavigationBarComponent} from './side-navigation-bar.component';
 import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 class MockWindowRef {
   nativeWindow = {
@@ -69,6 +71,7 @@ describe('Side Navigation Bar Component', () => {
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [
         HttpClientModule,
         HttpClientTestingModule,
@@ -97,8 +100,8 @@ describe('Side Navigation Bar Component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SideNavigationBarComponent);
-    sidebarStatusService = TestBed.inject(SidebarStatusService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    sidebarStatusService = TestBed.inject(SidebarStatusService);
     componentInstance = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
@@ -138,6 +141,14 @@ describe('Side Navigation Bar Component', () => {
     expect(componentInstance.getinvolvedSubmenuIsShown).toBeTrue();
     componentInstance.togglegetinvolvedSubmenu();
     expect(componentInstance.getinvolvedSubmenuIsShown).toBeFalse();
+  });
+
+  it('should toggle about submenu', () => {
+    componentInstance.aboutSubmenuIsShown = false;
+    componentInstance.toggleAboutSubmenu();
+    expect(componentInstance.aboutSubmenuIsShown).toBeTrue();
+    componentInstance.toggleAboutSubmenu();
+    expect(componentInstance.aboutSubmenuIsShown).toBeFalse();
   });
 
   it('should get static image url', () => {
@@ -189,33 +200,6 @@ describe('Side Navigation Bar Component', () => {
     })
   );
 
-  it(
-    'should navigate to classroom page when user clicks on' +
-      "'Basic Mathematics'",
-    fakeAsync(() => {
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-      componentInstance.navigateToClassroomPage('/classroom/url');
-      tick(151);
-
-      expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
-    })
-  );
-
-  it(
-    'should registers classroom header click event when user clicks' +
-      " on 'Basic Mathematics'",
-    () => {
-      spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
-
-      componentInstance.navigateToClassroomPage('/classroom/url');
-
-      expect(
-        siteAnalyticsService.registerClassroomHeaderClickEvent
-      ).toHaveBeenCalled();
-    }
-  );
-
   it('should populate properties properly on component initialization', fakeAsync(() => {
     let userInfo = new UserInfo(
       ['USER_ROLE'],
@@ -251,5 +235,44 @@ describe('Side Navigation Bar Component', () => {
     hackyStoryTitleTranslationIsDisplayed =
       componentInstance.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
+  });
+
+  it('should register About header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    componentInstance.navigateToAboutPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
+  });
+
+  it('should register Volunteer header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    componentInstance.navigateToVolunteerPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.VOLUNTEER);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
+  });
+
+  it('should register Teach header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    componentInstance.navigateToTeachPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });
 });

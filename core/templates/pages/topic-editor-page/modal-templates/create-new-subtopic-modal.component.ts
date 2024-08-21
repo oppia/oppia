@@ -40,7 +40,7 @@ export class CreateNewSubtopicModalComponent
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   hostname!: string;
-  classroomUrlFragment!: string;
+  classroomUrlFragment!: string | null;
   topic!: Topic;
   SUBTOPIC_PAGE_SCHEMA!: object;
   htmlData!: string;

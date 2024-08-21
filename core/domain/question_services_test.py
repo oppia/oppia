@@ -491,7 +491,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question_summaries[0].id, self.question_id)
         self.assertEqual(
             question_summaries[0].question_content,
-            feconf.DEFAULT_INIT_STATE_CONTENT_STR)
+            feconf.DEFAULT_STATE_CONTENT_STR)
         self.assertIsNone(question_summaries[1])
 
     def test_delete_question(self) -> None:
@@ -768,7 +768,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question_summary.id, self.question_id)
         self.assertEqual(
             question_summary.question_content,
-            feconf.DEFAULT_INIT_STATE_CONTENT_STR)
+            feconf.DEFAULT_STATE_CONTENT_STR)
 
     def test_raises_error_while_computing_summary_if_interaction_id_is_none(
         self

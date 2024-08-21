@@ -126,7 +126,7 @@ def initialize_android_test_data() -> str:
             del topic_id_to_prerequisite_topic_ids[topic.id]
             classroom.topic_id_to_prerequisite_topic_ids = (
                 topic_id_to_prerequisite_topic_ids)
-            classroom_config_services.update_or_create_classroom_model(
+            classroom_config_services.update_classroom(
                 classroom)
 
     # Generate new Structure id for topic, story, skill and question.
@@ -577,7 +577,7 @@ def initialize_android_test_data() -> str:
     classrooms = classroom_config_services.get_all_classrooms()
     for classroom in classrooms:
         classroom.topic_id_to_prerequisite_topic_ids[topic_id] = []
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        classroom_config_services.update_classroom(classroom)
     return topic_id
 
 

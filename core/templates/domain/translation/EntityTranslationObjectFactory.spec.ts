@@ -48,6 +48,26 @@ describe('EntityTranslation', () => {
     expect(entityTranslation.languageCode).toEqual('hi');
   });
 
+  it('should convert the entity translation object to backend dict', () => {
+    const entityTranslation = EntityTranslation.createFromBackendDict(
+      entityTranslationBackendDict
+    );
+
+    expect(entityTranslation.toBackendDict()).toEqual(
+      entityTranslationBackendDict
+    );
+  });
+
+  it('should convert translation mapping of entity translation object to backend dict', () => {
+    const entityTranslation = EntityTranslation.createFromBackendDict(
+      entityTranslationBackendDict
+    );
+
+    expect(entityTranslation.translationMappingToBackendDict()).toEqual(
+      entityTranslationBackendDict.translations
+    );
+  });
+
   it('should return null if content id not exist', () => {
     const entityTranslation = EntityTranslation.createFromBackendDict(
       entityTranslationBackendDict

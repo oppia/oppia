@@ -1,0 +1,2 @@
+core/templates/pages/privacy-page/privacy-page.module.ts
+core/templates/pages/terms-page/terms-page.module.ts

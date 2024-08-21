@@ -398,13 +398,6 @@ def validate_rte_tags(
             'Video'
         )
 
-        start_value = float(tag['start-with-value'].strip())
-        end_value = float(tag['end-with-value'].strip())
-        if start_value > end_value and start_value != 0.0 and end_value != 0.0:
-            raise utils.ValidationError(
-                'Start value should not be greater than End value in Video tag.'
-            )
-
         if not tag.has_attr('autoplay-with-value'):
             raise utils.ValidationError(
                 'Video tag does not have \'autoplay-with-value\' '

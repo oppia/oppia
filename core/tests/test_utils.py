@@ -46,16 +46,22 @@ from core.domain import auth_domain
 from core.domain import blog_services
 from core.domain import caching_domain
 from core.domain import classifier_domain
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_domain
 from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import object_registry
 from core.domain import param_domain
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -63,6 +69,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -323,7 +330,9 @@ def generate_random_hexa_str() -> str:
     """
     uppercase = 'ABCDEF'
     lowercase = 'abcdef'
-    return ''.join(random.choices(uppercase + lowercase + string.digits, k=32))
+    characters = '%s%s%s' % (uppercase, lowercase, string.digits)
+
+    return ''.join(random.choices(characters, k=32))
 
 
 @contextlib.contextmanager
@@ -342,14 +351,18 @@ def swap_is_feature_flag_enabled_function(
         context. The context with function replaced.
     """
     def mock_is_feature_flag_enabled(
-        _: Optional[str], feature_flag_name: str
+        feature_flag_name: str,
+        feature_flag: Optional[feature_flag_domain.FeatureFlag] = None, # pylint: disable=unused-argument
+        user_id: Optional[str] = None # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
         target_feature_flag_name is present in feature_flag_names.
 
         Args:
-            _: str|None. The id of the user, can be None.
             feature_flag_name: str. The name of the target feature flag.
+            feature_flag: FeatureFlag|None. The feature flag domain model.
+            user_id: str|None. The id of the user, if logged-out user
+                then None.
 
         Returns:
             enable_feature_flag: bool. Returns True if the target feature flag
@@ -403,6 +416,115 @@ def enable_feature_flags(
             *args: Any, **kwargs: Any
         ) -> _GenericHandlerFunctionReturnType:
             with swap_is_feature_flag_enabled_function(feature_flag_names):
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+@contextlib.contextmanager
+def swap_get_platform_parameter_value_function(
+    platform_parameter_name_value_tuples: List[
+        Tuple[
+            platform_parameter_list.ParamName,
+            platform_parameter_domain.PlatformDataTypes
+        ]
+    ]
+) -> Iterator[None]:
+    """Mocks get_platform_parameter_value function within the context of a
+    'with' statement. get_platform_parameter_value will return the value of
+    the platform parameter if the parameter is present in the
+    platform_parameter_names list.
+
+    Args:
+        platform_parameter_name_value_tuples: List[Tuple[ParamName,
+            PlatformDataTypes]]. The list of the names of the platform
+            parameters and their corresponding values that will be enabled.
+
+    Yields:
+        context. The context with function replaced.
+    """
+    def mock_get_platform_parameter_value(
+        parameter_name: str
+    ) -> platform_parameter_domain.PlatformDataTypes:
+        """Mocks get_platform_parameter_value function to return the value of
+        the platform parameter if the parameter is present in the
+        platform_parameter_names list.
+
+        Args:
+            parameter_name: str. The name of the platform parameter whose
+                value is required.
+
+        Returns:
+            PlatformDataTypes. The value of the platform parameter if the
+            parameter is present in the platform_parameter_names list.
+
+        Raises:
+            Exception. The parameter_name is not present in the
+                platform_parameter_names list.
+        """
+        platform_parameter_name_value_dict = dict(
+            (x.value, y) for x, y in platform_parameter_name_value_tuples
+        )
+        if parameter_name not in platform_parameter_name_value_dict:
+            raise Exception(
+                'The value for the platform parameter %s was needed in this '
+                'test, but not specified in the set_platform_parameters '
+                'decorator. Please this information in the decorator.'
+                % parameter_name
+            )
+        return platform_parameter_name_value_dict[parameter_name]
+
+    original_get_platform_parameter_value = getattr(
+        platform_parameter_services, 'get_platform_parameter_value')
+    setattr(
+        platform_parameter_services,
+        'get_platform_parameter_value',
+        mock_get_platform_parameter_value
+    )
+    try:
+        yield
+    finally:
+        setattr(
+            platform_parameter_services,
+            'get_platform_parameter_value',
+            original_get_platform_parameter_value
+        )
+
+
+def set_platform_parameters(
+    platform_parameter_name_value_tuples: List[
+        Tuple[
+            platform_parameter_list.ParamName,
+            platform_parameter_domain.PlatformDataTypes
+        ]
+    ]
+) -> Callable[
+        [Callable[..., _GenericHandlerFunctionReturnType]],
+        Callable[..., _GenericHandlerFunctionReturnType]
+]:
+    """This method guarantees to enable the given platform parameters for the
+    scope of the test.
+
+    Args:
+        platform_parameter_name_value_tuples: List[Tuple[ParamName,
+            PlatformDataTypes]]. The list of the names of the platform
+            parameters and their corresponding values that will be enabled.
+
+    Returns:
+        function. The newly decorated function that enables given platform
+        parameters for the scope of the test.
+    """
+    def decorator(
+        func: Callable[..., _GenericHandlerFunctionReturnType]
+    ) -> Callable[..., _GenericHandlerFunctionReturnType]:
+        # Here we use type Any because this method can accept arbitrary number
+        # of arguments with different types.
+        def wrapper(
+            *args: Any, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
+            with swap_get_platform_parameter_value_function(
+                platform_parameter_name_value_tuples
+            ):
                 return func(*args, **kwargs)
         return wrapper
     return decorator
@@ -2075,6 +2197,10 @@ class GenericTestBase(AppEngineTestBase):
     OWNER_USERNAME: Final = 'owner'
     EDITOR_EMAIL: Final = 'editor@example.com'
     EDITOR_USERNAME: Final = 'editor'
+    QUESTION_ADMIN_EMAIL: Final = 'questionExpert@app.com'
+    QUESTION_ADMIN_USERNAME: Final = 'questionExpert'
+    QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
+    QUESTION_REVIEWER_USERNAME: Final = 'question'
     TOPIC_MANAGER_EMAIL: Final = 'topicmanager@example.com'
     TOPIC_MANAGER_USERNAME: Final = 'topicmanager'
     VOICE_ARTIST_EMAIL: Final = 'voiceartist@example.com'
@@ -2322,6 +2448,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2352,6 +2479,7 @@ states:
     content:
       content_id: content_2
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3596,6 +3724,44 @@ version: 1
         committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
+    def add_explorations_to_story(
+        self, topic_id: str, story_id: str, exp_ids: List[str]
+    ) -> None:
+        """Appends a story node for each exploration id given in exp_ids to the
+        story with story_id. Each story node is assigned its exp id and then it
+        is published.
+
+        Args:
+            topic_id: str. ID of the topic that contains the story.
+            story_id: str. ID of the story containing the new node.
+            exp_ids: list(str). IDs of the exploration.
+        """
+        story = story_fetchers.get_story_by_id(story_id)
+        change_list = []
+
+        node_id = story.story_contents.next_node_id
+        for exp_id in exp_ids:
+            change_list.extend([
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': node_id,
+                    'title': node_id
+                }),
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name':
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                    'node_id': node_id,
+                    'old_value': None,
+                    'new_value': exp_id
+                })])
+            node_id = story_domain.StoryNode.get_incremented_node_id(node_id)
+
+        if len(change_list) > 0:
+            topic_services.update_story_and_topic_summary(
+                feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
+                'Linked explorations to story %s' % story_id, topic_id)
+
     def create_story_for_translation_opportunity(
         self,
         owner_id: str,
@@ -3629,15 +3795,23 @@ version: 1
             topic_id, story.id, admin_id)
         story_services.update_story(
             owner_id, story.id, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Node1',
             }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                 'node_id': 'node_1',
                 'old_value': None,
                 'new_value': exploration_id
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_STATUS),
+                'node_id': 'node_1',
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
             })], 'Changes.')
 
     def save_new_story(
@@ -3769,13 +3943,15 @@ version: 1
         Returns:
             Topic. A newly-created topic.
         """
+        canonical_story_ids = canonical_story_ids or []
+        additional_story_ids = additional_story_ids or []
         canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in (canonical_story_ids or [])
+            for story_id in canonical_story_ids
         ]
         additional_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in (additional_story_ids or [])
+            for story_id in additional_story_ids
         ]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
@@ -3894,9 +4070,11 @@ version: 1
         the latter approach would result in an question with the *current* state
         data schema version.
         """
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + skill_id)
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            skill_id
+        )
         change: Dict[
             str,
             Union[str, float, Dict[str, Union[Optional[Collection[str]], int]]]
@@ -4049,7 +4227,81 @@ version: 1
         assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
+        state.inapplicable_skill_misconception_ids = []
         return state
+
+    def save_new_valid_classroom(
+        self,
+        classroom_id: str = 'math_classroom_id',
+        name: str = 'math',
+        url_fragment: str = 'math',
+        course_details: str = 'Course Details',
+        teaser_text: str = 'Teaser Text',
+        topic_list_intro: str = 'Topic list intro',
+        topic_id_to_prerequisite_topic_ids: Optional[
+            Dict[str, List[str]]] = None,
+        is_published: bool = True,
+        thumbnail_data: Optional[
+            classroom_config_domain.ImageData
+        ] = None,
+        banner_data: Optional[
+            classroom_config_domain.ImageData
+        ] = None
+    ) -> classroom_config_domain.Classroom:
+        """Saves a new strictly-validated classroom.
+
+        Args:
+            classroom_id: str. Classroom ID of the newly-created classroom.
+            name: str. The name of the classroom.
+            url_fragment: str. The url fragment of the classroom.
+            course_details: str. A text to provide course details present in
+                the classroom.
+            teaser_text: str. A text to provide a summary of the classroom.
+            topic_list_intro: str. A text to provide an introduction for all
+                the topics in the classroom.
+            topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
+                with topic ID as key and list of topic IDs as value.
+            is_published: bool. Whether this classroom is published or not.
+            thumbnail_data: Optional[ImageData]. Image data object for
+                thumbnail.
+            banner_data: Optional[ImageData]. Image data object for banner.
+
+        Returns:
+            Classroom. The classroom domain object.
+        """
+        dummy_thumbnail_data = classroom_config_domain.ImageData(
+            'thumbnail.svg', 'transparent', 1000
+        )
+        dummy_banner_data = classroom_config_domain.ImageData(
+            'banner.png', 'transparent', 1000
+        )
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_id,
+            name=name,
+            url_fragment=url_fragment,
+            teaser_text=teaser_text,
+            course_details=course_details,
+            topic_list_intro=topic_list_intro,
+            topic_id_to_prerequisite_topic_ids=(
+                topic_id_to_prerequisite_topic_ids
+                if topic_id_to_prerequisite_topic_ids is not None
+                else {}
+            ),
+            is_published=is_published,
+            thumbnail_data=(
+                thumbnail_data
+                if thumbnail_data is not None
+                else dummy_thumbnail_data
+            ),
+            banner_data=(
+                banner_data
+                if banner_data is not None
+                else dummy_banner_data
+            )
+        )
+
+        classroom_config_services.create_new_classroom(classroom)
+        return classroom
 
 
 class LinterTestBase(GenericTestBase):

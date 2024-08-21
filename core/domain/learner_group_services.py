@@ -55,8 +55,8 @@ def is_learner_group_feature_enabled(user_id: Optional[str]) -> bool:
         bool. Whether the learner group feature is enabled.
     """
     return bool(feature_flag_services.is_feature_flag_enabled(
-        user_id,
-        feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value))
+        feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value,
+        user_id))
 
 
 def create_learner_group(

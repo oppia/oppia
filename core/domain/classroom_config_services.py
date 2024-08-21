@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.platform import models
@@ -79,13 +80,25 @@ def get_classroom_from_classroom_model(
         Classroom. A classroom domain object corresponding to the given
         classroom model.
     """
+    thumbnail_data = classroom_config_domain.ImageData(
+        classroom_model.thumbnail_filename,
+        classroom_model.thumbnail_bg_color,
+        classroom_model.thumbnail_size_in_bytes
+    )
+    banner_data = classroom_config_domain.ImageData(
+        classroom_model.banner_filename,
+        classroom_model.banner_bg_color,
+        classroom_model.banner_size_in_bytes
+    )
     return classroom_config_domain.Classroom(
         classroom_model.id,
         classroom_model.name,
         classroom_model.url_fragment,
         classroom_model.course_details,
+        classroom_model.teaser_text,
         classroom_model.topic_list_intro,
-        classroom_model.topic_id_to_prerequisite_topic_ids
+        classroom_model.topic_id_to_prerequisite_topic_ids,
+        classroom_model.is_published, thumbnail_data, banner_data
     )
 
 
@@ -165,6 +178,22 @@ def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
 
 
+def get_classroom_name_for_topic_id(topic_id: str) -> str:
+    """Returns the classroom name for the provided topic id.
+
+    Args:
+        topic_id: str. The topic id.
+
+    Returns:
+        str. Returns the classroom name for a topic.
+    """
+    classrooms = get_all_classrooms()
+    for classroom in classrooms:
+        if topic_id in classroom.get_topic_ids():
+            return classroom.name
+    return str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+
+
 def get_new_classroom_id() -> str:
     """Returns a new classroom ID.
 
@@ -176,22 +205,44 @@ def get_new_classroom_id() -> str:
 
 def update_classroom(
     classroom: classroom_config_domain.Classroom,
-    classroom_model: classroom_models.ClassroomModel
+    strict: bool = False
 ) -> None:
     """Saves a Clasroom domain object to the datastore.
 
     Args:
         classroom: Classroom. The classroom domain object for the given
             classroom.
-        classroom_model: ClassroomModel. The classroom model instance.
+        strict: bool. Whether to perform strict checking.
     """
-    classroom.validate()
+    classroom.validate(strict)
+    classroom_model = classroom_models.ClassroomModel.get(
+        classroom.classroom_id, strict=False)
+
+    if not classroom_model:
+        return
+
     classroom_model.name = classroom.name
     classroom_model.url_fragment = classroom.url_fragment
     classroom_model.course_details = classroom.course_details
     classroom_model.topic_list_intro = classroom.topic_list_intro
     classroom_model.topic_id_to_prerequisite_topic_ids = (
         classroom.topic_id_to_prerequisite_topic_ids)
+    classroom_model.teaser_text = classroom.teaser_text
+    classroom_model.is_published = classroom.is_published
+    classroom_model.thumbnail_filename = (
+        classroom.thumbnail_data.filename
+    )
+    classroom_model.thumbnail_bg_color = (
+        classroom.thumbnail_data.bg_color
+    )
+    classroom_model.thumbnail_size_in_bytes = (
+        classroom.thumbnail_data.size_in_bytes
+    )
+    classroom_model.banner_filename = classroom.banner_data.filename
+    classroom_model.banner_bg_color = classroom.banner_data.bg_color
+    classroom_model.banner_size_in_bytes = (
+        classroom.banner_data.size_in_bytes
+    )
 
     classroom_model.update_timestamps()
     classroom_model.put()
@@ -212,24 +263,62 @@ def create_new_classroom(
         classroom.name,
         classroom.url_fragment,
         classroom.course_details,
+        classroom.teaser_text,
         classroom.topic_list_intro,
-        classroom.topic_id_to_prerequisite_topic_ids
+        classroom.topic_id_to_prerequisite_topic_ids,
+        classroom.is_published,
+        classroom.thumbnail_data.filename,
+        classroom.thumbnail_data.bg_color,
+        classroom.thumbnail_data.size_in_bytes,
+        classroom.banner_data.filename,
+        classroom.banner_data.bg_color,
+        classroom.banner_data.size_in_bytes,
     )
 
 
-def update_or_create_classroom_model(
-    classroom: classroom_config_domain.Classroom
-) -> None:
-    """Updates the properties of an existing classroom model or creates a new
-    classroom model.
-    """
-    model = classroom_models.ClassroomModel.get(
-        classroom.classroom_id, strict=False)
+def create_new_default_classroom(
+        classroom_id: str, name: str, url_fragment: str
+    ) -> classroom_config_domain.Classroom:
+    """Creates a new default classroom model.
 
-    if model is None:
-        create_new_classroom(classroom)
-    else:
-        update_classroom(classroom, model)
+    Args:
+        classroom_id: str. The id of new classroom.
+        name: str. The name of the classroom.
+        url_fragment: str. The url fragment of the classroom.
+
+    Returns:
+        Classroom. The domain object representing a classroom.
+    """
+    classroom = classroom_config_domain.Classroom(
+        classroom_id=classroom_id, name=name, url_fragment=url_fragment,
+        teaser_text='', course_details='', topic_list_intro='',
+        topic_id_to_prerequisite_topic_ids={},
+        is_published=feconf.DEFAULT_CLASSROOM_PUBLICATION_STATUS,
+        thumbnail_data=classroom_config_domain.ImageData('', '', 0),
+        banner_data=classroom_config_domain.ImageData('', '', 0)
+    )
+
+    classroom.require_valid_name(name)
+    classroom.require_valid_url_fragment(url_fragment)
+
+    classroom_models.ClassroomModel.create(
+        classroom.classroom_id,
+        classroom.name,
+        classroom.url_fragment,
+        classroom.course_details,
+        classroom.teaser_text,
+        classroom.topic_list_intro,
+        classroom.topic_id_to_prerequisite_topic_ids,
+        classroom.is_published,
+        classroom.thumbnail_data.filename,
+        classroom.thumbnail_data.bg_color,
+        classroom.thumbnail_data.size_in_bytes,
+        classroom.banner_data.filename,
+        classroom.banner_data.bg_color,
+        classroom.banner_data.size_in_bytes,
+    )
+
+    return classroom
 
 
 def delete_classroom(classroom_id: str) -> None:

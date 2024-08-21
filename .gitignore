@@ -22,6 +22,7 @@ core/templates/prod/*
 webpack_bundles/*
 core/tests/.browserstack.env
 core/tests/puppeteer-acceptance-tests/build
+core/tests/test-dependencies/*.js
 node_modules/*
 # .angular is temp folder used by angular to put logs and other artefacts.
 .angular/*

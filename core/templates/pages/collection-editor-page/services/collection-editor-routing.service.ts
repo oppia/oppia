@@ -17,7 +17,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
@@ -78,10 +77,3 @@ export class CollectionEditorRoutingService {
     return this._updateViewEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CollectionEditorRoutingService',
-    downgradeInjectable(CollectionEditorRoutingService)
-  );

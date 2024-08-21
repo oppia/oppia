@@ -24,6 +24,7 @@ import os
 import re
 import zipfile
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -34,6 +35,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_services
+from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rating_services
@@ -68,7 +70,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import recommendations_models
     from mypy_imports import stats_models
     from mypy_imports import suggestion_models
+    from mypy_imports import translation_models
     from mypy_imports import user_models
+    from mypy_imports import voiceover_models
 
 (
     feedback_models,
@@ -78,7 +82,8 @@ if MYPY:  # pragma: no cover
     translation_models,
     stats_models,
     suggestion_models,
-    user_models
+    user_models,
+    voiceover_models,
 ) = models.Registry.import_models([
     models.Names.FEEDBACK,
     models.Names.EXPLORATION,
@@ -87,7 +92,8 @@ if MYPY:  # pragma: no cover
     models.Names.TRANSLATION,
     models.Names.STATISTICS,
     models.Names.SUGGESTION,
-    models.Names.USER
+    models.Names.USER,
+    models.Names.VOICEOVER
 ])
 
 search_services = models.Registry.import_search_services()
@@ -1142,7 +1148,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         state_with_training_data = exploration.states['Home']
         self.assertIsNotNone(
             state_with_training_data)
-        self.assertEqual(len(state_with_training_data.to_dict()), 8)
+        self.assertEqual(len(state_with_training_data.to_dict()), 9)
 
     def test_save_and_retrieve_exploration(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
@@ -1315,6 +1321,36 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         })]
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+    @test_utils.enable_feature_flags(
+            [feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT])
+    def test_changes_in_voiceover_list_with_feature_flag_enabled(self) -> None:
+        not_voiceover_change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        })]
+        self.assertFalse(
+            exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        change_list_voiceover = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_UPDATE_VOICEOVERS,
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            })
+        ]
+        self.assertTrue(
+            exp_services.is_voiceover_change_list(change_list_voiceover))
 
     def test_validation_for_valid_exploration(self) -> None:
         exploration = self.save_new_valid_exploration(
@@ -2123,7 +2159,7 @@ title: Title
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
-        category: Category    
+        category: Category
         edits_allowed: true
         init_state_name: Introduction
         language_code: en
@@ -2514,6 +2550,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2553,6 +2590,7 @@ states:
     content:
       content_id: content_3
       html: %s
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2618,6 +2656,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2657,6 +2696,7 @@ states:
     content:
       content_id: content_3
       html: %s
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3063,6 +3103,7 @@ classifier_model_id: null
 content:
   content_id: content_0
   html: ''
+inapplicable_skill_misconception_ids: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -3106,6 +3147,7 @@ classifier_model_id: null
 content:
   content_id: content_3
   html: ''
+inapplicable_skill_misconception_ids: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -3150,6 +3192,7 @@ classifier_model_id: null
 content:
   content_id: content_3
   html: ''
+inapplicable_skill_misconception_ids: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -4460,6 +4503,81 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             '<p><strong>Test content</strong></p>')
         self.assertEqual(
             exploration.states['State1'].linked_skill_id, 'string_2')
+
+    def test_update_inapplicable_skill_misconception_ids(
+        self
+    ) -> None:
+        """Test updating inapplicable_skill_misconception_ids."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.assertEqual(
+            exploration.init_state.inapplicable_skill_misconception_ids, [])
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State1',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            })], 'Add state name')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            []
+        )
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                'State1',
+                exp_domain.STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+                ['string_1']),
+            '')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            ['string_1']
+        )
+
+        # Check that the property can be changed when working
+        # on old version.
+        # Adding a content change just to upgrade the version.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.init_state_name, 'content', {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content_0',
+                }),
+            '')
+
+        change_list = _get_change_list(
+            'State1',
+            exp_domain.STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+            ['string_2'])
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list)
+        self.assertTrue(changes_are_mergeable)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, '')
+        # Assert that exploration's final version consist of all the
+        # changes.
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.content.html,
+            '<p><strong>Test content</strong></p>')
+        self.assertEqual(
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            ['string_2']
+        )
 
     def test_update_card_is_checkpoint(self) -> None:
         """Test updating of card_is_checkpoint."""
@@ -6372,14 +6490,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'title': 'Title 1'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': self.EXP_ID_1
             })
@@ -6462,6 +6580,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6484,6 +6603,7 @@ states:
     content:
       content_id: content
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6599,14 +6719,14 @@ title: Old Title
         change_list_story = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'title': 'Title 1'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': exp_id
             })
@@ -7106,6 +7226,46 @@ title: Old Title
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
                 'content_id': 'content_0'
+            })], 'Marked translation need update.')
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version + 1
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertTrue(
+            entity_translations[0].translations['content_0'].needs_update)
+
+    def test_update_exploration_with_mark_translation_needs_update_for_language(
+        self
+    ) -> None:
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+            exploration.version, 'hi', 'content_0',
+            translation_domain.TranslatedContent(
+                'Translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertFalse(
+            entity_translations[0].translations['content_0'].needs_update)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': (
+                    exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE),
+                'content_id': 'content_0',
+                'language_code': 'hi'
             })], 'Marked translation need update.')
         entity_translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
@@ -7622,6 +7782,428 @@ title: Old Title
             exp_services.revert_exploration('user_id', 'exp_id', 1, 0)
 
 
+class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
+    """Test exploration translation count."""
+
+    def test_translation_count_upon_adding_new_interaction(self) -> None:
+        self.save_new_valid_exploration(
+            exploration_id=self.EXP_0_ID,
+            owner_id=self.owner_id,
+            end_state_name='End',
+            interaction_id='Continue',
+            content_html='A content')
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.EXP_0_ID,
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=3,
+            incomplete_translation_language_codes=[
+                language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)],
+            language_codes_with_assigned_voice_artists=['en']
+        ).put()
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'content_0',
+            translation_domain.TranslatedContent(
+                'Translation 1',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'ca_buttonText_2',
+            translation_domain.TranslatedContent(
+                'Translation 2',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'content_3',
+            translation_domain.TranslatedContent(
+                'Translation 3',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        translation_counts = translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.EXPLORATION, exploration)
+
+        self.assertEqual(len(entity_translation_models), 1)
+        self.assertEqual(len(
+            entity_translation_models[0].translations), 3)
+        self.assertEqual(translation_counts['hi'], 3)
+
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput',
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            {
+                                'content_id': 'ca_choices_5',
+                                'html': '<p>1</p>'
+                            },
+                            {
+                                'content_id': 'ca_choices_6',
+                                'html': '<p>2</p>'
+                            },
+                            {
+                                'content_id': 'ca_choices_7',
+                                'html': '<p>3</p>'
+                            },
+                            {
+                                'content_id': 'ca_choices_8',
+                                'html': '<p>4</p>'
+                            }
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': False
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'outcome': { 
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'html': '<p>correct</p>',
+                            'content_id': 'feedback_9'},
+                        'labelled_as_correct': True
+                    },
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 0
+                        }
+                    }],
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }],
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'new_value': 10,
+                'old_value': 9,
+                'property_name': 'next_content_id_index'
+            })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Update 1')
+
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        exp_opportunity_summary: Optional[
+            opportunity_domain.ExplorationOpportunitySummary] = (
+                opportunity_services.get_exploration_opportunity_summary_by_id(
+                    self.EXP_0_ID))
+        if exp_opportunity_summary is not None:
+            translation_counts = exp_opportunity_summary.translation_counts
+
+        self.assertEqual(len(entity_translation_models), 2)
+        self.assertEqual(len(
+            entity_translation_models[1].translations), 2)
+        self.assertEqual(translation_counts['hi'], 2)
+
+    def test_translation_count_upon_revert(self) -> None:
+        self.save_new_valid_exploration(
+            exploration_id=self.EXP_0_ID,
+            owner_id=self.owner_id,
+            end_state_name='End',
+            interaction_id='Continue',
+            content_html='A content')
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        revert_to_version = exploration.version
+
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.EXP_0_ID,
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=3,
+            incomplete_translation_language_codes=[
+                language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)],
+            language_codes_with_assigned_voice_artists=['en']
+        ).put()
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'content_0',
+            translation_domain.TranslatedContent(
+                'Translation 1',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'ca_buttonText_2',
+            translation_domain.TranslatedContent(
+                'Translation 2',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'content_3',
+            translation_domain.TranslatedContent(
+                'Translation 3',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        translation_counts = translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.EXPLORATION, exploration)
+
+        self.assertEqual(len(entity_translation_models), 1)
+        self.assertEqual(len(
+            entity_translation_models[0].translations), 3)
+        self.assertEqual(translation_counts['hi'], 3)
+
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput',
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            {
+                                'content_id': 'ca_choices_5',
+                                'html': '<p>1</p>'
+                            },
+                            {
+                                'content_id': 'ca_choices_6',
+                                'html': '<p>2</p>'
+                            },
+                            {
+                                'content_id': 'ca_choices_7',
+                                'html': '<p>3</p>'
+                            },
+                            {
+                                'content_id': 'ca_choices_8',
+                                'html': '<p>4</p>'
+                            }
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': False
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'outcome': { 
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'html': '<p>correct</p>',
+                            'content_id': 'feedback_9'},
+                        'labelled_as_correct': True
+                    },
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 0
+                        }
+                    }],
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }],
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_10',
+                            'html': '<p>Hint 1</p>'
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_11',
+                            'html': '<p>Hint 2</p>'
+                        }
+                    }
+                ]
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'new_value': 12,
+                'old_value': 11,
+                'property_name': 'next_content_id_index'
+            })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Update 1')
+
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        exp_opportunity_summary: Optional[
+            opportunity_domain.ExplorationOpportunitySummary] = (
+                opportunity_services.get_exploration_opportunity_summary_by_id(
+                    self.EXP_0_ID))
+        if exp_opportunity_summary is not None:
+            translation_counts = exp_opportunity_summary.translation_counts
+
+        self.assertEqual(len(entity_translation_models), 2)
+        self.assertEqual(len(
+            entity_translation_models[1].translations), 2)
+        self.assertEqual(translation_counts['hi'], 2)
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        current_version = exploration.version
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'ca_choices_5',
+            translation_domain.TranslatedContent(
+                'Translation 4',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'ca_choices_6',
+            translation_domain.TranslatedContent(
+                'Translation 5',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'ca_choices_7',
+            translation_domain.TranslatedContent(
+                'Translation 6',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'ca_choices_8',
+            translation_domain.TranslatedContent(
+                'Translation 7',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'feedback_9',
+            translation_domain.TranslatedContent(
+                'Translation 8',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID,
+            exploration.version, 'hi', 'hint_10',
+            translation_domain.TranslatedContent(
+                'Translation 9',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        translation_counts = translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.EXPLORATION, exploration)
+
+        self.assertEqual(len(entity_translation_models), 2)
+        self.assertEqual(len(
+            entity_translation_models[1].translations), 8)
+        self.assertEqual(translation_counts['hi'], 8)
+
+        exp_services.revert_exploration(
+            self.owner_id, self.EXP_0_ID, current_version, revert_to_version)
+
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        exp_opportunity_summary = (
+                opportunity_services.get_exploration_opportunity_summary_by_id(
+                    self.EXP_0_ID))
+        if exp_opportunity_summary is not None:
+            translation_counts = exp_opportunity_summary.translation_counts
+
+        self.assertEqual(len(entity_translation_models), 3)
+        self.assertEqual(len(
+            entity_translation_models[2].translations), 3)
+        self.assertEqual(translation_counts['hi'], 3)
+
+
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     """Test editor auto saving functions in exp_services."""
 
@@ -7976,7 +8558,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 54,
+            'from_version': 55,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
@@ -9833,4 +10415,80 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                     'state_name=\'END\')',
                 ], 8, 5
             )
+        )
+
+
+class ComputeVoiceoversModelFromExplorationChangeTest(
+    ExplorationServicesUnitTests
+):
+    """Tests entity voiceovers model creation from exploration change dict."""
+
+    def test_should_be_able_to_create_entity_voiceovers_models(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'test_exp_id', title='some title', category='Algebra',
+            language_code=constants.DEFAULT_LANGUAGE_CODE
+        )
+        exploration.objective = 'An objective'
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'NumericInput',
+            content_id_generator
+        )
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        manual_voiceover_2: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+
+        voiceover_changes = [
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'default_outcome_1',
+                'voiceovers': {
+                    'manual': manual_voiceover_2
+                }
+            })
+        ]
+
+        models_to_put = (
+            exp_services.compute_models_to_put_when_saving_new_exp_version(
+                self.owner_id, 'test_exp_id', voiceover_changes,
+                'Added voiceover', False
+            )
+        )
+        entity_voiceovers_models = []
+        for model_instance in models_to_put:
+            if isinstance(
+                    model_instance, voiceover_models.EntityVoiceoversModel
+            ):
+                entity_voiceovers_models.append(model_instance)
+
+        self.assertEqual(len(entity_voiceovers_models), 1)
+        self.assertDictEqual(
+            entity_voiceovers_models[0].voiceovers_mapping[
+                'content_0']['manual'], manual_voiceover_1
+        )
+        self.assertDictEqual(
+            entity_voiceovers_models[0].voiceovers_mapping[
+                'default_outcome_1']['manual'], manual_voiceover_2
         )

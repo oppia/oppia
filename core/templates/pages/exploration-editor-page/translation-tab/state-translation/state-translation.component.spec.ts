@@ -62,6 +62,8 @@ import {RouterService} from 'pages/exploration-editor-page/services/router.servi
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
@@ -69,6 +71,19 @@ class MockNgbModal {
   open() {
     return {
       result: Promise.resolve(),
+    };
+  }
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: true,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -118,6 +133,7 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let platformFeatureService: PlatformFeatureService;
 
   let explorationState1 = {
     Introduction: {
@@ -311,6 +327,10 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -338,6 +358,7 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService.init(explorationState1, false);
     stateRecordedVoiceoversService.init(
       'Introduction',
@@ -400,6 +421,48 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('content_1', 'html');
+      });
+
+      it('should get disabled voiceover contribution feature flag data', () => {
+        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+          EnableVoiceoverContribution: {
+            isEnabled: false,
+          },
+        } as FeatureStatusChecker);
+
+        expect(component.isVoiceoverContributionEnabled()).toBeFalse();
+      });
+
+      it('should get enabled voiceover contribution feature flag data', () => {
+        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+          EnableVoiceoverContribution: {
+            isEnabled: true,
+          },
+        } as FeatureStatusChecker);
+
+        expect(component.isVoiceoverContributionEnabled()).toBeTrue();
+      });
+
+      it('should disable voiceover with accent feature flag data', () => {
+        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+          AddVoiceoverWithAccent: {
+            isEnabled: false,
+          },
+        } as FeatureStatusChecker);
+
+        expect(
+          component.isVoiceoverContributionWithAccentEnabled()
+        ).toBeFalse();
+      });
+
+      it('should enable voiceover with accent feature flag data', () => {
+        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+          AddVoiceoverWithAccent: {
+            isEnabled: true,
+          },
+        } as FeatureStatusChecker);
+
+        expect(component.isVoiceoverContributionWithAccentEnabled()).toBeTrue();
       });
 
       it(
@@ -974,6 +1037,10 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -1493,6 +1560,10 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -1588,7 +1659,7 @@ describe('State translation component', () => {
 
   it('should update correct translation with updateTranslatedContent', () => {
     component.activeTranslatedContent = new TranslatedContent();
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
@@ -1675,7 +1746,7 @@ describe('State translation component', () => {
   });
 
   it('should return translation html when translation available', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
@@ -1688,7 +1759,7 @@ describe('State translation component', () => {
   });
 
   it('should return unicode when translation is empty in voiceover mode', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
       });
@@ -1701,7 +1772,7 @@ describe('State translation component', () => {
   });
 
   it('should return translation html when translation no available', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated HTML', 'html', true),
       });
@@ -1714,7 +1785,7 @@ describe('State translation component', () => {
   });
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
@@ -2174,6 +2245,10 @@ describe('State translation component', () => {
         {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

@@ -396,12 +396,73 @@ describe('Settings Tab Component', () => {
     })
   );
 
+  it(
+    'should not add same exploration editor tags' +
+      'when user enter same tag, but with varying uppercase and lowercase',
+    fakeAsync(() => {
+      spyOn(component, 'saveExplorationTags').and.stub();
+      explorationTagsService.displayed = [];
+
+      component.add({
+        value: 'name',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['name']);
+
+      // When user try to enter same tag again.
+      component.add({
+        value: 'NAME',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['name']);
+    })
+  );
+
+  it(
+    'should not add exploration editor tags' +
+      'when user enter number or special character',
+    fakeAsync(() => {
+      spyOn(component, 'saveExplorationTags').and.stub();
+      explorationTagsService.displayed = [];
+
+      // When user try to enter special character.
+      component.add({
+        value: '!@#$%^&*()',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual([]);
+
+      // When user try to enter numbers.
+      component.add({
+        value: '1234567890',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual([]);
+    })
+  );
+
   it('should be able to add multiple exploration editor tags', fakeAsync(() => {
     spyOn(component, 'saveExplorationTags').and.stub();
     explorationTagsService.displayed = [];
 
     component.add({
-      value: 'tag-one',
+      value: 'tagone',
       input: {
         value: '',
       },
@@ -409,7 +470,7 @@ describe('Settings Tab Component', () => {
     tick();
 
     component.add({
-      value: 'tag-two',
+      value: 'tagtwo',
       input: {
         value: '',
       },
@@ -417,7 +478,7 @@ describe('Settings Tab Component', () => {
     tick();
 
     component.add({
-      value: 'tag-three',
+      value: 'tagthree',
       input: {
         value: '',
       },
@@ -425,9 +486,9 @@ describe('Settings Tab Component', () => {
     tick();
 
     expect(explorationTagsService.displayed).toEqual([
-      'tag-one',
-      'tag-two',
-      'tag-three',
+      'tagone',
+      'tagtwo',
+      'tagthree',
     ]);
   }));
 
@@ -601,6 +662,9 @@ describe('Settings Tab Component', () => {
         result: Promise.resolve(),
       } as NgbModalRef;
     });
+    spyOn(explorationRightsService, 'removeRoleAsync').and.returnValue(
+      Promise.resolve()
+    );
 
     component.removeRole('username', 'editor');
     tick();

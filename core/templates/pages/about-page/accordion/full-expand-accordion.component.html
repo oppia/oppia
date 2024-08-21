@@ -1,0 +1,40 @@
+
+<div [(ngbCollapse)]="listIsCollapsed"
+     [animation]="false"
+     class="collapse-container"
+     [ngClass]="listContainerCustomClasses">
+
+  <button *ngFor="let panel of accordionData; let i=index"
+          (click)="expandPanel(i)"
+          class="title-container"
+          [ngClass]="panel.customTitleClassNames">
+
+    <p> {{ panel.title | translate }} </p>
+    <i class="fas fa-plus accordion-icon"></i>
+  </button>
+
+</div>
+
+<div [(ngbCollapse)]="panelIsCollapsed"
+     [animation]="false"
+     class="collapse-container"
+     [ngClass]="accordionData[activeIndex].customPanelClassNames">
+
+  <div class="title-container">
+    <p class="panel-title">
+      {{ accordionData[activeIndex].title | translate }}
+    </p>
+    <button (click)="closePanel()">
+      <i class="fas fa-minus accordion-icon"></i>
+    </button>
+  </div>
+  <p class="panel-content"> {{ accordionData[activeIndex].text | translate }} </p>
+  <div class="panel-image-container" *ngIf="accordionData[activeIndex].image">
+    <picture>
+      <source type="image/webp" [srcset]="getStaticImageUrl(accordionData[activeIndex].image +  '.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl(accordionData[activeIndex].image + '.png')">
+      <img [src]="getStaticImageUrl(accordionData[activeIndex].image + '.png')"
+           [alt]="accordionData[activeIndex].altText">
+    </picture>
+  </div>
+</div>

@@ -67,13 +67,12 @@
           <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
         </span>
       </button>
-
       <button [matMenuTriggerFor]="discardButton" type="button" class="btn btn-light oppia-discard-button e2e-test-save-discard-toggle dropdown-toggle"
-              [disabled]="!connectedToInternet || !getChangeListLength()" aria-label="Discard Draft">
+              [disabled]="!connectedToInternet || !getChangeListLength() || autosaveIsInProgress" aria-label="Discard Draft">
       </button>
 
       <mat-menu #discardButton="matMenu" [ngStyle]="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-        <button mat-menu-item title="Discard all pending changes"><a (click)="discardChanges()" [ngClass]="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength()}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></button>
+        <button mat-menu-item title="Discard all pending changes"><a (click)="discardChanges()" [ngClass]="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength() || autosaveIsInProgress}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></button>
       </mat-menu>
     </div>
   </li>

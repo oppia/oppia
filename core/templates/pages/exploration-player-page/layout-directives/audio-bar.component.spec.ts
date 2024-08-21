@@ -41,6 +41,24 @@ import {AudioTranslationManagerService} from '../services/audio-translation-mana
 import {PlayerPositionService} from '../services/player-position.service';
 import {ContextService} from 'services/context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
+import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: false,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
 
 describe('Audio Bar Component', () => {
   let component: AudioBarComponent;
@@ -56,12 +74,19 @@ describe('Audio Bar Component', () => {
   let playerPositionService: PlayerPositionService;
   let contextService: ContextService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let voiceoverPlayerService: VoiceoverPlayerService;
+  let entityVoiceoversService: EntityVoiceoversService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [AudioBarComponent, MockTranslatePipe],
-      providers: [],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -85,8 +110,17 @@ describe('Audio Bar Component', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     contextService = TestBed.inject(ContextService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-
+    voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     fixture.detectChanges();
+
+    spyOn(voiceoverPlayerService, 'onActiveVoiceoverChanged').and.returnValue(
+      new EventEmitter<void>()
+    );
+    spyOn(
+      voiceoverPlayerService,
+      'onTranslationLanguageChanged'
+    ).and.returnValue(new EventEmitter<void>());
   });
   beforeEach(() => {
     spyOn(audioBarStatusService, 'markAudioBarExpanded').and.callThrough();
@@ -122,6 +156,9 @@ describe('Audio Bar Component', () => {
       fixture.detectChanges();
 
       mockOnAutoplayAudioEventEmitter.emit(params);
+      voiceoverPlayerService.onActiveVoiceoverChanged.emit();
+      voiceoverPlayerService.onTranslationLanguageChanged.emit();
+
       flush();
       discardPeriodicTasks();
       fixture.detectChanges();
@@ -148,6 +185,15 @@ describe('Audio Bar Component', () => {
     component.setProgress(param);
 
     expect(currentTimeSpy).toHaveBeenCalledWith(100);
+  });
+
+  it('should set current voiceover time after the view has changed', () => {
+    spyOn(audioPlayerService, 'getCurrentTime').and.returnValue(5);
+
+    component.currentVoiceoverTime = 0;
+    component.ngAfterContentChecked();
+
+    expect(component.currentVoiceoverTime).toEqual(5);
   });
 
   it(
@@ -182,6 +228,21 @@ describe('Audio Bar Component', () => {
     expect(result).toBe(true);
 
     component.languagesInExploration = [];
+    result = component.isAudioBarAvailable();
+    expect(result).toBe(false);
+  });
+
+  it('should check if the audio bar is available with enabled accent', () => {
+    component.languageAccentDecriptions = ['English (India)', 'English (US)'];
+    spyOn(
+      component,
+      'isVoiceoverContributionWithAccentEnabled'
+    ).and.returnValue(true);
+
+    let result = component.isAudioBarAvailable();
+    expect(result).toBe(true);
+
+    component.languageAccentDecriptions = [];
     result = component.isAudioBarAvailable();
     expect(result).toBe(false);
   });
@@ -338,6 +399,28 @@ describe('Audio Bar Component', () => {
     ).and.returnValue('en');
 
     let result = component.isAudioAvailableInCurrentLanguage();
+    expect(result).toBe(true);
+  });
+
+  it('should check if the audio is available in selected language with accent feature flag enabled', () => {
+    component.voiceoverToBePlayed = undefined;
+
+    spyOn(
+      component,
+      'isVoiceoverContributionWithAccentEnabled'
+    ).and.returnValue(true);
+
+    let result = component.isAudioAvailableInCurrentLanguage();
+    expect(result).toBe(false);
+
+    component.voiceoverToBePlayed = Voiceover.createFromBackendDict({
+      filename: 'audio-en.mp3',
+      file_size_bytes: 0.5,
+      needs_update: true,
+      duration_secs: 0.5,
+    });
+
+    result = component.isAudioAvailableInCurrentLanguage();
     expect(result).toBe(true);
   });
 
@@ -569,6 +652,109 @@ describe('Audio Bar Component', () => {
       }
     );
 
+    it('should load audio track and play audio when play button is clicked', () => {
+      let audioTranslation = {
+        en: Voiceover.createFromBackendDict({
+          filename: 'audio-en.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false,
+          duration_secs: 0.5,
+        }),
+        es: Voiceover.createFromBackendDict({
+          filename: 'audio-es.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false,
+          duration_secs: 0.5,
+        }),
+      };
+      spyOn(
+        component,
+        'isVoiceoverContributionWithAccentEnabled'
+      ).and.returnValue(true);
+
+      component.voiceoverToBePlayed = Voiceover.createFromBackendDict({
+        filename: 'audio-en.mp3',
+        file_size_bytes: 0.5,
+        needs_update: true,
+        duration_secs: 0.5,
+      });
+
+      spyOn(
+        audioTranslationManagerService,
+        'getCurrentAudioTranslations'
+      ).and.returnValue(audioTranslation);
+      // Setting selected language to be 'en'.
+      spyOn(
+        audioTranslationLanguageService,
+        'getCurrentAudioLanguageCode'
+      ).and.returnValue('en');
+      // Setting auto generated langugae to be false.
+      spyOn(
+        audioTranslationLanguageService,
+        'isAutogeneratedLanguageCodeSelected'
+      ).and.returnValue(false);
+      // Setting audio is playing to be true.
+      spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
+      // Settings audio tracks loaded to be false.
+      spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
+      let loadAndPlaySpy = spyOn(
+        component,
+        'loadAndPlayAudioTranslation'
+      ).and.returnValue();
+      spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+        'Start'
+      );
+      spyOn(audioPreloaderService, 'restartAudioPreloader').and.returnValue();
+
+      component.onPlayButtonClicked();
+      expect(loadAndPlaySpy).toHaveBeenCalled();
+    });
+
+    it('should be able update diplayable language accent code', () => {
+      let manualVoiceoverBackendDict: VoiceoverBackendDict = {
+        filename: 'a.mp3',
+        file_size_bytes: 200000,
+        needs_update: false,
+        duration_secs: 10.0,
+      };
+      let contentIdToVoiceoversMappingBackendDict = {
+        content0: {
+          manual: manualVoiceoverBackendDict,
+        },
+      };
+      let entityId = 'exploration_1';
+      let entityType = 'exploration';
+      let entityVersion = 1;
+      let languageAccentCode = 'en-US';
+      let entityVoiceoversBackendDict = {
+        entity_id: entityId,
+        entity_type: entityType,
+        entity_version: entityVersion,
+        language_accent_code: languageAccentCode,
+        voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+      };
+      let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
+        entityVoiceoversBackendDict
+      );
+      let languageAccentDecriptions = ['en-US', 'en-IN'];
+
+      spyOn(
+        voiceoverPlayerService,
+        'getLanguageAccentDescriptions'
+      ).and.returnValue(languageAccentDecriptions);
+      spyOn(
+        entityVoiceoversService,
+        'getActiveEntityVoiceovers'
+      ).and.returnValue(entityVoiceovers);
+      spyOn(playerPositionService, 'getCurrentStateName');
+      voiceoverPlayerService.activeContentId = 'content0';
+
+      component.voiceoverToBePlayed = undefined;
+      component.updateDisplayableLanguageAccentDescription();
+
+      expect(component.voiceoverToBePlayed.filename).toEqual('a.mp3');
+    });
+
     it(
       'should pause uploaded audio translation when ' +
         'pause button is clicked',
@@ -659,6 +845,42 @@ describe('Audio Bar Component', () => {
         expect(playSpy).toHaveBeenCalled();
       })
     );
+
+    it('should load audio track and play audio with accent', fakeAsync(() => {
+      component.voiceoverToBePlayed = Voiceover.createFromBackendDict({
+        filename: 'audio-en.mp3',
+        file_size_bytes: 0.5,
+        needs_update: false,
+        duration_secs: 0.5,
+      });
+      spyOn(component, 'getVoiceoverInCurrentLanguage');
+      spyOn(
+        component,
+        'isVoiceoverContributionWithAccentEnabled'
+      ).and.returnValue(true);
+      spyOn(audioTranslationManagerService, 'getCurrentAudioTranslations');
+      // Setting selected language to be 'en'.
+      spyOn(audioTranslationLanguageService, 'getCurrentAudioLanguageCode');
+      spyOn(
+        audioPreloaderService,
+        'setMostRecentlyRequestedAudioFilename'
+      ).and.callThrough();
+      // Setting cached value to be true.
+      spyOn(assetsBackendApiService, 'isCached').and.returnValue(true);
+      spyOn(audioPlayerService, 'loadAsync').and.returnValue(Promise.resolve());
+      let playCacheAudioSpy = spyOn(
+        component,
+        'playCachedAudioTranslation'
+      ).and.callThrough();
+      let playSpy = spyOn(audioPlayerService, 'play').and.callThrough();
+
+      component.loadAndPlayAudioTranslation();
+      tick();
+      discardPeriodicTasks();
+
+      expect(playCacheAudioSpy).toHaveBeenCalled();
+      expect(playSpy).toHaveBeenCalled();
+    }));
 
     it(
       'should restart audio track if audio is not' + 'stored in cache',

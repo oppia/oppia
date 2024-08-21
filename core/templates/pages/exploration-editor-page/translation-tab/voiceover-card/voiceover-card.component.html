@@ -1,0 +1,102 @@
+<mat-card>
+  <h3>Voiceovers</h3>
+  <div *ngIf="pageIsLoaded">
+    <div *ngIf="unsupportedLanguageCode">
+      <i>Voiceover functionality for this language is not yet supported in Oppia.
+        Please contact a server admin for more details.
+      </i>
+    </div>
+  </div>
+
+  <div *ngIf="pageIsLoaded && voiceoversAreLoaded && !unsupportedLanguageCode">
+    <div class="manual-voiceovers">
+      <div class="voiceovers-component" *ngIf="manualVoiceover">
+        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename)">
+          <mat-icon *ngIf="!audioPlayerService.isPlaying()" matTooltip="Play">play_arrow</mat-icon>
+          <mat-icon *ngIf="audioPlayerService.isPlaying()" matTooltip="Pause">pause_arrow</mat-icon>
+        </button>
+        <mat-progress-bar mode="determinate"
+                          [value]="voiceoverProgress"
+                          class="voiceover-progress">
+        </mat-progress-bar>
+        <span class="voiceover-timer">
+          {{currentVoiceoverDuration | formatTime}} / {{manualVoiceoverDuration | formatTime}}
+        </span>
+        <button (click)="deleteManualVoiceover()"
+                mat-icon-button
+                mat-button>
+          <mat-icon matTooltip="Delete voiceover">close</mat-icon>
+        </button>
+        <button (click)="toggleAudioNeedsUpdate()"
+                mat-icon-button
+                mat-button
+                [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
+          <mat-icon matTooltip="Audio needs update"
+                    *ngIf="manualVoiceover.needsUpdate"
+                    class="warning-icon">
+            warning
+          </mat-icon>
+          <mat-icon matTooltip="Audio is up-to-date"
+                    *ngIf="!manualVoiceover.needsUpdate">
+            check_circle
+          </mat-icon>
+        </button>
+      </div>
+      <div *ngIf="manualVoiceover">
+        <i *ngIf="manualVoiceover.needsUpdate">The current voiceover is stale.</i>
+      </div>
+      <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
+        <button (click)="addManualVoiceover()" class="add-manual-voiceover-button">ADD MANUAL VOICEOVER</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!voiceoversAreLoaded">
+    <p>Loading...</p>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+</mat-card>
+
+<style>
+  .warning-icon {
+    margin-bottom: 4px;
+  }
+  .needs-update-button-icon {
+    background-color: #e9b330;
+    color: #fff;
+  }
+  .does-not-needs-update-button-icon {
+    background-color: #009688;
+    color: #fff;
+  }
+  .language-accent-selector {
+    width: 350px;
+  }
+  .voiceover-timer {
+    margin: 10px;
+  }
+  .audio-button {
+    background-color: #009688;
+    border-radius: 20px;
+    color: #fff;
+    margin: 10px;
+  }
+  .voiceover-progress {
+    margin: 10px;
+    width: 50%;
+  }
+  .voiceovers-component {
+    align-items: center;
+    display: flex;
+    justify-content: space-evenly;
+  }
+  .add-new-manual-voiceovers {
+    text-align: center;
+  }
+  .add-manual-voiceover-button {
+    border-style: dashed;
+    color: #009688;
+    height: 40px;
+    width: 100%;
+  }
+</style>

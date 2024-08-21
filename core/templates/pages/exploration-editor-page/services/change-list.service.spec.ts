@@ -27,6 +27,7 @@ import {AutosaveInfoModalsService} from './autosave-info-modals.service';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
 
 class MockWindowRef {
   _window = {
@@ -259,6 +260,23 @@ describe('Change List Service when changes are mergable', () => {
     expect(saveSpy).toHaveBeenCalled();
   }));
 
+  it('should add change for markTranslationAsNeedingUpdateForLanguage', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.markTranslationAsNeedingUpdateForLanguage(
+      'content_id_1',
+      'fr'
+    );
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
   it('should add change for removeTranslations', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
@@ -320,6 +338,72 @@ describe('Change List Service when changes are mergable', () => {
         'edit_translation',
         'mark_translations_needs_update',
       ])
+    );
+  }));
+
+  it('should add change for edit voiceovers', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    let voiceover: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 100000,
+      needs_update: false,
+      duration_secs: 12.0,
+    };
+    let voiceoverTypeToVoiceovers = {
+      manual: voiceover,
+    };
+
+    changeListService.editVoiceovers(
+      'content_id_1',
+      'en-US',
+      voiceoverTypeToVoiceovers
+    );
+
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.explorationChangeList.length).toEqual(1);
+  }));
+
+  it('should get all voiceover changelist', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    let voiceover: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 100000,
+      needs_update: false,
+      duration_secs: 12.0,
+    };
+    let voiceoverTypeToVoiceovers = {
+      manual: voiceover,
+    };
+
+    changeListService.editVoiceovers(
+      'content_id_1',
+      'en-US',
+      voiceoverTypeToVoiceovers
+    );
+
+    changeListService.addState('state_2', 'content_id_2', 'content_id_default');
+    flush();
+
+    expect(changeListService.explorationChangeList.length).toEqual(2);
+    const voiceoverChangeList = changeListService.getVoiceoverChangeList();
+    expect(voiceoverChangeList.length).toEqual(1);
+    expect(voiceoverChangeList.map(change => change.cmd)).toEqual(
+      jasmine.arrayWithExactContents(['update_voiceovers'])
     );
   }));
 

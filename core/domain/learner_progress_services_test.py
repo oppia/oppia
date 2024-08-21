@@ -21,8 +21,6 @@ from __future__ import annotations
 import datetime
 
 from core.constants import constants
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -1598,18 +1596,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_all_and_untracked_topic_ids(self) -> None:
         # Add topics to config_domain.
-        classroom = classroom_config_domain.Classroom(
-            classroom_id=classroom_config_services.get_new_classroom_id(),
-            name='math',
-            url_fragment='math-one',
-            course_details='',
-            topic_list_intro='',
+        self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={
                 self.TOPIC_ID_0: [],
                 self.TOPIC_ID_1: []
             }
         )
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        self.save_new_valid_classroom(
+            is_published=False,
+            name='History',
+            url_fragment='history',
+            classroom_id='historyid'
+        )
 
         self.login(self.USER_EMAIL)
         partially_learnt_topic_ids = (
@@ -1663,6 +1661,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_and_untracked_topic_ids_for_user(
                 partially_learnt_topic_ids, learnt_topic_ids,
                 topic_ids_to_learn))
+        untracked_topic_summary_dicts = (
+            learner_progress_services
+            .get_displayable_untracked_topic_summary_dicts(
+                self.user_id,
+                topic_fetchers.get_all_topic_summaries()
+            )
+        )
+        self.assertEqual(len(untracked_topic_summary_dicts), 1)
         self.assertEqual(len(all_topics), 2)
         self.assertEqual(len(untracked_topics), 0)
 
@@ -2114,17 +2120,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_all_activity_progress(self) -> None:
         # Add topics to config_domain.
-        classroom = classroom_config_domain.Classroom(
-            classroom_id=classroom_config_services.get_new_classroom_id(),
-            name='math',
-            url_fragment='math-one',
-            course_details='',
-            topic_list_intro='',
+        self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={
                 self.TOPIC_ID_3: []
             }
         )
-        classroom_config_services.update_or_create_classroom_model(classroom)
 
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(

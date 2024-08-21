@@ -32,7 +32,6 @@ var ReleaseCoordinatorPage = function () {
   var saveButtonLocator = '.e2e-test-save-button';
   var valueSelectorLocator = '.e2e-test-value-selector';
   var statusMessage = $('.e2e-test-status-message');
-  var featureFlagRolloutPercentage = '.e2e-test-rollout-percentage';
 
   this.get = async function () {
     await browser.url(RELEASE_COORDINATOR_URL_SUFFIX);
@@ -118,6 +117,24 @@ var ReleaseCoordinatorPage = function () {
     return null;
   };
 
+  // Remove this method after the enable_voiceover_contribution feature flag
+  // is deprecated.
+  this.getVoiceoverContributionFeatureElement = async function () {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if (
+        (await elem.$(featureNameLocator).getText()) ===
+        'enable_voiceover_contribution'
+      ) {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   // TODO(#18881): Remove this method after the cd_admin_dashboard_new_ui
   // feature flag is deprecated.
   this.getCdAdminDashboardNewUiFeatureElement = async function () {
@@ -174,41 +191,6 @@ var ReleaseCoordinatorPage = function () {
 
     await featureFlagElement.$(valueSelectorLocator).selectByVisibleText('No');
     await this.saveChangeOfFeature(featureFlagElement);
-  };
-
-  this.setRolloutPercentageForFeatureFlag = async function (
-    featureFlagElement,
-    rolloutPercentage
-  ) {
-    await waitFor.visibilityOf(
-      featureFlagElement.$(featureFlagRolloutPercentage),
-      'Setting rollout-percentage property takes too long to appear'
-    );
-    await action.setValue(
-      'rolloutPercentage',
-      featureFlagElement
-        .$(featureFlagRolloutPercentage)
-        .$('.e2e-test-editor-int'),
-      rolloutPercentage
-    );
-    await this.saveChangeOfFeature(featureFlagElement);
-  };
-
-  this.expectRolloutPercentageToMatch = async function (
-    featureFlagElement,
-    rolloutPercentage
-  ) {
-    await waitFor.visibilityOf(
-      featureFlagElement.$(featureFlagRolloutPercentage),
-      'Rollout-percentage property takes too long to appear'
-    );
-    var value = await action.getValue(
-      'rolloutPercentage',
-      featureFlagElement
-        .$(featureFlagRolloutPercentage)
-        .$('.e2e-test-editor-int')
-    );
-    expect(value).toBe(rolloutPercentage);
   };
 
   this.saveChangeOfFeature = async function (featureElement) {

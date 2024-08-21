@@ -26,7 +26,7 @@
         </div>
         <oppia-primary-button
             [buttonHref]="formLink"
-            [customClasses]="['partnerships-page-button']"
+            [customClasses]="['partnerships-page-button','e2e-test-partnerships-page-partner-with-us-button-at-the-top']"
             buttonText="{{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}">
         </oppia-primary-button>
       </div>
@@ -84,7 +84,7 @@
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNERING_CONTENT' | translate }}</p>
           <oppia-primary-button
             buttonHref="https://drive.google.com/file/d/1RZ1mWDA2XWXTh1GlWFf5AWWuV2iGBBa2/view?usp=sharing"
-            [customClasses]="['partnerships-page-button']"
+            [customClasses]="['partnerships-page-button','e2e-test-partnerships-page-brochure-button']"
             buttonText="{{ 'I18N_PARTNERSHIPS_PAGE_BROCHURE_BUTTON' | translate }}">
           </oppia-primary-button>
         </div>
@@ -120,12 +120,12 @@
       <div class="partner-container d-block d-md-none">
         <ngb-carousel>
           <ng-template ngbSlide>
-            <mat-card-content>
+            <mat-card-content data-test="mat-card-content">
               <img class="partner-logo" alt="partner logo" [src]="partner1">
               <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1_HEADING' | translate }}</h4>
               <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1' | translate }}</p>
-              <a href=" https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-in-summer-school-0q6r28fzsrwcg" target="_blank" rel="noopener">
-                   {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
+              <a href="https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-in-summer-school-0q6r28fzsrwc" target="_blank" rel="noopener" class="e2e-test-partnerships-page-blog-post-mobile-button">
+                {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
               </a>
             </mat-card-content>
           </ng-template>
@@ -156,7 +156,7 @@
           <img alt="partner logo" [src]="partner1">
           <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1_HEADING' | translate }}</h4>
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1' | translate }}</p>
-          <a href="https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-in-summer-school-0q6r28fzsrwc" target="_blank" rel="noopener">
+          <a href="https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-in-summer-school-0q6r28fzsrwc" target="_blank" rel="noopener" class="e2e-test-partnerships-page-blog-post-desktop-button">
                {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
           </a>
         </mat-card-content>
@@ -179,7 +179,7 @@
       </div>
       <oppia-primary-button
         buttonHref="/blog"
-        [customClasses]="['partnerships-page-button']"
+        [customClasses]="['partnerships-page-button','e2e-test-partnerships-page-partner-stories-button']"
         buttonText="{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BUTTON' | translate }}">
       </oppia-primary-button>
     </div>
@@ -238,7 +238,7 @@
     </div>
     <oppia-primary-button
         [buttonHref]="formLink"
-        [customClasses]="['partnerships-page-button']"
+        [customClasses]="['partnerships-page-button','e2e-test-partnerships-page-partner-with-us-button-at-the-bottom']"
         buttonText="{{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}">
     </oppia-primary-button>
   </div>

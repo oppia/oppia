@@ -315,6 +315,28 @@ describe('Editor Navigation Component', () => {
       expect(component.isEditableOutsideTutorialMode()).toEqual(true);
     });
 
+    it('should update autosaveIsInProgress when autosaveInProgressEventEmitter emits true', () => {
+      spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'subscribe'
+      ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
+        callback(true);
+      });
+      component.ngOnInit();
+      expect(component.autosaveIsInProgress).toBe(true);
+    });
+
+    it('should update autosaveIsInProgress when autosaveInProgressEventEmitter emits false', () => {
+      spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'subscribe'
+      ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
+        callback(false);
+      });
+      component.ngOnInit();
+      expect(component.autosaveIsInProgress).toBe(false);
+    });
+
     it('should call exploration save service to discard changes', () => {
       let explorationSpy = spyOn(explorationSaveService, 'discardChanges');
       component.discardChanges();

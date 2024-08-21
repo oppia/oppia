@@ -1,0 +1,137 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+
+.oppia-bar-chart .charts-css.bar {
+  --labels-size: 220px;
+}
+
+.oppia-bar-chart .charts-css th {
+  padding: 0 30px 0 0;
+  width: 40%;
+}
+
+.oppia-bar-chart .charts-css.bar tbody tr td {
+  border-radius: 2px;
+  min-height: 24px;
+}
+
+.oppia-bar-chart .charts-css.bar tr {
+  padding: 0;
+}
+
+.oppia-bar-chart .charts-css.bar .data {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-right: 24px;
+}
+
+.oppia-bar-chart .charts-css.bar th span {
+  border-radius: 2px;
+  border-style: solid;
+  border-width: 2px;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 21.6px;
+  padding: 0 8px;
+  text-align: end;
+  width: 100%;
+}
+
+.oppia-bar-chart .charts-css.bar .oppia-chart-scale-element {
+  --size: 1.0;
+  --color: transparent;
+}
+
+.oppia-bar-chart .charts-css.bar .oppia-scale-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.oppia-bar-chart .charts-css.bar .oppia-scale-number {
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 21.6px;
+  margin-bottom: 0;
+  margin-left: -4px;
+}
+
+.oppia-bar-chart .charts-css.bar .oppia-scale-line {
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.oppia-bar-chart .charts-css.bar .oppia-bar-chart-scale-tick {
+  height: 100%;
+}
+
+@media only screen and (max-width: 1110px) {
+  .oppia-bar-chart .charts-css.bar .oppia-scale-number {
+    font-size: 14px;
+  }
+
+  .oppia-bar-chart .charts-css.bar .data {
+    font-size: 16px;
+    margin-right: 4px;
+  }
+}
+
+@media only screen and (max-width: 976px) {
+  .oppia-bar-chart .charts-css.bar .oppia-scale-number {
+    font-size: 16px;
+  }
+
+  .oppia-bar-chart .charts-css.bar .data {
+    margin-right: 24px;
+  }
+}
+@media only screen and (max-width: 769px) {
+  .oppia-bar-chart .charts-css.bar th span,
+  .oppia-bar-chart .charts-css.bar .data,
+  .oppia-bar-chart .charts-css.bar .oppia-scale-number {
+    font-size: 16px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .oppia-bar-chart .charts-css.bar th {
+    padding: 0 15px 0 0;
+  }
+
+  .oppia-bar-chart .charts-css.bar {
+    --labels-size: 150px;
+  }
+
+  .oppia-bar-chart .charts-css.bar th span,
+  .oppia-bar-chart .charts-css.bar .data,
+  .oppia-bar-chart  .charts-css.bar .oppia-scale-number {
+    font-size: 13px;
+  }
+
+  .oppia-bar-chart .charts-css.bar .data {
+    margin-right: 8px;
+  }
+
+  .oppia-bar-chart .charts-css.bar td {
+    min-height: 16px;
+  }
+
+  .oppia-bar-chart .charts-css.bar .oppia-scale-number {
+    font-size: 13px;
+    line-height: normal;
+  }
+
+  .oppia-bar-chart .charts-css.bar .oppia-scale-line {
+    font-size: 8px;
+    line-height: normal;
+  }
+
+}

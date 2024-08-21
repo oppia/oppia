@@ -19,7 +19,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {CollectionNode} from 'domain/collection/collection-node.model';
 import {CollectionUpdateService} from 'domain/collection/collection-update.service';
 import {Collection} from 'domain/collection/collection.model';
@@ -224,10 +223,3 @@ export class CollectionLinearizerService {
     return this.shiftNode(collection, explorationId, this.swapRight);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CollectionLinearizerService',
-    downgradeInjectable(CollectionLinearizerService)
-  );

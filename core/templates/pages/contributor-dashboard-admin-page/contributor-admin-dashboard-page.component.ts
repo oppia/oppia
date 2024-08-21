@@ -41,6 +41,8 @@ import {UsernameInputModal} from './username-input-modal/username-input-modal.co
 import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import isEqual from 'lodash/isEqual';
+import {ISODatePickerAdapter} from 'services/iso-datepicker-adapter.service';
+import {DateAdapter, MAT_DATE_FORMATS} from '@angular/material/core';
 import {AlertsService} from 'services/alerts.service';
 
 export interface LanguageChoice {
@@ -51,17 +53,30 @@ export interface TopicChoice {
   id: string;
   topic: string;
 }
+interface DateInputFormat {
+  month: 'short';
+  year: 'numeric';
+  day: 'numeric';
+}
+const dateInputValue: DateInputFormat = {
+  month: 'short',
+  year: 'numeric',
+  day: 'numeric',
+};
+export const PICK_FORMATS = {
+  parse: {dateInput: dateInputValue},
+  display: {
+    dateInput: 'input',
+    monthYearLabel: {year: 'numeric', month: 'short'},
+    dateA11yLabel: {year: 'numeric', month: 'long', day: 'numeric'},
+    monthYearA11yLabel: {year: 'numeric', month: 'long'},
+  },
+};
 @Component({
   selector: 'contributor-admin-dashboard-page',
   styleUrls: ['./contributor-admin-dashboard-page.component.css'],
   templateUrl: './contributor-admin-dashboard-page.component.html',
   animations: [
-    trigger('lastActivityDropdown', [
-      state('expanded', style({transform: 'rotate(180deg)'})),
-      state('collapsed', style({transform: 'rotate(0)'})),
-      transition('expanded => collapsed', animate('200ms ease-out')),
-      transition('collapsed => expanded', animate('200ms ease-in')),
-    ]),
     trigger('languageDropdownTrigger', [
       state('expanded', style({transform: 'rotate(180deg)'})),
       state('collapsed', style({transform: 'rotate(0)'})),
@@ -69,21 +84,22 @@ export interface TopicChoice {
       transition('collapsed => expanded', animate('200ms ease-in')),
     ]),
   ],
+  providers: [
+    {provide: DateAdapter, useClass: ISODatePickerAdapter},
+    {provide: MAT_DATE_FORMATS, useValue: PICK_FORMATS},
+  ],
 })
 export class ContributorAdminDashboardPageComponent implements OnInit {
   @ViewChild('languageDropdown', {static: false})
   languageDropdownRef!: ElementRef;
 
-  @ViewChild('activityDropdown', {static: false})
-  activityDropdownRef!: ElementRef;
-
   languageDropdownShown: boolean = false;
-  activityDropdownShown: boolean = false;
   activeTab!: string;
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'Translation Submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
   TAB_NAME_QUESTION_SUBMITTER: string = 'Question Submitter';
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
+  ONE_DAY_IN_MILLIS: number = 24 * 60 * 60 * 1000;
   translationReviewersCountByLanguage!: translationReviewersCount;
   translationReviewersCount: number = 0;
   questionReviewersCount: number = 0;
@@ -92,9 +108,9 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
   loadingMessage!: string;
-  selectedLastActivity!: number;
   allTopicNames: string[] = [];
-  lastActivity: number[] = [];
+  today!: Date;
+  lastDateToFilterUsersActivity!: Date;
   selectedTopicIds: string[] = [];
   selectedTopicNames: string[] = [];
   languageChoices: LanguageChoice[] = [];
@@ -140,14 +156,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             }
           );
 
-          this.selectedLastActivity = 0;
-
           this.userService.getUserInfoAsync().then(userInfo => {
             const username = userInfo.getUsername();
 
             if (username === null) {
               return;
             }
+            this.today = new Date();
+            this.lastDateToFilterUsersActivity = this.getDateNDaysAgo(90);
             this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
             this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
 
@@ -186,7 +202,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
             this.loadingMessage = '';
             this.changeDetectorRef.detectChanges();
-            this.lastActivity = [0, 7, 30, 90];
 
             this.contributorDashboardAdminStatsBackendApiService
               .fetchTopicChoices()
@@ -204,6 +219,20 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           );
         }
       );
+  }
+
+  isSubmitterTab(): boolean {
+    return (
+      this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER ||
+      this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER
+    );
+  }
+
+  isReviewerTab(): boolean {
+    return (
+      this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
+      this.activeTab === this.TAB_NAME_QUESTION_REVIEWER
+    );
   }
 
   filterTopicChoices(topic: TopicChoice[]): TopicChoice[] {
@@ -240,8 +269,23 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.languageDropdownShown = !this.languageDropdownShown;
   }
 
-  toggleActivityDropdown(): void {
-    this.activityDropdownShown = !this.activityDropdownShown;
+  getDateNDaysAgo(numberOfDaysBeforeToday: number): Date {
+    const today = new Date();
+    return new Date(
+      today.getTime() - this.ONE_DAY_IN_MILLIS * numberOfDaysBeforeToday
+    );
+  }
+
+  getDaysSince(date: Date): number {
+    const today = new Date();
+    return Math.floor(
+      (today.getTime() - new Date(date).getTime()) / this.ONE_DAY_IN_MILLIS
+    );
+  }
+
+  isValidLastDate(selectedLastDate: Date): boolean {
+    const today = new Date();
+    return today.getTime() >= selectedLastDate.getTime();
   }
 
   createFilter(): void {
@@ -249,12 +293,20 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      this.selectedLastActivity
+      this.getDaysSince(this.lastDateToFilterUsersActivity)
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {
       this.filter = tempFilter;
     }
+  }
+
+  changeLastDate(value: Date): void {
+    if (!this.isValidLastDate(value)) {
+      return;
+    }
+    this.lastDateToFilterUsersActivity = new Date(value);
+    this.createFilter();
   }
 
   applyTopicFilter(): void {
@@ -280,11 +332,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.selectedLanguage = currentOption;
     this.translationReviewersCount =
       this.translationReviewersCountByLanguage[this.selectedLanguage.id];
-    this.createFilter();
-  }
-
-  selectLastActivity(lastActive: number): void {
-    this.selectedLastActivity = lastActive;
     this.createFilter();
   }
 
@@ -396,12 +443,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       ) {
         this.languageDropdownShown = false;
       }
-    }
-    if (
-      targetElement &&
-      !this.activityDropdownRef.nativeElement.contains(targetElement)
-    ) {
-      this.activityDropdownShown = false;
     }
   }
 }

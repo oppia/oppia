@@ -38,6 +38,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {SearchService} from 'services/search.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {downgradeComponent} from '@angular/upgrade/static';
@@ -68,8 +69,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
-  OPPIA_BLOG_URL = '/blog';
+  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -380,10 +380,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  getOppiaBlogUrl(): string {
-    return this.OPPIA_BLOG_URL;
-  }
-
   changeLanguage(languageCode: string): void {
     this.i18nService.updateUserPreferredLanguage(languageCode);
   }
@@ -467,13 +463,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToClassroomPage(classroomUrl: string): void {
-    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = classroomUrl;
-    }, 150);
-  }
-
   /**
    * Checks if i18n has been run.
    * If i18n has not yet run, the <a> and <span> tags will have
@@ -542,6 +531,27 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.topicTitlesTranslationKeys[index]
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  navigateToAboutPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.ABOUT
+    );
+    this.windowRef.nativeWindow.location.href = '/about';
+  }
+
+  navigateToVolunteerPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.VOLUNTEER
+    );
+    this.windowRef.nativeWindow.location.href = '/volunteer';
+  }
+
+  navigateToTeachPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.TEACH
+    );
+    this.windowRef.nativeWindow.location.href = '/teach';
   }
 
   ngOnDestroy(): void {

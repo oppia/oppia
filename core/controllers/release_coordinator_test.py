@@ -57,13 +57,15 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
             response['total_allocation'], 0)
         self.assertEqual(
             response['peak_allocation'], 0)
-        self.assertEqual(response['total_keys_stored'], 1)
+        # Includes Platform Parameters.
+        self.assertEqual(response['total_keys_stored'], 20)
 
     def test_flush_memory_cache(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         response = self.get_json('/memorycachehandler')
-        self.assertEqual(response['total_keys_stored'], 1)
+        # Includes Platform Parameters.
+        self.assertEqual(response['total_keys_stored'], 20)
 
         self.delete_json('/memorycachehandler')
 

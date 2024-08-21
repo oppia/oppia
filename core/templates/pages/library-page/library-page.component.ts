@@ -16,12 +16,15 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {
+  ClassroomBackendApiService,
+  ClassroomSummaryDict,
+} from 'domain/classroom/classroom-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -38,8 +41,9 @@ import {
   LibraryPageBackendApiService,
   SummaryDict,
 } from './services/library-page-backend-api.service';
-
+import {NgbCarousel, NgbSlideEvent} from '@ng-bootstrap/ng-bootstrap';
 import './library-page.component.css';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;
@@ -52,6 +56,8 @@ interface MobileLibraryGroupProperties {
   styleUrls: ['./library-page.component.css'],
 })
 export class LibraryPageComponent {
+  @ViewChild('classroomCarousel') classroomCarousel!: NgbCarousel;
+
   possibleBannerFilenames: string[] = [
     'banner1.svg',
     'banner2.svg',
@@ -91,6 +97,9 @@ export class LibraryPageComponent {
   libraryWindowIsNarrow!: boolean;
   mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
   pageMode!: string;
+  classroomSummaries: ClassroomSummaryDict[] = [];
+  publicClassroomsCount: number = 0;
+  classroomCarouselIndex: number = 0;
 
   constructor(
     private loggerService: LoggerService,
@@ -105,7 +114,8 @@ export class LibraryPageComponent {
     private windowDimensionsService: WindowDimensionsService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private pageTitleService: PageTitleService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   setActiveGroup(groupIndex: number): void {
@@ -329,6 +339,17 @@ export class LibraryPageComponent {
       }
     );
 
+    this.classroomBackendApiService
+      .getAllClassroomsSummaryAsync()
+      .then(classroomSummaries => {
+        for (let i = 0; i < classroomSummaries.length; i++) {
+          if (classroomSummaries[i].is_published) {
+            this.publicClassroomsCount += 1;
+            this.classroomSummaries.push(classroomSummaries[i]);
+          }
+        }
+      });
+
     // Keeps track of the index of the left-most visible card of each
     // group.
     this.leftmostCardIndices = [];
@@ -474,6 +495,66 @@ export class LibraryPageComponent {
         this.libraryWindowIsNarrow =
           this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
       });
+  }
+
+  moveClassroomCarouselToPreviousSlide(): void {
+    this.classroomCarouselIndex -= 1;
+    this.classroomCarousel.prev();
+  }
+
+  moveClassroomCarouselToNextSlide(): void {
+    this.classroomCarouselIndex += 1;
+    this.classroomCarousel.next();
+  }
+
+  onClassroomNavigationIndicatorClicked(slideEvent: NgbSlideEvent): void {
+    // Extract numeric index from slide id (format: 'ngb-slide-{index}')
+    this.classroomCarouselIndex = parseInt(slideEvent?.current?.split('-')[2]);
+  }
+
+  getClassroomChunkIndices(length: number): number[] {
+    const chunkSize = 3;
+    const numChunks = Math.ceil(length / chunkSize);
+    return Array(numChunks)
+      .fill(0)
+      .map((_, index) => index);
+  }
+
+  getClassroomsForChunk(
+    classroomSummaries: ClassroomSummaryDict[],
+    chunkIndex: number
+  ): ClassroomSummaryDict[] {
+    const chunkSize = 3;
+    const start = chunkIndex * chunkSize;
+    const end = start + chunkSize;
+    return classroomSummaries.slice(start, end);
+  }
+
+  shouldShowNextClassroomChunkButton(): boolean {
+    const numberOfClassroomSlides = this.getClassroomChunkIndices(
+      this.classroomSummaries.length
+    ).length;
+    if (
+      this.publicClassroomsCount <= 3 ||
+      this.classroomCarouselIndex === numberOfClassroomSlides - 1
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  shouldShowPreviousClassroomChunkButton(): boolean {
+    if (this.publicClassroomsCount <= 3 || this.classroomCarouselIndex === 0) {
+      return false;
+    }
+    return true;
+  }
+
+  registerClassroomCardClickEvent(classroomName: string): void {
+    this.siteAnalyticsService.registerClickClassroomCardEvent(
+      'Classroom card in the community library page',
+      classroomName
+    );
   }
 
   ngOnDestroy(): void {

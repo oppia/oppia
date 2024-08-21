@@ -18,12 +18,15 @@
 
 import {AppConstants} from 'app.constants';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 import './home-tab.component.css';
 
@@ -37,17 +40,20 @@ export class HomeTabComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() incompleteExplorationsList!: LearnerExplorationSummary[];
+  @Input() incompleteCollectionsList!: CollectionSummary[];
   @Input() currentGoals!: LearnerTopicSummary[];
   @Input() goalTopics!: LearnerTopicSummary[];
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() username!: string;
-  @Input() featureFlag!: boolean;
+  @Input() redesignFeatureFlag!: boolean;
   currentGoalsLength!: number;
   classroomUrlFragment!: string;
   goalTopicsLength!: number;
   width!: number;
   CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
+  displayCollections: boolean = false;
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
@@ -57,7 +63,8 @@ export class HomeTabComponent {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -65,6 +72,7 @@ export class HomeTabComponent {
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
+
     if (allGoals.length !== 0) {
       var allGoalIds = [];
       for (var goal of allGoals) {
@@ -76,6 +84,7 @@ export class HomeTabComponent {
         this.continueWhereYouLeftOffList.push(allGoals[index]);
       }
     }
+
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
@@ -138,6 +147,26 @@ export class HomeTabComponent {
   changeActiveSection(): void {
     this.setActiveSection.emit(
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS
+    );
+  }
+
+  registerClassroomInProgressLessonEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this.siteAnalyticsService.registerInProgressClassroomLessonEngagedWithEvent(
+      classroomName,
+      topicName
+    );
+  }
+
+  registerNewClassroomLessonEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this.siteAnalyticsService.registerNewClassroomLessonEngagedWithEvent(
+      classroomName,
+      topicName
     );
   }
 }

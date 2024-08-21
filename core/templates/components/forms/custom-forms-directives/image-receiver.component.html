@@ -1,0 +1,203 @@
+<div class="image-receiver-drop-area"
+     [ngClass]="{'image-receiver-is-active': backgroundWhileUploading, 'image-receiver-is-narrow': blogDashboardPageService.imageUploaderIsNarrow}"
+     #dropArea>
+  <div class="image-receiver-text">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
+  <span *ngIf="errorMessage"
+        class="image-receiver-error-message e2e-test-upload-error">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ errorMessage }}
+  </span>
+  <span class="image-receiver-license-warning" tabindex="0">
+    Before uploading, please ensure that your image:<br>
+    <ul class="image-upload-instructions">
+      <li>{{ getAllowedImageFormatsString() }}</li>
+      <li>Has a size smaller than {{ maxImageSizeInKB }} KB</li>
+      <li>Has no watermarks and is compatible with the <a tabindex="0" class="license-term-link" href="/license" [smartRouterLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site</li>
+    </ul>
+  </span>
+  <label for="image-file-input" class="image-receiver-upload-label-button">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
+  <input type="file" id="image-file-input" (click)="this.imageInputRef.nativeElement.value = null"
+         (change)="handleFile()"
+         class="image-receiver-file-input e2e-test-photo-upload-input"
+         accept=".jpg,.jpeg,.png,.svg"
+         [ngClass]="fileInputClassName" #imageInput>
+</div>
+<style>
+  .image-receiver-license-warning {
+    background-color: rgba(225, 250, 89, 0.41);
+    border: 1px solid rgba(200, 230, 59, 0.41);
+    border-radius: 6px;
+    bottom: 8px;
+    font-size: 12px;
+    font-style: italic;
+    left: 8px;
+    padding: 4px 6px;
+    position: absolute;
+    text-align: left;
+  }
+
+  .image-receiver-drop-area {
+    background: #eee;
+    color: black;
+    font-size: 16px;
+    height: 260px;
+    padding-top: 74px;
+    position: relative;
+    text-align: center;
+    width: 100%;
+  }
+
+  .image-receiver-drop-area:hover {
+    background: #bbb;
+    cursor: pointer;
+  }
+
+  .image-receiver-text {
+    display: block;
+    font-size: 16px;
+    line-height: 28px;
+    margin-bottom: 12px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .image-receiver-is-active {
+    background-color: #bbb;
+  }
+
+  .image-receiver-file-input {
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 0.1px;
+    z-index: -1;
+  }
+
+  .license-term-link {
+    color: #0859aa;
+    text-decoration: underline;
+    text-decoration-color: #0859aa;
+  }
+
+  label.image-receiver-upload-label-button {
+    background: grey;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f2f2f2), color-stop(1, #bfbfbf));
+    background-image: -o-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
+    background-image: -moz-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
+    background-image: -webkit-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
+    background-image: -ms-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
+    background-image: linear-gradient(to bottom, #f2f2f2 0%, #bfbfbf 100%);
+    border: solid #707070 1px;
+    border-radius: 2px;
+    bottom: 6px;
+    cursor: pointer;
+    display: inline;
+    font-size: 16px;
+    font-weight: normal;
+    padding: 4px 8px;
+    position: absolute;
+    right: 8px;
+    text-align: center;
+  }
+
+  label.image-receiver-upload-label-button:hover {
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eaf6fd), color-stop(1, #a7d8f5));
+    background-image: -o-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
+    background-image: -moz-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
+    background-image: -webkit-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
+    background-image: -ms-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
+    background-image: linear-gradient(to bottom, #eaf6fd 0%, #a7d8f5 100%);
+    border: #3c7fb1 solid 1px;
+    cursor: pointer;
+  }
+
+  label.image-receiver-upload-label-button:active {
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e5f4fc), color-stop(0.5, #c4e5f6), color-stop(0.51, #98d0ef), color-stop(1, #68b3db));
+    background-image: -o-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    background-image: -moz-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    background-image: -webkit-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    background-image: -ms-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    background-image: linear-gradient(to bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    border: solid #2c628b 1px;
+    padding: 4px 8px;
+  }
+
+  .image-receiver-error-message {
+    color: red;
+    display: inline-block;
+    font-size: 16;
+    padding: 4px;
+  }
+
+  .image-receiver-error-message i {
+    font-size: 16px;
+    margin-right: 4px;
+  }
+
+  .mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+  }
+
+  .uploader-with-error-message {
+    height: 135px;
+  }
+
+  .image-receiver-no-thumbnail-icon {
+    font-size: 30px;
+  }
+
+  .image-upload-instructions {
+    display: flex;
+    flex-direction: column;
+    margin-top: 4px;
+    padding-left: 18px;
+    width: 100%;
+  }
+
+  @media(max-width:768px) {
+    .mat-icon {
+      font-size: 30px;
+      height: 30px;
+      width: 30px;
+    }
+
+    .font-weight-light {
+      font-size: 12px;
+      font-weight: 300 !important;
+    }
+
+    .image-receiver-license-warning {
+      bottom: 50px;
+    }
+
+    .image-receiver-drop-area {
+      padding-top: 8px;
+      text-align: left;
+    }
+
+    label.image-receiver-upload-label-button {
+      left: 8px;
+      right: auto;
+    }
+
+    .image-receiver-drop-area.image-receiver-is-narrow {
+      height: 35px;
+    }
+
+    .image-receiver-error-message {
+      font-size: 10px;
+    }
+
+    .image-receiver-error-message i {
+      font-size: 10px;
+    }
+
+    .image-receiver-is-narrow.uploader-with-error-message {
+      height: unset;
+      margin-top: -5px;
+    }
+  }
+</style>

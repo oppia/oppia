@@ -27,9 +27,24 @@ import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-p
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.ROUTE,
+    loadChildren: () =>
+      import('pages/subtopic-viewer-page/subtopic-viewer-page.module').then(
+        m => m.SubtopicViewerPageModule
+      ),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,
     loadChildren: () =>
       import('pages/admin-page/admin-page.module').then(m => m.AdminPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/collection-editor-page/collection-editor-page.module').then(
+        m => m.CollectionEditorPageModule
+      ),
     canActivate: [IsLoggedInGuard],
   },
   {
@@ -45,14 +60,6 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/blog-admin-page/blog-admin-page.module').then(
         m => m.BlogAdminPageModule
-      ),
-    canActivate: [IsLoggedInGuard],
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE,
-    loadChildren: () =>
-      import('pages/blog-dashboard-page/blog-dashboard-page.module').then(
-        m => m.BlogDashboardPageModule
       ),
     canActivate: [IsLoggedInGuard],
   },
@@ -78,6 +85,14 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/classrooms-page/classrooms-page.module').then(
+        m => m.ClassroomsPageModule
       ),
   },
   {
@@ -127,13 +142,6 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () =>
       import('pages/about-page/about-page.module').then(m => m.AboutPageModule),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE,
-    loadChildren: () =>
-      import('pages/about-foundation-page/about-foundation-page.module').then(
-        m => m.AboutFoundationPageModule
-      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND

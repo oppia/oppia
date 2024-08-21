@@ -61,6 +61,7 @@ import {
 import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {VoiceoverTypeToVoiceoversBackendDict} from 'domain/exploration/voiceover.model';
 
 export type StatePropertyValues =
   | AnswerGroup[]
@@ -90,6 +91,7 @@ export type StatePropertyNames =
   | 'content'
   | 'default_outcome'
   | 'hints'
+  | 'inapplicable_skill_misconception_ids'
   | 'linked_skill_id'
   | 'param_changes'
   | 'param_specs'
@@ -137,6 +139,7 @@ export class ChangeListService {
     recorded_voiceovers: true,
     default_outcome: true,
     hints: true,
+    inapplicable_skill_misconception_ids: true,
     linked_skill_id: true,
     param_changes: true,
     param_specs: true,
@@ -349,7 +352,16 @@ export class ChangeListService {
           'edit_translation',
           'remove_translations',
           'mark_translations_needs_update',
+          'mark_translation_needs_update_for_language',
         ].includes(change.cmd);
+      })
+    );
+  }
+
+  getVoiceoverChangeList(): ExplorationChange[] {
+    return angular.copy(
+      this.explorationChangeList.filter(change => {
+        return change.cmd === 'update_voiceovers';
       })
     );
   }
@@ -424,6 +436,17 @@ export class ChangeListService {
     });
   }
 
+  markTranslationAsNeedingUpdateForLanguage(
+    contentId: string,
+    languageCode: string
+  ): void {
+    this.addChange({
+      cmd: 'mark_translation_needs_update_for_language',
+      content_id: contentId,
+      language_code: languageCode,
+    });
+  }
+
   /**
    * Saves a change dict that represents editing translations.
    */
@@ -437,6 +460,22 @@ export class ChangeListService {
       language_code: languageCode,
       content_id: contentId,
       translation: translatedContent.toBackendDict(),
+    });
+  }
+
+  /**
+   * Saves a change dict that represents editing voiceovers.
+   */
+  editVoiceovers(
+    contentId: string,
+    languageAccentCode: string,
+    voiceovers: VoiceoverTypeToVoiceoversBackendDict
+  ): void {
+    this.addChange({
+      cmd: 'update_voiceovers',
+      language_accent_code: languageAccentCode,
+      content_id: contentId,
+      voiceovers: voiceovers,
     });
   }
 

@@ -95,39 +95,10 @@ export class ContributionOpportunitiesBackendApiService {
 
   private UPDATE_PINNED_OPPORTUNITY_HANDLER_URL = '/pinned-opportunities';
 
-  private _getExplorationOpportunityFromDict(
-    opportunityDict: ExplorationOpportunitySummaryBackendDict
-  ): ExplorationOpportunitySummary {
-    return new ExplorationOpportunitySummary(
-      opportunityDict.id,
-      opportunityDict.topic_name,
-      opportunityDict.story_title,
-      opportunityDict.chapter_title,
-      opportunityDict.content_count,
-      opportunityDict.translation_counts,
-      opportunityDict.translation_in_review_counts,
-      opportunityDict.language_code,
-      opportunityDict.is_pinned
-    );
-  }
-
-  private _getSkillOpportunityFromDict(
-    opportunityDict: SkillOpportunityBackendDict
-  ): SkillOpportunity {
-    return new SkillOpportunity(
-      opportunityDict.id,
-      opportunityDict.skill_description,
-      opportunityDict.topic_name,
-      opportunityDict.question_count
-    );
-  }
-
   async fetchSkillOpportunitiesAsync(
     cursor: string
   ): Promise<SkillContributionOpportunities> {
-    const params = {
-      cursor: cursor,
-    };
+    const params = {cursor};
 
     return this.http
       .get<SkillContributionOpportunitiesBackendDict>(
@@ -140,7 +111,7 @@ export class ContributionOpportunitiesBackendApiService {
       .then(
         data => {
           const opportunities = data.opportunities.map(dict =>
-            this._getSkillOpportunityFromDict(dict)
+            SkillOpportunity.createFromBackendDict(dict)
           );
 
           return {
@@ -186,12 +157,10 @@ export class ContributionOpportunitiesBackendApiService {
     topicName: string,
     cursor: string
   ): Promise<TranslationContributionOpportunities> {
-    topicName =
-      topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName;
-
     const params = {
       language_code: languageCode,
-      topic_name: topicName,
+      topic_name:
+        topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
       cursor: cursor,
     };
 
@@ -206,7 +175,7 @@ export class ContributionOpportunitiesBackendApiService {
       .then(
         data => {
           const opportunities = data.opportunities.map(dict =>
-            this._getExplorationOpportunityFromDict(dict)
+            ExplorationOpportunitySummary.createFromBackendDict(dict)
           );
 
           return {
@@ -229,15 +198,13 @@ export class ContributionOpportunitiesBackendApiService {
       topic_name?: string;
       language_code?: string;
     } = {};
-    if (
-      topicName !== '' &&
-      topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL
-    ) {
+    if (topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL) {
       params.topic_name = topicName;
     }
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
     }
+
     return this.http
       .get<ReviewableTranslationOpportunitiesBackendDict>(
         '/getreviewableopportunitieshandler',
@@ -249,10 +216,10 @@ export class ContributionOpportunitiesBackendApiService {
       .then(
         data => {
           const opportunities = data.opportunities.map(dict =>
-            this._getExplorationOpportunityFromDict(dict)
+            ExplorationOpportunitySummary.createFromBackendDict(dict)
           );
           return {
-            opportunities: opportunities,
+            opportunities,
           };
         },
         errorResponse => {
@@ -284,10 +251,8 @@ export class ContributionOpportunitiesBackendApiService {
       const response = await this.http
         .get<TopicNamesBackendDict>('/gettranslatabletopicnames')
         .toPromise();
-      // TODO(#15648): Re-enable "All Topics" after fetching latency is fixed.
-      // response.topic_names.unshift('All');
 
-      return response.topic_names;
+      return [AppConstants.TOPIC_SENTINEL_NAME_ALL, ...response.topic_names];
     } catch {
       return [];
     }

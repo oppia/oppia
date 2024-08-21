@@ -43,8 +43,7 @@
                            [misconceptionsBySkill]="misconceptionsBySkill"
                            [questionStateData]="questionStateData"
                            [question]="question"
-                           [userCanEditQuestion]="canEditQuestion"
-                           [stateContentShouldStayVisibleOnScroll]="false">
+                           [userCanEditQuestion]="canEditQuestion">
     </oppia-question-editor>
     <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && questionValidationService.getValidationErrorMessage(question)">
       {{questionValidationService.getValidationErrorMessage(question)}}
@@ -65,8 +64,8 @@
           <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
                (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
             <div class="question-data e2e-test-edit-question-button">
-              <oppia-rte-output-display classStr="question-text"
-                                         [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
+              <oppia-rte-output-display class="e2e-test-question-text" classStr="question-text"
+                            [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
               </oppia-rte-output-display>
               <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())"
                     matTooltip="Unaddressed skill misconceptions"

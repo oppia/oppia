@@ -90,24 +90,24 @@
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
         </div>
-        <div class="oppia-translation-review-edit-buttons">
-          <button class="btn btn-secondary mr-2"
-                  *ngIf="startedEditing"
-                  (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button class="btn btn-success ml-2"
-                  *ngIf="startedEditing"
-                  (click)="updateSuggestion()">
-            Update
-          </button>
-        </div>
         <div class="oppia-translation-error-section"
              *ngIf="startedEditing && errorFound">
           <p>
             {{ errorMessage }}
           </p>
         </div>
+      </div>
+      <div class="oppia-translation-review-edit-buttons">
+        <button class="btn btn-secondary mr-2"
+                *ngIf="startedEditing"
+                (click)="cancelEdit()">
+          Cancel
+        </button>
+        <button class="btn btn-success ml-2"
+                *ngIf="startedEditing"
+                (click)="updateSuggestion()">
+          Update
+        </button>
       </div>
       <div class="oppia-collapse-content"
            *ngIf="isTranslationOverflowing"

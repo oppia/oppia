@@ -144,6 +144,42 @@ export class Interaction extends BaseTranslatableObject {
     return translatableObjects;
   }
 
+  getContentIdToHtml(): {[contentId: string]: string} {
+    let contentIdToHtml = {};
+    let answerGroupsContentIdToHtml = {};
+    let outcomeContentIdToHtml = {};
+
+    for (let answerGroup of this.answerGroups) {
+      Object.assign(
+        answerGroupsContentIdToHtml,
+        answerGroupsContentIdToHtml,
+        answerGroup.getContentIdToHtml()
+      );
+    }
+
+    if (this.defaultOutcome) {
+      outcomeContentIdToHtml = this.defaultOutcome.getContentIdToHtml();
+    }
+
+    return Object.assign(
+      contentIdToHtml,
+      answerGroupsContentIdToHtml,
+      outcomeContentIdToHtml
+    );
+  }
+
+  getContentIdForMatchingHtml(contentHtml: string): string | undefined {
+    let contentIdToHtml = this.getContentIdToHtml();
+    for (let contentId in contentIdToHtml) {
+      let retrievedHtml = contentIdToHtml[contentId];
+
+      if (retrievedHtml === contentHtml) {
+        return contentId;
+      }
+    }
+    return undefined;
+  }
+
   setId(newValue: string): void {
     this.id = newValue;
   }

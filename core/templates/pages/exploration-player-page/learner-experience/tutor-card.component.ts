@@ -71,6 +71,7 @@ const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
 const MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS = [1, 5, 10, 25, 50];
 
 import './tutor-card.component.css';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -179,7 +180,8 @@ export class TutorCardComponent {
     private windowRef: WindowRef,
     public platformFeatureService: PlatformFeatureService,
     private renderer: Renderer2,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
   async getUserInfoAsync(): Promise<void> {
@@ -218,7 +220,7 @@ export class TutorCardComponent {
     this.getCanAskLearnerForAnswerInfo =
       this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo;
     this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
 
@@ -410,6 +412,14 @@ export class TutorCardComponent {
       this.interactionInstructions =
         this.displayedCard.getInteractionInstructions();
       this.contentAudioTranslations = this.displayedCard.getVoiceovers();
+
+      this.voiceoverPlayerService.setActiveVoiceover(
+        this.displayedCard.contentId
+      );
+      this.voiceoverPlayerService.setActiveComponentName(
+        AppConstants.COMPONENT_NAME_CONTENT
+      );
+
       this.audioTranslationManagerService.clearSecondaryAudioTranslations();
       this.audioTranslationManagerService.setContentAudioTranslations(
         cloneDeep(this.contentAudioTranslations),
@@ -429,9 +439,21 @@ export class TutorCardComponent {
     return this.displayedCard.isInteractionInline();
   }
 
+  isVoiceoverContributionWithAccentEnabled(): boolean {
+    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
+  }
+
   // This function returns null if audio is not available.
   getContentAudioHighlightClass(): string | null {
     if (
+      this.isVoiceoverContributionWithAccentEnabled() &&
+      this.voiceoverPlayerService.getActiveComponentName() ===
+        AppConstants.COMPONENT_NAME_CONTENT &&
+      this.audioPlayerService.isPlaying()
+    ) {
+      return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
+    } else if (
+      !this.isVoiceoverContributionWithAccentEnabled() &&
       this.audioTranslationManagerService.getCurrentComponentName() ===
         AppConstants.COMPONENT_NAME_CONTENT &&
       (this.audioPlayerService.isPlaying() ||
@@ -439,6 +461,7 @@ export class TutorCardComponent {
     ) {
       return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     }
+
     return null;
   }
 

@@ -105,7 +105,8 @@ export class AdminMiscTabComponent {
       .then(
         response => {
           this.setStatusMessage.emit(
-            'No. of opportunities model created: ' + response
+            'No. of opportunities model created: ' +
+              response.opportunities_count
           );
         },
         errorResponse => {
@@ -227,6 +228,20 @@ export class AdminMiscTabComponent {
           this.setStatusMessage.emit('Server error: ' + errorResponse);
         }
       );
+  }
+
+  regenerateTopicSummaries(): void {
+    this.setStatusMessage.emit('Regenerating all topic summaries...');
+    this.adminBackendApiService.regenerateTopicSummariesAsync().then(
+      () => {
+        this.setStatusMessage.emit(
+          'Successfully regenerated all topic summaries.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
   }
 
   getNumberOfPendingDeletionRequestModels(): void {

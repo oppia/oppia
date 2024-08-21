@@ -101,7 +101,7 @@ export class BaseUndoRedo {
    * returned list will not be reflected in this class instance.
    */
   getChangeList(): Change[] {
-    // TODO(bhenning): Consider integrating something like Immutable.js to
+    // TODO(#20337): Consider integrating something like Immutable.js to
     // avoid the slice here and ensure the returned object is truly an
     // immutable copy.
     return this._appliedChanges.slice();

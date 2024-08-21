@@ -61,7 +61,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
 
         with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError,
-            'Run backend tests before running this script. ' +
+            'Run backend tests before running this script. '
             '\nOUTPUT: No data to report.\nERROR: None'
         ):
             check_overall_backend_test_coverage.main()
@@ -85,7 +85,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
 
         with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError,
-            'Failed to calculate coverage because subprocess failed. ' +
+            'Failed to calculate coverage because subprocess failed. '
             '\nOUTPUT: Some error occured.\nERROR: Some error.'
         ):
             check_overall_backend_test_coverage.main()

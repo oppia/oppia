@@ -311,8 +311,10 @@ export class ExplorationDiffService {
           change.cmd !== 'edit_exploration_property' &&
           change.cmd !== 'add_written_translation' &&
           change.cmd !== 'mark_translations_needs_update' &&
+          change.cmd !== 'mark_translation_needs_update_for_language' &&
           change.cmd !== 'remove_translations' &&
-          change.cmd !== 'edit_translation'
+          change.cmd !== 'edit_translation' &&
+          change.cmd !== 'update_voiceovers'
         ) {
           throw new Error('Invalid change command: ' + change.cmd);
         }

@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
+from core.domain import classroom_config_services
+from core.domain import platform_parameter_list
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -98,6 +100,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_2, 0.5)
 
+        self.math_classroom = self.save_new_valid_classroom()
+
 
 class TopicViewerPageTests(BaseTopicViewerControllerTests):
 
@@ -126,8 +130,13 @@ class TopicPageDataHandlerTests(
         BaseTopicViewerControllerTests, test_utils.EmailTestBase):
 
     def test_get_with_no_user_logged_in(self) -> None:
+        self.math_classroom.topic_id_to_prerequisite_topic_ids = {
+            self.topic_id: []
+        }
+        classroom_config_services.update_classroom(self.math_classroom)
+
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
+            '%s/math/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
         expected_dict = {
             'topic_name': 'public_topic_name',
             'topic_id': self.topic_id,
@@ -172,73 +181,88 @@ class TopicPageDataHandlerTests(
                 self.skill_id_1: 'Skill Description 1',
                 self.skill_id_2: 'Skill Description 2'
             },
-            'practice_tab_is_displayed': False
+            'practice_tab_is_displayed': False,
+            'classroom_name': 'math'
         }
+
         self.assertDictContainsSubset(expected_dict, json_response)
 
+        # Test with no classroom assigned.
+        self.math_classroom.topic_id_to_prerequisite_topic_ids = {}
+        expected_dict['classroom_name'] = None
+        classroom_config_services.update_classroom(self.math_classroom)
+
+        json_response = self.get_json(
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
+
+        self.assertDictContainsSubset(expected_dict, json_response)
+
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_get_with_user_logged_in(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
         self.login(self.NEW_USER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-            json_response = self.get_json(
-                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
-            expected_email_html_body = (
-                'The deleted skills: %s are still'
-                ' present in topic with id %s' % (
-                    self.skill_id_1, self.topic_id))
-            self.assertEqual(len(messages), 1)
-            self.assertIn(expected_email_html_body, messages[0].html)
-            expected_dict = {
-                'topic_name': 'public_topic_name',
-                'topic_id': self.topic_id,
-                'canonical_story_dicts': [{
-                    'id': self.story_1.id,
-                    'title': self.story_1.title,
-                    'description': self.story_1.description,
-                    'node_titles': [],
-                    'thumbnail_filename': None,
-                    'thumbnail_bg_color': None,
-                    'story_is_published': True,
-                    'completed_node_titles': [],
-                    'url_fragment': 'story-frag-one',
-                    'all_node_dicts': []
-                }],
-                'additional_story_dicts': [{
-                    'id': self.story_2.id,
-                    'title': self.story_2.title,
-                    'description': self.story_2.description,
-                    'node_titles': [],
-                    'thumbnail_filename': None,
-                    'thumbnail_bg_color': None,
-                    'story_is_published': True,
-                    'completed_node_titles': [],
-                    'url_fragment': 'story-frag-two',
-                    'all_node_dicts': []
-                }],
-                'uncategorized_skill_ids': [self.skill_id_1],
-                'subtopics': [{
-                    u'thumbnail_filename': u'image.svg',
-                    u'thumbnail_bg_color': u'#FFFFFF',
-                    u'thumbnail_size_in_bytes': 21131,
-                    u'skill_ids': [self.skill_id_2],
-                    u'id': 1,
-                    u'title': u'subtopic_name',
-                    u'url_fragment': u'subtopic-name'}],
-                'degrees_of_mastery': {
-                    self.skill_id_1: 0.3,
-                    self.skill_id_2: 0.5
-                },
-                'skill_descriptions': {
-                    self.skill_id_2: 'Skill Description 2'
-                },
-                'practice_tab_is_displayed': False
-            }
-            self.assertDictContainsSubset(expected_dict, json_response)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(len(messages), 0)
+        json_response = self.get_json(
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
+        expected_email_html_body = (
+            'The deleted skills: %s are still'
+            ' present in topic with id %s' % (
+                self.skill_id_1, self.topic_id))
+        self.assertEqual(len(messages), 1)
+        self.assertIn(expected_email_html_body, messages[0].html)
+        expected_dict = {
+            'topic_name': 'public_topic_name',
+            'topic_id': self.topic_id,
+            'canonical_story_dicts': [{
+                'id': self.story_1.id,
+                'title': self.story_1.title,
+                'description': self.story_1.description,
+                'node_titles': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None,
+                'story_is_published': True,
+                'completed_node_titles': [],
+                'url_fragment': 'story-frag-one',
+                'all_node_dicts': []
+            }],
+            'additional_story_dicts': [{
+                'id': self.story_2.id,
+                'title': self.story_2.title,
+                'description': self.story_2.description,
+                'node_titles': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None,
+                'story_is_published': True,
+                'completed_node_titles': [],
+                'url_fragment': 'story-frag-two',
+                'all_node_dicts': []
+            }],
+            'uncategorized_skill_ids': [self.skill_id_1],
+            'subtopics': [{
+                u'thumbnail_filename': u'image.svg',
+                u'thumbnail_bg_color': u'#FFFFFF',
+                u'thumbnail_size_in_bytes': 21131,
+                u'skill_ids': [self.skill_id_2],
+                u'id': 1,
+                u'title': u'subtopic_name',
+                u'url_fragment': u'subtopic-name'}],
+            'degrees_of_mastery': {
+                self.skill_id_1: 0.3,
+                self.skill_id_2: 0.5
+            },
+            'skill_descriptions': {
+                self.skill_id_2: 'Skill Description 2'
+            },
+            'practice_tab_is_displayed': False,
+            'classroom_name': None
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
 
         self.logout()
 
@@ -287,7 +311,8 @@ class TopicPageDataHandlerTests(
             'subtopics': [],
             'degrees_of_mastery': {},
             'skill_descriptions': {},
-            'practice_tab_is_displayed': False
+            'practice_tab_is_displayed': False,
+            'classroom_name': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -343,7 +368,8 @@ class TopicPageDataHandlerTests(
             'skill_descriptions': {
                 self.skill_id_1: 'Skill Description 1'
             },
-            'practice_tab_is_displayed': True
+            'practice_tab_is_displayed': True,
+            'classroom_name': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -400,7 +426,8 @@ class TopicPageDataHandlerTests(
             'skill_descriptions': {
                 self.skill_id_1: 'Skill Description 1',
             },
-            'practice_tab_is_displayed': True
+            'practice_tab_is_displayed': True,
+            'classroom_name': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -456,7 +483,8 @@ class TopicPageDataHandlerTests(
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
-            'practice_tab_is_displayed': True
+            'practice_tab_is_displayed': True,
+            'classroom_name': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -513,7 +541,8 @@ class TopicPageDataHandlerTests(
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
-            'practice_tab_is_displayed': False
+            'practice_tab_is_displayed': False,
+            'classroom_name': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -570,7 +599,8 @@ class TopicPageDataHandlerTests(
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
-            'practice_tab_is_displayed': True
+            'practice_tab_is_displayed': True,
+            'classroom_name': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()

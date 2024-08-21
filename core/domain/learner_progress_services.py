@@ -88,7 +88,7 @@ class DisplayableTopicSummaryDict(TypedDict):
     thumbnail_bg_color: Optional[str]
     thumbnail_filename: Optional[str]
     canonical_story_summary_dict: List[topic_fetchers.CannonicalStoryDict]
-    url_fragment: str
+    url_fragment: Optional[str]
     classroom: str
     practice_tab_is_displayed: bool
     degrees_of_mastery: Dict[str, Optional[float]]
@@ -1728,7 +1728,16 @@ def get_displayable_untracked_topic_summary_dicts(
     ] = collections.defaultdict(list)
     topic_ids = [topic.id for topic in untracked_topic_summaries]
     topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
+    classrooms = classroom_config_services.get_all_classrooms()
+    published_classroom_topic_ids = [
+        topic_id
+        for classroom in classrooms if classroom.is_published
+        for topic_id in classroom.topic_id_to_prerequisite_topic_ids.keys()
+    ]
+
     for index, topic in enumerate(topics):
+        if topic.id not in published_classroom_topic_ids:
+            continue
         all_skill_ids = topic.get_all_skill_ids()
         skill_descriptions = (
             skill_services.get_descriptions_of_skills(

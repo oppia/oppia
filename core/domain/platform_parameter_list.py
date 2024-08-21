@@ -54,6 +54,7 @@ class ParamName(enum.Enum):
     UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
         'unpublish_exploration_email_html_body')
     RECORD_PLAYTHROUGH_PROBABILITY = 'record_playthrough_probability'
+    SERVER_CAN_SEND_EMAILS = 'server_can_send_emails'
 
 
 ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
@@ -80,5 +81,6 @@ ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
     ParamName.SIGNUP_EMAIL_BODY_CONTENT,
     ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
     ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
-    ParamName.RECORD_PLAYTHROUGH_PROBABILITY
+    ParamName.RECORD_PLAYTHROUGH_PROBABILITY,
+    ParamName.SERVER_CAN_SEND_EMAILS
 ]

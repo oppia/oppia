@@ -154,26 +154,6 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         )
 
 
-class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
-
-    def test_any_user_can_access_subtopic_viewer_page(self) -> None:
-        self.get_html_response(
-            '/learn/staging/%s/revision/%s' % ('name', 'sub-url-frag-one'))
-
-    def test_accessibility_of_subtopic_viewer_page_of_unpublished_topic(
-        self
-    ) -> None:
-        self.get_html_response(
-            '/learn/staging/%s/revision/%s'
-            % ('pvttopic', 'sub-url-frag-one'),
-            expected_status_int=302)
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '/learn/staging/%s/revision/%s'
-            % ('pvttopic', 'sub-url-frag-one'))
-        self.logout()
-
-
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_first_subtopic_in_topic(self) -> None:
         json_response = self.get_json(

@@ -467,7 +467,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     def test_get_displayable_collection_summary_dicts_matching_ids(
         self
     ) -> None:
-        collection_id_1 = self.COLLECTION_ID + '_1'
+        collection_id_1 = '%s_1' % self.COLLECTION_ID
         self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_collection(collection_id_1, self.owner_id)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)

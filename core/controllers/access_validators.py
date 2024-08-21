@@ -79,6 +79,67 @@ class ClassroomAccessValidationHandler(
         if not classroom:
             raise self.NotFoundException
 
+        if not classroom.is_published:
+            if self.user_id is None or not user_services.is_curriculum_admin(
+                self.user_id):
+                raise self.NotFoundException
+
+
+class ClassroomsPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to classrooms page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Retrieves information about classrooms.
+
+        Raises:
+            PageNotFoundException. No public classrooms are present.
+        """
+
+        classrooms = classroom_config_services.get_all_classrooms()
+        has_public_classrooms = any(map(lambda c: c.is_published, classrooms))
+
+        if not (has_public_classrooms or constants.DEV_MODE):
+            raise self.NotFoundException
+
+
+class SubtopicViewerPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """ Validates access to the Subtopic Viewer Page """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'subtopic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_subtopic_viewer_page
+    def get(self, *args: str) -> None:
+        """Handles GET requests."""
+        pass
+
 
 class CollectionViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
@@ -193,8 +254,8 @@ class DiagnosticTestPlayerAccessValidationHandler(
     def get(self) -> None:
         """Handles GET requests."""
         if not feature_flag_services.is_feature_flag_enabled(
-            self.user_id,
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
+            user_id=self.user_id
         ):
             raise self.NotFoundException
 
@@ -445,3 +506,23 @@ class BlogAuthorProfilePageAccessValidationHandler(
             raise self.NotFoundException(
                 'User with given username is not a blog post author.'
             )
+
+
+class CollectionEditorAccessValidationPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to collection editor page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_edit_collection
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass

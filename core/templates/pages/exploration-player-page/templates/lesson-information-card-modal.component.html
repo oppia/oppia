@@ -37,7 +37,8 @@
             </div>
           </div>
           <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
-               [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
+               [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}"
+               (click)="returnToCheckpointIfCompleted(idx)">
             {{ idx + 1 }}
           </div>
         </div>
@@ -84,7 +85,7 @@
               {{ averageRating | number:'1.1-1'}}
             </span>
           </li>
-          <li tabindex="0" class="row-item">
+          <li tabindex="0" class="row-item e2e-test-info-card-views">
             <span class="far fa-eye"
                   [ngbTooltip]="'I18N_PLAYER_VIEWS_TOOLTIP' | translate"
                   placement="top">
@@ -94,7 +95,7 @@
             </span>
             {{ numViews | summarizeNonnegativeNumber }}
           </li>
-          <li tabindex="0" class="row-item">
+          <li tabindex="0" class="row-item e2e-test-info-card-last-updated">
             <span class="far fa-clock"
                   [ngbTooltip]="'I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate"
                   placement="top">
@@ -115,6 +116,7 @@
             </span>
             <div class="named-contributors-container">
               <li *ngFor="let name of (contributorNames | limitTo: 2); index as idx"
+                  (click)="cancel()"
                   [ngbTooltip]="name"
                   placement="top"
                   class="contributor-{{idx}}">
@@ -157,7 +159,7 @@
                 {{ explorationTags.tagsToShow.join(", ") }}
               </span>
               <span *ngIf="explorationTags.tagsToShow.length === 0 && explorationTags.tagsInTooltip.length === 0">
-                <span><em>{{ 'I18N_PLAYER_NO_TAGS' | translate }}</em></span>
+                <span class="e2e-test-info-card-tags"><em>{{ 'I18N_PLAYER_NO_TAGS' | translate }}</em></span>
               </span>
             </div>
           </div>

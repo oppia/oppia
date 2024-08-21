@@ -35,6 +35,8 @@ import {
   TranslatedContent,
 } from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {ContextService} from 'services/context.service';
 
 interface HTMLSchema {
   type: string;
@@ -65,6 +67,8 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   UNICODE_SCHEMA: {type: string} = {
     type: 'unicode',
   };
+  explorationId!: string;
+  explorationVersion!: number;
 
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
@@ -91,7 +95,8 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     private stateEditorService: StateEditorService,
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
-    private translationTabActiveContentIdService: TranslationTabActiveContentIdService
+    private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
+    private contextService: ContextService
   ) {}
 
   showMarkAudioAsNeedingUpdateModalIfRequired(
@@ -153,12 +158,16 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     };
 
     const entityTranslations =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         this.languageCode
       ];
     if (entityTranslations) {
       this.activeWrittenTranslation = entityTranslations.getWrittenTranslation(
         this.translationTabActiveContentIdService.getActiveContentId() as string
+      );
+    } else {
+      this.activeWrittenTranslation = TranslatedContent.createNew(
+        this.dataFormat
       );
     }
   }
@@ -179,9 +188,42 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
       this.languageCode,
       this.activeWrittenTranslation
     );
-    this.entityTranslationsService.languageCodeToEntityTranslations[
-      this.languageCode
-    ].updateTranslation(this.contentId, this.activeWrittenTranslation);
+
+    let newTranslation = this.activeWrittenTranslation.translation;
+
+    // Check if the new translation isn't empty.
+    if (newTranslation) {
+      // Initialize the entity translation object if it doesn't exist.
+      if (
+        !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
+          this.languageCode
+        )
+      ) {
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+          this.languageCode
+        ] = EntityTranslation.createFromBackendDict({
+          entity_id: this.explorationId,
+          entity_type: 'exploration',
+          entity_version: this.explorationVersion,
+          language_code: this.languageCode,
+          translations: {},
+        });
+      }
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+        this.languageCode
+      ].updateTranslation(this.contentId, this.activeWrittenTranslation);
+    } else {
+      // If the translation is blank, remove the existing translation appropriately.
+      if (
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
+          this.languageCode
+        )
+      ) {
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+          this.languageCode
+        ].removeTranslation(this.contentId);
+      }
+    }
 
     this.translationStatusService.refresh();
     this.translationEditorIsOpen = false;
@@ -231,6 +273,9 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.dataFormat =
       this.translationTabActiveContentIdService.getActiveDataFormat() as string;
+    this.explorationId = this.contextService.getExplorationId();
+    this.explorationVersion =
+      this.contextService.getExplorationVersion() as number;
 
     this.directiveSubscriptions.add(
       this.translationTabActiveContentIdService.onActiveContentIdChanged.subscribe(

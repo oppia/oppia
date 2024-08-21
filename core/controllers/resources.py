@@ -69,7 +69,9 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         feconf.ENTITY_TYPE_BLOG_POST,
         feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
         feconf.ENTITY_TYPE_QUESTION, feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
-        feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]
+        feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
+        feconf.ENTITY_TYPE_CLASSROOM
+    ]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -259,3 +261,60 @@ class PromoBarHandler(
             promo_bar_message_parameter.default_value)
 
         self.render_json({})
+
+
+class FaviconHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handles favicon image redirection·"""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Redirects to correct favicon for particular deployment."""
+        self.redirect(fs_services.get_static_asset_url('favicon.ico'))
+
+
+class RobotsTxtHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handles robots.txt redirection·"""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Redirects to correct robots.txt for particular deployment."""
+        self.redirect(fs_services.get_static_asset_url('robots.txt'))
+
+
+class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handles copyrighted images redirection·"""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'folder': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'filename': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self, folder: str, filename: str) -> None:
+        """Redirects to correct copyrighted image for particular deployment.
+
+        Args:
+            folder: str. The folder in which the image is.
+            filename: str. The filename of the image.
+        """
+        self.redirect(
+            fs_services.get_static_asset_url(
+                'copyrighted-images/%s/%s' % (folder, filename)))

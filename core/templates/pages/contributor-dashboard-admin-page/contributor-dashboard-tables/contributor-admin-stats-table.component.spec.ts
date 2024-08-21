@@ -49,6 +49,15 @@ import {
 } from '../contributor-dashboard-admin-summary.model';
 
 describe('Contributor stats component', () => {
+  const createQuestionReviewerStats = function createQuestionReviewerStats(
+    numStats: number
+  ): QuestionReviewerStats[] {
+    let stats: QuestionReviewerStats[] = [];
+    for (let i = 0; i < numStats; i++) {
+      stats.push(questionReviewerStats);
+    }
+    return stats;
+  };
   let component: ContributorAdminStatsTable;
   let fixture: ComponentFixture<ContributorAdminStatsTable>;
   let $window: WindowRef;
@@ -192,7 +201,7 @@ describe('Contributor stats component', () => {
       };
       component.inputs.activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
       component.ngOnChanges(changes);
-      component.updateColumnsToDisplay();
+      component.displayContributorAdminStats();
       tick();
       expect(component.columnsToDisplay).toEqual([
         'chevron',
@@ -226,7 +235,7 @@ describe('Contributor stats component', () => {
       };
       component.inputs.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
       component.ngOnChanges(changes);
-      component.updateColumnsToDisplay();
+      component.displayContributorAdminStats();
       tick();
       expect(component.columnsToDisplay).toEqual([
         'chevron',
@@ -258,7 +267,7 @@ describe('Contributor stats component', () => {
       };
       component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
       component.ngOnChanges(changes);
-      component.updateColumnsToDisplay();
+      component.displayContributorAdminStats();
       tick();
       expect(component.columnsToDisplay).toEqual([
         'chevron',
@@ -269,6 +278,7 @@ describe('Contributor stats component', () => {
         'lastContributedInDays',
         'role',
       ]);
+      expect(component.getOverallItemCount()).toEqual('1');
     }));
 
     it('should show question reviewer stats', fakeAsync(() => {
@@ -279,7 +289,7 @@ describe('Contributor stats component', () => {
         Promise.resolve({
           stats: [questionReviewerStats],
           nextOffset: 1,
-          more: false,
+          more: true,
         } as QuestionReviewerStatsData)
       );
       const changes: SimpleChanges = {
@@ -292,7 +302,7 @@ describe('Contributor stats component', () => {
       };
       component.inputs.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
       component.ngOnChanges(changes);
-      component.updateColumnsToDisplay();
+      component.displayContributorAdminStats();
       tick();
       expect(component.columnsToDisplay).toEqual([
         'chevron',
@@ -301,15 +311,63 @@ describe('Contributor stats component', () => {
         'lastContributedInDays',
         'role',
       ]);
+      expect(component.getOverallItemCount()).toEqual('1+');
     }));
 
-    it('should check for upperlimit for pagination', fakeAsync(() => {
-      component.dataSource = [];
-      component.statsPageNumber = 1;
+    it(
+      'should index last item on page as "overall item count" when ' +
+        '"current page\'s cumulative item count"' +
+        ' exceeds "overall item count".',
+      fakeAsync(() => {
+        component.statsPageNumber = 1;
+        component.itemsPerPage = 4;
+        fixture.detectChanges();
+        component.allStats = createQuestionReviewerStats(3);
+        expect(component.getIndexOfLastItemOnPage()).toEqual(3);
+      })
+    );
+
+    it(
+      'should index last item on page as "current page\'s ' +
+        'cumulative item count" when "overall item count"' +
+        ' exceeds "current page\'s cumulative item count".',
+      fakeAsync(() => {
+        component.statsPageNumber = 1;
+        component.itemsPerPage = 1;
+        fixture.detectChanges();
+        component.allStats = createQuestionReviewerStats(3);
+        expect(component.getIndexOfLastItemOnPage()).toEqual(2);
+      })
+    );
+
+    it('should retrieve the index of the first item on the page', fakeAsync(() => {
+      component.statsPageNumber = 2;
       component.itemsPerPage = 3;
-      fixture.detectChanges();
-      expect(component.getUpperLimitValueForPagination()).toEqual(3);
+      expect(component.getDisplayedIndexOfFirstItemOnPage()).toEqual(7);
     }));
+
+    it('should show the overall item count from the number of items', fakeAsync(() => {
+      component.statsPageNumber = 1;
+      component.itemsPerPage = 1;
+      fixture.detectChanges();
+      component.allStats = createQuestionReviewerStats(3);
+      expect(component.getOverallItemCount()).toEqual(
+        component.allStats.length.toString()
+      );
+    }));
+
+    it(
+      'should show a "+" at the end of the overall item count when ' +
+        'the number of items exceeds max expected',
+      fakeAsync(() => {
+        component.statsPageNumber = 1;
+        component.itemsPerPage = 1;
+        component.tableHasMoreThanMaximumExpectedItems = true;
+        fixture.detectChanges();
+        component.allStats = createQuestionReviewerStats(1000);
+        expect(component.getOverallItemCount()).toEqual('1000+');
+      })
+    );
 
     it('should navigate to next page', fakeAsync(() => {
       const goToSpy = spyOn(component, 'goToPageNumber');
@@ -357,7 +415,7 @@ describe('Contributor stats component', () => {
       };
       component.inputs.activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
       component.ngOnChanges(changes);
-      component.updateColumnsToDisplay();
+      component.displayContributorAdminStats();
       tick();
       expect(component.columnsToDisplay).toEqual([
         'contributorName',
@@ -391,7 +449,7 @@ describe('Contributor stats component', () => {
       };
       component.inputs.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
       component.ngOnChanges(changes);
-      component.updateColumnsToDisplay();
+      component.displayContributorAdminStats();
       tick();
       expect(component.columnsToDisplay).toEqual([
         'contributorName',
@@ -423,7 +481,7 @@ describe('Contributor stats component', () => {
       };
       component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
       component.ngOnChanges(changes);
-      component.updateColumnsToDisplay();
+      component.displayContributorAdminStats();
       tick();
       expect(component.columnsToDisplay).toEqual([
         'contributorName',
@@ -457,7 +515,7 @@ describe('Contributor stats component', () => {
       };
       component.inputs.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
       component.ngOnChanges(changes);
-      component.updateColumnsToDisplay();
+      component.displayContributorAdminStats();
       tick();
       expect(component.columnsToDisplay).toEqual([
         'contributorName',
@@ -843,6 +901,48 @@ describe('Contributor stats component', () => {
       expect(component.getContributionCount(activeTab, 1, 2, 3, 4)).toEqual(3);
       activeTab = component.TAB_NAME_QUESTION_REVIEWER;
       expect(component.getContributionCount(activeTab, 1, 2, 3, 4)).toEqual(4);
+    }));
+
+    it('should convert the items per page dropdown back into numbers', fakeAsync(() => {
+      component.onItemsPerPageChange('05');
+      expect(component.itemsPerPage).toEqual(5);
+    }));
+  });
+
+  describe('when more than one page of stats are returned', () => {
+    it('should show data on multiple pages', fakeAsync(() => {
+      let allQuestionReviewerStats: QuestionReviewerStats[] =
+        createQuestionReviewerStats(30);
+
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
+          stats: allQuestionReviewerStats,
+          nextOffset: 1,
+          more: false,
+        } as QuestionReviewerStatsData)
+      );
+      const changes: SimpleChanges = {
+        activeTab: {
+          currentValue: component.TAB_NAME_QUESTION_REVIEWER,
+          previousValue: component.TAB_NAME_QUESTION_SUBMITTER,
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      };
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      component.ngOnChanges(changes);
+
+      tick();
+      expect(component.getOverallItemCount()).toEqual('30');
+      expect(component.displayStatsForCurrentPage().length).toEqual(20);
+      expect(component.tableCanShowMoreItems).toEqual(true);
+
+      component.goToPageNumber(1);
+      expect(component.displayStatsForCurrentPage().length).toEqual(10);
+      expect(component.tableCanShowMoreItems).toEqual(false);
     }));
   });
 });

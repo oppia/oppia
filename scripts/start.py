@@ -123,7 +123,7 @@ def notify_about_successful_shutdown() -> None:
 
 def call_extend_index_yaml() -> None:
     """Calls the extend_index_yaml.py script."""
-    print('\033[94m' + 'Extending index.yaml...' + '\033[0m')
+    print('\033[94mExtending index.yaml...\033[0m')
     extend_index_yaml.main()
 
 

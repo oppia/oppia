@@ -8,12 +8,14 @@
       {{ 'I18N_PLAYER_UNPUBLISHED_EXPLORATION_BANNER' | translate }}
     </p>
   </div>
-  <div class="embedded-body" *ngIf="pageIsIframed">
-    <oppia-conversation-skin></oppia-conversation-skin>
+  <div *ngIf="voiceoversAreLoaded">
+    <div class="embedded-body" *ngIf="pageIsIframed">
+      <oppia-conversation-skin></oppia-conversation-skin>
+    </div>
+    <oppia-conversation-skin *ngIf="!pageIsIframed"></oppia-conversation-skin>
+    <attribution-guide></attribution-guide>
+    <oppia-on-screen-keyboard></oppia-on-screen-keyboard>
   </div>
-  <oppia-conversation-skin *ngIf="!pageIsIframed"></oppia-conversation-skin>
-  <attribution-guide></attribution-guide>
-  <oppia-on-screen-keyboard></oppia-on-screen-keyboard>
 </div>
 
 <style>

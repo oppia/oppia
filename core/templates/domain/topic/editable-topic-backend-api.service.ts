@@ -43,8 +43,10 @@ interface FetchTopicBackendResponse {
   skill_id_to_rubrics_dict: {
     [skillId: string]: RubricBackendDict[];
   };
-  classroom_url_fragment: string;
+  classroom_url_fragment: string | null;
+  classroom_name: string | null;
   skill_creation_is_allowed: boolean;
+  curriculum_admin_usernames: string[];
 }
 
 export interface FetchTopicResponse {
@@ -59,8 +61,10 @@ export interface FetchTopicResponse {
   skillIdToRubricsDict: {
     [skillId: string]: RubricBackendDict[];
   };
-  classroomUrlFragment: string;
+  classroomUrlFragment: string | null;
+  classroomName: string | null;
   skillCreationIsAllowed: boolean;
+  curriculumAdminUsernames: string[];
 }
 
 interface FetchStoriesBackendResponse {
@@ -150,7 +154,9 @@ export class EditableTopicBackendApiService {
               },
               skillIdToRubricsDict: response.skill_id_to_rubrics_dict,
               classroomUrlFragment: response.classroom_url_fragment,
+              classroomName: response.classroom_name,
               skillCreationIsAllowed: response.skill_creation_is_allowed,
+              curriculumAdminUsernames: response.curriculum_admin_usernames,
             });
           }
         },

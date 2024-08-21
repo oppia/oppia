@@ -41,9 +41,15 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ContextService} from 'services/context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
+import {Voiceover} from '../../../../domain/exploration/voiceover.model';
+import {LocalStorageService} from 'services/local-storage.service';
+import {VoiceoverPlayerService} from '../../../exploration-player-page/services/voiceover-player.service';
 
 class MockNgbModal {
   open() {
@@ -63,6 +69,19 @@ class MockContextService {
   }
 }
 
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: true,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
+
 describe('Translator Overview component', () => {
   let component: TranslatorOverviewComponent;
   let contextService: ContextService;
@@ -78,9 +97,12 @@ describe('Translator Overview component', () => {
   let focusManagerService: FocusManagerService;
   let routerService: RouterService;
   let entityTranslationsService: EntityTranslationsService;
-  let changeListService: ChangeListService;
+  let entityVoiceoversService: EntityVoiceoversService;
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
+  let localStorageService: LocalStorageService;
+  let voiceoverPlayerService: VoiceoverPlayerService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -95,6 +117,10 @@ describe('Translator Overview component', () => {
         {
           provide: ContextService,
           useClass: MockContextService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         WindowRef,
       ],
@@ -122,8 +148,11 @@ describe('Translator Overview component', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     routerService = TestBed.inject(RouterService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
-    changeListService = TestBed.inject(ChangeListService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     windowRef = TestBed.inject(WindowRef);
+    localStorageService = TestBed.inject(LocalStorageService);
+    voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
 
     spyOn(
       translationTabActiveModeService,
@@ -137,6 +166,35 @@ describe('Translator Overview component', () => {
       entityTranslationsService,
       'getEntityTranslationsAsync'
     ).and.resolveTo();
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.resolveTo();
+    let languageAccentMasterList = {
+      en: {
+        'en-IN': 'English (India)',
+        'en-US': 'English (United State)',
+      },
+      hi: {
+        'hi-IN': 'Hindi (India)',
+      },
+    };
+    let languageCodesMapping = {
+      en: {
+        'en-US': true,
+      },
+      hi: {
+        'hi-IN': true,
+      },
+    };
+
+    let voiceoverAdminDataResponse = {
+      languageAccentMasterList: languageAccentMasterList,
+      languageCodesMapping: languageCodesMapping,
+    };
+    spyOn(translationLanguageService, 'setActiveLanguageAccentCode');
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchVoiceoverAdminDataAsync'
+    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
+    spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
 
     explorationLanguageCodeService.init(explorationLanguageCode);
     component.isTranslationTabBusy = false;
@@ -165,7 +223,7 @@ describe('Translator Overview component', () => {
           content1: new TranslatedContent('translated content', 'html', false),
         }
       );
-      entityTranslationsService.languageCodeToEntityTranslations = {
+      entityTranslationsService.languageCodeToLatestEntityTranslations = {
         hi: entityTranslation,
       };
       spyOn(windowRef.nativeWindow.localStorage, 'getItem').and.returnValue(
@@ -175,74 +233,6 @@ describe('Translator Overview component', () => {
         .createSpy()
         .and.returnValue(Promise.resolve(entityTranslation));
     });
-    it('should update entity translations with edit translation changes', fakeAsync(() => {
-      expect(
-        entityTranslationsService.getHtmlTranslations('hi', ['content1'])
-      ).toEqual(['translated content']);
-
-      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
-        {
-          cmd: 'edit_translation',
-          content_id: 'content1',
-          language_code: 'hi',
-          translation: {
-            content_value: 'new translation',
-            content_format: 'html',
-            needs_update: false,
-          },
-        },
-      ]);
-
-      spyOn(
-        translationLanguageService,
-        'getActiveLanguageCode'
-      ).and.returnValue(undefined as unknown as string);
-
-      component.ngOnInit();
-      tick();
-
-      expect(
-        entityTranslationsService.getHtmlTranslations('hi', ['content1'])
-      ).toEqual(['new translation']);
-    }));
-
-    it('should handle mark needs update translation changes', fakeAsync(() => {
-      let translatedContent = entityTranslation.getWrittenTranslation(
-        'content1'
-      ) as TranslatedContent;
-      expect(translatedContent.needsUpdate).toBeFalse();
-
-      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
-        {
-          cmd: 'mark_translations_needs_update',
-          content_id: 'content1',
-        },
-      ]);
-
-      component.ngOnInit();
-      tick();
-
-      translatedContent = entityTranslation.getWrittenTranslation(
-        'content1'
-      ) as TranslatedContent;
-      expect(translatedContent.needsUpdate).toBeTrue();
-    }));
-
-    it('should update entity translations with remove translation changes', fakeAsync(() => {
-      expect(entityTranslation.hasWrittenTranslation('content1')).toBeTrue();
-
-      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
-        {
-          cmd: 'remove_translations',
-          content_id: 'content1',
-        },
-      ]);
-
-      component.ngOnInit();
-      tick();
-
-      expect(entityTranslation.hasWrittenTranslation('content1')).toBeFalse();
-    }));
 
     it(
       'should set language code to previously selected one when there is no' +
@@ -410,5 +400,69 @@ describe('Translator Overview component', () => {
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'audioTranslationLanguageCodeField'
     );
+  }));
+
+  it('should be able to update language accent dropdown options on language change', fakeAsync(() => {
+    let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+    let manualVoiceover2 = new Voiceover('b.mp3', 1000, false, 10.0);
+
+    let entityVoiceovers = new EntityVoiceovers(
+      'exp_id',
+      'exploration',
+      5,
+      'en-US',
+      {
+        content_0: {
+          manual: manualVoiceover1,
+        },
+        content_8: {
+          manual: manualVoiceover2,
+        },
+      }
+    );
+    component.languageCode = 'en';
+    let languageAccentMasterList = {
+      en: {
+        'en-IN': 'English (India)',
+        'en-US': 'English (United States)',
+      },
+      hi: {
+        'hi-IN': 'Hindi (India)',
+      },
+    };
+
+    let languageCodesMapping = {
+      en: {
+        'en-US': false,
+        'en-IN': false,
+      },
+      hi: {
+        'hi-IN': false,
+      },
+    };
+
+    component.languageAccentMasterList = languageAccentMasterList;
+    component.languageCodesMapping = languageCodesMapping;
+
+    entityVoiceoversService.setLanguageCode('en');
+    entityVoiceoversService.addEntityVoiceovers('en-IN', entityVoiceovers);
+
+    localStorageService.setLastSelectedLanguageAccentCode('en-IN');
+
+    component.updateLanguageAccentCodesDropdownOptions();
+    tick(5);
+    flush();
+    discardPeriodicTasks();
+
+    expect(component.selectedLanguageAccentCode).toEqual('en-IN');
+
+    localStorageService.setLastSelectedLanguageAccentCode(undefined);
+
+    component.updateLanguageAccentCodesDropdownOptions();
+    tick(5);
+    flush();
+    discardPeriodicTasks();
+
+    expect(component.selectedLanguageAccentCode).toEqual('en-US');
   }));
 });

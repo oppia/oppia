@@ -86,7 +86,7 @@ describe('State Diff Modal Component', () => {
     spyOn(
       historyTabYamlConversionService,
       'getYamlStringFromStateOrMetadata'
-    ).and.resolveTo('Yaml data');
+    ).and.resolveTo('YAML data');
 
     component.ngOnInit();
     tick(201);
@@ -98,18 +98,34 @@ describe('State Diff Modal Component', () => {
     });
   }));
 
-  it('should evaluate yaml strings object', fakeAsync(() => {
+  it('should evaluate YAML strings object', fakeAsync(() => {
     spyOn(
       historyTabYamlConversionService,
       'getYamlStringFromStateOrMetadata'
-    ).and.resolveTo('Yaml data');
+    ).and.resolveTo('YAML data');
 
     component.ngOnInit();
     tick(201);
 
     fixture.whenStable().then(() => {
-      expect(component.yamlStrs.leftPane).toBe('Yaml data');
-      expect(component.yamlStrs.rightPane).toBe('Yaml data');
+      expect(component.yamlStrs.leftPane).toBe('YAML data');
+      expect(component.yamlStrs.rightPane).toBe('YAML data');
+    });
+  }));
+
+  it('should evaluate YAML string objects for translation changes', fakeAsync(() => {
+    spyOn(
+      historyTabYamlConversionService,
+      'getYamlStringFromTranslations'
+    ).and.resolveTo('YAML data');
+
+    component.showingTranslationChanges = true;
+    component.ngOnInit();
+    tick();
+
+    fixture.whenStable().then(() => {
+      expect(component.yamlStrs.leftPane).toBe('YAML data');
+      expect(component.yamlStrs.rightPane).toBe('YAML data');
     });
   }));
 });

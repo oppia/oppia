@@ -73,6 +73,13 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from './services/version-history.service';
 import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -127,6 +134,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   currentVersion: number;
   areExplorationWarningsVisible: boolean;
   isModalOpenable: boolean = true;
+  modifyTranslationsFeatureFlagIsEnabled: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -135,6 +143,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private changeListService: ChangeListService,
     private contextService: ContextService,
     public editabilityService: EditabilityService,
+    private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
     private explorationAutomaticTextToSpeechService: ExplorationAutomaticTextToSpeechService,
     private explorationCategoryService: ExplorationCategoryService,
@@ -163,6 +172,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private paramChangesObjectFactory: ParamChangesObjectFactory,
     private paramSpecsObjectFactory: ParamSpecsObjectFactory,
+    private platformFeatureService: PlatformFeatureService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -175,7 +185,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private userExplorationPermissionsService: UserExplorationPermissionsService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-    private versionHistoryService: VersionHistoryService
+    private versionHistoryService: VersionHistoryService,
+    private entityVoiceoversService: EntityVoiceoversService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService
   ) {}
 
   setDocumentTitle(): void {
@@ -205,6 +217,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   // Called on page load.
   initExplorationPage(): Promise<void> {
     this.editabilityService.lockExploration(true);
+    this.modifyTranslationsFeatureFlagIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled;
     return Promise.all([
       this.explorationDataService.getDataAsync((explorationId, lostChanges) => {
         if (!this.autosaveInfoModalsService.isModalOpen()) {
@@ -239,6 +253,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         this.explorationId,
         'exploration',
         explorationData.version
+      );
+      this.contextService.setExplorationVersion(explorationData.version);
+
+      this.entityVoiceoversService.init(
+        this.explorationId,
+        'exploration',
+        explorationData.version,
+        explorationData.language_code
       );
 
       this.explorationTitleService.init(explorationData.title);
@@ -334,6 +356,54 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         }
       }
 
+      if (this.modifyTranslationsFeatureFlagIsEnabled) {
+        this.entityBulkTranslationsBackendApiService
+          .fetchEntityBulkTranslationsAsync(
+            this.explorationId,
+            'exploration',
+            this.currentVersion
+          )
+          .then(response => {
+            for (let language in response) {
+              // Initialize the entity translation objects with the last published translations
+              // in order to compare translation changes made.
+              let languageTranslations =
+                response[language].translationMappingToBackendDict();
+              this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
+                language
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: response[language].entityVersion,
+                language_code: language,
+                translations: languageTranslations,
+              });
+
+              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+                language
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: response[language].entityVersion,
+                language_code: language,
+                translations: languageTranslations,
+              });
+            }
+            // Populate the entity translations with draft changes
+            // if they exist.
+            this.populateEntityTranslationsWithDraftChanges(
+              explorationData.draft_changes,
+              explorationData.version
+            );
+          });
+      } else {
+        // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
+        this.populateEntityTranslationsWithDraftChanges(
+          explorationData.draft_changes,
+          explorationData.version
+        );
+      }
+
       // Initialize changeList by draft changes if they exist.
       if (explorationData.draft_changes !== null) {
         this.changeListService.loadAutosavedChangeList(
@@ -387,6 +457,64 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.stateEditorRefreshService.onRefreshStateEditor.emit();
       this.explorationEditorPageHasInitialized = true;
     });
+  }
+
+  populateEntityTranslationsWithDraftChanges(
+    draftChanges: ExplorationChange[] | null,
+    version: number
+  ): void {
+    if (draftChanges !== null) {
+      for (let i in draftChanges) {
+        let changeDict = draftChanges[i];
+
+        if (changeDict.cmd === 'edit_translation') {
+          // Create the entity translation objects first if they don't exist.
+          if (
+            !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
+              changeDict.language_code
+            )
+          ) {
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+              changeDict.language_code
+            ] = EntityTranslation.createFromBackendDict({
+              entity_id: this.explorationId,
+              entity_type: 'exploration',
+              entity_version: version,
+              language_code: changeDict.language_code,
+              translations: {},
+            });
+          }
+
+          // Update the translations appropriately, via latest draft changes.
+          if (changeDict.translation.content_value) {
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+              changeDict.language_code
+            ].updateTranslation(
+              changeDict.content_id,
+              TranslatedContent.createFromBackendDict(changeDict.translation)
+            );
+          } else {
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+              changeDict.language_code
+            ].removeTranslation(changeDict.content_id);
+          }
+        } else if (changeDict.cmd === 'remove_translations') {
+          this.entityTranslationsService.removeAllTranslationsForContent(
+            changeDict.content_id
+          );
+        } else if (
+          changeDict.cmd === 'mark_translation_needs_update_for_language'
+        ) {
+          this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+            changeDict.language_code
+          ].markTranslationAsNeedingUpdate(changeDict.content_id);
+        } else if (changeDict.cmd === 'mark_translations_needs_update') {
+          this.entityTranslationsService.markAllTranslationsAsNeedingUpdate(
+            changeDict.content_id
+          );
+        }
+      }
+    }
   }
 
   getActiveTabName(): string {

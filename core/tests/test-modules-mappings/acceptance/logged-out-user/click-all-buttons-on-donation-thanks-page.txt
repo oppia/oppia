@@ -1,0 +1,2 @@
+core/templates/pages/blog-home-page/blog-home-page.module.ts
+core/templates/pages/donate-page/donate-page.module.ts

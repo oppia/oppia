@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import email_subscription_services
+from core.domain import platform_parameter_list
 from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
@@ -61,11 +62,16 @@ class InformSubscribersTest(test_utils.EmailTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
 
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_subscription_email_ctx = self.swap(
-            feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', True)
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'EMAIL_FOOTER'),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin')
+        ]
+    )
     def test_inform_subscribers(self) -> None:
         subscription_services.subscribe_to_creator(
             self.user_id_2, self.editor_id)
@@ -84,7 +90,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
         email_preferences_model.update_timestamps()
         email_preferences_model.put()
 
-        with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
+        with self.can_send_subscription_email_ctx:
             email_subscription_services.inform_subscribers(
                 self.editor_id, 'A', 'Title')
 

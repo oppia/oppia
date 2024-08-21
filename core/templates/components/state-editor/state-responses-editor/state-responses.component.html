@@ -128,9 +128,9 @@
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container e2e-test-response-body-default">
                     <oppia-answer-group-editor class="e2e-test-response-body"
-                                               [rules]="null"
+                                               [rules]="answerGroups[activeAnswerGroupIndex]?.rules"
                                                [outcome]="defaultOutcome"
-                                               [taggedSkillMisconceptionId]="null"
+                                               [taggedSkillMisconceptionId]="answerGroups[activeAnswerGroupIndex]?.taggedSkillMisconceptionId"
                                                [isEditable]="editabilityService.isEditable()"
                                                [suppressWarnings]="shouldHideDefaultAnswerGroup()"
                                                [displayFeedback]="!isLinearWithNoFeedback(defaultOutcome)"
@@ -162,18 +162,19 @@
             <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
           </span>
         </div>
-        <div *ngIf="isInQuestionMode() && answerGroups && answerGroups.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length)" class="misconception-parent-card">
+        <div *ngIf="isInQuestionMode() && answerGroups && answerGroups.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length) || (tagMisconceptionsFeatureFlagIsEnabled && answerGroups && answerGroups.length > 0 && getUnaddressedMisconceptionNames().length !== 0)" class="misconception-parent-card">
           <h3>Misconceptions</h3>
           <small class="text-muted">The following must be addressed by tagging to an incorrect answer. If a misconception is not relevant to this question, mark it as "Not Applicable".</small>
           <div class="pt-4" *ngIf="getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
             <h4 class="pl-3">Compulsory</h4>
-            <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames(misconceptionsBySkill); let index = index" class="misconception-list-item">
+            <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames(misconceptionsBySkill)"
+               class="misconception-list-item">
               {{misconceptionName}}
             </p>
           </div>
           <div class="pt-4">
             <h4 class="pl-3" *ngIf="containsOptionalMisconceptions">Optional</h4>
-            <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue; let index = index">
+            <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue">
               <div *ngFor="let misconception of skillWithMisconceptions.value">
                 <div *ngIf="!misconception.isMandatory()"
                      class="misconception-list-item optional-misconception-list-item"
@@ -188,12 +189,14 @@
                   <div *ngIf="skillWithMisconceptions.key + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
                     <div *ngIf="inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
                          (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), true)"
-                         (mouseleave)="setActiveEditOption(null)">
+                         (mouseleave)="setActiveEditOption(null)"
+                         class="e2e-test-misconception-applicable-toggle">
                         Mark as "Applicable"
                     </div>
                     <div *ngIf="!inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
                          (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), false)"
-                         (mouseleave)="setActiveEditOption(null)">
+                         (mouseleave)="setActiveEditOption(null)"
+                         class="e2e-test-misconception-applicable-toggle">
                         Mark as "Not Applicable"
                     </div>
                   </div>

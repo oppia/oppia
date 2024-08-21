@@ -247,6 +247,7 @@ describe('Topics List Component', () => {
       topicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized,
       'emit'
     );
+    componentInstance.topicSummaries = [];
     componentInstance.deleteTopic(topicId, topicName);
     expect(
       topicsAndSkillsDashboardBackendApiService
@@ -254,13 +255,57 @@ describe('Topics List Component', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should not delete topic if it is assigned to a classroom', () => {
+    let topic = CreatorTopicSummary.createFromBackendDict({
+      topic_model_created_on: 1581839432987.596,
+      uncategorized_skill_count: 0,
+      canonical_story_count: 1,
+      id: topicId,
+      is_published: true,
+      total_skill_count: 10,
+      total_published_node_count: 6,
+      can_edit_topic: true,
+      topic_model_last_updated: 1581839492500.852,
+      additional_story_count: 0,
+      name: topicName,
+      classroom: 'Math',
+      version: 1,
+      description: 'Alpha description',
+      subtopic_count: 0,
+      language_code: 'en',
+      url_fragment: 'alpha',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4],
+    });
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized,
+      'emit'
+    );
+    componentInstance.topicSummaries = [topic];
+    spyOn(alertsService, 'addWarning');
+    componentInstance.deleteTopic(topicId, topicName);
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'The topic is assigned to the Math classroom. Contact the curriculum admins to remove it from the classroom first.'
+    );
+    expect(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized.emit
+    ).not.toHaveBeenCalled();
+  });
+
   it('should handle modal cancel', () => {
+    componentInstance.topicSummaries = [];
     mockNgbModal.modalRef.success = false;
     componentInstance.deleteTopic(topicId, topicName);
   });
 
   it('should handle error when deleting topic', () => {
     editableTopicBackendApiService.success = false;
+    componentInstance.topicSummaries = [];
     spyOn(alertsService, 'addWarning');
     componentInstance.deleteTopic(topicId, topicName);
     expect(alertsService.addWarning).toHaveBeenCalledWith(
@@ -269,6 +314,7 @@ describe('Topics List Component', () => {
   });
 
   it('should handle error when deleting topic and show error message', () => {
+    componentInstance.topicSummaries = [];
     editableTopicBackendApiService.success = false;
     editableTopicBackendApiService.message = 'error_message';
     spyOn(alertsService, 'addWarning');

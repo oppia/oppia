@@ -410,7 +410,7 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
 
         for line in html_output_lines:
             trimmed_error_messages.append(line)
-        return '\n'.join(trimmed_error_messages) + '\n'
+        return '%s\n' % '\n'.join(trimmed_error_messages)
 
     def lint_html_files(self) -> concurrent_task_utils.TaskResult:
         """This function is used to check HTML files for linting errors.

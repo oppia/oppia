@@ -29,6 +29,10 @@ import {
   CreatorTopicSummary,
   CreatorTopicSummaryBackendDict,
 } from 'domain/topic/creator-topic-summary.model';
+import {
+  SkillSummary,
+  SkillSummaryBackendDict,
+} from 'domain/skill/skill-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface UserRolesBackendResponse {
@@ -82,6 +86,7 @@ export interface AdminPageDataBackendDict {
   human_readable_roles: HumanReadableRolesBackendResponse;
   topic_summaries: CreatorTopicSummaryBackendDict[];
   platform_params_dicts: PlatformParameterBackendDict[];
+  skill_list: SkillSummaryBackendDict[];
 }
 
 export interface AdminPageData {
@@ -94,6 +99,7 @@ export interface AdminPageData {
   humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
   platformParameters: PlatformParameter[];
+  skillList: SkillSummary[];
 }
 
 export interface ExplorationInteractionIdsBackendResponse {
@@ -129,6 +135,9 @@ export class AdminBackendApiService {
               ),
               platformParameters: response.platform_params_dicts.map(dict =>
                 PlatformParameter.createFromBackendDict(dict)
+              ),
+              skillList: response.skill_list.map(dict =>
+                SkillSummary.createFromBackendDict(dict)
               ),
             });
           },
@@ -337,13 +346,32 @@ export class AdminBackendApiService {
 
   async regenerateOpportunitiesRelatedToTopicAsync(
     topicId: string
-  ): Promise<number> {
+  ): Promise<{opportunities_count: number}> {
     return new Promise((resolve, reject) => {
       this.http
-        .post<number>(AdminPageConstants.ADMIN_HANDLER_URL, {
-          action: 'regenerate_topic_related_opportunities',
-          topic_id: topicId,
-        })
+        .post<{opportunities_count: number}>(
+          AdminPageConstants.ADMIN_HANDLER_URL,
+          {
+            action: 'regenerate_topic_related_opportunities',
+            topic_id: topicId,
+          }
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async regenerateTopicSummariesAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .put<void>(AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL, {})
         .toPromise()
         .then(
           response => {
@@ -533,6 +561,16 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateDummyTranslationOpportunitiesAsync(
+    numDummyTranslationOpportunitiesToGenerate: number
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_translation_opportunities',
+      num_dummy_translation_opportunities_to_generate:
+        numDummyTranslationOpportunitiesToGenerate,
+    });
+  }
+
   async reloadExplorationAsync(explorationId: string): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_exploration',
@@ -603,6 +641,17 @@ export class AdminBackendApiService {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_blog_post',
       blog_post_title: blogPostTitle,
+    });
+  }
+
+  async generateDummySuggestionQuestionsAsync(
+    skillId: string,
+    numberOfQuestions: number
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_question_suggestions',
+      skill_id: skillId,
+      num_dummy_question_suggestions_generate: numberOfQuestions,
     });
   }
 

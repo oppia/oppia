@@ -34,6 +34,7 @@ import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {PageTitleService} from 'services/page-title.service';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
 
 /**
@@ -57,6 +58,7 @@ describe('Exploration Player Page', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let translateService: TranslateService;
   let explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService;
+  let entityVoiceoversService: EntityVoiceoversService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -84,6 +86,7 @@ describe('Exploration Player Page', () => {
     explorationPermissionsBackendApiService = TestBed.inject(
       ExplorationPermissionsBackendApiService
     );
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
   }));
 
   it('should create', () => {
@@ -118,6 +121,9 @@ describe('Exploration Player Page', () => {
       'getPermissionsAsync'
     ).and.returnValue(
       Promise.resolve(explorationPermissionResponse as ExplorationPermissions)
+    );
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
+      Promise.resolve()
     );
 
     componentInstance.ngOnInit();

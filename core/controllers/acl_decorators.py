@@ -551,12 +551,14 @@ def can_edit_collection(
 
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
+
         if collection_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_edit_activity(
                 self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
+
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this collection.')
@@ -1244,8 +1246,8 @@ def can_access_contributor_dashboard_admin_page(
             raise self.NotLoggedInException
 
         new_dashboard_enabled = feature_flag_services.is_feature_flag_enabled(
-            self.user_id,
-            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
+            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
+            self.user_id)
 
         if new_dashboard_enabled and (
             role_services
@@ -4695,7 +4697,7 @@ def can_update_suggestion(
 
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException(
-                'Invalid format for suggestion_id.' +
+                'Invalid format for suggestion_id.'
                 ' It must contain 3 parts separated by \'.\'')
 
         suggestion = suggestion_services.get_suggestion_by_id(

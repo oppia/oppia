@@ -739,6 +739,7 @@ def managed_acceptance_tests_server(
     suite_name: str,
     headless: bool = False,
     mobile: bool = False,
+    prod_env: bool = False,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the acceptance tests
@@ -749,8 +750,9 @@ def managed_acceptance_tests_server(
         suite_name: str. The suite name whose tests should be run.
         headless: bool. Whether to run the acceptance tests in headless mode.
         mobile: bool. Whether to run the acceptance tests in mobile mode.
-        stdout: int. This parameter specifies the executed program's standard
-            output file handle.
+        prod_env: bool. Whether to run the acceptance tests in production mode.
+        stdout: int. The file descriptor where the standard output of the 
+            subprocess is sent.
 
     Yields:
         psutil.Process. The jasmine testing process.
@@ -764,6 +766,8 @@ def managed_acceptance_tests_server(
 
     os.environ['HEADLESS'] = 'true' if headless else 'false'
     os.environ['MOBILE'] = 'true' if mobile else 'false'
+    os.environ['SPEC_NAME'] = suite_name
+    os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
 
     nodemodules_jasmine_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jasmine')
@@ -771,8 +775,10 @@ def managed_acceptance_tests_server(
         common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
     puppeteer_build_dir_path = os.path.join(
         puppeteer_acceptance_tests_dir_path, 'build')
-    spec_dir_path = os.path.join(
-        puppeteer_build_dir_path, 'spec')
+    puppeteer_acceptance_tests_build_dir_path = os.path.join(
+        puppeteer_build_dir_path, 'puppeteer-acceptance-tests')
+    specs_dir_path = os.path.join(
+        puppeteer_acceptance_tests_build_dir_path, 'specs')
     jasmine_config_file_path = os.path.join(
         puppeteer_acceptance_tests_dir_path, 'jasmine.json')
 
@@ -781,7 +787,7 @@ def managed_acceptance_tests_server(
     acceptance_tests_args = [
         nodemodules_jasmine_bin_path,
         '--config="%s"' % jasmine_config_file_path,
-        '%s' % os.path.join(spec_dir_path, suite_name_with_extension)
+        '%s' % os.path.join(specs_dir_path, suite_name_with_extension)
     ]
 
     # OK to use shell=True here because we are passing string literals,

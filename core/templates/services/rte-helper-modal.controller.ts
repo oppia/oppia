@@ -30,6 +30,7 @@ import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ServicesConstants} from 'services/services.constants';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
+import {Subscription} from 'rxjs';
 
 const typedCloneDeep = <T>(obj: T): T => cloneDeep(obj);
 
@@ -94,20 +95,34 @@ type CustomizationArgsNameAndValueArray = {
   // Finally, use [keyof ComponentSpecsType] to create a union.
 }[keyof ComponentSpecsType];
 
+// RteComponentId extracts the frontend_id string from
+// the component in ComponentSpecsType.
+export type RteComponentId = {
+  [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['frontend_id'];
+}[keyof ComponentSpecsType];
+
 @Component({
   selector: 'oppia-rte-helper-modal',
   templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
+  @Input() componentId: RteComponentId;
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
   @Input() componentIsNewlyCreated: boolean;
   modalIsLoading: boolean = true;
-  currentRteIsMathExpressionEditor: boolean = false;
-  currentRteIsLinkEditor: boolean = false;
+  errorMessage: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
   public customizationArgsForm: FormGroup;
+  customizationArgsFormSubscription: Subscription;
+  COMPONENT_ID_COLLAPSIBLE = 'collapsible';
+  COMPONENT_ID_IMAGE = 'image';
+  COMPONENT_ID_LINK = 'link';
+  COMPONENT_ID_MATH = 'math';
+  COMPONENT_ID_SKILLREVIEW = 'skillreview';
+  COMPONENT_ID_TABS = 'tabs';
+  COMPONENT_ID_VIDEO = 'video';
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -126,7 +141,6 @@ export class RteHelperModalComponent {
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
-        this.currentRteIsMathExpressionEditor = true;
         // Typescript is not able to infer the correct type of mathValueDict.
         // Hence we manually typecast it to the correct type. When we use
         // typeof caName, it returns a string literal type which is
@@ -179,19 +193,6 @@ export class RteHelperModalComponent {
         ).push(tmpCustomizationArg);
       }
     }
-    // Infer that the RTE component is a Link if it contains the `url` and
-    // `text` customization arg names
-    // TODO(#18219): Remove the typecast once Typescript is able to infer
-    // the correct type..
-    const customizationArgNames = (
-      this.customizationArgSpecs as {name: string}[]
-    ).map(x => x.name);
-    if (
-      customizationArgNames.includes('url') &&
-      customizationArgNames.includes('text')
-    ) {
-      this.currentRteIsLinkEditor = true;
-    }
 
     const formGroupControls = {};
     this.customizationArgSpecs.forEach((_, index) => {
@@ -201,6 +202,11 @@ export class RteHelperModalComponent {
     });
 
     this.customizationArgsForm = this.fb.group(formGroupControls);
+
+    this.customizationArgsFormSubscription =
+      this.customizationArgsForm.valueChanges.subscribe(value => {
+        this.onCustomizationArgsFormChange(value);
+      });
 
     setTimeout(() => {
       this.modalIsLoading = false;
@@ -213,70 +219,112 @@ export class RteHelperModalComponent {
     } else {
       this.ngbActiveModal.dismiss(false);
     }
+    this.customizationArgsFormSubscription.unsubscribe();
   }
 
   delete(): void {
     this.ngbActiveModal.dismiss(true);
+    this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  disableSaveButtonForMathRte(): boolean {
-    // This method disables the save button when the Math SVG has not yet
-    // been generated but being processed.
-    if (!this.currentRteIsMathExpressionEditor) {
-      return false;
-    } else {
-      // We know that this is a math rich text component. Hence we can make the
-      // the type more specific.
-      const {value} = this.tmpCustomizationArgs[0] as Extract<
-        CustomizationArgsNameAndValueArray[number],
-        {name: 'math_content'}
-      >;
-      return value.mathExpressionSvgIsBeingProcessed || value.raw_latex === '';
+  onCustomizationArgsFormChange(value: number | string | boolean): void {
+    this.clearRteErrorMessage();
+    if (this.componentId === this.COMPONENT_ID_MATH) {
+      let rawLatex: string = value[0].raw_latex;
+      let mathExpressionSvgIsBeingProcessed: boolean =
+        value[0].mathExpressionSvgIsBeingProcessed;
+      if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
+        this.updateRteErrorMessage(
+          'Waiting for math expression SVG to be processed...'
+        );
+        return;
+      }
+    } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
+      let start: number = value[1];
+      let end: number = value[2];
+      if (start === 0 && end === 0) {
+        return;
+      }
+
+      if (start >= end) {
+        this.updateRteErrorMessage(
+          'Please ensure that the start time of the video is earlier than ' +
+            'the end time.'
+        );
+        return;
+      }
+    } else if (this.componentId === this.COMPONENT_ID_TABS) {
+      // Value[0] corresponds to all tab contents and titles.
+      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
+        if (value[0][tabIndex].title === '') {
+          this.updateRteErrorMessage(
+            'Please ensure that the title of tab ' +
+              (tabIndex + 1) +
+              ' is filled.'
+          );
+          break;
+        } else if (value[0][tabIndex].content === '') {
+          this.updateRteErrorMessage(
+            'Please ensure that the content of tab ' +
+              (tabIndex + 1) +
+              ' is filled.'
+          );
+          break;
+        } else {
+          this.updateRteErrorMessage('');
+        }
+      }
+    } else if (this.componentId === this.COMPONENT_ID_LINK) {
+      let url: string = value[0];
+      let text: string = value[1];
+      if (text === '') {
+        value[1] = url;
+        text = url;
+      } else {
+        // First check if the `text` looks like a URL.
+        const suffixes = ['.com', '.org', '.edu', '.gov'];
+        let textLooksLikeUrl = suffixes.some(suffix => text.endsWith(suffix));
+        if (!textLooksLikeUrl) {
+          this.clearRteErrorMessage();
+        } else {
+          // If the text looks like a URL, strip the leading 'http://' or
+          // 'https://' or 'www.'.
+          const prefixes = ['https://', 'http://', 'www.'];
+          for (const prefix of prefixes) {
+            if (url.startsWith(prefix)) {
+              url = url.substring(prefix.length);
+            }
+            if (text.startsWith(prefix)) {
+              text = text.substring(prefix.length);
+            }
+          }
+          // After the cleanup, if the strings are not equal, then we do not
+          // allow the lesson creator to save it.
+          if (url !== text) {
+            this.updateRteErrorMessage(
+              'It seems like clicking on this link will lead the user to a ' +
+                'different URL than the text specifies. Please change the text.'
+            );
+            return;
+          }
+        }
+      }
     }
   }
 
-  disableSaveButtonForLinkRte(): boolean {
-    // This method disables the save button when the `text` field for the
-    // Link RTE looks like a URL but it does not match the `url`. Otherwise,
-    // creators can make the `url` a malicious website and make the `text`
-    // a safe website.
-    if (!this.currentRteIsLinkEditor) {
-      return false;
+  isErrorMessageNonempty(): boolean {
+    if (this.errorMessage && this.errorMessage !== '') {
+      return true;
     }
-    // We know that this is a link rich text component. Hence we can make the
-    // the type more specific.
-    const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
-      CustomizationArgsNameAndValueArray[number],
-      {name: 'url' | 'text'}
-    >[];
-    let url: string = tmpCustomizationArgs[0].value;
-    let text: string = tmpCustomizationArgs[1].value;
+    return false;
+  }
 
-    // First check if the `text` looks like a URL.
-    const suffixes = ['.com', '.org', '.edu', '.gov'];
-    let textLooksLikeUrl = false;
-    for (const suffix of suffixes) {
-      if (text.endsWith(suffix)) {
-        textLooksLikeUrl = true;
-      }
-    }
-    if (!textLooksLikeUrl) {
-      return false;
-    }
-    // If the text looks like a URL, strip the leading 'http://' or
-    // 'https://' or 'www.'.
-    const prefixes = ['https://', 'http://', 'www.'];
-    for (const prefix of prefixes) {
-      if (url.startsWith(prefix)) {
-        url = url.substring(prefix.length);
-      }
-      if (text.startsWith(prefix)) {
-        text = text.substring(prefix.length);
-      }
-    }
-    // After the cleanup, if the strings are not equal, then we do not
-    // allow the lesson creator to save it.
-    return url !== text;
+  updateRteErrorMessage(errorMessage: string): void {
+    this.errorMessage = errorMessage;
+  }
+
+  clearRteErrorMessage(): void {
+    this.errorMessage = '';
   }
 
   save(): void {
@@ -296,7 +344,7 @@ export class RteHelperModalComponent {
     // The saving of SVGs to the backend cannot be done in the math RTE editor
     // because the control is passed to this function as soon as the user
     // clicks on the save button.
-    if (this.currentRteIsMathExpressionEditor) {
+    if (this.componentId === this.COMPONENT_ID_MATH) {
       // The tmpCustomizationArgs is guaranteed to have only one element for
       // the case of math rich text component.
       // We know that this is a math rich text component. Hence we can make the
@@ -382,29 +430,29 @@ export class RteHelperModalComponent {
     } else {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
-        if (caName === 'video_id') {
-          const temp = this.tmpCustomizationArgs[i].value;
-          customizationArgsDict[caName] = this.extractVideoIdFromVideoUrl(
-            temp.toString()
-          );
-        } else if (caName === 'text' && this.currentRteIsLinkEditor) {
-          // Set the link `text` to the link `url` if the `text` is empty.
-          (
-            customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-            }
-          )[caName] =
-            this.tmpCustomizationArgs[i].value ||
-            this.tmpCustomizationArgs[i - 1].value;
-        } else {
-          (
-            customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-            }
-          )[caName] = this.tmpCustomizationArgs[i].value;
+        if (this.componentId === this.COMPONENT_ID_VIDEO) {
+          if (caName === 'video_id') {
+            this.tmpCustomizationArgs[i].value =
+              this.extractVideoIdFromVideoUrl(
+                this.tmpCustomizationArgs[i].value.toString()
+              );
+          }
+        } else if (this.componentId === this.COMPONENT_ID_LINK) {
+          if (caName === 'text') {
+            // Set the link `text` to the link `url` if the `text` is empty.
+            this.tmpCustomizationArgs[i].value =
+              this.tmpCustomizationArgs[i].value ||
+              this.tmpCustomizationArgs[i - 1].value;
+          }
         }
+        (
+          customizationArgsDict as {
+            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+          }
+        )[caName] = this.tmpCustomizationArgs[i].value;
       }
       this.ngbActiveModal.close(customizationArgsDict);
+      this.customizationArgsFormSubscription.unsubscribe();
     }
   }
 

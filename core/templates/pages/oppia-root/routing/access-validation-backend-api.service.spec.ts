@@ -72,6 +72,40 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate access to subtopic viewer page', fakeAsync(() => {
+    let classroom = 'class';
+    let topic = 'topic';
+    let subtopic = 'subtopic';
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/access_validation_handler/can_access_subtopic_viewer_page/' +
+        classroom +
+        '/' +
+        topic +
+        '/revision/' +
+        subtopic
+    );
+
+    avbas
+      .validateAccessToSubtopicViewerPage(classroom, topic, subtopic)
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_subtopic_viewer_page/' +
+        classroom +
+        '/' +
+        topic +
+        '/revision/' +
+        subtopic
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate access to manage user account page', fakeAsync(() => {
     avbas.validateCanManageOwnAccount().then(successSpy, failSpy);
 
@@ -222,6 +256,24 @@ describe('Access validation backend api service', () => {
     expect(failSpy).toHaveBeenCalled();
   }));
 
+  it('should validate access to collection editor page', fakeAsync(() => {
+    let collectionId = 'collection_id';
+    avbas
+      .validateAccessCollectionEditorPage(collectionId)
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/' +
+        'can_access_collection_editor_page/collection_id'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate access to blog home page with valid access', fakeAsync(() => {
     avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
 
@@ -362,4 +414,44 @@ describe('Access validation backend api service', () => {
     expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
+
+  it('should validate access to classrooms page', fakeAsync(() => {
+    avbas.validateAccessToClassroomsPage().then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_classrooms_page'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it(
+    'should not validate access to classrooms page if feature ' +
+      'is not enabled or we just have one classroom',
+    fakeAsync(() => {
+      avbas.validateAccessToClassroomsPage().then(successSpy, failSpy);
+
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_classrooms_page'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {
+          error: 'Page not found',
+        },
+        {
+          status: 404,
+          statusText: 'Page not found',
+        }
+      );
+
+      flushMicrotasks();
+      expect(successSpy).not.toHaveBeenCalled();
+      expect(failSpy).toHaveBeenCalled();
+    })
+  );
 });

@@ -53,6 +53,11 @@
              [ngClass]="{'is-invalid': storyUrlFragmentExists || !validUrlFragmentRegex.test(story.urlFragment)}"
              (change)="onStoryUrlFragmentChange()">
       <div>
+        <div class="oppia-input-box-subtitle text-danger" [hidden]="story.urlFragment === '' || validUrlFragmentRegex.test(story.urlFragment)">
+          <b>
+            Please use only lowercase letters, optionally separated by hyphen.
+          </b>
+        </div>
         <span class="oppia-input-box-subtitle">
           <em>
             The story URL fragment is used to uniquely access the story viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_STORY_URL_FRAGMENT }} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".

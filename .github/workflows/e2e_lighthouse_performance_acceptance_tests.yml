@@ -12,7 +12,13 @@ on:
       - release-*
 
 jobs:
+  check_test_suites_to_run:
+    uses: ./.github/workflows/check_test_suites_to_run.yml
   build:
+    needs: check_test_suites_to_run
+    if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.count > 0 ||
+            fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.count > 0 ||
+            fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.count > 0 }}
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -63,58 +69,13 @@ jobs:
           path: /home/runner/work/oppia/build_files.zip
           retention-days: 1
   e2e_test:
-    needs: build
+    needs: [check_test_suites_to_run, build]
+    if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.count > 0 }}
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        suite:
-          - name: accessibility
-          - name: additionalEditorFeatures
-          - name: additionalEditorFeaturesModals
-          - name: additionalPlayerFeatures
-          - name: adminPage
-          - name: blogDashboard
-          - name: blog
-          - name: checkpointFeatures
-          - name: classroomPage
-          - name: classroomPageFileUploadFeatures
-          - name: collections
-          - name: contributorDashboard
-          - name: contributorAdminDashboard
-          - name: coreEditorAndPlayerFeatures
-          - name: creatorDashboard
-          - name: embedding
-          - name: explorationFeedbackTab
-          - name: explorationImprovementsTab
-          - name: explorationHistoryTab
-          - name: explorationStatisticsTab
-          - name: explorationTranslationTab
-          - name: extensions
-          - name: featureGating
-          - name: feedbackUpdates
-          - name: fileUploadExtensions
-          - name: fileUploadFeatures
-            flaky_indicators: |
-              Play record button is not clickable
-              Translation tab button is not clickable
-          - name: learner
-          - name: learnerDashboard
-          - name: library
-          - name: navigation
-          - name: playVoiceovers
-          - name: preferences
-          - name: profileFeatures
-          - name: profileMenu
-          - name: publication
-          - name: skillEditor
-          - name: subscriptions
-          - name: topicsAndSkillsDashboard
-          - name: topicAndStoryEditor
-          - name: topicAndStoryEditorFileUploadFeatures
-          - name: topicAndStoryViewer
-          - name: users
-          - name: wipeout
+        suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.suites }}
     name: e2e_test (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
       - uses: actions/checkout@v3
@@ -219,13 +180,15 @@ jobs:
         with:
           message: "An E2E test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  lighthouse:
-    needs: build
+  lighthouse_performance:
+    needs: [check_test_suites_to_run, build]
+    if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.count > 0 }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        shard: [1, 2]
+        suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.suites }}
+    name: lighthouse (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -288,9 +251,9 @@ jobs:
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      - name: Run Lighthouse performance checks shard
+      - name: Run Lighthouse performance checks shard ${{ matrix.suite.name }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build --record_screen
+        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Uploading puppeteer video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
@@ -304,26 +267,14 @@ jobs:
           message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   acceptance_test:
-      needs: build
+      needs: [check_test_suites_to_run, build]
+      if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.count > 0 }}
       runs-on:  ${{ matrix.os }}
       strategy:
         matrix:
           os: [ubuntu-22.04]
-          suite:
-            - blog-admin-tests/assign-roles-to-users-and-change-tag-properties
-            - blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked
-            - exploration-editor-tests/load-complete-and-restart-exploration-preview
-            - exploration-editor-tests/create-exploration-and-change-basic-settings
-            - logged-in-user-tests/click-all-buttons-on-about-page
-            - logged-in-user-tests/click-all-buttons-on-about-foundation-page
-            - logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page
-            - logged-in-user-tests/click-all-buttons-on-navbar
-            - logged-in-user-tests/click-all-links-in-about-oppia-footer
-            - logged-in-user-tests/click-all-links-on-get-started-page
-            - practice-question-admin-tests/add-and-remove-contribution-rights
-            - translation-admin-tests/add-translation-rights
-            - translation-admin-tests/remove-translation-rights
-            - voiceover-admin-tests/add-voiceover-artist-to-an-exploration
+          suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.suites }}
+      name: acceptance_test (${{ matrix.os }}, ${{ matrix.suite.name }})
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3
@@ -389,10 +340,16 @@ jobs:
         - name: (Artifact re-build) Build Webpack
           if: steps.download_artifact_1.outcome == 'failure'
           run: python -m scripts.build --prod_env
-        - name: Run Desktop Acceptance Test ${{ matrix.suite }}
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
-        - name: Run Mobile Acceptance Test ${{ matrix.suite }}
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env --mobile
+        - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env
+        - name: Uploading generated test to angular module mapping as an artifact
+          if: ${{ failure() }}
+          uses: actions/upload-artifact@v3
+          with:
+            name: generated-test-to-angular-module-mapping
+            path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite.name }}.txt
+        - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
           uses: actions/upload-artifact@v3
@@ -410,3 +367,24 @@ jobs:
           with:
             message: "An acceptance test failed on the upstream develop branch."
             webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  check_e2e_lighthouse_performance_acceptance_workflow_status:
+    needs: [check_test_suites_to_run, build, e2e_test, lighthouse_performance, acceptance_test]
+    if: always()
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      - uses: ./.github/actions/check-workflow-status
+        id: check_workflow_status
+        with:
+          jobs: ${{ toJson(needs) }}
+      - name: Fail if workflow status is failure
+        if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
+        run: exit 1

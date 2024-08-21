@@ -23,24 +23,25 @@ export class ContributorAdminDashboardFilter {
   topicIds: string[];
   languageCode?: string;
   sort?: string | null;
-  lastActivity?: number;
+  maxDaysSinceLastActivity?: number;
 
   /**
    * @param {String} languageCode - Language Code to filter for.
    * @param {String[]} topicIds - keywords to filter for.
    * @param {string} sort - sort options.
-   * @param {number} lastActivity - number of days since last activity.
+   * @param {number} maxDaysSinceLastActivity - The number of days before today from which to start considering
+    users' contributions, to filter users.
    */
   constructor(
     topicIds: string[],
     languageCode?: string,
     sort?: string | null,
-    lastActivity?: number
+    maxDaysSinceLastActivity?: number
   ) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
     this.sort = sort;
-    this.lastActivity = lastActivity;
+    this.maxDaysSinceLastActivity = maxDaysSinceLastActivity;
   }
 
   /**

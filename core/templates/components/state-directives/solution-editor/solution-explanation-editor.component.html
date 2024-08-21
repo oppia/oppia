@@ -5,7 +5,7 @@
     <div class="oppia-readonly-rule-tile"
          [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
-        <div class="oppia-click-to-start-editing"
+        <div class="oppia-click-to-start-editing e2e-test-edit-solution-explanation"
              *ngIf="isEditable" (click)="openExplanationEditor()">
           <i class="material-icons oppia-editor-edit-icon float-right"
              (keydown.enter)="openExplanationEditor()"
@@ -45,7 +45,7 @@
           Cancel
         </button>
         <button type="button"
-                class="btn btn-success"
+                class="btn btn-success e2e-test-save-solution-explanation-edit"
                 [disabled]="!stateSolutionService.displayed.explanation.html || isSolutionExplanationLengthExceeded()"
                 (click)="saveThisExplanation()">
           Save

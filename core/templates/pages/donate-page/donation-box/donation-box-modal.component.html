@@ -2,13 +2,20 @@
   <button type="button" class="close-btn" aria-label="Close" (click)="dismiss()">
     <span class="close">&times;</span>
   </button>
-  <donation-box></donation-box>
+  <div class="donation-box-container">
+    <donation-box></donation-box>
+  </div>
 </div>
 
 <style>
   .modal-container {
     overflow: hidden;
+    padding: 48px 10px;
     width: 100%;
+  }
+
+  .modal-container .donation-box-container {
+    background-color: #fff;
   }
 
   .close-btn {
@@ -23,7 +30,7 @@
   }
 
   .close-btn > span {
-    color: #fff;
+    color: #000;
     font-family: 'Helvetica Neue', sans-serif;
     font-size: 40px;
     font-weight: 300;

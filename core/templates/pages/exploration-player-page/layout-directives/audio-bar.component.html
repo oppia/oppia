@@ -1,5 +1,6 @@
 <div tabindex="0" aria-label="audio menu" class="audio-header" *ngIf="isAudioBarAvailable()"
      [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
+
   <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded" headroom>
     <div class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
       <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
@@ -29,7 +30,7 @@
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           </div>
           <div *ngIf="!audioLoadingIndicatorIsShown">
-            <oppia-audio-slider [value]="audioPlayerService.getCurrentTime()"
+            <oppia-audio-slider [value]="this.currentVoiceoverTime"
                                 [dir]="isLanguageRTL() ? 'rtl' : 'ltr'"
                                 [max]="audioPlayerService.getAudioDuration()"
                                 (valueChange)="setProgress($event)"
@@ -47,11 +48,20 @@
           <!--Filler space for message-->
           <span class="audio-controls-message">&zwnj;</span>
         </div>
-        <div class="oppia-audio-header-select">
+        <div class="oppia-audio-header-select"
+             *ngIf="!isVoiceoverContributionWithAccentEnabled()">
           <select class="audio-language-select e2e-test-audio-lang-select"
                   [(ngModel)]="selectedLanguage.value"
                   (change)="onNewLanguageSelected()">
             <option *ngFor="let opt of languagesInExploration" [value]="opt.value">{{ opt.displayed }}</option>
+          </select>
+        </div>
+        <div class="oppia-audio-header-select"
+             *ngIf="isVoiceoverContributionWithAccentEnabled() && languageAccentDecriptions.length > 0">
+          <select class="audio-language-select e2e-test-audio-lang-select"
+                  [(ngModel)]="selectedLanguageAccentDescription"
+                  (change)="updateSelectedLanguageAccent()">
+            <option *ngFor="let opt of languageAccentDecriptions" [value]="opt">{{ opt }}</option>
           </select>
         </div>
       </div>

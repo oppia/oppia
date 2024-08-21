@@ -71,6 +71,7 @@ import {
   TranslatableField,
 } from 'domain/objects/BaseTranslatableObject.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -117,7 +118,8 @@ export class ExplorationStatesService {
     private statesObjectFactory: StatesObjectFactory,
     private validatorsService: ValidatorsService,
     private generateContentIdService: GenerateContentIdService,
-    private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService
+    private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
+    private entityTranslationsService: EntityTranslationsService
   ) {}
 
   // Properties that have a different backend representation from the
@@ -192,6 +194,7 @@ export class ExplorationStatesService {
     solution: ['interaction', 'solution'],
     widget_id: ['interaction', 'id'],
     widget_customization_args: ['interaction', 'customizationArgs'],
+    inapplicable_skill_misconception_ids: ['inapplicableSkillMisconceptionIds'],
   };
 
   private _CONTENT_EXTRACTORS = {
@@ -278,6 +281,8 @@ export class ExplorationStatesService {
         }
       );
       modalRef.componentInstance.contentId = contentId;
+      modalRef.componentInstance.contentValue =
+        BaseTranslatableObject.getContentValue(content);
       modalRef.componentInstance.markNeedsUpdateHandler =
         this.markTranslationAndVoiceoverNeedsUpdate.bind(this);
       modalRef.componentInstance.removeHandler =
@@ -306,6 +311,7 @@ export class ExplorationStatesService {
       recordedVoiceovers.voiceoversMapping[contentId] = {};
       this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
     }
+    this.entityTranslationsService.removeAllTranslationsForContent(contentId);
   }
 
   private _getElementsInFirstSetButNotInSecond(
@@ -467,6 +473,11 @@ export class ExplorationStatesService {
     stateName: string,
     backendName: 'linked_skill_id',
     newValue: string
+  ): void;
+  saveStateProperty(
+    stateName: string,
+    backendName: 'inapplicable_skill_misconception_ids',
+    newValue: string[]
   ): void;
   saveStateProperty(
     stateName: string,
@@ -654,6 +665,17 @@ export class ExplorationStatesService {
 
   saveLinkedSkillId(stateName: string, newLinkedSkillId: string): void {
     this.saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
+  }
+
+  saveInapplicableSkillMisconceptionIds(
+    stateName: string,
+    newInapplicableSkillMisconceptionIds: string[]
+  ): void {
+    this.saveStateProperty(
+      stateName,
+      'inapplicable_skill_misconception_ids',
+      newInapplicableSkillMisconceptionIds
+    );
   }
 
   getInteractionCustomizationArgsMemento(

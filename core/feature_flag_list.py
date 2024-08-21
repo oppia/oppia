@@ -49,8 +49,16 @@ class FeatureNames(enum.Enum):
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
     NEW_LESSON_PLAYER = 'new_lesson_player'
+    ADD_VOICEOVER_WITH_ACCENT = 'add_voiceover_with_accent'
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
+    ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
     AUTO_UPDATE_EXP_VOICE_ARTIST_LINK = 'auto_update_exp_voice_artist_link'
+    EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS = (
+        'exploration_editor_can_modify_translations')
+    EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS = (
+        'exploration_editor_can_tag_misconceptions')
+    ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
+    REDESIGNED_TOPIC_VIEWER_PAGE = 'redesigned_topic_viewer_page'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -76,8 +84,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -86,7 +93,12 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     FeatureNames.DIAGNOSTIC_TEST,
-    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
+    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
+    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -95,9 +107,10 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     FeatureNames.END_CHAPTER_CELEBRATION,
     FeatureNames.CHECKPOINT_CELEBRATION,
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
-    FeatureNames.LEARNER_GROUPS_ARE_ENABLED
+    FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -106,6 +119,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
 DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ANDROID_BETA_LANDING_PAGE,
     FeatureNames.BLOG_PAGES,
+    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -124,13 +138,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.CHECKPOINT_CELEBRATION.value: (
         (
             'This flag is for the checkpoint celebration feature.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS.value: (
-        (
-            'This flag enables showing per-contributor accomplishments on the '
-            'contributor dashboard.',
             feature_flag_domain.ServerMode.PROD
         )
     ),
@@ -199,17 +206,62 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV
         )
     ),
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value: (
+        (
+            'The flag allows voice artists to add voiceovers in a specific '
+            'accent for the given language.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
         (
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
+        (
+            'The flag controls whether voiceover contributions from the '
+            'voiceover tab of the exploration editor page is enabled or '
+            'disabled during voiceover migration.',
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value: (
         (
             'The flag allows auto-updating of the exploration voice artists '
             'link model after an exploration update.',
+            feature_flag_domain.ServerMode.PROD
+        )
+    ),
+    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
+        (
+            'This flag allows exploration editors to promptly update '
+            'translations of content they are editing in the exploration '
+            'editor page.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
+        (
+            'This flag allows exploration editors to view a list of '
+            'misconceptions and tag answer groups with misconceptions '
+            'for a curated exploration.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
+        (
+            'The flag enables flow for multiple classrooms '
+            'and makes the classrooms page available to learners.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
+        (
+            'This flag activates the redesigned topic viewer page'
+            'and makes it accessible to learners.',
             feature_flag_domain.ServerMode.DEV
         )
     )

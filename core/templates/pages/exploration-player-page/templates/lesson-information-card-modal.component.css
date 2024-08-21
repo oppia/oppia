@@ -251,6 +251,11 @@
   z-index: 0;
 }
 
+.completed-checkpoint-node:hover {
+  background-color: #00968e;
+  cursor: pointer;
+}
+
 .in-progress-checkpoint-node {
   align-items: flex-start;
   background-color: #fff;

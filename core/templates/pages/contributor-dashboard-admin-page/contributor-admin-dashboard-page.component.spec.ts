@@ -399,14 +399,6 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.languageDropdownShown).toBeTrue();
     });
 
-    it('should open last activity dropdown', fakeAsync(() => {
-      expect(component.activityDropdownShown).toBeFalse();
-
-      component.toggleActivityDropdown();
-
-      expect(component.activityDropdownShown).toBeTrue();
-    }));
-
     it('should select language from dropdown', fakeAsync(() => {
       component.ngOnInit();
       tick();
@@ -422,18 +414,40 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.selectedLanguage.id).toBe(nonDefaultLanguage.id);
     }));
 
-    it('should select last activity from dropdown', fakeAsync(() => {
+    it("should change filter by users' last activity when end date changes", fakeAsync(() => {
+      const numberOfDaysSinceLastDate = 30;
       component.ngOnInit();
       tick();
       fixture.detectChanges();
 
-      let lastActivityDays = 7;
-      component.selectLastActivity(lastActivityDays);
-      expect(component.selectedLastActivity).toEqual(lastActivityDays);
-      lastActivityDays = 0;
-      component.selectLastActivity(lastActivityDays);
-      expect(component.selectedLastActivity).toEqual(lastActivityDays);
+      expect(component.filter.maxDaysSinceLastActivity).toEqual(90);
+
+      component.changeLastDate(
+        component.getDateNDaysAgo(numberOfDaysSinceLastDate)
+      );
+
+      expect(component.filter.maxDaysSinceLastActivity).toEqual(
+        numberOfDaysSinceLastDate
+      );
     }));
+
+    it(
+      "should not change filter by users' last activity when given end date " +
+        'is in the future',
+      fakeAsync(() => {
+        const numberOfDaysSinceLastDate = -1;
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+        const initialValue = component.filter.maxDaysSinceLastActivity;
+
+        component.changeLastDate(
+          component.getDateNDaysAgo(numberOfDaysSinceLastDate)
+        );
+
+        expect(component.filter.maxDaysSinceLastActivity).toEqual(initialValue);
+      })
+    );
 
     it(
       'should remove duplicates from available topics when component' +
@@ -569,7 +583,7 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.isTranslationCoordinator).toBeTrue();
     }));
 
-    it('should open the language dropdown when clicked away', fakeAsync(() => {
+    it('should close the language dropdown when clicked away', fakeAsync(() => {
       spyOn(component, 'checkMobileView').and.returnValue(false);
       const fakeClickAwayEvent = new MouseEvent('click');
       Object.defineProperty(fakeClickAwayEvent, 'target', {
@@ -585,37 +599,25 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.languageDropdownShown).toBe(false);
     }));
 
-    it('should hide opened activity dropdown when clicking away', fakeAsync(() => {
-      spyOn(component, 'checkMobileView').and.returnValue(false);
-      const fakeClickAwayEvent = new MouseEvent('click');
-      Object.defineProperty(fakeClickAwayEvent, 'target', {
-        value: document.createElement('div'),
-      });
+    it(
+      'should not close the language dropdown when clicked away' +
+        ' in mobile view',
+      fakeAsync(() => {
+        spyOn(component, 'checkMobileView').and.returnValue(true);
+        const fakeClickAwayEvent = new MouseEvent('click');
+        Object.defineProperty(fakeClickAwayEvent, 'target', {
+          value: document.createElement('div'),
+        });
 
-      component.toggleActivityDropdown();
-      component.ngOnInit();
-      tick();
-      component.onDocumentClick(fakeClickAwayEvent);
-      fixture.detectChanges();
+        component.toggleLanguageDropdown();
+        component.ngOnInit();
+        tick();
+        component.onDocumentClick(fakeClickAwayEvent);
+        fixture.detectChanges();
 
-      expect(component.activityDropdownShown).toBe(false);
-    }));
-
-    it('should not hide opened activity dropdown when clicking away on mobile', fakeAsync(() => {
-      spyOn(component, 'checkMobileView').and.returnValue(true);
-      const fakeClickAwayEvent = new MouseEvent('click');
-      Object.defineProperty(fakeClickAwayEvent, 'target', {
-        value: document.createElement('div'),
-      });
-
-      component.toggleActivityDropdown();
-      component.ngOnInit();
-      tick();
-      component.onDocumentClick(fakeClickAwayEvent);
-      fixture.detectChanges();
-
-      expect(component.activityDropdownShown).toBe(true);
-    }));
+        expect(component.languageDropdownShown).toBe(true);
+      })
+    );
 
     it(
       'should open question role editor modal when on question' +

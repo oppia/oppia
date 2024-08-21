@@ -353,9 +353,10 @@ describe('Checkpoint celebration modal component', function () {
 
   it('should initialize the component', fakeAsync(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('expId');
-    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      'dummyStaticImageUrl'
-    );
+    spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue('dummyStaticImageUrl');
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchExplorationAsync'

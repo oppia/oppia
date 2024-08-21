@@ -84,7 +84,9 @@ export class TopicEditorStateService {
   };
 
   private _skillCreationIsAllowed: boolean = false;
-  private _classroomUrlFragment: string = 'staging';
+  private _classroomUrlFragment: string | null = null;
+  private _curriculumAdminUsernames: string[] = [];
+  private _classroomName: string | null = null;
   private _storySummariesInitializedEventEmitter: EventEmitter<void> =
     new EventEmitter();
 
@@ -171,8 +173,20 @@ export class TopicEditorStateService {
     return null;
   }
 
-  private _updateClassroomUrlFragment(classroomUrlFragment: string): void {
+  private _updateClassroomUrlFragment(
+    classroomUrlFragment: string | null
+  ): void {
     this._classroomUrlFragment = classroomUrlFragment;
+  }
+
+  private _updateClassroomName(classroomName: string | null): void {
+    this._classroomName = classroomName;
+  }
+
+  private _updateCurriculumAdminUsernames(
+    curriculumAdminUsernames: string[]
+  ): void {
+    this._curriculumAdminUsernames = curriculumAdminUsernames;
   }
 
   private _updateTopic(
@@ -284,6 +298,10 @@ export class TopicEditorStateService {
         );
         this._updateClassroomUrlFragment(
           newBackendTopicObject.classroomUrlFragment
+        );
+        this._updateClassroomName(newBackendTopicObject.classroomName);
+        this._updateCurriculumAdminUsernames(
+          newBackendTopicObject.curriculumAdminUsernames
         );
         this._updateTopicRights(newBackendTopicRightsObject);
         this._setCanonicalStorySummaries(canonicalStorySummaries);
@@ -588,10 +606,23 @@ export class TopicEditorStateService {
   }
 
   /**
-   * Returns the classroom name for the topic.
+   * Returns the classroom url fragment if the topic is assigned to any
+   * classroom, else null.
    */
-  getClassroomUrlFragment(): string {
+  getClassroomUrlFragment(): string | null {
     return this._classroomUrlFragment;
+  }
+
+  /**
+   * Returns the classroom name if the topic is assigned to any
+   * classroom, else null.
+   */
+  getClassroomName(): string | null {
+    return this._classroomName;
+  }
+
+  getCurriculumAdminUsernames(): string[] {
+    return this._curriculumAdminUsernames;
   }
 
   /**

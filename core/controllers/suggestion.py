@@ -264,16 +264,94 @@ class SuggestionHandler(
         # adding an image, there is no method to remove the uploaded image.
         # See more - https://github.com/oppia/oppia/issues/14298
         if suggestion_type != feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            assert isinstance(
+                suggestion,
+                suggestion_registry.SuggestionTranslateContent
+            )
+            self._copy_images_from_target_exploration_content_to_translation(
+                suggestion
+            )
+
             files = self.normalized_payload.get('files')
             new_image_filenames = (
                 suggestion.get_new_image_filenames_added_in_suggestion()
             )
             if new_image_filenames and files is not None:
-                _upload_suggestion_images(
-                    files, suggestion, new_image_filenames
+                new_image_files = {
+                    filename: image_blob
+                    for filename, image_blob
+                    in files.items()
+                    if filename in new_image_filenames
+                }
+                self._save_new_images_added_in_translation(
+                    new_image_files, suggestion
                 )
 
         self.render_json(self.values)
+
+    def _save_new_images_added_in_translation(
+        self,
+        new_files: Dict[str, str],
+        suggestion: suggestion_registry.SuggestionTranslateContent
+    ) -> None:
+        """Saves new images introduced in translation suggestion to storage.
+
+        Args:
+            new_files: dict. A mapping from each new image's filename to its
+                corresponding image blob.
+            suggestion: SuggestionTranslateContent. The translation suggestion
+                for which images are being uploaded.
+        """
+        for filename, image in new_files.items():
+            decoded_image = base64.decodebytes(image.encode('utf-8'))
+            file_format = (
+                image_validation_services.validate_image_and_filename(
+                    decoded_image, filename))
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, suggestion.image_context, suggestion.target_id,
+                decoded_image, 'image', image_is_compressible)
+
+    def _copy_images_from_target_exploration_content_to_translation(
+        self,
+        suggestion: suggestion_registry.SuggestionTranslateContent
+    ) -> None:
+        """Creates copies of images from the suggestion's target exploration
+        for the translation suggestion to use.
+
+        Args:
+            suggestion: SuggestionTranslateContent. The translation suggestion
+                to copy its target exploration's images to.
+
+        Raises:
+            Exception. An image in the target exploration's content is not a
+                saved asset belonging to the target exploration.
+        """
+        target_image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                suggestion.get_target_entity_html_strings()
+            )
+        )
+        try:
+            fs_services.copy_images(
+                suggestion.target_type, suggestion.target_id,
+                suggestion.image_context, suggestion.target_id,
+                target_image_filenames
+            )
+        except ValueError as error:
+            _, source_asset_path, *_ = error.args
+            filename_start_index = source_asset_path.rfind('/') + 1
+            source_asset_filename = source_asset_path[filename_start_index:]
+            source_asset_directory = source_asset_path[:filename_start_index]
+            raise Exception(
+                'An image in the submitted translation\'s original content '
+                'named "%s" cannot be found. Please save it to the ' % (
+                    source_asset_filename
+                ) + 'backend file system at /%s ' % (
+                    source_asset_directory
+                ) + 'before submitting this translation again.'
+            ) from error
 
 
 class SuggestionToExplorationActionHandlerNormalizedPayloadDict(TypedDict):
@@ -1278,43 +1356,3 @@ def _construct_exploration_suggestions(
         }
         suggestion_dicts.append(updated_suggestion_dict)
     return suggestion_dicts
-
-
-def _upload_suggestion_images(
-    files: Dict[str, str],
-    suggestion: suggestion_registry.BaseSuggestion,
-    filenames: List[str]
-) -> None:
-    """Saves a suggestion's images to storage.
-
-    Args:
-        files: dict. Files containing a mapping of image
-            filename to image blob.
-        suggestion: BaseSuggestion. The suggestion for which images are being
-            uploaded.
-        filenames: list(str). The image filenames.
-    """
-    suggestion_image_context = suggestion.image_context
-    # TODO(#10513): Find a way to save the images before the suggestion is
-    # created.
-    for filename in filenames:
-        image = files[filename]
-        decoded_image = base64.decodebytes(image.encode('utf-8'))
-        file_format = (
-            image_validation_services.validate_image_and_filename(
-                decoded_image, filename))
-        image_is_compressible = (
-            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-        fs_services.save_original_and_compressed_versions_of_image(
-            filename, suggestion_image_context, suggestion.target_id,
-            decoded_image, 'image', image_is_compressible)
-
-    target_entity_html_list = suggestion.get_target_entity_html_strings()
-    target_image_filenames = (
-        html_cleaner.get_image_filenames_from_html_strings(
-            target_entity_html_list))
-
-    fs_services.copy_images(
-        suggestion.target_type, suggestion.target_id,
-        suggestion_image_context, suggestion.target_id,
-        target_image_filenames)

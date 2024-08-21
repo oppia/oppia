@@ -208,7 +208,7 @@
       <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType, platformParameter.name)" [(ngModel)]="platformParameter.defaultValue">
       </schema-based-editor>
     </div>
-    <div *ngIf="!platformParametersInEditMode.get(platformParameter.name)" class="col-10">{{platformParameter.defaultValue}}</div>
+    <div *ngIf="!platformParametersInEditMode.get(platformParameter.name)" class="col-10 e2e-test-param-default-value">{{platformParameter.defaultValue}}</div>
   </div>
   <div class="row oppia-control-buttons-container oppia-parameter-top-margin">
     <!-- Control Buttons -->

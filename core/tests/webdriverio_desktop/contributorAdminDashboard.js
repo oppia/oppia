@@ -49,6 +49,7 @@ describe('Contributor Admin Dashboard', function () {
   const ADMIN_EMAIL = 'curricullum@admin.com';
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
   const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
+  const ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
 
   let releaseCoordinatorPage = null;
   let adminPage = null;
@@ -125,21 +126,13 @@ describe('Contributor Admin Dashboard', function () {
       'Topic description 1',
       false
     );
-    const URL = await browser.getUrl();
-    // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
-    const TOPIC_ID_URL_PART = URL.split('/')[4];
-    // We have to remove the ending "#".
-    const TOPIC_ID = TOPIC_ID_URL_PART.substring(
-      0,
-      TOPIC_ID_URL_PART.length - 1
-    );
 
     // Add topic to classroom to make it available for question contributions.
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
-    await diagnosticTestPage.addTopicIdToClassroomConfig(TOPIC_ID, 0);
-
+    await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAMES[0]);
+    await diagnosticTestPage.publishClassroom();
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0],
       REVIEW_MATERIALS[0],
@@ -350,4 +343,114 @@ describe('Contributor Admin Dashboard', function () {
     await contributorDashboardAdminPage.expectNoStatsElement();
     await users.logout();
   });
+
+  it(
+    'should be able to filter those translation submitters, who have submitted' +
+      ' translations between a given date range',
+    async function () {
+      /**
+      One translation submission was created previously by the beforeAll block in
+      this describe block for earlier e2e test, so it was created within the last 24
+      hours.
+      **/
+      await users.login(TRANSLATION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+
+      await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await users.logout();
+    }
+  );
+
+  it(
+    'should be able to filter those translation reviewers, who have reviewed' +
+      ' translations between a given date range',
+    async function () {
+      /**
+      One translation review was created previously by the beforeAll block in this
+      describe block for earlier e2e test, so it was created within the last 24
+      hours.
+      **/
+      await users.login(TRANSLATION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+
+      await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await users.logout();
+    }
+  );
+
+  it(
+    'should be able to filter those question submitters, who have submitted' +
+      ' questiions between a given date range',
+    async function () {
+      /**
+      One question submission was created previously by the beforeAll block in this
+      describe block for earlier e2e test, so it was created within the last 24
+      hours.
+      **/
+      await users.login(QUESTION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToQuestionSubmitterTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await users.logout();
+    }
+  );
+
+  it(
+    'should be able to filter those question reviewers, who have reviewed' +
+      ' questions between a given date range',
+    async function () {
+      /**
+      One question review was created previously by the beforeAll block in this
+      describe block for earlier e2e test, so it was created within the last 24
+      hours.
+      **/
+      await users.login(QUESTION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await users.logout();
+    }
+  );
 });

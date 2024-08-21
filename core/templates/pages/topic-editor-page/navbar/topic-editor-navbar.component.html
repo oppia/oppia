@@ -65,7 +65,7 @@
     <button type="button"
             (click)="unpublishTopic()"
             *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
-            class="btn btn-light"
+            class="btn btn-light e2e-test-unpublish-topic-button"
             [disabled]="isTopicSaveable()">
       Unpublish Topic
     </button>
@@ -83,7 +83,7 @@
              class="oppia-topic-nav-dropdown-option" (click)="selectQuestionsTab()">
           <i class="fas fa-book-open"></i><span>Questions</span>
         </div>
-        <div class="oppia-topic-nav-dropdown-option" (click)="openTopicViewer()">
+        <div class="oppia-topic-nav-dropdown-option e2e-test-mobile-preview-tab" (click)="openTopicViewer()">
           <i class="fas fa-play"></i><span>Preview</span>
         </div>
       </div>
@@ -116,7 +116,7 @@
             ({{ totalWarningsCount }} <i class="fa fa-exclamation-triangle oppia-error-icon"></i>)
           </span>
         </div>
-        <div class="oppia-topic-nav-dropdown-icon"
+        <div class="oppia-topic-nav-dropdown-icon e2e-test-mobile-navbar-dropdown"
              (click)="toggleNavigationOptions()">
           <i class="fa fa-caret-down"></i>
         </div>
@@ -130,6 +130,7 @@
         </div>
         <div class="oppia-topic-nav-dropdown-option">
           <div *ngIf="!topicRights.isPublished()"
+               class="e2e-test-mobile-publish-topic-button"
                (click)="publishTopic()"
                [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="fas fa-pen"></i>
@@ -137,6 +138,7 @@
           </div>
           <div (click)="unpublishTopic()"
                *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
+               class="e2e-test-mobile-unpublish-topic-button"
                [attr.disabled]="isTopicSaveable()">
             <i class="fas fa-pen"></i>
             <span>Unpublish Topic</span>
@@ -144,7 +146,7 @@
         </div>
       </div>
       <div class="oppia-topic-nav-dropdown-content oppia-right-container">
-        <div class="oppia-topic-nav-dropdown-text"
+        <div class="oppia-topic-nav-dropdown-text e2e-test-mobile-save-topic-button"
              (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
@@ -156,7 +158,7 @@
             ({{ changeListLength }})
           </span>
         </div>
-        <div class="oppia-topic-nav-dropdown-icon"
+        <div class="oppia-topic-nav-dropdown-icon e2e-test-mobile-save-topic-dropdown"
              (click)="toggleTopicEditOptions()">
           <i class="fa fa-caret-down"></i>
         </div>

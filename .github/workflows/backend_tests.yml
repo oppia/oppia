@@ -48,13 +48,19 @@ jobs:
         run: pip install coverage configparser
       - name: Run backend test shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --generate_time_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "A backend test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+      - name: Upload time report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('backend_test_time_shard_{0}', matrix.shard) }}
+          path: backend_test_time_report.json
+          retention-days: 1
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: actions/upload-artifact@v3
@@ -138,3 +144,53 @@ jobs:
         with:
           message: "Backend coverage checks failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  check_backend_test_times:
+    name: Check backend test times
+    needs: run_tests
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - name: Download time report for shard 1
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_1
+          path: backend_test_time_reports_artifacts/backend_test_time_1
+      - name: Download time report for shard 2
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_2
+          path: backend_test_time_reports_artifacts/backend_test_time_2
+      - name: Download time report for shard 3
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_3
+          path: backend_test_time_reports_artifacts/backend_test_time_3
+      - name: Download time report for shard 4
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_4
+          path: backend_test_time_reports_artifacts/backend_test_time_4
+      - name: Download time report for shard 5
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_5
+          path: backend_test_time_reports_artifacts/backend_test_time_5
+      - name: Move time reports from artifact folders to backend_test_time_reports folder
+        shell: bash
+        run: |
+          mkdir -p backend_test_time_reports
+          for i in {1..5}; do cp backend_test_time_reports_artifacts/backend_test_time_$i/backend_test_time_report.json backend_test_time_reports/backend_test_time_report_$i.json; done
+      - name: Check test times
+        run: python -m scripts.check_backend_test_times
+        shell: bash
+      - name: Upload test times artifact
+        if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend_test_times
+          path: backend_test_times.txt
+          retention-days: 7
