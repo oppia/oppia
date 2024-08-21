@@ -1891,7 +1891,8 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * This function verifies that the classroom cards in classrooms page.
+   * This function verifies that the classroom cards are present in the classrooms page.
+   * @param {number} classroomsCount - The expected number of classrooms.
    */
   async expectClassroomCountInClassroomsPageToBe(
     classroomsCount: number
