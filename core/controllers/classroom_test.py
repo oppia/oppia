@@ -303,7 +303,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
                 'classroom_index': self.physics_classroom.index
             }
         ]
-        json_response = self.get_json(feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL)
+        json_response = self.get_json(feconf.CLASSROOM_DISPLAY_INFO_HANDLER_URL)
         self.assertEqual(
             sorted(
                 json_response['classroom_display_info'],

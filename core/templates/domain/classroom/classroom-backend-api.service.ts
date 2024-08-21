@@ -364,7 +364,7 @@ export class ClassroomBackendApiService {
     return new Promise((resolve, reject) => {
       this.http
         .get<classroomDisplayInfoBackendDict>(
-          ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
+          ClassroomDomainConstants.CLASSROOM_DISPLAY_INFO_HANDLER_URL_TEMPLATE
         )
         .toPromise()
         .then(

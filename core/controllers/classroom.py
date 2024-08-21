@@ -139,10 +139,10 @@ class ClassroomDataHandler(
         self.render_json(self.values)
 
 
-class ClassroomIdToNameHandler(
+class ClassroomDisplayInfoHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Fetches a list of classroom names corresponding to the given ids."""
+    """Fetches a list of classroom name & index corresponding to the given ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -150,7 +150,7 @@ class ClassroomIdToNameHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Retrieves a mapping of classroom IDs to classroom names."""
+        """Retrieves a mapping of classroom IDs to classroom name and index."""
         classroom_id_index_mappings: List[Dict[str, str|int]] = []
         classrooms = classroom_config_services.get_all_classrooms()
 
