@@ -153,6 +153,10 @@ oppia-library-page .community-library-breadcrumbs-container span {
   line-height: 16px;
 }
 
+oppia-library-page .community-library-breadcrumbs-container i {
+  transform: scale(0.75);
+}
+
 .oppia-library-group-header a:hover,
 .oppia-library-group-header a:focus {
   color: #04857c;
