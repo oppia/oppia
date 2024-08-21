@@ -60,18 +60,18 @@ describe('Parent/Teacher', function () {
       // Navigating to "Teacher Story tagged blogs page" by clicking on the "Check out our blog" button.
       await loggedOutUser.clickBlogButtonInTeachPage();
       // Checking if the lesson creators carousel is working in the "For Parent/Teacher" page.
-      await loggedOutUser.walkThroughLessonCreatorsCarouselInTeachPage();
+      await loggedOutUser.expectLessonCreatorsCarouselToBeFunctionalInTeachPage();
       // Navigating to "lesson creator's LinkedIn profile" by clicking on the "LinkedIn profile" button.
       await loggedOutUser.clickLinkedInButtonInTeachPage();
       // Checking if the lesson creation process is visible in the "For Parent/Teacher" page.
-      await loggedOutUser.viewLessonCreationStepsInTeachPage();
+      await loggedOutUser.expectLessonCreationStepsAccordionToBeFunctionalInTeachPage();
       // Navigating to lessons/classroom page by clicking on the
       // "Explore Lessons" button on the "For Parent/Teacher" page.
       await loggedOutUser.clickExploreLessonsButtonAtTheTopInTeachPage();
       // Navigating back.
       await loggedOutUser.navigateToTeachPage();
       // Checking if the testimonials carousel is working in the "For Parent/Teacher" page.
-      await loggedOutUser.walkThroughTestimonailsCarouselInTeachPage();
+      await loggedOutUser.expectTestimonailsCarouselToBeFunctionalInTeachPage();
       // Navigating to lessons/classroom page by clicking on the
       // "Explore Lessons" button on the "For Parent/Teacher" page.
       await loggedOutUser.clickExploreLessonsButtonAtTheBottomInTeachPage();

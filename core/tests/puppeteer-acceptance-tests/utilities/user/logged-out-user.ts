@@ -1496,10 +1496,11 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to verify the testimonial carousel functionality in the Teach page.
-   * and check if it opens the Android page.
+   * Function to verify the testimonial carousel functionality in the Teach page,
+   * ensuring that the carousel correctly displays the first and second testimonials
+   * and allows navigation back to the first testimonial.
    */
-  async walkThroughTestimonailsCarouselInTeachPage(): Promise<void> {
+  async expectTestimonailsCarouselToBeFunctionalInTeachPage(): Promise<void> {
     const testimonialCarousel = await this.page.waitForSelector(
       testimonialCarouselSelectorInTeachPage
     );
@@ -1559,10 +1560,11 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to verify the lesson creators carousel functionality in the Teach page.
-   * and check if it opens the Android page.
+   * Function to verify the lesson creators carousel functionality in the Teach page,
+   * ensuring that the carousel correctly displays the first and second testimonials
+   * and allows navigation back to the first testimonial.
    */
-  async walkThroughLessonCreatorsCarouselInTeachPage(): Promise<void> {
+  async expectLessonCreatorsCarouselToBeFunctionalInTeachPage(): Promise<void> {
     const creatorsCarousel = await this.page.waitForSelector(
       creatorsCarouselSelectorInTeachPage
     );
@@ -1619,8 +1621,10 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to verify the Lesson Creation Steps accordion functionality in the Teach page.
+   * It verifies that the expand button opens the corresponding accordion panel content
+   * and the close button closes it.
    */
-  async viewLessonCreationStepsInTeachPage(): Promise<void> {
+  async expectLessonCreationStepsAccordionToBeFunctionalInTeachPage(): Promise<void> {
     const lessonCreationSection = await this.page.waitForSelector(
       lessonCreationSectionInTeachPage
     );
@@ -1766,9 +1770,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to verify the Volunteer tabs functionality in the Volunteer page
+   * Function to verify the Volunteer tabs functionality in the Volunteer page.
+   * It checks if the tabs can be toggled through tab-labels in desktop and arrows in mobile.
    */
-  async viewVolunteerExpectationsInVolunteerPage(): Promise<void> {
+  async expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage(): Promise<void> {
     const tabsSection = await this.page.waitForSelector(
       tabsSectionInVolunteerPage
     );
@@ -2104,8 +2109,10 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to verify the Features accordion functionality in the About page.
+   * It verifies that the expand button opens the corresponding accordion panel content
+   * and the close button closes it.
    */
-  async viewFeaturesInAboutPage(): Promise<void> {
+  async expectFeaturesAccordionToBeFunctionalInAboutPage(): Promise<void> {
     const featuresSection = await this.page.waitForSelector(
       featuresSectionInAboutPage
     );
@@ -2138,9 +2145,11 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to verify the Volunteer carousel functionality in the About page.
+   * Function to verify the Volunteer carousel functionality in the About page,
+   * ensuring that the carousel correctly displays the first and second slides
+   * and allows navigation back to the first slide.
    */
-  async walkThroughVolunteerCarouselInAboutPage(): Promise<void> {
+  async expectVolunteerCarouselToBeFunctionalInAboutPage(): Promise<void> {
     const volunteerCarouselSelectorInAboutPage = !this.isViewportAtMobileWidth()
       ? volunteerCarouselSelectorDesktopInAboutPage
       : volunteerCarouselSelectorMobileInAboutPage;
