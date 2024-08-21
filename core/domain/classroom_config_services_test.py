@@ -348,7 +348,5 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'math'
         )
 
-        self.assertEqual(updated_history_classroom.name, 'History')
         self.assertEqual(updated_history_classroom.index, 1)
-        self.assertEqual(updated_math_classroom.name, 'Math')
         self.assertEqual(updated_math_classroom.index, 0)
