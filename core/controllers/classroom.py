@@ -591,12 +591,15 @@ class UpdateClassroomIndexMappingHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    classroom_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]
+    classroom_index_mappings: List[
+        classroom_config_domain.ClassroomIdToIndexDict
+    ]
 
 
 class UpdateClassroomIndexMappingHandler(
     base.BaseHandler[
-        UpdateClassroomIndexMappingHandlerNormalizedPayloadDict, Dict[str, str]
+        UpdateClassroomIndexMappingHandlerNormalizedPayloadDict,
+        Dict[str, str]
     ]
 ):
     """Updates the order of classrooms."""
@@ -609,10 +612,44 @@ class UpdateClassroomIndexMappingHandler(
                 'schema': {
                     'type': 'list',
                     'items': {
-                        'type': 'object_dict',
-                        'object_class': (
-                            classroom_config_domain.ClassroomIdToIndex
-                        )
+                        'type': 'dict',
+                        'properties': [
+                            {
+                                'name': 'classroom_id',
+                                'schema': {
+                                    'type': 'basestring',
+                                    'validators': [{
+                                        'id': 'is_regex_matched',
+                                        'regex_pattern': (
+                                            constants.ENTITY_ID_REGEX
+                                        )
+                                    }]
+                                }
+                            },
+                            {
+                                'name': 'classroom_name',
+                                'schema': {
+                                    'type': 'basestring',
+                                    'validators': [{
+                                        'id': 'is_nonempty'
+                                    }]
+                                }
+                            },
+                            {
+                                'name': 'classroom_index',
+                                'schema': {
+                                    'type': 'int',
+                                    'validators': [{
+                                        'id': 'is_at_least',
+                                        'min_value': 0
+                                    }]
+                                }
+                            }
+                        ],
+                        'required': [
+                            'classroom_id', 'classroom_name',
+                            'classroom_index'
+                        ]
                     }
                 }
             }
@@ -628,7 +665,10 @@ class UpdateClassroomIndexMappingHandler(
                 with classroom_order.
         """
         assert self.normalized_payload is not None
+        classroom_index_mappings = self.normalized_payload[
+            'classroom_index_mappings']
+
         classroom_config_services.update_classroom_id_to_index_mappings(
-            self.normalized_payload['classroom_index_mappings']
+            classroom_index_mappings
         )
         self.render_json({})

@@ -791,42 +791,47 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
         )
 
 
-class UpdateClassroomIndexMappingHandlerTests(
-    BaseClassroomControllerTests):
-    def setUp(self) -> None:
-        """Set up for testing the classroom order feature."""
+class TestUpdateClassroomIndexMappingHandler(BaseClassroomControllerTests):
+    """Test for updating classrooms order."""
+
+    def setUp(self):
+        """Set up test data and environment."""
         super().setUp()
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        self.save_new_valid_classroom(
-            'classroom1', 'classroom1', 'classroomone')
-        self.save_new_valid_classroom(
-            'classroom2', 'classroom2', 'classroomtwo')
-        self.save_new_valid_classroom(
-            'classroom3', 'classroom3', 'classroomthree')
-
-    def test_put_updates_classroom_order(self) -> None:
-        self.assertEqual(
-            classroom_config_services.get_classroom_by_id(
-                'classroom1').index, 0)
-        self.assertEqual(
-            classroom_config_services.get_classroom_by_id(
-                'classroom2').index, 1)
-        self.assertEqual(
-            classroom_config_services.get_classroom_by_id(
-                'classroom3').index, 2)
-
-        classroom_config_services.update_classroom_id_to_index_mappings(
-            [classroom_config_domain.ClassroomIdToIndex('classroom1', 1),
-            classroom_config_domain.ClassroomIdToIndex('classroom2', 0)]
+        self.classroom_1 = self.save_new_valid_classroom(
+            'classroomone', 'Trigonometry', 'classroomone'
+        )
+        self.classroom_2 = self.save_new_valid_classroom(
+            'classroomtwo', 'Math', 'classroomtwo'
         )
 
-        self.assertEqual(
-            classroom_config_services.get_classroom_by_id(
-                'classroom1').index, 1)
-        self.assertEqual(
-            classroom_config_services.get_classroom_by_id(
-                'classroom2').index, 0)
-        self.assertEqual(
-            classroom_config_services.get_classroom_by_id(
-                'classroom3').index, 2)
+    def test_successful_update_classroom_index(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        payload = {
+            'classroom_index_mappings': [
+                {
+                    'classroom_id': 'classroomone',
+                    'classroom_name': 'Trigonometry',
+                    'classroom_index': 1
+                },
+                {
+                    'classroom_id': 'classroomtwo',
+                    'classroom_name': 'Calculus',
+                    'classroom_index': 0
+                }
+            ]
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            feconf.UPDATE_CLASSROOMS_ORDER_HANDLER_URL, payload,
+            csrf_token
+        )
+
+        updated_classroom_1 = (
+            classroom_config_services.get_classroom_by_id('classroomone')
+        )
+        updated_classroom_2 = (
+            classroom_config_services.get_classroom_by_id('classroomtwo')
+        )
+
+        self.assertEqual(updated_classroom_1.index, 1)
+        self.assertEqual(updated_classroom_2.index, 0)

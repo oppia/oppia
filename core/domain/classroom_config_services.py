@@ -355,7 +355,9 @@ def delete_classroom(classroom_id: str) -> None:
 
 @transaction_services.run_in_transaction_wrapper
 def update_classroom_id_to_index_mappings(
-    classroom_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]
+    classroom_index_mappings: List[
+        classroom_config_domain.ClassroomIdToIndexDict
+    ]
 ) -> None:
     """Updates the index of multiple classrooms.
 
@@ -368,6 +370,11 @@ def update_classroom_id_to_index_mappings(
     """
 
     for classroom_index_mapping in classroom_index_mappings:
-        classroom = get_classroom_by_id(classroom_index_mapping.classroom_id)
-        classroom.index = classroom_index_mapping.classroom_index
+        classroom_id = classroom_index_mapping['classroom_id']
+        classroom_name = classroom_index_mapping['classroom_name']
+        classroom_index = int(classroom_index_mapping['classroom_index'])
+
+        classroom = get_classroom_by_id(classroom_id)
+        classroom.name = classroom_name
+        classroom.index = classroom_index
         update_classroom(classroom)
