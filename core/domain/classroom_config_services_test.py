@@ -315,3 +315,40 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             history_classroom.url_fragment, history_classroom_data.url_fragment
         )
         self.assertFalse(history_classroom_data.is_published)
+
+    def test_update_classroom_id_to_index_mappings(self) -> None:
+        self.save_new_valid_classroom(
+            'history', 'history', 'history', is_published=True
+        )
+        self.save_new_valid_classroom(
+            'math', 'math', 'math', is_published=True
+        )
+
+        classroom_index_mappings = [
+            {
+                'classroom_id': 'history',
+                'classroom_name': 'History',
+                'classroom_index': '1'
+            },
+            {
+                'classroom_id': 'math',
+                'classroom_name': 'Math',
+                'classroom_index': '0'
+            }
+        ]
+        classroom_config_services.update_classroom_id_to_index_mappings(
+            classroom_index_mappings
+        )
+
+        updated_history_classroom = (
+            classroom_config_services.get_classroom_by_id(
+                'history')
+        )
+        updated_math_classroom = classroom_config_services.get_classroom_by_id(
+            'math'
+        )
+
+        self.assertEqual(updated_history_classroom.name, 'History')
+        self.assertEqual(updated_history_classroom.index, 1)
+        self.assertEqual(updated_math_classroom.name, 'Math')
+        self.assertEqual(updated_math_classroom.index, 0)

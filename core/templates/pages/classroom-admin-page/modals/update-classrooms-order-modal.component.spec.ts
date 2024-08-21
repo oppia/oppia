@@ -20,7 +20,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UpdateClassroomsOrderModalComponent} from './update-classrooms-order-modal.component';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {ClassroomIdToNameIndexMapping} from '../../../domain/classroom/classroom-backend-api.service';
+import {classroomDisplayInfo} from '../../../domain/classroom/classroom-backend-api.service';
 
 describe('UpdateClassroomsOrderModalComponent', () => {
   let component: UpdateClassroomsOrderModalComponent;
@@ -61,7 +61,7 @@ describe('UpdateClassroomsOrderModalComponent', () => {
     const dropEvent = {
       previousIndex: 0,
       currentIndex: 2,
-    } as CdkDragDrop<ClassroomIdToNameIndexMapping[]>;
+    } as CdkDragDrop<classroomDisplayInfo[]>;
 
     component.drop(dropEvent);
 

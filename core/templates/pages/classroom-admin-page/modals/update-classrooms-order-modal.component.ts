@@ -19,7 +19,7 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {ClassroomIdToNameIndexMapping} from '../../../domain/classroom/classroom-backend-api.service';
+import {classroomDisplayInfo} from '../../../domain/classroom/classroom-backend-api.service';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
@@ -31,9 +31,9 @@ export class UpdateClassroomsOrderModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
-  classroomIdToClassroomNameIndex: ClassroomIdToNameIndexMapping[] = [];
+  classroomIdToClassroomNameIndex: classroomDisplayInfo[] = [];
 
-  drop(event: CdkDragDrop<ClassroomIdToNameIndexMapping[]>): void {
+  drop(event: CdkDragDrop<classroomDisplayInfo[]>): void {
     moveItemInArray(
       this.classroomIdToClassroomNameIndex,
       event.previousIndex,

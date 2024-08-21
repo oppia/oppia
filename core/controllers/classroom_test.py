@@ -306,7 +306,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         json_response = self.get_json(feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL)
         self.assertEqual(
             sorted(
-                json_response['classroom_id_to_name_index_mappings'],
+                json_response['classroom_display_info'],
                 key=lambda x: int(x['classroom_index'])
             ),
             sorted(

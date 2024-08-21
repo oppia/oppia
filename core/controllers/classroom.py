@@ -173,7 +173,7 @@ class ClassroomIdToNameHandler(
             classroom_id_index_mappings.append(classroom_id_index_mapping_dict)
 
         self.values.update({
-            'classroom_id_to_name_index_mappings': sorted(
+            'classroom_display_info': sorted(
                 classroom_id_index_mappings,
                 key=lambda x: int(x['classroom_index'])
             )

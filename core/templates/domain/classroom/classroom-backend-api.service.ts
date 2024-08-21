@@ -40,14 +40,14 @@ export interface ClassroomDataBackendDict {
   public_classrooms_count: number;
 }
 
-export interface ClassroomIdToNameIndexMapping {
+export interface classroomDisplayInfo {
   classroom_id: string;
   classroom_name: string;
   classroom_index: number;
 }
 
-interface ClassroomIdToNameIndexMappingBackendDict {
-  classroom_id_to_name_index_mappings: ClassroomIdToNameIndexMapping[];
+interface classroomDisplayInfoBackendDict {
+  classroom_display_info: classroomDisplayInfo[];
 }
 
 interface NewClassroomIdBackendDict {
@@ -360,18 +360,16 @@ export class ClassroomBackendApiService {
     });
   }
 
-  async getAllClassroomIdToClassroomNameDictAsync(): Promise<
-    ClassroomIdToNameIndexMapping[]
-  > {
+  async getAllClassroomDisplayInfoDictAsync(): Promise<classroomDisplayInfo[]> {
     return new Promise((resolve, reject) => {
       this.http
-        .get<ClassroomIdToNameIndexMappingBackendDict>(
+        .get<classroomDisplayInfoBackendDict>(
           ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
         )
         .toPromise()
         .then(
           response => {
-            resolve(response.classroom_id_to_name_index_mappings);
+            resolve(response.classroom_display_info);
           },
           errorResponse => {
             reject(errorResponse?.error?.error);
@@ -484,14 +482,14 @@ export class ClassroomBackendApiService {
   }
 
   updateClassroomIndexMappingAsync(
-    classroomIdToNameIndexMappings: ClassroomIdToNameIndexMapping[]
+    classroomDisplayInfoDicts: classroomDisplayInfo[]
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const body = new FormData();
       body.append(
         'payload',
         JSON.stringify({
-          classroom_index_mappings: classroomIdToNameIndexMappings,
+          classroom_index_mappings: classroomDisplayInfoDicts,
         })
       );
 

@@ -27,7 +27,7 @@ import {
   ClassroomBackendDict,
   ClassroomDict,
   TopicClassroomRelationDict,
-  ClassroomIdToNameIndexMapping,
+  classroomDisplayInfo,
 } from '../../domain/classroom/classroom-backend-api.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ClassroomEditorConfirmModalComponent} from './modals/classroom-editor-confirm-modal.component';
@@ -74,7 +74,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   tempClassroomData!: ExistingClassroomData;
 
   classroomCount: number = 0;
-  classroomIdToClassroomNameIndex: ClassroomIdToNameIndexMapping[] = [];
+  classroomIdToClassroomNameIndex: classroomDisplayInfo[] = [];
   existingClassroomNames: string[] = [];
 
   currentTopicOnEdit!: string;
@@ -233,7 +233,7 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   getAllClassroomIdToClassroomNameIndex(): void {
     this.classroomBackendApiService
-      .getAllClassroomIdToClassroomNameDictAsync()
+      .getAllClassroomDisplayInfoDictAsync()
       .then(response => {
         this.pageIsInitialized = true;
         this.classroomIdToClassroomNameIndex = response;

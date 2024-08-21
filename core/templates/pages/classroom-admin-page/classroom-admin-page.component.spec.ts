@@ -158,7 +158,7 @@ describe('Classroom Admin Page component ', () => {
 
     spyOn(
       classroomBackendApiService,
-      'getAllClassroomIdToClassroomNameDictAsync'
+      'getAllClassroomDisplayInfoDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
     expect(component.pageIsInitialized).toBeFalse();
@@ -322,7 +322,7 @@ describe('Classroom Admin Page component ', () => {
     ];
     spyOn(
       classroomBackendApiService,
-      'getAllClassroomIdToClassroomNameDictAsync'
+      'getAllClassroomDisplayInfoDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
     expect(component.pageIsInitialized).toBeFalse();
@@ -659,7 +659,7 @@ describe('Classroom Admin Page component ', () => {
 
     spyOn(
       classroomBackendApiService,
-      'getAllClassroomIdToClassroomNameDictAsync'
+      'getAllClassroomDisplayInfoDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
     component.ngOnInit();

@@ -248,7 +248,7 @@ describe('Classroom backend API service', function () {
     let service = classroomBackendApiService;
 
     service
-      .getAllClassroomIdToClassroomNameDictAsync()
+      .getAllClassroomDisplayInfoDictAsync()
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -256,7 +256,7 @@ describe('Classroom backend API service', function () {
     );
     expect(req.request.method).toEqual('GET');
 
-    let classroomIdToNameIndexMappings = [
+    let classroomDisplayInfoDicts = [
       {
         classroom_id: 'math_classroom_id',
         classroom_name: 'math',
@@ -270,12 +270,12 @@ describe('Classroom backend API service', function () {
     ];
 
     req.flush({
-      classroom_id_to_name_index_mappings: classroomIdToNameIndexMappings,
+      classroom_display_info: classroomDisplayInfoDicts,
     });
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(classroomIdToNameIndexMappings);
+    expect(successHandler).toHaveBeenCalledWith(classroomDisplayInfoDicts);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -288,7 +288,7 @@ describe('Classroom backend API service', function () {
       let service = classroomBackendApiService;
 
       service
-        .getAllClassroomIdToClassroomNameDictAsync()
+        .getAllClassroomDisplayInfoDictAsync()
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
