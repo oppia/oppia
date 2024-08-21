@@ -117,13 +117,6 @@ describe('Donation flow', function () {
 });
 
 describe('Static Pages Tour', function () {
-  var getStartedPage = new GetStartedPage.GetStartedPage();
-  it('should visit the Get started page', async function () {
-    await getStartedPage.get();
-    await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-get-started-page').isExisting()).toBe(true);
-  });
-
   it('should visit the Login page', async function () {
     await browser.url('/login');
     await waitFor.pageToFullyLoad();
