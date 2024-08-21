@@ -49,7 +49,7 @@ describe('Logged-out User', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    releaseCoordinator.enableFeatureFlag('enable_multiple_classrooms');
+    await releaseCoordinator.enableFeatureFlag('enable_multiple_classrooms');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
