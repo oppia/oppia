@@ -55,6 +55,7 @@ import {
   NgbSlideEvent,
   NgbSlideEventDirection,
 } from '@ng-bootstrap/ng-bootstrap';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -62,6 +63,7 @@ class MockWindowRef {
       pathname: '/community-library/top-rated',
       href: '',
     },
+    gtag: jasmine.createSpy('gtag'),
   };
 }
 
@@ -105,6 +107,7 @@ describe('Library Page Component', () => {
   let searchService: SearchService;
   let translateService: TranslateService;
   let classroomBackendApiService: ClassroomBackendApiService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   const mockNgbCarousel: Partial<NgbCarousel> = {
     next: jasmine.createSpy('next'),
@@ -302,6 +305,7 @@ describe('Library Page Component', () => {
     loggerService = TestBed.inject(LoggerService);
     searchService = TestBed.inject(SearchService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   afterEach(() => {
@@ -899,5 +903,16 @@ describe('Library Page Component', () => {
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       false
     );
+  });
+
+  it('should record analytics when classroom card is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickClassroomCardEvent'
+    ).and.callThrough();
+    componentInstance.registerClassroomCardClickEvent('Math');
+    expect(
+      siteAnalyticsService.registerClickClassroomCardEvent
+    ).toHaveBeenCalled();
   });
 });
