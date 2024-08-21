@@ -25,7 +25,6 @@ from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.domain import fs_services
-from core.domain import image_validation_services
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services
 
