@@ -96,7 +96,7 @@ export class LibraryPageComponent {
   pageMode!: string;
   classroomSummaries: ClassroomSummaryDict[] = [];
   publicClassroomsCount: number = 0;
-  // `translateX` controls the horizontal movement of the classroom carousel.
+  // The translateX state controls the horizontal movement of the classroom carousel.
   // It stores the direction (left or right) and the distance to slide.
   translateX: number = 0;
   currentCardIndex: number = 0;
