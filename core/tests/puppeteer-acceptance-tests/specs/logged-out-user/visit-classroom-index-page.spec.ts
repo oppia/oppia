@@ -69,9 +69,9 @@ describe('Logged-out User', function () {
       await curriculumAdmin.createNewClassroom('Math', 'math');
       await curriculumAdmin.updateClassroom(
         'Math',
-        'Learn math through fun stories!',
-        'Learn math through fun stories and interactive games!',
-        'Learn algebra and trigonometry.'
+        'Welcome to Math classroom!',
+        'This course covers basic algebra and trigonometry.',
+        'In this course, you will learn the following topics: algbera and trigonometry,'
       );
       await curriculumAdmin.addTopicToClassroom('Math', 'Test Topic 1');
       await curriculumAdmin.publishClassroom('Math');
@@ -90,9 +90,9 @@ describe('Logged-out User', function () {
       await curriculumAdmin.createNewClassroom('Science', 'science');
       await curriculumAdmin.updateClassroom(
         'Science',
-        'Learn science through fun stories!',
-        'Learn science through fun stories and interactive games!',
-        'Learn physics and chemistry.'
+        'Welcome to Science classroom!',
+        'This course covers basic physics and chemistry.',
+        'In this course, you will learn the following topics: physics and chemistry,'
       );
       await curriculumAdmin.addTopicToClassroom('Science', 'Test Topic 2');
       await curriculumAdmin.publishClassroom('Science');

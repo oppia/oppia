@@ -1560,9 +1560,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.createNewClassroom(classroomName, urlFragment);
     await this.updateClassroom(
       classroomName,
-      'Teaser text',
-      'Course details',
-      'Topic list intro'
+      'Welcome to Math classroom!',
+      'This course covers basic algebra and trigonometry.',
+      'In this course, you will learn the following topics: algbera and trigonometry,'
     );
     await this.addTopicToClassroom(classroomName, topicToBeAssigned);
     await this.publishClassroom(classroomName);
