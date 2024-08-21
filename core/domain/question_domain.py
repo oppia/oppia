@@ -1829,7 +1829,7 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
-        question_state_dict['inapplicable_skill_misconception_ids'] = None
+        question_state_dict['inapplicable_skill_misconception_ids'] = []
 
         return question_state_dict
 
