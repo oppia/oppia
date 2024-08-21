@@ -348,12 +348,13 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
-        if not isinstance(self.index, int):
-            raise utils.ValidationError(
-                'Expected index of the classroom to be a boolean, '
-                'received: %s.' % self.index)
 
         if strict:
+            if not isinstance(self.index, int):
+                raise utils.ValidationError(
+                    'Expected index of the classroom to be a boolean, '
+                    'received: %s.' % self.index)
+
             if not isinstance(self.thumbnail_data, ImageData):
                 raise utils.ValidationError(
                     'Expected thumbnail_data of the classroom to be a string, '
