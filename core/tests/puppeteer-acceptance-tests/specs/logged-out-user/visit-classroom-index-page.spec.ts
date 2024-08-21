@@ -83,7 +83,7 @@ describe('Logged-out User', function () {
   );
 
   it(
-    'should show classroom page with classroom cards.',
+    'should show classrooms page with classroom cards.',
     async function () {
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       await curriculumAdmin.createTopic('Test Topic 2', 'test-topic-two');
