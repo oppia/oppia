@@ -156,7 +156,7 @@ class ClassroomDisplayInfoHandler(
         classrooms = classroom_config_services.get_all_classrooms()
 
         for classroom in classrooms:
-            classroom_id_index_mapping_dict: Dict[str, str | int]
+            classroom_id_index_mapping_dict: Dict[str, str|int]
             # TODO(#20845): Remove this custom logic once we have
             # populated the index field of the math classroom.
             if classroom.index is not None:
