@@ -371,10 +371,8 @@ def update_classroom_id_to_index_mappings(
 
     for classroom_index_mapping in classroom_index_mappings:
         classroom_id = classroom_index_mapping['classroom_id']
-        classroom_name = classroom_index_mapping['classroom_name']
         classroom_index = int(classroom_index_mapping['classroom_index'])
 
         classroom = get_classroom_by_id(classroom_id)
-        classroom.name = classroom_name
         classroom.index = classroom_index
         update_classroom(classroom)
