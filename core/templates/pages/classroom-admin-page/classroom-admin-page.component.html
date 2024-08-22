@@ -1,7 +1,8 @@
 <mat-card class="oppia-editor-card-with-avatar">
   <div class="card-content">
-    <div>
+    <div class="top-content-container">
       <h3>Classroom details</h3>
+      <button class="btn add-new-classroom" (click)="changeClassroomsOrder()">Change Order</button>
     </div>
     <hr>
     <div>
@@ -14,29 +15,29 @@
         No classroom exists at this moment.
       </em>
 
-      <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
+      <div *ngFor="let classroom of classroomIdToClassroomNameIndex">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
-             (click)="getClassroomData(classroom.key)">
+             (click)="getClassroomData(classroom.classroom_id)">
           <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
-            {{ classroom.value }}
+            {{ classroom.classroom_name }}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">
+          <span *ngIf="classroomEditorMode && classroom.classroom_id === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">
             {{ this.tempClassroomData.getClassroomName() }}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length === 0">
+          <span *ngIf="classroomEditorMode && classroom.classroom_id === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length === 0">
             [New Classroom]
           </span>
           <button mat-button matSuffix mat-icon-button
                   class="e2e-test-delete-classroom-button"
                   aria-label="Clear"
                   *ngIf="!classroomEditorMode"
-                  (click)="deleteClassroom(classroom.key); $event.stopPropagation()">
+                  (click)="deleteClassroom(classroom.classroom_id); $event.stopPropagation()">
             <mat-icon matListIcon>close</mat-icon>
           </button>
         </div>
 
         <div class="classroom-details"
-             *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.key">
+             *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.classroom_id">
           <div *ngIf="classroomViewerMode">
             <i class="material-icons oppia-edit-icon e2e-test-edit-classroom-config-button"
                title="Edit Classroom"
@@ -315,7 +316,7 @@
                   >
               <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
                       [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid() && saveClassroomValidationErrors.length === 0)"
-                      (click)="saveClassroomData(classroom.key)">
+                      (click)="saveClassroomData(classroom.classroom_id)">
                 <span *ngIf="!classroomDataSaveInProgress">Save</span>
                 <mat-spinner *ngIf="classroomDataSaveInProgress"
                              class="oppia-update-classroom-data-spinning-button"
@@ -563,6 +564,12 @@
 
   .oppia-on-off-switch-main {
     right: 44px;
+  }
+
+  .top-content-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
   }
 
   @media screen and (max-width: 768px) {
