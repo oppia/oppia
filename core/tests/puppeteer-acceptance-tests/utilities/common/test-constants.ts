@@ -215,5 +215,12 @@ export default {
       Id: 'org.oppia.android',
     },
   },
+  TeachPageTestimonialsNames: ['Riya', 'Wala'],
+  TeachPageCreatorsNames: ['Rita Santos', 'Aanuoluwapo Adeoti'],
+  AboutPageVolunteerCarouselHeadings: [
+    'Outreach',
+    'Software',
+    'Art and Design',
+  ],
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };
