@@ -74,6 +74,8 @@ class ClassroomModel(base_models.BaseModel):
     banner_bg_color = datastore_services.StringProperty(indexed=True)
     # The banner size in bytes of the classroom.
     banner_size_in_bytes = datastore_services.IntegerProperty(indexed=False)
+    # The index of the classroom.
+    index = datastore_services.IntegerProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -103,7 +105,8 @@ class ClassroomModel(base_models.BaseModel):
             'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'banner_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'banner_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'banner_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'banner_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'index': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -135,7 +138,7 @@ class ClassroomModel(base_models.BaseModel):
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool, thumbnail_filename: str, thumbnail_bg_color: str,
         thumbnail_size_in_bytes: int, banner_filename: str,
-        banner_bg_color: str, banner_size_in_bytes: int
+        banner_bg_color: str, banner_size_in_bytes: int, index: int
     ) -> ClassroomModel:
         """Creates a new ClassroomModel entry.
 
@@ -157,6 +160,7 @@ class ClassroomModel(base_models.BaseModel):
             banner_filename: str. Classroom's banner filename.
             banner_bg_color: str. Classroom's banner background color.
             banner_size_in_bytes: int. The banner size in bytes.
+            index: int. The index of the classroom.
 
         Returns:
             ClassroomModel. The newly created ClassroomModel instance.
@@ -183,7 +187,8 @@ class ClassroomModel(base_models.BaseModel):
             thumbnail_size_in_bytes=thumbnail_size_in_bytes,
             banner_filename=banner_filename,
             banner_bg_color=banner_bg_color,
-            banner_size_in_bytes=banner_size_in_bytes
+            banner_size_in_bytes=banner_size_in_bytes,
+            index=index
         )
         entity.update_timestamps()
         entity.put()

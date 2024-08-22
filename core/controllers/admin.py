@@ -1596,7 +1596,8 @@ class AdminHandler(
                             ),
                             banner_data=classroom_config_domain.ImageData(
                                 'banner.png', 'transparent', 1000
-                            )
+                            ),
+                            index=0
                         )
 
             classroom_config_services.create_new_classroom(classroom_1)
