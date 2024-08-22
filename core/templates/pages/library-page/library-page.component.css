@@ -93,7 +93,7 @@ oppia-library-page .oppia-group-page-header {
 }
 
 .navigation-dots span.active {
-  background-color: #333;
+  background-color: #005240;
 }
 
 .mobile-buttons {
@@ -247,7 +247,7 @@ oppia-library-page .button-alignment-div {
 }
 
 .right-carousel-btn {
-  left: 4px;
+  left: 2px;
   position: relative;
 }
 
@@ -285,6 +285,20 @@ oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.classroom-width-1 {
+  width: 762px;
+}
+
+.classroom-width-2 {
+  padding-left: 44px;
+  width: fit-content;
+}
+
+.classroom-width-more {
+  padding-left: 70px;
+  width: fit-content;
 }
 
 oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container .classroom-cards-text-container {
@@ -434,6 +448,14 @@ oppia-library-page .community-library-breadcrumbs-container {
   }
 }
 @media (max-width: 900px) {
+  .classroom-width-2 {
+    padding-left: 0;
+  }
+
+  .classroom-width-more {
+    padding-left: 0;
+  }
+
   .mobile-buttons {
     display: flex;
     justify-content: space-between;

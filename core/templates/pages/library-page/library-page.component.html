@@ -1,5 +1,11 @@
 <div class="classroom-cards-wrapper" *ngIf="publicClassroomsCount > 0">
-  <div class="classroom-cards-inner-container">
+  <div class="classroom-cards-inner-container"
+    [ngClass]="{
+      'classroom-width-1': publicClassroomsCount === 1,
+      'classroom-width-2': publicClassroomsCount === 2,
+      'classroom-width-more': publicClassroomsCount > 2
+    }"
+  >
     <div class="classroom-cards-text-container">
       <h1>{{ 'I18N_COMMUNITY_LIBRARY_PAGE_CLASSROOMS_HINT_TEXT' | translate }}</h1>
       <p>{{ 'I18N_BROWSE_LESSONS_TEXT' | translate }}</p>
