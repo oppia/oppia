@@ -53,14 +53,19 @@ describe('Volunteer', function () {
       // Navigating to About page via footer from home page.
       await loggedOutUser.clickOnAboutLinkInFooter();
 
+      // View Features on the About page.
+      await loggedOutUser.expectFeaturesAccordionToBeFunctionalInAboutPage();
+      // View Volunteer Carousel on the About page.
+      await loggedOutUser.expectVolunteerCarouselToBeFunctionalInAboutPage();
       // Opening the Impact report by clicking on the "View Impact Report" button on the About page.
       await loggedOutUser.clickViewReportButtonInAboutPage();
-
       // Opening the Volunteer form by clicking on the "Volunteer with Oppia" button of Volunteer tab on the About page.
       await loggedOutUser.clickVolunteerWithOppiaButtonInAboutPage();
       // Navigating to the Volunteer page by clicking on the Learn More button of Volunteer tab.
       await loggedOutUser.clickVolunteerLearnMoreButtonInAboutPage();
 
+      // View the Volunteer expectations on the volunteer page.
+      await loggedOutUser.expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage();
       // Opening the Volunteer form by clicking the "Apply to Volunteer" button at the top of the Volunteer page.
       await loggedOutUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
       // Navigating back to Volunteer page for the next test.
