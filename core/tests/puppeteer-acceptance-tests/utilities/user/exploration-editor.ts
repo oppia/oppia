@@ -1069,9 +1069,11 @@ export class ExplorationEditor extends BaseUser {
     }
     if (isLastResponse) {
       await this.clickOn(addNewResponseButton);
-      await this.page.waitForSelector(responseModalHeaderSelector, {
-        hidden: true,
-      });
+      if (interactionType !== 'Text Input') {
+        await this.page.waitForSelector(responseModalHeaderSelector, {
+          hidden: true,
+        });
+      }
     } else {
       await this.clickOn(addAnotherResponseButton);
     }
