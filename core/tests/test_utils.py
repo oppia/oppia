@@ -4297,7 +4297,8 @@ version: 1
                 banner_data
                 if banner_data is not None
                 else dummy_banner_data
-            )
+            ),
+            index=0
         )
 
         classroom_config_services.create_new_classroom(classroom)
