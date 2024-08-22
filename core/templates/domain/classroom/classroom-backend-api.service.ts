@@ -40,14 +40,14 @@ export interface ClassroomDataBackendDict {
   public_classrooms_count: number;
 }
 
-interface ClassroomIdToClassroomNameBackendDict {
-  classroom_id_to_classroom_name: {
-    [classroomId: string]: string;
-  };
+export interface classroomDisplayInfo {
+  classroom_id: string;
+  classroom_name: string;
+  classroom_index: number;
 }
 
-interface ClassroomIdToClassroomNameResponse {
-  [classroomId: string]: string;
+interface classroomDisplayInfoBackendDict {
+  classroom_display_info: classroomDisplayInfo[];
 }
 
 interface NewClassroomIdBackendDict {
@@ -289,6 +289,7 @@ export class ClassroomBackendApiService {
               bg_color: classroomDict.banner_data.bg_color,
               size_in_bytes: classroomDict.banner_data.size_in_bytes,
             },
+            index: 0,
           },
         })
       );
@@ -359,16 +360,16 @@ export class ClassroomBackendApiService {
     });
   }
 
-  async getAllClassroomIdToClassroomNameDictAsync(): Promise<ClassroomIdToClassroomNameResponse> {
+  async getAllClassroomDisplayInfoDictAsync(): Promise<classroomDisplayInfo[]> {
     return new Promise((resolve, reject) => {
       this.http
-        .get<ClassroomIdToClassroomNameBackendDict>(
-          ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
+        .get<classroomDisplayInfoBackendDict>(
+          ClassroomDomainConstants.CLASSROOM_DISPLAY_INFO_HANDLER_URL_TEMPLATE
         )
         .toPromise()
         .then(
           response => {
-            resolve(response.classroom_id_to_classroom_name);
+            resolve(response.classroom_display_info);
           },
           errorResponse => {
             reject(errorResponse?.error?.error);
@@ -472,6 +473,32 @@ export class ClassroomBackendApiService {
         .then(
           response => {
             resolve(response.all_classrooms_summary);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  updateClassroomIndexMappingAsync(
+    classroomDisplayInfoDicts: classroomDisplayInfo[]
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const body = new FormData();
+      body.append(
+        'payload',
+        JSON.stringify({
+          classroom_index_mappings: classroomDisplayInfoDicts,
+        })
+      );
+
+      this.http
+        .put<void>('/update_classrooms_order', body)
+        .toPromise()
+        .then(
+          () => {
+            resolve();
           },
           errorResponse => {
             reject(errorResponse?.error?.error);
