@@ -671,9 +671,10 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   deleteTopic(topicNameToDelete: string): void {
-    const topicIdToDelete = Object.keys(this.topicIdsToTopicName).find(
-      id => this.topicIdsToTopicName[id] === topicNameToDelete
-    );
+    const topicIdToDelete =
+      Object.keys(this.topicIdsToTopicName).find(
+        id => this.topicIdsToTopicName[id] === topicNameToDelete
+      ) || '';
     this.topicsToClassroomRelation.push({
       topic_name: topicNameToDelete,
       topic_id: topicIdToDelete,
