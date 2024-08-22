@@ -7,8 +7,8 @@
           <div class="classroom-name-container" *ngIf="classroomName">
             <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
             <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
-            <a [href]="'/learn/' + classroomName" *ngIf="!isHackyClassroomNameTranslationDisplayed()">{{ classroomName }}</a>
-            <a [href]="'/learn/' + classroomName" *ngIf="isHackyClassroomNameTranslationDisplayed()">{{ classroomNameTranslationKey | translate }}</a>
+            <a [href]="'/learn/' + classroomUrlFragment" *ngIf="!isHackyClassroomNameTranslationDisplayed()">{{ classroomName }}</a>
+            <a [href]="'/learn/' + classroomUrlFragment" *ngIf="isHackyClassroomNameTranslationDisplayed()">{{ classroomNameTranslationKey | translate }}</a>
           </div>
           <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
           <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>

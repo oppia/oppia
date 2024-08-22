@@ -314,6 +314,25 @@
 }
 
 @media screen and (max-width: 498px) {
+  .diagnostic-test-info {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .classroom-content-container .classroom-content .diagnostic-test-container .diagnostic-test-box {
+    align-items: center;
+  }
+
+  .diagnostic-test-info p {
+    text-align: center;
+  }
+
+  .classroom-content-container {
+    position: relative;
+    right: 6px;
+  }
+
   .classroom-content-container .classroom-content .topic-tiles-container .oppia-topic-summary-tile {
     height: 157px;
     width: 45%;
