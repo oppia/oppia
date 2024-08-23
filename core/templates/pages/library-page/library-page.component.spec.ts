@@ -150,45 +150,6 @@ describe('Library Page Component', () => {
     },
   ];
 
-  const dummyClassroomSummaries = [
-    {
-      classroom_id: 'mathclassroom',
-      name: 'math',
-      url_fragment: 'math',
-      teaser_text: 'Learn math',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'scienceclassroom',
-      name: 'science',
-      url_fragment: 'science',
-      teaser_text: 'Learn science',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'history',
-      name: 'history',
-      url_fragment: 'history',
-      teaser_text: 'Learn history',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'english',
-      name: 'english',
-      url_fragment: 'english',
-      teaser_text: 'Learn english',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-  ];
-
   let libraryIndexData: LibraryIndexData = {
     activity_summary_dicts_by_category: [
       {
