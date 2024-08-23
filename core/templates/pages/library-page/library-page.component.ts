@@ -529,7 +529,7 @@ export class LibraryPageComponent {
   }
 
   updateActiveDot(): void {
-    const numberOfDots = this.classroomSummaries.length - 2;
+    const numberOfDots = Math.max(1, this.classroomSummaries.length - 2);
     this.dots = Array(numberOfDots)
       .fill(0)
       .map((_, i) => (i === this.currentCardIndex ? 1 : 0));

@@ -104,6 +104,16 @@ describe('Library Page Component', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
 
+  const dummyClassroomSummary = {
+    classroom_id: 'mathclassroom',
+    name: 'math',
+    url_fragment: 'math',
+    teaser_text: 'Learn math',
+    is_published: true,
+    thumbnail_filename: 'thumbnail.svg',
+    thumbnail_bg_color: 'transparent',
+  };
+
   let explorationList: CreatorExplorationSummaryBackendDict[] = [
     {
       category: '',
@@ -793,17 +803,7 @@ describe('Library Page Component', () => {
     componentInstance.translateX = 0;
     componentInstance.currentCardIndex = 0;
     componentInstance.dots = [];
-
-    const classroomTemplate = {
-      classroom_id: 'mathclassroom',
-      name: 'math',
-      url_fragment: 'math',
-      teaser_text: 'Learn math',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    };
-    componentInstance.classroomSummaries = Array(5).fill(classroomTemplate);
+    componentInstance.classroomSummaries = Array(5).fill(dummyClassroomSummary);
     componentInstance.updateActiveDot();
 
     componentInstance.moveClassroomCarouselToNextSlide();
