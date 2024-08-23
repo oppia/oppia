@@ -50,6 +50,8 @@ describe('Logged-out User', function () {
     );
 
     await releaseCoordinator.enableFeatureFlag('enable_multiple_classrooms');
+    await curriculumAdmin.createTopic('Test Topic 2', 'test-topic-two');
+    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -65,7 +67,6 @@ describe('Logged-out User', function () {
     'should be redirected to a classroom page if we have 1 public classroom.',
     async function () {
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-      await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
       await curriculumAdmin.createNewClassroom('Math', 'math');
       await curriculumAdmin.updateClassroom(
         'Math',
@@ -86,7 +87,6 @@ describe('Logged-out User', function () {
     'should show classrooms page with classroom cards.',
     async function () {
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-      await curriculumAdmin.createTopic('Test Topic 2', 'test-topic-two');
       await curriculumAdmin.createNewClassroom('Science', 'science');
       await curriculumAdmin.updateClassroom(
         'Science',
