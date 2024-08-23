@@ -92,7 +92,8 @@ describe('Logged-out User', function () {
     );
     await explorationEditor.addSolutionToState(
       '-99',
-      'The number -99 is a negative number.'
+      'The number -99 is a negative number.',
+      true
     );
     await explorationEditor.saveExplorationDraft();
 
