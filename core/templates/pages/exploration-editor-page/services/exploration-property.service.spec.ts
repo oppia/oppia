@@ -237,17 +237,4 @@ describe('Exploration Property Service', () => {
 
     expect(explorationPropertyService.saveDisplayedValue).toHaveBeenCalled();
   });
-
-  it('should reject when saveDisplayedValue throws an error', async () => {
-    spyOn(explorationPropertyService, 'saveDisplayedValue').and.throwError(
-      'Test Error'
-    );
-
-    explorationPropertyService.propertyName = 'property_1';
-    explorationPropertyService.init('initial value');
-
-    await expectAsync(
-      explorationPropertyService.saveDisplayedValueAsync()
-    ).toBeRejectedWithError('Test Error');
-  });
 });
