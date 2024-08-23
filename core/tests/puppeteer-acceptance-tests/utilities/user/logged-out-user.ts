@@ -153,7 +153,7 @@ const exploreLessonsButtonAtTheTopInTeachPage =
   '.e2e-test-teach-page-explore-lessons-button-at-the-top';
 const exploreLessonsButtonAtTheBottomInTeachPage =
   '.e2e-test-teach-page-explore-lessons-button-at-the-bottom';
-const downloadAndroidAppButtonInTeachPage =
+const getAndroidAppButtonInTeachPage =
   '.e2e-test-teach-page-download-android-app-button';
 const creatorsCarouselSelectorInTeachPage =
   '.e2e-test-teach-page-creators-carousel';
@@ -1486,13 +1486,13 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Download Andriod app button in the Teach page
+   * Function to click the Get Android app button in the Teach page
    * and check if it opens the Android page.
    */
   async clickDownloadAndriodAppButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
-      downloadAndroidAppButtonInTeachPage,
-      'Download Andriod app button',
+      getAndroidAppButtonInTeachPage,
+      'Get Android app button',
       androidUrl,
       'Android page'
     );
