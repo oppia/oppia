@@ -1075,6 +1075,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(addNewResponseButton, {
         visible: true,
       });
+      await this.page.waitForTimeout(1000);
       await this.clickOn(addNewResponseButton);
       await this.page.waitForSelector(responseModalHeaderSelector, {
         hidden: true,
