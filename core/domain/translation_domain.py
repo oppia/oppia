@@ -502,7 +502,7 @@ class EntityTranslation:
     """A domain object to store all translations for a given versioned-entity
     in a given language.
 
-    NOTE: This domain object corresponds to EntityTranslationsModel in the sdds
+    NOTE: This domain object corresponds to EntityTranslationsModel in the
     storage layer.
 
     Args:
