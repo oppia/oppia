@@ -33,6 +33,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
     {
+      "name": "exploration-editor/modify-translations-through-modal",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts"
+    },
+    {
       "name": "exploration-editor/publish-the-exploration-with-an-interaction",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/publish-the-exploration-with-an-interaction.spec.ts"
     },

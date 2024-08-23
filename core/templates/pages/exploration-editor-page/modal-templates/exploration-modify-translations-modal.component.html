@@ -26,7 +26,7 @@
             <i class="fas fa-pencil-alt e2e-test-{{ item.key }}-translation-edit" (click)="openTranslationEditor(item.key)"></i>
           </div>
           <div class="content-translation-value e2e-test-translation-{{ item.key }}">
-            <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
+            <oppia-rte-output-display *ngIf="item.value.dataFormat === 'html' || item.value.dataFormat === 'unicode'"
                                       [rteString]="item.value.translation"
                                       class="translations-rte-output-display">
             </oppia-rte-output-display>
