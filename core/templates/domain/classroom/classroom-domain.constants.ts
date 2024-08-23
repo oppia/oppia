@@ -30,5 +30,6 @@ export const ClassroomDomainConstants = {
   CLASSROOM_HANDLER_URL_TEMPLATE: '/classroom/<classroom_id>',
   NEW_CLASSROOM_HANDLER_URL: '/classroom_admin/create_new',
   NEW_CLASSROOM_ID_HANDLER_URL_TEMPLATE: '/new_classroom_id_handler',
-  CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE: '/classroom_id_to_name_handler',
+  CLASSROOM_DISPLAY_INFO_HANDLER_URL_TEMPLATE:
+    '/classroom_display_info_handler',
 } as const;

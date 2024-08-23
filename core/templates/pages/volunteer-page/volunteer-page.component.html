@@ -50,10 +50,10 @@
     </div>
   </div>
 
-  <div class="oppia-volunteer-body">
+  <div class="oppia-volunteer-body e2e-test-volunteer-page-tabs-section">
     <h1 class="oppia-volunteer-h1">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION' | translate }}</h1>
     <div class="oppia-volunteer-tabs">
-      <button class="oppia-volunteer-tab-prev-btn"
+      <button class="oppia-volunteer-tab-prev-btn e2e-test-volunteer-page-tabs-prev-btn"
               *ngIf="screenType !== 'desktop'"
               [disabled]="activeTabGroupIndex === 0"
               (click)="decrementTabGroupIndex()">
@@ -117,7 +117,7 @@
             <div class="oppia-volunteer-tab-content-bottom">
               <div class="oppia-volunteer-tab-content-boxes-container">
                 <div class="oppia-volunteer-tab-expectations">
-                  <p class="oppia-volunteer-tab-subtitle">
+                  <p class="oppia-volunteer-tab-subtitle e2e-test-volunteer-page-first-expectations">
                     {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_EXPECTATIONS_HEADING' | translate }}
                   </p>
                   <p class="oppia-volunteer-subtext">
@@ -202,7 +202,7 @@
             <div class="oppia-volunteer-tab-content-bottom">
               <div class="oppia-volunteer-tab-content-boxes-container">
                 <div class="oppia-volunteer-tab-expectations">
-                  <p class="oppia-volunteer-tab-subtitle">
+                  <p class="oppia-volunteer-tab-subtitle e2e-test-volunteer-page-second-expectations">
                     {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_EXPECTATIONS_HEADING' | translate }}
                   </p>
                   <p class="oppia-volunteer-subtext">
@@ -490,7 +490,7 @@
         </mat-tab>
       </mat-tab-group>
 
-      <button class="oppia-volunteer-tab-next-btn"
+      <button class="oppia-volunteer-tab-next-btn e2e-test-volunteer-page-tabs-next-btn"
               *ngIf="screenType !== 'desktop'"
               [disabled]="activeTabGroupIndex === tabGroups[screenType].length - 1"
               (click)="incrementTabGroupIndex()">
