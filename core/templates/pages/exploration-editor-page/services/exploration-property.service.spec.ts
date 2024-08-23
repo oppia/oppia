@@ -30,7 +30,7 @@ import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory'
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 
-describe('Exploration Property Service', () => {
+fdescribe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;
   let paramChangesObjectFactory: ParamChangesObjectFactory;
   let paramSpecsObjectFactory: ParamSpecsObjectFactory;
@@ -224,4 +224,30 @@ describe('Exploration Property Service', () => {
       });
     }
   );
+
+  it('should resolve successfully and call saveDisplayedValue', async () => {
+    spyOn(explorationPropertyService, 'saveDisplayedValue').and.callThrough();
+
+    explorationPropertyService.propertyName = 'property_1';
+    explorationPropertyService.init('initial value');
+
+    await expectAsync(
+      explorationPropertyService.saveDisplayedValueAsync()
+    ).toBeResolved();
+
+    expect(explorationPropertyService.saveDisplayedValue).toHaveBeenCalled();
+  });
+
+  it('should reject when saveDisplayedValue throws an error', async () => {
+    spyOn(explorationPropertyService, 'saveDisplayedValue').and.throwError(
+      'Test Error'
+    );
+
+    explorationPropertyService.propertyName = 'property_1';
+    explorationPropertyService.init('initial value');
+
+    await expectAsync(
+      explorationPropertyService.saveDisplayedValueAsync()
+    ).toBeRejectedWithError('Test Error');
+  });
 });
