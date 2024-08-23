@@ -94,7 +94,7 @@ const uploadImageButton = '.e2e-test-upload-image';
 const useTheUploadImageButton = '.e2e-test-use-image';
 const imageRegionSelector = '.e2e-test-svg';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
-const addNewResponseButton = '.e2e-test-add-new-response';
+const addNewResponseButton = 'button.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
 const modifyExistingTranslationsButton = '.e2e-test-modify-translations-button';
 const activeTranslationTab = '.e2e-test-active-translation-tab';
@@ -1072,6 +1072,9 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(correctAnswerInTheGroupSelector);
     }
     if (isLastResponse) {
+      await this.page.waitForSelector(addNewResponseButton, {
+        visible: true,
+      });
       await this.clickOn(addNewResponseButton);
       await this.page.waitForSelector(responseModalHeaderSelector, {
         hidden: true,
