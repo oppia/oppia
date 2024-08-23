@@ -84,12 +84,12 @@ oppia-library-page .oppia-group-page-header {
 }
 
 .navigation-dots span {
-  background-color: #ccc;
+  background-color: #d9d9d9;
   border-radius: 50%;
   cursor: pointer;
-  height: 10px;
-  margin: 0 5px;
-  width: 10px;
+  height: 8px;
+  margin: 0 3px;
+  width: 8px;
 }
 
 .navigation-dots span.active {

@@ -19,7 +19,7 @@
     gap: 24px;
     position: relative;
     text-align: center;
-    top: 18%;
+    top: 12%;
     width: 158px;
   }
 
@@ -36,12 +36,13 @@
   .classroom-name {
     color: #005240;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 14px;
+    font-size: 20px;
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.0075em;
     margin: 0;
     text-align: center;
+    word-break: break-all;
   }
 
   .classroom-card-dropshadow {
@@ -113,6 +114,10 @@
   }
 
   @media only screen and (max-width: 575px) {
+    .classroom-text-container {
+      max-width: 134px;
+    }
+
     .oppia-classroom-card-container .classroom-content {
       justify-content: space-around;
     }
