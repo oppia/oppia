@@ -78,7 +78,7 @@ describe('Parent/Teacher', function () {
       // Navigating back.
       await loggedOutUser.navigateToTeachPage();
       // Navigating to "Andriod page" by clicking on the "Get Android app" button.
-      await loggedOutUser.clickDownloadAndriodAppButtonInTeachPage();
+      await loggedOutUser.clickGetAndroidAppButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
