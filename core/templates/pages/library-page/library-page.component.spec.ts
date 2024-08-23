@@ -825,6 +825,18 @@ describe('Library Page Component', () => {
       -middleIndex * componentInstance.getCardWidth()
     );
     expect(componentInstance.dots).toEqual([0, 0, 1]);
+
+    componentInstance.currentCardIndex = 0;
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeFalse();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeTrue();
+
+    componentInstance.currentCardIndex = 2;
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeTrue();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeFalse();
   });
 
   it('should record analytics when classroom card is clicked', () => {
