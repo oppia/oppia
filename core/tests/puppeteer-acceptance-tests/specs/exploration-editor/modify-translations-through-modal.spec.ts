@@ -102,7 +102,7 @@ describe('Exploration Editor', function () {
       '0',
       '101',
     ]);
-    await explorationEditor.addResponseToTheInteraction(
+    await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.MULTIPLE_CHOICE,
       '-99',
       'Perfect!',
@@ -121,7 +121,7 @@ describe('Exploration Editor', function () {
       'What is the sign to represent negative numbers called?'
     );
     await explorationEditor.addTextInputInteraction();
-    await explorationEditor.addResponseToTheInteraction(
+    await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.TEXT_INPUT,
       'minus',
       'Correct!',
@@ -186,6 +186,7 @@ describe('Exploration Editor', function () {
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Test Story 1',
       'test-story-one',
+      'Test Chapter 1',
       explorationId,
       'Test Topic 1'
     );

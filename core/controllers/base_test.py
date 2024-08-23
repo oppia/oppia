@@ -226,7 +226,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 self.get_response_without_checking_for_errors(
                     url, [200, 301, 302, 400, 401, 404])
 
-        # TODO(sll): Add similar tests for POST, PUT, DELETE.
+        # TODO(#20399): Add similar tests for POST, PUT, DELETE.
 
     def test_requests_for_missing_csrf_token(self) -> None:
         """Tests request without csrf_token results in 401 error."""

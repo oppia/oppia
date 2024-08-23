@@ -18,6 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
   BlogAuthorProfilePageData,
@@ -56,6 +57,7 @@ export class BlogAuthorProfilePageComponent implements OnInit {
   showBlogPostCardsLoadingScreen: boolean = false;
   constructor(
     private windowDimensionsService: WindowDimensionsService,
+    private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
     private blogHomePageBackendApiService: BlogHomePageBackendApiService,
     private urlService: UrlService,
@@ -157,6 +159,10 @@ export class BlogAuthorProfilePageComponent implements OnInit {
     this.calculateFirstPostOnPageNum();
     this.calculateLastPostOnPageNum();
     this.loadPage();
+  }
+
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
   }
 
   isSmallScreenViewActive(): boolean {

@@ -21,7 +21,10 @@ import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {
+  ClassroomBackendApiService,
+  ClassroomSummaryDict,
+} from 'domain/classroom/classroom-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -38,8 +41,8 @@ import {
   LibraryPageBackendApiService,
   SummaryDict,
 } from './services/library-page-backend-api.service';
-
 import './library-page.component.css';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;
@@ -91,6 +94,14 @@ export class LibraryPageComponent {
   libraryWindowIsNarrow!: boolean;
   mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
   pageMode!: string;
+  classroomSummaries: ClassroomSummaryDict[] = [];
+  publicClassroomsCount: number = 0;
+  // The translateX state controls the horizontal movement of the classroom carousel.
+  // It stores the direction (left or right) and the distance to slide.
+  translateX: number = 0;
+  currentCardIndex: number = 0;
+  cardsToShow: number = 3;
+  dots: number[] = [];
 
   constructor(
     private loggerService: LoggerService,
@@ -105,7 +116,8 @@ export class LibraryPageComponent {
     private windowDimensionsService: WindowDimensionsService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private pageTitleService: PageTitleService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   setActiveGroup(groupIndex: number): void {
@@ -329,6 +341,18 @@ export class LibraryPageComponent {
       }
     );
 
+    this.classroomBackendApiService
+      .getAllClassroomsSummaryAsync()
+      .then(classroomSummaries => {
+        for (let i = 0; i < classroomSummaries.length; i++) {
+          if (classroomSummaries[i].is_published) {
+            this.publicClassroomsCount += 1;
+            this.classroomSummaries.push(classroomSummaries[i]);
+          }
+        }
+        this.updateActiveDot();
+      });
+
     // Keeps track of the index of the left-most visible card of each
     // group.
     this.leftmostCardIndices = [];
@@ -474,6 +498,69 @@ export class LibraryPageComponent {
         this.libraryWindowIsNarrow =
           this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
       });
+  }
+
+  moveClassroomCarouselToPreviousSlide(): void {
+    if (this.currentCardIndex > 0) {
+      this.currentCardIndex -= 1;
+      this.translateX += this.getCardWidth();
+      this.updateActiveDot();
+    }
+  }
+
+  moveClassroomCarouselToNextSlide(): void {
+    if (
+      this.currentCardIndex <
+      this.classroomSummaries.length - this.cardsToShow
+    ) {
+      this.currentCardIndex += 1;
+      this.translateX -= this.getCardWidth();
+      this.updateActiveDot();
+    }
+  }
+
+  moveToSlide(index: number): void {
+    this.translateX = -index * this.getCardWidth();
+    this.currentCardIndex = index;
+    this.updateActiveDot();
+  }
+
+  getCardWidth(): number {
+    const cardContainerWidth =
+      document.querySelector('.carousel-container')?.clientWidth || 0;
+    return cardContainerWidth / this.cardsToShow;
+  }
+
+  updateActiveDot(): void {
+    const numberOfDots = Math.ceil(
+      this.classroomSummaries.length / this.cardsToShow
+    );
+    this.dots = Array(numberOfDots)
+      .fill(0)
+      .map((_, i) => (i === this.currentCardIndex ? 1 : 0));
+  }
+
+  shouldShowNextClassroomChunkButton(): boolean {
+    const numberOfClassroomSlides = Math.ceil(
+      this.classroomSummaries.length / this.cardsToShow
+    );
+    return (
+      this.publicClassroomsCount > this.cardsToShow &&
+      this.currentCardIndex < numberOfClassroomSlides - 1
+    );
+  }
+
+  shouldShowPreviousClassroomChunkButton(): boolean {
+    return (
+      this.publicClassroomsCount > this.cardsToShow && this.currentCardIndex > 0
+    );
+  }
+
+  registerClassroomCardClickEvent(classroomName: string): void {
+    this.siteAnalyticsService.registerClickClassroomCardEvent(
+      'Classroom card in the community library page',
+      classroomName
+    );
   }
 
   ngOnDestroy(): void {

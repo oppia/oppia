@@ -1,5 +1,5 @@
+<i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [ngClass]="{'mobile-navbar-toggled': mobileNavOptionsAreShown}" aria-label="Mobile navbar options" role="button"></i>
 <div class="navbar-mobile-container">
-  <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" aria-label="Mobile navbar options" role="button"></i>
   <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
     <div class="exp-nav-dropdown-container">
       <div class="exp-nav-dropdown-content e2e-test-mobile-options-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -66,7 +66,7 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
             </a>
           </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'feedback'}">
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-feedback-button" [ngClass]="{'active': getActiveTabName() === 'feedback'}">
             <a href="#" ngbTooltip="Feedback" placement="bottom" (click)="selectFeedbackTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-comment-alt oppia-mobile-exploration-editor-tabs-icon"></i>
@@ -241,8 +241,27 @@
     width: 100%;
     z-index: 1040;
   }
+  .show-mobile-navbar-icon {
+    background-color: #e6e6e6;
+    border-left: 1.5px solid #000;
+    border-radius: 10px 0;
+    border-top: 1.5px solid #000;
+    bottom: 0;
+    color: #000;
+    display: none;
+    font-size: 25px;
+    padding: 10px;
+    position: fixed;
+    right: 0;
+    z-index: 1040;
+  }
+
   @media screen and (max-width: 600px) {
     .navbar-mobile-container {
+      display: block;
+    }
+
+    .show-mobile-navbar-icon {
       display: block;
     }
   }
@@ -251,16 +270,11 @@
     border-top: 1px solid #000;
     display: flex;
     flex-wrap: wrap;
+    height: 60px;
     justify-content: space-evenly;
   }
-  .show-mobile-navbar-icon {
-    background-color: #e6e6e6;
-    border-left: 1.5px solid #000;
-    border-radius: 10px 0;
-    border-top: 1.5px solid #000;
-    color: #000;
-    font-size: 25px;
-    padding: 10px;
+  .mobile-navbar-toggled {
+    transform: translateY(-60px);
   }
   .exp-nav-dropdown-container {
     padding: 10px 0;

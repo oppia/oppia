@@ -145,7 +145,7 @@ export class RouterService {
         }
       });
     } else if (newPath === this.TABS.HISTORY.path) {
-      // TODO(sll): Do this on-hover rather than on-click.
+      // TODO(#20449): Do this on-hover rather than on-click.
       this.refreshVersionHistoryEventEmitter.emit({
         forceRefresh: false,
       });

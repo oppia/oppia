@@ -72,6 +72,7 @@ install_third_party_libs.main()
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import git_changes_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -89,18 +90,22 @@ SHARDS_WIKI_LINK: Final = (
 _LOAD_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'load_tests'
 )
+TIME_REPORT_PATH: Final = os.path.join(
+    os.getcwd(), 'backend_test_time_report.json'
+)
+AVERAGE_TEST_CASE_TIME: Final = 2
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
-IMPORTANT: Only one of --test_path,  --test_target, and --test_shard
-should be specified.
+IMPORTANT: Only one of --test_path, --test_targets, --run_on_changed_files,
+and --test_shard should be specified.
 """)
 
 _EXCLUSIVE_GROUP: Final = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
-    '--test_target',
+    '--test_targets',
     help='optional dotted module name of the test(s) to run',
     type=str)
 _EXCLUSIVE_GROUP.add_argument(
@@ -111,9 +116,20 @@ _EXCLUSIVE_GROUP.add_argument(
     '--test_shard',
     help='optional name of shard to run',
     type=str)
+_EXCLUSIVE_GROUP.add_argument(
+    '--run_on_changed_files_in_branch',
+    help='optional; if specified, runs the backend tests on the files '
+    'that were changed in the current branch',
+    action='store_true'
+)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
+    action='store_true')
+_PARSER.add_argument(
+    '--generate_time_report',
+    help='optional; if specified, generates a report which shows the '
+        'time taken by each test',
     action='store_true')
 _PARSER.add_argument(
     '--ignore_coverage',
@@ -215,7 +231,8 @@ def get_all_test_targets_from_path(
     paths = []
     excluded_dirs = [
         '.git', 'third_party', 'node_modules', 'venv',
-        'core/tests/data', 'core/tests/build_sources']
+        'core/tests/data', 'core/tests/build_sources',
+        '.direnv']
     for root in os.listdir(base_path):
         if any(s in root for s in excluded_dirs):
             continue
@@ -312,12 +329,13 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
-) -> Tuple[int, int, int]:
+) -> Tuple[int, int, int, Dict[str, Tuple[float, float]]]:
     """Run tests and parse coverage reports."""
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
     total_failures = 0
+    time_report: Dict[str, Tuple[float, float]] = {}
     for task in tasks:
         test_count = 0
         spec = task_to_taskspec[task]
@@ -375,6 +393,12 @@ def check_test_results(
                     )
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
+                test_time_by_average_test_case = (
+                    test_count * AVERAGE_TEST_CASE_TIME)
+                time_report[spec.test_target] = (
+                    test_time,
+                    test_time_by_average_test_case
+                )
                 print(
                     'SUCCESS   %s: %d tests (%.1f secs)' %
                     (spec.test_target, test_count, test_time))
@@ -384,7 +408,7 @@ def check_test_results(
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
         total_count += test_count
 
-    return total_count, total_errors, total_failures
+    return total_count, total_errors, total_failures, time_report
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -408,35 +432,44 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
-    if parsed_args.test_target and '/' in parsed_args.test_target:
-        raise Exception('The delimiter in test_target should be a dot (.)')
 
     with contextlib.ExitStack() as stack:
         if not feconf.OPPIA_IS_DOCKERIZED:
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True))
             stack.enter_context(servers.managed_redis_server())
-        if parsed_args.test_target:
-            # Check if target either ends with '_test' which means a path to
-            # a test file has been provided or has '_test.' in it which means
-            # a path to a particular test class or a method in a test file has
-            # been provided. If the path provided does not exist, error is
-            # raised when we try to execute the tests.
-            if (
-                parsed_args.test_target.endswith('_test')
-                or '_test.' in parsed_args.test_target
-            ):
-                all_test_targets = [parsed_args.test_target]
-            else:
-                print('')
-                print('------------------------------------------------------')
-                print(
-                    'WARNING : test_target flag should point to the test file.')
-                print('------------------------------------------------------')
-                print('')
-                time.sleep(3)
-                print('Redirecting to its corresponding test file...')
-                all_test_targets = [parsed_args.test_target + '_test']
+        if parsed_args.test_targets:
+            all_test_targets = []
+            test_targets = parsed_args.test_targets.split(',')
+            for test_target in test_targets:
+                if '/' in test_target:
+                    raise Exception(
+                        'The delimiter in each test_target should be a dot (.)')
+                # Check if target either ends with '_test' which means a path to
+                # a test file has been provided or has '_test.' in it which
+                # means a path to a particular test class or a method in a test
+                # file has been provided. If the path provided does not exist,
+                # error is raised when we try to execute the tests.
+                if (
+                    test_target.endswith('_test')
+                    or '_test.' in test_target
+                ):
+                    all_test_targets.append(test_target)
+                else:
+                    print('')
+                    print(
+                        '-----------------------------------------------'
+                        '-------')
+                    print(
+                        'WARNING : each test_target should point to the '
+                        'test file.')
+                    print(
+                        '-----------------------------------------------'
+                        '-------')
+                    print('')
+                    time.sleep(3)
+                    print('Redirecting to its corresponding test file...')
+                    all_test_targets.append(test_target + '_test')
         elif parsed_args.test_shard:
             validation_error = check_shards_match_tests(
                 include_load_tests=True)
@@ -444,6 +477,9 @@ def main(args: Optional[List[str]] = None) -> None:
                 raise Exception(validation_error)
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
+        elif parsed_args.run_on_changed_files_in_branch:
+            all_test_targets = list(
+                git_changes_utils.get_changed_python_test_files())
         else:
             include_load_tests = not parsed_args.exclude_load_tests
             all_test_targets = get_all_test_targets_from_path(
@@ -479,7 +515,7 @@ def main(args: Optional[List[str]] = None) -> None:
     print('+------------------+')
     print('')
 
-    total_count, total_errors, total_failures = check_test_results(
+    total_count, total_errors, total_failures, time_report = check_test_results(
         tasks, task_to_taskspec)
 
     print('')
@@ -547,6 +583,10 @@ def main(args: Optional[List[str]] = None) -> None:
         if (coverage != 100
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
+
+    if parsed_args.generate_time_report:
+        with utils.open_file(TIME_REPORT_PATH, 'w') as time_report_file:
+            time_report_file.write(json.dumps(time_report, indent=4))
 
     print('')
     print('Done!')

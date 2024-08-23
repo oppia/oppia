@@ -346,13 +346,16 @@ export class AdminBackendApiService {
 
   async regenerateOpportunitiesRelatedToTopicAsync(
     topicId: string
-  ): Promise<number> {
+  ): Promise<{opportunities_count: number}> {
     return new Promise((resolve, reject) => {
       this.http
-        .post<number>(AdminPageConstants.ADMIN_HANDLER_URL, {
-          action: 'regenerate_topic_related_opportunities',
-          topic_id: topicId,
-        })
+        .post<{opportunities_count: number}>(
+          AdminPageConstants.ADMIN_HANDLER_URL,
+          {
+            action: 'regenerate_topic_related_opportunities',
+            topic_id: topicId,
+          }
+        )
         .toPromise()
         .then(
           response => {

@@ -27,10 +27,12 @@ import {
   ClassroomBackendDict,
   ClassroomDict,
   TopicClassroomRelationDict,
+  classroomDisplayInfo,
 } from '../../domain/classroom/classroom-backend-api.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ClassroomEditorConfirmModalComponent} from './modals/classroom-editor-confirm-modal.component';
 import {DeleteClassroomConfirmModalComponent} from './modals/delete-classroom-confirm-modal.component';
+import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
 import {CreateNewClassroomModalComponent} from './modals/create-new-classroom-modal.component';
 import {DeleteTopicFromClassroomModalComponent} from './modals/delete-topic-from-classroom-modal.component';
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
@@ -72,7 +74,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   tempClassroomData!: ExistingClassroomData;
 
   classroomCount: number = 0;
-  classroomIdToClassroomName: {[classroomId: string]: string} = {};
+  classroomIdToClassroomNameIndex: classroomDisplayInfo[] = [];
   existingClassroomNames: string[] = [];
 
   currentTopicOnEdit!: string;
@@ -93,8 +95,6 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomViewerMode: boolean = false;
   classroomEditorMode: boolean = false;
   classroomDataSaveInProgress: boolean = false;
-  classroomDataPublishInProgress: boolean = false;
-  classroomDataUnpublishInProgress: boolean = false;
 
   newTopicCanBeAdded: boolean = false;
   topicWithGivenIdExists: boolean = true;
@@ -107,7 +107,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   saveClassroomValidationErrors: string[] = [];
 
   thumbnailParameters: ImageUploaderParameters = {
-    disabled: false,
+    disabled: true,
     maxImageSizeInKB: 100,
     imageName: 'Thumbnail',
     orientation: 'portrait',
@@ -115,9 +115,10 @@ export class ClassroomAdminPageComponent implements OnInit {
     allowedBgColors: ['transparent'],
     allowedImageFormats: ['svg'],
     aspectRatio: '4:3',
+    previewImageUrl: '',
   };
   bannerParameters: ImageUploaderParameters = {
-    disabled: false,
+    disabled: true,
     maxImageSizeInKB: 1024,
     imageName: 'Banner',
     orientation: 'landscape',
@@ -125,6 +126,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     allowedBgColors: ['transparent'],
     allowedImageFormats: ['png', 'jpeg'],
     aspectRatio: '2851:197',
+    previewImageUrl: '',
   };
 
   getEligibleTopicPrerequisites(currentTopicName: string): void {
@@ -190,8 +192,8 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.eligibleTopicNamesForPrerequisites = [];
         this.tempEligibleTopicNamesForPrerequisites = [];
 
-        this.existingClassroomNames = Object.values(
-          this.classroomIdToClassroomName
+        this.existingClassroomNames = this.classroomIdToClassroomNameIndex.map(
+          classroomMapping => classroomMapping.classroom_name
         );
         const index = this.existingClassroomNames.indexOf(
           this.tempClassroomData.getClassroomName()
@@ -229,13 +231,13 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.getAllTopicsToClassroomRelation();
   }
 
-  getAllClassroomIdToClassroomName(): void {
+  getAllClassroomIdToClassroomNameIndex(): void {
     this.classroomBackendApiService
-      .getAllClassroomIdToClassroomNameDictAsync()
+      .getAllClassroomDisplayInfoDictAsync()
       .then(response => {
         this.pageIsInitialized = true;
-        this.classroomIdToClassroomName = response;
-        this.classroomCount = Object.keys(response).length;
+        this.classroomIdToClassroomNameIndex = response;
+        this.classroomCount = response.length;
       });
   }
 
@@ -281,6 +283,8 @@ export class ClassroomAdminPageComponent implements OnInit {
     thumbnailData: ImageData,
     bannerData: ImageData
   ): void {
+    this.thumbnailParameters.previewImageUrl = '';
+    this.bannerParameters.previewImageUrl = '';
     this.thumbnailParameters.filename = thumbnailData.filename;
     this.thumbnailParameters.bgColor = thumbnailData.bg_color;
     this.bannerParameters.filename = bannerData.filename;
@@ -330,6 +334,9 @@ export class ClassroomAdminPageComponent implements OnInit {
     const classroomBannerIsChanged =
       this.tempClassroomData.getBannerData().filename !==
       this.classroomData.getBannerData().filename;
+    const classroomPublicationStatusIsChanged =
+      this.tempClassroomData.getIsPublished() !==
+      this.classroomData.getIsPublished();
 
     this.classroomAdminDataService.validateClassroom(
       this.tempClassroomData,
@@ -353,7 +360,8 @@ export class ClassroomAdminPageComponent implements OnInit {
       topicDependencyIsChanged ||
       classroomTeaserTextIsChanged ||
       classroomBannerIsChanged ||
-      classroomThumbnailIsChanged
+      classroomThumbnailIsChanged ||
+      classroomPublicationStatusIsChanged
     ) {
       this.classroomDataIsChanged = true;
     } else {
@@ -379,27 +387,6 @@ export class ClassroomAdminPageComponent implements OnInit {
     };
   }
 
-  unpublishClassroom(): void {
-    this.classroomDataUnpublishInProgress = true;
-    this.tempClassroomData.setIsPublished(false);
-    this.updateClassroomData(this.tempClassroomData.getClassroomId()).then(
-      () => {
-        this.classroomDataUnpublishInProgress = false;
-        this.openClassroomInViewerMode();
-      }
-    );
-  }
-
-  publishClassroom(): void {
-    this.classroomDataPublishInProgress = true;
-    this.tempClassroomData.setIsPublished(true);
-    this.updateClassroomData(this.tempClassroomData.getClassroomId()).then(
-      () => {
-        this.classroomDataPublishInProgress = false;
-      }
-    );
-  }
-
   saveClassroomData(classroomId: string): void {
     if (!this.canSaveClassroom()) {
       return;
@@ -419,9 +406,6 @@ export class ClassroomAdminPageComponent implements OnInit {
       .updateClassroomDataAsync(classroomId, backendDict)
       .then(
         () => {
-          this.classroomIdToClassroomName[
-            this.tempClassroomData.getClassroomId()
-          ] = this.tempClassroomData.getClassroomName();
           this.classroomData = cloneDeep(this.tempClassroomData);
           this.classroomDataSaveInProgress = false;
         },
@@ -446,7 +430,31 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomBackendApiService
           .deleteClassroomAsync(classroomId)
           .then(() => {
-            delete this.classroomIdToClassroomName[classroomId];
+            let classroomIndexToDelete =
+              this.classroomIdToClassroomNameIndex.find(
+                classroomMapping =>
+                  classroomMapping.classroom_id === classroomId
+              )?.classroom_index;
+
+            this.classroomIdToClassroomNameIndex =
+              this.classroomIdToClassroomNameIndex.filter(
+                classroomMapping =>
+                  classroomMapping.classroom_id !== classroomId
+              );
+
+            this.classroomIdToClassroomNameIndex =
+              this.classroomIdToClassroomNameIndex.map(classroomMapping => {
+                if (
+                  classroomIndexToDelete &&
+                  classroomMapping.classroom_index > classroomIndexToDelete
+                ) {
+                  return {
+                    ...classroomMapping,
+                    classroom_index: classroomMapping.classroom_index - 1,
+                  };
+                }
+                return classroomMapping;
+              });
             this.classroomCount--;
           });
       },
@@ -459,11 +467,15 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   openClassroomInEditorMode(): void {
+    this.thumbnailParameters.disabled = false;
+    this.bannerParameters.disabled = false;
     this.classroomViewerMode = false;
     this.classroomEditorMode = true;
   }
 
   openClassroomInViewerMode(): void {
+    this.thumbnailParameters.disabled = true;
+    this.bannerParameters.disabled = true;
     this.classroomViewerMode = true;
     this.classroomEditorMode = false;
   }
@@ -508,13 +520,17 @@ export class ClassroomAdminPageComponent implements OnInit {
         backdrop: 'static',
       }
     );
-    modalRef.componentInstance.existingClassroomNames = Object.values(
-      this.classroomIdToClassroomName
-    );
+    modalRef.componentInstance.existingClassroomNames =
+      this.classroomIdToClassroomNameIndex.map(
+        classroomMapping => classroomMapping.classroom_name
+      );
     modalRef.result.then(
       classroomDict => {
-        this.classroomIdToClassroomName[classroomDict.classroom_id] =
-          classroomDict.name;
+        this.classroomIdToClassroomNameIndex.push({
+          classroom_id: classroomDict.classroom_id,
+          classroom_name: classroomDict.name,
+          classroom_index: this.classroomIdToClassroomNameIndex.length,
+        });
         this.classroomCount++;
       },
       () => {
@@ -523,8 +539,34 @@ export class ClassroomAdminPageComponent implements OnInit {
     );
   }
 
+  changeClassroomsOrder(): void {
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      UpdateClassroomsOrderModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    modalRef.componentInstance.classroomIdToClassroomNameIndex = cloneDeep(
+      this.classroomIdToClassroomNameIndex
+    );
+    modalRef.result.then(
+      data => {
+        this.classroomBackendApiService
+          .updateClassroomIndexMappingAsync(data)
+          .then(() => {
+            this.classroomIdToClassroomNameIndex = data;
+          });
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
+  }
+
   ngOnInit(): void {
-    this.getAllClassroomIdToClassroomName();
+    this.getAllClassroomIdToClassroomNameIndex();
   }
 
   setTopicDependencyByTopicName(
@@ -549,7 +591,7 @@ export class ClassroomAdminPageComponent implements OnInit {
             prerequisiteTopicNames.push(topicIdsToTopicName[topicId]);
           }
 
-          this.tempClassroomData._topicIdToTopicName = topicIdsToTopicName;
+          this.tempClassroomData.setTopicIdToTopicName(topicIdsToTopicName);
 
           this.topicNameToPrerequisiteTopicNames[currentTopicName] =
             prerequisiteTopicNames;
@@ -568,6 +610,9 @@ export class ClassroomAdminPageComponent implements OnInit {
           const topicName = topicIdToTopicName[topicId];
 
           this.topicIdsToTopicName[topicId] = topicName;
+          this.tempClassroomData.setTopicIdToTopicName(
+            this.topicIdsToTopicName
+          );
           this.tempClassroomData.addNewTopicId(topicId);
           this.topicNameToPrerequisiteTopicNames[topicName] = [];
           this.topicNames.push(topicName);
@@ -679,6 +724,16 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   deleteTopic(topicNameToDelete: string): void {
+    const topicIdToDelete =
+      Object.keys(this.topicIdsToTopicName).find(
+        id => this.topicIdsToTopicName[id] === topicNameToDelete
+      ) || '';
+    this.topicsToClassroomRelation.push({
+      topic_name: topicNameToDelete,
+      topic_id: topicIdToDelete,
+      classroom_name: null,
+      classroom_url_fragment: null,
+    });
     let childTopicNodes = [];
     for (let topicName in this.topicNameToPrerequisiteTopicNames) {
       const prerequisites = this.topicNameToPrerequisiteTopicNames[topicName];
@@ -703,6 +758,8 @@ export class ClassroomAdminPageComponent implements OnInit {
 
         delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
         delete this.topicIdsToTopicName[topicId];
+
+        this.tempClassroomData.setTopicIdToTopicName(this.topicIdsToTopicName);
 
         this.topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
 
@@ -771,6 +828,13 @@ export class ClassroomAdminPageComponent implements OnInit {
         // clicked. No further action is needed.
       }
     );
+  }
+
+  togglePublicationStatus(): void {
+    this.tempClassroomData.setIsPublished(
+      !this.tempClassroomData.getIsPublished()
+    );
+    this.updateClassroomField();
   }
 
   canSaveClassroom(): boolean {

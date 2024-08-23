@@ -217,6 +217,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         expected_dict = {
             'classroom_id': 'test_id',
             'name': 'math',
+            'url_fragment': 'math',
             'topic_summary_dicts': [
                 public_topic_1_summary_dict, private_topic_summary_dict
             ],
@@ -257,7 +258,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 0
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -278,7 +280,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 1
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -288,14 +291,36 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
     def test_get_classroom_id_to_classroom_name(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        classroom_id_to_classroom_name = {
-            self.math_classroom_id: 'math',
-            self.physics_classroom_id: 'physics'
-        }
-        json_response = self.get_json(feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL)
+        physics_classroom = classroom_config_services.get_classroom_by_id(
+            self.physics_classroom_id
+        )
+        # TODO (#20845): Here we use MyPy ignore because we have a
+        # Test that checks if the index is None, it returns 0. The MyPy ignore
+        # Can be removed once the index for the math classroom is populated.
+        physics_classroom.index = None # type: ignore[assignment]
+        classroom_config_services.update_classroom(physics_classroom)
+        classroom_id_to_classroom_name = [
+            {
+                'classroom_id': self.physics_classroom.classroom_id,
+                'classroom_name': self.physics_classroom.name,
+                'classroom_index': 0
+            },
+            {
+                'classroom_id': self.math_classroom.classroom_id,
+                'classroom_name': self.math_classroom.name,
+                'classroom_index': 1
+            }
+        ]
+        json_response = self.get_json(feconf.CLASSROOM_DISPLAY_INFO_HANDLER_URL)
         self.assertEqual(
-            json_response['classroom_id_to_classroom_name'],
-            classroom_id_to_classroom_name
+            sorted(
+                json_response['classroom_display_info'],
+                key=lambda x: int(x['classroom_index'])
+            ),
+            sorted(
+                classroom_id_to_classroom_name,
+                key=lambda x: int(x['classroom_index'])
+            )
         )
         self.logout()
 
@@ -522,7 +547,8 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 0
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -633,9 +659,14 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.save_new_valid_classroom(
+        classroom1 = self.save_new_valid_classroom(
             'classroom1', 'history', 'history'
         )
+        # TODO (#20845): Here we use MyPy ignore because we have a
+        # Test that checks if the index is None, it returns 0. The MyPy ignore
+        # Can be removed once the index for the math classroom is populated.
+        classroom1.index = None # type: ignore[assignment]
+        classroom_config_services.update_classroom(classroom1)
         self.save_new_valid_classroom(
             'classroom2', 'english', 'english'
         )
@@ -654,7 +685,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
                 'thumbnail_filename': 'thumbnail.svg',
-                'thumbnail_bg_color': 'transparent'
+                'thumbnail_bg_color': 'transparent', 'index': 0
             },
             {
                 'classroom_id': 'classroom2',
@@ -663,7 +694,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
                 'thumbnail_filename': 'thumbnail.svg',
-                'thumbnail_bg_color': 'transparent'
+                'thumbnail_bg_color': 'transparent', 'index': 1
             }
         ]
 
@@ -771,3 +802,49 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
             'Schema validation for \'name\' failed: '
             'Validation failed: is_nonempty ({}) for object '
         )
+
+
+class TestUpdateClassroomIndexMappingHandler(BaseClassroomControllerTests):
+    """Test for updating classrooms order."""
+
+    def setUp(self) -> None:
+        """Set up test data and environment."""
+        super().setUp()
+        self.classroom_1 = self.save_new_valid_classroom(
+            'classroomone', 'Trigonometry', 'classroomone'
+        )
+        self.classroom_2 = self.save_new_valid_classroom(
+            'classroomtwo', 'Math', 'classroomtwo'
+        )
+
+    def test_successful_update_classroom_index(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        payload = {
+            'classroom_index_mappings': [
+                {
+                    'classroom_id': 'classroomone',
+                    'classroom_name': 'Trigonometry',
+                    'classroom_index': 1
+                },
+                {
+                    'classroom_id': 'classroomtwo',
+                    'classroom_name': 'Calculus',
+                    'classroom_index': 0
+                }
+            ]
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            feconf.UPDATE_CLASSROOMS_ORDER_HANDLER_URL, payload,
+            csrf_token
+        )
+
+        updated_classroom_1 = (
+            classroom_config_services.get_classroom_by_id('classroomone')
+        )
+        updated_classroom_2 = (
+            classroom_config_services.get_classroom_by_id('classroomtwo')
+        )
+
+        self.assertEqual(updated_classroom_1.index, 1)
+        self.assertEqual(updated_classroom_2.index, 0)

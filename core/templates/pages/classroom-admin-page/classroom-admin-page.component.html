@@ -1,7 +1,8 @@
 <mat-card class="oppia-editor-card-with-avatar">
   <div class="card-content">
-    <div>
+    <div class="top-content-container">
       <h3>Classroom details</h3>
+      <button class="btn add-new-classroom" (click)="changeClassroomsOrder()">Change Order</button>
     </div>
     <hr>
     <div>
@@ -14,28 +15,29 @@
         No classroom exists at this moment.
       </em>
 
-      <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
+      <div *ngFor="let classroom of classroomIdToClassroomNameIndex">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
-             (click)="getClassroomData(classroom.key)">
-          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())">
-            {{ classroom.value }}
+             (click)="getClassroomData(classroom.classroom_id)">
+          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
+            {{ classroom.classroom_name }}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">
+          <span *ngIf="classroomEditorMode && classroom.classroom_id === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">
             {{ this.tempClassroomData.getClassroomName() }}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length === 0">
+          <span *ngIf="classroomEditorMode && classroom.classroom_id === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length === 0">
             [New Classroom]
           </span>
           <button mat-button matSuffix mat-icon-button
+                  class="e2e-test-delete-classroom-button"
                   aria-label="Clear"
                   *ngIf="!classroomEditorMode"
-                  (click)="deleteClassroom(classroom.key); $event.stopPropagation()">
+                  (click)="deleteClassroom(classroom.classroom_id); $event.stopPropagation()">
             <mat-icon matListIcon>close</mat-icon>
           </button>
         </div>
 
         <div class="classroom-details"
-             *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.key">
+             *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.classroom_id">
           <div *ngIf="classroomViewerMode">
             <i class="material-icons oppia-edit-icon e2e-test-edit-classroom-config-button"
                title="Edit Classroom"
@@ -144,7 +146,28 @@
             </div>
           </div>
 
-          <div>
+          <div class="row oppia-classroom-input-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Publication Status</strong>
+            </span>
+            <div>
+              <span *ngIf="classroomViewerMode">
+                {{ tempClassroomData.getIsPublished() ? 'Public' : 'Private' }}
+              </span>
+              <div class="oppia-on-off-switch" *ngIf="!classroomViewerMode">
+                <input *ngIf="tempClassroomData.getIsPublished()" type="checkbox" class="sr-only" aria-label="Change classroom publication status" checked (click)="togglePublicationStatus()">
+                <input span *ngIf="tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" checked (click)="togglePublicationStatus()">
+                <input *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="sr-only" (click)="togglePublicationStatus()" aria-label="Change classroom publication status">
+                <input span *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" (click)="togglePublicationStatus()">
+                <label class="oppia-on-off-switch-label e2e-test-toggle-classroom-publication-status-btn" for="edits-switch">
+                  <span class="oppia-on-off-switch-inner"></span>
+                  <span class="oppia-on-off-switch-main"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="topic-and-prerequisites-container">
             <hr>
             <div class="topic-and-prerequisites-text-container">
               <p><strong>Topics and their prerequisites</strong></p>
@@ -248,7 +271,7 @@
                   <mat-form-field appearance="fill" class="topics-selector-form-field e2e-test-classroom-topics-modal">
                     <mat-label for="explorationCategory" class="d-block">Select a topic</mat-label>
                     <mat-select (selectionChange)="onNewTopicInputModelChange($event.value)" class="e2e-test-classroom-category-dropdown">
-                      <mat-option class="e2e-test-exploration-new-category-add">
+                      <mat-option class="e2e-test-classroom-new-topic-add">
                         <ngx-mat-select-search
                           ngModel
                           (ngModelChange)="filterTopicsByName($event)"
@@ -286,37 +309,6 @@
                     [disabled]="classroomDataSaveInProgress">
               Cancel
             </button>
-            <button *ngIf="tempClassroomData._isPublished"
-                    [disabled]="false"
-                    class="btn btn-secondary publish-classroom-btn e2e-unpublish-classroom-btn"
-                    (click)="unpublishClassroom()"
-                    >
-              <span *ngIf="!classroomDataUnpublishInProgress">Unpublish</span>
-              <mat-spinner *ngIf="classroomDataUnpublishInProgress"
-                           class="oppia-update-classroom-data-spinning-button"
-                           [diameter]="22">
-              </mat-spinner>
-            </button>
-            <span [matTooltip]="allValidationErrors.join('\n')"
-                  matTooltipClass="oppia-mat-tooltip-list"
-                  [matTooltipDisabled]="false"
-                  aria-label="List that shows issues preventing to publish a classroom"
-                  >
-              <button *ngIf="!tempClassroomData._isPublished"
-                      [disabled]="!(allValidationErrors.length === 0)"
-                      class="btn btn-success publish-classroom-btn e2e-test-publish-classroom-btn"
-                      (click)="publishClassroom()"
-                  >
-                <span *ngIf="!classroomDataPublishInProgress">Publish</span>
-                <mat-spinner *ngIf="classroomDataPublishInProgress"
-                             class="oppia-update-classroom-data-spinning-button"
-                             [diameter]="22">
-                </mat-spinner>
-                <mat-icon *ngIf="allValidationErrors.length > 0" class="save-draft-button-warning">
-                  warning
-                </mat-icon>
-              </button>
-            </span>
             <span [matTooltip]="(saveClassroomValidationErrors).join('\n')"
                   matTooltipClass="oppia-mat-tooltip-list"
                   [matTooltipDisabled]="false"
@@ -324,7 +316,7 @@
                   >
               <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
                       [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid() && saveClassroomValidationErrors.length === 0)"
-                      (click)="saveClassroomData(classroom.key)">
+                      (click)="saveClassroomData(classroom.classroom_id)">
                 <span *ngIf="!classroomDataSaveInProgress">Save</span>
                 <mat-spinner *ngIf="classroomDataSaveInProgress"
                              class="oppia-update-classroom-data-spinning-button"
@@ -559,17 +551,82 @@
     justify-content: space-between;
     width: 100%;
   }
-  @media screen and (max-width: 768px) {
-    .oppia-editor-card-with-avatar {
-      margin-top: 20px;
-    }
 
-    .oppia-classroom-input-container span {
-      padding-left: 0;
-    }
-
-    .topic-dependency-container {
-      overflow: auto;
-    }
+  .oppia-on-off-switch-inner:before {
+    content: 'Public';
+    padding-left: 6px;
   }
+
+  .oppia-on-off-switch-inner:after {
+    content: 'Private';
+    padding-right: 3px;
+  }
+
+  .oppia-on-off-switch-main {
+    right: 44px;
+  }
+
+  .top-content-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media screen and (max-width: 768px) {
+  .oppia-editor-card-with-avatar {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    max-width: 100%;
+  }
+
+  .card-content {
+    padding: 35px 10px;
+  }
+
+  .oppia-classroom-input-container {
+    padding-left: 0;
+    width: 100%;
+  }
+
+  .oppia-classroom-input-container span {
+    display: block;
+    padding-left: 0;
+  }
+
+  .oppia-classroom-tile {
+    box-sizing: border-box;
+    margin: 10px 0;
+    width: 100%;
+  }
+
+  .classroom-details {
+    margin-bottom: 10px;
+    padding: 0;
+  }
+
+  .topic-and-prerequisites-container {
+    margin: 0;
+    position: static;
+    right: auto;
+  }
+
+  .new-topic-input-container {
+    width: 100%;
+  }
+
+  .create-new-classroom-button-wrapper {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .btn.add-new-classroom {
+    width: 100%;
+  }
+
+  .topic-dependency-container {
+    margin-bottom: 10px;
+    overflow: auto;
+  }
+}
 </style>

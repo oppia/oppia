@@ -20,7 +20,6 @@ import {Component, Input} from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ContextService} from 'services/context.service';
-import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
@@ -31,8 +30,11 @@ import {
 } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {
+  TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+  TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+} from 'domain/exploration/WrittenTranslationObjectFactory';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;
@@ -48,8 +50,6 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   explorationId!: string;
   explorationVersion!: number;
   contentTranslations: LanguageCodeToContentTranslations = {};
-  contentHasDisplayableTranslations: boolean = false;
-  allExistingTranslationsHaveBeenRemoved: boolean = false;
   languageIsCheckedStatusDict: {
     [languageCode: string]: boolean;
   } = {};
@@ -60,7 +60,6 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     private ngbActiveModal: NgbActiveModal,
     private ngbModal: NgbModal,
     private contextService: ContextService,
-    private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private languageUtilService: LanguageUtilService,
     private entityTranslationsService: EntityTranslationsService,
     private changeListService: ChangeListService,
@@ -89,78 +88,13 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
         this.contentTranslations[language] = translationContent;
       }
     }
-
-    this.allExistingTranslationsHaveBeenRemoved = this.changeListService
-      .getTranslationChangeList()
-      .some(changeDict => {
-        return (
-          changeDict.cmd === 'remove_translations' &&
-          changeDict.content_id === this.contentId
-        );
-      });
-
-    // Populate the content translations via published translations from the backend.
-    // These translations are used for a language when the published translations are
-    // the latest translations available.
-    if (!this.allExistingTranslationsHaveBeenRemoved) {
-      this.entityBulkTranslationsBackendApiService
-        .fetchEntityBulkTranslationsAsync(
-          this.explorationId,
-          'exploration',
-          this.explorationVersion
-        )
-        .then(response => {
-          for (let language in response) {
-            let languageTranslations = response[language].translationMapping;
-            if (
-              this.contentId in languageTranslations &&
-              !this.contentTranslations[language]
-            ) {
-              let translationDict = languageTranslations[this.contentId];
-              this.contentTranslations[language] = new TranslatedContent(
-                translationDict.translation,
-                translationDict.dataFormat,
-                translationDict.needsUpdate
-              );
-            }
-            // Initialize the entity translations object to track future draft changes.
-            if (
-              !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
-                language
-              )
-            ) {
-              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
-                language
-              ] = EntityTranslation.createFromBackendDict({
-                entity_id: this.explorationId,
-                entity_type: 'exploration',
-                entity_version: response[language].entityVersion,
-                language_code: language,
-                translations: {},
-              });
-            }
-          }
-          this.updateTranslationDisplayContent();
-        });
-    } else {
-      this.updateTranslationDisplayContent();
-    }
+    this.updateTranslationDisplayContent();
   }
 
   updateTranslationDisplayContent(): void {
-    this.changeListService.getTranslationChangeList().forEach(changeDict => {
-      if (changeDict.cmd === 'mark_translation_needs_update_for_language') {
-        if (changeDict.content_id === this.contentId) {
-          this.contentTranslations[changeDict.language_code].needsUpdate = true;
-        }
-      }
-    });
-
     Object.keys(this.contentTranslations).forEach(languageCode => {
       this.languageIsCheckedStatusDict[languageCode] = false;
     });
-    this.contentHasDisplayableTranslations =
-      this.doesContentHaveDisplayableTranslations();
     this.translationsHaveLoaded = true;
   }
 
@@ -186,6 +120,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     modalRef.result.then(result => {
       if (result) {
         this.contentTranslations[languageCode].translation = result;
+        this.languageIsCheckedStatusDict[languageCode] = true;
       }
     });
   }
@@ -234,13 +169,13 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     ) as string;
   }
 
-  doesContentHaveDisplayableTranslations(): boolean {
-    // Check if at least one translation is not stale and can be displayed.
-    for (const translation of Object.values(this.contentTranslations)) {
-      if (!translation.needsUpdate) {
-        return true;
-      }
-    }
-    return false;
+  isSetOfStringDataFormat(): boolean {
+    const activeDataFormat =
+      this.contentTranslations[Object.keys(this.contentTranslations)[0]]
+        .dataFormat;
+    return (
+      activeDataFormat === TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING ||
+      activeDataFormat === TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
+    );
   }
 }

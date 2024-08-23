@@ -247,7 +247,25 @@ describe('State Translation Editor Component', () => {
       expect(changeListService.editTranslation).toHaveBeenCalled();
     });
 
-    it('should update the translation with edited translation', () => {});
+    it('should remove translation if edited translation is blank', () => {
+      spyOn(changeListService, 'editTranslation');
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
+          'content1'
+        )
+      ).toBeTrue();
+
+      component.activeWrittenTranslation = TranslatedContent.createNew('html');
+      component.activeWrittenTranslation.translation = '';
+      component.onSaveTranslationButtonClicked();
+
+      expect(changeListService.editTranslation).toHaveBeenCalled();
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
+          'content1'
+        )
+      ).toBeFalse();
+    });
 
     it('should refresh the translation status', () => {
       spyOn(translationStatusService, 'refresh');

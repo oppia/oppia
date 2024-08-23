@@ -29,8 +29,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 export class ThanksPageComponent {
   constructor(private urlInterpolationService: UrlInterpolationService) {}
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
   }
 }
 angular

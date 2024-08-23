@@ -1,0 +1,1142 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.teach-page {
+  background-color: #fff;
+  color: #333;
+}
+
+.teach-page p {
+  margin-bottom: 0;
+}
+
+.teach-page .oppia-teach-hero-title,
+.teach-page .oppia-teach-title,
+.teach-page .oppia-teach-subtitle {
+  color: #00645c;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+
+.teach-page .oppia-teach-hero-title {
+  font-size: 4.8rem;
+  line-height: 57.6px;
+}
+
+.teach-page .oppia-teach-title {
+  font-size: 3rem;
+  line-height: 40.5px;
+}
+
+.teach-page .oppia-teach-subtitle {
+  font-size: 3rem;
+  line-height: 36px;
+}
+
+.teach-page .oppia-teach-subtext {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1.8rem;
+  line-height: 21.6px;
+}
+
+.teach-page .oppia-teach-text {
+  color: #00645c;
+  font-weight: 700;
+}
+
+.teach-page .oppia-teach-subheading {
+  color: #000;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 21.6px;
+  margin-bottom: 8px;
+}
+
+.teach-page .oppia-teach-subtext.oppia-teach-bolded-text {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.teach-page .oppia-teach-btn {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 21.6px;
+  max-width: 100%;
+  min-height: 44px;
+  min-width: 240px;
+  padding: 10px;
+}
+
+.teach-page .oppia-teach-secondary-btn {
+  background-color: #fff;
+  border: 1px solid #00645c;
+  color: #00645c;
+}
+.teach-page .oppia-teach-secondary-btn:hover,
+.teach-page .oppia-teach-secondary-btn:focus {
+  border-width: 2px;
+}
+.teach-page .oppia-teach-secondary-btn:active {
+  background-color: #f5f5f5;
+}
+
+.teach-page .carousel-indicators li {
+  background-color: gray;
+  border-radius: 50%;
+}
+
+.teach-page .carousel-indicators li.active {
+  background-color: #005240;
+}
+
+.teach-page .rtl-flip {
+  transform: scaleX(-1);
+}
+
+.teach-page .oppia-teach-hero-section {
+  align-items: end;
+  background-image: url("/assets/images/teach/banner-desktop.webp");
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  min-height: 448px;
+  padding: 40px 64px;
+}
+
+.teach-page .oppia-teach-hero-box {
+  background-color: #fff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 58%;
+  opacity: 0.93;
+  padding: 48px 32px;
+}
+
+.teach-page .oppia-teach-hero-subtext {
+  font-size: 2rem;
+  line-height: 24px;
+}
+
+.teach-page .oppia-teach-tips-section {
+  background-color: #fff;
+  padding: 112px 64px;
+}
+
+.teach-page .oppia-teach-tips-section .oppia-teach-title {
+  width: 42%;
+}
+
+.teach-page .oppia-teach-tips-section .oppia-teach-tips-boxes-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.teach-page .oppia-teach-tips-box {
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 48px;
+  width: 50%;
+}
+
+.teach-page .oppia-teach-tips-box .oppia-teach-subtext {
+  margin: 8px 0 24px;
+}
+
+.teach-page .oppia-teach-tips-guide-box {
+  align-items: start;
+  background-color: #e3f1f1;
+}
+
+.teach-page .oppia-teach-tips-blog-box {
+  align-items: start;
+  border: 2px solid #eee;
+}
+
+.teach-page .oppia-teach-tips-section .oppia-teach-subtitle {
+  font-size: 2rem;
+  line-height: 27px;
+}
+
+.teach-page .oppia-teach-creators-section {
+  background-color: #fff;
+  padding: 0 64px 112px;
+  width: 100%;
+}
+
+.teach-page .oppia-teach-creators-carousel {
+  display: flex;
+  gap: 32px;
+  margin: 24px 0 32px;
+  -ms-overflow-style: none;
+  overflow-x: scroll;
+  scrollbar-width: none;
+}
+
+.teach-page .oppia-teach-creators-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.teach-page .oppia-teach-creators-carousel-item {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 8px;
+  width: 240px;
+}
+
+.teach-page .oppia-teach-creators-carousel-item-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.teach-page .oppia-teach-creators-carousel-item-image {
+  position: relative;
+  width: 100%;
+}
+
+.teach-page .oppia-teach-creators-carousel-item-image img {
+  opacity: 0.8;
+  width: 100%;
+}
+
+.teach-page .oppia-teach-creators-carousel-item-image p {
+  background-color: #00645c80;
+  bottom: 8px;
+  color: #fff;
+  padding: 4px 13px;
+  position: absolute;
+  width: 100%;
+}
+
+.teach-page .oppia-teach-creators-carousel-item .oppia-teach-btn {
+  min-width: 0;
+  width: 100%;
+}
+
+.teach-page .oppia-teach-creators-arrows-container {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 32px;
+  padding: 24px 0;
+}
+
+.teach-page .oppia-teach-creators-arrows-container i {
+  color: #00645c;
+  font-size: 36px;
+}
+
+.teach-page .oppia-teach-creators-arrows-container i.oppia-disabled-icon {
+  color: #b7bbbf;
+}
+
+.teach-page .oppia-teach-lesson-section {
+  background-color: #fff;
+  padding: 0 64px 64px;
+}
+
+.teach-page .oppia-teach-lesson-section .oppia-teach-heading {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 2.4rem;
+  font-weight: 500;
+  line-height: 28.8px;
+}
+
+.teach-page .oppia-teach-lesson-top {
+  margin-bottom: 32px;
+  width: 60%;
+}
+
+.teach-page .oppia-teach-lesson-top .oppia-teach-heading {
+  color: #00645c;
+  margin: 16px 0 8px;
+}
+
+.teach-page .oppia-teach-lesson-bottom {
+  display: flex;
+  flex-direction: row;
+  gap: 64px;
+  width: 100%;
+}
+
+.teach-page .oppia-teach-lesson-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  width: calc(54% - 64px);
+}
+
+.teach-page .oppia-teach-lesson-left .oppia-teach-heading {
+  margin-bottom: 16px;
+}
+
+.teach-page .oppia-teach-lesson-right {
+  align-items: start;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 32px;
+  width: 46%;
+}
+
+.teach-page .oppia-teach-lesson-image {
+  margin: 16px 0 0;
+  position: relative;
+  width: 100%;
+}
+
+.teach-page .oppia-teach-lesson-image img {
+  width: 100%;
+}
+
+.teach-page .oppia-teach-lesson-hover-button {
+  display: none;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99;
+}
+
+.teach-page .oppia-teach-accordion-container {
+  background-color: #fff;
+}
+
+.oppia-teach-lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teach-page .oppia-teach-lesson-panel-title {
+  background-color: #fff;
+  border: 1px solid #00645c;
+  border-radius: 4px;
+  min-height: 54px;
+  padding: 8px 22px 8px 10px;
+}
+
+.teach-page .oppia-teach-lesson-panel .title-container,
+.teach-page .oppia-teach-lesson-panel-title {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 2rem;
+  line-height: 24px;
+}
+
+.teach-page .oppia-teach-lesson-panel-title:active,
+.teach-page .oppia-teach-lesson-panel-title:focus,
+.teach-page .oppia-teach-lesson-panel-title:hover {
+  border: 0.75px solid #00645c;
+  outline: none;
+}
+
+.oppia-teach-lesson-panel {
+  background-color: #e3f1f1;
+  border: 1px solid #00645c;
+  border-radius: 4px;
+}
+
+.oppia-teach-lesson-panel .panel-image-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  padding: 0 16px;
+}
+
+.teach-page .oppia-teach-lesson-panel .panel-content {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1.8rem;
+  line-height: 21.6px;
+  padding: 10px 20px 16px 30px;
+  width: 94%;
+}
+
+.teach-page .oppia-teach-lesson-panel .title-container {
+  color: #00645c;
+  font-weight: 700;
+  padding: 14px 16px 8px;
+}
+
+.teach-page .oppia-teach-outcomes-section {
+  background-color: #e3f1f1;
+  display: flex;
+  flex-direction: row;
+  gap: 68px;
+  margin: 0 64px 112px;
+  padding: 32px 24px;
+}
+
+.teach-page .oppia-teach-outcomes-section .oppia-teach-title {
+  margin-bottom: 16px;
+}
+
+.teach-page .oppia-teach-outcomes-left {
+  width: 60%;
+}
+
+.teach-page .oppia-teach-outcomes-section-right .oppia-teach-subtext b {
+  margin-bottom: 8px;
+}
+
+.teach-page .oppia-teach-outcomes-rct-container {
+  background-color: #fff;
+  border-radius: 4px;
+  margin: 16px 0 24px;
+  padding: 16px;
+}
+
+.teach-page .oppia-teach-outcomes-rct-container img {
+  width: 100%;
+}
+
+.teach-page .oppia-teach-outcomes-rct-heading {
+  color: #00645c;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 2.4rem;
+  font-weight: 500;
+  line-height: 28.8px;
+}
+
+.teach-page .oppia-teach-outcomes-rct-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  width: min-content;
+}
+
+.teach-page .oppia-teach-outcomes-rct-label {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.teach-page .oppia-teach-outcomes-charts-container p,
+.teach-page .oppia-teach-outcomes-rct-label p {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1.8rem;
+  line-height: 21.6px;
+}
+
+.teach-page .oppia-teach-outcomes-charts-container p {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.teach-page .oppia-teach-outcomes-rct-control-box,
+.teach-page .oppia-teach-outcomes-rct-oppia-box {
+  height: 20px;
+  width: 40px;
+}
+
+.teach-page .oppia-teach-outcomes-rct-control-box {
+  background-color: #d9d9d9;
+}
+
+.teach-page .oppia-teach-outcomes-rct-oppia-box {
+  background-color: #00645c;
+}
+
+.teach-page .oppia-teach-outcomes-chart {
+  align-items: end;
+  display: flex;
+  flex-direction: row;
+  gap: 48px;
+}
+
+.teach-page .oppia-teach-outcomes-legend-container {
+  margin-bottom: 32px;
+  width: calc(30% - 48px);
+}
+
+.teach-page .oppia-teach-outcomes-legend {
+  width: 100%;
+}
+
+.teach-page .oppia-teach-outcomes-charts-container {
+  align-items: end;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 24px;
+  width: 70%;
+}
+
+.teach-page .oppia-teach-testimonials-section {
+  padding: 0 64px 112px;
+}
+
+.teach-page .oppia-teach-testimonials-section .oppia-teach-subtitle {
+  margin-bottom: 32px;
+}
+
+.teach-page .oppia-teach-testimonials-section .carousel-indicators {
+  bottom: -48px;
+  gap: 8px;
+  margin: 0;
+}
+
+.teach-page .oppia-teach-testimonials-section .carousel-indicators li {
+  height: 20px;
+  width: 20px;
+}
+
+.teach-page .oppia-teach-testimonials-container {
+  background-color: #e3f1f1;
+  border-radius: 4px;
+  padding: 48px 64px 100px;
+}
+
+.teach-page .oppia-teach-testimonial-top {
+  align-items: end;
+  display: flex;
+  flex-direction: row;
+  gap: 64px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.teach-page .oppia-teach-testimonial-left {
+  width: 31%;
+}
+
+.teach-page .oppia-teach-testimonial-right {
+  padding-bottom: 48px;
+  width: calc(66% - 34px);
+}
+
+.teach-page .oppia-teach-testimonials-container i {
+  color: #00645c;
+  font-size: 28px;
+}
+
+.teach-page .oppia-teach-testimonials-container > button {
+  background-color: transparent;
+  padding: 24px;
+}
+
+.teach-page .oppia-teach-creators-arrows-container button {
+  background-color: #fff;
+  border: none;
+  height: 36px;
+  outline: none;
+  width: 36px;
+}
+
+.teach-page .oppia-teach-lesson-panel button {
+  border: none;
+  outline: none;
+}
+
+.teach-page .oppia-teach-testimonials-container > button,
+.teach-page .oppia-teach-testimonials-container > button:active,
+.teach-page .oppia-teach-testimonials-container > button:focus,
+.teach-page .oppia-teach-testimonials-container > button:hover {
+  border: none;
+  outline: none;
+}
+
+.teach-page .oppia-teach-creators-arrows-container button:active,
+.teach-page .oppia-teach-creators-arrows-container button:focus,
+.teach-page .oppia-teach-creators-arrows-container button:hover {
+  border: none;
+  outline: none;
+}
+
+.teach-page .oppia-teach-lesson-panel button:active,
+.teach-page .oppia-teach-lesson-panel button:focus,
+.teach-page .oppia-teach-lesson-panel button:hover {
+  border: none;
+  outline: none;
+}
+
+.teach-page .oppia-teach-testimonial-image img {
+  border-radius: 50%;
+}
+
+.teach-page .oppia-teach-testimonial-name {
+  color: #000;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 2rem;
+  line-height: 24px;
+  margin-bottom: 16px;
+}
+
+.teach-page .oppia-teach-features-section {
+  align-items: center;
+  background-color: #fff;
+  display: flex;
+  flex-direction: row;
+  gap: 64px;
+  padding: 32px 64px;
+}
+
+.teach-page .oppia-teach-features-left {
+  margin: 0 32px;
+  width: 44%;
+}
+
+.teach-page .oppia-teach-matthew-image img {
+  width: 100%;
+}
+
+.teach-page .oppia-teach-creators-carousel-item-image img:hover {
+  opacity: 1;
+}
+
+.teach-page .oppia-teach-features-right .oppia-teach-subtitle {
+  margin: 0 0 32px 56px;
+}
+
+.teach-page .oppia-teach-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 74%;
+}
+
+.teach-page .oppia-teach-feature {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.teach-page .oppia-teach-feature-text {
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 2rem;
+  line-height: 28px;
+}
+
+.teach-page .oppia-teach-cta-section {
+  background-color: #fff;
+  padding: 112px 0;
+}
+
+.teach-page .oppia-teach-cta-section .oppia-teach-subtitle {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.teach-page .oppia-teach-cta-buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  justify-content: center;
+}
+
+.teach-page .oppia-teach-cta-section .oppia-teach-btn {
+  min-width: 360px;
+}
+
+@media only screen and (min-width: 976px) {
+  .teach-page .oppia-teach-lesson-mobile-content {
+    display: none;
+  }
+  .oppia-teach-lesson-image::before {
+    background: #0000001a;
+    content: '';
+    height: 100%;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 0.3s ease;
+    width: 100%;
+  }
+  .oppia-teach-lesson-image:hover::before {
+    opacity: 1;
+  }
+  .oppia-teach-lesson-image:hover {
+    box-shadow: 0 2px 10px 0 #00000026;
+  }
+  .oppia-teach-lesson-image:hover .oppia-teach-lesson-hover-button {
+    display: block;
+  }
+}
+
+@media only screen and (min-width: 922px) {
+  .teach-page .oppia-teach-testimonials-container > button {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: 641px) {
+  .teach-page .oppia-teach-testimonial-quote2 {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 1051px) {
+  .teach-page .oppia-teach-features-section {
+    gap: 32px;
+    padding: 0 48px;
+  }
+  .teach-page .oppia-teach-features-left {
+    margin: 0;
+    width: 66%;
+  }
+  .teach-page .oppia-teach-features-right .oppia-teach-subtitle {
+    margin: 0 0 16px 56px;
+  }
+  .teach-page .oppia-teach-features {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-feature-text {
+    font-size: 1.6rem;
+    line-height: 22.4px;
+  }
+}
+
+@media only screen and (max-width: 976px) {
+  .teach-page .oppia-teach-hero-title {
+    font-size: 3rem;
+    line-height: 33.6px;
+  }
+  .teach-page .oppia-teach-hero-section {
+    background-size: cover;
+    min-height: 364px;
+    padding: 32px 48px;
+  }
+  .teach-page .oppia-teach-hero-box {
+    max-width: 64%;
+    padding: 32px;
+  }
+  .teach-page .oppia-teach-hero-subtext {
+    font-size: 1.6rem;
+    line-height: 19.2px;
+  }
+  .teach-page .oppia-teach-lesson-bottom {
+    flex-direction: column;
+    gap: 48px;
+  }
+  .teach-page .oppia-teach-lesson-desktop-content {
+    display: none;
+  }
+  .teach-page .oppia-teach-lesson-left {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-lesson-right {
+    background-color: #fff;
+    padding: 0;
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 922px) {
+  .teach-page .oppia-teach-testimonials-section {
+    padding: 0 0 80px;
+  }
+  .teach-page .oppia-teach-testimonials-section .oppia-teach-subtitle {
+    margin-bottom: 16px;
+    padding-left: 48px;
+  }
+  .teach-page .oppia-teach-testimonials-section .carousel-indicators {
+    bottom: -36px;
+    gap: 0;
+  }
+  .teach-page .oppia-teach-testimonials-section .carousel-indicators li {
+    height: 8px;
+    width: 8px;
+  }
+  .teach-page .oppia-teach-testimonials-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    padding: 48px 16px 52px;
+  }
+  .teach-page .oppia-teach-testimonial-top {
+    gap: 24px;
+    min-height: 163px;
+  }
+  .teach-page .oppia-teach-testimonial-left {
+    width: 27%;
+  }
+  .teach-page .oppia-teach-testimonial-right {
+    padding-bottom: 0;
+    width: calc(73% - 34px);
+  }
+  .teach-page .oppia-teach-testimonial {
+    padding: 0;
+  }
+}
+
+@media only screen and (max-width: 769px) {
+  .teach-page .oppia-teach-title {
+    font-size: 3rem;
+    line-height: 40.5px;
+  }
+  .teach-page .oppia-teach-subtitle {
+    font-size: 2rem;
+    line-height: 24px;
+  }
+  .teach-page .oppia-teach-subtext {
+    font-size: 1.6rem;
+    line-height: 19.2px;
+  }
+  .teach-page .oppia-teach-tips-section {
+    padding: 80px 48px;
+  }
+  .teach-page .oppia-teach-tips-section .oppia-teach-title {
+    width: 70%;
+  }
+  .teach-page .oppia-teach-tips-section .oppia-teach-tips-boxes-container {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .teach-page .oppia-teach-tips-box {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-creators-section {
+    padding: 0 48px 80px;
+  }
+  .teach-page .oppia-teach-creators-carousel {
+    gap: 24px;
+    margin: 24px 0 16px;
+  }
+  .teach-page .oppia-teach-creators-carousel-item {
+    width: calc((100% - 48px) / 3);
+  }
+  .teach-page .oppia-teach-creators-carousel-item-image .oppia-teach-subtext {
+    font-size: 1.3rem;
+    line-height: 15.6px;
+    min-height: 40px;
+    padding: 4px 8px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container {
+    margin-top: 16px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container button {
+    height: 28px;
+    width: 28px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container i {
+    font-size: 28px;
+  }
+  .teach-page .oppia-teach-lesson-section {
+    padding: 0 48px 80px;
+  }
+  .teach-page .oppia-teach-lesson-top {
+    margin-bottom: 24px;
+    width: 85%;
+  }
+  .teach-page .oppia-teach-lesson-section .oppia-teach-heading {
+    font-size: 2rem;
+    line-height: 24px;
+  }
+  .teach-page .oppia-teach-lesson-top .oppia-teach-heading {
+    font-size: 1.8rem;
+    line-height: 21.6px;
+    margin: 8px 0;
+  }
+  .teach-page .oppia-teach-lesson-image {
+    margin: 16px 0 32px;
+  }
+  .teach-page .oppia-teach-lesson-panel .panel-content {
+    font-size: 1.6rem;
+    line-height: 19.2px;
+    padding: 10px 16px 16px 24px;
+    width: 100%;
+  }
+  .teach-page .oppia-teach-outcomes-section {
+    flex-direction: column;
+    gap: 32px;
+    margin: 0 48px 80px;
+  }
+  .teach-page .oppia-teach-outcomes-left {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-outcomes-rct-container {
+    padding: 16px 0 56px 16px;
+  }
+  .teach-page .oppia-teach-outcomes-charts-container p,
+  .teach-page .oppia-teach-outcomes-rct-label p {
+    font-size: 1.6rem;
+    line-height: 19.2px;
+  }
+  .teach-page .oppia-teach-outcomes-charts-container {
+    gap: 32px;
+    justify-content: start;
+  }
+  .teach-page .oppia-teach-cta-section .oppia-teach-btn {
+    min-width: 240px;
+  }
+  .teach-page .oppia-teach-cta-section {
+    padding: 80px 0;
+  }
+  .teach-page .oppia-teach-cta-section .oppia-teach-subtitle {
+    margin-bottom: 24px;
+  }
+}
+
+@media only screen and (max-width: 641px) {
+  .teach-page .oppia-teach-hero-section {
+    min-height: 376px;
+    padding: 24px;
+  }
+  .teach-page .oppia-teach-hero-box {
+    max-width: 100%;
+  }
+  .teach-page .oppia-teach-tips-section {
+    padding: 24px;
+  }
+  .teach-page .oppia-teach-tips-section .oppia-teach-title {
+    width: 82%;
+  }
+  .teach-page .oppia-teach-creators-section {
+    padding: 0 40px 64px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container {
+    padding: 16px 0;
+  }
+  .teach-page .oppia-teach-creators-arrows-container button {
+    height: 24px;
+    width: 24px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container i {
+    font-size: 24px;
+  }
+  .teach-page .oppia-teach-creators-carousel {
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .teach-page .oppia-teach-creators-carousel-item {
+    width: calc((100% - 32px) / 3);
+  }
+  .teach-page .oppia-teach-lesson-section {
+    padding: 0 40px 64px;
+  }
+  .teach-page .oppia-teach-lesson-top {
+    width: 90%;
+  }
+  .teach-page .oppia-teach-lesson-bottom {
+    gap: 40px;
+  }
+  .teach-page .oppia-teach-lesson-panel .title-container,
+  .teach-page .oppia-teach-lesson-panel-title,
+  .teach-page .oppia-teach-lesson-section .oppia-teach-heading {
+    font-size: 1.8rem;
+    line-height: 21.6px;
+  }
+  .teach-page .oppia-teach-lesson-panel .panel-content {
+    padding: 10px 16px 16px;
+  }
+  .teach-page .oppia-teach-outcomes-section {
+    margin: 0 40px 64px;
+    padding: 32px 16px;
+  }
+  .teach-page .oppia-teach-testimonial-quote1 {
+    display: none;
+  }
+  .teach-page .oppia-teach-testimonials-section {
+    padding: 0 0 64px;
+  }
+  .teach-page .oppia-teach-testimonials-container {
+    gap: 8px;
+    padding: 32px 16px 52px;
+  }
+  .teach-page .oppia-teach-testimonial-top {
+    gap: 16px;
+    min-height: 0;
+  }
+  .teach-page .oppia-teach-testimonial-left {
+    width: 27%;
+  }
+  .teach-page .oppia-teach-testimonial-right {
+    width: calc(73% - 34px);
+  }
+  .teach-page .oppia-teach-testimonial-quote2 {
+    min-height: 96px;
+  }
+  .teach-page .oppia-teach-features-section {
+    flex-direction: column;
+    padding: 0;
+  }
+  .teach-page .oppia-teach-features-left {
+    width: 52%;
+  }
+  .teach-page .oppia-teach-features-right {
+    width: 48%;
+  }
+  .teach-page .oppia-teach-cta-section {
+    padding: 64px 0;
+  }
+  .teach-page .oppia-teach-cta-section .oppia-teach-subtitle {
+    margin-bottom: 16px;
+  }
+}
+
+@media only screen and (max-width: 603px) {
+  .teach-page .oppia-teach-creators-carousel-item-header .oppia-teach-text {
+    min-height: 38px;
+  }
+}
+
+@media only screen and (max-width: 553px) {
+  .teach-page .oppia-teach-title {
+    font-size: 2rem;
+    line-height: 27px;
+  }
+  .teach-page .oppia-teach-hero-section {
+    background-image: url("/assets/images/teach/banner-mobile.webp");
+    min-height: 376px;
+    padding: 32px 12px;
+  }
+  .teach-page .oppia-teach-tips-section {
+    padding: 56px 20px;
+  }
+  .teach-page .oppia-teach-tips-section .oppia-teach-title {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-tips-box {
+    padding: 24px 20px;
+  }
+  .teach-page .oppia-teach-creators-section {
+    padding: 0 20px 56px;
+  }
+  .teach-page .oppia-teach-creators-carousel-item {
+    width: calc((100% - 32px) / 2);
+  }
+  .teach-page .oppia-teach-creators-carousel-item .oppia-teach-btn {
+    min-height: 0;
+    min-width: 0;
+    padding: 6px;
+  }
+  .teach-page .oppia-teach-creators-carousel-item-image .oppia-teach-subtext {
+    padding: 4px 4px;
+  }
+  .teach-page .oppia-teach-creators-carousel-item-image p {
+    bottom: 4px;
+  }
+  .teach-page .oppia-teach-lesson-section {
+    padding: 0 20px 56px;
+  }
+  .teach-page .oppia-teach-lesson-top {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-lesson-top .oppia-teach-subtitle {
+    width: 86%;
+  }
+  .teach-page .oppia-teach-lesson-bottom {
+    gap: 32px;
+  }
+  .teach-page .oppia-teach-lesson-image {
+    margin: 8px 0 24px;
+  }
+  .teach-page .oppia-teach-lesson-left .oppia-teach-heading {
+    margin-bottom: 8px;
+  }
+  .teach-page .oppia-teach-lesson-panel-title {
+    min-height: 40px;
+    padding-left: 16px;
+  }
+  .teach-page .oppia-teach-lesson-panel .title-container,
+  .teach-page .oppia-teach-lesson-panel-title {
+    font-size: 1.6rem;
+    line-height: 19.2px;
+  }
+  .oppia-teach-lesson-list {
+    gap: 4px;
+  }
+  .teach-page .oppia-teach-outcomes-section {
+    margin: 0 0 56px;
+    padding: 32px 20px;
+  }
+  .teach-page .oppia-teach-outcomes-rct-container {
+    padding: 16px;
+  }
+  .teach-page .oppia-teach-outcomes-chart {
+    align-items: start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .teach-page .oppia-teach-outcomes-charts-container {
+    gap: 16px;
+    padding: 0;
+    width: 100%;
+  }
+  .teach-page .oppia-teach-outcomes-legend-container {
+    width: 36%;
+  }
+  .teach-page .oppia-teach-outcomes-pre-test-container,
+  .teach-page .oppia-teach-outcomes-post-test-container {
+    width: 50%;
+  }
+  .teach-page .oppia-teach-outcomes-rct-heading {
+    margin-bottom: 8px;
+  }
+  .teach-page .oppia-teach-testimonials-section {
+    padding: 0 0 56px;
+  }
+  .teach-page .oppia-teach-testimonials-container {
+    gap: 4px;
+    padding: 32px 0 52px;
+  }
+  .teach-page .oppia-teach-testimonial-top {
+    gap: 8px;
+    min-height: 100px;
+  }
+  .teach-page .oppia-teach-testimonial-left {
+    width: 32%;
+  }
+  .teach-page .oppia-teach-testimonial-right {
+    width: calc(68% - 8px);
+  }
+  .teach-page .oppia-teach-testimonial-quote2 {
+    min-height: 156px;
+  }
+  .teach-page .oppia-teach-testimonials-container > button {
+    padding: 15px;
+  }
+  .teach-page .oppia-teach-testimonial-name {
+    font-size: 1.8rem;
+    line-height: 21.6px;
+    margin-bottom: 8px;
+  }
+  .teach-page .oppia-teach-testimonials-section .oppia-teach-subtitle {
+    padding: 0 20px;
+  }
+  .teach-page .oppia-teach-features-section {
+    padding: 0 20px;
+  }
+  .teach-page .oppia-teach-features-left {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-features-right {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-features {
+    gap: 8px;
+    width: 97%;
+  }
+  .teach-page .oppia-teach-cta-section {
+    padding: 56px 20px;
+  }
+  .teach-page .oppia-teach-cta-section .oppia-teach-subtitle {
+    margin-bottom: 16px;
+  }
+  .teach-page .oppia-teach-cta-buttons-container {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .teach-page .oppia-teach-lesson-section .oppia-teach-btn,
+  .teach-page .oppia-teach-cta-section .oppia-teach-btn {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 324px) {
+  .teach-page .oppia-teach-btn {
+    max-width: 100%;
+    min-width: 0;
+  }
+}

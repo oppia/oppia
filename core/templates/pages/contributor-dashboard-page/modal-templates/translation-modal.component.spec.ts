@@ -906,9 +906,18 @@ describe('Translation Modal Component', () => {
 
   it('should close modal and return the new translation when updating translated text', () => {
     spyOn(activeModal, 'close');
+    spyOn(component, 'translatedTextCanBeSubmitted').and.returnValue(true);
     component.activeWrittenTranslation = 'Test translation';
     component.updateTranslatedText();
 
     expect(activeModal.close).toHaveBeenCalledWith('Test translation');
+  });
+
+  it('should not close modal if new translated text cannot be submitted', () => {
+    spyOn(activeModal, 'close');
+    component.activeWrittenTranslation = 'Test translation';
+    component.updateTranslatedText();
+
+    expect(activeModal.close).not.toHaveBeenCalled();
   });
 });

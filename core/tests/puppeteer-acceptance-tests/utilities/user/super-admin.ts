@@ -16,7 +16,7 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import * as puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -26,6 +26,7 @@ const adminPageActivitiesTab = testConstants.URLs.AdminPageActivitiesTab;
 const adminPagePlatformParametersTab =
   testConstants.URLs.AdminPagePlatformParametersTab;
 const adminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
+const adminPageMiscTab = testConstants.URLs.AdminPageMiscTab;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
@@ -87,15 +88,41 @@ const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
 const loadDummyMathClassRoomButton = '.load-dummy-math-classroom';
 const prodModeActivitiesTab = 'oppia-admin-prod-mode-activities-tab';
 
+// Misc Tab selectors.
+const topicIdInputSelector = '.e2e-test-topic-id-input';
+const regenerateOpportunitiesButton =
+  '.e2e-test-regenerate-opportunities-button';
+const regenerateTopicSummariesButton =
+  '.e2e-test-regenerate-topic-summaries-button';
+const blogIdInputSelector = '.e2e-test-blog-id-input';
+const blogAuthorInputSelector = '.e2e-test-blog-author-name-input';
+const blogPublishedOnInputSelector = '.e2e-test-blog-published-on-input';
+const updateBlogPostButtonSelector = '.e2e-test-update-blog-post-button';
+const rollbackExplorationButton = '.e2e-test-rollback-exploration-button';
+const explorationIdInputSelector = '.e2e-test-exploration-id-input';
+const updateUserNameButtonSelector = '.e2e-test-update-username-button';
+const oldUserNameInputSelector = '.e2e-test-old-username-input';
+const newUserNameInputSelector = '.e2e-test-new-username-input';
+const getPendingDeletionRequestsCountButton =
+  '.e2e-test-get-deletion-request-button';
+const explorationIdToGetInteractionsInput =
+  '.e2e-test-exploration-id-to-get-interactions-input';
+const getInteractionsButton = '.e2e-test-get-interactions-button';
+const grantSuperAdminButtonSelector = '.e2e-test-grant-super-admin-button';
+const usernameToGrantPrivilegeInput = '.e2e-test-username-to-grant-input';
+const revokeSuperAdminButton = '.e2e-test-revoke-super-admin-button';
+const usernameToRevokePrivilegeInput = '.e2e-test-username-to-revoke-input';
+
 export class SuperAdmin extends BaseUser {
-  /**
-   * Navigates to the Admin Page Activities Tab.
-   */
   /**
    * Navigates to the Admin Page Activities Tab.
    */
   async navigateToAdminPageActivitiesTab(): Promise<void> {
     await this.goto(adminPageActivitiesTab);
+  }
+
+  async navigateToAdminPageMiscTab(): Promise<void> {
+    await this.goto(adminPageMiscTab);
   }
 
   /**
@@ -153,7 +180,7 @@ export class SuperAdmin extends BaseUser {
         await allRoleElements[i].evaluate(element =>
           (element as HTMLElement).click()
         );
-        await this.page.waitForNetworkIdle();
+        await this.waitForStaticAssetsToLoad();
         if (role === topicManagerRole) {
           await this.selectTopicForTopicManagerRole(topicName as string);
         }
@@ -380,7 +407,7 @@ export class SuperAdmin extends BaseUser {
         }
         await this.waitForElementToBeClickable(reloadButton);
         await reloadButton.click();
-        await this.page.waitForNetworkIdle();
+        await this.waitForNetworkIdle();
         showMessage(`Reloaded exploration ${explorationName}`);
         return;
       }
@@ -697,17 +724,27 @@ export class SuperAdmin extends BaseUser {
     await this.page.waitForSelector(actionStatusMessageSelector, {
       visible: true,
     });
-    const actualMessage = await this.page.$eval(
-      actionStatusMessageSelector,
-      el => el.textContent?.trim()
-    );
-    if (actualMessage === expectedMessage.trim()) {
-      showMessage('Action was successful.');
-      return;
+
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedText: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === expectedText.trim();
+        },
+        {timeout: 5000},
+        actionStatusMessageSelector,
+        expectedMessage
+      );
+    } catch (error) {
+      const actualMessage = await this.page.$eval(
+        actionStatusMessageSelector,
+        el => el.textContent?.trim()
+      );
+
+      throw new Error(
+        `Text did not match within the specified time. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
+      );
     }
-    throw new Error(
-      `Action failed. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
-    );
   }
 
   /**
@@ -919,6 +956,125 @@ export class SuperAdmin extends BaseUser {
    */
   async saveChangesToStorage(): Promise<void> {
     await this.clickOn(saveValuesToStorageButton);
+  }
+
+  /**
+   * Regenerates contribution opportunities for a given topic.
+   * @param {string} topicId - The ID of the topic.
+   */
+  async regenerateContributionOpportunitiesForTopic(
+    topicId: string
+  ): Promise<void> {
+    await this.type(topicIdInputSelector, topicId);
+
+    await this.page.waitForSelector(regenerateOpportunitiesButton);
+    await this.clickOn(regenerateOpportunitiesButton);
+  }
+
+  /**
+   * Regenerates the topic summaries.
+   */
+  async regenerateTopicSummaries(): Promise<void> {
+    await this.page.waitForSelector(regenerateTopicSummariesButton);
+    await this.clickOn(regenerateTopicSummariesButton);
+  }
+
+  /**
+   * Rolls back an exploration to a safe state.
+   */
+  async rollbackExplorationToSafeState(
+    explorationId: string | null
+  ): Promise<void> {
+    await this.type(explorationIdInputSelector, explorationId as string);
+
+    await this.page.waitForSelector(rollbackExplorationButton);
+    await this.clickOn(rollbackExplorationButton);
+  }
+
+  /**
+   * Updates the username of a user.
+   * @param {string} oldUserName - The old username.
+   * @param {string} newUserName - The new username.
+   */
+  async updateUserName(
+    oldUserName: string,
+    newUserName: string
+  ): Promise<void> {
+    await this.type(oldUserNameInputSelector, oldUserName);
+
+    await this.type(newUserNameInputSelector, newUserName);
+
+    await this.page.waitForSelector(updateUserNameButtonSelector);
+    await this.clickOn(updateUserNameButtonSelector);
+  }
+
+  /**
+   * Finds the number of pending account deletion requests.
+   */
+  async getNumberOfPendingDeletionRequests(): Promise<void> {
+    await this.page.waitForSelector(getPendingDeletionRequestsCountButton);
+    await this.clickOn(getPendingDeletionRequestsCountButton);
+  }
+
+  /**
+   * Gets the interactions for a given exploration.
+   * @param {string} explorationId - The ID of the exploration.
+   */
+  async getExplorationInteractions(
+    explorationId: string | null
+  ): Promise<void> {
+    await this.type(
+      explorationIdToGetInteractionsInput,
+      explorationId as string
+    );
+
+    await this.page.waitForSelector(getInteractionsButton);
+    await this.clickOn(getInteractionsButton);
+  }
+
+  /**
+   * Grants super admin privileges to a user.
+   * @param {string} username - The username of the user to grant privileges to.
+   * @returns {Promise<void>}
+   */
+  async grantSuperAdminPrivileges(username: string): Promise<void> {
+    await this.type(usernameToGrantPrivilegeInput, username);
+
+    await this.page.waitForSelector(grantSuperAdminButtonSelector);
+    await this.clickOn(grantSuperAdminButtonSelector);
+  }
+
+  /**
+   * Revokes super admin privileges from a user.
+   * @param {string} username - The username of the user to revoke privileges from.
+   * @returns {Promise<void>}
+   */
+  async revokeSuperAdminPrivileges(username: string): Promise<void> {
+    await this.type(usernameToRevokePrivilegeInput, username);
+
+    await this.page.waitForSelector(revokeSuperAdminButton);
+    await this.clickOn(revokeSuperAdminButton);
+  }
+
+  /**
+   * Updates the data of a blog post.
+   * @param {string} blogId - The ID of the blog post.
+   * @param {string} author - The author of the blog post.
+   * @param {string} publishedOn - The published date of the blog post.
+   */
+  async updateBlogPostData(
+    blogId: string,
+    author: string,
+    publishedOn: string
+  ): Promise<void> {
+    await this.type(blogIdInputSelector, blogId);
+
+    await this.type(blogAuthorInputSelector, author);
+
+    await this.type(blogPublishedOnInputSelector, publishedOn);
+
+    await this.page.waitForSelector(updateBlogPostButtonSelector);
+    await this.clickOn(updateBlogPostButtonSelector);
   }
 }
 

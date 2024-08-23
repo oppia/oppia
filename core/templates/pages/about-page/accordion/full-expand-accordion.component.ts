@@ -20,6 +20,7 @@ import {Component, Input} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import './full-expand-accordion.component.css';
 import {AccordionPanelData} from '../data.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'oppia-full-expand-accordion',
@@ -42,7 +43,7 @@ export class FullExpandAccordionComponent {
   panelIsCollapsed: boolean = true;
   activeIndex: number = 0;
 
-  constructor() {}
+  constructor(private urlInterpolationService: UrlInterpolationService) {}
 
   expandPanel(index: number): void {
     this.activeIndex = index;
@@ -53,6 +54,10 @@ export class FullExpandAccordionComponent {
   closePanel(): void {
     this.listIsCollapsed = false;
     this.panelIsCollapsed = true;
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
 

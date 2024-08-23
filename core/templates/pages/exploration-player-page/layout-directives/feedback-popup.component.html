@@ -21,7 +21,7 @@
     <div class="oppia-feedback-popover-bottom-container">
       <div class="checkbox oppia-checkbox" *ngIf="isLoggedIn">
         <label>
-          <input type="checkbox" [(ngModel)]="isSubmitterAnonymized">
+          <input type="checkbox" [(ngModel)]="isSubmitterAnonymized" class="e2e-test-stay-anonymous-checkbox">
           <span>{{ 'I18N_PLAYER_STAY_ANONYMOUS' | translate }}</span>
         </label>
       </div>
@@ -35,7 +35,7 @@
     </div>
   </div>
 
-  <div aria-live="polite" *ngIf="feedbackSubmitted">
+  <div class="e2e-test-rating-submitted-message" aria-live="polite" *ngIf="feedbackSubmitted">
     {{ 'I18N_PLAYER_THANK_FEEDBACK' | translate }}
   </div>
 </div>

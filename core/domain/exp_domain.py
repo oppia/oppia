@@ -74,6 +74,9 @@ DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID: Final = 'widget_id'
 DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
 STATE_PROPERTY_LINKED_SKILL_ID: Final = 'linked_skill_id'
+STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS: Final = (
+    'inapplicable_skill_misconception_ids'
+)
 STATE_PROPERTY_INTERACTION_CUST_ARGS: Final = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS: Final = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME: Final = 'default_outcome'
@@ -305,6 +308,7 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_LINKED_SKILL_ID,
+        STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
         STATE_PROPERTY_INTERACTION_HANDLERS,
@@ -622,6 +626,21 @@ class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):
     state_name: str
     new_value: str
     old_value: str
+
+
+class EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd(
+    ExplorationChange
+):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
+    as allowed value.
+    """
+
+    property_name: Literal['inapplicable_skill_misconception_ids']
+    state_name: str
+    new_value: List[str]
+    old_value: List[str]
 
 
 class EditExpStatePropertyInteractionCustArgsCmd(ExplorationChange):
@@ -1600,6 +1619,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state.solicit_answer_details = sdict['solicit_answer_details']
 
             state.card_is_checkpoint = sdict['card_is_checkpoint']
+
+            state.inapplicable_skill_misconception_ids = (
+                sdict['inapplicable_skill_misconception_ids'])
 
             exploration.states[state_name] = state
 
@@ -5124,6 +5146,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict, next_content_id_index
 
     @classmethod
+    def _convert_states_v55_dict_to_v56_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from v55 to v56. Version 56 adds an
+        inapplicable_skill_misconception_ids list to the state.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            Dict[str, state_domain.StateDict]. The converted
+            v56 state dictionary.
+        """
+        for _, state_dict in states_dict.items():
+            state_dict['inapplicable_skill_misconception_ids'] = []
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -5178,7 +5221,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 60
+    CURRENT_EXP_SCHEMA_VERSION = 61
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5528,6 +5571,32 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v60_dict_to_v61_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v60 exploration dict into a v61 exploration dict.
+        Introduces the inapplicable_skill_misconception_ids list into
+        the state properties.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v60.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v61.
+        """
+        exploration_dict['schema_version'] = 61
+
+        exploration_dict['states'] = (
+            cls._convert_states_v55_dict_to_v56_dict(
+                exploration_dict['states'])
+        )
+        exploration_dict['states_schema_version'] = 56
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -5638,6 +5707,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v59_dict_to_v60_dict(
                 exploration_dict)
             exploration_schema_version = 60
+
+        if exploration_schema_version == 60:
+            exploration_dict = cls._convert_v60_dict_to_v61_dict(
+                exploration_dict)
+            exploration_schema_version = 61
 
         return exploration_dict
 
@@ -6221,6 +6295,7 @@ class ExplorationChangeMergeVerifier:
     NON_CONFLICTING_PROPERTIES: List[str] = [
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
         STATE_PROPERTY_LINKED_SKILL_ID,
+        STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
         STATE_PROPERTY_CARD_IS_CHECKPOINT
     ]
 
