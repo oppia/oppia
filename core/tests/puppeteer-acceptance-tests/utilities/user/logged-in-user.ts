@@ -24,11 +24,11 @@ import puppeteer from 'puppeteer';
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
   testConstants.URLs.WikiPrivilegesToFirebaseAccount;
-const PendingAccountDeletionPage = testConstants.URLs.PendingAccountDeletion;
 const baseUrl = testConstants.URLs.BaseURL;
 const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
-const LearnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -67,6 +67,55 @@ const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-tes
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
+const addProfilePictureButton = '.e2e-test-photo-upload-submit';
+const editProfilePictureButton = '.e2e-test-photo-clickable';
+const bioTextareaSelector = '.e2e-test-user-bio';
+const saveChangesButtonSelector = '.e2e-test-save-changes-button';
+const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
+const explorationLanguageInputSelector =
+  '.e2e-test-preferred-exploration-language-input';
+const siteLanguageInputSelector = '.e2e-test-site-language-selector';
+const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
+const goToProfilePageButton = '.e2e-test-go-to-profile-page';
+const profilePictureSelector = '.e2e-test-profile-user-photo';
+const bioSelector = '.oppia-user-bio-text';
+const subjectInterestSelector = '.e2e-test-profile-interest';
+const exportButtonSelector = '.e2e-test-export-account-button';
+const angularRootElementSelector = 'oppia-angular-root';
+const checkboxesSelector = '.checkbox';
+const defaultProfilePicture =
+  '/assets/images/avatar/user_blue_150px.png?2983.800000011921';
+
+const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
+  'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
+const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
+const reportExplorationTextAreaSelector =
+  '.e2e-test-report-exploration-text-area';
+const submitReportButtonSelector = '.e2e-test-submit-report-button';
+const feedbackThreadSelector = '.e2e-test-feedback-thread';
+const feedbackMessageSelector = '.e2e-test-feedback-message';
+const desktopCompletedLessonsSectionSelector =
+  '.e2e-test-completed-community-lessons-section';
+const lessonTileTitleSelector =
+  '.e2e-test-topic-name-in-learner-story-summary-tile';
+const progressSectionSelector = '.e2e-test-progress-section';
+const mobileGoalsSectionSelector = '.e2e-test-mobile-goals-section';
+const goalsSectionSelector = '.e2e-test-goals-section';
+const homeSectionSelector = '.e2e-test-home-section';
+const mobileHomeSectionSelector = '.e2e-test-mobile-home-section';
+const topicNameInEditGoalsSelector = '.e2e-test-topic-name-in-edit-goals';
+const completedGoalsSectionSelector = '.e2e-test-completed-goals-section';
+const completedGoalsTopicNameSelector = '.e2e-test-completed-goals-topic-name';
+const completedStoriesSectionSelector = '.completed-stories';
+const storyNameSelector = '.e2e-test-story-name-in-learner-story-summary-tile';
+const continueFromWhereLeftOffSectionSelector =
+  '.continue-where-you-left-off-section';
+const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
+const addTopicToCurrentGoalsButton =
+  '.e2e-test-add-topic-to-current-goals-button';
+const mobileCompletedLessonSection = '.community-lessons-section';
+const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
+const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class LoggedInUser extends BaseUser {
@@ -79,13 +128,6 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     await this.goto(profilePageUrl);
-  }
-
-  /**
-   * Function for navigating to the Learner dashboard page.
-   */
-  async navigateToLearnerDashboardPage(): Promise<void> {
-    await this.goto(LearnerDashboardUrl);
   }
 
   /**
@@ -131,6 +173,118 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the learner dashboard.
+   */
+  async navigateToLearnerDashboard(): Promise<void> {
+    await this.goto(learnerDashboardUrl);
+  }
+
+  /**
+   * Navigates to the progress section of the learner dashboard.
+   */
+  async navigateToProgressSection(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileProgressSectionButton);
+      await this.clickOn(mobileProgressSectionButton);
+
+      try {
+        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileProgressSectionButton);
+        } else {
+          throw error;
+        }
+      }
+      await this.clickOn('Stories');
+    } else {
+      await this.page.waitForSelector(progressSectionSelector);
+      const progressSection = await this.page.$(progressSectionSelector);
+      if (!progressSection) {
+        throw new Error('Progress section not found.');
+      }
+      await progressSection.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the home section of the learner dashboard.
+   */
+  async navigateToHomeSection(): Promise<void> {
+    if (await this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileHomeSectionSelector);
+      await this.clickOn(mobileHomeSectionSelector);
+
+      try {
+        await this.page.waitForSelector(homeSectionGreetingElement, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileHomeSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      await this.page.waitForSelector(homeSectionSelector);
+      const homeSectionElement = await this.page.$(homeSectionSelector);
+      if (!homeSectionElement) {
+        throw new Error('Home section not found.');
+      }
+      await this.waitForElementToBeClickable(homeSectionElement);
+      await homeSectionElement.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the goals section of the learner dashboard.
+   */
+  async navigateToGoalsSection(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileGoalsSectionSelector);
+      await this.clickOn(mobileGoalsSectionSelector);
+
+      try {
+        await this.page.waitForSelector(currentGoalsSectionSelector, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileGoalsSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      await this.page.waitForSelector(goalsSectionSelector);
+      const goalSectionElement = await this.page.$(goalsSectionSelector);
+      if (!goalSectionElement) {
+        throw new Error('Progress section not found.');
+      }
+      await goalSectionElement.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the feedback updates page.
+   */
+  async navigateToFeedbackUpdatesPage(): Promise<void> {
+    await this.goto(feedbackUpdatesUrl);
+  }
+
+  /**
    * Checks whether the exploration with the given title is authored by the creator.
    */
   async expectExplorationToBePresentInProfilePageWithTitle(
@@ -160,10 +314,6 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToPreferencesPage(): Promise<void> {
     await this.goto(PreferencesPageUrl);
-  }
-
-  async navigateToPendingAccountDeletionPage(): Promise<void> {
-    await this.goto(PendingAccountDeletionPage);
   }
 
   /**
@@ -454,7 +604,7 @@ export class LoggedInUser extends BaseUser {
    */
   async expectToolTipMessage(expectedMessage: string): Promise<void> {
     try {
-      await this.page.waitForSelector(toastMessageSelector);
+      await this.page.waitForSelector(toastMessageSelector, {visible: true});
       const toastMessageElement = await this.page.$(toastMessageSelector);
       const toastMessage = await this.page.evaluate(
         el => el.textContent.trim(),
@@ -588,7 +738,6 @@ export class LoggedInUser extends BaseUser {
           `Lesson "${lessonName}" was not found in 'Play Later' list, but it should be.`
         );
       }
-      showMessage('Lesson is present in "Play Later" list.');
     } catch (error) {
       const newError = new Error(
         `Failed to verify presence of lesson in 'Play Later' list: ${error}`
@@ -596,6 +745,543 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Updates the profile picture in preference page.
+   * @param {string} picturePath - The path of the picture to upload.
+   */
+  async updateProfilePicture(picturePath: string): Promise<void> {
+    await this.clickOn(editProfilePictureButton);
+    await this.uploadFile(picturePath);
+    await this.clickOn(addProfilePictureButton);
+  }
+
+  /**
+   * Updates the user's bio in preference page.
+   * @param {string} bio - The new bio to set for the user.
+   */
+  async updateBio(bio: string): Promise<void> {
+    await this.clickOn(bioTextareaSelector);
+    await this.type(bioTextareaSelector, bio);
+  }
+
+  /**
+   * Updates the user's preferred dashboard in preference page.
+   * @param {string} dashboard - The new dashboard to set for the user. Can be one of 'Learner Dashboard', 'Creator Dashboard', or 'Contributor Dashboard'.
+   */
+  async updatePreferredDashboard(dashboard: string): Promise<void> {
+    const allowedDashboards = [
+      'Learner Dashboard',
+      'Creator Dashboard',
+      'Contributor Dashboard',
+    ];
+
+    if (!allowedDashboards.includes(dashboard)) {
+      throw new Error(
+        `Invalid dashboard: ${dashboard}. Must be one of ${allowedDashboards.join(', ')}.`
+      );
+    }
+
+    // Converting the dashboard to lowercase and replace spaces with hyphens to match the selector.
+    const dashboardInSelector = dashboard.toLowerCase().replace(/\s+/g, '-');
+    const dashboardSelector = `.e2e-test-${dashboardInSelector}-radio`;
+
+    await this.clickOn(dashboardSelector);
+  }
+
+  /**
+   * Updates the user's subject interests in preference page.
+   * @param {string[]} interests - The new interests to set for the user.
+   */
+  async updateSubjectInterests(interests: string[]): Promise<void> {
+    for (const interest of interests) {
+      await this.type(subjectInterestsInputSelector, interest);
+      await this.page.keyboard.press('Enter');
+    }
+  }
+
+  /**
+   * Updates the user's preferred exploration language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredExplorationLanguage(language: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.clickOn(explorationLanguageInputSelector);
+
+    await this.page.waitForSelector(optionText);
+    const options = await this.page.$$(optionText);
+    for (const option of options) {
+      const optionText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        option
+      );
+      if (optionText === language) {
+        await option.click();
+        break;
+      }
+    }
+  }
+
+  /**
+   * Updates the user's preferred site language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredSiteLanguage(language: string): Promise<void> {
+    await this.type(siteLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Updates the user's preferred audio language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredAudioLanguage(language: string): Promise<void> {
+    await this.type(audioLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Updates the user's email preferences from the preferences page.
+   * @param {string[]} preferences - The new email preferences to set for the user.
+   */
+  async updateEmailPreferences(preferences: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    try {
+      await this.page.waitForSelector(checkboxesSelector);
+      const checkboxes = await this.page.$$(checkboxesSelector);
+
+      for (const preference of preferences) {
+        let found = false;
+
+        for (const checkbox of checkboxes) {
+          const label = await checkbox.evaluate(el => el.textContent?.trim());
+          if (label === preference) {
+            await this.waitForElementToBeClickable(checkbox);
+            await checkbox.click();
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          throw new Error(`Preference not found: ${preference}`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to update email preferences: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates to the Profile tab from the Preferences page.
+   */
+  async navigateToProfilePageFromPreferencePage(): Promise<void> {
+    try {
+      await this.page.waitForSelector(goToProfilePageButton);
+      const profileTab = await this.page.$(goToProfilePageButton);
+
+      if (!profileTab) {
+        throw new Error('Profile tab not found');
+      }
+
+      await this.clickAndWaitForNavigation(goToProfilePageButton);
+      await this.waitForPageToFullyLoad();
+    } catch (error) {
+      const newError = new Error(
+        `Failed to navigate to Profile tab from Preferences page: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Saves the changes made in the preferences page.
+   */
+  async saveChanges(): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+    await this.waitForPageToFullyLoad();
+    await this.clickAndWaitForNavigation(saveChangesButtonSelector);
+  }
+
+  /**
+   * Expects the profile picture to not match a certain image.
+   */
+  async verifyProfilePicUpdate(): Promise<void> {
+    try {
+      await this.page.waitForSelector(profilePictureSelector);
+      const profilePicture = await this.page.$(profilePictureSelector);
+
+      if (!profilePicture) {
+        throw new Error('Profile picture not found');
+      }
+      const actualImageUrl = await this.page.evaluate(
+        img => img.src,
+        profilePicture
+      );
+
+      if (actualImageUrl === defaultProfilePicture) {
+        throw new Error(
+          `Profile picture does not match. Expected image source to be different from: ${defaultProfilePicture}`
+        );
+      }
+      showMessage('Profile picture is different from the default one.');
+    } catch (error) {
+      const newError = new Error(`Failed to check profile picture: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Expects the user's bio to match a certain text.
+   * @param {string} expectedBio - The expected bio text.
+   */
+  async expectBioToBe(expectedBio: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(bioSelector);
+      const bioElement = await this.page.$(bioSelector);
+
+      if (!bioElement) {
+        throw new Error('Bio not found');
+      }
+
+      const actualBio = await this.page.evaluate(
+        el => el.textContent,
+        bioElement
+      );
+      if (actualBio.trim() !== expectedBio) {
+        throw new Error(
+          `Bio does not match. Expected: ${expectedBio}, but got: ${actualBio}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check bio: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Expects the user's subject interests to match a certain list.
+   * @param {string[]} expectedInterests - The expected list of interests.
+   */
+  async expectSubjectInterestsToBe(expectedInterests: string[]): Promise<void> {
+    try {
+      await this.page.waitForSelector(subjectInterestSelector);
+      const interestElements = await this.page.$$(subjectInterestSelector);
+      const actualInterests = await Promise.all(
+        interestElements.map(el =>
+          this.page.evaluate(el => el.textContent.trim(), el)
+        )
+      );
+
+      // Check if the actual interests match the expected interests.
+      for (const interest of expectedInterests) {
+        if (!actualInterests.includes(interest)) {
+          throw new Error(`Interest not found: ${interest}`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check interests: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Exports the user's account data.
+   */
+  async exportAccount(): Promise<void> {
+    try {
+      await this.page.waitForSelector(exportButtonSelector);
+      const exportButton = await this.page.$(exportButtonSelector);
+
+      if (!exportButton) {
+        throw new Error('Export button not found');
+      }
+
+      await this.waitForPageToFullyLoad();
+      await exportButton.click();
+
+      const isTextPresent = await this.isTextPresentOnPage(
+        ACCOUNT_EXPORT_CONFIRMATION_MESSAGE
+      );
+
+      if (!isTextPresent) {
+        throw new Error(
+          `Expected text not found on page: ${ACCOUNT_EXPORT_CONFIRMATION_MESSAGE}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to export account: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies if the page is displayed in Right-to-Left (RTL) mode.
+   */
+  async verifyPageIsRTL(): Promise<void> {
+    await this.page.waitForSelector(angularRootElementSelector);
+    const pageDirection = await this.page.evaluate(selector => {
+      const oppiaRoot = document.querySelector(selector);
+      if (!oppiaRoot) {
+        throw new Error(`${selector} not found`);
+      }
+
+      const childDiv = oppiaRoot.querySelector('div');
+      if (!childDiv) {
+        throw new Error('Child div not found');
+      }
+
+      return childDiv.getAttribute('dir');
+    }, angularRootElementSelector);
+
+    if (pageDirection !== 'rtl') {
+      throw new Error('Page is not in RTL mode');
+    }
+
+    showMessage('Page is displayed in RTL mode.');
+  }
+
+  /**
+   * This function is used to report an exploration. It clicks on the report button,
+   * opens the report modal, selects an issue, types a description, and submits the report.
+   * @param {string} issueName - The name of the issue to report.
+   * @param {string} issueDescription - The description of the issue.
+   */
+  async reportExploration(issueDescription: string): Promise<void> {
+    await this.clickOn(reportExplorationButtonSelector);
+    await this.page.waitForSelector(issueTypeSelector);
+    const issueTypeElement = await this.page.$(issueTypeSelector);
+    await issueTypeElement?.click();
+    await this.clickOn(reportExplorationTextAreaSelector);
+    await this.type(reportExplorationTextAreaSelector, issueDescription);
+
+    await this.clickOn(submitReportButtonSelector);
+
+    await this.clickOn('Close');
+  }
+
+  /**
+   * Views a feedback update thread.
+   * @param {number} threadNumber - The 0-indexed position of the thread.
+   */
+  async viewFeedbackUpdateThread(threadNumber: number): Promise<void> {
+    await this.page.waitForSelector(feedbackThreadSelector);
+    const feedbackThreads = await this.page.$$(feedbackThreadSelector);
+
+    if (threadNumber >= 0 && threadNumber < feedbackThreads.length) {
+      await feedbackThreads[threadNumber - 1].click();
+    } else {
+      throw new Error(`Thread not found: ${threadNumber}`);
+    }
+  }
+
+  /**
+   * Checks if the feedback and response match the expected values.
+   * @param {string} expectedFeedback - The expected feedback.
+   * @param {string} expectedResponse - The expected response.
+   */
+
+  async expectFeedbackAndResponseToMatch(
+    expectedFeedback: string,
+    expectedResponse: string
+  ): Promise<void> {
+    await this.page.waitForSelector(feedbackMessageSelector);
+    const feedbackMessages = await this.page.$$(feedbackMessageSelector);
+
+    if (feedbackMessages.length < 2) {
+      throw new Error('Not enough feedback messages found.');
+    }
+
+    const actualFeedback = await this.page.$eval(feedbackMessageSelector, el =>
+      el.textContent?.trim()
+    );
+
+    // Fetch the text content of the second feedbackMessageSelector.
+    const actualResponse = await this.page.$$eval(
+      feedbackMessageSelector,
+      elements => elements[1]?.textContent?.trim()
+    );
+
+    if (actualFeedback !== expectedFeedback) {
+      throw new Error(
+        `Feedback does not match the expected value. Expected: ${expectedFeedback}, Found: ${actualFeedback}`
+      );
+    }
+    if (actualResponse !== expectedResponse) {
+      throw new Error(
+        `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
+      );
+    }
+  }
+
+  /**
+   * Adds goals from the goals section in the learner dashboard.
+   * @param {string[]} goals - The goals to add.
+   */
+  async addGoals(goals: string[]): Promise<void> {
+    await this.page.waitForSelector(topicNameInEditGoalsSelector, {
+      visible: true,
+    });
+    await this.page.waitForSelector(addTopicToCurrentGoalsButton, {
+      visible: true,
+    });
+
+    const topicNames = await this.page.$$(topicNameInEditGoalsSelector);
+    const addGoalButtons = await this.page.$$(addTopicToCurrentGoalsButton);
+
+    const actualTopicNames = await Promise.all(
+      topicNames.map(topicName =>
+        this.page.evaluate(el => el.textContent.trim(), topicName)
+      )
+    );
+
+    for (const goal of goals) {
+      const matchingTopicIndex = actualTopicNames.findIndex(
+        topicName => topicName === goal
+      );
+
+      if (matchingTopicIndex !== -1) {
+        await this.waitForElementToBeClickable(
+          addGoalButtons[matchingTopicIndex]
+        );
+        await addGoalButtons[matchingTopicIndex]?.click();
+        showMessage(`Goal "${goal}" added.`);
+      } else {
+        throw new Error(`Goal not found: ${goal}`);
+      }
+    }
+  }
+
+  /**
+   * Checks if the completed goals include the expected goals.
+   * @param {string[]} expectedGoals - The expected goals.
+   */
+  async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(completedGoalsSectionSelector);
+    await this.page
+      .waitForSelector(completedGoalsTopicNameSelector)
+      .catch(() => {
+        throw new Error('Completed goals section is empty');
+      });
+
+    const completedGoals = await this.page.$$eval(
+      `${completedGoalsSectionSelector} ${completedGoalsTopicNameSelector}`,
+      (elements: Element[]) =>
+        elements.map(el =>
+          el.textContent ? el.textContent.trim().replace('Learnt ', '') : ''
+        )
+    );
+
+    for (const expectedGoal of expectedGoals) {
+      if (!completedGoals.includes(expectedGoal)) {
+        throw new Error(
+          `Goal not found in completed lesson section: ${expectedGoal}`
+        );
+      }
+    }
+  }
+  /**
+   * Checks if the completed stories include the expected stories.
+   * @param {string[]} expectedStories - The expected stories.
+   */
+  async expectStoriesCompletedToInclude(
+    expectedStories: string[]
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(completedStoriesSectionSelector);
+    const storyNames = await this.page.$$(
+      completedStoriesSectionSelector + ' ' + storyNameSelector
+    );
+    const actualStories = await Promise.all(
+      storyNames.map(async storyName => {
+        return await this.page.evaluate(el => el.textContent.trim(), storyName);
+      })
+    );
+
+    for (const expectedStory of expectedStories) {
+      if (!actualStories.includes(expectedStory)) {
+        throw new Error(`Story not found: ${expectedStory}`);
+      }
+    }
+  }
+
+  /**
+   * Checks if the completed lessons include the expected lessons in the community lessons section of learner dashboard.
+   * @param {string[]} expectedLessons - The expected lessons.
+   */
+  async expectCompletedLessonsToInclude(
+    expectedLessons: string[]
+  ): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const completedLessonsSection = isMobileViewport
+      ? mobileCompletedLessonSection
+      : desktopCompletedLessonsSectionSelector;
+
+    await this.page.waitForSelector(completedLessonsSection);
+    await this.page.waitForSelector(lessonCardTitleSelector);
+    const lessonObjectives = await this.page.$$(
+      completedLessonsSection + ' ' + lessonCardTitleSelector
+    );
+
+    const actualLessons = await Promise.all(
+      lessonObjectives.map(async lessonObjective => {
+        return await this.page.evaluate(
+          el => el.textContent.trim(),
+          lessonObjective
+        );
+      })
+    );
+
+    for (const expectedLesson of expectedLessons) {
+      if (!actualLessons.includes(expectedLesson)) {
+        throw new Error(`Lesson not found: ${expectedLesson}`);
+      }
+    }
+  }
+
+  /**
+   * Plays a lesson from the "Continue Where you Left off section" section in learner dashboard.
+   * @param {string} lessonName - The name of the lesson.
+   */
+  async playLessonFromContinueWhereLeftOff(lessonName: string): Promise<void> {
+    await this.page.waitForSelector(continueFromWhereLeftOffSectionSelector);
+    await this.page.waitForSelector(lessonTileTitleSelector);
+
+    const lessonTileTitles = await this.page.$$(
+      continueFromWhereLeftOffSectionSelector + ' ' + lessonTileTitleSelector
+    );
+
+    for (const lessonTileTitle of lessonTileTitles) {
+      const actualLessonName = await this.page.evaluate(
+        el => el.textContent.trim(),
+        lessonTileTitle
+      );
+
+      if (actualLessonName === lessonName) {
+        await Promise.all([
+          this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+          await this.waitForElementToBeClickable(lessonTileTitle),
+          lessonTileTitle.click(),
+        ]);
+        return;
+      }
+    }
+    throw new Error(`Lesson not found: ${lessonName}`);
   }
 }
 
