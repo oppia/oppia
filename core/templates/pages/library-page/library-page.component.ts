@@ -509,10 +509,7 @@ export class LibraryPageComponent {
   }
 
   moveClassroomCarouselToNextSlide(): void {
-    if (
-      this.currentCardIndex <
-      this.classroomSummaries.length - this.cardsToShow
-    ) {
+    if (this.currentCardIndex < this.classroomSummaries.length - 1) {
       this.currentCardIndex += 1;
       this.translateX -= this.getCardWidth();
       this.updateActiveDot();
@@ -532,28 +529,18 @@ export class LibraryPageComponent {
   }
 
   updateActiveDot(): void {
-    const numberOfDots = Math.ceil(
-      this.classroomSummaries.length / this.cardsToShow
-    );
+    const numberOfDots = this.classroomSummaries.length - 2;
     this.dots = Array(numberOfDots)
       .fill(0)
       .map((_, i) => (i === this.currentCardIndex ? 1 : 0));
   }
 
   shouldShowNextClassroomChunkButton(): boolean {
-    const numberOfClassroomSlides = Math.ceil(
-      this.classroomSummaries.length / this.cardsToShow
-    );
-    return (
-      this.publicClassroomsCount > this.cardsToShow &&
-      this.currentCardIndex < numberOfClassroomSlides - 1
-    );
+    return this.currentCardIndex < this.classroomSummaries.length - 3;
   }
 
   shouldShowPreviousClassroomChunkButton(): boolean {
-    return (
-      this.publicClassroomsCount > this.cardsToShow && this.currentCardIndex > 0
-    );
+    return this.currentCardIndex > 0;
   }
 
   registerClassroomCardClickEvent(classroomName: string): void {

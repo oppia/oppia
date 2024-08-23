@@ -1,11 +1,10 @@
 <div class="classroom-cards-wrapper" *ngIf="publicClassroomsCount > 0">
   <div class="classroom-cards-inner-container"
-    [ngClass]="{
-      'classroom-width-1': publicClassroomsCount === 1,
-      'classroom-width-2': publicClassroomsCount === 2,
-      'classroom-width-more': publicClassroomsCount > 2
-    }"
-  >
+       [ngClass]="{
+         'classroom-width-1': publicClassroomsCount === 1,
+         'classroom-width-2': publicClassroomsCount === 2,
+         'classroom-width-more': publicClassroomsCount > 2
+       }">
     <div class="classroom-cards-text-container">
       <h1>{{ 'I18N_COMMUNITY_LIBRARY_PAGE_CLASSROOMS_HINT_TEXT' | translate }}</h1>
       <p>{{ 'I18N_BROWSE_LESSONS_TEXT' | translate }}</p>
@@ -57,14 +56,12 @@
       <div class="mobile-buttons" *ngIf="publicClassroomsCount > 3">
         <button class="mobile-carousel-btn mobile-prev-btn"
                 (click)="moveClassroomCarouselToPreviousSlide()"
-                *ngIf="publicClassroomsCount > 3"
                 [disabled]="!shouldShowPreviousClassroomChunkButton()"
                 aria-label="Previous Slide">
           <i class="fa fa-angle-left"></i>
         </button>
         <button class="mobile-carousel-btn mobile-next-btn"
                 (click)="moveClassroomCarouselToNextSlide()"
-                *ngIf="publicClassroomsCount > 3"
                 [disabled]="!shouldShowNextClassroomChunkButton()"
                 aria-label="Next Slide">
           <i class="fa fa-angle-right"></i>
