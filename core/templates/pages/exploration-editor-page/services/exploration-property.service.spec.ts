@@ -30,7 +30,7 @@ import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory'
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 
-fdescribe('Exploration Property Service', () => {
+describe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;
   let paramChangesObjectFactory: ParamChangesObjectFactory;
   let paramSpecsObjectFactory: ParamSpecsObjectFactory;
