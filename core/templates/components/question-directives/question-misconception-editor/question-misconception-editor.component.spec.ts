@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the question misconception editor component.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -133,13 +133,57 @@ describe('Question Misconception Editor Component', () => {
     expect(component.misconceptionEditorIsOpen).toBeTrue();
   });
 
-  it('should report containing misconceptions correctly', () => {
+  it('should report containing misconceptions in question mode', () => {
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
     expect(component.containsMisconceptions()).toBeTrue();
 
     component.misconceptionsBySkill = {};
 
     expect(component.containsMisconceptions()).toBeFalse();
   });
+
+  it('should report containing misconceptions for state skill', () => {
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
+    spyOn(stateEditorService, 'getLinkedSkillId').and.returnValue('abc');
+    expect(component.containsMisconceptions()).toBeTrue();
+
+    component.misconceptionsBySkill = {};
+
+    expect(component.containsMisconceptions()).toBeFalse();
+  });
+
+  it('should reset values when linked skill id change event is emitted', fakeAsync(() => {
+    let onUpdateMisconceptionsEmitter = new EventEmitter();
+    spyOnProperty(stateEditorService, 'onUpdateMisconceptions').and.returnValue(
+      onUpdateMisconceptionsEmitter
+    );
+    spyOn(component, 'initValues');
+
+    component.ngOnInit();
+    onUpdateMisconceptionsEmitter.emit();
+    tick();
+
+    expect(component.initValues).toHaveBeenCalled();
+    component.ngOnDestroy();
+  }));
+
+  it('should update values when update misconception event is emitted', fakeAsync(() => {
+    let onChangeLinkedSkillIdEmitter = new EventEmitter();
+    spyOnProperty(stateEditorService, 'onChangeLinkedSkillId').and.returnValue(
+      onChangeLinkedSkillIdEmitter
+    );
+    spyOn(component, 'initValues');
+
+    expect(component.taggedSkillMisconceptionId).toEqual('abc-1');
+
+    component.ngOnInit();
+    onChangeLinkedSkillIdEmitter.emit();
+    tick();
+
+    expect(component.taggedSkillMisconceptionId).toBeNull();
+    expect(component.initValues).toHaveBeenCalled();
+    component.ngOnDestroy();
+  }));
 
   it('should tag a misconception correctly', fakeAsync(() => {
     let mockResultObject = {
