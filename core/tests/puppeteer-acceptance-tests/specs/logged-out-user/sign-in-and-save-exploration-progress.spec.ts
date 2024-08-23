@@ -96,7 +96,7 @@ describe('Logged-out User', function () {
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
-      'We have practiced Positive Numbers.'
+      'Lesson completed successfully. We have practiced negative numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
@@ -156,8 +156,8 @@ describe('Logged-out User', function () {
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
 
       await loggedOutUser.continueToNextCard();
-      await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
+      await loggedOutUser.expectCardContentToMatch(
+        'Lesson completed successfully. We have practiced negative numbers.'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

@@ -49,14 +49,36 @@ describe('Parent/Teacher', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate to "For Parent/Teacher page" via footer' +
+    'should be able to navigate to "For Parent/Teacher page" via footer ' +
       'and click on "Explore Lessons" button',
     async function () {
       // Navigating to "For Parent/Teacher page" via footer from home page.
       await loggedOutUser.clickOnForParentsSlashTeachersLinkInFooter();
+
+      // Navigating to "Parents/Teachers guide pdf" by clicking on the "Check out our guide" button.
+      await loggedOutUser.clickGuideButtonInTeachPage();
+      // Navigating to "Teacher Story tagged blogs page" by clicking on the "Check out our blog" button.
+      await loggedOutUser.clickBlogButtonInTeachPage();
+      // Checking if the lesson creators carousel is working in the "For Parent/Teacher" page.
+      await loggedOutUser.expectLessonCreatorsCarouselToBeFunctionalInTeachPage();
+      // Navigating to "lesson creator's LinkedIn profile" by clicking on the "LinkedIn profile" button.
+      await loggedOutUser.clickLinkedInButtonInTeachPage();
+      // Checking if the lesson creation process is visible in the "For Parent/Teacher" page.
+      await loggedOutUser.expectLessonCreationStepsAccordionToBeFunctionalInTeachPage();
       // Navigating to lessons/classroom page by clicking on the
       // "Explore Lessons" button on the "For Parent/Teacher" page.
-      await loggedOutUser.clickExploreLessonsButtonInTeachPage();
+      await loggedOutUser.clickExploreLessonsButtonAtTheTopInTeachPage();
+      // Navigating back.
+      await loggedOutUser.navigateToTeachPage();
+      // Checking if the testimonials carousel is working in the "For Parent/Teacher" page.
+      await loggedOutUser.expectTestimonailsCarouselToBeFunctionalInTeachPage();
+      // Navigating to lessons/classroom page by clicking on the
+      // "Explore Lessons" button on the "For Parent/Teacher" page.
+      await loggedOutUser.clickExploreLessonsButtonAtTheBottomInTeachPage();
+      // Navigating back.
+      await loggedOutUser.navigateToTeachPage();
+      // Navigating to "Andriod page" by clicking on the "Download Andriod app" button.
+      await loggedOutUser.clickDownloadAndriodAppButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

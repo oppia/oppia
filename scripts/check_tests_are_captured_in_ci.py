@@ -30,7 +30,8 @@ from typing import List, TypedDict
 
 E2E_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI = ['full']
 ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI = [
-    'exploration-editor/modify-translations-through-modal'
+    'exploration-editor/modify-translations-through-modal',
+    'exploration-editor/manage-exploration-misconceptions'
 ]
 
 
