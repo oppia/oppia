@@ -160,7 +160,7 @@ export class ExplorationPropertyService {
       try {
         this.saveDisplayedValue();
         resolve();
-      } catch (error) {
+      } catch (errr) {
         reject(error);
       }
     });
