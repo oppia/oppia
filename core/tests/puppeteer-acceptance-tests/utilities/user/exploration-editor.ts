@@ -456,6 +456,10 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOn(textInputInteractionButton);
     await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage('Text input interaction has been added successfully.');
   }
 
   /**
@@ -1069,11 +1073,9 @@ export class ExplorationEditor extends BaseUser {
     }
     if (isLastResponse) {
       await this.clickOn(addNewResponseButton);
-      if (interactionType !== 'Text Input') {
-        await this.page.waitForSelector(responseModalHeaderSelector, {
-          hidden: true,
-        });
-      }
+      await this.page.waitForSelector(responseModalHeaderSelector, {
+        hidden: true,
+      });
     } else {
       await this.clickOn(addAnotherResponseButton);
     }
