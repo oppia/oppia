@@ -76,8 +76,14 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     {
       title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_1_TITLE',
       text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_1_TEXT',
-      customPanelClassNames: ['oppia-teach-lesson-panel'],
-      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      customPanelClassNames: [
+        'oppia-teach-lesson-panel',
+        'e2e-test-teach-page-lesson-panel',
+      ],
+      customTitleClassNames: [
+        'oppia-teach-lesson-panel-title',
+        'e2e-test-teach-page-lesson-panel-title',
+      ],
       image: '/teach/skill-tree-image',
       altText: 'Skill tree image',
       panelIsCollapsed: true,

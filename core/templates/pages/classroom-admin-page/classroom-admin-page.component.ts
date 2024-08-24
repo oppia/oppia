@@ -27,10 +27,12 @@ import {
   ClassroomBackendDict,
   ClassroomDict,
   TopicClassroomRelationDict,
+  classroomDisplayInfo,
 } from '../../domain/classroom/classroom-backend-api.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ClassroomEditorConfirmModalComponent} from './modals/classroom-editor-confirm-modal.component';
 import {DeleteClassroomConfirmModalComponent} from './modals/delete-classroom-confirm-modal.component';
+import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
 import {CreateNewClassroomModalComponent} from './modals/create-new-classroom-modal.component';
 import {DeleteTopicFromClassroomModalComponent} from './modals/delete-topic-from-classroom-modal.component';
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
@@ -72,7 +74,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   tempClassroomData!: ExistingClassroomData;
 
   classroomCount: number = 0;
-  classroomIdToClassroomName: {[classroomId: string]: string} = {};
+  classroomIdToClassroomNameIndex: classroomDisplayInfo[] = [];
   existingClassroomNames: string[] = [];
 
   currentTopicOnEdit!: string;
@@ -190,8 +192,8 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.eligibleTopicNamesForPrerequisites = [];
         this.tempEligibleTopicNamesForPrerequisites = [];
 
-        this.existingClassroomNames = Object.values(
-          this.classroomIdToClassroomName
+        this.existingClassroomNames = this.classroomIdToClassroomNameIndex.map(
+          classroomMapping => classroomMapping.classroom_name
         );
         const index = this.existingClassroomNames.indexOf(
           this.tempClassroomData.getClassroomName()
@@ -229,13 +231,13 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.getAllTopicsToClassroomRelation();
   }
 
-  getAllClassroomIdToClassroomName(): void {
+  getAllClassroomIdToClassroomNameIndex(): void {
     this.classroomBackendApiService
-      .getAllClassroomIdToClassroomNameDictAsync()
+      .getAllClassroomDisplayInfoDictAsync()
       .then(response => {
         this.pageIsInitialized = true;
-        this.classroomIdToClassroomName = response;
-        this.classroomCount = Object.keys(response).length;
+        this.classroomIdToClassroomNameIndex = response;
+        this.classroomCount = response.length;
       });
   }
 
@@ -404,9 +406,6 @@ export class ClassroomAdminPageComponent implements OnInit {
       .updateClassroomDataAsync(classroomId, backendDict)
       .then(
         () => {
-          this.classroomIdToClassroomName[
-            this.tempClassroomData.getClassroomId()
-          ] = this.tempClassroomData.getClassroomName();
           this.classroomData = cloneDeep(this.tempClassroomData);
           this.classroomDataSaveInProgress = false;
         },
@@ -431,7 +430,31 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomBackendApiService
           .deleteClassroomAsync(classroomId)
           .then(() => {
-            delete this.classroomIdToClassroomName[classroomId];
+            let classroomIndexToDelete =
+              this.classroomIdToClassroomNameIndex.find(
+                classroomMapping =>
+                  classroomMapping.classroom_id === classroomId
+              )?.classroom_index;
+
+            this.classroomIdToClassroomNameIndex =
+              this.classroomIdToClassroomNameIndex.filter(
+                classroomMapping =>
+                  classroomMapping.classroom_id !== classroomId
+              );
+
+            this.classroomIdToClassroomNameIndex =
+              this.classroomIdToClassroomNameIndex.map(classroomMapping => {
+                if (
+                  classroomIndexToDelete &&
+                  classroomMapping.classroom_index > classroomIndexToDelete
+                ) {
+                  return {
+                    ...classroomMapping,
+                    classroom_index: classroomMapping.classroom_index - 1,
+                  };
+                }
+                return classroomMapping;
+              });
             this.classroomCount--;
           });
       },
@@ -497,13 +520,17 @@ export class ClassroomAdminPageComponent implements OnInit {
         backdrop: 'static',
       }
     );
-    modalRef.componentInstance.existingClassroomNames = Object.values(
-      this.classroomIdToClassroomName
-    );
+    modalRef.componentInstance.existingClassroomNames =
+      this.classroomIdToClassroomNameIndex.map(
+        classroomMapping => classroomMapping.classroom_name
+      );
     modalRef.result.then(
       classroomDict => {
-        this.classroomIdToClassroomName[classroomDict.classroom_id] =
-          classroomDict.name;
+        this.classroomIdToClassroomNameIndex.push({
+          classroom_id: classroomDict.classroom_id,
+          classroom_name: classroomDict.name,
+          classroom_index: this.classroomIdToClassroomNameIndex.length,
+        });
         this.classroomCount++;
       },
       () => {
@@ -512,8 +539,34 @@ export class ClassroomAdminPageComponent implements OnInit {
     );
   }
 
+  changeClassroomsOrder(): void {
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      UpdateClassroomsOrderModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    modalRef.componentInstance.classroomIdToClassroomNameIndex = cloneDeep(
+      this.classroomIdToClassroomNameIndex
+    );
+    modalRef.result.then(
+      data => {
+        this.classroomBackendApiService
+          .updateClassroomIndexMappingAsync(data)
+          .then(() => {
+            this.classroomIdToClassroomNameIndex = data;
+          });
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
+  }
+
   ngOnInit(): void {
-    this.getAllClassroomIdToClassroomName();
+    this.getAllClassroomIdToClassroomNameIndex();
   }
 
   setTopicDependencyByTopicName(
@@ -671,6 +724,16 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   deleteTopic(topicNameToDelete: string): void {
+    const topicIdToDelete =
+      Object.keys(this.topicIdsToTopicName).find(
+        id => this.topicIdsToTopicName[id] === topicNameToDelete
+      ) || '';
+    this.topicsToClassroomRelation.push({
+      topic_name: topicNameToDelete,
+      topic_id: topicIdToDelete,
+      classroom_name: null,
+      classroom_url_fragment: null,
+    });
     let childTopicNodes = [];
     for (let topicName in this.topicNameToPrerequisiteTopicNames) {
       const prerequisites = this.topicNameToPrerequisiteTopicNames[topicName];
