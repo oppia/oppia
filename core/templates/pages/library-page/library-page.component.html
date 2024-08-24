@@ -60,6 +60,12 @@
                 aria-label="Previous Slide">
           <i class="fa fa-angle-left"></i>
         </button>
+        <div class="mobile-navigation-dots" *ngIf="publicClassroomsCount > 3">
+          <span *ngFor="let dot of dots; let i = index"
+                [class.active]="dot === 1"
+                (click)="moveToSlide(i)">
+          </span>
+        </div>
         <button class="mobile-carousel-btn mobile-next-btn"
                 (click)="moveClassroomCarouselToNextSlide()"
                 [disabled]="!shouldShowNextClassroomChunkButton()"

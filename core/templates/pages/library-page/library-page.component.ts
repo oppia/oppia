@@ -509,7 +509,10 @@ export class LibraryPageComponent {
   }
 
   moveClassroomCarouselToNextSlide(): void {
-    if (this.currentCardIndex < this.classroomSummaries.length - 1) {
+    if (
+      this.currentCardIndex <
+      this.classroomSummaries.length - this.cardsToShow
+    ) {
       this.currentCardIndex += 1;
       this.translateX -= this.getCardWidth();
       this.updateActiveDot();
@@ -529,17 +532,27 @@ export class LibraryPageComponent {
   }
 
   updateActiveDot(): void {
-    const numberOfDots = Math.max(1, this.classroomSummaries.length - 2);
+    // We subtract (cardsToShow - 1) because the last dot represents the last set of cards
+    // that can be fully displayed. This creates a sliding window of size n-(cardsToShow-1).
+    const numberOfDots = Math.max(
+      1,
+      this.classroomSummaries.length - (this.cardsToShow - 1)
+    );
     this.dots = Array(numberOfDots)
       .fill(0)
       .map((_, i) => (i === this.currentCardIndex ? 1 : 0));
   }
 
   shouldShowNextClassroomChunkButton(): boolean {
-    return this.currentCardIndex < this.classroomSummaries.length - 3;
+    // We subtract cardsToShow from the total length because the last viable
+    // starting index is when cardsToShow number of cards can still be displayed.
+    return (
+      this.currentCardIndex < this.classroomSummaries.length - this.cardsToShow
+    );
   }
 
   shouldShowPreviousClassroomChunkButton(): boolean {
+    // Checks if we're not at the beginning of the carousel.
     return this.currentCardIndex > 0;
   }
 
