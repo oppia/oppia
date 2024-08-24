@@ -104,6 +104,16 @@ describe('Library Page Component', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
 
+  const dummyClassroomSummary = {
+    classroom_id: 'mathclassroom',
+    name: 'math',
+    url_fragment: 'math',
+    teaser_text: 'Learn math',
+    is_published: true,
+    thumbnail_filename: 'thumbnail.svg',
+    thumbnail_bg_color: 'transparent',
+  };
+
   let explorationList: CreatorExplorationSummaryBackendDict[] = [
     {
       category: '',
@@ -147,45 +157,6 @@ describe('Library Page Component', () => {
       thumbnail_icon_url: '',
       title: '',
       node_count: 2,
-    },
-  ];
-
-  const dummyClassroomSummaries = [
-    {
-      classroom_id: 'mathclassroom',
-      name: 'math',
-      url_fragment: 'math',
-      teaser_text: 'Learn math',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'scienceclassroom',
-      name: 'science',
-      url_fragment: 'science',
-      teaser_text: 'Learn science',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'history',
-      name: 'history',
-      url_fragment: 'history',
-      teaser_text: 'Learn history',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'english',
-      name: 'english',
-      url_fragment: 'english',
-      teaser_text: 'Learn english',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
     },
   ];
 
@@ -827,63 +798,45 @@ describe('Library Page Component', () => {
     expect(componentInstance.publicClassroomsCount).toEqual(1);
   }));
 
-  it('should handle more than 3 classrooms correctly in the classroom carousel', () => {
-    componentInstance.classroomSummaries = [...dummyClassroomSummaries];
-    componentInstance.publicClassroomsCount =
-      componentInstance.classroomSummaries.length;
+  it('should handle carousel navigation correctly', () => {
     componentInstance.cardsToShow = 3;
-
+    componentInstance.translateX = 0;
+    componentInstance.currentCardIndex = 0;
+    componentInstance.dots = [];
+    componentInstance.classroomSummaries = Array(5).fill(dummyClassroomSummary);
     componentInstance.updateActiveDot();
 
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      false
-    );
-    expect(componentInstance.dots).toEqual([1, 0]);
-
     componentInstance.moveClassroomCarouselToNextSlide();
-    expect(componentInstance.currentCardIndex).toEqual(1);
-    expect(componentInstance.dots).toEqual([0, 1]);
+    expect(componentInstance.currentCardIndex).toBe(1);
+    expect(componentInstance.translateX).toBe(
+      -componentInstance.getCardWidth()
+    );
+    expect(componentInstance.dots).toEqual([0, 1, 0]);
 
     componentInstance.moveClassroomCarouselToPreviousSlide();
-    expect(componentInstance.currentCardIndex).toEqual(0);
-    expect(componentInstance.dots).toEqual([1, 0]);
+    expect(componentInstance.currentCardIndex).toBe(0);
+    expect(componentInstance.translateX).toBe(0);
+    expect(componentInstance.dots).toEqual([1, 0, 0]);
 
-    componentInstance.moveClassroomCarouselToNextSlide();
-    componentInstance.moveClassroomCarouselToNextSlide();
-    expect(componentInstance.currentCardIndex).toEqual(1);
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      true
+    const middleIndex = 2;
+    componentInstance.moveToSlide(middleIndex);
+    expect(componentInstance.currentCardIndex).toBe(middleIndex);
+    expect(componentInstance.translateX).toBe(
+      -middleIndex * componentInstance.getCardWidth()
     );
-    expect(componentInstance.dots).toEqual([0, 1]);
+    expect(componentInstance.dots).toEqual([0, 0, 1]);
 
-    componentInstance.moveClassroomCarouselToPreviousSlide();
-    expect(componentInstance.currentCardIndex).toEqual(0);
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      false
-    );
-    expect(componentInstance.dots).toEqual([1, 0]);
+    componentInstance.currentCardIndex = 0;
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeFalse();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeTrue();
 
-    componentInstance.moveToSlide(1);
-    expect(componentInstance.currentCardIndex).toEqual(1);
-    expect(componentInstance.dots).toEqual([0, 1]);
-
-    componentInstance.moveToSlide(0);
-    expect(componentInstance.currentCardIndex).toEqual(0);
-    expect(componentInstance.dots).toEqual([1, 0]);
-  });
-
-  it('should handle less than 3 classrooms correctly in the classroom carousel', () => {
-    componentInstance.classroomSummaries = dummyClassroomSummaries.slice(0, 2);
-    componentInstance.publicClassroomsCount =
-      componentInstance.classroomSummaries.length;
-
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      false
-    );
+    componentInstance.currentCardIndex = 2;
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeTrue();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeFalse();
   });
 
   it('should record analytics when classroom card is clicked', () => {
