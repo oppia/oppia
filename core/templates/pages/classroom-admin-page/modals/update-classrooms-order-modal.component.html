@@ -5,8 +5,7 @@
     <div *ngFor="let classroom of classroomIdToClassroomNameIndex"
          class="classroom-tile"
          cdkDrag
-         (cdkDragStarted)="onDragStarted($event)"
-         (cdkDragEnded)="onDragEnded($event)">
+    >
       {{ classroom.classroom_name }}
     </div>
   </div>

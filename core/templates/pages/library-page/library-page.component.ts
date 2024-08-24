@@ -532,8 +532,11 @@ export class LibraryPageComponent {
   }
 
   updateActiveDot(): void {
-    const numberOfDots = Math.ceil(
-      this.classroomSummaries.length / this.cardsToShow
+    // We subtract (cardsToShow - 1) because the last dot represents the last set of cards
+    // that can be fully displayed. This creates a sliding window of size n-(cardsToShow-1).
+    const numberOfDots = Math.max(
+      1,
+      this.classroomSummaries.length - (this.cardsToShow - 1)
     );
     this.dots = Array(numberOfDots)
       .fill(0)
@@ -541,19 +544,16 @@ export class LibraryPageComponent {
   }
 
   shouldShowNextClassroomChunkButton(): boolean {
-    const numberOfClassroomSlides = Math.ceil(
-      this.classroomSummaries.length / this.cardsToShow
-    );
+    // We subtract cardsToShow from the total length because the last viable
+    // starting index is when cardsToShow number of cards can still be displayed.
     return (
-      this.publicClassroomsCount > this.cardsToShow &&
-      this.currentCardIndex < numberOfClassroomSlides - 1
+      this.currentCardIndex < this.classroomSummaries.length - this.cardsToShow
     );
   }
 
   shouldShowPreviousClassroomChunkButton(): boolean {
-    return (
-      this.publicClassroomsCount > this.cardsToShow && this.currentCardIndex > 0
-    );
+    // Checks if we're not at the beginning of the carousel.
+    return this.currentCardIndex > 0;
   }
 
   registerClassroomCardClickEvent(classroomName: string): void {
