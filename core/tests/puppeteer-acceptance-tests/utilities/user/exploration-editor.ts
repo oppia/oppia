@@ -1316,7 +1316,7 @@ export class ExplorationEditor extends BaseUser {
       }
     } catch (error) {
       if (isPresent) {
-        throw new Error(`No misconceptions found.`);
+        throw new Error('No misconceptions found.');
       }
     }
 
