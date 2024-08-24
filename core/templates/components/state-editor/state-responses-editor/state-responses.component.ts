@@ -611,15 +611,11 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       Object.keys(this.misconceptionsBySkill).forEach(skillId => {
         let misconceptions = this.misconceptionsBySkill[skillId];
         for (let i = 0; i < misconceptions.length; i++) {
+          if (!misconceptions[i].isMandatory()) {
+            continue;
+          }
           let skillMisconceptionId = skillId + '-' + misconceptions[i].getId();
           if (
-            !misconceptions[i].isMandatory() &&
-            this.inapplicableSkillMisconceptionIds.includes(
-              skillMisconceptionId
-            )
-          ) {
-            continue;
-          } else if (
             !taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)
           ) {
             unaddressedMisconceptionNames.push(misconceptions[i].getName());
