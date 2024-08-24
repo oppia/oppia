@@ -155,18 +155,15 @@ describe('Exploration Editor', function () {
       'Some might think 2 + 3 = 23.',
       'The correct answer is 5.'
     );
-    await curriculumAdmin.addMisconception(
-      'Subtraction Misconception',
-      'Some might think 11 - 1 = 1.',
-      'The correct answer is 10.',
-      true
+    await curriculumAdmin.addSkillToDiagnosticTest(
+      'Test Skill 1',
+      'Test Topic 1'
     );
-    await curriculumAdmin.publishUpdatedSkill('Update');
 
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Test Story One',
       'test-story-one',
-      'Test Chapter',
+      'Test Chapter 1',
       explorationId,
       'Test Topic One'
     );
