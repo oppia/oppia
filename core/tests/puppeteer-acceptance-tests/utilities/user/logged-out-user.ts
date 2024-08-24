@@ -1486,13 +1486,13 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Get Android app button in the Teach page
+   * Function to click the Get Android App button in the Teach page
    * and check if it opens the Android page.
    */
   async clickGetAndroidAppButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       getAndroidAppButtonInTeachPage,
-      'Get Android app button',
+      'Get Android App button',
       androidUrl,
       'Android page'
     );
