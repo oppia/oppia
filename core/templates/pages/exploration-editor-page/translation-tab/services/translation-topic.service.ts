@@ -25,6 +25,7 @@ import {
   ContributionOpportunitiesService,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import {Observable, Subject} from 'rxjs';
 import {LoggerService} from 'services/contextual/logger.service';
 
 @Injectable({
@@ -35,7 +36,7 @@ export class TranslationTopicService {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private activeTopicName!: string;
-  private _activeTopicChangedEventEmitter = new EventEmitter<void>();
+  private _activeTopicChangedEventEmitter = new Subject<void>();
 
   constructor(
     private ContributionOpportunitiesService: ContributionOpportunitiesService,
@@ -45,6 +46,8 @@ export class TranslationTopicService {
   getActiveTopicName(): string {
     return this.activeTopicName;
   }
+
+  activeTopicChanged$ = this._activeTopicChangedEventEmitter.asObservable();
 
   setActiveTopicName(newActiveTopicName: string): void {
     this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync().then(
@@ -59,13 +62,13 @@ export class TranslationTopicService {
           return;
         }
         this.activeTopicName = newActiveTopicName;
-        this._activeTopicChangedEventEmitter.emit();
+        this._activeTopicChangedEventEmitter.next();
       }
     );
   }
 
-  get onActiveTopicChanged(): EventEmitter<void> {
-    return this._activeTopicChangedEventEmitter;
+  get onActiveTopicChanged(): Observable<void> {
+    return this._activeTopicChangedEventEmitter.asObservable();
   }
 }
 

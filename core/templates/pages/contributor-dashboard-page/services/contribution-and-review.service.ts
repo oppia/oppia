@@ -145,6 +145,10 @@ export class ContributionAndReviewService {
     const currentCacheSize: number = Object.keys(
       fetcher.suggestionIdToDetails
     ).length;
+    console.log(
+      'before cache: ',
+      Object.keys(fetcher.suggestionIdToDetails).length
+    );
     return this.contributionAndReviewBackendApiService
       .fetchSuggestionsAsync(
         fetcher.type,
@@ -180,6 +184,14 @@ export class ContributionAndReviewService {
           }
         });
         fetcher.offset = responseBody.next_offset;
+        console.log(
+          'after cache: ',
+          Object.keys(fetcher.suggestionIdToDetails).length
+        );
+        console.log(
+          'response: ',
+          Object.keys(responseSuggestionIdToDetails).length
+        );
         return {
           suggestionIdToDetails: responseSuggestionIdToDetails,
           more: Object.keys(fetcher.suggestionIdToDetails).length > 0,

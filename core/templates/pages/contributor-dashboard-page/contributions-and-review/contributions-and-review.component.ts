@@ -194,7 +194,15 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     private htmlLengthService: HtmlLengthService,
     private htmlEscaperService: HtmlEscaperService,
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.directiveSubscriptions.add(
+      this.translationTopicService.activeTopicChanged$.subscribe(() => {
+        this.activeExplorationId = null;
+        this.loadOpportunities();
+      })
+    );
+    console.log('subscribed to noActiveTopicChanged EventEmitter 2');
+  }
 
   getQuestionContributionsSummary(
     suggestionIdToSuggestions: Record<string, SuggestionDetails>
@@ -634,6 +642,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   loadOpportunities(): Promise<GetOpportunitiesResponse> {
+    console.log('running loadOpportunities()');
     return this.loadContributions(/* Param shouldResetOffset= */ true);
   }
 
@@ -722,12 +731,14 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     ];
 
     // Reset active exploration when changing topics.
-    this.directiveSubscriptions.add(
-      this.translationTopicService.onActiveTopicChanged.subscribe(() => {
-        this.activeExplorationId = null;
-        this.loadOpportunities();
-      })
-    );
+    // this.directiveSubscriptions.add(
+    //   this.translationTopicService.onActiveTopicChanged.subscribe(() => {
+    //     this.activeExplorationId = null;
+    //     this.loadOpportunities();
+    //   })
+    // );
+    // console.log('subscribed to noActiveTopicChanged EventEmitter')
+    console.log(typeof this.translationTopicService.onActiveTopicChanged);
 
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
