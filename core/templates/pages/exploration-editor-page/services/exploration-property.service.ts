@@ -156,7 +156,7 @@ export class ExplorationPropertyService {
   }
 
   saveDisplayedValueAsync(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reect) => {
       this.saveDisplayedValue();
       resolve();
     });
