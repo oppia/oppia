@@ -145,11 +145,11 @@ describe('Exploration Editor', function () {
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createAndPublishTopic(
-      'Test Topic 1',
-      'Test Subtopic 1',
-      'Test Skill 1'
+      'Test Topic One',
+      'Test Subtopic One',
+      'Test Skill One'
     );
-    await curriculumAdmin.openSkillEditor('Test Skill 1');
+    await curriculumAdmin.openSkillEditor('Test Skill One');
     await curriculumAdmin.addMisconception(
       'Addition Misconception',
       'Some might think 2 + 3 = 23.',
@@ -163,13 +163,12 @@ describe('Exploration Editor', function () {
     );
     await curriculumAdmin.publishUpdatedSkill('Update');
 
-    await curriculumAdmin.publishDraftTopic('Test Topic 1');
     await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Test Story 1',
+      'Test Story One',
       'test-story-one',
       'Test Chapter',
       explorationId,
-      'Test Topic 1'
+      'Test Topic One'
     );
     // We set an increased custom timeout since the setup takes too long unlike other specs.
   }, 400000);
@@ -184,7 +183,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToCard(
         CARD_NAME.MULTIPLE_CHOICE_QUESTION
       );
-      await explorationEditor.addSkillToState('Test Skill 1');
+      await explorationEditor.addSkillToState('Test Skill One');
       await explorationEditor.verifyMisconceptionPresentForState(
         'Addition Misconception',
         true
@@ -221,6 +220,10 @@ describe('Exploration Editor', function () {
   it(
     'should tag answer group with misconception.',
     async function () {
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
       await explorationEditor.tagAnswerGroupWithMisconception(
         1,
         'Addition Misconception',
@@ -237,10 +240,14 @@ describe('Exploration Editor', function () {
   it(
     'should change tagged misconception for response group',
     async function () {
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
       await explorationEditor.changeTaggedAnswerGroupMisconception(
         1,
         'Subtraction Misconception',
-        false
+        true
       );
       await explorationEditor.verifyMisconceptionPresentForState(
         'Addition Misconception',

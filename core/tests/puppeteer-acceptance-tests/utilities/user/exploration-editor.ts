@@ -97,6 +97,7 @@ const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = 'button.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
 const modifyExistingTranslationsButton = '.e2e-test-modify-translations-button';
+const leaveTranslationsAsIsButton = '.e2e-test-leave-translations-as-is';
 const activeTranslationTab = '.e2e-test-active-translation-tab';
 
 const stateNodeSelector = '.e2e-test-node-label';
@@ -148,6 +149,7 @@ const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
 const deleteSkillButton = 'i.skill-delete-button';
 
 const misconceptionDiv = '.misconception-list-item';
+const misconceptionTitle = '.e2e-test-misconception-title';
 const optionalMisconceptionDiv = '.optional-misconception-list-item';
 const inapplicableMisconceptionDiv = '.optional-misconception-list-no-action';
 const optionalMisconceptionOptionsButton =
@@ -1208,15 +1210,34 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isOptional: boolean
   ): Promise<void> {
+    let expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
     let responseTabs = await this.page.$$(responseGroupDiv);
+
     await responseTabs[responseIndex].click();
     await this.clickOn('Tag with misconception');
-    if (!isOptional) {
-      await this.clickOn(misconceptionName);
-    } else {
-      await this.clickOn(`(Optional) ${misconceptionName}`);
+
+    await this.page.waitForSelector(misconceptionTitle, {
+      timeout: 5000,
+      visible: true,
+    });
+    const misconceptionTitles = await this.page.$$(misconceptionTitle);
+    for (const misconceptionTitle of misconceptionTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        misconceptionTitle
+      );
+      if (title.trim() === expectedTitle) {
+        await misconceptionTitle.click();
+      }
     }
+
     await this.clickOn('Done');
+    await this.page.waitForSelector(leaveTranslationsAsIsButton, {
+      visible: true,
+    });
+    await this.clickOn(leaveTranslationsAsIsButton);
   }
 
   /**
@@ -1230,15 +1251,31 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isOptional: boolean
   ): Promise<void> {
+    let expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
     let responseTabs = await this.page.$$(responseGroupDiv);
     await responseTabs[responseIndex].click();
     await this.clickOn(misconceptionEditorTab);
-    if (!isOptional) {
-      await this.clickOn(misconceptionName);
-    } else {
-      await this.clickOn(`(Optional) ${misconceptionName}`);
+    await this.page.waitForSelector(misconceptionTitle, {
+      timeout: 5000,
+      visible: true,
+    });
+    const misconceptionTitles = await this.page.$$(misconceptionTitle);
+    for (const misconceptionTitle of misconceptionTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        misconceptionTitle
+      );
+      if (title.trim() === expectedTitle) {
+        await misconceptionTitle.click();
+      }
     }
     await this.clickOn('Save Misconception');
+    await this.page.waitForSelector(leaveTranslationsAsIsButton, {
+      visible: true,
+    });
+    await this.clickOn(leaveTranslationsAsIsButton);
   }
 
   /**
@@ -1265,7 +1302,7 @@ export class ExplorationEditor extends BaseUser {
         if (title.trim() === misconceptionName) {
           if (!isPresent) {
             throw new Error(
-              `The misconception ${misconceptionName} is present, which was not expected`
+              `The misconception ${misconceptionName} is present, should be absent.`
             );
           }
           return;
@@ -1274,14 +1311,12 @@ export class ExplorationEditor extends BaseUser {
 
       if (isPresent) {
         throw new Error(
-          `The misconception ${misconceptionName} is not present, which was expected`
+          `The misconception ${misconceptionName} is not present.`
         );
       }
     } catch (error) {
       if (isPresent) {
-        throw new Error(
-          `The misconception ${misconceptionName} is not present, which was expected`
-        );
+        throw new Error(`No misconceptions found.`);
       }
     }
 
@@ -1341,7 +1376,10 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isApplicable: boolean
   ): Promise<void> {
-    await this.verifyMisconceptionPresentForState(misconceptionName, true);
+    if (!isApplicable) {
+      this.page.waitForSelector(inapplicableMisconceptionDiv);
+    }
+
     const inapplicableMisconceptions = await this.page.$$(
       inapplicableMisconceptionDiv
     );
