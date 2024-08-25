@@ -315,8 +315,8 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
   }
 
-  onClickDownloadAndroidAppButton(): void {
-    this.siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent();
+  onClickGetAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickGetAndroidAppButtonEvent();
   }
 
   onClickDonateCTAButton(): void {
