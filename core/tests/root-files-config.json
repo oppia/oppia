@@ -59,7 +59,6 @@
     "core/templates/AppSpec.ts",
     "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts",
-    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
