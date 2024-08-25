@@ -581,8 +581,8 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerClickDownloadAndroidAppButtonEvent(): void {
-    this._sendEventToGoogleAnalytics('download_android_app_button_click', {
+  registerClickGetAndroidAppButtonEvent(): void {
+    this._sendEventToGoogleAnalytics('get_android_app_button_click', {
       page_path: this.windowRef.nativeWindow.location.pathname,
     });
   }

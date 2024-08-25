@@ -328,11 +328,11 @@ describe('About Page', () => {
   it('should register GA event when Download Android App is clicked', () => {
     spyOn(
       siteAnalyticsService,
-      'registerClickDownloadAndroidAppButtonEvent'
+      'registerClickGetAndroidAppButtonEvent'
     ).and.callThrough();
-    component.onClickDownloadAndroidAppButton();
+    component.onClickGetAndroidAppButton();
     expect(
-      siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent
+      siteAnalyticsService.registerClickGetAndroidAppButtonEvent
     ).toHaveBeenCalled();
   });
 
