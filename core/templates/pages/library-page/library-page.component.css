@@ -83,16 +83,18 @@ oppia-library-page .oppia-group-page-header {
   top: 195px;
 }
 
-.navigation-dots span {
-  background-color: #ccc;
+.navigation-dots span,
+.mobile-navigation-dots span {
+  background-color: #d9d9d9;
   border-radius: 50%;
   cursor: pointer;
-  height: 10px;
-  margin: 0 5px;
-  width: 10px;
+  height: 8px;
+  margin: 0 3px;
+  width: 8px;
 }
 
-.navigation-dots span.active {
+.navigation-dots span.active,
+.mobile-navigation-dots span.active {
   background-color: #005240;
 }
 
@@ -458,8 +460,11 @@ oppia-library-page .community-library-breadcrumbs-container {
 
   .mobile-buttons {
     display: flex;
+    gap: 6px;
     justify-content: space-between;
     margin-top: 10px;
+    position: relative;
+    top: 10px;
   }
 
   .desktop-carousel-btn {
@@ -467,7 +472,19 @@ oppia-library-page .community-library-breadcrumbs-container {
   }
 
   .navigation-dots {
-    top: 180px;
+    display: none;
+  }
+
+  .mobile-navigation-dots {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+  }
+
+  oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container .classrooms-carousel {
+    flex-direction: column;
+    height: 194px;
+    width: 444px;
   }
 
   oppia-library-page .desktop-carousel-btn {
@@ -525,10 +542,6 @@ oppia-library-page .community-library-breadcrumbs-container {
     width: 442px;
   }
 
-  oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container .classrooms-carousel {
-    width: 444px;
-  }
-
   oppia-library-page .classrooms-carousel .carousel-indicators {
     bottom: -14px;
     display: flex;
@@ -548,7 +561,6 @@ oppia-library-page .community-library-breadcrumbs-container {
     font-size: 24px;
     height: auto;
     padding: 0;
-    position: absolute;
     width: auto;
     z-index: 1;
   }
@@ -681,7 +693,7 @@ oppia-library-page .community-library-breadcrumbs-container {
 
 @media only screen and (max-width: 416px) {
   .mobile-buttons {
-    top: 180px;
+    top: 122px;
   }
 
   oppia-library-page .classroom-cards-wrapper {
