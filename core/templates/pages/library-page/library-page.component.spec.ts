@@ -50,11 +50,6 @@ import {
   LibraryPageBackendApiService,
 } from './services/library-page-backend-api.service';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {
-  NgbCarousel,
-  NgbSlideEvent,
-  NgbSlideEventDirection,
-} from '@ng-bootstrap/ng-bootstrap';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockWindowRef {
@@ -109,10 +104,14 @@ describe('Library Page Component', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
 
-  const mockNgbCarousel: Partial<NgbCarousel> = {
-    next: jasmine.createSpy('next'),
-    prev: jasmine.createSpy('prev'),
-    select: jasmine.createSpy('select'),
+  const dummyClassroomSummary = {
+    classroom_id: 'mathclassroom',
+    name: 'math',
+    url_fragment: 'math',
+    teaser_text: 'Learn math',
+    is_published: true,
+    thumbnail_filename: 'thumbnail.svg',
+    thumbnail_bg_color: 'transparent',
   };
 
   let explorationList: CreatorExplorationSummaryBackendDict[] = [
@@ -158,45 +157,6 @@ describe('Library Page Component', () => {
       thumbnail_icon_url: '',
       title: '',
       node_count: 2,
-    },
-  ];
-
-  const dummyClassroomSummaries = [
-    {
-      classroom_id: 'mathclassroom',
-      name: 'math',
-      url_fragment: 'math',
-      teaser_text: 'Learn math',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'scienceclassroom',
-      name: 'science',
-      url_fragment: 'science',
-      teaser_text: 'Learn science',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'history',
-      name: 'history',
-      url_fragment: 'history',
-      teaser_text: 'Learn history',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
-    },
-    {
-      classroom_id: 'english',
-      name: 'english',
-      url_fragment: 'english',
-      teaser_text: 'Learn english',
-      is_published: true,
-      thumbnail_filename: 'thumbnail.svg',
-      thumbnail_bg_color: 'transparent',
     },
   ];
 
@@ -838,71 +798,45 @@ describe('Library Page Component', () => {
     expect(componentInstance.publicClassroomsCount).toEqual(1);
   }));
 
-  it('should handle more than 3 classrooms correctly in the classroom carousel', () => {
-    componentInstance.classroomCarousel = mockNgbCarousel as NgbCarousel;
-    componentInstance.classroomSummaries = [...dummyClassroomSummaries];
-    componentInstance.publicClassroomsCount =
-      componentInstance.classroomSummaries.length;
-
-    const mockSlideEvent: NgbSlideEvent = {
-      current: 'ngb-slide-0',
-      paused: false,
-      prev: '',
-      direction: 'left' as NgbSlideEventDirection,
-    };
-
-    expect(
-      componentInstance.getClassroomChunkIndices(
-        componentInstance.classroomSummaries.length
-      )
-    ).toEqual([0, 1]);
-    expect(componentInstance.classroomCarouselIndex).toEqual(0);
-    expect(
-      componentInstance.getClassroomsForChunk(
-        componentInstance.classroomSummaries,
-        0
-      )
-    ).toEqual(componentInstance.classroomSummaries.slice(0, 3));
-    expect(
-      componentInstance.getClassroomsForChunk(
-        componentInstance.classroomSummaries,
-        1
-      )
-    ).toEqual(componentInstance.classroomSummaries.slice(3));
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      false
-    );
+  it('should handle carousel navigation correctly', () => {
+    componentInstance.cardsToShow = 3;
+    componentInstance.translateX = 0;
+    componentInstance.currentCardIndex = 0;
+    componentInstance.dots = [];
+    componentInstance.classroomSummaries = Array(5).fill(dummyClassroomSummary);
+    componentInstance.updateActiveDot();
 
     componentInstance.moveClassroomCarouselToNextSlide();
-    expect(componentInstance.classroomCarouselIndex).toEqual(1);
-
-    componentInstance.onClassroomNavigationIndicatorClicked(mockSlideEvent);
-    expect(componentInstance.classroomCarouselIndex).toEqual(0);
-
-    componentInstance.moveClassroomCarouselToNextSlide();
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      true
+    expect(componentInstance.currentCardIndex).toBe(1);
+    expect(componentInstance.translateX).toBe(
+      -componentInstance.getCardWidth()
     );
+    expect(componentInstance.dots).toEqual([0, 1, 0]);
 
     componentInstance.moveClassroomCarouselToPreviousSlide();
-    expect(componentInstance.classroomCarouselIndex).toEqual(0);
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      false
-    );
-  });
+    expect(componentInstance.currentCardIndex).toBe(0);
+    expect(componentInstance.translateX).toBe(0);
+    expect(componentInstance.dots).toEqual([1, 0, 0]);
 
-  it('should handle less than 3 classrooms correctly in the classroom carousel', () => {
-    componentInstance.classroomCarousel = mockNgbCarousel as NgbCarousel;
-    componentInstance.classroomSummaries = dummyClassroomSummaries.slice(0, 3);
-    componentInstance.publicClassroomsCount =
-      componentInstance.classroomSummaries.length;
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
-    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
-      false
+    const middleIndex = 2;
+    componentInstance.moveToSlide(middleIndex);
+    expect(componentInstance.currentCardIndex).toBe(middleIndex);
+    expect(componentInstance.translateX).toBe(
+      -middleIndex * componentInstance.getCardWidth()
     );
+    expect(componentInstance.dots).toEqual([0, 0, 1]);
+
+    componentInstance.currentCardIndex = 0;
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeFalse();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeTrue();
+
+    componentInstance.currentCardIndex = 2;
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeTrue();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeFalse();
   });
 
   it('should record analytics when classroom card is clicked', () => {

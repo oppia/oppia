@@ -724,6 +724,16 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   deleteTopic(topicNameToDelete: string): void {
+    const topicIdToDelete =
+      Object.keys(this.topicIdsToTopicName).find(
+        id => this.topicIdsToTopicName[id] === topicNameToDelete
+      ) || '';
+    this.topicsToClassroomRelation.push({
+      topic_name: topicNameToDelete,
+      topic_id: topicIdToDelete,
+      classroom_name: null,
+      classroom_url_fragment: null,
+    });
     let childTopicNodes = [];
     for (let topicName in this.topicNameToPrerequisiteTopicNames) {
       const prerequisites = this.topicNameToPrerequisiteTopicNames[topicName];
