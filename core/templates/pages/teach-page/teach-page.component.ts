@@ -347,8 +347,8 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
   }
 
-  onClickDownloadAndroidAppButton(): void {
-    this.siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent();
+  onClickGetAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickGetAndroidAppButtonEvent();
   }
 
   registerFirstTimePageViewEvent(): void {
