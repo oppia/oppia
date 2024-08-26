@@ -131,7 +131,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedback('Wrong.');
     await explorationEditor.addSolutionToState(
       'minus',
-      'Minus is the opposite of plus.'
+      'Minus is the opposite of plus.',
+      false
     );
     await explorationEditor.saveExplorationDraft();
 
