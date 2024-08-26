@@ -100,7 +100,7 @@ export class ClassroomPageComponent implements OnDestroy {
           thumbnailFilename
         )
       : this.urlInterpolationService.getStaticImageUrl(
-          '/classrooms/default-classroom-thumbnail.svg'
+          '/classroom/default-classroom-thumbnail.svg'
         );
 
     this.classroomBanner = bannerFilename
@@ -110,7 +110,7 @@ export class ClassroomPageComponent implements OnDestroy {
           bannerFilename
         )
       : this.urlInterpolationService.getStaticImageUrl(
-          '/classrooms/default-classroom-background.png'
+          '/classroom/default-classroom-background.png'
         );
   }
 
@@ -160,7 +160,7 @@ export class ClassroomPageComponent implements OnDestroy {
                 ) {
                   let firstTopic = classroomData.getTopicSummaries()[0].name;
                   this.firstTopicUrl =
-                    '/learn/math/' +
+                    `/learn/${classroomData.getUrlFragment()}/` +
                     classroomData.getTopicSummaries()[0].urlFragment;
 
                   this.beginWithFirstTopicButtonText =
@@ -191,7 +191,7 @@ export class ClassroomPageComponent implements OnDestroy {
                     errorResponse.status
                   ) !== -1
                 ) {
-                  this.alertsService.addWarning('Failed to get dashboard data');
+                  this.alertsService.addWarning('Failed to get classroom data');
                 }
               }
             );

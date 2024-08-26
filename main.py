@@ -477,8 +477,11 @@ URLS = [
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL,
-        classroom.ClassroomIdToNameHandler),
+        r'%s' % feconf.CLASSROOM_DISPLAY_INFO_HANDLER_URL,
+        classroom.ClassroomDisplayInfoHandler),
+    get_redirect_route(
+        r'%s' % feconf.UPDATE_CLASSROOMS_ORDER_HANDLER_URL,
+        classroom.UpdateClassroomIndexMappingHandler),
     get_redirect_route(
         r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
         classroom.UnusedTopicsHandler),
@@ -1069,6 +1072,8 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -1280,6 +1285,16 @@ URLS.extend((
         tasks.FeedbackThreadStatusChangeEmailHandler),
     get_redirect_route(
         r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
+))
+
+# Add URLs to static resources that differ between deployments.
+URLS.extend((
+    get_redirect_route('/favicon.ico', resources.FaviconHandler),
+    get_redirect_route('/robots.txt', resources.RobotsTxtHandler),
+    get_redirect_route(
+        '/assets/copyrighted-images/<folder>/<filename>',
+        resources.CopyrightImagesHandler
+    ),
 ))
 
 # 404 error handler (Needs to be at the end of the URLS list).

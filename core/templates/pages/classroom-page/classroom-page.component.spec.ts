@@ -190,13 +190,15 @@ describe('Classroom Page Component', () => {
     let classroomData = ClassroomData.createFromBackendData(
       'mathid',
       'Math',
+      'math',
       topicSummaryDicts,
       'Course details',
       'Topics covered',
       'Learn math',
       true,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
-      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
     );
     spyOn(
       accessValidationBackendApiService,
@@ -271,7 +273,7 @@ describe('Classroom Page Component', () => {
       classroomBackendApiService.fetchClassroomDataAsync
     ).toHaveBeenCalled();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to get dashboard data'
+      'Failed to get classroom data'
     );
   }));
 
@@ -370,13 +372,15 @@ describe('Classroom Page Component', () => {
     let classroomData = ClassroomData.createFromBackendData(
       'mathid',
       'Math',
+      'math',
       [],
       'Course details',
       'Topics covered',
       'Learn math',
       false,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
-      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
     );
 
     spyOn(

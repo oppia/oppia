@@ -114,6 +114,9 @@ describe('Voiceover card component', () => {
       translationLanguageService,
       'onActiveLanguageAccentChanged'
     ).and.returnValue(new EventEmitter<void>());
+    spyOn(entityVoiceoversService, 'onVoiceoverLoad').and.returnValue(
+      new EventEmitter<void>()
+    );
   });
 
   it('should be able to initialize the voiceover card component', fakeAsync(() => {
@@ -142,6 +145,7 @@ describe('Voiceover card component', () => {
     translationLanguageService.onActiveLanguageAccentChanged.emit();
     translationLanguageService.onActiveLanguageChanged.emit();
     translationTabActiveContentIdService.onActiveContentIdChanged.emit();
+    entityVoiceoversService.onVoiceoverLoad.emit();
 
     flush();
     tick(5000);

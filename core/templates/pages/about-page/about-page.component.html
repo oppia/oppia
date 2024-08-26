@@ -81,7 +81,7 @@
   </div>
 
   <div class="oppia-about-platform-section">
-    <div class="oppia-about-platform-section-left">
+    <div class="oppia-about-platform-section-left e2e-test-about-page-features-section">
       <p class="oppia-about-subtitle">
         {{ 'I18N_ABOUT_PAGE_FEATURES' | translate }}
       </p>
@@ -96,7 +96,7 @@
         <div *ngFor="let panel of featuresData; let i = index"
              class="oppia-about-accordion-item">
           <button (click)="expandPanel(i)" *ngIf="featuresData[i].panelIsCollapsed"
-                  class="oppia-about-accordion-title-container"
+                  class="oppia-about-accordion-title-container e2e-test-about-page-features-panel-title-mobile"
                   [ngClass]="panel.customTitleClassNames">
             <p class="oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
             <i class="fas fa-plus accordion-icon"></i>
@@ -105,11 +105,11 @@
             [ngClass]="panel.customPanelClassNames">
             <div class="oppia-about-accordion-title-container ">
               <p class="oppia-about-accordion-panel-title oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
-              <button (click)="closePanel(i)">
+              <button (click)="closePanel(i)" class="e2e-test-about-page-features-panel-close-button">
                 <i class="fas fa-minus accordion-icon"></i>
               </button>
             </div>
-            <p class="oppia-about-platform-subtext"> {{ panel.text | translate }} </p>
+            <p class="oppia-about-platform-subtext e2e-test-about-page-features-panel-content"> {{ panel.text | translate }} </p>
             <img *ngIf="panel.image" [src]="panel.image" >
           </div>
         </div>
@@ -129,14 +129,16 @@
       </div>
       <div class="oppia-about-platform-button-container">
         <oppia-primary-button
-          buttonHref="/learn/math"
+          buttonHref="/learn"
+          (onClickPrimaryButton)="onClickExploreLessonsButton()"
           [customClasses]="['oppia-about-platform-button', 'oppia-about-platform-subtext']"
           buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
         </oppia-primary-button>
         <oppia-primary-button
           buttonHref="/android"
+          (onClickPrimaryButton)="onClickGetAndroidAppButton()"
           [customClasses]="['oppia-about-platform-button', 'oppia-about-secondary-button', 'oppia-about-platform-subtext']"
-          buttonText="{{ 'I18N_ACTION_DOWNLOAD_ANDRIOD_APP' | translate }}">
+          buttonText="{{ 'I18N_ACTION_GET_ANDRIOD_APP' | translate }}">
         </oppia-primary-button>
       </div>
     </div>
@@ -170,7 +172,8 @@
               <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1.5])">
               <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1.5])">
               <img [src]="getStaticImageUrl( partner.imageUrl + '15x.png')"
-                   alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}">
+                   alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}"
+                   loading="lazy">
             </picture>
           </div>
           <div>
@@ -182,7 +185,7 @@
       </div>
     </div>
     <div class="oppia-about-partnerships-cards-container-tablet">
-      <ngb-carousel [interval]="8000" [showNavigationArrows]="false">
+      <ngb-carousel [interval]="8000" [showNavigationArrows]="false" [animation]="false">
         <ng-template ngbSlide *ngFor="let partner of partnersData">
           <div class="oppia-about-partnerships-card">
             <div class="oppia-about-partnerships-card-content-container">
@@ -202,7 +205,8 @@
                 <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1.5])">
                 <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1.5])">
                 <img [src]="getStaticImageUrl( partner.imageUrl + '15x.png')"
-                     alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}">
+                     alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}"
+                     loading="lazy">
               </picture>
             </div>
           </div>
@@ -338,8 +342,8 @@
       </p>
     </div>
 
-    <div class="oppia-about-cta-tabs oppia-non-mobile-portrait-content">
-      <mat-tab-group [(selectedIndex)]="selectedTabIndex" mat-align-tabs="center" mat-stretch-tabs dynamicHeight disablePagination="true">
+    <div class="oppia-about-cta-tabs">
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" mat-align-tabs="center" mat-stretch-tabs dynamicHeight disablePagination="true" [animationDuration]="0">
         <mat-tab>
           <ng-template mat-tab-label>
             <span class="oppia-about-cta-title-small e2e-test-about-page-donor-desktop-tab">
@@ -388,7 +392,7 @@
                 </p>
               </div>
             </div>
-            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext e2e-test-donate-desktop-button" (click)="openDonationBoxModal()">
+            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext e2e-test-donate-desktop-button" (click)="onClickDonateCTAButton()">
               <img [src]="getStaticImageUrl('/icons/white-heart-icon.svg')" alt="A white heart icon">
               <span> {{ 'I18N_ABOUT_PAGE_CTA_DONATE' | translate }} </span>
             </button>
@@ -400,19 +404,19 @@
               {{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER' | translate }}
             </span>
           </ng-template>
-          <div class="oppia-about-cta-volunteer">
+          <div class="oppia-about-cta-volunteer e2e-test-about-page-volunteer-carousel-desktop">
             <p class="oppia-about-cta-subtext center-aligned-text">
               {{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_SUBTEXT' | translate }}
             </p>
             <div class="oppia-cta-carousel-container">
-              <button class="oppia-cta-carousel-control-prev-btn"
+              <button class="oppia-cta-carousel-control-prev-btn e2e-test-about-page-volunteer-carousel-prev-button-desktop"
                       (click)="moveCarouselToPreviousSlide()">
                 <i class="oppia-cta-carousel-control-prev-icon fas"
                    [ngClass]="{'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL()}">
                 </i>
                 <span class="sr-only">Previous</span>
               </button>
-              <ngb-carousel #volunteerCarousel *ngIf="volunteerRolesIndices[screenType].length > 1" [interval]="0" [showNavigationArrows]="false">
+              <ngb-carousel #volunteerCarousel *ngIf="volunteerRolesIndices[screenType].length > 1" [interval]="0" [showNavigationArrows]="false" [animation]="false">
                 <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
                   <div class="oppia-about-cta-volunteer-roles">
                     <div class="oppia-about-cta-role-card" *ngFor="let roleIndex of activeIndices">
@@ -422,7 +426,7 @@
                           <source type="image/png" [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')">
                           <img [src]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')" alt="{{ (volunteerRolesDetails[roleIndex].title | translate)  + ' icon' }}" >
                         </picture>
-                        <p class="oppia-about-cta-title-small oppia-about-cta-role-card-title">
+                        <p class="oppia-about-cta-title-small oppia-about-cta-role-card-title e2e-test-about-page-volunteer-carousel-slide-heading-desktop">
                           {{volunteerRolesDetails[roleIndex].title | translate}}
                         </p>
                       </div>
@@ -438,7 +442,7 @@
                   </div>
                 </ng-template>
               </ngb-carousel>
-              <button class="oppia-cta-carousel-control-next-btn"
+              <button class="oppia-cta-carousel-control-next-btn e2e-test-about-page-volunteer-carousel-next-button-desktop"
                       (click)="moveCarouselToNextSlide()">
                 <i class="oppia-cta-carousel-control-next-icon fas"
                    [ngClass]="{'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL()}">
@@ -449,11 +453,13 @@
             <div class="oppia-about-cta-volunteer-buttons-container">
               <oppia-primary-button
                 [buttonHref]="volunteerFormLink"
+                (onClickPrimaryButton)="onClickVolunteerCTAButton()"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-desktop-volunteer-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_BUTTON_TEXT' | translate }}">
               </oppia-primary-button>
               <oppia-primary-button
                 buttonHref="/volunteer"
+                (onClickPrimaryButton)="onClickVolunteerLearnMoreButton()"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-volunteer-learn-more-desktop-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
               </oppia-primary-button>
@@ -490,6 +496,7 @@
                 </div>
                 <oppia-primary-button
                   [buttonHref]="partnershipsFormLink"
+                  (onClickPrimaryButton)="onClickPartnerCTAButton()"
                   [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-desktop-partner-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_CTA_PARTNER_BUTTON_TEXT' | translate }}">
                 </oppia-primary-button>
@@ -513,6 +520,7 @@
                 </div>
                 <oppia-primary-button
                   buttonHref="/partnerships"
+                  (onClickPrimaryButton)="onClickPartnerLearnMoreButton()"
                   [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-partner-learn-more-desktop-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
                 </oppia-primary-button>
@@ -523,7 +531,7 @@
       </mat-tab-group>
     </div>
 
-    <ngb-accordion #acc="ngbAccordion" class="oppia-mobile-portrait-content oppia-cta-accordion" [closeOthers]="true" [animation]="false" activeIds="ngb-panel-1">
+    <ngb-accordion #acc="ngbAccordion" class="oppia-cta-accordion" [closeOthers]="true" [animation]="false" activeIds="ngb-panel-1">
       <ngb-panel>
         <ng-template ngbPanelHeader let-opened="opened">
           <button ngbPanelToggle class="btn oppia-cta-accordion-toggle-btn">
@@ -578,7 +586,7 @@
                 </p>
               </div>
             </div>
-            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext e2e-test-donate-mobile-button" (click)="openDonationBoxModal()">
+            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext e2e-test-donate-mobile-button" (click)="onClickDonateCTAButton()">
               <img [src]="getStaticImageUrl('/icons/white-heart-icon.svg')" alt="A white heart icon">
               <span> {{ 'I18N_ABOUT_PAGE_CTA_DONATE' | translate }} </span>
             </button>
@@ -597,12 +605,12 @@
           </button>
         </ng-template>
         <ng-template ngbPanelContent>
-          <div class="oppia-about-cta-volunteer">
+          <div class="oppia-about-cta-volunteer e2e-test-about-page-volunteer-carousel-mobile">
             <p class="oppia-about-cta-subtext center-aligned-text">
               {{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_SUBTEXT' | translate }}
             </p>
             <div class="oppia-cta-carousel-container">
-              <button class="oppia-cta-carousel-control-prev-btn"
+              <button class="oppia-cta-carousel-control-prev-btn e2e-test-about-page-volunteer-carousel-prev-button-mobile"
                       (click)="moveCarouselToPreviousSlide()">
                 <i class="oppia-cta-carousel-control-prev-icon fas"
                    [ngClass]="{'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL()}">
@@ -610,7 +618,7 @@
                 <span class="sr-only">Previous</span>
               </button>
 
-              <ngb-carousel #volunteerCarouselMobile *ngIf="volunteerRolesIndices[screenType].length > 1" [interval]="0" [showNavigationArrows]="false">
+              <ngb-carousel #volunteerCarouselMobile *ngIf="volunteerRolesIndices[screenType].length > 1" [interval]="0" [showNavigationArrows]="false" [animation]="false">
                 <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
                   <div class="oppia-about-cta-volunteer-roles">
                     <div class="oppia-about-cta-role-card" *ngFor="let roleIndex of activeIndices">
@@ -620,7 +628,7 @@
                           <source type="image/png" [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')">
                           <img [src]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')" alt="{{ (volunteerRolesDetails[roleIndex].title | translate)  + ' icon' }}">
                         </picture>
-                        <p class="oppia-about-cta-title-small oppia-about-cta-role-card-title">
+                        <p class="oppia-about-cta-title-small oppia-about-cta-role-card-title e2e-test-about-page-volunteer-carousel-slide-heading-mobile">
                           {{volunteerRolesDetails[roleIndex].title | translate}}
                         </p>
                       </div>
@@ -637,7 +645,7 @@
                 </ng-template>
               </ngb-carousel>
 
-              <button class="oppia-cta-carousel-control-next-btn"
+              <button class="oppia-cta-carousel-control-next-btn e2e-test-about-page-volunteer-carousel-next-button-mobile"
                       (click)="moveCarouselToNextSlide()">
                 <i class="oppia-cta-carousel-control-next-icon fas"
                    [ngClass]="{'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL()}">
@@ -648,11 +656,13 @@
             <div class="oppia-about-cta-volunteer-buttons-container">
               <oppia-primary-button
                 [buttonHref]="volunteerFormLink"
+                (onClickPrimaryButton)="onClickVolunteerCTAButton()"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-mobile-volunteer-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_BUTTON_TEXT' | translate }}">
               </oppia-primary-button>
               <oppia-primary-button
                 buttonHref="/volunteer"
+                (onClickPrimaryButton)="onClickVolunteerLearnMoreButton()"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-volunteer-learn-more-mobile-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
               </oppia-primary-button>
@@ -696,6 +706,7 @@
                 </div>
                 <oppia-primary-button
                   [buttonHref]="partnershipsFormLink"
+                  (onClickPrimaryButton)="onClickPartnerCTAButton()"
                   [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-mobile-partner-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_CTA_PARTNER_BUTTON_TEXT' | translate }}">
                 </oppia-primary-button>
@@ -719,6 +730,7 @@
                 </div>
                 <oppia-primary-button
                   buttonHref="/partnerships"
+                  (onClickPrimaryButton)="onClickPartnerLearnMoreButton()"
                   [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-partner-learn-more-mobile-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
                 </oppia-primary-button>

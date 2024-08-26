@@ -363,6 +363,11 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   max-width: 1216px;
 }
 
+.oppia-learner-dash-content {
+  display: flex;
+  gap: 0 16px;
+}
+
 @media screen and (max-width: 767px) {
   .oppia-learner-dash-container {
     padding: 0;
@@ -453,4 +458,9 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   .oppia-learner-dash-sidebar_position {
     max-height: 100%;
   }
+
+  .oppia-learner-dash-tab {
+    width: 1216px;
+  }
+
 }

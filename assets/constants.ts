@@ -26,10 +26,6 @@ export default {
   // Acceptable URL schemes for links.
   "ACCEPTABLE_SCHEMES": ["https", ""],
 
-  // The default classroom URL fragment to use when the provided classroom URL
-  // fragment in the controller is invalid.
-  "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
-
   "FEATURED_TRANSLATION_LANGUAGES": [
     {
       "language_code": "pt",
@@ -6287,6 +6283,7 @@ export default {
       "html": "",
       "content_id": "content"
     },
+    "inapplicable_skill_misconception_ids": null,
     "interaction": {
       "id": null,
       "customization_args": {},
@@ -6532,7 +6529,7 @@ export default {
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
   // up to 4 bytes long.
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
-  "MAX_REVIEW_MESSAGE_LENGTH": 10000,
+  "MAX_REVIEW_MESSAGE_LENGTH": 2000,
 
   "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
     {
@@ -7247,24 +7244,6 @@ export default {
     "CLASSROOMS": {
       "ROUTE": "learn",
       "TITLE": "Oppia Classrooms",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
-    },
-    "BLOG_DASHBOARD": {
-      "ROUTE": "blog-dashboard",
-      "TITLE": "Blog Dashboard - Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",

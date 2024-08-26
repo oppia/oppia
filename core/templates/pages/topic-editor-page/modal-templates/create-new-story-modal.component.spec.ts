@@ -94,6 +94,24 @@ describe('Create New Story Modal Component', () => {
     expect(component.storyUrlFragmentExists).toBeTrue();
   });
 
+  it('should not update story url with wrong framgent', () => {
+    component.story.urlFragment = 'not empty';
+    spyOn(
+      storyEditorStateService,
+      'updateExistenceOfStoryUrlFragment'
+    ).and.callFake((urlFragment, successCallback, errorCallback) => {
+      errorCallback();
+    });
+    spyOn(storyEditorStateService, 'getStoryWithUrlFragmentExists');
+    component.onStoryUrlFragmentChange();
+    expect(
+      storyEditorStateService.updateExistenceOfStoryUrlFragment
+    ).toHaveBeenCalled();
+    expect(
+      storyEditorStateService.getStoryWithUrlFragmentExists
+    ).not.toHaveBeenCalled();
+  });
+
   it('should not update story url fragment existence for empty url fragment', () => {
     spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
     component.story.urlFragment = '';

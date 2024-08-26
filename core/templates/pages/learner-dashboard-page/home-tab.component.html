@@ -26,7 +26,7 @@
             <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
                  class="story-summary-tile">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-                [topicName]="topicSummaryTile.name">
+                [topicName]="topicSummaryTile.name" (click)="registerClassroomInProgressLessonEvent(topicSummaryTile.classroom, topicSummaryTile.name)">
               </oppia-learner-story-summary-tile>
             </div>
           </div>
@@ -44,7 +44,7 @@
           <div class="topic-summary-tile-scroll">
             <div class="topic-summary-tile-section d-flex"
               [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile">
+              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile" (click)="registerNewClassroomLessonEvent(item.key, topicSummaryTile.name)">
                 <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
                 </oppia-learner-topic-summary-tile>
               </div>
@@ -109,8 +109,8 @@
         <!--TODO(#18384): Replace with recommended lessons data (placeholder with explorations); affects numCards and ng-content-->
         <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
         <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
-          <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
-            <lesson-card [story]="lesson" [lastCard]="last"></lesson-card>
+          <ng-container *ngFor="let lesson of incompleteExplorationsList">
+            <lesson-card [story]="lesson"></lesson-card>
           </ng-container>
         </oppia-card-display>
       </div>
@@ -121,8 +121,8 @@
       <!--TODO(#18384): Replace with classroom topic data, only untracked topics at the moment; affects heading-->
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
         <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION'" [numCards]="item.value.length" [tabType]="'homeFull'" [cardWidth]="226">
-          <ng-container *ngFor="let topicSummaryTile of item.value; last as last">
-            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [lastCard]="last">
+          <ng-container *ngFor="let topicSummaryTile of item.value">
+            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
             </oppia-learner-topic-summary-tile>
           </ng-container>
         </oppia-card-display>
@@ -134,8 +134,8 @@
       </ng-container>
        <!--TODO(#18384): Replace with saved lessons data (placeholder with explorations); affects numCards and ng-content-->
       <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [tabType]="'homeFull'" [numCards]="incompleteExplorationsList.length">
-        <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
-          <lesson-card [story]="lesson" [lastCard]="last"></lesson-card>
+        <ng-container *ngFor="let lesson of incompleteExplorationsList">
+          <lesson-card [story]="lesson"></lesson-card>
         </ng-container>
       </oppia-card-display>
     </div>

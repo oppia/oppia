@@ -387,18 +387,6 @@ describe('URL Interpolation Service', () => {
       '/build/assets/audio/hash_test.' + hashes['/audio/hash_test.mp3'] + '.mp3'
     );
 
-    expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
-      '/build/assets/videos/test.mp4'
-    );
-    expect(uis.getStaticVideoUrl('/test_url/test.mp4')).toBe(
-      '/build/assets/videos/test_url/test.mp4'
-    );
-    expect(uis.getStaticVideoUrl('/hash_test.mp4')).toBe(
-      '/build/assets/videos/hash_test.' +
-        hashes['/videos/hash_test.mp4'] +
-        '.mp4'
-    );
-
     expect(uis.getInteractionThumbnailImageUrl('interTest')).toBe(
       '/build/extensions/interactions/interTest/static/interTest.' +
         hashes['/interactions/interTest/static/interTest.png'] +
@@ -413,18 +401,6 @@ describe('URL Interpolation Service', () => {
       '/build/assets/assets_test/hash_test.' +
         hashes['/assets_test/hash_test.json'] +
         '.json'
-    );
-
-    expect(uis.getFullStaticAssetUrl('/assets/msapplication-large.png')).toBe(
-      'http://sample.com/build/assets/msapplication-large.png'
-    );
-    expect(
-      uis.getFullStaticAssetUrl('/assets/images/msapplication-large.png')
-    ).toBe('http://sample.com/build/assets/images/msapplication-large.png');
-    expect(
-      uis.getFullStaticAssetUrl('/assets/images/path/msapplication-large.png')
-    ).toBe(
-      'http://sample.com/build/assets/images/path/msapplication-large.png'
     );
 
     expect(uis.getExtensionResourceUrl('/test.html')).toBe(
@@ -446,10 +422,6 @@ describe('URL Interpolation Service', () => {
     );
 
     expect(uis.getStaticAudioUrl.bind(uis, '')).toThrowError(
-      'Empty path passed in method.'
-    );
-
-    expect(uis.getStaticVideoUrl.bind(uis, '')).toThrowError(
       'Empty path passed in method.'
     );
 
@@ -479,13 +451,6 @@ describe('URL Interpolation Service', () => {
     );
     expect(uis.getStaticAudioUrl.bind(uis, 'test_url/fail.mp3')).toThrowError(
       "Path must start with '/': '" + 'test_url/fail.mp3' + "'."
-    );
-
-    expect(uis.getStaticVideoUrl.bind(uis, 'test_fail.png')).toThrowError(
-      "Path must start with '/': '" + 'test_fail.png' + "'."
-    );
-    expect(uis.getStaticVideoUrl.bind(uis, 'test_url/fail.png')).toThrowError(
-      "Path must start with '/': '" + 'test_url/fail.png' + "'."
     );
 
     expect(uis.getStaticAssetUrl.bind(uis, 'test_fail.html')).toThrowError(

@@ -53,7 +53,7 @@ export class WelcomeTranslationModalComponent
       this.explorationId
     );
     this.translationWelcomeImgUrl =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/general/editor_welcome.svg'
       );
     this.welcomeHeading?.nativeElement.focus();

@@ -39,12 +39,14 @@ export class StoriesListComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() canonicalStorySummaries!: StorySummary[];
   @Input() classroomUrlFragment!: string;
+  @Input() classroomName!: string | null;
   @Input() topicUrlFragment!: string;
   @Input() topicName!: string;
   @Input() topicDescription!: string;
   @Input() topicId!: string;
   topicNameTranslationKey!: string;
   topicDescTranslationKey!: string;
+  classroomNameTranslationKey!: string;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -62,6 +64,13 @@ export class StoriesListComponent implements OnInit {
         this.topicId,
         TranslationKeyType.DESCRIPTION
       );
+
+    if (this.classroomName) {
+      this.classroomNameTranslationKey =
+        this.i18nLanguageCodeService.getClassroomTranslationKeys(
+          this.classroomName
+        ).name;
+    }
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {
@@ -80,8 +89,21 @@ export class StoriesListComponent implements OnInit {
     );
   }
 
+  isHackyClassroomNameTranslationDisplayed(): boolean {
+    if (!this.classroomName) {
+      return false;
+    }
+    return this.i18nLanguageCodeService.isClassroomnNameTranslationAvailable(
+      this.classroomName
+    );
+  }
+
   checkTabletView(): boolean {
     return this.windowDimensionsService.getWidth() < 768;
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 angular

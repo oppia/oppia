@@ -24,7 +24,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Topic Manager User Journey', function () {
+describe('Topic Manager', function () {
   let topicManager: TopicManager;
   let curriculumAdmin: CurriculumAdmin;
 
@@ -52,7 +52,7 @@ describe('Topic Manager User Journey', function () {
     'should be able to assign and unassign a skill to a topic and merge skills',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.navigateToSkillTab();
+      await topicManager.navigateToSkillsTab();
 
       // The skill is unassigned first because it was previously assigned during the setup phase in the beforeAll block.
       await topicManager.unassignSkillFromTopic('Addition', 'Mathematics');

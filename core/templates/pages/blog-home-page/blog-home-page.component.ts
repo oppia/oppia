@@ -86,9 +86,10 @@ export class BlogHomePageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.oppiaAvatarImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg'
-    );
+    this.oppiaAvatarImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
     this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE =
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
     this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH =
@@ -131,8 +132,8 @@ export class BlogHomePageComponent implements OnInit {
     );
   }
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticAssetUrl(imagePath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
   }
 
   loadSearchResultsPageData(data: SearchResponseData): void {

@@ -60,7 +60,7 @@ describe('Exploration Editor', function () {
       'Enter a negative number greater than -100.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-    await explorationEditor.addResponseToTheInteraction(
+    await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-99',
       'Prefect!',

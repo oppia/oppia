@@ -2448,6 +2448,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2478,6 +2479,7 @@ states:
     content:
       content_id: content_2
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4225,6 +4227,7 @@ version: 1
         assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
+        state.inapplicable_skill_misconception_ids = []
         return state
 
     def save_new_valid_classroom(
@@ -4294,7 +4297,8 @@ version: 1
                 banner_data
                 if banner_data is not None
                 else dummy_banner_data
-            )
+            ),
+            index=0
         )
 
         classroom_config_services.create_new_classroom(classroom)
