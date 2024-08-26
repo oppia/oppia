@@ -256,6 +256,25 @@
             </span>
           </div>
         </div>
+
+        <div class="form-group row">
+          <label class="col-lg-4 col-md-4 col-sm-4"
+                 tabindex="0"
+                 [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_ACCENT' | translate) + ('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_ACCENT_EXPLAIN' | translate)">
+            {{ "I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_ACCENT" | translate }}
+          </label>
+          <div class="col-lg-8 col-md-8 col-sm-8">
+            <div *ngIf="hasPageLoaded">
+              <oppia-preferred-language-selector formControlName="preferredAudioLanguageCode"
+                                                 [choices]="AUDIO_LANGUAGE_CHOICES"
+                                                 entity="{{ 'I18N_PREFERENCES_AUDIO_LANGUAGE_ACCENT_LABEL' | translate }}">
+              </oppia-preferred-language-selector>
+            </div>
+            <span class="form-text oppia-form-text">
+              {{ 'I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_ACCENT_EXPLAIN' | translate }}
+            </span>
+          </div>
+        </div>
         <hr>
         <div role="form" class="form-group row">
           <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
