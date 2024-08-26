@@ -34,6 +34,7 @@
 	"I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM": "Команда разработчиков Oppia также благодарна <[listOfNames]> за отзывы, идеи, помощь и предложения.",
 	"I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI": "Мы также хотели бы поблагодарить <a href=\"https://translatewiki.net/wiki/Translating:Oppia\">translatewiki.net</a> за предоставленные краудсорсинговых переводов.",
 	"I18N_ABOUT_PAGE_CTA_PARTNER_OUR_PARTNERS": "Наши партнеры",
+	"I18N_ABOUT_PAGE_CTA_SOFTWARE_TITLE": "Программное обеспечение",
 	"I18N_ABOUT_PAGE_CTA_TRANSLATION_TITLE": "Перевод",
 	"I18N_ABOUT_PAGE_EXPLORE_LESSONS": "Изучите уроки, сделанные сообществом",
 	"I18N_ABOUT_PAGE_FEATURES": "Особенности",
@@ -413,6 +414,7 @@
 	"I18N_TEACH_PAGE_LESSON_CREATOR_4_COUNTRY": "США",
 	"I18N_TEACH_PAGE_LESSON_CREATOR_5_COUNTRY": "Нигерия",
 	"I18N_TEACH_PAGE_LESSON_CREATOR_6_COUNTRY": "Нигерия",
+	"I18N_TEACH_PAGE_OUTCOMES_SECTION_LEGEND": "Легенда",
 	"I18N_TEACH_PAGE_TESTIMONIAL_ROLE_PARENT": "Родитель",
 	"I18N_TIME_FOR_BREAK_FOOTER": "Я готов_а продолжить урок",
 	"I18N_TIME_FOR_BREAK_TITLE": "Самое время для перерыва?",
@@ -460,6 +462,8 @@
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Отписаться",
 	"I18N_VOLUNTEER_PAGE_SECTION_ONE_HEADING_1": "Волонтер",
 	"I18N_VOLUNTEER_PAGE_TITLE": "Волонтёр | Oppia",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "Программное обеспечение",
 	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION": "Перевод",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_EXPECTATIONS_HEADING": "Ожидания волонтеров-переводчиков",
 	"I18N_YES": "Да"
 }

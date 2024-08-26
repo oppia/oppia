@@ -41,7 +41,7 @@
 	"I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM": "ओपिया डेवलपमेंट टीम, फीडबैक, विचार, सहायता और सुझावों के लिए भी आभारी है, <[listOfNames]> की।",
 	"I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI": "हम भीड़-भाल अनुवादों को प्रदान करने के लिए <a href=\"https://translatewiki.net/wiki/Translating:Oppia\">translatewiki.net</a> का शुक्रिया अदा करना चाहेंगे।",
 	"I18N_ABOUT_PAGE_CTA_DONATE": "दान करें",
-	"I18N_ABOUT_PAGE_CTA_GROWTH_TITLE": "विकास",
+	"I18N_ABOUT_PAGE_CTA_OUTREACH_TITLE": "विकास",
 	"I18N_ABOUT_PAGE_CTA_PARTNER": "भागीदार",
 	"I18N_ABOUT_PAGE_CTA_TRANSLATION_TITLE": "अनुवाद",
 	"I18N_ABOUT_PAGE_CTA_VOLUNTEER": "स्वयंसेवक",
@@ -82,6 +82,7 @@
 	"I18N_ACTION_EXPLORE_LESSONS": "पाठों का अन्वेषण करें",
 	"I18N_ACTION_GUIDE_FOR_TEACHERS": "शिक्षकों के लिए मार्गदर्शक निर्देश",
 	"I18N_ACTION_TIPS_FOR_PARENTS": "माता-पिता और अभिभावकों के लिए सुझाव",
+	"I18N_ACTION_VIEW_LESSONS": "पाठ देखें",
 	"I18N_ACTION_VISIT_CLASSROOM": "कक्षा में जाएँ",
 	"I18N_ADD_NEW_SYLLABUS_CANCEL_BUTTON_TEXT": "रद्द करें",
 	"I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT": "पूर्ण हुआ।",
@@ -906,7 +907,7 @@
 	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "विषय और कौशल डैशबोर्ड",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "आपके पास <[totalSubscribers]> ग्राहकों है।",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "सदस्यता समाप्त",
-	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH": "विकास",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH": "विकास",
 	"I18N_WORKED_EXAMPLE": "हल किया गया उदाहरण",
 	"I18N_YES": "हाँ"
 }

@@ -62,8 +62,8 @@
 	"I18N_ACTION_BROWSE_LESSONS": "Esplora le nostre lezioni",
 	"I18N_ACTION_CREATE_EXPLORATION": "Crea un'esplorazione",
 	"I18N_ACTION_CREATE_LESSON": "Crea la tua lezione",
-	"I18N_ACTION_DOWNLOAD_ANDRIOD_APP": "Scarica l'applicazione per Android",
 	"I18N_ACTION_EXPLORE_LESSONS": "Esplora le lezioni",
+	"I18N_ACTION_GET_ANDRIOD_APP": "Ottieni l'applicazione per Android",
 	"I18N_ADD_NEW_SYLLABUS_CANCEL_BUTTON_TEXT": "Annulla",
 	"I18N_ANDROID_PAGE_AVAILABLE_FOR_DOWNLOAD_TEXT": "Inizia oggi a imparare gratuitamente su Android",
 	"I18N_ANDROID_PAGE_EMAIL_FIELD_LABEL": "Indirizzo email",
@@ -482,8 +482,8 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Accedi con Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Insegna con Oppia",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Annulla iscrizione",
-	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE": "La missione di Oppia è creare una piattaforma di apprendimento efficace e facile da usare per consentire agli studenti di tutto il mondo di accedere all'istruzione. La nostra piattaforma di apprendimento è costruita e mantenuta da sviluppatori volontari che condividono la nostra missione di rendere l'istruzione accessibile a studenti di ogni provenienza.",
-	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_SUB_HEADING_2": "Sviluppare la nostra strategia di marketing",
 	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE": "Le nostre lezioni sono create da educatori e studenti volontari che condividono la nostra missione di equità educativa. Il team di creazione delle lezioni di Oppia produce lezioni efficaci e piacevoli che gli studenti di tutto il mondo possono utilizzare gratuitamente e completare secondo i propri ritmi.",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_SUB_HEADING_2": "Sviluppare la nostra strategia di marketing",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_WHAT_WE": "La missione di Oppia è creare una piattaforma di apprendimento efficace e facile da usare per consentire agli studenti di tutto il mondo di accedere all'istruzione. La nostra piattaforma di apprendimento è costruita e mantenuta da sviluppatori volontari che condividono la nostra missione di rendere l'istruzione accessibile a studenti di ogni provenienza.",
 	"I18N_WARNING_MODAL_TITLE": "Attenzione!"
 }

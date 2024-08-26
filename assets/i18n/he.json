@@ -10,6 +10,7 @@
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "פרסום ושיתוף",
 	"I18N_ABOUT_PAGE_BREADCRUMB": "אודות",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "תודות",
+	"I18N_ABOUT_PAGE_CTA_SOFTWARE_TITLE": "תוכנה",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON": "לתרום",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON": "להשתתף במיזם",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_HEADING": "קרן Oppia",
@@ -309,6 +310,8 @@
 	"I18N_SPLASH_VOLUNTEERS_TITLE": "מופעל על ידי הקהילה",
 	"I18N_START_HERE": "נא להקיש כאן כדי להתחיל!",
 	"I18N_STORY_VIEWER_COMPLETED_CHAPTER": "<[title]> - הושלם!",
+	"I18N_TEACH_PAGE_OUTCOMES_SECTION_LEGEND": "מקרא",
+	"I18N_TEACH_STUDENT_DETAILS_2": "ולאא עוואד, פלסטין",
 	"I18N_TIME_FOR_BREAK_BODY_1": "נראה ששליחת התשובות התבצעה די מהר. התעייפת?",
 	"I18N_TIME_FOR_BREAK_BODY_2": "אם כך, שקול לקחת הפסקה! ניתן לחזור מאוחר יותר.",
 	"I18N_TIME_FOR_BREAK_FOOTER": "אפשר להמשיך בשיעור",
@@ -318,6 +321,9 @@
 	"I18N_TOPIC_VIEWER_COMING_SOON": "בקרוב!",
 	"I18N_TOPIC_VIEWER_LESSONS_UNAVAILABLE": "חזרו מאוחר יותר כשיהיו שיעורים זמינים עבור נושא זה.",
 	"I18N_TOPIC_VIEWER_QUESTIONS_UNAVAILABLE": "חזרו מאוחר יותר כשתהיינה שאלות תרגול זמינות עבור נושא זה.",
+	"I18N_TOPNAV_LIBRARY_TEXT": "ספרייה",
 	"I18N_VIEW_ALL_TOPICS": "צפה בכל נושאי ה-<[classroomName]>",
+	"I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL2": "כישורי כתיבה, מחקר והוראה",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "תוכנה",
 	"I18N_YES": "כן"
 }
