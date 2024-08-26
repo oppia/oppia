@@ -144,29 +144,48 @@ describe('Exploration Editor', function () {
     }
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createAndPublishTopic(
-      'Test Topic One',
-      'Test Subtopic One',
-      'Test Skill One'
+    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+
+    await curriculumAdmin.createSubtopicForTopic(
+      'Test Subtopic 1',
+      'test-subtopic-one',
+      'Test Topic 1'
     );
-    await curriculumAdmin.openSkillEditor('Test Skill One');
-    await curriculumAdmin.addMisconception(
-      'Addition Misconception',
-      'Some might think 2 + 3 = 23.',
-      'The correct answer is 5.'
+
+    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
+    await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
+    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
+      'Test Skill 1',
+      'Test Subtopic 1',
+      'Test Topic 1'
     );
     await curriculumAdmin.addSkillToDiagnosticTest(
       'Test Skill 1',
       'Test Topic 1'
     );
 
+    await curriculumAdmin.publishDraftTopic('Test Topic 1');
     await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Test Story One',
+      'Test Story 1',
       'test-story-one',
       'Test Chapter 1',
       explorationId,
-      'Test Topic One'
+      'Test Topic 1'
     );
+
+    await curriculumAdmin.openSkillEditor('Test Skill 1');
+    await curriculumAdmin.addMisconception(
+      'Addition Misconception',
+      'Some might think 2 + 3 = 23.',
+      'The correct answer is 5.'
+    );
+    await curriculumAdmin.addMisconception(
+      'Subtraction Misconception',
+      'Some might think 11 - 1 = 1.',
+      'The correct answer is 10.',
+      true
+    );
+    await curriculumAdmin.publishUpdatedSkill('Update');
     // We set an increased custom timeout since the setup takes too long unlike other specs.
   }, 400000);
 
@@ -180,7 +199,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToCard(
         CARD_NAME.MULTIPLE_CHOICE_QUESTION
       );
-      await explorationEditor.addSkillToState('Test Skill One');
+      await explorationEditor.addSkillToState('Test Skill 1');
       await explorationEditor.verifyMisconceptionPresentForState(
         'Addition Misconception',
         true
