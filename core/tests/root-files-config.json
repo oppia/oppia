@@ -10,6 +10,8 @@
     ".github/SECURITY.md",
     ".github/ISSUE_TEMPLATE/4_server_error_template.md",
     ".github/workflows/README.md",
+    "core/tests/test-modules-mappings/README.md",
+    "core/tests/README.md",
     "assets/README.md",
     "core/templates/domain/exploration/ExplorationMetadataObjectFactorySpec.ts",
     "core/templates/domain/exploration/ExplorationObjectFactorySpec.ts",
