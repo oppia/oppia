@@ -762,9 +762,13 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
     def test_cannot_access_topic_editor_page_with_invalid_topic_id(
         self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        invalid_topic_id = 'p3MBT4ndlCTX'
+
         self.get_html_response(
-            '%s/can_access_topic_editor/invalid' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX),
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                invalid_topic_id),
                 expected_status_int=404)
         self.logout()
 
