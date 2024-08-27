@@ -4,7 +4,7 @@
   </ng-container>
   <ng-template #content>
     <div class="classroom-navigation-links-content">
-      <span>No classrooms available. To create classrooms, visit the <a href="/classroom-admin">classroom admin</a> page.</span>
+      <span *ngIf="classroomSummaries.length === 0">No classrooms available. To create classrooms, visit the <a href="/classroom-admin">classroom admin</a> page.</span>
       <div class="multiple-classroom-nav-links" *ngIf="classroomSummaries.length > 0">
         <div class="multiple-classrooms-intro">
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
