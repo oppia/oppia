@@ -218,49 +218,20 @@
   }
 }
 
-.oppia-learner-dash-greeting {
-  color: #00645c;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 32px;
-}
-
-.oppia-learner-dash-section {
+.oppia-learner-dash-button-lg--classroom {
   background-color: #fff;
-  border-radius: .25em;
-  margin-bottom: 16px;
-  padding: 16px;
-}
-
-.oppia-learner-dash-section-heading {
+  border-color: #205d86;
   color: #205d86;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 24px;
 }
 
-.oppia-learner-dash-section-subheading {
-  color: #333;
-  font-size: 20px;
-  font-weight: 500;
-  margin-bottom: 0;
-}
-
-.oppia-learner-dash-home-classes {
-  -webkit-appearance: none;
-}
-
-.oppia-learner-dash-home-button {
-  background-color: #fff;
-  border: 2px solid #205d86;
-  border-radius: .25em;
-  color: #205d86;
-  font-weight: 700;
-  padding: 10px 0;
-  text-decoration: none;
-  width: 344px;
-}
-
-.oppia-learner-dash-home-button:hover {
+.oppia-learner-dash-button-lg--classroom:hover {
   background-color: #cadbda;
+  border-color: #205d86;
   color: #205d86;
-  text-decoration: none;
+}
+
+.oppia-learner-dash-button-lg--classroom:focus {
+  background-color: #429488;
+  border-color: #205d86;
+  color: #fff;
 }
