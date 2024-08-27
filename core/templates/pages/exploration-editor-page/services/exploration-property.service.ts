@@ -155,6 +155,13 @@ export class ExplorationPropertyService {
     this._explorationPropertyChangedEventEmitter.emit();
   }
 
+  saveDisplayedValueAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.saveDisplayedValue();
+      resolve();
+    });
+  }
+
   // Reverts the displayed value to the saved memento.
   restoreFromMemento(): void {
     this.displayed = cloneDeep(this.savedMemento);
