@@ -193,12 +193,13 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 )
 
     if parsed_args.run_on_changed_files_in_branch:
-        remote = git_changes_utils.get_local_git_repository_remote_name()
+        remote = git_changes_utils.get_upstream_git_repository_remote_name()
         if not remote:
             sys.exit('Error: No remote repository found.')
         refs = git_changes_utils.get_refs()
         collected_files = git_changes_utils.get_changed_files(
-            refs, remote.decode('utf-8'))
+            refs, remote.decode('utf-8'),
+            git_changes_utils.get_parent_branch_name_for_diff())
         for _, (_, acmrt_files) in collected_files.items():
             if not acmrt_files:
                 continue

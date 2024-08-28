@@ -30,7 +30,7 @@ GitRef = collections.namedtuple(
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 
-def get_upstream_git_remote_name() -> Optional[bytes]:
+def get_upstream_git_repository_remote_name() -> Optional[bytes]:
     """Get the remote name of the upstream repository.
 
     Returns:
@@ -411,12 +411,12 @@ def get_changed_python_test_files() -> Set[str]:
         SystemExit. No remote repository found.
     """
     python_test_files: Set[str] = set()
-    remote = get_local_git_repository_remote_name()
+    remote = get_upstream_git_repository_remote_name()
     if not remote:
         sys.exit('Error: No remote repository found.')
     refs = get_refs()
     collected_files = get_changed_files(
-        refs, remote.decode('utf-8'))
+        refs, remote.decode('utf-8'), get_parent_branch_name_for_diff())
     for _, (_, acmrt_files) in collected_files.items():
         if not acmrt_files:
             continue

@@ -47,7 +47,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             git_changes_utils, 'get_js_or_ts_files_from_diff',
             mock_get_js_or_ts_files_from_diff)
 
-    def test_get_remote_name_without_errors(self) -> None:
+    def test_get_local_remote_name_without_errors(self) -> None:
         process_for_remote = subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -75,9 +75,6 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             expected_args=[
                 (['git', 'remote'],),
                 ([b'git', b'config', b'--get', b'remote.origin.url'],),
-                ([b'git', b'config', b'--get', b'remote.upstream.url'],),
-                (['git', 'remote'],),
-                ([b'git', b'config', b'--get', b'remote.origin.url'],),
                 ([b'git', b'config', b'--get', b'remote.upstream.url'],)
             ])
         with popen_swap:
@@ -85,12 +82,44 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 git_changes_utils.get_local_git_repository_remote_name(),
                 b'origin'
             )
+
+    def test_get_upstream_remote_name_without_errors(self) -> None:
+        process_for_remote = subprocess.Popen(
+            [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        process_for_upstream_url = subprocess.Popen(
+            [b'echo', b'https://github.com/oppia/oppia.git'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        process_for_origin_url = subprocess.Popen(
+            [b'echo', b'https://github.com/testuser/oppia.git'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        def mock_popen(
+            cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            if b'remote.origin.url' in cmd_tokens:
+                return process_for_origin_url
+            elif b'remote.upstream.url' in cmd_tokens:
+                return process_for_upstream_url
+            else:
+                return process_for_remote
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[
+                (['git', 'remote'],),
+                ([b'git', b'config', b'--get', b'remote.origin.url'],),
+                ([b'git', b'config', b'--get', b'remote.upstream.url'],)
+            ])
+        with popen_swap:
             self.assertEqual(
-                git_changes_utils.get_upstream_git_remote_name(),
+                git_changes_utils.get_upstream_git_repository_remote_name(),
                 b'upstream'
             )
 
-    def test_get_remote_name_with_error_in_obtaining_remote(self) -> None:
+    def test_get_local_remote_name_with_error_in_obtaining_remote(self) -> None:
         def mock_communicate() -> Tuple[bytes, bytes]:
             return (b'test', b'test_oppia_error')
         process = subprocess.Popen(
@@ -108,6 +137,28 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         with popen_swap, communicate_swap:
             with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                 git_changes_utils.get_local_git_repository_remote_name()
+
+    def test_get_upstream_remote_name_with_error_in_obtaining_remote(
+        self
+    ) -> None:
+        def mock_communicate() -> Tuple[bytes, bytes]:
+            return (b'test', b'test_oppia_error')
+        process = subprocess.Popen(
+            [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        communicate_swap = self.swap(
+            process, 'communicate', mock_communicate)
+
+        def mock_popen(
+            cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            return process
+
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[(['git', 'remote'],)])
+        with popen_swap, communicate_swap:
+            with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
+                git_changes_utils.get_upstream_git_repository_remote_name()
 
     def test_get_remote_name_with_error_in_obtaining_remote_url(self) -> None:
         def mock_communicate() -> Tuple[str, str]:
@@ -168,7 +219,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             '2b. If \'upstream\' is not listed in the command output, then run '
             'the command \'git remote add upstream '
             'https://github.com/oppia/oppia.git\'\n'):
-            git_changes_utils.get_upstream_git_remote_name()
+            git_changes_utils.get_upstream_git_repository_remote_name()
 
     def test_get_upstream_remote_name_with_multiple_remotes_set(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -203,7 +254,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         )
         with popen_swap, self.print_swap:
             self.assertIsNone(
-                git_changes_utils.get_upstream_git_remote_name())
+                git_changes_utils.get_upstream_git_repository_remote_name())
         self.assertTrue(
             'Warning: Please keep only one remote branch for oppia:develop.\n'
             'To do that follow these steps:\n'
@@ -721,7 +772,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
         def mock_get_changed_files(
             unused_refs: List[git_changes_utils.GitRef],
-            unused_remote_name: str
+            unused_remote_name: str,
+            unused_remote_branch: str
         ) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
             return {
                 'branch1': (
@@ -770,13 +822,13 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             return set()
 
         get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_local_git_repository_remote_name',
+            git_changes_utils, 'get_upstream_git_repository_remote_name',
             mock_get_remote_name)
         get_refs_swap = self.swap(
             git_changes_utils, 'get_refs', mock_get_refs)
         get_changed_files_swap = self.swap_with_checks(
             git_changes_utils, 'get_changed_files', mock_get_changed_files,
-            expected_args=[(git_refs, 'remote')])
+            expected_args=[(git_refs, 'remote', 'develop')])
         get_staged_acmrt_files_swap = self.swap(
             git_changes_utils, 'get_staged_acmrt_files',
             mock_get_staged_acmrt_files)
@@ -821,7 +873,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             return b''
 
         get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_local_git_repository_remote_name',
+            git_changes_utils, 'get_upstream_git_repository_remote_name',
             mock_get_remote_name)
 
         with get_remote_name_swap, self.assertRaisesRegex(

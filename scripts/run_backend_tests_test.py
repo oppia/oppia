@@ -783,7 +783,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             return b''
 
         get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_local_git_repository_remote_name',
+            git_changes_utils, 'get_upstream_git_repository_remote_name',
             mock_get_remote_name)
 
         with get_remote_name_swap, self.swap_redis_server:
