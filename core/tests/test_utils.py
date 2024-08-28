@@ -3061,6 +3061,8 @@ version: 1
             response = self.testapp.delete(
                 url, params=params, expect_errors=True
             )
+        else:
+            raise Exception('Inavlid http method %s' % http_method)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
