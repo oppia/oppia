@@ -543,10 +543,6 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerClassroomHeaderClickEvent(): void {
-    this._sendEventToGoogleAnalytics('click_on_classroom', {});
-  }
-
   registerClassroomPageViewed(): void {
     this._sendEventToGoogleAnalytics('view_classroom', {});
   }
@@ -585,8 +581,8 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerClickDownloadAndroidAppButtonEvent(): void {
-    this._sendEventToGoogleAnalytics('download_android_app_button_click', {
+  registerClickGetAndroidAppButtonEvent(): void {
+    this._sendEventToGoogleAnalytics('get_android_app_button_click', {
       page_path: this.windowRef.nativeWindow.location.pathname,
     });
   }
@@ -640,6 +636,40 @@ export class SiteAnalyticsService {
       }
     }
     this.localStorageService.setLastPageViewTime(lastPageViewTimeKey);
+  }
+
+  registerClickClassroomCardEvent(
+    srcElement: string,
+    classroomName: string
+  ): void {
+    this._sendEventToGoogleAnalytics('classroom_card_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+      source_element: srcElement,
+      classroom_name: classroomName,
+    });
+  }
+
+  registerInProgressClassroomLessonEngagedWithEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this._sendEventToGoogleAnalytics(
+      'classroom_lesson_in_progress_engaged_with',
+      {
+        classroom_name: classroomName,
+        topic_name: topicName,
+      }
+    );
+  }
+
+  registerNewClassroomLessonEngagedWithEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this._sendEventToGoogleAnalytics('new_classroom_lesson_engaged_with', {
+      classroom_name: classroomName,
+      topic_name: topicName,
+    });
   }
 }
 

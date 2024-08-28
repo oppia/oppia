@@ -49,7 +49,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
                 'topic_id_1': ['topic_id_2', 'topic_id_3'],
                 'topic_id_2': [],
                 'topic_id_3': []
-            }, True, self.dummy_thumbnail_data, self.dummy_banner_data
+            }, True, self.dummy_thumbnail_data, self.dummy_banner_data, 0
         )
         self.classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'classroom_id',
@@ -65,7 +65,8 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             },
             'is_published': True,
             'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
-            'banner_data': self.dummy_banner_data.to_dict()
+            'banner_data': self.dummy_banner_data.to_dict(),
+            'index': 0
         }
 
     def test_that_domain_object_is_created_correctly(self) -> None:
@@ -101,6 +102,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             self.classroom.thumbnail_data, self.dummy_thumbnail_data
         )
         self.assertEqual(self.classroom.banner_data, self.dummy_banner_data)
+        self.assertEqual(self.classroom.index, 0)
         self.classroom.validate(strict=True)
 
     def test_from_dict_method(self) -> None:
@@ -132,9 +134,14 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         self.assertTrue(classroom.is_published)
         self.assertEqual(
-            self.classroom.thumbnail_data, self.dummy_thumbnail_data
+            classroom.thumbnail_data.to_dict(),
+            self.dummy_thumbnail_data.to_dict()
         )
-        self.assertEqual(self.classroom.banner_data, self.dummy_banner_data)
+        self.assertEqual(
+            classroom.banner_data.to_dict(),
+            self.dummy_banner_data.to_dict()
+        )
+        self.assertEqual(classroom.index, 0)
 
     def test_to_dict_method(self) -> None:
         self.assertEqual(self.classroom.to_dict(), self.classroom_dict)
@@ -324,6 +331,19 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         error_msg = (
             'Expected is_published of the classroom to be a boolean, '
             'received: 1.'
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate(strict=True)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_invalid_index_should_raise_exception(self) -> None:
+        self.classroom.index = 'index' # type: ignore[assignment]
+        error_msg = (
+            'Expected index of the classroom to be a boolean, '
+            'received: index.'
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):

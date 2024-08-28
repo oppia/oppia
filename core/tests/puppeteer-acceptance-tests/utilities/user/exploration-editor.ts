@@ -60,6 +60,7 @@ const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
   'div.e2e-test-interaction-tile-MultipleChoiceInput';
 const addResponseOptionButton = 'button.e2e-test-add-list-entry';
+const addAnotherResponseButton = 'button.e2e-test-add-another-response';
 const multipleChoiceResponseDropdown =
   'mat-select.e2e-test-main-html-select-selector';
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
@@ -93,7 +94,7 @@ const uploadImageButton = '.e2e-test-upload-image';
 const useTheUploadImageButton = '.e2e-test-use-image';
 const imageRegionSelector = '.e2e-test-svg';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
-const addNewResponseButton = '.e2e-test-add-new-response';
+const addNewResponseButton = 'button.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
 const modifyExistingTranslationsButton = '.e2e-test-modify-translations-button';
 const activeTranslationTab = '.e2e-test-active-translation-tab';
@@ -114,7 +115,9 @@ const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const solutionInput = 'oppia-add-or-update-solution-modal input';
+const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
+const solutionInputTextArea =
+  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const dismissTranslationWelcomeModalSelector =
@@ -151,6 +154,8 @@ const optionalMisconceptionOptionsButton =
   '.optional-misconception-options-button';
 const misconceptionApplicableToggle =
   '.e2e-test-misconception-applicable-toggle';
+const responseGroupDiv = '.e2e-test-response-tab';
+const misconceptionEditorTab = '.e2e-test-open-misconception-editor';
 
 const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
@@ -215,7 +220,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to creator dashboard page.
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
-    await this.page.goto(creatorDashboardPage);
+    await this.goto(creatorDashboardPage);
     showMessage('Creator dashboard page is opened successfully.');
   }
 
@@ -451,6 +456,10 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOn(textInputInteractionButton);
     await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage('Text input interaction has been added successfully.');
   }
 
   /**
@@ -996,13 +1005,15 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} feedback - The feedback for the response.
    * @param {string} destination - The destination state for the response.
    * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
+   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
    */
   async addResponsesToTheInteraction(
     interactionType: string,
     answer: string,
     feedback: string,
     destination: string,
-    responseIsCorrect: boolean
+    responseIsCorrect: boolean,
+    isLastResponse: boolean = true
   ): Promise<void> {
     switch (interactionType) {
       case 'Number Input':
@@ -1053,15 +1064,28 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
-    await this.select(destinationCardSelector, '/');
-    await this.type(addStateInput, destination);
+    if (destination) {
+      await this.select(destinationCardSelector, '/');
+      await this.type(addStateInput, destination);
+    }
     if (responseIsCorrect) {
       await this.clickOn(correctAnswerInTheGroupSelector);
     }
-    await this.clickOn(addNewResponseButton);
-    await this.page.waitForSelector(responseModalHeaderSelector, {
-      hidden: true,
-    });
+    if (isLastResponse) {
+      await this.page.waitForSelector(addNewResponseButton, {
+        visible: true,
+      });
+      await this.clickOn(addNewResponseButton);
+      await this.page
+        .waitForSelector(responseModalHeaderSelector, {
+          hidden: true,
+        })
+        .catch(async () => {
+          await this.clickOn(addNewResponseButton);
+        });
+    } else {
+      await this.clickOn(addAnotherResponseButton);
+    }
   }
 
   /**
@@ -1103,14 +1127,19 @@ export class ExplorationEditor extends BaseUser {
    * Function to add a solution for a state interaction.
    * @param {string} answer - The solution of the current state card.
    * @param {string} answerExplanation - The explanation for this state card's solution.
+   * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
    */
   async addSolutionToState(
     answer: string,
-    answerExplanation: string
+    answerExplanation: string,
+    isSolutionNumericInput: boolean
   ): Promise<void> {
+    const solutionSelector = isSolutionNumericInput
+      ? solutionInputNumeric
+      : solutionInputTextArea;
     await this.clickOn(addSolutionButton);
-    await this.page.waitForSelector(solutionInput, {visible: true});
-    await this.type(solutionInput, answer);
+    await this.page.waitForSelector(solutionSelector, {visible: true});
+    await this.type(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
     await this.type(stateContentInputField, answerExplanation);
@@ -1166,6 +1195,50 @@ export class ExplorationEditor extends BaseUser {
     await this.type(skillNameInput, skillName);
     await this.clickOn(skillItem);
     await this.clickOn(confirmSkillButton);
+  }
+
+  /**
+   * Tag an answer response group with a misconception for a state card.
+   * @param responseIndex - The index of the response group to be tagged.
+   * @param misconceptionName - The name of the misconception to tag response with.
+   * @param isOptional - Whether the misconception is optional or compulsory.
+   */
+  async tagAnswerGroupWithMisconception(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    let responseTabs = await this.page.$$(responseGroupDiv);
+    await responseTabs[responseIndex].click();
+    await this.clickOn('Tag with misconception');
+    if (!isOptional) {
+      await this.clickOn(misconceptionName);
+    } else {
+      await this.clickOn(`(Optional) ${misconceptionName}`);
+    }
+    await this.clickOn('Done');
+  }
+
+  /**
+   * Replace a misconception tagged to a response group with a new one.
+   * @param responseIndex - The index of the response group to change.
+   * @param misconceptionName - The name of the new misconception to be tagged.
+   * @param isOptional - Whether the new misconception is optional or not.
+   */
+  async changeTaggedAnswerGroupMisconception(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    let responseTabs = await this.page.$$(responseGroupDiv);
+    await responseTabs[responseIndex].click();
+    await this.clickOn(misconceptionEditorTab);
+    if (!isOptional) {
+      await this.clickOn(misconceptionName);
+    } else {
+      await this.clickOn(`(Optional) ${misconceptionName}`);
+    }
+    await this.clickOn('Save Misconception');
   }
 
   /**

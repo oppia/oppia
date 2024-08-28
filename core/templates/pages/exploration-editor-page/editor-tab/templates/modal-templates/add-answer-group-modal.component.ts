@@ -52,6 +52,7 @@ import {AppConstants} from 'app.constants';
 import {EditabilityService} from 'services/editability.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface TaggedMisconception {
   skillId: string;
@@ -94,6 +95,7 @@ export class AddAnswerGroupModalComponent
   questionModeEnabled: boolean = false;
   isInvalid: boolean = false;
   validation: boolean = false;
+  tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -106,6 +108,7 @@ export class AddAnswerGroupModalComponent
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private generateContentIdService: GenerateContentIdService,
     private outcomeObjectFactory: OutcomeObjectFactory,
+    private platformFeatureService: PlatformFeatureService,
     private editabilityService: EditabilityService
   ) {
     super(ngbActiveModal);
@@ -205,6 +208,8 @@ export class AddAnswerGroupModalComponent
       '',
       []
     );
+    this.tagMisconceptionsFeatureFlagIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorCanTagMisconceptions.isEnabled;
   }
 
   updateAnswerGroupFeedback(outcome: Outcome): void {

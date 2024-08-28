@@ -78,10 +78,6 @@ describe('ClassroomNavigationLinksComponent', () => {
       'AssetsBackendApiService',
       ['getThumbnailUrlForPreview']
     );
-    const siteAnalyticsServiceSpy = jasmine.createSpyObj(
-      'SiteAnalyticsService',
-      ['registerClassroomHeaderClickEvent']
-    );
 
     await TestBed.configureTestingModule({
       imports: [HttpClientModule, HttpClientTestingModule],
@@ -94,10 +90,6 @@ describe('ClassroomNavigationLinksComponent', () => {
         {
           provide: AssetsBackendApiService,
           useValue: assetsBackendApiServiceSpy,
-        },
-        {
-          provide: SiteAnalyticsService,
-          useValue: siteAnalyticsServiceSpy,
         },
       ],
     }).compileComponents();
@@ -179,11 +171,14 @@ describe('ClassroomNavigationLinksComponent', () => {
     ).toHaveBeenCalledWith(classroomName);
   });
 
-  it('should register classroom header click event', () => {
-    component.registerClassroomHeaderClickEvent();
-
+  it('should record analytics when classroom card is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickClassroomCardEvent'
+    ).and.callThrough();
+    component.registerClassroomCardClickEvent('Math');
     expect(
-      siteAnalyticsService.registerClassroomHeaderClickEvent
+      siteAnalyticsService.registerClickClassroomCardEvent
     ).toHaveBeenCalled();
   });
 });
