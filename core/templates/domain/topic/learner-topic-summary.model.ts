@@ -38,8 +38,8 @@ export interface LearnerTopicSummaryBackendDict {
   canonical_story_summary_dict: StorySummaryBackendDict[];
   thumbnail_filename: string;
   thumbnail_bg_color: string;
-  classroomName: string | null;
-  classroomUrlFragment: string | null;
+  classroomName: string;
+  classroomUrlFragment: string;
   practice_tab_is_displayed: boolean;
   degrees_of_mastery: DegreesOfMastery;
   skill_descriptions: SkillIdToDescriptionMap;
