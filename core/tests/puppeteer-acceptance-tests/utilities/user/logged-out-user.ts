@@ -153,7 +153,7 @@ const exploreLessonsButtonAtTheTopInTeachPage =
   '.e2e-test-teach-page-explore-lessons-button-at-the-top';
 const exploreLessonsButtonAtTheBottomInTeachPage =
   '.e2e-test-teach-page-explore-lessons-button-at-the-bottom';
-const downloadAndroidAppButtonInTeachPage =
+const getAndroidAppButtonInTeachPage =
   '.e2e-test-teach-page-download-android-app-button';
 const creatorsCarouselSelectorInTeachPage =
   '.e2e-test-teach-page-creators-carousel';
@@ -1486,13 +1486,13 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Download Andriod app button in the Teach page
+   * Function to click the Get Android App button in the Teach page
    * and check if it opens the Android page.
    */
-  async clickDownloadAndriodAppButtonInTeachPage(): Promise<void> {
+  async clickGetAndroidAppButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
-      downloadAndroidAppButtonInTeachPage,
-      'Download Andriod app button',
+      getAndroidAppButtonInTeachPage,
+      'Get Android App button',
       androidUrl,
       'Android page'
     );
@@ -2296,6 +2296,27 @@ export class LoggedOutUser extends BaseUser {
       partnerWithUsButtonInAboutPage,
       partnershipsFormUrl
     );
+  }
+
+  /**
+   * This function verifies that the classroom cards are present in the classrooms page.
+   * @param {number} classroomsCount - The expected number of classrooms.
+   */
+  async expectClassroomCountInClassroomsPageToBe(
+    classroomsCount: number
+  ): Promise<void> {
+    await this.page.waitForSelector(classroomTileContainer);
+    const classroomTiles = await this.page.$$(classroomTileContainer);
+
+    if (classroomTiles.length === classroomsCount) {
+      showMessage(
+        `${classroomsCount} classrooms are present in classrooms page.`
+      );
+    } else {
+      throw new Error(
+        `Expect ${classroomsCount} classrooms to be present in classrooms page, found: ${classroomTiles.length} classrooms.`
+      );
+    }
   }
 
   /**
