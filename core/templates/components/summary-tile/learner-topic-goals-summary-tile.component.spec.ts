@@ -104,7 +104,8 @@ describe('Learner Topic Goals Summary Tile Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
+      classroomName: 'math',
+      classroomUrlFragment: 'math',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {
