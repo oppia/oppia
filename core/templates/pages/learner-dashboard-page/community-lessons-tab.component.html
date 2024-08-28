@@ -398,31 +398,31 @@
   </ng-container>
   <div *ngIf="learnerDashboardRedesignFeatureFlag">
     <p class="oppia-learner-dash-greeting mt-4"> {{ 'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING' | translate: {username: username} }} </p>
-    <div tabindex="0" class="oppia-learner-dash-section">
-      <p class="oppia-learner-dash-section-heading">{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}</p>
-      <div *ngIf="noCommunityLessonActivity">
-        <h2 class="empty-section"> {{ 'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate }}</h2>
-        <oppia-primary-button [customClasses]="'btn oppia-dashboard-intro-button'"
-                              [buttonHref]="communityLibraryUrl"
-                              [buttonText]="'I18N_ACTION_BROWSE_LESSONS' | translate">
-        </oppia-primary-button>
+    <ng-container *ngIf="isLearnerStateEmpty(); else empty"> 
+      <div tabindex="0" class="oppia-learner-dash-section">
+        <p class="oppia-learner-dash-section-heading">{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}</p>
+        <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="totalIncompleteLessonsList.length !== 0">
+          <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalIncompleteLessonsList.length" [tabType]="'progress'">
+            <ng-container *ngFor="let summaryTile of displayIncompleteLessonsList">
+              <lesson-card [story]="summaryTile"> </lesson-card>
+            </ng-container>
+          </oppia-card-display>
+        </div>
       </div>
-      <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="totalIncompleteLessonsList.length !== 0">
-        <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalIncompleteLessonsList.length" [tabType]="'progress'">
-          <ng-container *ngFor="let summaryTile of displayIncompleteLessonsList">
-            <lesson-card [story]="summaryTile"> </lesson-card>
+      <div tabindex="0" class="oppia-learner-dash-section e2e-test-completed-community-lessons-section" *ngIf="totalCompletedLessonsList.length !== 0">
+        <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
+        <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalCompletedLessonsList.length" [tabType]="'progress'">
+          <ng-container *ngFor="let summaryTile of displayCompletedLessonsList">
+            <lesson-card [story]="summaryTile" [isCommunityLessonComplete]="true"> </lesson-card>
           </ng-container>
         </oppia-card-display>
       </div>
-    </div>
-    <div tabindex="0" class="oppia-learner-dash-section e2e-test-completed-community-lessons-section" *ngIf="totalCompletedLessonsList.length !== 0">
-      <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
-      <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalCompletedLessonsList.length" [tabType]="'progress'">
-        <ng-container *ngFor="let summaryTile of displayCompletedLessonsList">
-          <lesson-card [story]="summaryTile" [isCommunityLessonComplete]="true"> </lesson-card>
-        </ng-container>
-      </oppia-card-display>
-    </div>
+    </ng-container>
+    <ng-template #empty>
+      <div class="oppia-learner-dash-progress-empty-div">
+        <oppia-classroom-button [classroom]="'math'" [variant]="'default'"> </oppia-classroom-button>
+      </div>
+    </ng-template>
     <!--TODO(#18384): Move saved data to home tab, totalLessonsInPlaylist/displayLessonsInPlaylist-->
     <!--TODO(#18384): Remove subscriptions-->
     <div tabindex="0" class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
