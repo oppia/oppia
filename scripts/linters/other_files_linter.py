@@ -333,7 +333,10 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         for job, job_dict in workflow_dict['jobs'].items():
             if (
                 job not in JOBS_EXEMPT_FROM_MERGE_REQUIREMENT and
-                MERGE_STEP not in job_dict['steps']
+                all(
+                    step.get('uses') != MERGE_STEP['uses']
+                    for step in job_dict['steps']
+                )
             ):
                 jobs_without_merge.append(job)
         return [
