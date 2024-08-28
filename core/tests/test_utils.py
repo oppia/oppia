@@ -3031,8 +3031,8 @@ version: 1
             webtest.TestResponse. The test response.
 
         Raises:
-            Exception. If the http method is not one of GET, POST, PUT or DELETE, then
-                this exception is raised.
+            Exception. If the http method is not one of GET, POST, PUT or
+                DELETE, then this exception is raised.
         """
         if params is not None:
             self.assertIsInstance(
