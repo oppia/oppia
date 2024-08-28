@@ -160,17 +160,22 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                 git_changes_utils.get_upstream_git_repository_remote_name()
 
-    def test_get_remote_name_with_error_in_obtaining_remote_url(self) -> None:
+    def test_get_upstream_remote_name_with_error_in_obtaining_remote_url(
+        self
+    ) -> None:
         def mock_communicate() -> Tuple[str, str]:
             return ('test', 'test_oppia_error')
+
         process_for_remote = subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
+
         process_for_remote_url = subprocess.Popen(
             [b'echo', b'https://github.com/oppia/oppia.git'],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
+
         def mock_popen(
             cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
@@ -182,12 +187,54 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         communicate_swap = self.swap(
             process_for_remote_url, 'communicate', mock_communicate
         )
+
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=[
                 (['git', 'remote'],),
                 ([b'git', b'config', b'--get', b'remote.origin.url'],)
             ])
+
+        with communicate_swap:
+            with popen_swap:
+                with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
+                    git_changes_utils.get_upstream_git_repository_remote_name()
+
+    def test_get_local_remote_name_with_error_in_obtaining_remote_url(
+        self
+    ) -> None:
+        def mock_communicate() -> Tuple[str, str]:
+            return ('test', 'test_oppia_error')
+
+        process_for_remote = subprocess.Popen(
+            [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+
+        process_for_remote_url = subprocess.Popen(
+            [b'echo', b'https://github.com/testuser/oppia.git'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        def mock_popen(
+            cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            if b'config' in cmd_tokens:
+                return process_for_remote_url
+            else:
+                return process_for_remote
+
+        communicate_swap = self.swap(
+            process_for_remote_url, 'communicate', mock_communicate
+        )
+
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[
+                (['git', 'remote'],),
+                ([b'git', b'config', b'--get', b'remote.origin.url'],)
+            ])
+
         with communicate_swap:
             with popen_swap:
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
