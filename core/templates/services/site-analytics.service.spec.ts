@@ -787,12 +787,12 @@ describe('Site Analytics Service', () => {
       });
     });
 
-    it('should register Download the Android App button click event', () => {
-      sas.registerClickDownloadAndroidAppButtonEvent();
+    it('should register Get the Android App button click event', () => {
+      sas.registerClickGetAndroidAppButtonEvent();
 
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
-        'download_android_app_button_click',
+        'get_android_app_button_click',
         {
           page_path: pathname,
         }
