@@ -1157,10 +1157,10 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         # arguments passed in raise_exception(). It is just to
         # prevent a TypeError from being thrown, which in turn
         # will give a 405 status code.
-        def raise_exception(*args: Any, **kwargs: Any) -> None:
+        def mock_add_user_to_raise_exception(unused_email, unused_tag, name=None) -> None:
             raise Exception('Backend error')
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_mailing_list', raise_exception)
+            user_services, 'add_user_to_mailing_list', mock_add_user_to_raise_exception)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
