@@ -515,6 +515,24 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   text-decoration: none;
 }
 
+.oppia-learner-dash-button--default {
+  background-color: #00645c;
+  border-color: #00645c;
+  color: #fff;
+}
+
+.oppia-learner-dash-button--default:hover {
+  background-color: #004d45;
+  border-color: #004d45;
+  color: #fff;
+}
+
+.oppia-learner-dash-button--default:focus {
+  background-color: #429488;
+  border-color: #429488;
+  color: #fff;
+}
+
 .oppia-learner-dash-button--inverse {
   background-color: #fff;
   border-color: #00645c;
