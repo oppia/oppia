@@ -26,10 +26,6 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const PROGRESS_URL_VALIDITY_INFO =
   'Use the link below to save progress for 72 hours.';
 
-const EXPECTED_FB_SHARE_URL = explorationId =>
-  `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=http://localhost:8181/explore/${explorationId}&display=popup&ref=plugin&src=share_button`;
-const EXPECTED_X_SHARE_URL = explorationId =>
-  `https://twitter.com/share?text=Check%20out%20this%20interactive%20lesson%20on%20Oppia%20-%20a%20free%20platform%20for%20teaching%20and%20learning!&url=http://localhost:8181/explore/${explorationId}`;
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   NUMERIC_INPUT = 'Number Input',
@@ -133,11 +129,11 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.shareExplorationFromLessonInfoModal(
         'Facebook',
-        EXPECTED_FB_SHARE_URL(explorationId)
+        explorationId
       );
       await loggedOutUser.shareExplorationFromLessonInfoModal(
         'Twitter',
-        EXPECTED_X_SHARE_URL(explorationId)
+        explorationId
       );
 
       await loggedOutUser.closeLessonInfoModal();
