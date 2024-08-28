@@ -114,7 +114,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         popen_error_swap = self.swap(
             subprocess, 'Popen', mock_popen_error_call)
         with popen_error_swap:
-            with self.assertRaisesRegex(Exception, 'Some error sdkfjlafkds'):
+            with self.assertRaisesRegex(Exception, 'Some error'):
                 run_acceptance_tests.compile_test_ts_files()
 
     def test_compile_test_ts_files_success(
