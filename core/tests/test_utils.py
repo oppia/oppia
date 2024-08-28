@@ -3066,6 +3066,9 @@ version: 1
                 url, params=params, expect_errors=True
             )
         elif http_method == 'GET':
+            # This block is present just to prevent an Exception from being raised everytime
+            # the http method is GET. The actual handling of GET is done above under the 
+            # swap.
             pass
         else:
             raise Exception('Inavlid http method %s' % http_method)
