@@ -3029,6 +3029,10 @@ version: 1
 
         Returns:
             webtest.TestResponse. The test response.
+
+        Raises:
+            Exception. If the http method is not one of GET, POST, PUT or DELETE, then
+                this exception is raised.
         """
         if params is not None:
             self.assertIsInstance(
@@ -3061,6 +3065,8 @@ version: 1
             response = self.testapp.delete(
                 url, params=params, expect_errors=True
             )
+        elif http_method == 'GET':
+            pass
         else:
             raise Exception('Inavlid http method %s' % http_method)
 
