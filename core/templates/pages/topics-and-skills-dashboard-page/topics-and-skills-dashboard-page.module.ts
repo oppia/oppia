@@ -47,7 +47,6 @@ import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 import {CreateNewTopicModalComponent} from './modals/create-new-topic-modal.component';
-import {CreateNewSkillModalComponent} from './modals/create-new-skill-modal.component';
 import {ToastrModule} from 'ngx-toastr';
 import {MyHammerConfig, toastrConfig} from 'pages/oppia-root/app.module';
 import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
@@ -77,7 +76,6 @@ import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
     TopicsListComponent,
     DeleteTopicModalComponent,
     SelectTopicsComponent,
-    CreateNewSkillModalComponent,
     TopicsAndSkillsDashboardPageComponent,
     CreateNewTopicModalComponent,
     DeleteTopicModalComponent,
@@ -92,7 +90,6 @@ import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
     TopicsListComponent,
     DeleteTopicModalComponent,
     SelectTopicsComponent,
-    CreateNewSkillModalComponent,
     TopicsAndSkillsDashboardPageComponent,
     CreateNewTopicModalComponent,
   ],
