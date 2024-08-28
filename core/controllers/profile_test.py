@@ -1153,9 +1153,9 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_email_provider_error(self) -> None:
-        # Here we use type Any because we will not be using the
-        # arguments passed in raise_exception(). It is just to
-        # prevent a TypeError from being thrown, which in turn
+        # Here we the arguments passed in
+        # mock_add_user_to_raise_exception() are unused as they are 
+        # just to prevent a TypeError from being thrown, which in turn
         # will give a 405 status code.
         def mock_add_user_to_raise_exception(unused_email, unused_tag, name=None) -> None:
             raise Exception('Backend error')
