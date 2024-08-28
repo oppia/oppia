@@ -75,11 +75,18 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             expected_args=[
                 (['git', 'remote'],),
                 ([b'git', b'config', b'--get', b'remote.origin.url'],),
+                ([b'git', b'config', b'--get', b'remote.upstream.url'],),
+                (['git', 'remote'],),
+                ([b'git', b'config', b'--get', b'remote.origin.url'],),
                 ([b'git', b'config', b'--get', b'remote.upstream.url'],)
             ])
         with popen_swap:
             self.assertEqual(
                 git_changes_utils.get_local_git_repository_remote_name(),
+                b'origin'
+            )
+            self.assertEqual(
+                git_changes_utils.get_upstream_git_remote_name(),
                 b'upstream'
             )
 
@@ -135,7 +142,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                     git_changes_utils.get_local_git_repository_remote_name()
 
-    def test_get_remote_name_with_no_remote_set(self) -> None:
+    def test_get_upstream_remote_name_with_no_remote_set(self) -> None:
         process_for_remote = subprocess.Popen(
             [b'echo', b''], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -161,9 +168,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             '2b. If \'upstream\' is not listed in the command output, then run '
             'the command \'git remote add upstream '
             'https://github.com/oppia/oppia.git\'\n'):
-            git_changes_utils.get_local_git_repository_remote_name()
+            git_changes_utils.get_upstream_git_remote_name()
 
-    def test_get_remote_name_with_multiple_remotes_set(self) -> None:
+    def test_get_upstream_remote_name_with_multiple_remotes_set(self) -> None:
         process_for_remote = subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -196,7 +203,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         )
         with popen_swap, self.print_swap:
             self.assertIsNone(
-                git_changes_utils.get_local_git_repository_remote_name())
+                git_changes_utils.get_upstream_git_remote_name())
         self.assertTrue(
             'Warning: Please keep only one remote branch for oppia:develop.\n'
             'To do that follow these steps:\n'
@@ -510,7 +517,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             common, 'get_current_branch_name', mock_get_branch)
         compare_to_remote_swap = self.swap_with_checks(
             git_changes_utils, 'compare_to_remote', mock_compare_to_remote,
-            expected_args=[('remote', 'branch1')])
+            expected_args=[('remote', 'branch1', None)])
         extract_files_swap = self.swap(
             git_changes_utils, 'extract_acmrt_files_from_diff',
             mock_extract_acmrt_files_from_diff)

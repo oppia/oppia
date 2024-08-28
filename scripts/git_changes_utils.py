@@ -30,11 +30,11 @@ GitRef = collections.namedtuple(
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 
-def get_local_git_repository_remote_name() -> Optional[bytes]:
-    """Get the remote name of the local repository.
+def get_upstream_git_remote_name() -> Optional[bytes]:
+    """Get the remote name of the upstream repository.
 
     Returns:
-        Optional[bytes]. The remote name of the local repository.
+        Optional[bytes]. The remote name of the upstream repository.
 
     Raises:
         ValueError. Subprocess failed to start.
@@ -90,6 +90,45 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
             'the main \'upstream\' remote.\n'
         )
         return None
+    return remote_name
+
+
+def get_local_git_repository_remote_name() -> Optional[bytes]:
+    """Get the remote name of the local repository.
+
+    Returns:
+        Optional[bytes]. The remote name of the local repository.
+
+    Raises:
+        ValueError. Subprocess failed to start.
+        Exception. Upstream not set.
+    """
+    remote_name = b''
+    remote_num = 0
+    task = subprocess.Popen(
+        ['git', 'remote'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = task.communicate()
+    remotes = out[:-1].split(b'\n')
+    if not err:
+        for remote in remotes:
+            get_remotes_url_cmd = (
+                b'git config --get remote.%s.url' % remote).split()
+            task = subprocess.Popen(
+                get_remotes_url_cmd, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+            remote_url, err = task.communicate()
+            if not err:
+                if (
+                    remote_url.endswith(b'oppia.git\n') and
+                    not remote_url.endswith(b'oppia/oppia.git\n')
+                ):
+                    remote_num += 1
+                    remote_name = remote
+            else:
+                raise ValueError(err)
+    else:
+        raise ValueError(err)
+
     return remote_name
 
 
@@ -272,7 +311,7 @@ def get_refs() -> List[GitRef]:
 
 
 def get_changed_files(
-    ref_list: List[GitRef], remote: str
+    ref_list: List[GitRef], remote: str, remote_branch: Optional[str] = None
 ) -> Dict[str, Tuple[List[FileDiff], List[bytes]]]:
     """Collect diff files and ACMRT files for each branch in ref_list.
     ACMRT files are files that are Added, Copied, Modified, Renamed, or
@@ -281,6 +320,8 @@ def get_changed_files(
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
         remote: str. The name of the remote being pushed to.
+        remote_branch: str. The name of the branch on the remote to compare
+            against.
 
     Returns:
         dict. Dict mapping branch names to 2-tuples of the form (list of
@@ -302,7 +343,7 @@ def get_changed_files(
     for branch, _ in zip(branches, hashes):
         # Get the difference to remote/develop.
         diff_files = compare_to_remote(
-            remote, branch, remote_branch=get_parent_branch_name_for_diff())
+            remote, branch, remote_branch)
         acmrt_files = extract_acmrt_files_from_diff(diff_files)
         collected_files[branch] = (diff_files, acmrt_files)
 
