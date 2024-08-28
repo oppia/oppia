@@ -1158,7 +1158,7 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         # just to prevent a TypeError from being thrown, which in turn
         # will give a 405 status code.
         def mock_add_user_to_raise_exception(
-                unused_email: Any, unused_tag: Any, name=None) -> None:
+                unused_email: Any, unused_tag: Any, name: Any) -> None:
             raise Exception('Backend error')
         swap_add_fn = self.swap(
             user_services, 'add_user_to_mailing_list',
