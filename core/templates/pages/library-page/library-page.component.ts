@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -41,7 +41,6 @@ import {
   LibraryPageBackendApiService,
   SummaryDict,
 } from './services/library-page-backend-api.service';
-import {NgbCarousel, NgbSlideEvent} from '@ng-bootstrap/ng-bootstrap';
 import './library-page.component.css';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
@@ -56,8 +55,6 @@ interface MobileLibraryGroupProperties {
   styleUrls: ['./library-page.component.css'],
 })
 export class LibraryPageComponent {
-  @ViewChild('classroomCarousel') classroomCarousel!: NgbCarousel;
-
   possibleBannerFilenames: string[] = [
     'banner1.svg',
     'banner2.svg',
@@ -99,7 +96,12 @@ export class LibraryPageComponent {
   pageMode!: string;
   classroomSummaries: ClassroomSummaryDict[] = [];
   publicClassroomsCount: number = 0;
-  classroomCarouselIndex: number = 0;
+  // The translateX state controls the horizontal movement of the classroom carousel.
+  // It stores the direction (left or right) and the distance to slide.
+  translateX: number = 0;
+  currentCardIndex: number = 0;
+  cardsToShow: number = 3;
+  dots: number[] = [];
 
   constructor(
     private loggerService: LoggerService,
@@ -348,6 +350,7 @@ export class LibraryPageComponent {
             this.classroomSummaries.push(classroomSummaries[i]);
           }
         }
+        this.updateActiveDot();
       });
 
     // Keeps track of the index of the left-most visible card of each
@@ -498,56 +501,59 @@ export class LibraryPageComponent {
   }
 
   moveClassroomCarouselToPreviousSlide(): void {
-    this.classroomCarouselIndex -= 1;
-    this.classroomCarousel.prev();
+    if (this.currentCardIndex > 0) {
+      this.currentCardIndex -= 1;
+      this.translateX += this.getCardWidth();
+      this.updateActiveDot();
+    }
   }
 
   moveClassroomCarouselToNextSlide(): void {
-    this.classroomCarouselIndex += 1;
-    this.classroomCarousel.next();
+    if (
+      this.currentCardIndex <
+      this.classroomSummaries.length - this.cardsToShow
+    ) {
+      this.currentCardIndex += 1;
+      this.translateX -= this.getCardWidth();
+      this.updateActiveDot();
+    }
   }
 
-  onClassroomNavigationIndicatorClicked(slideEvent: NgbSlideEvent): void {
-    // Extract numeric index from slide id (format: 'ngb-slide-{index}')
-    this.classroomCarouselIndex = parseInt(slideEvent?.current?.split('-')[2]);
+  moveToSlide(index: number): void {
+    this.translateX = -index * this.getCardWidth();
+    this.currentCardIndex = index;
+    this.updateActiveDot();
   }
 
-  getClassroomChunkIndices(length: number): number[] {
-    const chunkSize = 3;
-    const numChunks = Math.ceil(length / chunkSize);
-    return Array(numChunks)
+  getCardWidth(): number {
+    const cardContainerWidth =
+      document.querySelector('.carousel-container')?.clientWidth || 0;
+    return cardContainerWidth / this.cardsToShow;
+  }
+
+  updateActiveDot(): void {
+    // We subtract (cardsToShow - 1) because the last dot represents the last set of cards
+    // that can be fully displayed. This creates a sliding window of size n-(cardsToShow-1).
+    const numberOfDots = Math.max(
+      1,
+      this.classroomSummaries.length - (this.cardsToShow - 1)
+    );
+    this.dots = Array(numberOfDots)
       .fill(0)
-      .map((_, index) => index);
-  }
-
-  getClassroomsForChunk(
-    classroomSummaries: ClassroomSummaryDict[],
-    chunkIndex: number
-  ): ClassroomSummaryDict[] {
-    const chunkSize = 3;
-    const start = chunkIndex * chunkSize;
-    const end = start + chunkSize;
-    return classroomSummaries.slice(start, end);
+      .map((_, i) => (i === this.currentCardIndex ? 1 : 0));
   }
 
   shouldShowNextClassroomChunkButton(): boolean {
-    const numberOfClassroomSlides = this.getClassroomChunkIndices(
-      this.classroomSummaries.length
-    ).length;
-    if (
-      this.publicClassroomsCount <= 3 ||
-      this.classroomCarouselIndex === numberOfClassroomSlides - 1
-    ) {
-      return false;
-    }
-    return true;
+    // We subtract cardsToShow from the total length because the last viable
+    // starting index is when cardsToShow number of cards can still be displayed.
+    return (
+      this.currentCardIndex < this.classroomSummaries.length - this.cardsToShow
+    );
   }
 
   shouldShowPreviousClassroomChunkButton(): boolean {
-    if (this.publicClassroomsCount <= 3 || this.classroomCarouselIndex === 0) {
-      return false;
-    }
-    return true;
+    // Checks if we're not at the beginning of the carousel.
+    return this.currentCardIndex > 0;
   }
 
   registerClassroomCardClickEvent(classroomName: string): void {
