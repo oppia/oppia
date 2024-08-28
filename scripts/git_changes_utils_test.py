@@ -821,6 +821,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 }
             return set()
 
+        def mock_get_parent_branch_name_for_diff() -> str:
+            return 'develop'
+
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_upstream_git_repository_remote_name',
             mock_get_remote_name)
@@ -853,18 +856,22 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 )
             ]
         )
+        get_parent_branch_name_for_diff_swap = self.swap(
+            git_changes_utils, 'get_parent_branch_name_for_diff',
+            mock_get_parent_branch_name_for_diff)
 
         with get_remote_name_swap, get_refs_swap, get_changed_files_swap:
             with get_staged_acmrt_files_swap:
                 with get_python_dot_test_files_from_diff_swap:
-                    self.assertEqual(
-                        git_changes_utils.get_changed_python_test_files(),
-                        {
-                            'test.file1_test.py',
-                            'test.file3_test.py',
-                            'test.file4_test.py'
-                        }
-                    )
+                    with get_parent_branch_name_for_diff_swap:
+                        self.assertEqual(
+                            git_changes_utils.get_changed_python_test_files(),
+                            {
+                                'test.file1_test.py',
+                                'test.file3_test.py',
+                                'test.file4_test.py'
+                            }
+                        )
 
     def test_get_changed_python_test_files_without_remote(
         self
