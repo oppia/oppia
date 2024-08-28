@@ -1153,7 +1153,7 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_email_provider_error(self) -> None:
-        # Here we the arguments passed in
+        # Here the arguments passed in
         # mock_add_user_to_raise_exception() are unused as they are 
         # just to prevent a TypeError from being thrown, which in turn
         # will give a 405 status code.
