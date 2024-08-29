@@ -79,6 +79,20 @@ def get_local_git_repository_remote_name() -> str:
             '\"The URL of your fork of Oppia GitHub repository\"\'\n'
         )
 
+    if remote_num > 1:
+        raise Exception(
+            'Error: Please keep only one remote branch for your Oppia fork.'
+            '\nTo do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2. This command will list the remote references. There will be '
+            'multiple remotes for an Oppia fork, but we'
+            ' want to make sure that there is only one main \'origin\' remote'
+            ' that uses an Oppia fork URL. Please use '
+            'the command, \'git remote remove <remote_name>\' on all remotes '
+            'that have an Oppia fork URL except for '
+            'the main \'origin\' remote.\n'
+        )
+
     return remote_name.decode('utf-8')
 
 

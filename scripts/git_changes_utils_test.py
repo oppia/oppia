@@ -170,6 +170,53 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             '\"The URL of your fork of Oppia GitHub repository\"\'\n'):
             git_changes_utils.get_local_git_repository_remote_name()
 
+    def test_get_local_remote_name_with_multiple_remotes(self) -> None:
+        process_for_remote = subprocess.Popen(
+            [b'echo', b'origin\norigintwo'], stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        process_for_origin_url = subprocess.Popen(
+            [b'echo', b'https://github.com/testuser/oppia.git'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        process_for_origintwo_url = subprocess.Popen(
+            [b'echo', b'https://github.com/testusertwo/oppia.git'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        def mock_popen(
+            cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            if b'remote.origin.url' in cmd_tokens:
+                return process_for_origin_url
+            elif b'remote.origintwo.url' in cmd_tokens:
+                return process_for_origintwo_url
+            else:
+                return process_for_remote
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[
+                (['git', 'remote'],),
+                ([b'git', b'config', b'--get', b'remote.origin.url'],),
+                ([b'git', b'config', b'--get', b'remote.origintwo.url'],)
+            ]
+        )
+
+        with popen_swap, self.assertRaisesRegex(
+            Exception,
+            'Error: Please keep only one remote branch for your Oppia fork.'
+            '\nTo do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2. This command will list the remote references. There will be '
+            'multiple remotes for an Oppia fork, but we'
+            ' want to make sure that there is only one main \'origin\' remote'
+            ' that uses an Oppia fork URL. Please use '
+            'the command, \'git remote remove <remote_name>\' on all remotes '
+            'that have an Oppia fork URL except for '
+            'the main \'origin\' remote.\n'
+        ):
+            git_changes_utils.get_local_git_repository_remote_name()
+
     def test_git_diff_name_status_without_error(self) -> None:
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
