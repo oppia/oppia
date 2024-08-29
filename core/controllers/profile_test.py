@@ -36,7 +36,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Final
+from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1153,12 +1153,8 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_email_provider_error(self) -> None:
-        # Here we use type Any because the arguments passed in
-        # mock_add_user_to_raise_exception() will be unused as they are
-        # just to prevent a TypeError from being thrown, which in turn
-        # will give a 405 status code.
         def mock_add_user_to_raise_exception(
-                unused_email: Any, unused_tag: Any, name: Any) -> None:
+                unused_email: str, unused_tag: str, name: str) -> None:
             raise Exception('Backend error')
         swap_add_fn = self.swap(
             user_services, 'add_user_to_mailing_list',
