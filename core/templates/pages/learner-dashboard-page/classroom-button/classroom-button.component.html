@@ -1,10 +1,15 @@
 <a [href]="classroomUrl" target="_self"
-   [ngClass]="'mb-4 oppia-learner-dash-button-lg oppia-learner-dash-button--' + variant">
+  [ngClass]="'mb-4 oppia-learner-dash-button-lg oppia-learner-dash-button--' + variant">
   <span class="fas fa-arrow-right mr-2"></span>
   {{ 'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION_LINK' | translate }}
 </a>
 
 <style>
+  :host {
+    max-width: 344px;
+    width: 100%;
+  }
+
   .oppia-learner-dash-button-lg {
     align-items: center;
     border: 1px solid;
@@ -31,6 +36,9 @@
   @media screen and (max-width: 500px) {
     .oppia-learner-dash-button-lg {
       padding: 10px 8px;
+    }
+
+    .oppia-learner-dash-button--blue {
       width: 90%;
     }
   }

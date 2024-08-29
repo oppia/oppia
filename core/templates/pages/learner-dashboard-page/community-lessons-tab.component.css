@@ -319,6 +319,7 @@
   height: 75vh;
   justify-content: center;
   max-height: 750px;
+  padding: 16px;
   width: 100%;
 }
 
