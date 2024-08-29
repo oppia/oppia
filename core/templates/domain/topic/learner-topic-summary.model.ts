@@ -38,8 +38,8 @@ export interface LearnerTopicSummaryBackendDict {
   canonical_story_summary_dict: StorySummaryBackendDict[];
   thumbnail_filename: string;
   thumbnail_bg_color: string;
-  classroomName: string;
-  classroomUrlFragment: string;
+  classroom_name: string;
+  classroom_url_fragment: string;
   practice_tab_is_displayed: boolean;
   degrees_of_mastery: DegreesOfMastery;
   skill_descriptions: SkillIdToDescriptionMap;
@@ -93,8 +93,8 @@ export class LearnerTopicSummary {
       canonicalStorySummaries,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
-      topicSummaryBackendDict.classroomName,
-      topicSummaryBackendDict.classroomUrlFragment,
+      topicSummaryBackendDict.classroom_name,
+      topicSummaryBackendDict.classroom_url_fragment,
       topicSummaryBackendDict.practice_tab_is_displayed,
       topicSummaryBackendDict.degrees_of_mastery,
       topicSummaryBackendDict.skill_descriptions,

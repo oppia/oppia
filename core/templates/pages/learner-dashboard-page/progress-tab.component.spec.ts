@@ -255,8 +255,8 @@ describe('Progress tab Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroomName: 'math',
-      classroomUrlFragment: 'math',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {
@@ -301,8 +301,8 @@ describe('Progress tab Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroomName: 'math',
-      classroomUrlFragment: 'math',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {
@@ -379,8 +379,8 @@ describe('Progress tab Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroomName: 'math',
-      classroomUrlFragment: 'math',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {
