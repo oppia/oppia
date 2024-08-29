@@ -289,7 +289,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     '  run:',
                     '    steps:',
                     '      - uses: actions/checkout@v2',
-                    '      - uses: ./.github/actions/merge',
+                    '      - name: Merge Action',
+                    '        uses: ./.github/actions/merge',
                     '      - run: echo "oppia"',
                 ])
             elif path.endswith('fail.yml'):
