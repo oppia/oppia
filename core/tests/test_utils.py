@@ -3065,13 +3065,8 @@ version: 1
             response = self.testapp.delete(
                 url, params=params, expect_errors=True
             )
-        elif http_method == 'GET':
-            # This block is present just to prevent an Exception from being
-            # raised everytime the http method is GET. The actual handling of
-            # GET is done above under the swap.
-            pass
-        else:
-            raise Exception('Inavlid http method %s' % http_method)
+        elif http_method != 'GET':
+            raise Exception('Invalid http method %s' % http_method)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
