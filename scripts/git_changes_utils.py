@@ -30,69 +30,6 @@ GitRef = collections.namedtuple(
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 
-def get_upstream_git_repository_remote_name() -> Optional[bytes]:
-    """Get the remote name of the upstream repository.
-
-    Returns:
-        Optional[bytes]. The remote name of the upstream repository.
-
-    Raises:
-        ValueError. Subprocess failed to start.
-        Exception. Upstream not set.
-    """
-    remote_name = b''
-    remote_num = 0
-    task = subprocess.Popen(
-        ['git', 'remote'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    remotes = out[:-1].split(b'\n')
-    if not err:
-        for remote in remotes:
-            get_remotes_url_cmd = (
-                b'git config --get remote.%s.url' % remote).split()
-            task = subprocess.Popen(
-                get_remotes_url_cmd, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            remote_url, err = task.communicate()
-            if not err:
-                if remote_url.endswith(b'oppia/oppia.git\n'):
-                    remote_num += 1
-                    remote_name = remote
-            else:
-                raise ValueError(err)
-    else:
-        raise ValueError(err)
-
-    if not remote_num:
-        raise Exception(
-            'Error: Please set the git \'upstream\' repository.\n'
-            'To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2a. If \'upstream\' is listed in the command output, then run the '
-            'command \'git remote set-url upstream '
-            'https://github.com/oppia/oppia.git\'\n'
-            '2b. If \'upstream\' is not listed in the command output, then run '
-            'the command \'git remote add upstream '
-            'https://github.com/oppia/oppia.git\'\n'
-        )
-
-    if remote_num > 1:
-        print(
-            'Warning: Please keep only one remote branch for oppia:develop.\n'
-            'To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2. This command will list the remote references. There will be '
-            'multiple remotes with the main oppia github reopsitory url, but we'
-            ' want to make sure that there is only one main \'upstream\' remote'
-            ' that uses the url https://github.com/oppia/oppia.git. Please use '
-            'the command, \'git remote remove <remote_name>\' on all remotes '
-            'that have the url https://github.com/oppia/oppia.git except for '
-            'the main \'upstream\' remote.\n'
-        )
-        return None
-    return remote_name
-
-
 def get_local_git_repository_remote_name() -> Optional[bytes]:
     """Get the remote name of the local repository.
 
@@ -128,6 +65,19 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
                 raise ValueError(err)
     else:
         raise ValueError(err)
+
+    if remote_num == 0:
+        raise Exception(
+            'Error: Please set the git \'origin\' repository.\n'
+            'To do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2a. If \'origin\' is listed in the command output, then run the '
+            'command \'git remote set-url origin '
+            '\"The URL of your fork of Oppia GitHub repository\"\'\n'
+            '2b. If \'origin\' is not listed in the command output, then run '
+            'the command \'git remote add origin '
+            '\"The URL of your fork of Oppia GitHub repository\"\'\n'
+        )
 
     return remote_name
 
@@ -411,7 +361,7 @@ def get_changed_python_test_files() -> Set[str]:
         SystemExit. No remote repository found.
     """
     python_test_files: Set[str] = set()
-    remote = get_upstream_git_repository_remote_name()
+    remote = get_local_git_repository_remote_name()
     if not remote:
         sys.exit('Error: No remote repository found.')
     refs = get_refs()

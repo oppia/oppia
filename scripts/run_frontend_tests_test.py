@@ -279,7 +279,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_get_parent_branch_name_for_diff() -> str:
             return 'develop'
         get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_upstream_git_repository_remote_name',
+            git_changes_utils, 'get_local_git_repository_remote_name',
             mock_get_remote_name)
         get_refs_swap = self.swap(
             git_changes_utils, 'get_refs', mock_get_refs)
@@ -318,7 +318,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             return b''
 
         get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_upstream_git_repository_remote_name',
+            git_changes_utils, 'get_local_git_repository_remote_name',
             mock_get_remote_name)
 
         with self.swap_success_Popen, self.print_swap, self.swap_build:
