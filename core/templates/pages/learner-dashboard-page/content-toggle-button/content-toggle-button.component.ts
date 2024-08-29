@@ -15,7 +15,7 @@
 /**
  * @fileoverview Component for content toggle button
  */
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 @Component({
   selector: 'oppia-content-toggle-button',
@@ -23,10 +23,22 @@ import {downgradeComponent} from '@angular/upgrade/static';
 })
 export class ContentToggleButtonComponent {
   isExpanded: boolean = false;
+  @Output() toggleUpdated = new EventEmitter<boolean>();
 
   constructor() {}
 
   ngOnInit(): void {}
+
+  toggle(): void {
+    this.isExpanded = !this.isExpanded;
+    this.toggleUpdated.emit(this.isExpanded);
+  }
+
+  getButtonTranslationKey(): string {
+    return this.isExpanded
+      ? 'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS'
+      : 'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE';
+  }
 }
 
 angular

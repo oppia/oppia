@@ -1,5 +1,5 @@
-<button class="align-self-end content-toggle-button mt-4" (click)="viewMore = !viewMore">
-  {{}}
+<button class="align-self-end content-toggle-button mt-4" (click)="toggle()">
+  {{ getButtonTranslationKey() | translate }}
   <span class="fas ml-2" [ngClass]="isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></span>
 </button>
 
