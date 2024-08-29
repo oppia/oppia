@@ -1,0 +1,22 @@
+<button class="align-self-end content-toggle-button mt-4" (click)="viewMore = !viewMore">
+  {{}}
+  <span class="fas ml-2" [ngClass]="isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></span>
+</button>
+
+<style>
+  .content-toggle-button {
+    align-items: center;
+    background-color: #fff;
+    border: none;
+    border-radius: .25em;
+    color: #00645c;
+    display: flex;
+    font-weight: 500;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .content-toggle-button:not(:disabled):hover {
+    text-decoration: solid;
+  }
+</style>
