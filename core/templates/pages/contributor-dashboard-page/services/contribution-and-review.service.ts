@@ -192,6 +192,7 @@ export class ContributionAndReviewService {
           'response: ',
           Object.keys(responseSuggestionIdToDetails).length
         );
+        console.log('-------------');
         return {
           suggestionIdToDetails: responseSuggestionIdToDetails,
           more: Object.keys(fetcher.suggestionIdToDetails).length > 0,

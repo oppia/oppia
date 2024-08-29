@@ -47,8 +47,6 @@ export class TranslationTopicService {
     return this.activeTopicName;
   }
 
-  activeTopicChanged$ = this._activeTopicChangedEventEmitter.asObservable();
-
   setActiveTopicName(newActiveTopicName: string): void {
     this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync().then(
       data => {
@@ -62,6 +60,7 @@ export class TranslationTopicService {
           return;
         }
         this.activeTopicName = newActiveTopicName;
+        console.log('emit');
         this._activeTopicChangedEventEmitter.next();
       }
     );
