@@ -34,6 +34,7 @@ export class CardDisplayComponent {
   maxShifts: number = 0;
   lastShift: number = 0;
   isLanguageRTL: boolean = false;
+  toggleState: boolean = false;
 
   constructor(private I18nLanguageCodeService: I18nLanguageCodeService) {}
 
@@ -77,6 +78,19 @@ export class CardDisplayComponent {
       return this.cardWidth - 32;
     }
     return nextShift === this.maxShifts ? this.lastShift : this.cardWidth;
+  }
+
+  handleToggleState(updateState: boolean): void {
+    this.toggleState = updateState;
+  }
+
+  getVisibility(): string {
+    if (!this.tabType.includes('progress')) {
+      return '';
+    }
+    return this.toggleState
+      ? 'card-display-content-shown'
+      : 'card-display-content-hidden';
   }
 }
 

@@ -17,27 +17,32 @@
  */
 import {Component, EventEmitter, Output} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
+import {TranslateService} from '@ngx-translate/core';
 @Component({
   selector: 'oppia-content-toggle-button',
   templateUrl: './content-toggle-button.component.html',
 })
 export class ContentToggleButtonComponent {
   isExpanded: boolean = false;
+  buttonText: string = '';
   @Output() toggleUpdated = new EventEmitter<boolean>();
 
-  constructor() {}
+  constructor(private translateService: TranslateService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.buttonText = this.translateService.instant(
+      'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE'
+    );
+  }
 
   toggle(): void {
     this.isExpanded = !this.isExpanded;
+    this.buttonText = this.translateService.instant(
+      this.isExpanded
+        ? 'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS'
+        : 'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE'
+    );
     this.toggleUpdated.emit(this.isExpanded);
-  }
-
-  getButtonTranslationKey(): string {
-    return this.isExpanded
-      ? 'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS'
-      : 'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE';
   }
 }
 

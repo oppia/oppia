@@ -891,7 +891,7 @@
     "I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION": "Completed Goals",
     "I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Completed",
     "I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "<[numberMoved]> of the collections you completed have been moved to the 'in progress' section as new explorations have been added to them!",
-    "I18N_LEARNER_DASHBOARD_CONTENT_TOOGLE_BUTTON_LESS": "View less",
+    "I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS": "View less",
     "I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE": "Display more",
     "I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION": "Continue where you left off",
     "I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION": "Current Goals",
