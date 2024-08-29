@@ -16,9 +16,9 @@
  * @fileoverview Collection Player page root component.
  */
 
-import {Component} from '@angular/core';
-import {AppConstants} from 'app.constants';
-import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
+import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 
 import './collection-player-page-root.component.css';
 
