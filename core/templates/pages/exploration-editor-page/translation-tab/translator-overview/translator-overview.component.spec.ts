@@ -236,6 +236,7 @@ describe('Translator Overview component', () => {
         .createSpy()
         .and.returnValue(Promise.resolve(entityTranslation));
     });
+
     it('should update entity translations with edit translation changes', fakeAsync(() => {
       expect(
         entityTranslationsService.getHtmlTranslations('hi', ['content1'])
