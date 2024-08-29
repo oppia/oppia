@@ -10,7 +10,7 @@ FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenanc
 
 sharding_instances := 3
 
-# Escape special characters in the PATH and remove spaces
+# Escape special characters in the PATH and remove spaces to resolve errors in WSL due to windows paths. specially on WSL with appendWindowsPath enabled.
 FIXED_PATH=$(shell echo "$(PATH)" | sed 's/ /\\ /g' | sed 's/(/\\(/g' | sed 's/)/\\)/g')
 
 
