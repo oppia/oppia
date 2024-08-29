@@ -30,11 +30,11 @@ GitRef = collections.namedtuple(
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 
-def get_local_git_repository_remote_name() -> Optional[bytes]:
+def get_local_git_repository_remote_name() -> str:
     """Get the remote name of the local repository.
 
     Returns:
-        Optional[bytes]. The remote name of the local repository.
+        bytes. The remote name of the local repository.
 
     Raises:
         ValueError. Subprocess failed to start.
@@ -79,7 +79,7 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
             '\"The URL of your fork of Oppia GitHub repository\"\'\n'
         )
 
-    return remote_name
+    return remote_name.decode('utf-8')
 
 
 def git_diff_name_status(
@@ -366,7 +366,7 @@ def get_changed_python_test_files() -> Set[str]:
         sys.exit('Error: No remote repository found.')
     refs = get_refs()
     collected_files = get_changed_files(
-        refs, remote.decode('utf-8'), get_parent_branch_name_for_diff())
+        refs, remote, get_parent_branch_name_for_diff())
     for _, (_, acmrt_files) in collected_files.items():
         if not acmrt_files:
             continue

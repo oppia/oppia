@@ -245,8 +245,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_frontend_tests_with_run_on_changed_files_in_branch(self) -> None:
         git_refs = [git_changes_utils.GitRef(
             'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
-        def mock_get_remote_name() -> bytes:
-            return b'remote'
+        def mock_get_remote_name() -> str:
+            return 'remote'
         def mock_get_refs() -> List[git_changes_utils.GitRef]:
             return git_refs
         def mock_get_changed_files(
@@ -314,8 +314,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_frontend_tests_with_run_on_changed_files_in_branch_no_remote(
         self
     ) -> None:
-        def mock_get_remote_name() -> bytes:
-            return b''
+        def mock_get_remote_name() -> str:
+            return ''
 
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_local_git_repository_remote_name',

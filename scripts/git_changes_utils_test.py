@@ -80,7 +80,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         with popen_swap:
             self.assertEqual(
                 git_changes_utils.get_local_git_repository_remote_name(),
-                b'origin'
+                'origin'
             )
 
     def test_get_local_remote_name_with_error_in_obtaining_remote(self) -> None:
@@ -667,8 +667,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         git_refs = [git_changes_utils.GitRef(
             'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
 
-        def mock_get_remote_name() -> bytes:
-            return b'remote'
+        def mock_get_remote_name() -> str:
+            return 'remote'
 
         def mock_get_refs() -> List[git_changes_utils.GitRef]:
             return git_refs
@@ -779,8 +779,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
     def test_get_changed_python_test_files_without_remote(
         self
     ) -> None:
-        def mock_get_remote_name() -> bytes:
-            return b''
+        def mock_get_remote_name() -> str:
+            return ''
 
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_local_git_repository_remote_name',

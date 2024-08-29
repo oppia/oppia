@@ -47,8 +47,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             stderr: int = subprocess.PIPE
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
-        def mock_get_remote_name() -> bytes:
-            return b'remote'
+        def mock_get_remote_name() -> str:
+            return 'remote'
         def mock_get_refs() -> List[str]:
             return ['ref1', 'ref2']
         def mock_get_changed_files(
