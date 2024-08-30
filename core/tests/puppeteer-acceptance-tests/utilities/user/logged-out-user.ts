@@ -2813,32 +2813,6 @@ export class LoggedOutUser extends BaseUser {
       );
     }
     await this.closeAttributionModal();
-
-    /*
-    switch (shortcut) {
-      case '/':
-        expectedFocusedElement = await this.page.$(searchInputSelector);
-        break;
-      case 's':
-        expectedFocusedElement = await this.page.$(skipLinkSelector);
-        break;
-      case 'c':
-        expectedFocusedElement = await this.page.$(
-          categoryFilterDropdownToggler
-        );
-        break;
-      case 'j':
-        expectedFocusedElement = await this.page.$(
-          `:is(${nextCardArrowButton}, ${nextCardButton})`
-        );
-        break;
-      case 'k':
-        expectedFocusedElement = await this.page.$(previousCardButton);
-        break;
-      default:
-        throw new Error(`Unsupported shortcut: ${shortcut}`);
-    }
-*/
   }
 
   /**
