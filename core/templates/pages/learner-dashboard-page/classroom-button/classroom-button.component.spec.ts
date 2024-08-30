@@ -20,16 +20,19 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ClassroomButtonComponent} from './classroom-button.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 describe('ClassroomButtonComponent', () => {
   let component: ClassroomButtonComponent;
   let fixture: ComponentFixture<ClassroomButtonComponent>;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
+      providers: [UrlInterpolationService],
       declarations: [ClassroomButtonComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -38,13 +41,19 @@ describe('ClassroomButtonComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ClassroomButtonComponent);
     component = fixture.componentInstance;
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     component.variant = 'blue';
     component.classroom = 'math';
-    fixture.detectChanges();
   });
 
   it('should set classoomUrl correctly', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/learn/math'
+    );
+
+    component.ngOnInit();
+
     expect(component.classroomUrl).toEqual('/learn/math');
   });
 });
