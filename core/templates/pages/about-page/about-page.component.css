@@ -362,7 +362,7 @@
     bottom: -58px;
   }
 }
-@media only screen and (max-width: 361px) {
+@media only screen and (max-width: 376px) {
   .about-page  .oppia-about-partnerships-section br {
     display: none;
   }
@@ -669,7 +669,7 @@
   }
 }
 
-@media only screen and (max-width: 361px) {
+@media only screen and (max-width: 376px) {
   .about-page .oppia-mobile-portrait-content {
     display: block;
   }
@@ -1469,7 +1469,7 @@
     padding-bottom: 46px;
   }
 }
-@media only screen and (max-width: 361px) {
+@media only screen and (max-width: 376px) {
   .about-page .oppia-about-platform-section {
     gap: 40px;
     padding: 0 20px 56px;
