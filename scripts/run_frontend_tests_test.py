@@ -251,8 +251,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             return git_refs
         def mock_get_changed_files(
             unused_refs: List[git_changes_utils.GitRef],
-            unused_remote_name: str,
-            unused_remote_branch: str
+            unused_remote_name: str
         ) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
             return {
                 'branch1': (
@@ -285,7 +284,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             git_changes_utils, 'get_refs', mock_get_refs)
         get_changed_files_swap = self.swap_with_checks(
             git_changes_utils, 'get_changed_files', mock_get_changed_files,
-            expected_args=[(git_refs, 'remote', 'develop')])
+            expected_args=[(git_refs, 'remote')])
         get_staged_acmrt_files_swap = self.swap(
             git_changes_utils, 'get_staged_acmrt_files',
             mock_get_staged_acmrt_files)

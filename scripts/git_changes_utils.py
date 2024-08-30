@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import collections
+import itertools
 import os
 import subprocess
 import sys
@@ -30,6 +31,97 @@ GitRef = collections.namedtuple(
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 
+def get_git_remotes() -> List[str]:
+    """Get the list of remotes in the git repository.
+
+    Returns:
+        list(str). The list of remotes in the git repository.
+
+    Raises:
+        ValueError. Subprocess failed to start.
+    """
+    task = subprocess.Popen(
+        ['git', 'remote'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = task.communicate()
+    if not err:
+        remotes = out[:-1].decode('utf-8').split('\n')
+        return remotes
+    else:
+        raise ValueError(err)
+
+
+def get_remote_url(remote_name: str) -> str:
+    """Get the remote URL of the given remote name.
+
+    Parameter:
+        remote_name: str. The name of the remote.
+
+    Returns:
+        str. The remote URL of the given remote name.
+
+    Raises:
+        ValueError. Subprocess failed to start.
+    """
+    task = subprocess.Popen(
+        ['git', 'config', '--get', 'remote.%s.url' % remote_name],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    remote_url, err = task.communicate()
+    if not err:
+        return remote_url.decode('utf-8')
+    else:
+        raise ValueError(err)
+
+
+def get_upstream_git_repository_remote_name() -> str:
+    """Get the remote name of the upstream repository.
+
+    Returns:
+        Optional[bytes]. The remote name of the upstream repository.
+
+    Raises:
+        ValueError. Subprocess failed to start.
+        Exception. Upstream not set.
+    """
+    remote_name = ''
+    remote_num = 0
+    remotes = get_git_remotes()
+    for remote in remotes:
+        remote_url = get_remote_url(remote)
+        if remote_url.endswith('oppia/oppia.git\n'):
+            remote_num += 1
+            remote_name = remote
+
+    if not remote_num:
+        raise Exception(
+            'Error: Please set the git \'upstream\' repository.\n'
+            'To do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2a. If \'upstream\' is listed in the command output, then run the '
+            'command \'git remote set-url upstream '
+            'https://github.com/oppia/oppia.git\'\n'
+            '2b. If \'upstream\' is not listed in the command output, then run '
+            'the command \'git remote add upstream '
+            'https://github.com/oppia/oppia.git\'\n'
+        )
+
+    if remote_num > 1:
+        raise Exception(
+            'Error: Please keep only one remote branch for oppia:develop.\n'
+            'To do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2. This command will list the remote references. There will be '
+            'multiple remotes with the main oppia github reopsitory url, but we'
+            ' want to make sure that there is only one main \'upstream\' remote'
+            ' that uses the url https://github.com/oppia/oppia.git. Please use '
+            'the command, \'git remote remove <remote_name>\' on all remotes '
+            'that have the url https://github.com/oppia/oppia.git except for '
+            'the main \'upstream\' remote.\n'
+        )
+
+    return remote_name
+
+
 def get_local_git_repository_remote_name() -> str:
     """Get the remote name of the local repository.
 
@@ -40,31 +132,17 @@ def get_local_git_repository_remote_name() -> str:
         ValueError. Subprocess failed to start.
         Exception. Upstream not set.
     """
-    remote_name = b''
+    remote_name = ''
     remote_num = 0
-    task = subprocess.Popen(
-        ['git', 'remote'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    remotes = out[:-1].split(b'\n')
-    if not err:
-        for remote in remotes:
-            get_remotes_url_cmd = (
-                b'git config --get remote.%s.url' % remote).split()
-            task = subprocess.Popen(
-                get_remotes_url_cmd, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            remote_url, err = task.communicate()
-            if not err:
-                if (
-                    remote_url.endswith(b'oppia.git\n') and
-                    not remote_url.endswith(b'oppia/oppia.git\n')
-                ):
-                    remote_num += 1
-                    remote_name = remote
-            else:
-                raise ValueError(err)
-    else:
-        raise ValueError(err)
+    remotes = get_git_remotes()
+    for remote in remotes:
+        remote_url = get_remote_url(remote)
+        if (
+            remote_url.endswith('oppia.git\n') and
+            not remote_url.endswith('oppia/oppia.git\n')
+        ):
+            remote_num += 1
+            remote_name = remote
 
     if remote_num == 0:
         raise Exception(
@@ -93,7 +171,7 @@ def get_local_git_repository_remote_name() -> str:
             'the main \'origin\' remote.\n'
         )
 
-    return remote_name.decode('utf-8')
+    return remote_name
 
 
 def git_diff_name_status(
@@ -191,16 +269,15 @@ def get_merge_base(branch: str, other_branch: str) -> str:
 
 
 def compare_to_remote(
-    remote: str, local_branch: str, remote_branch: Optional[str] = None
+    remote: str, local_branch: str, remote_branch: str
 ) -> List[FileDiff]:
     """Compare local with remote branch with git diff.
 
     Parameter:
         remote: str. Name of the git remote being pushed to.
         local_branch: str. Name of the git branch being pushed to.
-        remote_branch: str|None. The name of the branch on the remote
-            to test against. If None, the remote branch is considered
-            to be the same as the local branch.
+        remote_branch: str. The name of the branch on the remote
+            to test against.
 
     Returns:
         list(FileDiff). List of FileDiffs (tuple with name/status).
@@ -209,14 +286,12 @@ def compare_to_remote(
         ValueError. Raise ValueError if git command fails or if a git diff
             file is not inside the oppia directory.
     """
-    remote_branch = remote_branch if remote_branch else local_branch
-    git_remote = '%s/%s' % (remote, remote_branch)
     # Ensure that references to the remote branches exist on the local machine.
     common.start_subprocess_for_result(['git', 'pull', remote])
     # Only compare differences to the merge base of the local and remote
     # branches (what GitHub shows in the files tab of pull requests).
     file_diffs = git_diff_name_status(
-        get_merge_base(git_remote, local_branch), local_branch)
+        get_merge_base(remote_branch, local_branch), local_branch)
     for file_diff in file_diffs:
         if not check_file_inside_directory(
             file_diff.name.decode(), common.CURR_DIR
@@ -267,15 +342,17 @@ def get_refs() -> List[GitRef]:
         if stderr:
             raise ValueError(stderr)
         stdout = encoded_stdout.decode('utf-8')
-        local_ref_line, remote_ref_line = stdout.splitlines()
-        local_sha, local_ref = local_ref_line.split()
-        remote_sha, remote_ref = remote_ref_line.split()
+        refs = stdout.splitlines()
+        local_sha, local_ref = refs[0].split()
+        remote_sha, remote_ref = None, None
+        if len(refs) > 1:
+            remote_sha, remote_ref = refs[1].split()
         ref_list.append(GitRef(local_ref, local_sha, remote_ref, remote_sha))
     return ref_list
 
 
 def get_changed_files(
-    ref_list: List[GitRef], remote: str, remote_branch: Optional[str] = None
+    ref_list: List[GitRef], remote: str
 ) -> Dict[str, Tuple[List[FileDiff], List[bytes]]]:
     """Collect diff files and ACMRT files for each branch in ref_list.
     ACMRT files are files that are Added, Copied, Modified, Renamed, or
@@ -284,8 +361,6 @@ def get_changed_files(
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
         remote: str. The name of the remote being pushed to.
-        remote_branch: str. The name of the branch on the remote to compare
-            against.
 
     Returns:
         dict. Dict mapping branch names to 2-tuples of the form (list of
@@ -298,16 +373,33 @@ def get_changed_files(
     ref_heads_only = [
         ref for ref in ref_list
         if (ref.local_ref.startswith('refs/heads/') or ref.local_ref == 'HEAD')]
+    ref_remotes_only = [
+        ref for ref in ref_list if ref.remote_ref and
+        ref.remote_ref.startswith('refs/remotes/')]
     # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
+    remote_branches = [
+        ref.remote_ref[len('refs/remotes/'):] for ref in ref_remotes_only]
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
-    for branch, _ in zip(branches, hashes):
+    for branch, _, remote_branch in itertools.zip_longest(
+        branches,
+        hashes,
+        remote_branches
+    ):
+        remote_to_use = remote
+        if not remote_branch:
+            upstream_remote_name = get_upstream_git_repository_remote_name()
+            remote_branch = (
+                '%s/%s' % (
+                    upstream_remote_name, get_parent_branch_name_for_diff())
+            )
+            remote_to_use = upstream_remote_name
         # Get the difference to remote/develop.
         diff_files = compare_to_remote(
-            remote, branch, remote_branch)
+            remote_to_use, branch, remote_branch)
         acmrt_files = extract_acmrt_files_from_diff(diff_files)
         collected_files[branch] = (diff_files, acmrt_files)
 
@@ -380,7 +472,7 @@ def get_changed_python_test_files() -> Set[str]:
         sys.exit('Error: No remote repository found.')
     refs = get_refs()
     collected_files = get_changed_files(
-        refs, remote, get_parent_branch_name_for_diff())
+        refs, remote)
     for _, (_, acmrt_files) in collected_files.items():
         if not acmrt_files:
             continue

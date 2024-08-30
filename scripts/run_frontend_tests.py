@@ -198,8 +198,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             sys.exit('Error: No remote repository found.')
         refs = git_changes_utils.get_refs()
         collected_files = git_changes_utils.get_changed_files(
-            refs, remote,
-            git_changes_utils.get_parent_branch_name_for_diff())
+            refs, remote)
         for _, (_, acmrt_files) in collected_files.items():
             if not acmrt_files:
                 continue
