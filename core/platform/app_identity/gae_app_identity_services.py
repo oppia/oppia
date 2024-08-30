@@ -18,7 +18,8 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
@@ -36,10 +37,13 @@ def get_application_id() -> str:
     Raises:
         ValueError. Value can't be None for application id.
     """
-    app_id = feconf.OPPIA_PROJECT_ID
-    if app_id is None:
+    oppia_project_id = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+    if oppia_project_id is None:
         raise ValueError('Value None for application id is invalid.')
-    return app_id
+    assert isinstance(oppia_project_id, str)
+    return oppia_project_id
 
 
 def get_gcs_resource_bucket_name() -> str:

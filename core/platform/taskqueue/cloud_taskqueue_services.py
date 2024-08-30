@@ -24,6 +24,8 @@ import logging
 
 from core import feconf
 from core.constants import constants
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 
 from google import auth
 from google.api_core import retry
@@ -68,8 +70,12 @@ def create_http_task(
     """
     # The cloud tasks library requires the Oppia project id and region, as well
     # as the queue name as the path to be able to find the correct queue.
+    oppia_project_id = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+    assert isinstance(oppia_project_id, str)
     parent = CLIENT.queue_path(
-        feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
+        oppia_project_id, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
     # Here we use type Any because task's structure can vary a lot. So, to allow
     # every type of value we used Dict[str, Any] type here.

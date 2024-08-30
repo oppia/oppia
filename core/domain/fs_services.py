@@ -23,8 +23,6 @@ from core import utils
 from core.constants import constants
 from core.domain import image_services
 from core.domain import image_validation_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.platform import models
 
 from typing import Dict, List, Optional
@@ -460,6 +458,8 @@ def get_static_asset_url(filepath: str) -> str:
         return 'http://localhost:8181/assetsstatic/%s' % (
             filepath
         )
+    from core.domain import platform_parameter_list
+    from core.domain import platform_parameter_services
     oppia_project_id = (
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
