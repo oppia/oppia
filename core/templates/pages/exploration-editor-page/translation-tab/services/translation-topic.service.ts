@@ -25,7 +25,6 @@ import {
   ContributionOpportunitiesService,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
-import {Observable, Subject} from 'rxjs';
 import {LoggerService} from 'services/contextual/logger.service';
 
 @Injectable({
