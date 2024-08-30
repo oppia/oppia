@@ -20,18 +20,25 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ContentToggleButtonComponent} from './content-toggle-button.component';
 import {CardDisplayComponent} from './card-display.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 describe('CardDisplayComponent', () => {
   let component: CardDisplayComponent;
+  let childComponent: ContentToggleButtonComponent;
   let fixture: ComponentFixture<CardDisplayComponent>;
+  let childFixture: ComponentFixture<ContentToggleButtonComponent>;
   let scrollLeftSetterSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
-      declarations: [CardDisplayComponent, MockTranslatePipe],
+      declarations: [
+        CardDisplayComponent,
+        ContentToggleButtonComponent,
+        MockTranslatePipe,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -39,6 +46,8 @@ describe('CardDisplayComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CardDisplayComponent);
     component = fixture.componentInstance;
+    childFixture = TestBed.createComponent(ContentToggleButtonComponent);
+    childComponent = childFixture.componentInstance;
 
     component.numCards = 5;
     component.tabType = 'home';
@@ -255,5 +264,15 @@ describe('CardDisplayComponent', () => {
         expect(scrollLeftSetterSpy.calls.mostRecent().args[0]).toBe(0);
       });
     });
+  });
+
+  it('should handle event emitted by content toggle button', () => {
+    spyOn(component, 'handleToggleState').and.callThrough();
+
+    childComponent.toggle();
+
+    fixture.detectChanges();
+
+    expect(component.handleToggleState).toHaveBeenCalledWith(true);
   });
 });
