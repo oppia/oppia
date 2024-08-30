@@ -274,5 +274,27 @@ describe('CardDisplayComponent', () => {
     fixture.detectChanges();
 
     expect(component.handleToggleState).toHaveBeenCalledWith(true);
+    expect(component.toggleState).toBeTrue();
+  });
+
+  it('should return empty string for getVisibility if tabType is not progress', () => {
+    expect(component.getVisibility).toEqual('');
+  });
+
+  it('should return hidden class for getVisibility if tabType is progress', () => {
+    component.tabType = 'progress';
+
+    fixture.detectChanges();
+
+    expect(component.getVisibility).toEqual('card-display-content-hidden');
+  });
+
+  it('should return shown class for getVisibility after toggling if tabType is progress', () => {
+    component.tabType = 'progress';
+    childComponent.toggle();
+    fixture.detectChanges();
+
+    expect(component.toggleState).toBeTrue();
+    expect(component.getVisibility).toEqual('card-display-content-shown');
   });
 });
