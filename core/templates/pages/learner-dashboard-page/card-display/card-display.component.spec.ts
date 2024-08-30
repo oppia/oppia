@@ -20,9 +20,16 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {ContentToggleButtonComponent} from './content-toggle-button.component';
+import {ContentToggleButtonComponent} from '../content-toggle-button/content-toggle-button.component';
 import {CardDisplayComponent} from './card-display.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {By} from '@angular/platform-browser';
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('CardDisplayComponent', () => {
   let component: CardDisplayComponent;
@@ -39,6 +46,12 @@ describe('CardDisplayComponent', () => {
         ContentToggleButtonComponent,
         MockTranslatePipe,
       ],
+      providers: [
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -48,6 +61,7 @@ describe('CardDisplayComponent', () => {
     component = fixture.componentInstance;
     childFixture = TestBed.createComponent(ContentToggleButtonComponent);
     childComponent = childFixture.componentInstance;
+    TestBed.inject(TranslateService);
 
     component.numCards = 5;
     component.tabType = 'home';
@@ -267,9 +281,14 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should handle event emitted by content toggle button', () => {
-    spyOn(component, 'handleToggleState').and.callThrough();
+    component.tabType = 'progress';
+    fixture.detectChanges();
 
-    childComponent.toggle();
+    spyOn(component, 'handleToggleState').and.callThrough();
+    const button = fixture.debugElement.query(
+      By.directive(ContentToggleButtonComponent)
+    ).componentInstance;
+    button.toggle();
 
     fixture.detectChanges();
 
@@ -278,7 +297,7 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should return empty string for getVisibility if tabType is not progress', () => {
-    expect(component.getVisibility).toEqual('');
+    expect(component.getVisibility()).toEqual('');
   });
 
   it('should return hidden class for getVisibility if tabType is progress', () => {
@@ -286,15 +305,20 @@ describe('CardDisplayComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.getVisibility).toEqual('card-display-content-hidden');
+    expect(component.getVisibility()).toEqual('card-display-content-hidden');
   });
 
   it('should return shown class for getVisibility after toggling if tabType is progress', () => {
     component.tabType = 'progress';
-    childComponent.toggle();
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(
+      By.directive(ContentToggleButtonComponent)
+    ).componentInstance;
+    button.toggle();
+
     fixture.detectChanges();
 
     expect(component.toggleState).toBeTrue();
-    expect(component.getVisibility).toEqual('card-display-content-shown');
+    expect(component.getVisibility()).toEqual('card-display-content-shown');
   });
 });

@@ -21,7 +21,7 @@ import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TranslateService} from '@ngx-translate/core';
-import {ContentToggleButtonComponent} from './classroom-button.component';
+import {ContentToggleButtonComponent} from './content-toggle-button.component';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {By} from '@angular/platform-browser';
 
@@ -69,7 +69,7 @@ describe('ContentToggleButtonComponent', () => {
     );
   });
 
-  it('should invert isExpanded to true and emit false when toggle is called', () => {
+  it('should invert isExpanded to true and emit true when toggle is called', () => {
     fixture.detectChanges();
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(component.toggleUpdated, 'emit');
@@ -84,7 +84,7 @@ describe('ContentToggleButtonComponent', () => {
     expect(component.toggleUpdated.emit).toHaveBeenCalledWith(true);
   });
 
-  it('should invert isExpanded to false and emit true when toggle is called', () => {
+  it('should invert isExpanded to false and emit false when toggle is called', () => {
     component.isExpanded = true;
     fixture.detectChanges();
     spyOn(translateService, 'instant').and.callThrough();
@@ -93,7 +93,7 @@ describe('ContentToggleButtonComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.isExpanded).toBeTrue();
+    expect(component.isExpanded).toBeFalse();
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE'
     );
@@ -109,6 +109,6 @@ describe('ContentToggleButtonComponent', () => {
     button.triggerEventHandler('click', null);
 
     expect(component.isExpanded).toBeTrue();
-    expect(component.toggleUpdated.emit).toHaveBeenCalledWith(false);
+    expect(component.toggleUpdated.emit).toHaveBeenCalledWith(true);
   });
 });
