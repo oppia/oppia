@@ -33,9 +33,7 @@ class MockTranslateService {
 
 describe('CardDisplayComponent', () => {
   let component: CardDisplayComponent;
-  let childComponent: ContentToggleButtonComponent;
   let fixture: ComponentFixture<CardDisplayComponent>;
-  let childFixture: ComponentFixture<ContentToggleButtonComponent>;
   let scrollLeftSetterSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
@@ -59,8 +57,6 @@ describe('CardDisplayComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CardDisplayComponent);
     component = fixture.componentInstance;
-    childFixture = TestBed.createComponent(ContentToggleButtonComponent);
-    childComponent = childFixture.componentInstance;
     TestBed.inject(TranslateService);
 
     component.numCards = 5;
