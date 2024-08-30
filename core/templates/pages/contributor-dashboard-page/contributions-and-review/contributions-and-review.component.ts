@@ -634,7 +634,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   loadOpportunities(): Promise<GetOpportunitiesResponse> {
-    // console.log('running.. loadOpportunities()');
     return this.loadContributions(/* Param shouldResetOffset= */ true);
   }
 
@@ -725,9 +724,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     // Reset active exploration when changing topics.
     this.directiveSubscriptions.add(
       this.translationTopicService.onActiveTopicChanged.subscribe(() => {
-        console.log('handle');
         this.activeExplorationId = null;
-        this.loadOpportunities();
+        // this.loadOpportunities();
       })
     );
 

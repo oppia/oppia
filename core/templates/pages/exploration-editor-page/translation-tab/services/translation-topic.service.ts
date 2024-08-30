@@ -36,7 +36,7 @@ export class TranslationTopicService {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private activeTopicName!: string;
-  private _activeTopicChangedEventEmitter = new Subject<void>();
+  private _activeTopicChangedEventEmitter = new EventEmitter<void>();
 
   constructor(
     private ContributionOpportunitiesService: ContributionOpportunitiesService,
@@ -60,14 +60,13 @@ export class TranslationTopicService {
           return;
         }
         this.activeTopicName = newActiveTopicName;
-        console.log('emit');
-        this._activeTopicChangedEventEmitter.next();
+        this._activeTopicChangedEventEmitter.emit();
       }
     );
   }
 
-  get onActiveTopicChanged(): Observable<void> {
-    return this._activeTopicChangedEventEmitter.asObservable();
+  get onActiveTopicChanged(): EventEmitter<void> {
+    return this._activeTopicChangedEventEmitter;
   }
 }
 
