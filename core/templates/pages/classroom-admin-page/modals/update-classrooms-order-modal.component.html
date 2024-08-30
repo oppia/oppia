@@ -1,0 +1,54 @@
+<div class="update-classroom-order-modal">
+  <h3>Update Classroom order</h3>
+  <p class="hint">Drag the classroom tiles to change the order in which they appear to learners on the classrooms page, community library, and in the navigation bar.</p>
+  <div cdkDropList (cdkDropListDropped)="drop($event)">
+    <div *ngFor="let classroom of classroomIdToClassroomNameIndex"
+         class="classroom-tile"
+         cdkDrag
+    >
+      {{ classroom.classroom_name }}
+    </div>
+  </div>
+  <div class="button-container">
+    <button class="btn btn-success" (click)="save()">Save</button>
+    <button class="btn btn-secondary" (click)="close()">Close</button>
+  </div>
+</div>
+
+<style>
+  .update-classroom-order-modal {
+    padding: 20px;
+
+    h3 {
+      margin-bottom: 10px;
+    }
+
+    .hint {
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .classroom-tile {
+      background-color: #e0f2f1;
+      color: black;
+      cursor: move;
+      margin-bottom: 10px;
+      padding: 10px;
+      transition: transform 0.2s ease;
+    }
+
+    .cdk-drag-placeholder {
+      transform: scale(1.1);
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+
+      button {
+        margin-left: 10px;
+      }
+    }
+  }
+</style>
