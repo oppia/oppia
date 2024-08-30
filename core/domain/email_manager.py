@@ -108,57 +108,6 @@ REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     }
 }
 
-EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
-        'The default sender name for outgoing emails.',
-        platform_parameter_domain.DataTypes.STRING,
-        default='Site Admin'
-    )
-)
-
-EMAIL_FOOTER: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.EMAIL_FOOTER,
-        'The footer to append to all outgoing emails. (This should '
-        'be written in HTML and include an unsubscribe link.)',
-        platform_parameter_domain.DataTypes.STRING,
-        default=(
-            'You can change your email preferences via the '
-            '<a href="%s%s">Preferences</a> page.' % (
-                feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL)
-        )
-    )
-)
-
-_PLACEHOLDER_SUBJECT: Final = 'THIS IS A PLACEHOLDER.'
-_PLACEHOLDER_HTML_BODY: Final = (
-    'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
-)
-
-SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
-        'Content of email sent after a new user signs up. Set the email '
-        'subject. These emails are only sent if the functionality is enabled '
-        'in feconf.py.',
-        platform_parameter_domain.DataTypes.STRING,
-        default=_PLACEHOLDER_SUBJECT
-    )
-)
-
-SIGNUP_EMAIL_BODY_CONTENT: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
-        'Content of email sent after a new user signs up. (The email body '
-        'should be written with HTML and not include a salutation or footer.) '
-        'These emails are only sent if the functionality is enabled in '
-        'feconf.py.',
-        platform_parameter_domain.DataTypes.STRING,
-        default=_PLACEHOLDER_HTML_BODY
-    )
-)
-
 EXPLORATION_ROLE_MANAGER: Final = 'manager rights'
 EXPLORATION_ROLE_EDITOR: Final = 'editor rights'
 EXPLORATION_ROLE_VOICE_ARTIST: Final = 'voice artist rights'
@@ -196,24 +145,6 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
     ),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
-
-UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
-    platform_parameter_domain.PlatformParameter) = (
-        PlatformParameterRegistry.create_platform_parameter(
-            (
-                platform_parameter_list.ParamName.
-                UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
-            ),
-            'Default content for the email sent after an exploration is '
-            'unpublished by a moderator. These emails are only sent if the '
-            'functionality is enabled in feconf.py. Leave this field blank '
-            'if emails should not be sent.',
-            platform_parameter_domain.DataTypes.STRING,
-            default=(
-                'I\'m writing to inform you that I have unpublished the above '
-                'exploration.')
-        )
-    )
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     'email_body_template': (

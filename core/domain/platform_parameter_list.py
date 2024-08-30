@@ -62,7 +62,6 @@ class ParamName(enum.Enum):
     MAILCHIMP_AUDIENCE_ID = 'mailchimp_audience_id'
     MAILCHIMP_USERNAME = 'mailchimp_username'
     MAILGUN_DOMAIN_NAME = 'mailgun_domain_name'
-    REDISHOST = 'redishost'
     ES_CLOUD_ID = 'es_cloud_id'
     ES_USERNAME = 'es_username'
     OPPIA_PROJECT_ID = 'oppia_project_id'
@@ -101,7 +100,6 @@ ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
     ParamName.MAILCHIMP_AUDIENCE_ID,
     ParamName.MAILCHIMP_USERNAME,
     ParamName.MAILGUN_DOMAIN_NAME,
-    ParamName.REDISHOST,
     ParamName.ES_CLOUD_ID,
     ParamName.ES_USERNAME,
     ParamName.OPPIA_PROJECT_ID

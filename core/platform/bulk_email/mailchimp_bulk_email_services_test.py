@@ -296,6 +296,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         [(
             platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
             'username'
+        ), (
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            ''
         )]
     )
     def test_add_or_update_mailchimp_user_status(self) -> None:
@@ -366,6 +369,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         [(
             platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
             'username'
+        ), (
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            ''
         )]
     )
     def test_android_merge_fields(self) -> None:
@@ -393,6 +399,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         [(
             platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
             'username'
+        ), (
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            ''
         )]
     )
     def test_catch_or_raise_errors_when_creating_new_invalid_user(self) -> None:
@@ -427,6 +436,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         [(
             platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
             'username'
+        ), (
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            ''
         )]
     )
     def test_permanently_delete_user(self) -> None:
