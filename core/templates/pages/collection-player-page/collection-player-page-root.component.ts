@@ -28,9 +28,14 @@ import './collection-player-page-root.component.css';
 })
 export class CollectionPlayerPageRootComponent extends BaseRootComponent {
   title: string =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.TITLE ||
-    'Loading...';
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.TITLE;
 
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
     .COLLECTION_PLAYER.META as unknown as Readonly<MetaTagData>[];
+  ngOnInit(): void {
+    if (!this.title || this.title.trim() === '') {
+      return;
+    }
+    super.ngOnInit();
+  }
 }
