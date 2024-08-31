@@ -1,6 +1,6 @@
 <button class="align-self-end content-toggle-button mt-4" (click)="toggle()">
   <span class="content-toggle-button-text"> {{ buttonText }} </span>
-  <span class="fas ml-2" [ngClass]="isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></span>
+  <span class="fas" [ngClass]="isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></span>
 </button>
 
 <style>
@@ -17,6 +17,7 @@
     color: #00645c;
     display: flex;
     font-weight: 500;
+    gap: 0 4px;
     justify-content: center;
     padding: 8px;
     transition: all 300ms ease-out;
