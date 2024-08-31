@@ -373,14 +373,12 @@ def get_changed_files(
     ref_heads_only = [
         ref for ref in ref_list
         if (ref.local_ref.startswith('refs/heads/') or ref.local_ref == 'HEAD')]
-    ref_remotes_only = [
-        ref for ref in ref_list if ref.remote_ref and
-        ref.remote_ref.startswith('refs/remotes/')]
     # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
     remote_branches = [
-        ref.remote_ref[len('refs/remotes/'):] for ref in ref_remotes_only]
+        '%s/%s' % (remote, ref.remote_ref.split('/')[-1])
+        for ref in ref_heads_only if ref.remote_ref]
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
