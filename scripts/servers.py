@@ -222,7 +222,7 @@ def managed_firebase_auth_emulator(
     """
     emulator_args = [
         common.FIREBASE_PATH, 'emulators:start', '--only', 'auth',
-        '--project', common.get_oppia_project_id(),
+        '--project', feconf.OPPIA_PROJECT_ID,
         '--config', feconf.FIREBASE_EMULATOR_CONFIG_PATH,
     ]
 
@@ -292,7 +292,7 @@ def managed_cloud_datastore_emulator(
         feconf.CLOUD_DATASTORE_EMULATOR_PORT)
     emulator_args = [
         common.GCLOUD_PATH, 'beta', 'emulators', 'datastore', 'start',
-        '--project', common.get_oppia_project_id(),
+        '--project', feconf.OPPIA_PROJECT_ID,
         '--data-dir', common.CLOUD_DATASTORE_EMULATOR_DATA_DIR,
         '--host-port', emulator_hostport,
         '--consistency=1.0',
@@ -321,9 +321,8 @@ def managed_cloud_datastore_emulator(
         common.wait_for_port_to_be_in_use(feconf.CLOUD_DATASTORE_EMULATOR_PORT)
 
         # Environment variables required to communicate with the emulator.
-        oppia_project_id = common.get_oppia_project_id()
         stack.enter_context(common.swap_env(
-            'DATASTORE_DATASET', oppia_project_id))
+            'DATASTORE_DATASET', feconf.OPPIA_PROJECT_ID))
         stack.enter_context(common.swap_env(
             'DATASTORE_EMULATOR_HOST', emulator_hostport))
         stack.enter_context(common.swap_env(
@@ -331,11 +330,11 @@ def managed_cloud_datastore_emulator(
         stack.enter_context(common.swap_env(
             'DATASTORE_HOST', 'http://%s' % emulator_hostport))
         stack.enter_context(common.swap_env(
-            'DATASTORE_PROJECT_ID', oppia_project_id))
+            'DATASTORE_PROJECT_ID', feconf.OPPIA_PROJECT_ID))
         stack.enter_context(common.swap_env(
             'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
         stack.enter_context(common.swap_env(
-            'GOOGLE_CLOUD_PROJECT', oppia_project_id))
+            'GOOGLE_CLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
 
         yield proc
 

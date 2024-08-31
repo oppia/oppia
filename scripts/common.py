@@ -1048,14 +1048,3 @@ def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
-
-
-def get_oppia_project_id() -> str:
-    """Fetches and returns oppia project ID."""
-    from core.domain import platform_parameter_list
-    from core.domain import platform_parameter_services
-    oppia_project_id = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-    assert isinstance(oppia_project_id, str)
-    return oppia_project_id
