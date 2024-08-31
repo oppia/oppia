@@ -97,7 +97,7 @@ def establish_firebase_connection() -> None:
         firebase_admin.get_app()
     except ValueError as error:
         if 'initialize_app' in str(error):
-            with datastore_services.get_ndb_context()
+            with datastore_services.get_ndb_context():
                 oppia_project_id = (
                     platform_parameter_services.get_platform_parameter_value(
                         platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
