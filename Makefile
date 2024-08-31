@@ -10,7 +10,8 @@ FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenanc
 
 sharding_instances := 3
 
-# Escape special characters in the PATH and remove spaces to resolve errors in WSL due to windows paths. specially on WSL with appendWindowsPath enabled.
+# This escapes any special characters and remove any spaces in the PATH. We do this to resolve errors in WSL due to windows paths.
+# Path like this /usr/git cli/git -> /usr/gitcli/git this is temporary for this Makefile processes.
 FIXED_PATH=$(shell echo "$(PATH)" | sed 's/ /\\ /g' | sed 's/(/\\(/g' | sed 's/)/\\)/g')
 
 
