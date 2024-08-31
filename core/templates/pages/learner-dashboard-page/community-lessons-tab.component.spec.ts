@@ -52,6 +52,31 @@ class MockTruncatePipe {
   }
 }
 
+const sampleExploration = {
+  last_updated_msec: 1591296737470.528,
+  community_owned: false,
+  objective: 'Test Objective',
+  id: '44LKoKLlIbGe',
+  num_views: 0,
+  thumbnail_icon_url: '/subjects/Algebra.svg',
+  human_readable_contributors_summary: {},
+  language_code: 'en',
+  thumbnail_bg_color: '#cc4b00',
+  created_on_msec: 1591296635736.666,
+  ratings: {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+  },
+  status: 'public',
+  tags: [],
+  activity_type: 'exploration',
+  category: 'Algebra',
+  title: 'Test Title',
+};
+
 describe('Community lessons tab Component', () => {
   let component: CommunityLessonsTabComponent;
   let fixture: ComponentFixture<CommunityLessonsTabComponent>;
@@ -779,4 +804,38 @@ describe('Community lessons tab Component', () => {
 
     expect(modalSpy).toHaveBeenCalled();
   }));
+
+  it('should return true when there are no lessons', () => {
+    expect(component.isLearnerStateEmpty()).toBeTrue();
+  });
+
+  it('should return false when there are in-progress lessons', () => {
+    component.totalIncompleteLessonsList = [
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+    ];
+    fixture.detectChanges();
+
+    expect(component.isLearnerStateEmpty()).toBeFalse();
+  });
+
+  it('should return false when there are completed lessons', () => {
+    component.totalCompletedLessonsList = [
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+    ];
+    fixture.detectChanges();
+
+    expect(component.isLearnerStateEmpty()).toBeFalse();
+  });
+
+  it('should return false when there are completed and in-progress lessons', () => {
+    component.totalCompletedLessonsList = [
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+    ];
+    component.totalIncompleteLessonsList = [
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+    ];
+    fixture.detectChanges();
+
+    expect(component.isLearnerStateEmpty()).toBeFalse();
+  });
 });
