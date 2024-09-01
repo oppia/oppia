@@ -103,7 +103,7 @@ def establish_firebase_connection() -> None:
                         platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
                 assert isinstance(oppia_project_id, str)
                 firebase_admin.initialize_app(
-                    options={'projectId': feconf.OPPIA_PROJECT_ID})
+                    options={'projectId': oppia_project_id})
         else:
             raise
 
