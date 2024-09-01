@@ -219,10 +219,17 @@ describe('Supplemental card component', () => {
           offsetHeight: 400,
         },
       ]);
-    spyOn(componentInstance, 'updateHelpCardBottomPosition');
     componentInstance.maxHelpCardHeightSeen = height - 100;
+    spyOn(componentInstance, 'updateHelpCardBottomPosition');
+
+    let innerHeight = 500;
+    spyOnProperty(windowRef.nativeWindow, 'innerHeight', 'get').and.callFake(
+      () => innerHeight
+    );
+
     expect(componentInstance.isHelpCardTall()).toBeFalse();
-    spyOnProperty(windowRef.nativeWindow, 'innerHeight').and.returnValue(100);
+
+    innerHeight = 100;
     expect(componentInstance.isHelpCardTall()).toBeTrue();
   });
 
