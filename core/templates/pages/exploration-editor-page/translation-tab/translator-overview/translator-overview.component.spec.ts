@@ -41,6 +41,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ContextService} from 'services/context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
+import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
@@ -98,6 +99,7 @@ describe('Translator Overview component', () => {
   let routerService: RouterService;
   let entityTranslationsService: EntityTranslationsService;
   let entityVoiceoversService: EntityVoiceoversService;
+  let changeListService: ChangeListService;
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -150,6 +152,7 @@ describe('Translator Overview component', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
+    changeListService = TestBed.inject(ChangeListService);
     windowRef = TestBed.inject(WindowRef);
     localStorageService = TestBed.inject(LocalStorageService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
@@ -233,6 +236,102 @@ describe('Translator Overview component', () => {
         .createSpy()
         .and.returnValue(Promise.resolve(entityTranslation));
     });
+
+    it('should update entity translations with edit translation changes', fakeAsync(() => {
+      expect(
+        entityTranslationsService.getHtmlTranslations('hi', ['content1'])
+      ).toEqual(['translated content']);
+
+      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
+        {
+          cmd: 'edit_translation',
+          content_id: 'content1',
+          language_code: 'hi',
+          translation: {
+            content_value: 'new translation',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+      ]);
+
+      spyOn(
+        translationLanguageService,
+        'getActiveLanguageCode'
+      ).and.returnValue(undefined as unknown as string);
+
+      component.ngOnInit();
+      tick();
+
+      expect(
+        entityTranslationsService.getHtmlTranslations('hi', ['content1'])
+      ).toEqual(['new translation']);
+    }));
+
+    it('should handle mark needs update translation changes', fakeAsync(() => {
+      let translatedContent = entityTranslation.getWrittenTranslation(
+        'content1'
+      ) as TranslatedContent;
+      expect(translatedContent.needsUpdate).toBeFalse();
+
+      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
+        {
+          cmd: 'mark_translations_needs_update',
+          content_id: 'content1',
+        },
+      ]);
+
+      component.ngOnInit();
+      tick();
+
+      translatedContent = entityTranslation.getWrittenTranslation(
+        'content1'
+      ) as TranslatedContent;
+      expect(translatedContent.needsUpdate).toBeTrue();
+    }));
+
+    it('should handle mark needs update translation changes for language', fakeAsync(() => {
+      let translatedContent = entityTranslation.getWrittenTranslation(
+        'content1'
+      ) as TranslatedContent;
+      expect(translatedContent.needsUpdate).toBeFalse();
+
+      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
+        {
+          cmd: 'mark_translation_needs_update_for_language',
+          content_id: 'content1',
+          language_code: 'hi',
+        },
+      ]);
+      spyOn(
+        translationLanguageService,
+        'getActiveLanguageCode'
+      ).and.returnValue(undefined as unknown as string);
+
+      component.ngOnInit();
+      tick();
+
+      translatedContent = entityTranslation.getWrittenTranslation(
+        'content1'
+      ) as TranslatedContent;
+      expect(translatedContent.needsUpdate).toBeTrue();
+    }));
+
+    it('should update entity translations with remove translation changes', fakeAsync(() => {
+      expect(entityTranslation.hasWrittenTranslation('content1')).toBeTrue();
+
+      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
+        {
+          cmd: 'remove_translations',
+          content_id: 'content1',
+        },
+      ]);
+
+      component.ngOnInit();
+      tick();
+
+      expect(entityTranslation.hasWrittenTranslation('content1')).toBeFalse();
+    }));
 
     it(
       'should set language code to previously selected one when there is no' +
