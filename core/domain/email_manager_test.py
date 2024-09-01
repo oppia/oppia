@@ -3936,7 +3936,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
