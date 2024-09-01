@@ -246,16 +246,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     this.platformParametersInEditMode.set(param.name, false);
   }
 
-  async saveDefaultValueToStorage(): Promise<void> {
-    if (!this.windowRef.nativeWindow.confirm('This action is irreversible.')) {
-      return;
-    }
-    for (const param of this.platformParameters) {
-      const commitMessage = `Update default value for '${param.name}'.`;
-      await this.updatePlatformParameter(param, commitMessage);
-    }
-  }
-
   async updatePlatformParameter(
     param: PlatformParameter,
     commitMessage: string

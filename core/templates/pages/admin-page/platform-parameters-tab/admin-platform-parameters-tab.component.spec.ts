@@ -480,26 +480,6 @@ describe('Admin page platform parameters tab', () => {
     });
   });
 
-  describe('.saveDefaultValueToStorage', () => {
-    it('should save the changes', fakeAsync(() => {
-      spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(true);
-
-      component.saveDefaultValueToStorage();
-
-      expect(updateApiSpy).toHaveBeenCalled();
-    }));
-
-    it("should not proceed if the user doesn't confirm", fakeAsync(() => {
-      spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(false);
-
-      component.saveDefaultValueToStorage();
-
-      flushMicrotasks();
-
-      expect(updateApiSpy).not.toHaveBeenCalled();
-    }));
-  });
-
   describe('.updateParameterRulesAsync', () => {
     let setStatusSpy: jasmine.Spy;
     let promptSpy: jasmine.Spy;
