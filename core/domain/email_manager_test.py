@@ -4612,7 +4612,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
-        )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
             '<br><br>'
