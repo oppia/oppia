@@ -2535,23 +2535,24 @@ version: 1
 
         with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
+            es_client = elastic_search_services.get_es_client()
             stack.enter_context(self.swap(
-                elastic_search_services.ES.indices, 'create',
+                es_client.indices, 'create',
                 es_stub.mock_create_index))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'index',
+                es_client, 'index',
                 es_stub.mock_index))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'exists',
+                es_client, 'exists',
                 es_stub.mock_exists))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'delete',
+                es_client, 'delete',
                 es_stub.mock_delete))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'delete_by_query',
+                es_client, 'delete_by_query',
                 es_stub.mock_delete_by_query))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'search',
+                es_client, 'search',
                 es_stub.mock_search))
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_caches',
