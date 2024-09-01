@@ -33,7 +33,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             gae_app_identity_services.get_application_id(), 'some_id')
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, None)]
+        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, '')]
     )
     def test_get_application_id_throws_error(self) -> None:
         with self.assertRaisesRegex(

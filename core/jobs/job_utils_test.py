@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services
 from core.jobs import job_utils
@@ -191,7 +190,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         assert isinstance(self.oppia_project_id, str)
 
     def test_get_beam_entity_from_model(self) -> None:
-        
+
         model = FooModel(id='abc', project=self.oppia_project_id, prop='123')
 
         beam_entity = job_utils.get_beam_entity_from_ndb_model(model)

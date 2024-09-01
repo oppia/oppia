@@ -758,7 +758,7 @@ def send_post_signup_email(
                 email_subject_content_param_name
             ).default_value
         )
-        email_body_content_default_value =(
+        email_body_content_default_value = (
             platform_parameter_registry.Registry.get_platform_parameter(
                 email_body_content_param_name
             ).default_value

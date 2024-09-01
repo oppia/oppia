@@ -25,9 +25,9 @@ import signal
 import subprocess
 import threading
 
-from core.constants import constants
 from core import feconf
 from core import utils
+from core.constants import constants
 from scripts import common
 
 import psutil
@@ -229,7 +229,7 @@ def managed_firebase_auth_emulator(
         oppia_project_id = (
             platform_parameter_services.get_platform_parameter_value(
                     platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
+    assert isinstance(oppia_project_id, str)
     emulator_args = [
         common.FIREBASE_PATH, 'emulators:start', '--only', 'auth',
         '--project', oppia_project_id,
@@ -308,7 +308,7 @@ def managed_cloud_datastore_emulator(
         oppia_project_id = (
             platform_parameter_services.get_platform_parameter_value(
                     platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
+    assert isinstance(oppia_project_id, str)
 
     emulator_args = [
         common.GCLOUD_PATH, 'beta', 'emulators', 'datastore', 'start',

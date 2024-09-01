@@ -2535,7 +2535,7 @@ version: 1
 
         with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
-            es_client = elastic_search_services.get_es_client()
+            es_client = elastic_search_services.ES.get_client()
             stack.enter_context(self.swap(
                 es_client.indices, 'create',
                 es_stub.mock_create_index))
