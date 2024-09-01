@@ -982,7 +982,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     )
     def test_contents_of_signup_email_are_correct(self) -> None:
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_SENDER_NAME.name,
+            param_list.ParamName.EMAIL_SENDER_NAME.value,
             self.admin_id,
             'Update sender name',
             [
@@ -998,7 +998,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     'value_when_matched': 'Email Sender'
                 })
             ],
-            email_manager.EMAIL_SENDER_NAME.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.EMAIL_SENDER_NAME.value
+            ).default_value
         )
         platform_parameter_registry.Registry.update_platform_parameter(
             param_list.ParamName.EMAIL_FOOTER.value,
@@ -1213,7 +1215,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     )
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_SENDER_NAME.name,
+            param_list.ParamName.EMAIL_SENDER_NAME.value,
             self.admin_id,
             'Update sender name',
             [
@@ -1229,7 +1231,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     'value_when_matched': 'Email Sender'
                 })
             ],
-            email_manager.EMAIL_SENDER_NAME.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.EMAIL_SENDER_NAME.value
+            ).default_value
         )
         platform_parameter_registry.Registry.update_platform_parameter(
             param_list.ParamName.EMAIL_FOOTER.value,

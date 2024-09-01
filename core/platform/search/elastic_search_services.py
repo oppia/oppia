@@ -32,8 +32,8 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import secrets_services
     from mypy_imports import datastore_services
+    from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -42,10 +42,10 @@ datastore_services = models.Registry.import_datastore_services()
 class ElasticSearchClient:
     """Cretes an Elastic Search Client."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._client = None
 
-    def get_client(self) -> elasticsearch.Elasticsearch:
+    def get_client(self) -> Any:
         if self._client is None:
             with datastore_services.get_ndb_context():
                 es_cloud_id = (
@@ -59,7 +59,8 @@ class ElasticSearchClient:
                     if es_cloud_id is None else None,
                     cloud_id=es_cloud_id,
                     http_auth=(
-                        (es_username, secrets_services.get_secret('ES_PASSWORD'))
+                        (es_username, secrets_services.get_secret(
+                            'ES_PASSWORD'))
                         if es_cloud_id else None), timeout=30)
 
         return self._client

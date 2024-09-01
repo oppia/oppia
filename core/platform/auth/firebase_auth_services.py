@@ -99,13 +99,12 @@ def establish_firebase_connection() -> None:
             firebase_admin.get_app()
         except ValueError as error:
             if 'initialize_app' in str(error):
-                    oppia_project_id = (
-                        platform_parameter_services.get_platform_parameter_value(
-                            platform_parameter_list.ParamName.
-                            OPPIA_PROJECT_ID.value))
-                    assert isinstance(oppia_project_id, str)
-                    firebase_admin.initialize_app(
-                        options={'projectId': oppia_project_id})
+                oppia_project_id = (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+                assert isinstance(oppia_project_id, str)
+                firebase_admin.initialize_app(
+                    options={'projectId': oppia_project_id})
             else:
                 raise
 
