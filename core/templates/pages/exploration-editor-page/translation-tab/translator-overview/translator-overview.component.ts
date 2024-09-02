@@ -31,8 +31,19 @@ import {TranslationStatusService} from '../services/translation-status.service';
 import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import {ContextService} from 'services/context.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LoaderService} from 'services/loader.service';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {
+  ExplorationChangeEditTranslation,
+  ExplorationChangeMarkTranslationsNeedsUpdate,
+  ExplorationChangeMarkTranslationNeedsUpdateForLanguage,
+  ExplorationChangeRemoveTranslations,
+  ExplorationTranslationChange,
+} from 'domain/exploration/exploration-draft.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {
   LanguageAccentMasterList,
@@ -72,7 +83,9 @@ export class TranslatorOverviewComponent implements OnInit {
 
   constructor(
     private contextService: ContextService,
+    private entityTranslationsService: EntityTranslationsService,
     private entityVoiceoversService: EntityVoiceoversService,
+    private changeListService: ChangeListService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
     private focusManagerService: FocusManagerService,
     private graphDataService: GraphDataService,
@@ -172,14 +185,21 @@ export class TranslatorOverviewComponent implements OnInit {
     }
 
     this.loaderService.showLoadingScreen('Loading');
-    this.translationLanguageService.setActiveLanguageCode(this.languageCode);
-    this.translationStatusService.refresh();
-    this.windowRef.nativeWindow.localStorage.setItem(
-      this.LAST_SELECTED_TRANSLATION_LANGUAGE,
-      this.languageCode
-    );
-    this.routerService.onCenterGraph.emit();
-    this.loaderService.hideLoadingScreen();
+    this.entityTranslationsService
+      .getEntityTranslationsAsync(this.languageCode)
+      .then(entityTranslations => {
+        this.updateTranslationWithChangeList(entityTranslations);
+        this.translationLanguageService.setActiveLanguageCode(
+          this.languageCode
+        );
+        this.translationStatusService.refresh();
+        this.windowRef.nativeWindow.localStorage.setItem(
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE,
+          this.languageCode
+        );
+        this.routerService.onCenterGraph.emit();
+        this.loaderService.hideLoadingScreen();
+      });
 
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
     this.localStorageService.setLastSelectedLanguageAccentCode('');
@@ -208,6 +228,42 @@ export class TranslatorOverviewComponent implements OnInit {
     }
   }
 
+  updateTranslationWithChangeList(entityTranslation: EntityTranslation): void {
+    this.changeListService.getTranslationChangeList().forEach(changeDict => {
+      changeDict = changeDict as ExplorationTranslationChange;
+      switch (changeDict.cmd) {
+        case 'edit_translation':
+          changeDict = changeDict as ExplorationChangeEditTranslation;
+          if (this.languageCode === changeDict.language_code) {
+            entityTranslation.updateTranslation(
+              changeDict.content_id,
+              TranslatedContent.createFromBackendDict(changeDict.translation)
+            );
+          }
+          break;
+        case 'remove_translations':
+          changeDict = changeDict as ExplorationChangeRemoveTranslations;
+          entityTranslation.removeTranslation(changeDict.content_id);
+          break;
+        case 'mark_translations_needs_update':
+          changeDict =
+            changeDict as ExplorationChangeMarkTranslationsNeedsUpdate;
+          entityTranslation.markTranslationAsNeedingUpdate(
+            changeDict.content_id
+          );
+          break;
+        case 'mark_translation_needs_update_for_language':
+          changeDict =
+            changeDict as ExplorationChangeMarkTranslationNeedsUpdateForLanguage;
+          if (this.languageCode === changeDict.language_code) {
+            entityTranslation.markTranslationAsNeedingUpdate(
+              changeDict.content_id
+            );
+          }
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.LAST_SELECTED_TRANSLATION_LANGUAGE = 'last_selected_translation_lang';
     let lastSelectedTranslationLanguage =
@@ -234,15 +290,22 @@ export class TranslatorOverviewComponent implements OnInit {
           : ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE;
     }
 
-    this.translationLanguageService.setActiveLanguageCode(this.languageCode);
-    // We need to refresh the status service once the active language is
-    // set.
-    this.translationStatusService.refresh();
-    this.routerService.onCenterGraph.emit();
+    this.entityTranslationsService
+      .getEntityTranslationsAsync(this.languageCode)
+      .then(entityTranslation => {
+        this.updateTranslationWithChangeList(entityTranslation);
+        this.translationLanguageService.setActiveLanguageCode(
+          this.languageCode
+        );
+        // We need to refresh the status service once the active language is
+        // set.
+        this.translationStatusService.refresh();
+        this.routerService.onCenterGraph.emit();
 
-    this.inTranslationMode = false;
-    this.inVoiceoverMode = false;
-    this.refreshDirectiveScope();
+        this.inTranslationMode = false;
+        this.inVoiceoverMode = false;
+        this.refreshDirectiveScope();
+      });
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
 
     this.voiceoverBackendApiService
