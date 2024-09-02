@@ -224,7 +224,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
   }
 
@@ -936,7 +936,7 @@ export class CurriculumAdmin extends BaseUser {
     const pathSegments = url.pathname.split('/');
     const storyId = pathSegments[pathSegments.length - 1];
     showMessage(`Story ${storyTitle} is created.`);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
 
     return storyId;
   }
@@ -1154,8 +1154,8 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
-    await this.page.waitForSelector(skillSelector, {visible: true});
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(skillSelector, {visible: true});
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
     const skills = await this.page.$$(skillListItemSelector);
@@ -1298,7 +1298,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToClassroomAdminPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(classroomAdminUrl);
   }
 
@@ -1313,6 +1313,7 @@ export class CurriculumAdmin extends BaseUser {
     if (classroomTiles.length === 0) {
       throw new Error('No classrooms are present.');
     }
+
     let foundClassroom = false;
 
     for (let i = 0; i < classroomTiles.length; i++) {
@@ -1322,7 +1323,7 @@ export class CurriculumAdmin extends BaseUser {
       );
 
       if (currentClassroomName === classroomName) {
-        await this.clickOn(classroomTileSelector);
+        await classroomTiles[i].click();
         await this.page.waitForSelector(editClassroomConfigButton);
         await this.clickOn(editClassroomConfigButton);
         await this.page.waitForSelector(closeClassroomConfigButton);
@@ -1333,7 +1334,7 @@ export class CurriculumAdmin extends BaseUser {
     }
 
     if (!foundClassroom) {
-      throw new Error(`${classroomName} classroom do not exists.`);
+      throw new Error(`${classroomName} classroom does not exist.`);
     }
   }
 
@@ -1360,8 +1361,8 @@ export class CurriculumAdmin extends BaseUser {
   async updateClassroom(
     classroomName: string,
     teaserText: string,
-    courseDetails: string,
-    topicListIntro: string
+    topicListIntro: string,
+    courseDetails: string
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
@@ -1370,13 +1371,11 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
     await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
     await this.clickOn(classroomThumbnailContainer);
-    await this.page.waitForSelector(imageUploaderModal, {visible: true});
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
     await this.clickOn(uploadClassroomImageButton);
-    await this.page.waitForSelector(imageUploaderModal, {visible: false});
-
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
 
     await this.clickOn(classroomBannerContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
@@ -1441,6 +1440,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async deleteClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
+    await this.page.waitForSelector(classroomTileSelector);
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === 0) {
@@ -1452,14 +1452,21 @@ export class CurriculumAdmin extends BaseUser {
     for (let i = 0; i < classroomTiles.length; i++) {
       const currentClassroomName = await classroomTiles[i].$eval(
         classroomTileNameSpan,
-        element => (element as HTMLSpanElement).innerText.trim()
+        element => element.textContent?.trim()
       );
 
       if (currentClassroomName === classroomName) {
         const classroomTile = classroomTiles[i];
-        await classroomTile.$eval(deleteClassroomButton, element =>
-          (element as HTMLButtonElement).click()
+
+        await classroomTile.waitForSelector(deleteClassroomButton);
+        const deleteClassroomButtonElement = await classroomTile.$(
+          deleteClassroomButton
         );
+        if (deleteClassroomButtonElement) {
+          await this.waitForElementToBeClickable(deleteClassroomButtonElement);
+          await deleteClassroomButtonElement.click();
+        }
+
         await this.page.waitForSelector(deleteClassroomModal, {visible: true});
         await this.clickOn(confirmDeleteClassroomButton);
         await this.page.waitForSelector(deleteClassroomModal, {visible: false});
@@ -1552,9 +1559,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.createNewClassroom(classroomName, urlFragment);
     await this.updateClassroom(
       classroomName,
-      'Teaser text',
-      'Course details',
-      'Topic list intro'
+      'Welcome to Math classroom!',
+      'This course covers basic algebra and trigonometry.',
+      'In this course, you will learn the following topics: algbera and trigonometry,'
     );
     await this.addTopicToClassroom(classroomName, topicToBeAssigned);
     await this.publishClassroom(classroomName);

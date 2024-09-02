@@ -10,6 +10,8 @@
     ".github/SECURITY.md",
     ".github/ISSUE_TEMPLATE/4_server_error_template.md",
     ".github/workflows/README.md",
+    "core/tests/test-modules-mappings/README.md",
+    "core/tests/README.md",
     "assets/README.md",
     "core/templates/domain/exploration/ExplorationMetadataObjectFactorySpec.ts",
     "core/templates/domain/exploration/ExplorationObjectFactorySpec.ts",
@@ -60,7 +62,7 @@
     "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
-    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts"
+    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",
@@ -124,6 +126,7 @@
     "extensions/objects/objectComponentsRequiresForPlayers.ts",
     "core/templates/pages/error-pages/error-page.import.ts",
     "core/templates/pages/error-pages/error-iframed-page/error-iframed-page.import.ts",
-    "core/templates/pages/maintenance-page/maintenance-page.import.ts"
+    "core/templates/pages/maintenance-page/maintenance-page.import.ts",
+    "core/templates/pages/blog-dashboard-page/blog-dashboard-page.import.ts"
   ]
 }

@@ -859,7 +859,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
-            'inapplicable_skill_misconception_ids': None
+            'inapplicable_skill_misconception_ids': []
         }
         self.assertEqual(expected_dict, state_dict)
 
@@ -1282,6 +1282,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_linked_skill_id('string_2')
         self.assertEqual(state.linked_skill_id, 'string_2')
 
+    def test_update_inapplicable_misconception_skill_ids(self) -> None:
+        """Test updating inapplicable_skill_misconception_ids."""
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
+        self.assertEqual(state.inapplicable_skill_misconception_ids, [])
+        state.update_inapplicable_skill_misconception_ids(
+            ['string_1']
+        )
+        self.assertEqual(
+            state.inapplicable_skill_misconception_ids,
+            ['string_1']
+        )
+
     def test_update_card_is_checkpoint(self) -> None:
         """Test update card_is_checkpoint."""
         state = state_domain.State.create_default_state(
@@ -1431,7 +1444,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
                 'default_outcome': {
@@ -1502,7 +1515,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
                 'default_outcome': {
@@ -1700,7 +1713,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'interaction': {
                 'solution': {
                     'answer_is_exclusive': True,
@@ -1762,7 +1775,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -1906,7 +1919,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -1973,7 +1986,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2084,7 +2097,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2204,7 +2217,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2306,7 +2319,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': old_solution_dict,
@@ -2400,7 +2413,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2447,7 +2460,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
-            'inapplicable_skill_misconception_ids': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2819,6 +2832,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(init_state, 'linked_skill_id', 12):
                 exploration.validate()
         self.assertEqual(init_state.linked_skill_id, None)
+
+    def test_validate_state_inapplicable_skill_misconception_ids(self) -> None:
+        """Test validation of inapplicable_skill_misconception_ids."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.inapplicable_skill_misconception_ids, [])
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected '
+            'inapplicable_skill_misconception_ids to be a list, received 12.'):
+            with self.swap(
+                init_state, 'inapplicable_skill_misconception_ids', 12
+            ):
+                exploration.validate()
+        self.assertEqual(init_state.inapplicable_skill_misconception_ids, [])
 
     def test_validate_state_card_is_checkpoint(self) -> None:
         """Test validation of card_is_checkpoint."""

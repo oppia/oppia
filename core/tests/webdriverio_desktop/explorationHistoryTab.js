@@ -219,7 +219,7 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       30: {
-        text: 'inapplicable_skill_misconception_ids: null',
+        text: 'inapplicable_skill_misconception_ids: []',
         highlighted: false,
       },
       31: {
@@ -422,7 +422,7 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       49: {
-        text: 'inapplicable_skill_misconception_ids: null',
+        text: 'inapplicable_skill_misconception_ids: []',
         highlighted: false,
       },
       50: {
@@ -466,7 +466,7 @@ describe('Exploration history', function () {
       '    ca_buttonText_5: {}\n' +
       'solicit_answer_details: false\n' +
       'card_is_checkpoint: false\n' +
-      'inapplicable_skill_misconception_ids: null\n' +
+      'inapplicable_skill_misconception_ids: []\n' +
       '';
 
     var expectedHistoryStates = [

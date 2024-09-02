@@ -49,9 +49,9 @@ describe('Logged-out User in Teach page', function () {
   it(
     'should open the classrooms page when "Explore Lessons" button is clicked',
     async function () {
-      await loggedOutUser.clickExploreLessonsButtonInTeachPage();
+      await loggedOutUser.clickExploreLessonsButtonAtTheBottomInTeachPage();
       await loggedOutUser.expectScreenshotToMatch(
-        'clickExploreLessonsButtonInTeachPage',
+        'clickExploreLessonsButtonAtTheBottomInTeachPage',
         __dirname
       );
     },

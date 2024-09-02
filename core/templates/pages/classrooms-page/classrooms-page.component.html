@@ -36,7 +36,7 @@
         <div class="classroom-tile-container">
           <ng-container *ngFor="let classroomSummary of classroomSummaries">
             <ng-container *ngIf="classroomSummary.is_published">
-              <oppia-classroom-summary-tile [classroomSummary]="classroomSummary"></oppia-classroom-summary-tile>
+              <oppia-classroom-summary-tile [classroomSummary]="classroomSummary" (click)="registerClassroomCardClickEvent(classroomSummary.name)"></oppia-classroom-summary-tile>
             </ng-container>
           </ng-container>
           <ng-container *ngIf="hasPublicClassrooms">
@@ -102,8 +102,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: center;
-    width: 100vw;
+    justify-content: start;
+    width: 884px;
   }
 
   .classrooms-main-content .description-container {
@@ -241,6 +241,11 @@
   }
 
 @media screen and (max-width: 768px) {
+    .classrooms-main-content .classroom-tile-container {
+      justify-content: center;
+      width: fit-content;
+    }
+
     .breadcrumbs-container .classrooms-breadcrumbs,
     .classrooms-main-content .description-container {
         width: 90vw;
@@ -283,9 +288,14 @@
     }
   }
 
-  @media screen and (max-width: 375px) {
+  @media screen and (max-width: 395px) {
+    .classrooms-main-content .description-container .classrooms-description {
+      padding-left: 16px;
+    }
+
     .classrooms-page-content .classrooms-heading {
       font-size: 24px;
+      margin-bottom: 0;
     }
   }
 </style>

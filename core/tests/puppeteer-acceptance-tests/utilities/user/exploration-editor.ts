@@ -60,6 +60,7 @@ const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
   'div.e2e-test-interaction-tile-MultipleChoiceInput';
 const addResponseOptionButton = 'button.e2e-test-add-list-entry';
+const addAnotherResponseButton = 'button.e2e-test-add-another-response';
 const multipleChoiceResponseDropdown =
   'mat-select.e2e-test-main-html-select-selector';
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
@@ -93,7 +94,7 @@ const uploadImageButton = '.e2e-test-upload-image';
 const useTheUploadImageButton = '.e2e-test-use-image';
 const imageRegionSelector = '.e2e-test-svg';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
-const addNewResponseButton = '.e2e-test-add-new-response';
+const addNewResponseButton = 'button.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
 const modifyExistingTranslationsButton = '.e2e-test-modify-translations-button';
 const activeTranslationTab = '.e2e-test-active-translation-tab';
@@ -114,7 +115,9 @@ const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const solutionInput = 'oppia-add-or-update-solution-modal input';
+const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
+const solutionInputTextArea =
+  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const dismissTranslationWelcomeModalSelector =
@@ -137,6 +140,22 @@ const saveSolutionEditButton = 'button.e2e-test-save-solution-explanation-edit';
 const stateHintTab = '.e2e-test-hint-tab';
 const editStateHintSelector = '.e2e-test-open-hint-editor';
 const saveHintEditButton = 'button.e2e-test-save-hint-edit';
+
+const addSkillButton = '.e2e-test-add-skill-button';
+const skillNameInput = '.e2e-test-skill-name-input';
+const skillItem = '.e2e-test-skills-list-item';
+const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
+const deleteSkillButton = 'i.skill-delete-button';
+
+const misconceptionDiv = '.misconception-list-item';
+const optionalMisconceptionDiv = '.optional-misconception-list-item';
+const inapplicableMisconceptionDiv = '.optional-misconception-list-no-action';
+const optionalMisconceptionOptionsButton =
+  '.optional-misconception-options-button';
+const misconceptionApplicableToggle =
+  '.e2e-test-misconception-applicable-toggle';
+const responseGroupDiv = '.e2e-test-response-tab';
+const misconceptionEditorTab = '.e2e-test-open-misconception-editor';
 
 const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
@@ -184,6 +203,16 @@ const outcomeDestWhenStuckSelector =
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
+const uploadAudioButton = '.e2e-test-accessibility-translation-upload-audio';
+const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
+const feedBackButtonTab = '.e2e-test-feedback-tab';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
+const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
+const feedbackSelector = '.e2e-test-exploration-feedback';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
+const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
+const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -294,6 +323,17 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(closePublishedPopUpButton);
     return explorationId;
+  }
+
+  async navigateToFeedbackTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileFeedbackTabButton);
+    } else {
+      await this.clickOn(feedBackButtonTab);
+      await this.waitForNetworkIdle();
+    }
   }
 
   /**
@@ -416,6 +456,10 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOn(textInputInteractionButton);
     await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage('Text input interaction has been added successfully.');
   }
 
   /**
@@ -834,7 +878,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
     showMessage('Exploration is saved successfully.');
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   async publishExploration(): Promise<string | null> {
@@ -944,7 +988,7 @@ export class ExplorationEditor extends BaseUser {
         await elements[cardIndex].click();
       }
 
-      await this.page.waitForNetworkIdle({idleTime: 700});
+      await this.waitForNetworkIdle({idleTime: 700});
     } catch (error) {
       const newError = new Error(
         `Error navigating to card ${cardName}: ${error.message}`
@@ -961,13 +1005,15 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} feedback - The feedback for the response.
    * @param {string} destination - The destination state for the response.
    * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
+   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
    */
   async addResponsesToTheInteraction(
     interactionType: string,
     answer: string,
     feedback: string,
     destination: string,
-    responseIsCorrect: boolean
+    responseIsCorrect: boolean,
+    isLastResponse: boolean = true
   ): Promise<void> {
     switch (interactionType) {
       case 'Number Input':
@@ -1018,15 +1064,28 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
-    await this.select(destinationCardSelector, '/');
-    await this.type(addStateInput, destination);
+    if (destination) {
+      await this.select(destinationCardSelector, '/');
+      await this.type(addStateInput, destination);
+    }
     if (responseIsCorrect) {
       await this.clickOn(correctAnswerInTheGroupSelector);
     }
-    await this.clickOn(addNewResponseButton);
-    await this.page.waitForSelector(responseModalHeaderSelector, {
-      hidden: true,
-    });
+    if (isLastResponse) {
+      await this.page.waitForSelector(addNewResponseButton, {
+        visible: true,
+      });
+      await this.clickOn(addNewResponseButton);
+      await this.page
+        .waitForSelector(responseModalHeaderSelector, {
+          hidden: true,
+        })
+        .catch(async () => {
+          await this.clickOn(addNewResponseButton);
+        });
+    } else {
+      await this.clickOn(addAnotherResponseButton);
+    }
   }
 
   /**
@@ -1068,14 +1127,19 @@ export class ExplorationEditor extends BaseUser {
    * Function to add a solution for a state interaction.
    * @param {string} answer - The solution of the current state card.
    * @param {string} answerExplanation - The explanation for this state card's solution.
+   * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
    */
   async addSolutionToState(
     answer: string,
-    answerExplanation: string
+    answerExplanation: string,
+    isSolutionNumericInput: boolean
   ): Promise<void> {
+    const solutionSelector = isSolutionNumericInput
+      ? solutionInputNumeric
+      : solutionInputTextArea;
     await this.clickOn(addSolutionButton);
-    await this.page.waitForSelector(solutionInput, {visible: true});
-    await this.type(solutionInput, answer);
+    await this.page.waitForSelector(solutionSelector, {visible: true});
+    await this.type(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
     await this.type(stateContentInputField, answerExplanation);
@@ -1120,6 +1184,195 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(editStateHintSelector);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintEditButton);
+  }
+
+  /**
+   * Adds a particular skill to the current state card.
+   * @param skillName - Name of the skill to be linked to state.
+   */
+  async addSkillToState(skillName: string): Promise<void> {
+    await this.clickOn(addSkillButton);
+    await this.type(skillNameInput, skillName);
+    await this.clickOn(skillItem);
+    await this.clickOn(confirmSkillButton);
+  }
+
+  /**
+   * Tag an answer response group with a misconception for a state card.
+   * @param responseIndex - The index of the response group to be tagged.
+   * @param misconceptionName - The name of the misconception to tag response with.
+   * @param isOptional - Whether the misconception is optional or compulsory.
+   */
+  async tagAnswerGroupWithMisconception(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    let responseTabs = await this.page.$$(responseGroupDiv);
+    await responseTabs[responseIndex].click();
+    await this.clickOn('Tag with misconception');
+    if (!isOptional) {
+      await this.clickOn(misconceptionName);
+    } else {
+      await this.clickOn(`(Optional) ${misconceptionName}`);
+    }
+    await this.clickOn('Done');
+  }
+
+  /**
+   * Replace a misconception tagged to a response group with a new one.
+   * @param responseIndex - The index of the response group to change.
+   * @param misconceptionName - The name of the new misconception to be tagged.
+   * @param isOptional - Whether the new misconception is optional or not.
+   */
+  async changeTaggedAnswerGroupMisconception(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    let responseTabs = await this.page.$$(responseGroupDiv);
+    await responseTabs[responseIndex].click();
+    await this.clickOn(misconceptionEditorTab);
+    if (!isOptional) {
+      await this.clickOn(misconceptionName);
+    } else {
+      await this.clickOn(`(Optional) ${misconceptionName}`);
+    }
+    await this.clickOn('Save Misconception');
+  }
+
+  /**
+   * Verifies if a misconception is present on the page.
+   * @param {string} misconceptionName - The name of the misconception to verify.
+   * @param {boolean} isPresent - Whether the misconception is expected to be present.
+   */
+  async verifyMisconceptionPresentForState(
+    misconceptionName: string,
+    isPresent: boolean
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(misconceptionDiv, {
+        timeout: 5000,
+        visible: true,
+      });
+      const misconceptions = await this.page.$$(misconceptionDiv);
+
+      for (const misconception of misconceptions) {
+        const title = await this.page.evaluate(
+          el => el.textContent,
+          misconception
+        );
+        if (title.trim() === misconceptionName) {
+          if (!isPresent) {
+            throw new Error(
+              `The misconception ${misconceptionName} is present, which was not expected`
+            );
+          }
+          return;
+        }
+      }
+
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    } catch (error) {
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isPresent ? '' : 'not'} present as expected.`
+    );
+  }
+
+  /**
+   * Toggles the applicability status of an optional misconception.
+   * @param misconceptionName - The name of the misconception to be toggled.
+   */
+  async toggleMisconceptionApplicableStatus(
+    misconceptionName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(optionalMisconceptionDiv, {
+      timeout: 5000,
+      visible: true,
+    });
+    let misconceptions = await this.page.$$(optionalMisconceptionDiv);
+    let misconceptionFound = false;
+    for (const misconception of misconceptions) {
+      const optionalMisconceptionName = await misconception.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (optionalMisconceptionName?.startsWith(misconceptionName)) {
+        const misconceptionOptions = await misconception.$(
+          optionalMisconceptionOptionsButton
+        );
+        if (!misconceptionOptions) {
+          throw new Error(
+            `Options not found for misconception "${misconceptionName}"`
+          );
+        }
+        await misconceptionOptions.click();
+        await this.page.waitForSelector(misconceptionApplicableToggle, {
+          visible: true,
+        });
+        await this.clickOn(misconceptionApplicableToggle);
+        misconceptionFound = true;
+        break;
+      }
+    }
+    if (!misconceptionFound) {
+      throw new Error(
+        `Couldn't find misconception with name ${misconceptionName}.`
+      );
+    }
+  }
+
+  /**
+   * Verifies whether a given optional misconception is applicable or not.
+   * @param misconceptionName - The name of the misconception to be verified.
+   * @param isApplicable - The expected applicability status of the misconception.
+   */
+  async verifyOptionalMisconceptionApplicableStatus(
+    misconceptionName: string,
+    isApplicable: boolean
+  ): Promise<void> {
+    await this.verifyMisconceptionPresentForState(misconceptionName, true);
+    const inapplicableMisconceptions = await this.page.$$(
+      inapplicableMisconceptionDiv
+    );
+
+    for (const misconception of inapplicableMisconceptions) {
+      const title = await this.page.evaluate(
+        el => el.textContent.trim(),
+        misconception
+      );
+      if (title === misconceptionName && !isApplicable) {
+        return;
+      } else if (title.startsWith(misconceptionName) && isApplicable) {
+        // We use startsWith since misconception title divs can have an icon at
+        // the end indicating that the misconception needs to be addressed.
+        throw new Error(
+          `The misconception ${misconceptionName} is expected to be applicable, found not applicable.`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isApplicable ? '' : 'not'} applicable as expected.`
+    );
+  }
+
+  /**
+   * Removes the attached skill from the current state card.
+   */
+  async removeSkillFromState(): Promise<void> {
+    await this.clickOn(deleteSkillButton);
+    await this.clickOn('Delete skill');
   }
 
   /**
@@ -1174,7 +1427,7 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(mainTabButton);
     }
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1395,11 +1648,24 @@ export class ExplorationEditor extends BaseUser {
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
    */
-  async giveFeedback(feedback: string): Promise<void> {
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
+    // as well. see: https://github.com/oppia/oppia/issues/19443.
+    if (process.env.MOBILE === 'true') {
+      return;
+    }
     await this.page.waitForSelector('nav-options', {visible: true});
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn(stayAnonymousCheckbox);
+    }
+
     await this.clickOn('Submit');
 
     try {
@@ -1459,7 +1725,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1471,7 +1737,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(modifyExistingTranslationsButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1606,6 +1872,137 @@ export class ExplorationEditor extends BaseUser {
         `The expected translation does not exist in the translations tab. Found "${translation}", expected "${expectedTranslation}"`
       );
     }
+  }
+
+  /**
+   * Function to add a voiceover for specific content of the current card.
+   * @param {string} languageCode - Code of language for which the voiceover has to be added.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
+   * @param {string} voiceoverFilePath - The path of the voiceover file which will be added for the content.
+   * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
+   */
+  async addVoiceoverToContent(
+    languageCode: string,
+    contentType: string,
+    voiceoverFilePath: string
+  ): Promise<void> {
+    await this.select(translationLanguageSelector, languageCode);
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOn(contentType);
+    }
+    await this.clickOn(uploadAudioButton);
+    await this.uploadFile(voiceoverFilePath);
+    await this.clickOn(saveUploadedAudioButton);
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Opens an exploration in the editor.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async openExplorationInExplorationEditor(
+    explorationName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const title = await this.page.$eval(
+      explorationSummaryTileTitleSelector,
+      el => el.textContent?.trim()
+    );
+
+    if (title === explorationName) {
+      const explorationTileElement = await this.page.$(
+        explorationSummaryTileTitleSelector
+      );
+      await explorationTileElement?.click();
+    } else {
+      throw new Error(`Exploration not found: ${explorationName}`);
+    }
+
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Checks the number of suggestions in the exploration editor.
+   * @param {number} expectedNumber - The expected number of suggestions.
+   */
+  async expectNoOfSuggestionsToBe(expectedNumber: number): Promise<void> {
+    await this.page.waitForSelector(feedbackSubjectSelector);
+    const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
+    if (feedbackSubjects.length === expectedNumber) {
+      showMessage('Number of suggestions matches the expected number.');
+    } else {
+      throw new Error(
+        `Number of suggestions does not match the expected number. Expected: ${expectedNumber}, Found: ${feedbackSubjects.length}`
+      );
+    }
+  }
+
+  /**
+   * Views a feedback thread.
+   * @param {number} expectedThread - The 1-indexed position of the expected thread.
+   */
+  async viewFeedbackThread(expectedThread: number): Promise<void> {
+    // Reloading to make sure the feedback threads are updated.
+    await this.reloadPage();
+    await this.page.waitForSelector(feedbackSubjectSelector);
+    const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
+    if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
+      await feedbackSubjects[expectedThread - 1].click();
+    } else {
+      throw new Error(`Expected thread not found: ${expectedThread}`);
+    }
+  }
+
+  /**
+   * Checks if a suggestion is anonymous.
+   * @param {string} suggestion - The expected suggestion.
+   * @param {boolean} anonymouslySubmitted - Indicates whether the suggestion is expected to be anonymous.
+   */
+  async expectSuggestionToBeAnonymous(
+    suggestion: string,
+    anonymouslySubmitted: boolean
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(feedbackSelector);
+    const actualSuggestion = await this.page.$eval(feedbackSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualSuggestion !== suggestion) {
+      throw new Error(
+        `Suggestion does not match the expected value. Expected: ${suggestion}, Found: ${actualSuggestion}`
+      );
+    }
+
+    const isAnonymouslySubmitted = await this.isTextPresentOnPage(
+      '(anonymously submitted)'
+    );
+
+    if (isAnonymouslySubmitted !== anonymouslySubmitted) {
+      throw new Error(
+        `Anonymity does not match the expected value. Expected: ${anonymouslySubmitted ? 'Anonymous' : 'Not anonymous'}, Found: ${isAnonymouslySubmitted ? 'Anonymous' : 'Not anonymous'}`
+      );
+    }
+  }
+
+  /**
+   * Replies to a suggestion.
+   * @param {string} reply - The reply to the suggestion.
+   */
+  async replyToSuggestion(reply: string): Promise<void> {
+    await this.type(responseTextareaSelector, reply);
+    await this.clickOn(sendButtonSelector);
   }
 }
 

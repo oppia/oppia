@@ -108,6 +108,10 @@ export class TopicSummaryTileComponent {
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 }
 
 angular.module('oppia').directive(
