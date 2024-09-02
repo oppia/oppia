@@ -92,6 +92,15 @@ export class CardDisplayComponent {
       ? 'card-display-content-shown'
       : 'card-display-content-hidden';
   }
+
+  isToggleButtonVisible(): boolean {
+    if (this.tabType.includes('home')) {
+      return false;
+    }
+    return (
+      this.numCards * this.cardWidth - 16 > this.cards.nativeElement.offsetWidth
+    );
+  }
 }
 
 angular

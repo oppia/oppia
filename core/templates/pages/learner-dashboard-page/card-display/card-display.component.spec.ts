@@ -35,6 +35,7 @@ describe('CardDisplayComponent', () => {
   let component: CardDisplayComponent;
   let fixture: ComponentFixture<CardDisplayComponent>;
   let scrollLeftSetterSpy: jasmine.Spy;
+  let offsetWidthGetterSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -65,7 +66,7 @@ describe('CardDisplayComponent', () => {
     component.isLanguageRTL = false;
     fixture.detectChanges();
 
-    spyOnProperty(
+    offsetWidthGetterSpy = spyOnProperty(
       component.cards.nativeElement,
       'offsetWidth',
       'get'
@@ -316,5 +317,26 @@ describe('CardDisplayComponent', () => {
 
     expect(component.toggleState).toBeTrue();
     expect(component.getVisibility()).toEqual('card-display-content-shown');
+  });
+
+  it('should return false for isToggleButtonVisible if tabType is not progress', () => {
+    expect(component.isToggleButtonVisible()).toBeFalse();
+  });
+
+  it('should return false for isToggleButtonVisible if tabType is progress and all the cards fit', () => {
+    component.tabType = 'progress';
+    offsetWidthGetterSpy.and.returnValue(600);
+    component.numCards = 2;
+    fixture.detectChanges();
+
+    expect(component.isToggleButtonVisible()).toBeFalse();
+  });
+
+  it('should return true for isToggleButtonVisible if tabType is progress and all the cards do not fit', () => {
+    component.tabType = 'progress';
+    component.numCards = 2;
+    fixture.detectChanges();
+
+    expect(component.isToggleButtonVisible()).toBeTrue();
   });
 });

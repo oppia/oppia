@@ -85,6 +85,7 @@ describe('Community lessons tab Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService;
+  let explorationSummary: LearnerExplorationSummary;
 
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
@@ -131,6 +132,10 @@ describe('Community lessons tab Component', () => {
     component.collectionPlaylist = [];
     component.subscriptionsList = [];
     component.completedToIncompleteCollections = [];
+    component.totalCompletedLessonsList = [];
+    component.totalIncompleteLessonsList = [];
+    explorationSummary =
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration);
 
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
       'default-image-url-png',
@@ -810,30 +815,22 @@ describe('Community lessons tab Component', () => {
   });
 
   it('should return false when there are in-progress lessons', () => {
-    component.totalIncompleteLessonsList = [
-      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
-    ];
+    component.totalIncompleteLessonsList = [explorationSummary];
     fixture.detectChanges();
 
     expect(component.isLearnerStateEmpty()).toBeFalse();
   });
 
   it('should return false when there are completed lessons', () => {
-    component.totalCompletedLessonsList = [
-      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
-    ];
+    component.totalCompletedLessonsList = [explorationSummary];
     fixture.detectChanges();
 
     expect(component.isLearnerStateEmpty()).toBeFalse();
   });
 
   it('should return false when there are completed and in-progress lessons', () => {
-    component.totalCompletedLessonsList = [
-      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
-    ];
-    component.totalIncompleteLessonsList = [
-      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
-    ];
+    component.totalCompletedLessonsList = [explorationSummary];
+    component.totalIncompleteLessonsList = [explorationSummary];
     fixture.detectChanges();
 
     expect(component.isLearnerStateEmpty()).toBeFalse();
