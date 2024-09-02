@@ -311,9 +311,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         return concurrent_task_utils.TaskResult(
             name, bool(errors), errors, errors)
 
-    # Here we use type Any because the argument 'workflow_dict' accept
+    # Here we use type Any because the argument 'workflow_dict' accepts
     # dictionaries that represents the content of workflow YAML file and
-    # that dictionaries can contain various types of values.
+    # those dictionaries can contain various types of values.
     @staticmethod
     def _check_that_workflow_steps_use_merge_action(
         workflow_dict: Dict[str, Any], workflow_path: str
@@ -369,9 +369,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         return concurrent_task_utils.TaskResult(
             name, bool(errors), errors, errors)
 
-    # Here we use type Any because the argument 'workflow_dict' accept
+    # Here we use type Any because the argument 'workflow_dict' accepts
     # dictionaries that represents the content of workflow YAML file and
-    # that dictionaries can contain various types of values.
+    # those dictionaries can contain various types of values.
     @staticmethod
     def _check_that_workflow_steps_have_name(
         workflow_dict: Dict[str, Any], workflow_path: str
