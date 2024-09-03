@@ -649,7 +649,9 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             user_data_json_string = (
                 'There was an error while exporting '
                 'data. Please contact %s to export your data.'
-                % feconf.ADMIN_EMAIL_ADDRESS)
+                % platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
+            )
             user_images = []
 
         # Create zip file.

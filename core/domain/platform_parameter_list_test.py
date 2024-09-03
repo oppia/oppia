@@ -27,7 +27,9 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     core/domain/platform_parameter_list.py.
     """
 
-    EXPECTED_PARAM_NAMES = ['always_ask_learners_for_answer_details',
+    EXPECTED_PARAM_NAMES = [
+                            'admin_email_address',
+                            'always_ask_learners_for_answer_details',
                             'contributor_dashboard_reviewer_emails_is_enabled',
                             'dummy_parameter',
                             'email_footer',
@@ -48,13 +50,16 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                                 'notify_admins_suggestions_waiting_too_long_'
                                 'is_enabled'
                             ),
+                            'noreply_email_address',
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'record_playthrough_probability',
+                            'server_can_send_emails',
                             'signup_email_body_content',
                             'signup_email_subject_content',
-                            'unpublish_exploration_email_html_body',
-                            'server_can_send_emails']
+                            'system_email_address',
+                            'system_email_name',
+                            'unpublish_exploration_email_html_body']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = (

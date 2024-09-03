@@ -21,8 +21,8 @@ from __future__ import annotations
 import logging
 import textwrap
 
-from core import feconf
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 
@@ -31,6 +31,15 @@ from typing import Dict, Union
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        self.system_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
@@ -63,7 +72,7 @@ class EmailTests(test_utils.GenericTestBase):
             Recipient Variables:
                 Length: 0
             """ % (
-                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                self.system_email_address, self.admin_email_address,
                 'subject', 4, 4))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
@@ -71,9 +80,11 @@ class EmailTests(test_utils.GenericTestBase):
             'dev environment. Emails are sent out in the production'
             ' environment.')
 
+        assert isinstance(self.admin_email_address, str)
+        assert isinstance(self.system_email_address, str)
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
-                feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
+                self.system_email_address, [self.admin_email_address],
                 'subject', 'body', 'html')
         self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(
@@ -120,7 +131,7 @@ class EmailTests(test_utils.GenericTestBase):
             Recipient Variables:
                 Length: %d
             """ % (
-                feconf.SYSTEM_EMAIL_ADDRESS, recipient_email_list_str,
+                self.system_email_address, recipient_email_list_str,
                 'subject', 4, 4, bcc_email_list_str, '123',
                 len(recipient_variables)))
         logging_info_email_body = textwrap.dedent(msg_body)
@@ -130,8 +141,9 @@ class EmailTests(test_utils.GenericTestBase):
             ' environment.')
 
         with self.swap(logging, 'info', _mock_logging_function):
+            assert isinstance(self.system_email_address, str)
             dev_mode_email_services.send_email_to_recipients(
-                feconf.SYSTEM_EMAIL_ADDRESS,
+                self.system_email_address,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],
                 'subject', 'body', 'html',
                 bcc=['e@e.com', 'f@f.com', 'g@g.com', 'h@h.com'],

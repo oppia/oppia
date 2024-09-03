@@ -96,6 +96,10 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
                 'I\'m writing to inform you that '
                 'I have unpublished the above exploration.'
             ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
         ]
     )
     def test_get_draft_email_body(self) -> None:
