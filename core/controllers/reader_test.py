@@ -1239,7 +1239,19 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_emails_are_sent(self) -> None:

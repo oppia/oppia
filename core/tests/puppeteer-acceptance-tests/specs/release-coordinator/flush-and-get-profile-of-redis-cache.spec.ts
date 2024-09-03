@@ -52,10 +52,19 @@ describe('Release Coordinator', function () {
         'totalKeysStored',
       ]);
 
-      // Since the cache is flushed, the total keys stored should be less than 10.
+      // Since the cache is flushed, the total keys stored should be less than 60.
       // But, not necessarily 0, as there could be some keys stored in the cache
-      // while fetching the profile.
-      await releaseCoordinator.expectTotalKeysStoredToBeLessThan(10);
+      // while fetching the profile, for example platform params.
+      // Ideally the keys should be equal to number of platform params but the
+      // count is almost 2 * number of platform params because there is a
+      // discrepancy in how redis employs internal data structures to calculate
+      // count which is not getting updated exactly to match the number of keys.
+      // Redis also employs lazy memory reclamation to optimize performance
+      // which might mean that memory allocated for deleted keys might not be
+      // immediately freed, causing the increase in the keys.count value we see.
+      // See details in:
+      // https://github.com/oppia/oppia/pull/20369#issuecomment-2282186319.
+      await releaseCoordinator.expectTotalKeysStoredToBeLessThan(60);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

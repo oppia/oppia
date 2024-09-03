@@ -29,6 +29,8 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import auth_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
@@ -1146,17 +1148,22 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
                 self.create_request(session_cookie=cookie)),
             auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False))
 
-    def test_feconf_admin_email_address_is_super_admin(self) -> None:
+    def test_admin_email_address_is_super_admin(self) -> None:
+        admin_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        assert isinstance(admin_email_address, str)
+
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(
-                self.AUTH_ID, email=feconf.ADMIN_EMAIL_ADDRESS),
+                self.AUTH_ID, email=admin_email_address),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
         self.assertEqual(
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)),
             auth_domain.AuthClaims(
-                self.AUTH_ID, feconf.ADMIN_EMAIL_ADDRESS, True))
+                self.AUTH_ID, admin_email_address, True))
 
     def test_raises_stale_auth_session_error_when_cookie_is_expired(
             self

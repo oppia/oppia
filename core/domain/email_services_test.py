@@ -16,10 +16,10 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.constants import constants
 from core.domain import email_services
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -30,14 +30,26 @@ platform_email_services = models.Registry.import_email_services()
 class EmailServicesTest(test_utils.EmailTestBase):
     """Tests for email_services functions."""
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        self.system_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+
     def test_send_mail_raises_exception_for_invalid_permissions(self) -> None:
         """Tests the send_mail exception raised for invalid user permissions."""
         send_email_exception = (
             self.assertRaisesRegex(
                 Exception, 'This app cannot send emails to users.'))
+        assert isinstance(self.admin_email_address, str)
+        assert isinstance(self.system_email_address, str)
+
         with send_email_exception, self.swap(constants, 'DEV_MODE', False):
             email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                self.system_email_address, self.admin_email_address,
                 'subject', 'body', 'html', bcc_admin=False)
 
     @test_utils.set_platform_parameters(
@@ -45,14 +57,20 @@ class EmailServicesTest(test_utils.EmailTestBase):
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            )
         ]
     )
     def test_send_mail_data_properly_sent(self) -> None:
         """Verifies that the data sent in send_mail is correct."""
+        assert isinstance(self.admin_email_address, str)
+        assert isinstance(self.system_email_address, str)
         email_services.send_mail(
-            feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+            self.system_email_address, self.admin_email_address,
             'subject', 'body', 'html', bcc_admin=False)
-        messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].subject, 'subject')
         self.assertEqual(messages[0].body, 'body')
@@ -63,18 +81,24 @@ class EmailServicesTest(test_utils.EmailTestBase):
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            )
         ]
     )
     def test_bcc_admin_flag(self) -> None:
         """Verifies that the bcc admin flag is working properly in
         send_mail.
         """
+        assert isinstance(self.admin_email_address, str)
+        assert isinstance(self.system_email_address, str)
         email_services.send_mail(
-            feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+            self.system_email_address, self.admin_email_address,
             'subject', 'body', 'html', bcc_admin=True)
-        messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(messages[0].bcc, self.admin_email_address)
 
     def test_send_bulk_mail_exception_for_invalid_permissions(self) -> None:
         """Tests the send_bulk_mail exception raised for invalid user
@@ -83,11 +107,14 @@ class EmailServicesTest(test_utils.EmailTestBase):
         send_email_exception = (
             self.assertRaisesRegex(
                 Exception, 'This app cannot send emails to users.'))
+        assert isinstance(self.admin_email_address, str)
+        assert isinstance(self.system_email_address, str)
+
         with send_email_exception, (
             self.swap(constants, 'DEV_MODE', False)
         ):
             email_services.send_bulk_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
+                self.system_email_address, [self.admin_email_address],
                 'subject', 'body', 'html')
 
     @test_utils.set_platform_parameters(
@@ -101,12 +128,14 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Verifies that the data sent in send_bulk_mail is correct
            for each user in the recipient list.
         """
-        recipients = [feconf.ADMIN_EMAIL_ADDRESS]
+        assert isinstance(self.admin_email_address, str)
+        assert isinstance(self.system_email_address, str)
+        recipients = [self.admin_email_address]
 
         email_services.send_bulk_mail(
-            feconf.SYSTEM_EMAIL_ADDRESS, recipients,
+            self.system_email_address, recipients,
             'subject', 'body', 'html')
-        messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].to, recipients)
 
@@ -194,6 +223,10 @@ class EmailServicesTest(test_utils.EmailTestBase):
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            )
         ]
     )
     def test_unsuccessful_status_codes_raises_exception(self) -> None:
@@ -205,23 +238,25 @@ class EmailServicesTest(test_utils.EmailTestBase):
         swap_send_email_to_recipients = self.swap(
             platform_email_services, 'send_email_to_recipients',
             lambda *_: False)
-        recipients = [feconf.ADMIN_EMAIL_ADDRESS]
+        assert isinstance(self.admin_email_address, str)
+        assert isinstance(self.system_email_address, str)
+        recipients = [self.admin_email_address]
 
         with email_exception, swap_send_email_to_recipients:
             email_services.send_bulk_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, recipients,
+                self.system_email_address, recipients,
                 'subject', 'body', 'html')
 
         email_exception = self.assertRaisesRegex(
             Exception, (
                 'Email to %s failed to send. Please try again later or '
                 'contact us to report a bug at '
-                'https://www.oppia.org/contact.') % feconf.ADMIN_EMAIL_ADDRESS)
+                'https://www.oppia.org/contact.') % self.admin_email_address)
         swap_send_email_to_recipients = self.swap(
             platform_email_services, 'send_email_to_recipients',
             lambda *_: False)
 
         with email_exception, swap_send_email_to_recipients:
             email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                self.system_email_address, self.admin_email_address,
                 'subject', 'body', 'html', bcc_admin=True)

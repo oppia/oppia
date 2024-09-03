@@ -98,7 +98,7 @@ class SetPlatformParametersTests(test_utils.GenericTestBase):
             Exception,
             'The value for the platform parameter dummy_parameter was '
             'needed in this test, but not specified in the '
-            'set_platform_parameters decorator. Please this information in '
+            'set_platform_parameters decorator. Please use this information in '
             'the decorator.'
         ):
             platform_parameter_services.get_platform_parameter_value(
