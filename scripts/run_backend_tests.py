@@ -93,6 +93,7 @@ _LOAD_TESTS_DIR: Final = os.path.join(
 TIME_REPORT_PATH: Final = os.path.join(
     os.getcwd(), 'backend_test_time_report.json'
 )
+AVERAGE_TEST_CASE_TIME: Final = 2
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -328,13 +329,13 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
-) -> Tuple[int, int, int, Dict[str, float]]:
+) -> Tuple[int, int, int, Dict[str, Tuple[float, float]]]:
     """Run tests and parse coverage reports."""
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
     total_failures = 0
-    time_report: Dict[str, float] = {}
+    time_report: Dict[str, Tuple[float, float]] = {}
     for task in tasks:
         test_count = 0
         spec = task_to_taskspec[task]
@@ -392,7 +393,12 @@ def check_test_results(
                     )
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
-                time_report[spec.test_target] = test_time
+                test_time_by_average_test_case = (
+                    test_count * AVERAGE_TEST_CASE_TIME)
+                time_report[spec.test_target] = (
+                    test_time,
+                    test_time_by_average_test_case
+                )
                 print(
                     'SUCCESS   %s: %d tests (%.1f secs)' %
                     (spec.test_target, test_count, test_time))

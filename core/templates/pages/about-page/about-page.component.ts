@@ -48,8 +48,15 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     {
       title: 'I18N_ABOUT_PAGE_FEATURE_TITLE1',
       text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT1',
-      customPanelClassNames: ['feature-panel'],
-      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      customPanelClassNames: [
+        'feature-panel',
+        'e2e-test-about-page-features-panel',
+      ],
+      customTitleClassNames: [
+        'feature-title',
+        'oppia-about-platform-subtext',
+        'e2e-test-about-page-features-panel-title-desktop',
+      ],
       panelIsCollapsed: true,
     },
     {
@@ -111,23 +118,23 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   selectedTabIndex = 1;
   volunteerRolesDetails = [
     {
-      title: 'I18N_ABOUT_PAGE_CTA_GROWTH_TITLE',
-      iconUrl: '/icons/growth-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_GROWTH_DESCRIPTION',
+      title: 'I18N_ABOUT_PAGE_CTA_OUTREACH_TITLE',
+      iconUrl: '/icons/outreach-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_OUTREACH_DESCRIPTION',
       listItems: [
-        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM3',
+        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM3',
       ],
     },
     {
-      title: 'I18N_ABOUT_PAGE_CTA_DEV_TITLE',
-      iconUrl: '/icons/dev-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_DEV_DESCRIPTION',
+      title: 'I18N_ABOUT_PAGE_CTA_SOFTWARE_TITLE',
+      iconUrl: '/icons/software-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_SOFTWARE_DESCRIPTION',
       listItems: [
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM3',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM3',
       ],
     },
     {
@@ -308,8 +315,8 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
   }
 
-  onClickDownloadAndroidAppButton(): void {
-    this.siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent();
+  onClickGetAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickGetAndroidAppButtonEvent();
   }
 
   onClickDonateCTAButton(): void {

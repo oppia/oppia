@@ -487,6 +487,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         this.stateEditorService.getLinkedSkillId()
       );
     }
+    this.stateEditorService.onChangeLinkedSkillId.emit();
   }
 
   saveInapplicableSkillMisconceptionIds(displayedValue: string[]): void {

@@ -138,6 +138,7 @@ describe('Teach Page', () => {
   it('should successfully instantiate the component from beforeEach block', () => {
     expect(component).toBeDefined();
   });
+
   it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image'
@@ -159,6 +160,20 @@ describe('Teach Page', () => {
     ).toHaveBeenCalledWith(
       AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.TEACH
     );
+  });
+
+  it('should toggle creators carousel arrows disablitiy after page is loaded', () => {
+    component.ngOnInit();
+    component.ngAfterViewInit();
+    spyOn(component, 'toggleCreatorsCarouselArrowsDisablityStatusDesktop');
+    spyOn(component, 'toggleCreatorsCarouselArrowsDisablityStatusMobile');
+    component.setScreenType();
+    expect(
+      component.toggleCreatorsCarouselArrowsDisablityStatusDesktop
+    ).toHaveBeenCalled();
+    expect(
+      component.toggleCreatorsCarouselArrowsDisablityStatusMobile
+    ).toHaveBeenCalled();
   });
 
   it('should check if loader screen is working', () =>
@@ -273,11 +288,11 @@ describe('Teach Page', () => {
   it('should regiester GA event when Download Android App is clicked', () => {
     spyOn(
       siteAnalyticsService,
-      'registerClickDownloadAndroidAppButtonEvent'
+      'registerClickGetAndroidAppButtonEvent'
     ).and.callThrough();
-    component.onClickDownloadAndroidAppButton();
+    component.onClickGetAndroidAppButton();
     expect(
-      siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent
+      siteAnalyticsService.registerClickGetAndroidAppButtonEvent
     ).toHaveBeenCalled();
   });
 
@@ -289,13 +304,13 @@ describe('Teach Page', () => {
     expect(windowRef.nativeWindow.location.href).toEqual('/android');
   });
 
-  it('should set screen type to mobile when window width is less than or equal to 360', () => {
+  it('should set screen type to mobile when window width is less than or equal to 553', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(360);
     component.setScreenType();
     expect(component.screenType).toEqual('mobile');
   });
 
-  it('should set screen type to tablet when window width is between 361 and 768', () => {
+  it('should set screen type to tablet when window width is between 553 and 768', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(765);
     component.setScreenType();
     expect(component.screenType).toEqual('tablet');

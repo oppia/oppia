@@ -22,6 +22,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const aboutUrl = testConstants.URLs.About;
+const androidUrl = testConstants.URLs.Android;
 const blogPostUrlinPartnershipsPage =
   testConstants.URLs.BlogPostUrlInPartnershipsPage;
 const creatorDashboardCreateModeUrl =
@@ -66,7 +67,8 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
-const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
+const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
+const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
@@ -75,6 +77,9 @@ const teacherStoryTaggedBlogsLink =
   testConstants.URLs.TeacherStoryTaggedBlogsLink;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
 const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
+const testimonialCarouselNamesInTeachPage =
+  testConstants.TeachPageTestimonialsNames;
+const creatorsCarouselNamesInTeachPage = testConstants.TeachPageCreatorsNames;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -122,6 +127,7 @@ const readOurBlogButton =
 const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
+const aboutPage = '.e2e-test-about-page';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
 const mobileSidebarBasicMathematicsButton =
@@ -143,8 +149,36 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
-const exploreLessonsButtonInTeachPage =
-  '.e2e-test-teach-page-explore-lessons-button';
+const exploreLessonsButtonAtTheTopInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-button-at-the-top';
+const exploreLessonsButtonAtTheBottomInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-button-at-the-bottom';
+const getAndroidAppButtonInTeachPage =
+  '.e2e-test-teach-page-download-android-app-button';
+const creatorsCarouselSelectorInTeachPage =
+  '.e2e-test-teach-page-creators-carousel';
+const creatorsCarouselPrevButton =
+  '.e2e-test-teach-page-creators-carousel-prev-btn';
+const creatorsCarouselNextButton =
+  '.e2e-test-teach-page-creators-carousel-next-btn';
+const creatorsCarouselNameInTeachPage =
+  '.e2e-test-teach-page-lesson-creator-name';
+const testimonialCarouselSelectorInTeachPage =
+  '.e2e-test-teach-page-testimonial-carousel';
+const testimonialCarouselPrevButton =
+  '.e2e-test-teach-page-testimonial-carousel-prev-btn';
+const testimonialCarouselNextButton =
+  '.e2e-test-teach-page-testimonial-carousel-next-btn';
+// The following two are external components' selectors so they are not prefixed with "e2e-test".
+const testimonialCarouselNameInTeachPage =
+  '.carousel-item.active .e2e-test-teach-page-testimonial-name';
+const testimonialCarouselIndicatorsInTeachPage = '.carousel-indicators li';
+const lessonCreationAccordionExpandButtonInTeachPage =
+  '.e2e-test-teach-page-lesson-panel-title';
+const lessonCreationAccordionCloseButtonInTeachPage =
+  '.e2e-test-teach-page-lesson-panel button';
+const lessonCreationAccordionPanelContentInTeachPage =
+  '.e2e-test-teach-page-lesson-panel .panel-content';
 const blogButtonInTeachPage = '.e2e-test-teach-page-blog-button';
 const guideButtonInTeachPage = '.e2e-test-teach-page-guide-button';
 const lessonCreatorLinkedinButtonInTeachPage =
@@ -167,8 +201,49 @@ const applyToVolunteerButtonAtTheTopOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
 const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
+const tabsSectionInVolunteerPage = '.e2e-test-volunteer-page-tabs-section';
+const tabsPreviousButtonInVolunteerPage =
+  '.e2e-test-volunteer-page-tabs-prev-btn';
+const tabsNextButtonInVolunteerPage = '.e2e-test-volunteer-page-tabs-next-btn';
+const tabsFirstVolunteerExpectationsInVolunteerPage =
+  '.e2e-test-volunteer-page-first-expectations';
+const tabsSecondVolunteerExpectationsInVolunteerPage =
+  '.e2e-test-volunteer-page-second-expectations';
+// This is an external component's selector so it is not prefixed with "e2e-test".
+const tabsLabelsInVolunteerPage = '.mat-tab-label';
 const donorBoxIframe = '.e2e-test-donate-page-iframe';
 const languageDropdown = '.e2e-test-language-dropdown';
+const featuresSectionInAboutPage = '.e2e-test-about-page-features-section';
+const featuresAccordionExpandButtonDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel-title-desktop';
+const featuresAccordionExpandButtonMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-title-mobile';
+const featuresAccordionCloseButtonDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel button';
+const featuresAccordionCloseButtonMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-close-button';
+const featuresAccordionPanelContentDesktopInAboutPage =
+  '.e2e-test-about-page-features-panel .panel-content';
+const featuresAccordionPanelContentMobileInAboutPage =
+  '.e2e-test-about-page-features-panel-content';
+const volunteerCarouselSelectorDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-desktop';
+const volunteerCarouselSelectorMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-mobile';
+const volunteerCarouselSlideHeadingDesktopInAboutPage =
+  '.active .e2e-test-about-page-volunteer-carousel-slide-heading-desktop';
+const volunteerCarouselSlideHeadingMobileInAboutPage =
+  '.active .e2e-test-about-page-volunteer-carousel-slide-heading-mobile';
+const volunteerCarouselNextButtonDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-next-button-desktop';
+const volunteerCarouselNextButtonMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-next-button-mobile';
+const volunteerCarouselPrevButtonDesktopInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-prev-button-desktop';
+const volunteerCarouselPrevButtonMobileInAboutPage =
+  '.e2e-test-about-page-volunteer-carousel-prev-button-mobile';
+const volunteerCarouselSlideHeadingsInAboutPage =
+  testConstants.AboutPageVolunteerCarouselHeadings;
 const volunteerWithOppiaDesktopButtonInAboutPage =
   '.e2e-test-about-page-desktop-volunteer-button';
 const volunteerWithOppiaMobileButtonInAboutPage =
@@ -278,7 +353,6 @@ const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
-const conversationSkinUserAvatar = '.conversation-skin-user-avatar';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
@@ -286,6 +360,13 @@ const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
+const lessonLanguageSelector = '.oppia-content-language-selector';
+const playVoiceoverButton = '.e2e-test-play-circle';
+const voiceoverDropdown = '.e2e-test-audio-bar';
+const pauseVoiceoverButton = '.e2e-test-pause-circle';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
+
+const getStartedHeader = '.e2e-test-get-started-page';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -333,13 +414,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the Thanks for Donating page.
+   * Function to navigate to the Donation thanks modal on donate page.
    */
-  async navigateToThanksForDonatingPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.goto(thanksForDonatingUrl),
-    ]);
+  async navigateToDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.goto(donatePageThanksModalURL);
+  }
+
+  /**
+   * Function to navigate to the Donation thanks modal on About page.
+   */
+  async navigateToDonationThanksModalOnAboutPage(): Promise<void> {
+    await this.goto(aboutPageThanksModalURL);
   }
 
   /**
@@ -347,6 +432,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToGetStartedPage(): Promise<void> {
     await this.goto(getStartedUrl);
+    await this.page.waitForSelector(getStartedHeader);
   }
 
   /**
@@ -699,9 +785,9 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Watch A Video button
-   * in the Thanks for Donating page and check if it opens the right page.
+   * in the Donation thanks modal on donate page and check if it opens the right page.
    */
-  async clickWatchAVideoButtonInThanksForDonatingPage(): Promise<void> {
+  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,
@@ -727,9 +813,9 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Read Our Blog button
-   * in the Thanks for Donating page and check if it opens the Blog page.
+   * in the Donation thanks modal on donate page and check if it opens the Blog page.
    */
-  async clickReadOurBlogButtonInThanksForDonatingPage(): Promise<void> {
+  async clickReadOurBlogButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(readOurBlogButton);
     const buttonText = await this.page.$eval(
       readOurBlogButton,
@@ -804,17 +890,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the dismiss button in the Thanks for Donating page,
-   * and check if the Thanks for Donating popup disappears
+   * Function to click the dismiss button in the Donation thanks modal on Donate page,
+   * and check if the Donation thanks modal disappears
    * and if the Donate page is shown.
    */
-  async clickDismissButtonInThanksForDonatingPage(): Promise<void> {
+  async dismissDonationThanksModalOnDonatePage(): Promise<void> {
     await this.clickOn(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
       throw new Error(
-        'The dismiss button does not close the Thanks for Donating popup!'
+        'The dismiss button does not close the Donation thanks modal on Donate page!'
       );
     }
     await this.page.waitForSelector(donatePage);
@@ -826,8 +912,38 @@ export class LoggedOutUser extends BaseUser {
       );
     } else {
       showMessage(
-        'The dismiss button closes the Thanks for Donating popup ' +
+        'The dismiss button closes the Donation thanks modal on Donate page ' +
           'and shows the Donate page.'
+      );
+    }
+  }
+
+  /**
+   * Function to click the dismiss button on the Donation thanks modal on About page,
+   * and check if the Donation thanks modal disappears
+   * and if the About page is shown.
+   */
+  async dismissDonationThanksModalOnAboutPage(): Promise<void> {
+    await this.clickOn(dismissButton);
+    await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
+    const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
+    if (thanksForDonatingHeader !== null) {
+      throw new Error(
+        'The dismiss button does not close the Donation thanks modal on About page!'
+      );
+    }
+
+    await this.page.waitForSelector(aboutPage);
+    const donatePageShowed = await this.page.$(aboutPage);
+    if (donatePageShowed === null) {
+      throw new Error(
+        `The dismiss button should show the About page,
+          but it opens ${this.page.url()} instead.`
+      );
+    } else {
+      showMessage(
+        'The dismiss button closes the Donation thanks modal on About page ' +
+          'and shows the About page.'
       );
     }
   }
@@ -1305,23 +1421,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to check if the lesson creation section is visible on the Teach page.
-   * If the section is not visible, an error is thrown.
-   */
-  async expectLessonCreationSectionToBeVisibleInTeachPage(): Promise<void> {
-    const lessonCreationSection = await this.page.waitForSelector(
-      lessonCreationSectionInTeachPage
-    );
-    if (!lessonCreationSection) {
-      throw new Error(
-        'The lesson creation section is not visible on the teach page.'
-      );
-    } else {
-      showMessage('The lesson creation section is visible on the teach page.');
-    }
-  }
-
-  /**
    * Function to click the first LinkedIn button in the Teach page
    * and check if it opens corresponding Creator's LinkedIn Url link
    */
@@ -1351,25 +1450,206 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Teacher Story tagged blogs link
    */
   async clickBlogButtonInTeachPage(): Promise<void> {
-    await this.clickLinkButtonToNewTab(
+    await this.openExternalLink(
       blogButtonInTeachPage,
-      'Check out our blog button',
-      teacherStoryTaggedBlogsLink,
-      'Blog'
+      teacherStoryTaggedBlogsLink
     );
   }
 
   /**
-   * Function to click the Browse Our Lessons button in the Teach page
+   * Function to click the Explore Lessons button  at the top in the Teach page
    * and check if it opens the classrooms page.
    */
-  async clickExploreLessonsButtonInTeachPage(): Promise<void> {
+  async clickExploreLessonsButtonAtTheTopInTeachPage(): Promise<void> {
+    // This button is only visible in mobile view.
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickButtonToNavigateToNewPage(
+        exploreLessonsButtonAtTheTopInTeachPage,
+        'Explore Lessons button',
+        classroomsPageUrl,
+        'Classrooms page'
+      );
+    }
+  }
+
+  /**
+   * Function to click the Explore Lessons button  at the bottom in the Teach page
+   * and check if it opens the classrooms page.
+   */
+  async clickExploreLessonsButtonAtTheBottomInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
-      exploreLessonsButtonInTeachPage,
+      exploreLessonsButtonAtTheBottomInTeachPage,
       'Explore Lessons button',
       classroomsPageUrl,
       'Classrooms page'
     );
+  }
+
+  /**
+   * Function to click the Get Android App button in the Teach page
+   * and check if it opens the Android page.
+   */
+  async clickGetAndroidAppButtonInTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      getAndroidAppButtonInTeachPage,
+      'Get Android App button',
+      androidUrl,
+      'Android page'
+    );
+  }
+
+  /**
+   * Function to verify the testimonial carousel functionality in the Teach page,
+   * ensuring that the carousel correctly displays the first and second testimonials
+   * and allows navigation back to the first testimonial.
+   */
+  async expectTestimonailsCarouselToBeFunctionalInTeachPage(): Promise<void> {
+    const testimonialCarousel = await this.page.waitForSelector(
+      testimonialCarouselSelectorInTeachPage
+    );
+    if (!testimonialCarousel) {
+      throw new Error('The testimonial carousel is not visible.');
+    }
+    const firstName = testimonialCarouselNamesInTeachPage[0];
+    const secondName = testimonialCarouselNamesInTeachPage[1];
+    const carouselIndicators = await this.page.$$(
+      testimonialCarouselIndicatorsInTeachPage
+    );
+
+    const firstTestimonialName = await this.page.$eval(
+      testimonialCarouselNameInTeachPage,
+      el => el.textContent
+    );
+    if (!firstTestimonialName?.includes(firstName)) {
+      throw new Error(
+        `Expected first testimonial name to contain "${firstName}" , but got "${firstTestimonialName}"`
+      );
+    }
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(testimonialCarouselNextButton);
+    } else {
+      await carouselIndicators[1].click();
+    }
+
+    // Toggle to the next slide.
+    const secondTestimonialName = await this.page.$eval(
+      testimonialCarouselNameInTeachPage,
+      el => el.textContent
+    );
+    if (!secondTestimonialName?.includes(secondName)) {
+      throw new Error(
+        `Expected second testimonial name to contain "${secondName}", but got "${secondTestimonialName}"`
+      );
+    }
+
+    // Toggle to the previous slide.
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(testimonialCarouselPrevButton);
+    } else {
+      await carouselIndicators[0].click();
+    }
+
+    const firstTestimonialNameAgain = await this.page.$eval(
+      testimonialCarouselNameInTeachPage,
+      el => el.textContent
+    );
+    if (!firstTestimonialNameAgain?.includes(firstName)) {
+      throw new Error(
+        `Expected first testimonial name to contain "${firstName}" again, but got "${firstTestimonialNameAgain}"`
+      );
+    }
+    showMessage('The testimonial carousel in teach page is working correctly.');
+  }
+
+  /**
+   * Function to verify the lesson creators carousel functionality in the Teach page,
+   * ensuring that the carousel correctly displays the first and second testimonials
+   * and allows navigation back to the first testimonial.
+   */
+  async expectLessonCreatorsCarouselToBeFunctionalInTeachPage(): Promise<void> {
+    const creatorsCarousel = await this.page.waitForSelector(
+      creatorsCarouselSelectorInTeachPage
+    );
+    if (!creatorsCarousel) {
+      throw new Error('The lesson creators carousel is not visible.');
+    }
+    const firstName = creatorsCarouselNamesInTeachPage[0];
+    const secondName = creatorsCarouselNamesInTeachPage[1];
+
+    const firstLessonCreatorName = await this.page.$eval(
+      creatorsCarouselNameInTeachPage,
+      el => el.textContent
+    );
+    if (!firstLessonCreatorName?.includes(firstName)) {
+      throw new Error(
+        `Expected first lesson creator name to contain "${firstName}" , but got "${firstLessonCreatorName}"`
+      );
+    }
+
+    if (!this.isViewportAtMobileWidth()) {
+      // The carousel displays all creators at once in desktop view as it has enough space.
+      return;
+    }
+
+    // Toggle to the next slide.
+    await this.clickOn(creatorsCarouselNextButton);
+
+    const secondLessonCreatorName = await this.page.$eval(
+      creatorsCarouselNameInTeachPage,
+      el => el.textContent
+    );
+    if (!secondLessonCreatorName?.includes(secondName)) {
+      throw new Error(
+        `Expected second lesson creator name to contain "${secondName}", but got "${secondLessonCreatorName}"`
+      );
+    }
+
+    // Toggle to the previous slide.
+    await this.clickOn(creatorsCarouselPrevButton);
+
+    const firstLessonCreatorNameAgain = await this.page.$eval(
+      creatorsCarouselNameInTeachPage,
+      el => el.textContent
+    );
+    if (!firstLessonCreatorNameAgain?.includes(firstName)) {
+      throw new Error(
+        `Expected first lesson creator name to contain "${firstName}" again, but got "${firstLessonCreatorNameAgain}"`
+      );
+    }
+    showMessage(
+      'The lesson creators carousel in teach page is working correctly.'
+    );
+  }
+
+  /**
+   * Function to verify the Lesson Creation Steps accordion functionality in the Teach page.
+   * It verifies that the expand button opens the corresponding accordion panel content
+   * and the close button closes it.
+   */
+  async expectLessonCreationStepsAccordionToBeFunctionalInTeachPage(): Promise<void> {
+    const lessonCreationSection = await this.page.waitForSelector(
+      lessonCreationSectionInTeachPage
+    );
+    if (!lessonCreationSection) {
+      throw new Error(
+        'The lesson creation section is not visible on the teach page.'
+      );
+    } else {
+      showMessage('The lesson creation section is visible on the teach page.');
+    }
+    await this.clickOn(lessonCreationAccordionExpandButtonInTeachPage);
+    await this.page.waitForSelector(
+      lessonCreationAccordionPanelContentInTeachPage,
+      {visible: true}
+    );
+    showMessage('Lesson Creation accordion expand button is working correctly');
+    await this.clickOn(lessonCreationAccordionCloseButtonInTeachPage);
+    await this.page.waitForSelector(
+      lessonCreationAccordionPanelContentInTeachPage,
+      {hidden: true}
+    );
+    showMessage('Lesson Creation accordion close button is working correctly');
   }
 
   /**
@@ -1380,10 +1660,12 @@ export class LoggedOutUser extends BaseUser {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
 
     if (this.isViewportAtMobileWidth()) {
-      // This reload is required to ensure the language dropdown is visible in mobile view,
+      // This is required to ensure the language dropdown is visible in mobile view,
       // if the earlier movements of the page have hidden it and since the inbuilt
       // scrollIntoView function call of the clickOn function didn't work as expected.
-      await this.page.reload();
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
@@ -1419,12 +1701,9 @@ export class LoggedOutUser extends BaseUser {
     langCode: string
   ): Promise<void> {
     await this.changeSiteLanguage(langCode);
-
-    await this.clickLinkButtonToNewTab(
+    await this.openExternalLink(
       partnerWithUsButtonAtTheBottomOfPartnershipsPage,
-      'Partner With Us button at the bottom of the Partnerships page',
-      partnershipsFormInPortugueseUrl,
-      'Partnerships Google Form'
+      partnershipsFormInPortugueseUrl
     );
     await this.changeSiteLanguage('en');
   }
@@ -1491,6 +1770,67 @@ export class LoggedOutUser extends BaseUser {
       blogUrl,
       'Blog'
     );
+  }
+
+  /**
+   * Function to verify the Volunteer tabs functionality in the Volunteer page.
+   * It checks if the tabs can be toggled through tab-labels in desktop and arrows in mobile.
+   */
+  async expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage(): Promise<void> {
+    const tabsSection = await this.page.waitForSelector(
+      tabsSectionInVolunteerPage
+    );
+    if (!tabsSection) {
+      throw new Error('The tabs section is not visible in Volunteer page');
+    }
+
+    const tabLablels = await this.page.$$(tabsLabelsInVolunteerPage);
+    const expectedFirstTabHeading = 'Outreach volunteer expectations';
+    const expectedSecondTabHeading = 'Software volunteer expectations';
+
+    const firstTabHeading = await this.page.$eval(
+      tabsFirstVolunteerExpectationsInVolunteerPage,
+      el => el.textContent
+    );
+    if (!firstTabHeading?.includes(expectedFirstTabHeading)) {
+      throw new Error(
+        `Expected first tab heading to contain "${expectedFirstTabHeading}" , but got "${firstTabHeading}"`
+      );
+    }
+
+    // Toggle to the next tab.
+    if (!this.isViewportAtMobileWidth()) {
+      await tabLablels[1].click();
+    } else {
+      await this.clickOn(tabsNextButtonInVolunteerPage);
+    }
+
+    const secondTabHeading = await this.page.$eval(
+      tabsSecondVolunteerExpectationsInVolunteerPage,
+      el => el.textContent
+    );
+    if (!secondTabHeading?.includes(expectedSecondTabHeading)) {
+      throw new Error(
+        `Expected second tab heading to contain "${expectedSecondTabHeading}", but got "${secondTabHeading}"`
+      );
+    }
+
+    // Toggle to the previous tab.
+    if (!this.isViewportAtMobileWidth()) {
+      await tabLablels[0].click();
+    } else {
+      await this.clickOn(tabsPreviousButtonInVolunteerPage);
+    }
+
+    const firstTabAgain = await this.page.$eval(
+      tabsFirstVolunteerExpectationsInVolunteerPage,
+      el => el.textContent
+    );
+    if (!firstTabAgain?.includes(expectedFirstTabHeading)) {
+      throw new Error(
+        `Expected first tab heading to contain "${expectedFirstTabHeading}" again, but got "${firstTabHeading}"`
+      );
+    }
   }
 
   /**
@@ -1771,6 +2111,113 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to verify the Features accordion functionality in the About page.
+   * It verifies that the expand button opens the corresponding accordion panel content
+   * and the close button closes it.
+   */
+  async expectFeaturesAccordionToBeFunctionalInAboutPage(): Promise<void> {
+    const featuresSection = await this.page.waitForSelector(
+      featuresSectionInAboutPage
+    );
+    if (!featuresSection) {
+      throw new Error('The features section is not visible on the About page.');
+    }
+
+    const featuresAccordionPanelContentInAboutPage =
+      this.isViewportAtMobileWidth()
+        ? featuresAccordionPanelContentMobileInAboutPage
+        : featuresAccordionPanelContentDesktopInAboutPage;
+    const featuresAccordionExpandButtonInAboutPage =
+      this.isViewportAtMobileWidth()
+        ? featuresAccordionExpandButtonMobileInAboutPage
+        : featuresAccordionExpandButtonDesktopInAboutPage;
+    const featuresAccordionCloseButtonInAboutPage =
+      this.isViewportAtMobileWidth()
+        ? featuresAccordionCloseButtonMobileInAboutPage
+        : featuresAccordionCloseButtonDesktopInAboutPage;
+
+    await this.clickOn(featuresAccordionExpandButtonInAboutPage);
+    await this.page.waitForSelector(featuresAccordionPanelContentInAboutPage, {
+      visible: true,
+    });
+
+    await this.clickOn(featuresAccordionCloseButtonInAboutPage);
+    await this.page.waitForSelector(featuresAccordionPanelContentInAboutPage, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Function to verify the Volunteer carousel functionality in the About page,
+   * ensuring that the carousel correctly displays the first and second slides
+   * and allows navigation back to the first slide.
+   */
+  async expectVolunteerCarouselToBeFunctionalInAboutPage(): Promise<void> {
+    const volunteerCarouselSelectorInAboutPage = !this.isViewportAtMobileWidth()
+      ? volunteerCarouselSelectorDesktopInAboutPage
+      : volunteerCarouselSelectorMobileInAboutPage;
+    const volunteerCarouselSlideHeadingInAboutPage =
+      !this.isViewportAtMobileWidth()
+        ? volunteerCarouselSlideHeadingDesktopInAboutPage
+        : volunteerCarouselSlideHeadingMobileInAboutPage;
+    const volunteerCarouselNextButtonInAboutPage =
+      !this.isViewportAtMobileWidth()
+        ? volunteerCarouselNextButtonDesktopInAboutPage
+        : volunteerCarouselNextButtonMobileInAboutPage;
+    const volunteerCarouselPrevButtonInAboutPage =
+      !this.isViewportAtMobileWidth()
+        ? volunteerCarouselPrevButtonDesktopInAboutPage
+        : volunteerCarouselPrevButtonMobileInAboutPage;
+    const firstSlideHeading = volunteerCarouselSlideHeadingsInAboutPage[0];
+    const secondSlideHeading = !this.isViewportAtMobileWidth()
+      ? volunteerCarouselSlideHeadingsInAboutPage[2]
+      : volunteerCarouselSlideHeadingsInAboutPage[1];
+
+    const volunteerCarousel = await this.page.waitForSelector(
+      volunteerCarouselSelectorInAboutPage
+    );
+    if (!volunteerCarousel) {
+      throw new Error('The volunteer carousel in About page is not visible.');
+    }
+
+    const firstVolunteerSlideSlideHeading = await this.page.$eval(
+      volunteerCarouselSlideHeadingInAboutPage,
+      el => el.textContent
+    );
+    if (!firstVolunteerSlideSlideHeading?.includes(firstSlideHeading)) {
+      throw new Error(
+        `Expected first volunteer slide heading to contain "${firstSlideHeading}" , but got "${firstVolunteerSlideSlideHeading}"`
+      );
+    }
+
+    // Toggle to the next slide.
+    await this.clickOn(volunteerCarouselNextButtonInAboutPage);
+
+    const secondVolunteerSlideSlideHeading = await this.page.$eval(
+      volunteerCarouselSlideHeadingInAboutPage,
+      el => el.textContent
+    );
+    if (!secondVolunteerSlideSlideHeading?.includes(secondSlideHeading)) {
+      throw new Error(
+        `Expected second volunteer slide heading to contain "${secondSlideHeading}", but got "${secondVolunteerSlideSlideHeading}"`
+      );
+    }
+
+    // Toggle to the previous slide.
+    await this.clickOn(volunteerCarouselPrevButtonInAboutPage);
+
+    const firstVolunteerSlideHeadingAgain = await this.page.$eval(
+      volunteerCarouselSlideHeadingInAboutPage,
+      el => el.textContent
+    );
+    if (!firstVolunteerSlideHeadingAgain?.includes(firstSlideHeading)) {
+      throw new Error(
+        `Expected first volunteer slide heading to contain "${firstSlideHeading}" again, but got "${firstVolunteerSlideHeadingAgain}"`
+      );
+    }
+  }
+
+  /**
    * Function to click the "View Report" button on the About Page
    * and check if it opens the Impact Report.
    */
@@ -1840,8 +2287,36 @@ export class LoggedOutUser extends BaseUser {
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
 
+    const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? partnerWithUsMobileButtonInAboutPage
+      : partnerWithUsDesktopButtonInAboutPage;
+
     await this.clickOn(partnerTab);
-    await this.clickLinkAnchorToNewTab('Partner with us', partnershipsFormUrl);
+    await this.openExternalLink(
+      partnerWithUsButtonInAboutPage,
+      partnershipsFormUrl
+    );
+  }
+
+  /**
+   * This function verifies that the classroom cards are present in the classrooms page.
+   * @param {number} classroomsCount - The expected number of classrooms.
+   */
+  async expectClassroomCountInClassroomsPageToBe(
+    classroomsCount: number
+  ): Promise<void> {
+    await this.page.waitForSelector(classroomTileContainer);
+    const classroomTiles = await this.page.$$(classroomTileContainer);
+
+    if (classroomTiles.length === classroomsCount) {
+      showMessage(
+        `${classroomsCount} classrooms are present in classrooms page.`
+      );
+    } else {
+      throw new Error(
+        `Expect ${classroomsCount} classrooms to be present in classrooms page, found: ${classroomTiles.length} classrooms.`
+      );
+    }
   }
 
   /**
@@ -1864,11 +2339,9 @@ export class LoggedOutUser extends BaseUser {
       : partnerWithUsDesktopButtonInAboutPage;
 
     await this.clickOn(partnerTab);
-    await this.clickLinkButtonToNewTab(
+    await this.openExternalLink(
       partnerWithUsButtonInAboutPage,
-      `Partner With Us button in About page, after changing the language to ${langCode},`,
-      partnershipsFormInPortugueseUrl,
-      'Partnerships Google Form'
+      partnershipsFormInPortugueseUrl
     );
     await this.changeSiteLanguage('en');
   }
@@ -2008,9 +2481,6 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
-    await this.page.waitForSelector(conversationSkinUserAvatar, {
-      hidden: true,
-    });
   }
 
   /**
@@ -2030,18 +2500,19 @@ export class LoggedOutUser extends BaseUser {
   async expectExplorationCompletionToastMessage(
     message: string
   ): Promise<void> {
-    await this.page.waitForSelector(explorationCompletionToastMessage, {
-      visible: true,
-    });
-    const element = await this.page.$(explorationCompletionToastMessage);
-    const toastMessage = await this.page.evaluate(
-      element => element.textContent,
-      element
+    await this.page.waitForSelector(explorationCompletionToastMessage);
+
+    const toastMessage = await this.page.$eval(
+      explorationCompletionToastMessage,
+      element => element.textContent
     );
+
     if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
     }
+
     showMessage('Exploration has completed successfully');
+
     await this.page.waitForSelector(explorationCompletionToastMessage, {
       hidden: true,
     });
@@ -2347,12 +2818,12 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Selects and opens a chapter within a story to learn.
-   * @param {string} chapterName - The name of the chapter to select and open.
    * @param {string} storyName - The name of the story containing the chapter.
+   * @param {string} chapterName - The name of the chapter to select and open.
    */
   async selectChapterWithinStoryToLearn(
-    chapterName: string,
-    storyName: string
+    storyName: string,
+    chapterName: string
   ): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const storyTitleSelector = isMobileViewport
@@ -2623,8 +3094,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
    */
-  async giveFeedback(feedback: string): Promise<void> {
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
@@ -2636,6 +3108,12 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn(stayAnonymousCheckbox);
+    }
+
     await this.clickOn('Submit');
 
     try {
@@ -2915,6 +3393,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectCardContentToMatch(expectedCardContent: string): Promise<void> {
     await this.waitForPageToFullyLoad();
+
     await this.page.waitForSelector(`${stateConversationContent} p`, {
       visible: true,
     });
@@ -3415,6 +3894,45 @@ export class LoggedOutUser extends BaseUser {
 
     // Remove focus from the focused element.
     await this.page.evaluate(element => element.blur(), expectedFocusedElement);
+  }
+
+  /**
+   * Changes the language of the lesson.
+   * @param {string} languageCode - The code of the language to change to.
+   */
+  async changeLessonLanguage(languageCode: string): Promise<void> {
+    await this.select(lessonLanguageSelector, languageCode);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
+   */
+  async startVoiceover(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
+    if (voiceoverDropdownElement) {
+      await this.clickOn(voiceoverDropdown);
+    }
+    await this.clickOn(playVoiceoverButton);
+    await this.page.waitForSelector(pauseVoiceoverButton);
+  }
+
+  /**
+   * Verifies if the voiceover is playing.
+   */
+  async verifyVoiceoverIsPlaying(shouldBePlaying: true): Promise<void> {
+    // If the pause button is present, it means the audio is playing.
+    await this.page.waitForSelector(pauseVoiceoverButton);
+    showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
+  }
+
+  /**
+   * Pauses the voiceover by clicking on the pause button.
+   */
+  async pauseVoiceover(): Promise<void> {
+    await this.clickOn(pauseVoiceoverButton);
   }
 }
 
