@@ -115,5 +115,9 @@ if [ "$is_container_running" != "0" ]; then
     make stop
 fi
 
+if [ "$exitcode" = "0" ]; then
+    git push --no-verify
+fi
+
 # Exit with exit code from container
 exit $exitcode
