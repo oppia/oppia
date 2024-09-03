@@ -56,7 +56,6 @@ describe('Super Admin', function () {
         'always'
       );
 
-      await superAdmin.saveChangesToStorage();
       await superAdmin.expectActionSuccessMessage('Saved successfully.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
