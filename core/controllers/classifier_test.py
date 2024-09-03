@@ -31,6 +31,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
@@ -61,9 +62,13 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         with utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
+        self.admin_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        assert isinstance(self.admin_email_address, str)
         self.signup(
-            feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME, True)
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+            self.admin_email_address, self.ADMIN_USERNAME, True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         assets_list: List[Tuple[str, bytes]] = []
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
@@ -188,7 +193,18 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+        ]
     )
     def test_email_sent_on_failed_job(self) -> None:
 
@@ -208,12 +224,13 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             'get_classifier_training_job_by_id',
             mock_get_classifier_training_job_by_id)
 
+        assert isinstance(self.admin_email_address, str)
         with can_send_feedback_email_ctx:
             with fail_training_job:
                 # Check that there are no sent emails to the
                 # email address before posting json.
                 messages = self._get_sent_email_messages(
-                    feconf.ADMIN_EMAIL_ADDRESS)
+                    self.admin_email_address)
                 self.assertEqual(len(messages), 0)
 
                 # Post ML Job.
@@ -229,7 +246,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                         expected_status_int=500)
                 # Check that there are now emails sent.
                 messages = self._get_sent_email_messages(
-                    feconf.ADMIN_EMAIL_ADDRESS)
+                    self.admin_email_address)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject, expected_subject)
