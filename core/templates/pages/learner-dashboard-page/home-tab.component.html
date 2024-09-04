@@ -26,7 +26,7 @@
             <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
                  class="story-summary-tile">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-                [topicName]="topicSummaryTile.name">
+                [topicName]="topicSummaryTile.name" (click)="registerClassroomInProgressLessonEvent(topicSummaryTile.classroom, topicSummaryTile.name)">
               </oppia-learner-story-summary-tile>
             </div>
           </div>
@@ -44,7 +44,7 @@
           <div class="topic-summary-tile-scroll">
             <div class="topic-summary-tile-section d-flex"
               [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile">
+              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile" (click)="registerNewClassroomLessonEvent(item.key, topicSummaryTile.name)">
                 <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
                 </oppia-learner-topic-summary-tile>
               </div>
@@ -127,7 +127,7 @@
           </ng-container>
         </oppia-card-display>
         <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-           class="align-items-center d-inline-flex justify-content-center mb-4 oppia-learner-dash-home-button text-center">
+           class="align-items-center d-inline-flex justify-content-center mb-4 oppia-learner-dash-button-lg oppia-learner-dash-button-lg--classroom text-center">
           <span class="fas fa-arrow-right mr-2"></span>
           {{ 'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION_LINK' | translate }}
         </a>

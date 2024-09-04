@@ -51,7 +51,8 @@ export default {
     CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
     CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
-    DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
+    DonatePageThanksModalURL: 'http://localhost:8181/donate?thanks=',
+    AboutPageThanksModalURL: 'http://localhost:8181/about?thanks=',
     DesktopExternalLinkWatchAVideo:
       'https://www.facebook.com/oppiaorg/videos/189487953721583/',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
@@ -214,5 +215,12 @@ export default {
       Id: 'org.oppia.android',
     },
   },
+  TeachPageTestimonialsNames: ['Riya', 'Wala'],
+  TeachPageCreatorsNames: ['Rita Santos', 'Aanuoluwapo Adeoti'],
+  AboutPageVolunteerCarouselHeadings: [
+    'Outreach',
+    'Software',
+    'Art and Design',
+  ],
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };
