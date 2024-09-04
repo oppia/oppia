@@ -66,6 +66,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ format('backend_test_coverage_shard_{0}', matrix.shard) }}
+          include-hidden-files: true
           path: .coverage
           retention-days: 1
   check_combined_coverage:
