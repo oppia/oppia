@@ -469,7 +469,7 @@ def swap_get_platform_parameter_value_function(
             raise Exception(
                 'The value for the platform parameter %s was needed in this '
                 'test, but not specified in the set_platform_parameters '
-                'decorator. Please this information in the decorator.'
+                'decorator. Please use this information in the decorator.'
                 % parameter_name
             )
         return platform_parameter_name_value_dict[parameter_name]
@@ -4289,7 +4289,8 @@ version: 1
                 banner_data
                 if banner_data is not None
                 else dummy_banner_data
-            )
+            ),
+            index=0
         )
 
         classroom_config_services.create_new_classroom(classroom)
