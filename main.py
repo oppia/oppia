@@ -316,6 +316,34 @@ URLS = [
         access_validators.DiagnosticTestPlayerAccessValidationHandler
     ),
 
+    get_redirect_route(
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/story' % 
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/revision' % 
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/practice' % 
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
