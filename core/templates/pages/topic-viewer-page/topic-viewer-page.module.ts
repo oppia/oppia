@@ -20,10 +20,6 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 import {SharedComponentsModule} from 'components/shared-component.module';
-import {
-  TopicViewerNavbarBreadcrumbComponent,
-  // eslint-disable-next-line max-len
-} from 'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
 import {TopicViewerPageComponent} from 'pages/topic-viewer-page/topic-viewer-page.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {PracticeSessionConfirmationModal} from './modals/practice-session-confirmation-modal.component';
@@ -48,14 +44,9 @@ import {TopicPlayerViewerCommonModule} from 'pages/topic-viewer-page/topic-viewe
   ],
   declarations: [
     TopicViewerPageRootComponent,
-    TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent,
     PracticeSessionConfirmationModal,
   ],
-  entryComponents: [
-    TopicViewerNavbarBreadcrumbComponent,
-    TopicViewerPageComponent,
-    PracticeSessionConfirmationModal,
-  ],
+  entryComponents: [TopicViewerPageComponent, PracticeSessionConfirmationModal],
 })
 export class TopicViewerPageModule {}
