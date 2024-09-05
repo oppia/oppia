@@ -1,0 +1,76 @@
+<h3 class="oppia-learner-dash-goals-modal-title" mat-dialog-title> Add or edit a goal </h3>
+<p class="oppia-learner-dash-goals-modal-info"> You can select up to 5 goals at a time </p>
+<div class="oppia-learner-dash-goals-modal" mat-dialog-content>
+  <!--What if goals are all completed, should they be disabled and checked?-->
+  <ng-container *ngFor="let topic of editGoals">
+    <mat-checkbox color="primary"
+                  class="oppia-learner-dash-goals-checkbox"
+                  (click)="!checkedTopics.has(topic.id) ? checkTopics.add(topic.id) : checkedTopics.remove(topic.id)"
+                  [disabled]="checkedTopics.length === 5 && !checkedTopics.has(topic.id)">
+     {{ topic.name }}
+  </mat-checkbox>
+  </ng-container>
+</div>
+<div class="oppia-learner-dash-goals-modal-actions" mat-dialog-actions>
+  <!--What if goals are all completed, should they be disabled and checked?-->
+  <button class="oppia-learner-dash--inverse oppia-learner-dash-button-sm oppia-learner-dash-goals-button--modal" mat-button> Cancel </button>
+  <button class="oppia-learner-dash--default oppia-learner-dash-button-sm oppia-learner-dash-goals-button--modal" mat-button> Save </button>
+</div>
+
+<style>
+  
+.oppia-learner-dash-goals-button--modal {
+  height: 44px;
+  width: 178px;
+}
+
+.oppia-learner-dash-goals-checkbox {
+  font-size: 16px;
+  gap: 0 12px;
+}
+
+.oppia-learner-dash-goals-modal {
+  display: grid;
+  gap: 0 4px;
+  grid-template-columns: repeat(3, 1fr); 
+  padding: 24px;
+}
+
+/*not sure why it's 11 and then 6 for small*/
+.oppia-learner-dash-goals-modal-actions {
+  gap: 0 12px;
+}
+
+.oppia-learner-dash-goals-modal-title {
+  font-weight: 500;
+  font-size: 20px;
+  text-align: center;
+}
+
+.oppia-learner-dash-goals-modal-info {
+  font-size: 14px;
+  text-align: center;
+}
+
+
+@media screen and (max-width: 500px) {
+  .oppia-learner-dash-goals-button--modal {
+    width: 147px;
+  }
+
+  .oppia-learner-dash-goals-modal {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px 0;
+    padding: 12px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .oppia-learner-dash-goals-modal {
+    grid-template-columns: repeat(2, 1fr); 
+  }
+}
+
+</style>

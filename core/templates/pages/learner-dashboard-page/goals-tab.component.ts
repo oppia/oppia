@@ -78,6 +78,10 @@ export class GoalsTabComponent implements OnInit {
   topicIdsInCurrentGoals: string[] = [];
   topicIdsInEditGoals: string[] = [];
   topicIdsInPartiallyLearntTopics: string[] = [];
+  goalsStates: {[key: string]: boolean} = Object.assign(
+    {},
+    ...this.editGoals.map(topic => ({[topic.name]: false}))
+  );
   topicToIndexMapping = {
     CURRENT: 0,
     COMPLETED: 1,
