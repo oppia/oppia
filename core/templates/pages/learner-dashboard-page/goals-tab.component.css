@@ -392,6 +392,22 @@
 
 .oppia-learner-dash-goals-text {
   color: #333;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-family: Roboto;
   font-size: 18px;
+  width: 80%;
+}
+
+.oppia-learner-dash-goals-modal {
+  border-radius: 4px;
+  height: 343px;
+  max-width: 851px;
+  width: 75%;
+}
+
+@media screen and (max-width: 500px) {
+  .oppia-learner-dash-goals-modal {
+    height: 452px;
+    max-width: 328px;
+    width: 80%;
+  }
 }

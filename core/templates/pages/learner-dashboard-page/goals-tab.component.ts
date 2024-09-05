@@ -35,7 +35,8 @@ import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import './goals-tab.component.css';
 
 @Component({
@@ -49,7 +50,8 @@ export class GoalsTabComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
-    private deviceInfoService: DeviceInfoService
+    private deviceInfoService: DeviceInfoService,
+    private dialog: MatDialog
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -283,5 +285,21 @@ export class GoalsTabComponent implements OnInit {
           }
         }
       });
+  }
+
+  openModal(): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      checkedTopics: this.checkedTopics,
+      topics: this.editGoals.map(t => ({name: t.name, id: t.id})),
+    };
+    dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
+    const dialogRef = this.dialog.open(AddGoalsModalComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.checkedTopics = new Set(result);
+      }
+    });
   }
 }

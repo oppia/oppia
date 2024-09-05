@@ -1,20 +1,22 @@
-<h3 class="oppia-learner-dash-goals-modal-title" mat-dialog-title> Add or edit a goal </h3>
-<p class="oppia-learner-dash-goals-modal-info"> You can select up to 5 goals at a time </p>
-<div class="oppia-learner-dash-goals-modal" mat-dialog-content>
-  <!--What if goals are all completed, should they be disabled and checked?-->
-  <ng-container *ngFor="let topic of editGoals">
-    <mat-checkbox color="primary"
-                  class="oppia-learner-dash-goals-checkbox"
-                  (click)="!checkedTopics.has(topic.id) ? checkTopics.add(topic.id) : checkedTopics.remove(topic.id)"
-                  [disabled]="checkedTopics.length === 5 && !checkedTopics.has(topic.id)">
-     {{ topic.name }}
-  </mat-checkbox>
-  </ng-container>
-</div>
-<div class="oppia-learner-dash-goals-modal-actions" mat-dialog-actions>
-  <!--What if goals are all completed, should they be disabled and checked?-->
-  <button class="oppia-learner-dash--inverse oppia-learner-dash-button-sm oppia-learner-dash-goals-button--modal" mat-button> Cancel </button>
-  <button class="oppia-learner-dash--default oppia-learner-dash-button-sm oppia-learner-dash-goals-button--modal" mat-button> Save </button>
+<div class="d-flex flex-column h-100">
+  <h3 class="oppia-learner-dash-goals-modal-title" mat-dialog-title> Add or edit a goal </h3>
+  <p class="oppia-learner-dash-goals-modal-info"> You can select up to 5 goals at a time </p>
+  <div class="oppia-learner-dash-goals-modal-content" mat-dialog-content>
+    <!--TODO(#18384): What if all the goals are completed, should they be disabled and checked?-->
+    <ng-container *ngFor="let t of topics">
+      <mat-checkbox color="primary"
+                    class="oppia-learner-dash-goals-checkbox"
+                    (change)="!checkedTopics.has(t.id) ? checkedTopics.add(t.id) : checkedTopics.delete(t.id)"
+                    [checked]="checkedTopics.has(t.id)"
+                    [disabled]="checkedTopics.length === 5 && !checkedTopics.has(t.id)">
+      {{ t.name }}
+    </mat-checkbox>
+    </ng-container>
+  </div>
+  <div class="oppia-learner-dash-goals-modal-actions" mat-dialog-actions>
+    <button (click)="onClose()" class="oppia-learner-dash-button--inverse oppia-learner-dash-button-sm oppia-learner-dash-goals-button--modal" mat-button> Cancel </button>
+    <button (click)="onSubmit()" class="oppia-learner-dash-button--default oppia-learner-dash-button-sm oppia-learner-dash-goals-button--modal" mat-button> Save </button>
+  </div>
 </div>
 
 <style>
@@ -29,16 +31,20 @@
   gap: 0 12px;
 }
 
-.oppia-learner-dash-goals-modal {
+.oppia-learner-dash-goals-modal-content {
   display: grid;
   gap: 0 4px;
   grid-template-columns: repeat(3, 1fr); 
-  padding: 24px;
+  grid-template-rows: auto;
+  height: 100%;
+  width: 100%;
 }
 
 /*not sure why it's 11 and then 6 for small*/
 .oppia-learner-dash-goals-modal-actions {
+  display: flex;
   gap: 0 12px;
+  justify-content: end;
 }
 
 .oppia-learner-dash-goals-modal-title {
@@ -58,7 +64,7 @@
     width: 147px;
   }
 
-  .oppia-learner-dash-goals-modal {
+  .oppia-learner-dash-goals-modal-content{
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -68,7 +74,7 @@
 }
 
 @media screen and (max-width: 767px) {
-  .oppia-learner-dash-goals-modal {
+  .oppia-learner-dash-goals-modal-content{
     grid-template-columns: repeat(2, 1fr); 
   }
 }

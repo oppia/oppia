@@ -114,7 +114,7 @@
         </div>
       </mat-card>
     </div>
-    <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dash-tab overflow-hidden px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
+    <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow && !isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dash-tab overflow-hidden px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
       <div class="d-flex w-100"
            [ngClass]="{'oppia-learner-dashboard-main-content-container pl-5': !windowIsNarrow && !isShowRedesignedLearnerDashboardActive(), 'justify-content-center': windowIsNarrow}">
         <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
