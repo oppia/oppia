@@ -41,6 +41,7 @@ import {ViewLearnerGroupDetailsModalComponent} from './modal-templates/view-lear
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ToastrModule} from 'ngx-toastr';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 
 @NgModule({
   imports: [
@@ -56,6 +57,7 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
     ]),
   ],
   declarations: [
+    AddGoalsModalComponent,
     CardDisplayComponent,
     LearnerDashboardPageComponent,
     LearnerDashboardPageRootComponent,
@@ -74,6 +76,7 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
     ViewLearnerGroupDetailsModalComponent,
   ],
   entryComponents: [
+    AddGoalsModalComponent,
     CardDisplayComponent,
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
