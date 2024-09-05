@@ -43,14 +43,14 @@ export class TopicEditorAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>(resolve => {
-      let topicId = route.paramMap.get('topic_id') || '';
+      const topicId = route.paramMap.get('topic_id') || '';
       this.accessValidationBackendApiService
         .validateAccessToTopicEditorPage(topicId)
         .then(() => {
           resolve(true);
         })
         .catch(err => {
-          let statusCode = err ? err.status : 401;
+          const statusCode = err ? err.status : 401;
           this.router
             .navigate([
               `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${statusCode}`,

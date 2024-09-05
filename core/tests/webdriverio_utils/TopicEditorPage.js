@@ -112,7 +112,7 @@ var TopicEditorPage = function () {
     return $$('.e2e-test-subtopic-column');
   };
   var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
-  var subtopicsSelector = async function (count) {
+  var subtopicsSelector = async function (count = 0) {
     if (count) {
       let singleSubtopic = $('.e2e-test-subtopic');
       await waitFor.presenceOf(
