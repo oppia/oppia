@@ -470,9 +470,6 @@ URLS = [
         feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
         topics_and_skills_dashboard.TopicIdToDiagnosticTestSkillIdsHandler),
     get_redirect_route(
-        r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
@@ -539,17 +536,8 @@ URLS = [
         r'/<subtopic_url_fragment>' % feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
-        r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
-    get_redirect_route(
-        r'%s' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s/practice' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         % feconf.TOPIC_DATA_HANDLER,
