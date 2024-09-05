@@ -107,6 +107,14 @@
   </div>
   <div *ngIf="learnerDashboardRedesignFeatureFlag">
     <h2 class="oppia-learner-dash-greeting">  {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING' | translate: {username: username} }} </h2>
-    <div class="oppia-learner-dash-section"> </div>
+    <div class="oppia-learner-dash-section d-flex justify-content-between"> 
+      <p class="oppia-learner-dash-goals-text"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS' | translate }} </p>
+      <button class="bg-white border-0">
+        <span class="oppia-learner-dash-goals-add-circle">
+          <span class="fas fa-plus"></span>
+        </span>
+        <span> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_ADD_BUTTON' }} </span>
+      </button>
+    </div>
   </div>
 </div>
