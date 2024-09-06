@@ -269,10 +269,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                 check_tests_are_captured_in_ci
                     .get_acceptance_test_suites_from_acceptance_directory())
             self.assertEqual(
-                sorted(acceptance_test_suites, key=lambda x: x['name']),
-                sorted(ACCEPTANCE_TEST_SUITES, key=lambda x: x['name']),
-                ACCEPTANCE_TEST_SUITES
-            )
+                acceptance_test_suites, ACCEPTANCE_TEST_SUITES)
 
     def test_get_acceptance_test_suites_from_acceptance_directory_with_exclusion(self) -> None: # pylint: disable=line-too-long
         def mock_get_cwd() -> str:
