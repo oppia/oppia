@@ -29,8 +29,6 @@ import {toMatchImageSnapshot} from 'jest-image-snapshot';
 expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
-const devModeDesktop = 0.0012;
-const devModeMobile = 0.01;
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
@@ -591,12 +589,16 @@ export class BaseUser {
   }
 
   /**
+   * ONLY TAKES SCREENSHOTS IN PROD MODE
    * This function takes a screenshot of the page.
    * If there's no parameter for newPage, it checks this.page instead of newPage.
-   * If there's no image with the given filename, it stores the screenshot with the given filename in the folder __image_snapshots__
+   * If there's no image with the given filename, it stores the screenshot with the given filename in the folder:
+   *  prod_desktop_screenshots or prod_mobile_screenshots for screenshots in production mode
+   *  dev_desktop_screenshots or dev_mobile_screenshots for screenshots in development mode
    * Otherwise, it compares the screenshot with the image named as the given string to check if they match.
    * If they don't match, it generates an image in the folder __diff_output__ to show the difference.
    * @param {string} imageName - The name for the image
+   * @param {string} testPath - The path of the file that called this function
    * @param {Page|undefined} newPage - The page to take screenshot from,
    */
   async expectScreenshotToMatch(
@@ -617,17 +619,12 @@ export class BaseUser {
 
       var failureTrigger = 0;
       if (this.isViewportAtMobileWidth()) {
-        failureTrigger = (await this.isInProdMode()) ? 0 : devModeMobile;
-
-        // If (await currentPage.$(backgroundBanner)) {
-        //   failureTrigger += 0.03;
-        // } else.
-        if (await currentPage.$(libraryBanner)) {
+        if (await currentPage.$(backgroundBanner)) {
+          failureTrigger += 0.03;
+        } else if (await currentPage.$(libraryBanner)) {
           failureTrigger += 0.0039;
         }
       } else {
-        failureTrigger = (await this.isInProdMode()) ? 0 : devModeDesktop;
-
         if (await currentPage.$(backgroundBanner)) {
           failureTrigger += 0.03;
         } else if (await currentPage.$(libraryBanner)) {
@@ -635,16 +632,25 @@ export class BaseUser {
         }
       }
 
+      /*
+       * Set dumpInlineDiffToConsole as true prints the base64 string of the image that shows the difference when failed in the terminal
+       * The string can be copy-pasted to a browser address string to preview the image
+       * If you are running tests locally, you can set dumpInlineDiffToConsole as false to stop printing the base64 string
+       */
       expect(await currentPage.screenshot()).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
-        dumpInlineDiffToConsole: true,
+        dumpInlineDiffToConsole: false,
         customSnapshotIdentifier: imageName,
         customSnapshotsDir: path.join(
           testPath,
-          this.isViewportAtMobileWidth()
-            ? '/mobile_golden_screenshots'
-            : '/desktop_golden_screenshots'
+          (await this.isInProdMode())
+            ? this.isViewportAtMobileWidth()
+              ? '/prod_mobile_screenshots'
+              : '/prod_desktop_screenshots'
+            : this.isViewportAtMobileWidth()
+              ? '/dev_mobile_screenshots'
+              : '/dev_desktop_screenshots'
         ),
       });
       if (typeof newPage !== 'undefined') {

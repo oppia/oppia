@@ -97,5 +97,5 @@ const context = require.context(
 // And load the modules.
 context.keys().map(context);*/
 
-const context = require.context('../../', true, /(:?)/);
+const context = require.context('../../', true, /(:?)(?<!@bcoe.*\.spec\.ts)/);
 context.keys().forEach(context);

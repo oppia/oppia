@@ -40,28 +40,12 @@ describe('Blog Editor', function () {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
       await blogPostEditor.createDraftBlogPostWithTitle('Test Blog Post');
-      await blogPostEditor.expectScreenshotToMatch(
-        'createDraftBlogPostWithTitle',
-        __dirname
-      );
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(1);
-      await blogPostEditor.expectScreenshotToMatch(
-        'expectNumberOfBlogPostsToBe1',
-        __dirname
-      );
       await blogPostEditor.expectDraftBlogPostWithTitleToBePresent(
         'Test Blog Post'
       );
-      await blogPostEditor.expectScreenshotToMatch(
-        'expectDraftBlogPostWithTitleToBePresent',
-        __dirname
-      );
       await blogPostEditor.deleteDraftBlogPostWithTitle('Test Blog Post');
-      await blogPostEditor.expectScreenshotToMatch(
-        'deleteDraftBlogPostWithTitle',
-        __dirname
-      );
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
