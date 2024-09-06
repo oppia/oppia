@@ -43,7 +43,7 @@ class ElasticSearchClient:
     """Cretes an Elastic Search Client."""
 
     def __init__(self) -> None:
-        self._client = self.get_client()
+        self._client: Optional[elasticsearch.ElasticSearch] = None
 
     def get_client(self) -> elasticsearch.ElasticSearch:
         """Creates and returns elastic search client."""
