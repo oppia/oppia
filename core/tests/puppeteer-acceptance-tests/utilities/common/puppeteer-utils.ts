@@ -614,10 +614,10 @@ export class BaseUser {
 
       /* If currentPage includes a background banner, which are randomly selected from a set of four,
        * then the percentage to trigger a failure is 0.03 (3%) for the randomness of the banner.
-       * Otherwise, the percentage is 0.003 (0.3%) for the randomness of the page that are small enough to be ignored
+       * Otherwise, the percentage is 0.0004 (0.04%) for the randomness of the page that are small enough to be ignored
        */
 
-      var failureTrigger = 0;
+      var failureTrigger = 0.0004;
       if (this.isViewportAtMobileWidth()) {
         if (await currentPage.$(backgroundBanner)) {
           failureTrigger += 0.0352;
@@ -640,7 +640,7 @@ export class BaseUser {
       expect(await currentPage.screenshot()).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
-        dumpInlineDiffToConsole: false,
+        dumpInlineDiffToConsole: true,
         customSnapshotIdentifier: imageName,
         customSnapshotsDir: path.join(
           testPath,
