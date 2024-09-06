@@ -110,11 +110,11 @@
     <div class="oppia-learner-dash-section d-flex justify-content-between"> 
       <p class="oppia-learner-dash-goals-text mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS' | translate }} </p>
       <!--TODO(#18384): Check to see if text is part of button (text changes when hover too)-->
-      <button class="d-flex justify-content-center bg-white border-0" (click)="openModal()">
-          <span class="oppia-learner-dash-goals-add-circle oppia-learner-dash-button--default">
+      <button class="oppia-learner-dash-button--add-goals flex-grow-1 d-flex justify-content-center bg-white border-0" (click)="openModal()">
+          <span class="oppia-learner-dash-goals-add-circle">
             <span class="fas fa-plus"></span>
           </span>
-        <span class="oppia-learner-dash-button--default"></span>{{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_ADD_BUTTON' | translate }} </span>
+        <span class="oppia-learner-dash-goals-add-text"></span>{{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_ADD_BUTTON' | translate }} </span>
       </button>
     </div>
   </div>
