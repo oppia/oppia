@@ -4,13 +4,13 @@
   <div class="oppia-learner-dash-goals-modal-content" mat-dialog-content>
     <!--TODO(#18384): What if all the goals are completed, should they be disabled and checked?-->
      <!--TODO(#18384): Topic name translate keys-->
-    <ng-container *ngFor="let t of topics">
+    <ng-container *ngFor="const [name, id] of Object.entries(topics)">
       <mat-checkbox color="primary"
                     class="oppia-learner-dash-goals-checkbox"
-                    (change)="!checkedTopics.has(t.id) ? checkedTopics.add(t.id) : checkedTopics.delete(t.id)"
-                    [checked]="checkedTopics.has(t.id)"
-                    [disabled]="checkedTopics.length === 5 && !checkedTopics.has(t.id)">
-      {{ t.name }}
+                    (change)="onChange(id)"
+                    [checked]="checkedTopics.has(id)"
+                    [disabled]="checkedTopics.length === 5 && !checkedTopics.has(id)">
+      {{ name }}
     </mat-checkbox>
     </ng-container>
   </div>

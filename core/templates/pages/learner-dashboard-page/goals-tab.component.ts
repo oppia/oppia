@@ -287,11 +287,16 @@ export class GoalsTabComponent implements OnInit {
       });
   }
 
+  //topics: this.editGoals.map(t => ({name: t.name, id: t.id})),
+  // comma - https://stackoverflow.com/questions/19874555/how-do-i-convert-array-of-objects-into-one-object-in-javascript
   openModal(): void {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.data = {
       checkedTopics: this.checkedTopics,
-      topics: this.editGoals.map(t => ({name: t.name, id: t.id})),
+      topics: this.editGoals.reduce(
+        (obj, item) => ((obj[item.name] = item.id), obj),
+        {}
+      ),
     };
     dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
     const dialogRef = this.dialog.open(AddGoalsModalComponent, dialogConfig);
