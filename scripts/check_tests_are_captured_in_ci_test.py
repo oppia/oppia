@@ -268,7 +268,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             acceptance_test_suites = (
                 check_tests_are_captured_in_ci
                     .get_acceptance_test_suites_from_acceptance_directory())
-            self.assertEqual(
+            self.assertCountEqual(
                 acceptance_test_suites, ACCEPTANCE_TEST_SUITES)
 
     def test_get_acceptance_test_suites_from_acceptance_directory_with_exclusion(self) -> None: # pylint: disable=line-too-long

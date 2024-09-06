@@ -612,9 +612,10 @@ export class BaseUser {
       // To wait for all images to load and the page to be stable.
       await currentPage.waitForTimeout(5000);
 
-      /* If currentPage includes a background banner, which are randomly selected from a set of four,
-       * then the percentage to trigger a failure is 0.03 (3%) for the randomness of the banner.
-       * Otherwise, the percentage is 0.0007 (0.07%) for the randomness of the page that are small enough to be ignored
+      /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
+       * In general, it is set as 0.0007 (0.07%) for the randomness of the page that are small enough to be ignored.
+       * Based on the existence of the background/library banner, which are randomly selected from a set of four,
+       * failureTrigger is set in the specific percentage for the randomness of the banner in desktop mode and mobile mode.
        */
 
       var failureTrigger = 0.0007;

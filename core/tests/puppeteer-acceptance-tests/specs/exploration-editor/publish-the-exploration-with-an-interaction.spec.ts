@@ -54,29 +54,42 @@ describe('Exploration Creator', function () {
     async function () {
       // Navigate to the creator dashboard and create a new exploration.
       await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.expectScreenshotToMatch('1', __dirname);
       await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.expectScreenshotToMatch('2', __dirname);
       await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.expectScreenshotToMatch('3', __dirname);
       await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
+      await explorationEditor.expectScreenshotToMatch('4', __dirname);
       await explorationEditor.addImageInteraction();
+      await explorationEditor.expectScreenshotToMatch('5', __dirname);
       await explorationEditor.editDefaultResponseFeedback('Wrong.');
+      await explorationEditor.expectScreenshotToMatch('6', __dirname);
 
       await explorationEditor.addHintToState('Initial coordinate');
+      await explorationEditor.expectScreenshotToMatch('7', __dirname);
       // Add a new card with an end interaction.
       await explorationEditor.navigateToCard(CARD_NAME.LAST_CARD);
+      await explorationEditor.expectScreenshotToMatch('8', __dirname);
       await explorationEditor.updateCardContent('Congratulations!');
+      await explorationEditor.expectScreenshotToMatch('9', __dirname);
       await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+      await explorationEditor.expectScreenshotToMatch('10', __dirname);
 
       await explorationEditor.saveExplorationDraft();
+      await explorationEditor.expectScreenshotToMatch('11', __dirname);
 
       explorationId = await explorationEditor.publishExplorationWithMetadata(
         'Publish with an interaction',
         'This is the goal of exploration.',
         'Algebra'
       );
+      await explorationEditor.expectScreenshotToMatch('12', __dirname);
 
       await explorationVisitor.expectExplorationToBeAccessibleByUrl(
         explorationId
       );
+      await explorationEditor.expectScreenshotToMatch('13', __dirname);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
