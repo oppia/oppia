@@ -86,16 +86,19 @@ jasmine.getEnv().addReporter({
 //              to templateCache.
 // The '@nodelib' and 'openapi3-ts' are excluded from the tests since they are
 // coming from third party library.
-/* eslint-disable-next-line max-len */
-/* 
-const context = require.context(
-  '../../',
-  true,
-  /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!puppeteer-acceptance-tests.*\.spec\.ts)(?<!@bcoe.*\.spec\.ts)(?<!@nodelib.*\.spec\.ts)(?<!openapi3-ts.*\.spec\.ts)(?<!(valid|invalid)[_-][\w\d.\-]*\.ts)/
-);
+const context = require.context('../../', true, /(:?)/);
 
-// And load the modules.
-context.keys().map(context);*/
+// Filter out problematic modules before loading
+const filteredKeys = (context.keys() as string[]).filter((key: string) => {
+  // Exclude @bcoe, @nodelib, and other problematic modules
+  return !(
+    /@bcoe/.test(key) ||
+    /@nodelib/.test(key) ||
+    /openapi3-ts/.test(key) ||
+    // Add any other problematic patterns here
+    /fs-extra/.test(key)
+  );
+});
 
-const context = require.context('../../', true, /(:?)(?<!@bcoe.*\.spec\.ts)/);
-context.keys().forEach(context);
+// Load only the filtered modules
+filteredKeys.forEach((key: string) => context(key));
