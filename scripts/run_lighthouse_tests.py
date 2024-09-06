@@ -197,7 +197,6 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
         common.NODE_BIN_PATH, lhci_path, 'autorun',
         '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
         '--max-old-space-size=4096'
-        '--no-sandbox'
     ]
 
     process = subprocess.Popen(

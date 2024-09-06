@@ -474,7 +474,7 @@ const main = async function () {
     headless: true,
     // Sandbox requires a non-root user, and we use a root user in docker.
     // Thus, we need to disable the sandbox.
-    args: ['--no-sandbox'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   const page = await browser.newPage();
   await page.setViewport({
