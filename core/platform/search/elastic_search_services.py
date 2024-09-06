@@ -43,9 +43,10 @@ class ElasticSearchClient:
     """Cretes an Elastic Search Client."""
 
     def __init__(self) -> None:
-        self._client = None
+        self._client = self.get_client()
 
-    def get_client(self) -> Any:
+    def get_client(self) -> elasticsearch.ElasticSearch:
+        """Creates and returns elastic search client."""
         if self._client is None:
             with datastore_services.get_ndb_context():
                 es_cloud_id = (
