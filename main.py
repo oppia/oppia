@@ -83,7 +83,7 @@ from core.controllers import voiceover
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-import google
+import google.cloud.logging
 from typing import Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
