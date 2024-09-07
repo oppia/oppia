@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for EditLearnerGroupPageAuthGuard
+ * @fileoverview Tests for TopicEditorPageAuthGuard
  */
 import {Location} from '@angular/common';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {
   ActivatedRouteSnapshot,
+  convertToParamMap,
   RouterStateSnapshot,
   Router,
 } from '@angular/router';
@@ -67,21 +68,26 @@ describe('TopicEditorAuthGuard', () => {
   });
 
   it('should allow access if validation succeeds', fakeAsync(() => {
+    const routeSnapshot = jasmine.createSpyObj<ActivatedRouteSnapshot>(
+      'ActivatedRouteSnapshot',
+      [],
+      {paramMap: convertToParamMap({topic_id: 'validTopicId'})}
+    );
+
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
       'validateAccessToTopicEditorPage'
     ).and.returnValue(Promise.resolve());
+
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
     );
 
     let canActivateResult: boolean | null = null;
 
-    guard
-      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(result => {
-        canActivateResult = result;
-      });
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
 
     tick();
 
@@ -91,27 +97,63 @@ describe('TopicEditorAuthGuard', () => {
   }));
 
   it('should redirect to 401 page if validation fails', fakeAsync(() => {
+    const routeSnapshot = jasmine.createSpyObj<ActivatedRouteSnapshot>(
+      'ActivatedRouteSnapshot',
+      [],
+      {paramMap: convertToParamMap({topic_id: 'invalidTopicId'})}
+    );
+
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToTopicEditorPage'
     ).and.returnValue(Promise.reject());
+
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
     );
 
     let canActivateResult: boolean | null = null;
 
-    guard
-      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(result => {
-        canActivateResult = result;
-      });
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
 
     tick();
 
     expect(canActivateResult).toBeFalse();
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+    ]);
+  }));
+
+  it('should redirect to 404 page if topic_id is null or undefined', fakeAsync(() => {
+    const routeSnapshot = jasmine.createSpyObj<ActivatedRouteSnapshot>(
+      'ActivatedRouteSnapshot',
+      [],
+      {paramMap: convertToParamMap({})}
+    );
+
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToTopicEditorPage'
+    ).and.returnValue(Promise.resolve());
+
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+
+    let canActivateResult: boolean | null = null;
+
+    guard.canActivate(routeSnapshot, {} as RouterStateSnapshot).then(result => {
+      canActivateResult = result;
+    });
+
+    tick();
+
+    expect(canActivateResult).toBeFalse();
+    expect(validateAccessSpy).not.toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
   }));
 });
