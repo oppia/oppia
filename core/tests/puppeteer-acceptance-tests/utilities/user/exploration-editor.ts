@@ -147,6 +147,7 @@ const skillNameInput = '.e2e-test-skill-name-input';
 const skillItem = '.e2e-test-skills-list-item';
 const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
 const deleteSkillButton = 'i.skill-delete-button';
+const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
 
 const misconceptionDiv = '.misconception-list-item';
 const misconceptionTitle = '.e2e-test-misconception-title';
@@ -1193,6 +1194,13 @@ export class ExplorationEditor extends BaseUser {
    * @param skillName - Name of the skill to be linked to state.
    */
   async addSkillToState(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        this.clickOn(mobileToggleSkillCard);
+      }
+    }
     await this.clickOn(addSkillButton);
     await this.type(skillNameInput, skillName);
     await this.clickOn(skillItem);
@@ -1213,6 +1221,13 @@ export class ExplorationEditor extends BaseUser {
     let expectedTitle = !isOptional
       ? misconceptionName
       : `(Optional) ${misconceptionName}`;
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        this.clickOn('.e2e-test-response-tab-toggle');
+      }
+    }
     let responseTabs = await this.page.$$(responseGroupDiv);
 
     await responseTabs[responseIndex].click();
@@ -1254,6 +1269,13 @@ export class ExplorationEditor extends BaseUser {
     let expectedTitle = !isOptional
       ? misconceptionName
       : `(Optional) ${misconceptionName}`;
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        this.clickOn('.e2e-test-response-tab-toggle');
+      }
+    }
     let responseTabs = await this.page.$$(responseGroupDiv);
     await responseTabs[responseIndex].click();
     await this.clickOn(misconceptionEditorTab);
@@ -1288,6 +1310,13 @@ export class ExplorationEditor extends BaseUser {
     isPresent: boolean
   ): Promise<void> {
     try {
+      if (this.isViewportAtMobileWidth()) {
+        const element = await this.page.$(responseGroupDiv);
+        // If the responses were collapsed in mobile view.
+        if (!element) {
+          this.clickOn('.e2e-test-response-tab-toggle');
+        }
+      }
       await this.page.waitForSelector(misconceptionDiv, {
         timeout: 5000,
         visible: true,
@@ -1332,6 +1361,13 @@ export class ExplorationEditor extends BaseUser {
   async toggleMisconceptionApplicableStatus(
     misconceptionName: string
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        this.clickOn('.e2e-test-response-tab-toggle');
+      }
+    }
     await this.page.waitForSelector(optionalMisconceptionDiv, {
       timeout: 5000,
       visible: true,
@@ -1376,6 +1412,13 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isApplicable: boolean
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        this.clickOn('.e2e-test-response-tab-toggle');
+      }
+    }
     if (!isApplicable) {
       this.page.waitForSelector(inapplicableMisconceptionDiv);
     }
@@ -1409,6 +1452,13 @@ export class ExplorationEditor extends BaseUser {
    * Removes the attached skill from the current state card.
    */
   async removeSkillFromState(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        this.clickOn(mobileToggleSkillCard);
+      }
+    }
     await this.clickOn(deleteSkillButton);
     await this.clickOn('Delete skill');
   }

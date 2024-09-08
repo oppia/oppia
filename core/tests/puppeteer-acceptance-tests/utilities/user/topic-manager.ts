@@ -149,6 +149,9 @@ const skillPrerequisiteLinkSelector = '.skill-prerequisite-link';
 const removeSkillIconSelector = '.remove-skill-icon';
 const misconceptionDeleteButtonSelector = '.e2e-test-delete-example-button';
 const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
+const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
+const mobileSkillNavToggle =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
 const commitMessageInputSelector = '.e2e-test-commit-message-input';
 const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
 const skillPreviewModalTitleSelector = '.skill-preview-modal-title';
@@ -1738,6 +1741,13 @@ export class TopicManager extends BaseUser {
     feedback: string,
     optional: boolean = false
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addButtonSelector);
+      // If the misconceptions were collapsed in mobile view.
+      if (!element) {
+        this.clickOn('Misconceptions');
+      }
+    }
     await this.clickOn(addButtonSelector);
     await this.type(nameFieldSelector, misconceptionName);
     await this.type(rteSelector, notes);
@@ -2047,7 +2057,15 @@ export class TopicManager extends BaseUser {
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      return;
+      await this.clickOn(mobileOptionsSelector);
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here.
+      const elems = await this.page.$$(mobileSkillNavToggle);
+      await elems[1].click();
+      await this.page.waitForSelector(mobileSaveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(mobileSaveOrPublishSkillSelector);
     } else {
       await this.waitForStaticAssetsToLoad();
       await this.page.waitForSelector(saveOrPublishSkillSelector, {
