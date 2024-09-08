@@ -159,6 +159,7 @@ const misconceptionApplicableToggle =
   '.e2e-test-misconception-applicable-toggle';
 const responseGroupDiv = '.e2e-test-response-tab';
 const misconceptionEditorTab = '.e2e-test-open-misconception-editor';
+const toggleResponseTab = '.e2e-test-response-tab-toggle';
 
 const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
@@ -1225,7 +1226,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        this.clickOn('.e2e-test-response-tab-toggle');
+        this.clickOn(toggleResponseTab);
       }
     }
     let responseTabs = await this.page.$$(responseGroupDiv);
@@ -1273,7 +1274,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        this.clickOn('.e2e-test-response-tab-toggle');
+        this.clickOn(toggleResponseTab);
       }
     }
     let responseTabs = await this.page.$$(responseGroupDiv);
@@ -1314,7 +1315,7 @@ export class ExplorationEditor extends BaseUser {
         const element = await this.page.$(responseGroupDiv);
         // If the responses were collapsed in mobile view.
         if (!element) {
-          this.clickOn('.e2e-test-response-tab-toggle');
+          this.clickOn(toggleResponseTab);
         }
       }
       await this.page.waitForSelector(misconceptionDiv, {
@@ -1365,7 +1366,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        this.clickOn('.e2e-test-response-tab-toggle');
+        this.clickOn(toggleResponseTab);
       }
     }
     await this.page.waitForSelector(optionalMisconceptionDiv, {
@@ -1416,7 +1417,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        this.clickOn('.e2e-test-response-tab-toggle');
+        this.clickOn(toggleResponseTab);
       }
     }
     if (!isApplicable) {
