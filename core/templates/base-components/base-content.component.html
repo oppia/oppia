@@ -55,7 +55,9 @@
                   <div [ngClass]="{'mr-auto': !isLanguageRTL(), 'ml-auto': isLanguageRTL()}">
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
-                  <ng-content select="nav-options"></ng-content>
+                  <div class="hide-on-tablet">
+                    <ng-content select="nav-options"></ng-content>
+                  </div>
                 </div>
               </div>
             </nav>
@@ -105,3 +107,11 @@
     Dev Mode
   </div>
 </main>
+
+<style>
+  @media screen and (max-width: 768px) {
+    .hide-on-tablet {
+      display: none;
+    }
+  }
+</style>
