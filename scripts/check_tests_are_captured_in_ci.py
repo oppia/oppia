@@ -68,7 +68,10 @@ def get_acceptance_test_suites_from_ci_config_file() -> List[TestSuiteDict]:
         acceptance_test_suite_config = json.load(f)
         acceptance_test_suites: List[TestSuiteDict] = (
             acceptance_test_suite_config['suites'])
-    return acceptance_test_suites
+    return sorted(
+        acceptance_test_suites,
+        key=lambda x: x['name']
+    )
 
 
 def get_e2e_test_suites_from_ci_config_file() -> List[TestSuiteDict]:
@@ -165,7 +168,10 @@ def get_e2e_test_suites_from_webdriverio_config_file() -> List[TestSuiteDict]:
                     'module': test_suite_module
                 }
             )
-    return e2e_test_suites
+    return sorted(
+        e2e_test_suites,
+        key=lambda x: x['name']
+    )
 
 
 def get_acceptance_test_suites_from_acceptance_directory() -> List[TestSuiteDict]: # pylint: disable=line-too-long
@@ -193,7 +199,10 @@ def get_acceptance_test_suites_from_acceptance_directory() -> List[TestSuiteDict
             'name': acceptance_test_suite_name,
             'module': os.path.relpath(module, os.getcwd())
         })
-    return acceptance_test_suites
+    return sorted(
+        acceptance_test_suites,
+        key=lambda x: x['name']
+    )
 
 
 def compute_test_suites_difference(
