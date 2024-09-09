@@ -76,7 +76,7 @@ export default {
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
     MobileExternalLinkWatchAVideo:
-      'https://m.facebook.com/oppiaorg/videos/189487953721583/',
+      'https://m.facebook.com/watch/?v=189487953721583&vanity=oppiaorg',
     ModeratorPage: 'http://localhost:8181/moderator',
     Partnerships: 'http://localhost:8181/partnerships',
     PartnershipsBrochure:
