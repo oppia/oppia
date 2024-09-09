@@ -662,6 +662,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
         ]
     )
     def test_send_post_signup_email(self) -> None:
@@ -1092,6 +1096,18 @@ class SignupTests(test_utils.GenericTestBase):
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_user_settings_of_existing_user(self) -> None:
