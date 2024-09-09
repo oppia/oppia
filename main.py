@@ -583,7 +583,7 @@ URLS = [
         feedback_updates.FeedbackUpdatesHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
-        learner_dashboard.LearnerDashboardIdsHandler),   
+        learner_dashboard.LearnerDashboardIdsHandler),
     get_redirect_route(
         r'%s/<thread_id>' %
         feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
