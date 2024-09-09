@@ -15,14 +15,22 @@
 /**
  * @fileoverview Component to display lesson cards based on tab
  */
-import {Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  AfterContentInit,
+  ChangeDetectorRef,
+  ViewChild,
+  HostListener,
+} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
 })
-export class CardDisplayComponent {
+export class CardDisplayComponent implements AfterContentInit {
   @Input() headingI18n!: string;
   @Input() numCards!: number;
   @Input() tabType!: string;
@@ -35,11 +43,24 @@ export class CardDisplayComponent {
   lastShift: number = 0;
   isLanguageRTL: boolean = false;
   toggleState: boolean = false;
+  toggleButtonVisibility: boolean = false;
 
-  constructor(private I18nLanguageCodeService: I18nLanguageCodeService) {}
+  constructor(
+    private I18nLanguageCodeService: I18nLanguageCodeService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.isLanguageRTL = this.I18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  ngAfterContentInit(): void {
+    this.toggleButtonVisibility = this.isToggleButtonVisible();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(): void {
+    this.toggleButtonVisibility = this.isToggleButtonVisible();
   }
 
   getMaxShifts(width: number): number {
@@ -98,6 +119,8 @@ export class CardDisplayComponent {
       return false;
     }
     return (
+      this.cards &&
+      this.cards.nativeElement &&
       this.numCards * this.cardWidth - 16 > this.cards.nativeElement.offsetWidth
     );
   }

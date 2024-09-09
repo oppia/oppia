@@ -329,3 +329,9 @@
   max-width: 522px;
   text-align: center;
 }
+
+@media screen and (max-width: 400px) {
+  .oppia-learner-dash-progress-empty-div {
+    align-items: normal;
+  }
+}
