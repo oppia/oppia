@@ -471,6 +471,7 @@ const main = async function () {
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
+    executablePath: process.env.CHROME_BIN,
     headless: true,
     // Sandbox requires a non-root user, and we use a root user in docker.
     // Thus, we need to disable the sandbox.
