@@ -23,6 +23,7 @@ from core.constants import constants
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry
 from core.domain import feature_flag_services
+from core.domain import platform_parameter_list
 from core.tests import test_utils
 
 
@@ -57,20 +58,33 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
             response['total_allocation'], 0)
         self.assertEqual(
             response['peak_allocation'], 0)
-        # Includes Platform Parameters.
-        self.assertEqual(response['total_keys_stored'], 20)
+        # Cache contains csrf secret and all platform parameters. Platform
+        # parameters are accessed in user services to retrieve system email
+        # address and hence cached.
+        self.assertEqual(
+            response['total_keys_stored'],
+            len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST) + 1)
 
     def test_flush_memory_cache(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         response = self.get_json('/memorycachehandler')
-        # Includes Platform Parameters.
-        self.assertEqual(response['total_keys_stored'], 20)
+        # Cache contains csrf secret and all platform parameters. Platform
+        # parameters are accessed in user services to retrieve system email
+        # address and hence cached.
+        self.assertEqual(
+            response['total_keys_stored'],
+            len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST) + 1)
 
         self.delete_json('/memorycachehandler')
 
         response = self.get_json('/memorycachehandler')
-        self.assertEqual(response['total_keys_stored'], 0)
+        # Cache contains platform parameters post flushing since user services
+        # are accessed in call to get json and platform parameters are again
+        # cached.
+        self.assertEqual(
+            response['total_keys_stored'],
+            len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST))
 
 
 class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
