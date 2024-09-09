@@ -49,6 +49,9 @@ export class AccessValidationBackendApiService {
   DIAGNOSTIC_TEST_PLAYER_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_diagnostic_test_player_page';
 
+  TOPICS_AND_SKILLS_DASHBOARD_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_topics_and_skills_dashboard_page';
+
   FACILITATOR_DASHBOARD_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_facilitator_dashboard_page';
 
@@ -194,6 +197,12 @@ export class AccessValidationBackendApiService {
   validateAccessToDiagnosticTestPlayerPage(): Promise<void> {
     return this.http
       .get<void>(this.DIAGNOSTIC_TEST_PLAYER_PAGE_ACCESS_VALIDATOR)
+      .toPromise();
+  }
+
+  validateAccessToTopicsAndSkillsDashboardPage(): Promise<void> {
+    return this.http
+      .get<void>(this.TOPICS_AND_SKILLS_DASHBOARD_PAGE_ACCESS_VALIDATOR)
       .toPromise();
   }
 
