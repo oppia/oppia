@@ -20,7 +20,6 @@ import {
   ElementRef,
   Input,
   AfterContentInit,
-  ChangeDetectorRef,
   ViewChild,
   HostListener,
 } from '@angular/core';
@@ -42,13 +41,10 @@ export class CardDisplayComponent implements AfterContentInit {
   maxShifts: number = 0;
   lastShift: number = 0;
   isLanguageRTL: boolean = false;
-  toggleState: boolean = false;
+  currentToggleState: boolean = false;
   toggleButtonVisibility: boolean = false;
 
-  constructor(
-    private I18nLanguageCodeService: I18nLanguageCodeService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  constructor(private I18nLanguageCodeService: I18nLanguageCodeService) {}
 
   ngOnInit(): void {
     this.isLanguageRTL = this.I18nLanguageCodeService.isCurrentLanguageRTL();
@@ -102,14 +98,14 @@ export class CardDisplayComponent implements AfterContentInit {
   }
 
   handleToggleState(updateState: boolean): void {
-    this.toggleState = updateState;
+    this.currentToggleState = updateState;
   }
 
   getVisibility(): string {
     if (!this.tabType.includes('progress')) {
       return '';
     }
-    return this.toggleState
+    return this.currentToggleState
       ? 'card-display-content-shown'
       : 'card-display-content-hidden';
   }

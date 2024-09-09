@@ -290,7 +290,7 @@ describe('CardDisplayComponent', () => {
     fixture.detectChanges();
 
     expect(component.handleToggleState).toHaveBeenCalledWith(true);
-    expect(component.toggleState).toBeTrue();
+    expect(component.currentToggleState).toBeTrue();
   });
 
   it('should return empty string for getVisibility if tabType is not progress', () => {
@@ -315,7 +315,7 @@ describe('CardDisplayComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.toggleState).toBeTrue();
+    expect(component.currentToggleState).toBeTrue();
     expect(component.getVisibility()).toEqual('card-display-content-shown');
   });
 
@@ -334,9 +334,55 @@ describe('CardDisplayComponent', () => {
 
   it('should return true for isToggleButtonVisible if tabType is progress and all the cards do not fit', () => {
     component.tabType = 'progress';
-    component.numCards = 2;
     fixture.detectChanges();
 
     expect(component.isToggleButtonVisible()).toBeTrue();
+  });
+
+  it('should call ngAfterContentInit and update toggleButtonVisibility', () => {
+    spyOn(component, 'isToggleButtonVisible').and.returnValue(true);
+    spyOn(component, 'ngAfterContentInit').and.callThrough();
+
+    fixture.detectChanges();
+
+    expect(component.ngAfterContentInit).toHaveBeenCalled();
+    expect(component.isToggleButtonVisible).toHaveBeenCalled();
+    expect(component.toggleButtonVisibility).toBeTrue();
+  });
+
+  it('should resize to max screen size and be able to fit number of cards, hiding toggle button', () => {
+    component.numCards = 3;
+    spyOn(component, 'isToggleButtonVisible');
+    spyOn(component, 'onResize').and.callThrough();
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1700);
+    offsetWidthGetterSpy.and.callThrough();
+    window.dispatchEvent(new Event('resize'));
+
+    fixture.detectChanges();
+
+    expect(component.onResize).toHaveBeenCalled();
+    expect(component.isToggleButtonVisible).toHaveBeenCalled();
+    expect(component.toggleButtonVisibility).toBeFalse();
+  });
+
+  it('should resize to smaller screen and be no longer able to fit cards, showing toggle button', () => {
+    component.numCards = 3;
+    offsetWidthGetterSpy.and.returnValue(700);
+
+    fixture.detectChanges();
+
+    expect(component.toggleButtonVisibility).toBeFalse();
+
+    spyOn(component, 'isToggleButtonVisible');
+    spyOn(component, 'onResize').and.callThrough();
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(500);
+    offsetWidthGetterSpy.and.callThrough();
+    window.dispatchEvent(new Event('resize'));
+
+    fixture.detectChanges();
+
+    expect(component.onResize).toHaveBeenCalled();
+    expect(component.isToggleButtonVisible).toHaveBeenCalled();
+    expect(component.toggleButtonVisibility).toBeTrue();
   });
 });
