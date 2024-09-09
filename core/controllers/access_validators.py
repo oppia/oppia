@@ -163,6 +163,20 @@ class CollectionViewerPageAccessValidationHandler(
         pass
 
 
+class TopicsAndSkillsDashboardPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Page showing the topics and skills dashboard."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self) -> None:
+        """Handles GET requests."""
+        pass
+
+
 class FacilitatorDashboardPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
