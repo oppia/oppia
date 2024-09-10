@@ -313,6 +313,8 @@ export class ExplorationEditor extends BaseUser {
       await this.type(tagsField, tags);
     }
     await this.clickOn(saveExplorationChangesButton);
+    await this.waitForPageToFullyLoad();
+
     await this.page.waitForSelector(explorationConfirmPublishButton);
     const explorationConfirmPublishButtonElement = await this.page.$(
       explorationConfirmPublishButton
