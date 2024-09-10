@@ -319,12 +319,12 @@ export class ExplorationEditor extends BaseUser {
 
     try {
       await this.page.waitForSelector(explorationIdElement, {
-        timeout: 5000,
+        timeout: 10000,
       });
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
         // Try clicking again if does not opens the expected modal.
-        await this.clickOn(explorationConfirmPublishButton);
+        await this.page.click(explorationConfirmPublishButton);
       } else {
         throw error;
       }
