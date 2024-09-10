@@ -50,15 +50,22 @@ describe('Blog Editor', function () {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
       await blogPostEditor.publishNewBlogPost('Test-Blog');
-
       await blogPostEditor.navigateToPublishTab();
       await blogPostEditor.expectNumberOfBlogPostsToBe(1);
       await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
         'Test-Blog'
       );
+      await blogPostEditor.expectScreenshotToMatch(
+        'expectPublishedBlogPostWithTitleToBePresent',
+        __dirname
+      );
 
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
+      await blogPostEditor.expectScreenshotToMatch(
+        'createNewBlogPostWithTitle',
+        __dirname
+      );
 
       await blogPostEditor.expectUserUnableToPublishBlogPost(
         duplicateBlogPostWarning

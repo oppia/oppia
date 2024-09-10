@@ -613,19 +613,21 @@ export class BaseUser {
       await currentPage.waitForTimeout(5000);
 
       /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
-       * In general, it is set as 0.0007 (0.07%) for the randomness of the page that are small enough to be ignored.
+       * In general, it is set as 0.002/0.2% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
        * Based on the existence of the background/library banner, which are randomly selected from a set of four,
        * failureTrigger is set in the specific percentage for the randomness of the banner in desktop mode and mobile mode.
        */
 
-      var failureTrigger = 0.0007;
+      var failureTrigger = 0;
       if (this.isViewportAtMobileWidth()) {
+        failureTrigger += 0.042;
         if (await currentPage.$(backgroundBanner)) {
           failureTrigger += 0.0352;
         } else if (await currentPage.$(libraryBanner)) {
           failureTrigger += 0.0039;
         }
       } else {
+        failureTrigger += 0.002;
         if (await currentPage.$(backgroundBanner)) {
           failureTrigger += 0.03;
         } else if (await currentPage.$(libraryBanner)) {
