@@ -329,6 +329,10 @@ export class ExplorationEditor extends BaseUser {
         throw error;
       }
     }
+    const result = this.isTextPresentOnPage(
+      'Failed to publish an exploration: TransportError'
+    );
+    console.log('The flake is different?' + result);
 
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
