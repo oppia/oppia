@@ -324,11 +324,12 @@ export class ExplorationEditor extends BaseUser {
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
         // Try clicking again if does not opens the expected modal.
-        await this.page.click(explorationConfirmPublishButton);
+        await this.clickOn(explorationConfirmPublishButton);
       } else {
         throw error;
       }
     }
+
     const result = await this.isTextPresentOnPage(
       'Failed to publish an exploration: TransportError'
     );
