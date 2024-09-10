@@ -314,12 +314,22 @@ export class ExplorationEditor extends BaseUser {
     }
     await this.clickOn(saveExplorationChangesButton);
     await this.waitForPageToFullyLoad();
-
     await this.page.waitForSelector(explorationConfirmPublishButton);
-    const explorationConfirmPublishButtonElement = await this.page.$(
-      explorationConfirmPublishButton
-    );
-    await explorationConfirmPublishButtonElement?.click();
+    await this.page.click(explorationConfirmPublishButton);
+
+    try {
+      await this.page.waitForSelector(explorationIdElement, {
+        timeout: 5000,
+      });
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        // Try clicking again if does not opens the expected modal.
+        await this.page.click(explorationConfirmPublishButton);
+      } else {
+        throw error;
+      }
+    }
+
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
       explorationIdElement,
