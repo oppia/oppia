@@ -796,7 +796,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await Promise.all([this.clickAndWaitForNavigation(watchAVideoButton)]);
 
-    const url = this.getCurrentUrlWithoutParameters();
+    const url = this.page.url();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
       ? mobileWatchAVideoUrl
       : desktopWatchAVideoUrl;
