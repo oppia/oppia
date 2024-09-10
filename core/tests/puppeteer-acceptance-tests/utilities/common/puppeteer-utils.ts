@@ -589,7 +589,6 @@ export class BaseUser {
   }
 
   /**
-   * ONLY TAKES SCREENSHOTS IN PROD MODE
    * This function takes a screenshot of the page.
    * If there's no parameter for newPage, it checks this.page instead of newPage.
    * If there's no image with the given filename, it stores the screenshot with the given filename in the folder:
@@ -643,7 +642,7 @@ export class BaseUser {
       expect(await currentPage.screenshot()).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
-        dumpInlineDiffToConsole: false,
+        dumpInlineDiffToConsole: true,
         customSnapshotIdentifier: imageName,
         customSnapshotsDir: path.join(
           testPath,
