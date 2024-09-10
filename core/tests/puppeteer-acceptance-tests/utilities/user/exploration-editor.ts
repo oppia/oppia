@@ -329,7 +329,7 @@ export class ExplorationEditor extends BaseUser {
         throw error;
       }
     }
-    const result = this.isTextPresentOnPage(
+    const result = await this.isTextPresentOnPage(
       'Failed to publish an exploration: TransportError'
     );
     console.log('The flake is different?' + result);
