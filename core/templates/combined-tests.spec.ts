@@ -92,6 +92,7 @@ const context = require.context('../../', true, /(:?)/);
 const filteredKeys = (context.keys() as string[]).filter((key: string) => {
   // Exclude @bcoe, @nodelib, and other problematic modules
   return !(
+    /node_modules/.test(key) ||
     /@bcoe/.test(key) ||
     /@nodelib/.test(key) ||
     /openapi3-ts/.test(key) ||
