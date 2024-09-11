@@ -349,8 +349,6 @@ export class ExplorationEditor extends BaseUser {
         '..',
         '..',
         '..',
-        '..',
-        '..',
         'puppeteer-screenshots/'
       );
 
@@ -369,6 +367,7 @@ export class ExplorationEditor extends BaseUser {
       );
       const fileName = testName + '.png';
       const filePath = path.join(screenshotPath, fileName);
+      console.log(filePath);
 
       // Save screenshot
       await this.page.screenshot({path: filePath});
