@@ -137,4 +137,19 @@ describe('OppiaAngularRootComponent', function () {
     fixture.detectChanges();
     expect(component.direction).toEqual(newDirection);
   });
+
+  it('should set OppiaAngularRootComponent.contextService if not set', () => {
+    // Initially, OppiaAngularRootComponent.contextService should be undefined.
+    OppiaAngularRootComponent.contextService = undefined;
+    expect(OppiaAngularRootComponent.contextService).toBeUndefined();
+    component.ngAfterViewInit();
+    expect(OppiaAngularRootComponent.contextService).toBe(
+      component.getContextServiceForTesting()
+    );
+    const previousContextService = OppiaAngularRootComponent.contextService;
+    component.ngAfterViewInit();
+    expect(OppiaAngularRootComponent.contextService).toBe(
+      previousContextService
+    );
+  });
 });
