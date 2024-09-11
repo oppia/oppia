@@ -293,6 +293,7 @@ export class ExplorationEditor extends BaseUser {
     category: string,
     tags?: string
   ): Promise<string | null> {
+    await this.reloadPage();
     try {
       if (this.isViewportAtMobileWidth()) {
         await this.page.waitForSelector(toastMessage, {
@@ -320,14 +321,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
-
-      try {
-        await this.page.click(explorationConfirmPublishButton);
-        await this.page.waitForSelector(explorationIdElement);
-      } catch (error) {
-        // Try clicking again if does not opens the expected modal.
-        await this.page.click(explorationConfirmPublishButton);
-      }
+      await this.clickOn(explorationConfirmPublishButton);
 
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
