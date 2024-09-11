@@ -321,13 +321,13 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
 
-      try {
-        await this.page.click(explorationConfirmPublishButton);
-        await this.page.waitForSelector(explorationIdElement);
-      } catch (error) {
-        // Try clicking again if does not opens the expected modal.
-        await this.page.click(explorationConfirmPublishButton);
-      }
+      // try {
+      //   await this.page.click(explorationConfirmPublishButton);
+      //   await this.page.waitForSelector(explorationIdElement);
+      // } catch (error) {
+      //   // Try clicking again if does not opens the expected modal.
+      //   await this.page.click(explorationConfirmPublishButton);
+      // }
 
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
@@ -342,8 +342,8 @@ export class ExplorationEditor extends BaseUser {
       console.error('Error in publishExplorationWithMetadata:', error);
 
       // Ensure the screenshots directory exists
-      var dirPath = path.resolve(
-        __dirname,
+      const dirPath = path.resolve(
+        '__dirname',
         '..',
         '..',
         '..',
@@ -351,18 +351,20 @@ export class ExplorationEditor extends BaseUser {
         '..',
         'puppeteer-screenshots'
       );
-      var screenshotPath = '../puppeteer-screenshots'; // Assign screenshotPath here
+      let screenshotPath = '';
+
       try {
         fs.mkdirSync(dirPath, {recursive: true});
+        screenshotPath = dirPath; // Use the resolved absolute path
       } catch (err) {
         console.error('Error creating screenshot directory:', err);
       }
 
-      var testName = encodeURIComponent(
+      const testName = encodeURIComponent(
         'publishExplorationWithMetadata'.replace(/\s+/g, '-')
       );
-      var fileName = testName + '.png';
-      var filePath = path.join(screenshotPath, fileName);
+      const fileName = testName + '.png';
+      const filePath = path.join(screenshotPath, fileName);
 
       // Save screenshot
       await this.page.screenshot({path: filePath});

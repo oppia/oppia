@@ -361,7 +361,7 @@ jobs:
           uses: actions/upload-artifact@v3
           with:
             name: puppeteer-screenshots
-            path: /home/runner/work/oppia/puppeteer-screenshots
+            path: /home/runner/work/oppia/publishExplorationWithMetadata.png
         - name: Report failure if failed on oppia/oppia develop branch
           if: ${{
             failure() &&
