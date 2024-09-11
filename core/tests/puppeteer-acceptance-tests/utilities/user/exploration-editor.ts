@@ -21,6 +21,8 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
+import fs from 'fs';
+import path from 'path';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -291,50 +293,82 @@ export class ExplorationEditor extends BaseUser {
     category: string,
     tags?: string
   ): Promise<string | null> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(toastMessage, {
+    try {
+      if (this.isViewportAtMobileWidth()) {
+        await this.page.waitForSelector(toastMessage, {
+          visible: true,
+        });
+        await this.page.waitForSelector(toastMessage, {
+          hidden: true,
+        });
+        await this.clickOn(mobileChangesDropdown);
+        await this.clickOn(mobilePublishButton);
+      } else {
+        await this.clickOn(publishExplorationButton);
+      }
+      await this.clickOn(explorationTitleInput);
+      await this.type(explorationTitleInput, `${title}`);
+      await this.clickOn(explorationGoalInput);
+      await this.type(explorationGoalInput, `${goal}`);
+      await this.clickOn(explorationCategoryDropdown);
+      await this.clickOn(`${category}`);
+      if (tags) {
+        await this.type(tagsField, tags);
+      }
+      await this.clickOn(saveExplorationChangesButton);
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
-      await this.page.waitForSelector(toastMessage, {
-        hidden: true,
-      });
-      await this.clickOn(mobileChangesDropdown);
-      await this.clickOn(mobilePublishButton);
-    } else {
-      await this.clickOn(publishExplorationButton);
-    }
-    await this.clickOn(explorationTitleInput);
-    await this.type(explorationTitleInput, `${title}`);
-    await this.clickOn(explorationGoalInput);
-    await this.type(explorationGoalInput, `${goal}`);
-    await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn(`${category}`);
-    if (tags) {
-      await this.type(tagsField, tags);
-    }
-    await this.clickOn(saveExplorationChangesButton);
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(explorationConfirmPublishButton, {
-      visible: true,
-    });
 
-    try {
-      await this.page.click(explorationConfirmPublishButton);
+      try {
+        await this.page.click(explorationConfirmPublishButton);
+        await this.page.waitForSelector(explorationIdElement);
+      } catch (error) {
+        // Try clicking again if does not opens the expected modal.
+        await this.page.click(explorationConfirmPublishButton);
+      }
+
       await this.page.waitForSelector(explorationIdElement);
+      const explorationIdUrl = await this.page.$eval(
+        explorationIdElement,
+        element => (element as HTMLElement).innerText
+      );
+      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+
+      await this.clickOn(closePublishedPopUpButton);
+      return explorationId;
     } catch (error) {
-      // Try clicking again if does not opens the expected modal.
-      await this.page.click(explorationConfirmPublishButton);
+      console.error('Error in publishExplorationWithMetadata:', error);
+
+      // Ensure the screenshots directory exists
+      var dirPath = path.resolve(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        '..',
+        '..',
+        'puppeteer-screenshots'
+      );
+      var screenshotPath = '../puppeteer-screenshots'; // Assign screenshotPath here
+      try {
+        fs.mkdirSync(dirPath, {recursive: true});
+      } catch (err) {
+        console.error('Error creating screenshot directory:', err);
+      }
+
+      var testName = encodeURIComponent(
+        'publishExplorationWithMetadata'.replace(/\s+/g, '-')
+      );
+      var fileName = testName + '.png';
+      var filePath = path.join(screenshotPath, fileName);
+
+      // Save screenshot
+      await this.page.screenshot({path: filePath});
+
+      throw error; // Re-throw the error to ensure the test fails
     }
-
-    await this.page.waitForSelector(explorationIdElement);
-    const explorationIdUrl = await this.page.$eval(
-      explorationIdElement,
-      element => (element as HTMLElement).innerText
-    );
-    const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
-
-    await this.clickOn(closePublishedPopUpButton);
-    return explorationId;
   }
 
   async navigateToFeedbackTab(): Promise<void> {
