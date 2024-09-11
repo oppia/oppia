@@ -70,7 +70,7 @@
                  aria-label="Mobile navbar options">
               </i>
               <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
-                <div>
+                <div class="hide-on-desktops">
                   <ng-content select="mobile-nav-options"></ng-content>
                 </div>
               </div>
@@ -109,6 +109,11 @@
 </main>
 
 <style>
+  @media screen and (max-width: 992px) {
+    .hide-on-desktops{
+      display: none;
+    }
+  }
   @media screen and (max-width: 768px) {
     .hide-on-tablet {
       display: none;
