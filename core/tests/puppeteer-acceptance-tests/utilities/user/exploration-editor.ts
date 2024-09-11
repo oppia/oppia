@@ -321,13 +321,13 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
 
-      // try {
-      //   await this.page.click(explorationConfirmPublishButton);
-      //   await this.page.waitForSelector(explorationIdElement);
-      // } catch (error) {
-      //   // Try clicking again if does not opens the expected modal.
-      //   await this.page.click(explorationConfirmPublishButton);
-      // }
+      try {
+        await this.page.click(explorationConfirmPublishButton);
+        await this.page.waitForSelector(explorationIdElement);
+      } catch (error) {
+        // Try clicking again if does not opens the expected modal.
+        await this.page.click(explorationConfirmPublishButton);
+      }
 
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
@@ -343,14 +343,18 @@ export class ExplorationEditor extends BaseUser {
 
       // Ensure the screenshots directory exists
       const dirPath = path.resolve(
-        '__dirname',
+        __dirname,
         '..',
         '..',
         '..',
         '..',
         '..',
-        'puppeteer-screenshots'
+        '..',
+        '..',
+        'puppeteer-screenshots/'
       );
+
+      console.log('Resolved dirPath:', dirPath); // Debugging line
       let screenshotPath = '';
 
       try {
