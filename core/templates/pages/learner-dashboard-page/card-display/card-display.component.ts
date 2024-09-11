@@ -19,9 +19,10 @@ import {
   Component,
   ElementRef,
   Input,
-  AfterContentInit,
   ViewChild,
   HostListener,
+  AfterViewInit,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -29,7 +30,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
 })
-export class CardDisplayComponent implements AfterContentInit {
+export class CardDisplayComponent implements AfterViewInit {
   @Input() headingI18n!: string;
   @Input() numCards!: number;
   @Input() tabType!: string;
@@ -43,15 +44,19 @@ export class CardDisplayComponent implements AfterContentInit {
   isLanguageRTL: boolean = false;
   currentToggleState: boolean = false;
   toggleButtonVisibility: boolean = false;
-
-  constructor(private I18nLanguageCodeService: I18nLanguageCodeService) {}
+  testVar: boolean = false;
+  constructor(
+    private I18nLanguageCodeService: I18nLanguageCodeService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.isLanguageRTL = this.I18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  ngAfterContentInit(): void {
+  ngAfterViewInit(): void {
     this.toggleButtonVisibility = this.isToggleButtonVisible();
+    this.cdr.detectChanges();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -114,6 +119,7 @@ export class CardDisplayComponent implements AfterContentInit {
     if (this.tabType.includes('home')) {
       return false;
     }
+
     return (
       this.cards &&
       this.cards.nativeElement &&

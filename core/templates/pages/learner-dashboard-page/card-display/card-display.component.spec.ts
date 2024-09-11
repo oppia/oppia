@@ -61,9 +61,10 @@ describe('CardDisplayComponent', () => {
     TestBed.inject(TranslateService);
 
     component.numCards = 5;
-    component.tabType = 'home';
+    component.tabType = 'progress';
     component.headingI18n = 'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION';
     component.isLanguageRTL = false;
+    component.toggleButtonVisibility = false;
     fixture.detectChanges();
 
     offsetWidthGetterSpy = spyOnProperty(
@@ -278,10 +279,9 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should handle event emitted by content toggle button', () => {
-    component.tabType = 'progress';
-    fixture.detectChanges();
-
     spyOn(component, 'handleToggleState').and.callThrough();
+
+    fixture.detectChanges();
     const button = fixture.debugElement.query(
       By.directive(ContentToggleButtonComponent)
     ).componentInstance;
@@ -294,20 +294,17 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should return empty string for getVisibility if tabType is not progress', () => {
+    component.tabType = 'home';
+    fixture.detectChanges();
     expect(component.getVisibility()).toEqual('');
   });
 
   it('should return hidden class for getVisibility if tabType is progress', () => {
-    component.tabType = 'progress';
-
-    fixture.detectChanges();
-
     expect(component.getVisibility()).toEqual('card-display-content-hidden');
   });
 
   it('should return shown class for getVisibility after toggling if tabType is progress', () => {
-    component.tabType = 'progress';
-    fixture.detectChanges();
+    expect(component.toggleButtonVisibility).toBeTrue();
     const button = fixture.debugElement.query(
       By.directive(ContentToggleButtonComponent)
     ).componentInstance;
@@ -320,11 +317,12 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should return false for isToggleButtonVisible if tabType is not progress', () => {
+    component.tabType = 'home';
+    fixture.detectChanges();
     expect(component.isToggleButtonVisible()).toBeFalse();
   });
 
   it('should return false for isToggleButtonVisible if tabType is progress and all the cards fit', () => {
-    component.tabType = 'progress';
     offsetWidthGetterSpy.and.returnValue(600);
     component.numCards = 2;
     fixture.detectChanges();
@@ -333,31 +331,16 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should return true for isToggleButtonVisible if tabType is progress and all the cards do not fit', () => {
-    component.tabType = 'progress';
-    fixture.detectChanges();
-
     expect(component.isToggleButtonVisible()).toBeTrue();
   });
 
-  it('should call ngAfterContentInit and update toggleButtonVisibility', () => {
-    spyOn(component, 'isToggleButtonVisible').and.returnValue(true);
-    spyOn(component, 'ngAfterContentInit').and.callThrough();
-
-    fixture.detectChanges();
-
-    expect(component.ngAfterContentInit).toHaveBeenCalled();
-    expect(component.isToggleButtonVisible).toHaveBeenCalled();
-    expect(component.toggleButtonVisibility).toBeTrue();
-  });
-
-  it('should resize to max screen size and be able to fit number of cards, hiding toggle button', () => {
+  it('should resize and be able to fit number of cards, hiding toggle button', () => {
     component.numCards = 3;
-    spyOn(component, 'isToggleButtonVisible');
-    spyOn(component, 'onResize').and.callThrough();
-    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1700);
-    offsetWidthGetterSpy.and.callThrough();
-    window.dispatchEvent(new Event('resize'));
+    offsetWidthGetterSpy.and.returnValue(1000);
 
+    spyOn(component, 'isToggleButtonVisible').and.callThrough();
+    spyOn(component, 'onResize').and.callThrough();
+    window.dispatchEvent(new Event('resize'));
     fixture.detectChanges();
 
     expect(component.onResize).toHaveBeenCalled();
@@ -367,18 +350,14 @@ describe('CardDisplayComponent', () => {
 
   it('should resize to smaller screen and be no longer able to fit cards, showing toggle button', () => {
     component.numCards = 3;
-    offsetWidthGetterSpy.and.returnValue(700);
-
+    component.toggleButtonVisibility = false;
+    offsetWidthGetterSpy.and.returnValue(1000);
     fixture.detectChanges();
 
-    expect(component.toggleButtonVisibility).toBeFalse();
-
-    spyOn(component, 'isToggleButtonVisible');
+    offsetWidthGetterSpy.and.returnValue(500);
+    spyOn(component, 'isToggleButtonVisible').and.callThrough();
     spyOn(component, 'onResize').and.callThrough();
-    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(500);
-    offsetWidthGetterSpy.and.callThrough();
     window.dispatchEvent(new Event('resize'));
-
     fixture.detectChanges();
 
     expect(component.onResize).toHaveBeenCalled();
