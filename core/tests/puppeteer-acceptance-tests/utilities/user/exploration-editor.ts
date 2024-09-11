@@ -24,7 +24,7 @@ import {error} from 'console';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
-const imageToUpload = testConstants.data.blogPostThumbnailImage;
+const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
