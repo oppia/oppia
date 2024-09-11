@@ -77,7 +77,7 @@ const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
-const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
+const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
 const discardDraftDropdown = 'button.e2e-test-save-discard-toggle';
@@ -314,26 +314,17 @@ export class ExplorationEditor extends BaseUser {
     }
     await this.clickOn(saveExplorationChangesButton);
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(explorationConfirmPublishButton);
-    await this.page.click(explorationConfirmPublishButton);
+    await this.page.waitForSelector(explorationConfirmPublishButton, {
+      visible: true,
+    });
 
     try {
-      await this.page.waitForSelector(explorationIdElement, {
-        timeout: 10000,
-      });
+      await this.page.click(explorationConfirmPublishButton);
+      await this.page.waitForSelector(explorationIdElement);
     } catch (error) {
-      if (error instanceof puppeteer.errors.TimeoutError) {
-        // Try clicking again if does not opens the expected modal.
-        await this.page.click(explorationConfirmPublishButton);
-      } else {
-        throw error;
-      }
+      // Try clicking again if does not opens the expected modal.
+      await this.page.click(explorationConfirmPublishButton);
     }
-
-    const result = await this.isTextPresentOnPage(
-      'Failed to publish an exploration: TransportError'
-    );
-    console.log('The flake is different?' + result);
 
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
