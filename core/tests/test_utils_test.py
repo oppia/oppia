@@ -713,7 +713,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(Exception, ''):
                 mock_exception_func()
 
-    def test_invalid_http_method_raises_exception(self):
+    def test_invalid_http_method_raises_exception(self) -> None:
         url = '/mock-url'
         invalid_http_method = 'INVALID_METHOD'
         expected_status_int_list = [200]
