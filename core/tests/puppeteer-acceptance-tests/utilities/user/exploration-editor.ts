@@ -215,6 +215,7 @@ const feedbackSelector = '.e2e-test-exploration-feedback';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
+const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -321,6 +322,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
+
       await this.clickOn(explorationConfirmPublishButton);
 
       await this.page.waitForSelector(explorationIdElement);
@@ -333,6 +335,43 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(closePublishedPopUpButton);
       return explorationId;
     } catch (error) {
+      await this.waitForPageToFullyLoad();
+      const errorSavingExplorationElement = await this.page.$(
+        errorSavingExplorationModal
+      );
+      if (errorSavingExplorationElement) {
+        await this.clickOn(errorSavingExplorationModal);
+      }
+      if (this.isViewportAtMobileWidth()) {
+        await this.page.waitForSelector(toastMessage, {
+          visible: true,
+        });
+        await this.page.waitForSelector(toastMessage, {
+          hidden: true,
+        });
+        await this.clickOn(mobileChangesDropdown);
+        await this.clickOn(mobilePublishButton);
+      } else {
+        await this.clickOn(publishExplorationButton);
+      }
+
+      await this.clickOn(saveExplorationChangesButton);
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(explorationConfirmPublishButton, {
+        visible: true,
+      });
+
+      await this.clickOn(explorationConfirmPublishButton);
+
+      await this.page.waitForSelector(explorationIdElement);
+      const explorationIdUrl = await this.page.$eval(
+        explorationIdElement,
+        element => (element as HTMLElement).innerText
+      );
+      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+
+      await this.clickOn(closePublishedPopUpButton);
+
       console.error('Error in publishExplorationWithMetadata:', error);
 
       // Ensure the screenshots directory exists
@@ -366,6 +405,7 @@ export class ExplorationEditor extends BaseUser {
       // Save screenshot
       await this.page.screenshot({path: filePath});
 
+      return explorationId;
       throw error; // Re-throw the error to ensure the test fails
     }
   }
