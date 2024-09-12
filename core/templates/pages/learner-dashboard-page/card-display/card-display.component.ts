@@ -44,7 +44,7 @@ export class CardDisplayComponent implements AfterViewInit {
   isLanguageRTL: boolean = false;
   currentToggleState: boolean = false;
   toggleButtonVisibility: boolean = false;
-  testVar: boolean = false;
+
   constructor(
     private I18nLanguageCodeService: I18nLanguageCodeService,
     private cdr: ChangeDetectorRef
