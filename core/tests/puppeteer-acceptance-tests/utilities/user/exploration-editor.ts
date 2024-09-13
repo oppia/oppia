@@ -23,6 +23,7 @@ import {showMessage} from '../common/show-message';
 import {error} from 'console';
 import fs from 'fs';
 import path from 'path';
+import {patch_obj} from 'diff-match-patch';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -336,12 +337,18 @@ export class ExplorationEditor extends BaseUser {
       return explorationId;
     } catch (error) {
       await this.waitForPageToFullyLoad();
+
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
       );
       if (errorSavingExplorationElement) {
+        console.log('reached 1');
         await this.clickOn(errorSavingExplorationModal);
+        await this.page.waitForNavigation({
+          waitUntil: ['load', 'networkidle0'],
+        });
       }
+
       if (this.isViewportAtMobileWidth()) {
         await this.page.waitForSelector(toastMessage, {
           visible: true,
@@ -355,6 +362,7 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(publishExplorationButton);
       }
 
+      console.log('Reached 2');
       await this.clickOn(saveExplorationChangesButton);
       await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
