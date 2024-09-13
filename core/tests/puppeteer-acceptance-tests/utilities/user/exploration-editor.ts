@@ -21,9 +21,6 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
-import fs from 'fs';
-import path from 'path';
-import {patch_obj} from 'diff-match-patch';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -288,6 +285,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.,
+   * @param {string} tags - The tags of the exploration.
    */
   async publishExplorationWithMetadata(
     title: string,
@@ -295,19 +293,7 @@ export class ExplorationEditor extends BaseUser {
     category: string,
     tags?: string
   ): Promise<string | null> {
-    try {
-      if (this.isViewportAtMobileWidth()) {
-        await this.page.waitForSelector(toastMessage, {
-          visible: true,
-        });
-        await this.page.waitForSelector(toastMessage, {
-          hidden: true,
-        });
-        await this.clickOn(mobileChangesDropdown);
-        await this.clickOn(mobilePublishButton);
-      } else {
-        await this.clickOn(publishExplorationButton);
-      }
+    const fillExplorationMetadataDetails = async () => {
       await this.clickOn(explorationTitleInput);
       await this.type(explorationTitleInput, `${title}`);
       await this.clickOn(explorationGoalInput);
@@ -317,26 +303,40 @@ export class ExplorationEditor extends BaseUser {
       if (tags) {
         await this.type(tagsField, tags);
       }
+    };
+
+    const publishExploration = async () => {
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileChangesDropdown);
+        await this.clickOn(mobilePublishButton);
+      } else {
+        await this.clickOn(publishExplorationButton);
+      }
+    };
+
+    const confirmPublish = async () => {
       await this.clickOn(saveExplorationChangesButton);
       await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
-
       await this.clickOn(explorationConfirmPublishButton);
-
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
         element => (element as HTMLElement).innerText
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
-
       await this.clickOn(closePublishedPopUpButton);
       return explorationId;
+    };
+
+    try {
+      await publishExploration();
+      await fillExplorationMetadataDetails();
+      return await confirmPublish();
     } catch (error) {
       await this.waitForPageToFullyLoad();
-
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
       );
@@ -346,33 +346,8 @@ export class ExplorationEditor extends BaseUser {
           waitUntil: ['load', 'networkidle0'],
         });
       }
-
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(mobileOptionsButton);
-        await this.clickOn(mobileChangesDropdown);
-        await this.clickOn(mobilePublishButton);
-      } else {
-        await this.clickOn(publishExplorationButton);
-      }
-
-      await this.clickOn(saveExplorationChangesButton);
-      await this.waitForPageToFullyLoad();
-      await this.page.waitForSelector(explorationConfirmPublishButton, {
-        visible: true,
-      });
-
-      await this.clickOn(explorationConfirmPublishButton);
-
-      await this.page.waitForSelector(explorationIdElement);
-      const explorationIdUrl = await this.page.$eval(
-        explorationIdElement,
-        element => (element as HTMLElement).innerText
-      );
-
-      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
-      await this.clickOn(closePublishedPopUpButton);
-
-      return explorationId;
+      await publishExploration();
+      return await confirmPublish();
     }
   }
 
@@ -928,18 +903,20 @@ export class ExplorationEditor extends BaseUser {
     await this.type(commitMessage, 'Testing Testing');
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
+
+    // Toast message confirms that the draft has been saved.
+    await this.page.waitForSelector('.e2e-test-toast-message', {
+      visible: true,
+    });
+    await this.page.waitForSelector('.e2e-test-toast-message', {
+      hidden: true,
+    });
     showMessage('Exploration is saved successfully.');
     await this.waitForNetworkIdle();
   }
 
   async publishExploration(): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        visible: true,
-      });
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        hidden: true,
-      });
       await this.clickOn(mobileChangesDropdown);
       await this.clickOn(mobilePublishButton);
     } else {
