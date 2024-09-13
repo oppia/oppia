@@ -295,7 +295,6 @@ export class ExplorationEditor extends BaseUser {
     category: string,
     tags?: string
   ): Promise<string | null> {
-    await this.reloadPage();
     try {
       if (this.isViewportAtMobileWidth()) {
         await this.page.waitForSelector(toastMessage, {
@@ -342,7 +341,6 @@ export class ExplorationEditor extends BaseUser {
         errorSavingExplorationModal
       );
       if (errorSavingExplorationElement) {
-        console.log('reached 1');
         await this.clickOn(errorSavingExplorationModal);
         await this.page.waitForNavigation({
           waitUntil: ['load', 'networkidle0'],
@@ -350,19 +348,13 @@ export class ExplorationEditor extends BaseUser {
       }
 
       if (this.isViewportAtMobileWidth()) {
-        await this.page.waitForSelector(toastMessage, {
-          visible: true,
-        });
-        await this.page.waitForSelector(toastMessage, {
-          hidden: true,
-        });
+        await this.clickOn(mobileOptionsButton);
         await this.clickOn(mobileChangesDropdown);
         await this.clickOn(mobilePublishButton);
       } else {
         await this.clickOn(publishExplorationButton);
       }
 
-      console.log('Reached 2');
       await this.clickOn(saveExplorationChangesButton);
       await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
@@ -376,45 +368,11 @@ export class ExplorationEditor extends BaseUser {
         explorationIdElement,
         element => (element as HTMLElement).innerText
       );
-      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
 
+      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
       await this.clickOn(closePublishedPopUpButton);
 
-      console.error('Error in publishExplorationWithMetadata:', error);
-
-      // Ensure the screenshots directory exists
-      const dirPath = path.resolve(
-        __dirname,
-        '..',
-        '..',
-        '..',
-        '..',
-        '..',
-        'puppeteer-screenshots/'
-      );
-
-      console.log('Resolved dirPath:', dirPath); // Debugging line
-      let screenshotPath = '';
-
-      try {
-        fs.mkdirSync(dirPath, {recursive: true});
-        screenshotPath = dirPath; // Use the resolved absolute path
-      } catch (err) {
-        console.error('Error creating screenshot directory:', err);
-      }
-
-      const testName = encodeURIComponent(
-        'publishExplorationWithMetadata'.replace(/\s+/g, '-')
-      );
-      const fileName = testName + '.png';
-      const filePath = path.join(screenshotPath, fileName);
-      console.log(filePath);
-
-      // Save screenshot
-      await this.page.screenshot({path: filePath});
-
       return explorationId;
-      throw error; // Re-throw the error to ensure the test fails
     }
   }
 
