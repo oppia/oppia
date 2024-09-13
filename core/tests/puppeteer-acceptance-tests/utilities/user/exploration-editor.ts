@@ -905,10 +905,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
     // Toast message confirms that the draft has been saved.
-    await this.page.waitForSelector('.e2e-test-toast-message', {
+    await this.page.waitForSelector(toastMessage, {
       visible: true,
     });
-    await this.page.waitForSelector('.e2e-test-toast-message', {
+    await this.page.waitForSelector(toastMessage, {
       hidden: true,
     });
     showMessage('Exploration is saved successfully.');
