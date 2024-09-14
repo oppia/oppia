@@ -76,9 +76,6 @@ module.exports = {
       commonPrefix +
       '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
-    email_dashboard_result:
-      commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
     error: commonPrefix + '/pages/error-pages/error-page.import.ts',
     error_iframed:
       commonPrefix +
@@ -174,16 +171,6 @@ module.exports = {
         commonPrefix +
         '/pages/contributor-dashboard-page/' +
         'contributor-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['email_dashboard_result'],
-      filename: 'email-dashboard-result.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/email-dashboard-pages/email-dashboard-result.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),
