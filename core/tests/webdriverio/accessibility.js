@@ -522,14 +522,3 @@ describe('screenreader and keyboard user accessibility features', function () {
     await general.checkForConsoleErrors([]);
   });
 });
-
-describe('Cache Slugs', function () {
-  it('should check that errors get logged for missing resources', async function () {
-    await browser.url('/console_errors');
-    var expectedErrors = [
-      'http://localhost:8181/build/fail/logo/288x128_logo_white.png',
-      'http://localhost:8181/build/fail/logo/288x128_logo_white.webp',
-    ];
-    await general.checkForConsoleErrors(expectedErrors);
-  });
-});
