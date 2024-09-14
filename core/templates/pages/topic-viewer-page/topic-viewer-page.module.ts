@@ -25,8 +25,11 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {PracticeSessionConfirmationModal} from './modals/practice-session-confirmation-modal.component';
 import {ToastrModule} from 'ngx-toastr';
 import {TopicViewerPageRootComponent} from './topic-viewer-page-root.component';
-import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
 import {TopicPlayerViewerCommonModule} from 'pages/topic-viewer-page/topic-viewer-player-common.module';
+import {StoriesListComponent} from './stories-list/topic-viewer-stories-list.component';
+import {PracticeTabComponent} from './practice-tab/practice-tab.component';
+import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
+import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
 
 @NgModule({
   imports: [
@@ -39,6 +42,20 @@ import {TopicPlayerViewerCommonModule} from 'pages/topic-viewer-page/topic-viewe
         path: '',
         component: TopicViewerPageRootComponent,
         canActivate: [TopicViewerAccessGuard],
+        children: [
+          {
+            path: 'story',
+            component: StoriesListComponent,
+          },
+          {
+            path: 'practice',
+            component: PracticeTabComponent,
+          },
+          {
+            path: 'revision',
+            component: SubtopicsListComponent,
+          },
+        ],
       },
     ]),
   ],
