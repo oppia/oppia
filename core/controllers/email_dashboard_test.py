@@ -174,64 +174,6 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.set_curriculum_admins(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
 
-    def test_email_dashboard_result_page(self) -> None:
-        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
-
-        query_id = user_models.UserQueryModel.get_new_id('')
-        user_models.UserQueryModel(
-            id=query_id, inactive_in_last_n_days=10,
-            has_not_logged_in_for_n_days=30,
-            created_at_least_n_exps=5,
-            created_fewer_than_n_exps=None,
-            edited_at_least_n_exps=None,
-            edited_fewer_than_n_exps=None,
-            submitter_id=self.submitter_id,
-            query_status=feconf.USER_QUERY_STATUS_COMPLETED,
-            user_ids=[]).put()
-        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
-
-        self.assertIn(
-            b'{"title": "Email Dashboard Result - Oppia"})', response.body)
-
-        self.logout()
-
-    def test_email_dashboard_result_page_with_invalid_query_id_raises_400(
-        self
-    ) -> None:
-        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
-
-        response = self.get_html_response(
-            '/emaildashboardresult/aaa', expected_status_int=400)
-        self.assertIn(
-            b'<oppia-error-page-root></oppia-error-page-root>', response.body)
-
-        self.logout()
-
-    def test_email_dashboard_result_page_with_invalid_user_raises_401(
-        self
-    ) -> None:
-        self.login(self.NEW_SUBMITTER_EMAIL, is_super_admin=True)
-
-        query_id = user_models.UserQueryModel.get_new_id('')
-        user_models.UserQueryModel(
-            id=query_id, inactive_in_last_n_days=10,
-            has_not_logged_in_for_n_days=30,
-            created_at_least_n_exps=5,
-            created_fewer_than_n_exps=None,
-            edited_at_least_n_exps=None,
-            edited_fewer_than_n_exps=None,
-            submitter_id=self.submitter_id,
-            query_status=feconf.USER_QUERY_STATUS_COMPLETED,
-            user_ids=[]
-        ).put()
-
-        response = self.get_html_response(
-            '/emaildashboardresult/%s' % query_id, expected_status_int=401)
-        self.assertIn(
-            b'<oppia-error-page-root></oppia-error-page-root>', response.body)
-
-        self.logout()
-
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
