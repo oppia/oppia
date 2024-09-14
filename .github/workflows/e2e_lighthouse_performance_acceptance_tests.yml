@@ -356,12 +356,6 @@ jobs:
           with:
             name: webpack-bundles
             path: /home/runner/work/oppia/oppia/build
-        - name: Uploading Puppeteer screenshots as an artifact
-          if: ${{ failure() }}
-          uses: actions/upload-artifact@v3
-          with:
-            name: puppeteer-screenshots
-            path: /home/runner/work/oppia/oppia/core/tests/puppeteer-screenshots
         - name: Report failure if failed on oppia/oppia develop branch
           if: ${{
             failure() &&

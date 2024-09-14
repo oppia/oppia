@@ -21,8 +21,6 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
-import * as fs from 'fs';
-import * as path from 'path';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -294,7 +292,7 @@ export class ExplorationEditor extends BaseUser {
     goal: string,
     category: string,
     tags?: string
-  ): Promise<string | null | undefined> {
+  ): Promise<string | null> {
     const fillExplorationMetadataDetails = async () => {
       await this.clickOn(explorationTitleInput);
       await this.type(explorationTitleInput, `${title}`);
@@ -346,47 +344,19 @@ export class ExplorationEditor extends BaseUser {
       await fillExplorationMetadataDetails();
       return await confirmPublish();
     } catch (error) {
-      try {
-        await this.waitForPageToFullyLoad();
+      await this.waitForPageToFullyLoad();
 
-        const errorSavingExplorationElement = await this.page.$(
-          errorSavingExplorationModal
-        );
-        if (errorSavingExplorationElement) {
-          await this.clickOn(errorSavingExplorationModal);
-          await this.page.waitForNavigation({
-            waitUntil: ['load', 'networkidle0'],
-          });
-        }
-        await publishExploration();
-        return await confirmPublish();
-      } catch {
-        console.error('Error in publishExplorationWithMetadata:', error);
-        // Ensure the screenshots directory exists
-        const dirPath = path.resolve(
-          __dirname,
-          '..',
-          '..',
-          '..',
-          'puppeteer-screenshots/'
-        );
-        console.log('Resolved dirPath:', dirPath); // Debugging line
-        let screenshotPath = '';
-        try {
-          fs.mkdirSync(dirPath, {recursive: true});
-          screenshotPath = dirPath; // Use the resolved absolute path
-        } catch (err) {
-          console.error('Error creating screenshot directory:', err);
-        }
-        const testName = encodeURIComponent(
-          'publishExplorationWithMetadata'.replace(/\s+/g, '-')
-        );
-        const fileName = testName + '.png';
-        const filePath = path.join(screenshotPath, fileName);
-        console.log(filePath);
-        // Save screenshot
-        await this.page.screenshot({path: filePath});
+      const errorSavingExplorationElement = await this.page.$(
+        errorSavingExplorationModal
+      );
+      if (errorSavingExplorationElement) {
+        await this.clickOn(errorSavingExplorationModal);
+        await this.page.waitForNavigation({
+          waitUntil: ['load', 'networkidle0'],
+        });
       }
+      await publishExploration();
+      return await confirmPublish();
     }
   }
 
