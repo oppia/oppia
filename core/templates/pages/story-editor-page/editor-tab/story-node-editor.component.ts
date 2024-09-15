@@ -57,8 +57,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   @Input() acquiredSkillIds: string[];
   @Input() plannedPublicationDateMsecs: number;
 
-  MAX_CHARS_IN_EXPLORATION_TITLE = 36; 
-  MAX_CHARS_IN_CHAPTER_DESCRIPTION = 156; 
+  MAX_CHARS_IN_EXPLORATION_TITLE = AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE; 
+  MAX_CHARS_IN_CHAPTER_DESCRIPTION = AppConstants.MAX_CHARS_IN_CHAPTER_DESCRIPTION; 
   chapterPreviewCardIsShown = false;
   mainChapterCardIsShown = true;
   explorationInputButtonsAreShown = false;
