@@ -16,7 +16,7 @@
                  required="true"
                  aria-labelledby="email">
           <button class="oppia-footer-newsletter-button"
-                  [disabled]="!validateEmailAddress()"
+                  [disabled]="isSubmitting || !validateEmailAddress()"
                   (click)="subscribeToMailingList()">
             <span>{{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}</span>
           </button>
