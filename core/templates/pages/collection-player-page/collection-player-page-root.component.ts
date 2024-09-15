@@ -32,9 +32,9 @@ export class CollectionPlayerPageRootComponent extends BaseRootComponent {
 
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
     .COLLECTION_PLAYER.META as unknown as Readonly<MetaTagData>[];
-    ngOnInit(): void {
-      if (!this.title || this.title.trim() === '') {
-        return;
-      }
+  ngOnInit(): void {
+    if (!this.title || this.title.trim() === '') {
+      return;
     }
+  }
 }
