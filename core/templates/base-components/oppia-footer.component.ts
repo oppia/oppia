@@ -51,6 +51,11 @@ export class OppiaFooterComponent {
   versionInformationIsShown: boolean =
     this.router.url === '/about' && !AppConstants.DEV_MODE;
 
+  isSubmitting: boolean = false;
+
+  debounceTimeout: number = 3500;
+  private debounceTimer: any;
+
   constructor(
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
@@ -71,35 +76,58 @@ export class OppiaFooterComponent {
   }
 
   subscribeToMailingList(): void {
-    // Convert null or empty string to null for consistency.
-    const userName = this.name ? String(this.name) : null;
-    this.mailingListBackendApiService
-      .subscribeUserToMailingList(
-        String(this.emailAddress),
-        userName,
-        AppConstants.MAILING_LIST_WEB_TAG
-      )
-      .then(status => {
-        if (status) {
+    if (this.isSubmitting) {
+      return;
+    }
+
+    if (!this.validateEmailAddress()) {
+      this.alertsService.addInfoMessage(
+        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
+        10000
+      );
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    clearTimeout(this.debounceTimer);
+
+    this.debounceTimer = setTimeout(() => {
+      // Convert null or empty string to null for consistency.
+      const userName = this.name ? String(this.name) : null;
+
+      this.mailingListBackendApiService
+        .subscribeUserToMailingList(
+          String(this.emailAddress),
+          userName,
+          AppConstants.MAILING_LIST_WEB_TAG
+        )
+        .then(status => {
+          if (status) {
           this.alertsService.addInfoMessage('Done!', 1000);
           this.ngbModal.open(ThanksForSubscribingModalComponent, {
             backdrop: 'static',
             size: 'xl',
           });
-        } else {
+          } else {
+            this.alertsService.addInfoMessage(
+              AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
+              10000
+            );
+          }
+        })
+        .catch(errorResponse => {
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
             10000
           );
-        }
-      })
-      .catch(errorResponse => {
-        this.alertsService.addInfoMessage(
-          AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
-          10000
-        );
-      });
+        })
+        .finally(() => {
+          this.isSubmitting = false;
+        });
+    }, this.debounceTimeout);
   }
+
 
   navigateToAboutPage(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
