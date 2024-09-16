@@ -364,6 +364,8 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
+    await this.waitForPageToFullyLoad();
+
     const allPublishedBlogPosts = await this.page.$$(
       listOfBlogsInBlogDashboard
     );
