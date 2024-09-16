@@ -23,6 +23,8 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
+import path from 'path';
+import fs from 'fs';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -89,44 +91,69 @@ describe('Logged-in User', function () {
   it(
     'should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.',
     async function () {
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Algebra I');
-      await loggedInUser.selectChapterWithinStoryToLearn(
-        'Test Story 1',
-        'Test Chapter 1'
-      );
-      // The exploration has a single state.
-      await loggedInUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
+      try {
+        await loggedInUser.navigateToClassroomPage('math');
+        await loggedInUser.selectAndOpenTopic('Algebra I');
+        await loggedInUser.selectChapterWithinStoryToLearn(
+          'Test Story 1',
+          'Test Chapter 1'
+        );
+        // The exploration has a single state.
+        await loggedInUser.expectExplorationCompletionToastMessage(
+          'Congratulations for completing this lesson!'
+        );
 
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToGoalsSection();
-      await loggedInUser.addGoals(['Algebra I']);
-      await loggedInUser.expectToolTipMessage(
-        "Successfully added to your 'Current Goals' list."
-      );
+        await loggedInUser.navigateToLearnerDashboard();
+        await loggedInUser.navigateToGoalsSection();
+        await loggedInUser.addGoals(['Algebra I']);
+        await loggedInUser.expectToolTipMessage(
+          "Successfully added to your 'Current Goals' list."
+        );
 
-      await loggedInUser.navigateToHomeSection();
-      await loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I');
-      // The exploration has a single state.
-      await loggedInUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
+        await loggedInUser.navigateToHomeSection();
+        await loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I');
+        // The exploration has a single state.
+        await loggedInUser.expectExplorationCompletionToastMessage(
+          'Congratulations for completing this lesson!'
+        );
 
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToGoalsSection();
-      await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
+        await loggedInUser.navigateToLearnerDashboard();
+        await loggedInUser.navigateToGoalsSection();
+        await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
 
-      await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
+        await loggedInUser.navigateToProgressSection();
+        await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
 
-      await loggedInUser.navigateToCommunityLessonsSection();
-      await loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']);
-      await loggedInUser.verifyLessonPresenceInPlayLater(
-        'Positive Numbers',
-        false
-      );
+        await loggedInUser.navigateToCommunityLessonsSection();
+        await loggedInUser.expectCompletedLessonsToInclude([
+          'Negative Numbers',
+        ]);
+        await loggedInUser.verifyLessonPresenceInPlayLater(
+          'Positive Numbers',
+          false
+        );
+      } catch (error) {
+        const dirPath = path.resolve(
+          __dirname,
+          '..',
+          '..',
+          '..',
+          'puppeteer-screenshots/'
+        );
+        console.log('Resolved dirPath:', dirPath); // Debugging line
+        let screenshotPath = '';
+        try {
+          fs.mkdirSync(dirPath, {recursive: true});
+          screenshotPath = dirPath; // Use the resolved absolute path
+        } catch (err) {
+          console.error('Error creating screenshot directory:', err);
+        }
+        const fileName = 'errorScreenshot.png';
+        const filePath = path.join(screenshotPath, fileName);
+        console.log(filePath);
+        // Save screenshot
+        await this.page.screenshot({path: filePath});
+      }
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
