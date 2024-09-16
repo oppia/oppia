@@ -25,7 +25,7 @@ import {TranslateService} from '@ngx-translate/core';
 export class ContentToggleButtonComponent {
   isExpanded: boolean = false;
   buttonText: string = '';
-  @Output() toggleUpdated = new EventEmitter<boolean>();
+  @Output() contentToggleEmitter = new EventEmitter<boolean>();
 
   constructor(private translateService: TranslateService) {}
 
@@ -42,7 +42,7 @@ export class ContentToggleButtonComponent {
         ? 'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS'
         : 'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE'
     );
-    this.toggleUpdated.emit(this.isExpanded);
+    this.contentToggleEmitter.emit(this.isExpanded);
   }
 }
 

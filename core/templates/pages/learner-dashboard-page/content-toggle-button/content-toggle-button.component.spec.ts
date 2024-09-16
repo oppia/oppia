@@ -72,7 +72,7 @@ describe('ContentToggleButtonComponent', () => {
   it('should invert isExpanded to true and emit true when toggle is called', () => {
     fixture.detectChanges();
     spyOn(translateService, 'instant').and.callThrough();
-    spyOn(component.toggleUpdated, 'emit');
+    spyOn(component.contentToggleEmitter, 'emit');
     component.toggle();
 
     fixture.detectChanges();
@@ -81,14 +81,14 @@ describe('ContentToggleButtonComponent', () => {
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS'
     );
-    expect(component.toggleUpdated.emit).toHaveBeenCalledWith(true);
+    expect(component.contentToggleEmitter.emit).toHaveBeenCalledWith(true);
   });
 
   it('should invert isExpanded to false and emit false when toggle is called', () => {
     component.isExpanded = true;
     fixture.detectChanges();
     spyOn(translateService, 'instant').and.callThrough();
-    spyOn(component.toggleUpdated, 'emit');
+    spyOn(component.contentToggleEmitter, 'emit');
     component.toggle();
 
     fixture.detectChanges();
@@ -97,18 +97,18 @@ describe('ContentToggleButtonComponent', () => {
     expect(translateService.instant).toHaveBeenCalledWith(
       'I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE'
     );
-    expect(component.toggleUpdated.emit).toHaveBeenCalledWith(false);
+    expect(component.contentToggleEmitter.emit).toHaveBeenCalledWith(false);
   });
 
   it('should emit isExpanded when content-toggle-button is clicked', () => {
     fixture.detectChanges();
     spyOn(translateService, 'instant').and.callThrough();
-    spyOn(component.toggleUpdated, 'emit');
+    spyOn(component.contentToggleEmitter, 'emit');
 
     const button = fixture.debugElement.query(By.css('.content-toggle-button'));
     button.triggerEventHandler('click', null);
 
     expect(component.isExpanded).toBeTrue();
-    expect(component.toggleUpdated.emit).toHaveBeenCalledWith(true);
+    expect(component.contentToggleEmitter.emit).toHaveBeenCalledWith(true);
   });
 });
