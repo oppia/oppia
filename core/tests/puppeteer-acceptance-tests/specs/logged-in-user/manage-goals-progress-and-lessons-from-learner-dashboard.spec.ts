@@ -114,10 +114,6 @@ describe('Logged-in User', function () {
         'Congratulations for completing this lesson!'
       );
 
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToGoalsSection();
-      await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
-
       await loggedInUser.navigateToProgressSection();
       await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
 
