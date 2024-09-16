@@ -72,6 +72,13 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/error-pages/error-iframed-page/error-iframed-page.module'
+      ).then(m => m.ErrorIframedPageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
       .ROUTE,
     loadChildren: () =>
