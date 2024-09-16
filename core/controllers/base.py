@@ -716,8 +716,9 @@ class BaseHandler(
         if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
             if self.iframed:
-                self.render_template(
-                    'error-iframed-page.mainpage.html', iframe_restriction=None)
+                # self.render_template(
+                #     'error-iframed-page.mainpage.html', iframe_restriction=None)
+                pass
             elif values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.

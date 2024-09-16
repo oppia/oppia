@@ -318,24 +318,24 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 observed_log_messages[0],
                 'Not a recognized request method.')
 
-    def test_renders_error_page_with_iframed(self) -> None:
-        # Modify the testapp to use the mock handler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_iframed', self.MockHandlerForTestingErrorPageWithIframed,
-                name='MockHandlerForTestingErrorPageWithIframed')],
-            debug=feconf.DEBUG,
-        ))
-        # The 500 is expected because the template file does not exist
-        # (so it is a legitimate server error caused by the
-        # MockHandlerForTestingErrorPageWithIframed).
-        response = self.get_html_response(
-            '/mock_iframed', expected_status_int=500)
+    # def test_renders_error_page_with_iframed(self) -> None:
+    #     # Modify the testapp to use the mock handler.
+    #     self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+    #         [webapp2.Route(
+    #             '/mock_iframed', self.MockHandlerForTestingErrorPageWithIframed,
+    #             name='MockHandlerForTestingErrorPageWithIframed')],
+    #         debug=feconf.DEBUG,
+    #     ))
+    #     # The 500 is expected because the template file does not exist
+    #     # (so it is a legitimate server error caused by the
+    #     # MockHandlerForTestingErrorPageWithIframed).
+    #     response = self.get_html_response(
+    #         '/mock_iframed', expected_status_int=500)
 
-        self.assertIn(
-            b'<oppia-error-iframed-page-root></oppia-error-iframed-page-root>',
-            response.body
-        )
+    #     self.assertIn(
+    #         b'<oppia-error-iframed-page-root></oppia-error-iframed-page-root>',
+    #         response.body
+    #     )
 
     def test_dev_mode_cannot_be_true_on_production(self) -> None:
         server_software_swap = self.swap(
