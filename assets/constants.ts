@@ -6955,6 +6955,22 @@ export default {
         }
       ]
     },
+    "ERROR_IFRAMED": {
+      "ROUTE": "error-iframed",
+      "TITLE": "Error Iframed - Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Error Iframed Page"
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Error Iframed Page"
+        }
+      ]
+    },
     "LOGIN": {
       "ROUTE": "login",
       "TITLE": "I18N_LOGIN_PAGE_TITLE",
