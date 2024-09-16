@@ -1171,7 +1171,9 @@ export class LoggedInUser extends BaseUser {
   async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
     await this.waitForPageToFullyLoad();
 
-    await this.page.waitForSelector(completedGoalsSectionSelector);
+    await this.page.waitForSelector(completedGoalsSectionSelector, {
+      visible: true,
+    });
     await this.page
       .waitForSelector(completedGoalsTopicNameSelector)
       .catch(() => {
@@ -1194,6 +1196,7 @@ export class LoggedInUser extends BaseUser {
       }
     }
   }
+
   /**
    * Checks if the completed stories include the expected stories.
    * @param {string[]} expectedStories - The expected stories.
