@@ -133,20 +133,20 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """
             self.render_template('invalid_page.html')
 
-    class MockHandlerForTestingErrorPageWithIframed(
-        base.BaseHandler[Dict[str, str], Dict[str, str]]
-    ):
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    # class MockHandlerForTestingErrorPageWithIframed(
+    #     base.BaseHandler[Dict[str, str], Dict[str, str]]
+    # ):
+    #     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    #     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
-            self.iframed = True
-            self.render_template('invalid_page.html')
+    #     # Here we use MyPy ignore because the signature of 'get' method does not
+    #     # match with the signature of super class's (BaseHandler) 'get' method,
+    #     # and this happens because all handler methods in the main codebase have
+    #     # decorators which modify the function signature accordingly, but these
+    #     # methods in base_test.py do not.
+    #     def get(self) -> None:  # type: ignore[override]
+    #         self.iframed = True
+    #         self.render_template('invalid_page.html')
 
     class MockHandlerForTestingUiAccessWrapper(
         base.BaseHandler[Dict[str, str], Dict[str, str]]
