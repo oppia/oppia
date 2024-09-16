@@ -776,3 +776,29 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
             ACCESS_VALIDATION_HANDLER_PREFIX,
             ), expected_status_int=404
         )
+
+
+class ExplorationEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Checks the access to the story editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.guest_username = 'guest'
+        self.guest_email = 'guest@example.com'
+        self.signup(self.guest_email, self.guest_username)
+
+    def test_access_exploration_editor_page_without_logging_in(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration_id
+            ), expected_status_int=302
+        )
+
+    def test_access_exploration_editor_page_after_logging_in(self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration_id
+            ), expected_status_int=200
+        )
+        self.logout()

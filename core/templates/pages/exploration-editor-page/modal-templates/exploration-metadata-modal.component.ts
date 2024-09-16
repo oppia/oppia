@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
@@ -262,10 +261,3 @@ export class ExplorationMetadataModalComponent
     });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationMetadataModal',
-  downgradeComponent({
-    component: ExplorationMetadataModalComponent,
-  }) as angular.IDirectiveFactory
-);

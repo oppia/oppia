@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -119,10 +118,3 @@ export class AddAudioTranslationModalComponent
     this.droppedFile = this.audioFile;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAddAudioTranslationModal',
-  downgradeComponent({
-    component: AddAudioTranslationModalComponent,
-  }) as angular.IDirectiveFactory
-);

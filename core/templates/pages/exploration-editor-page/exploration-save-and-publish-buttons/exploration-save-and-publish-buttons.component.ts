@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {EditabilityService} from 'services/editability.service';
@@ -236,10 +235,3 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'explorationSaveAndPublishButtons',
-  downgradeComponent({
-    component: ExplorationSaveAndPublishButtonsComponent,
-  })
-);

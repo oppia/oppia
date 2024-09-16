@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 // This throws "Object is possibly undefined." The type undefined
 // comes here from ngx joyride dependency. We need to suppress this
@@ -195,10 +194,3 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTranslationTab',
-  downgradeComponent({
-    component: TranslationTabComponent,
-  }) as angular.IDirectiveFactory
-);

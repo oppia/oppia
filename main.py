@@ -247,6 +247,11 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CollectionEditorAccessValidationPage
     ),
+     get_redirect_route(
+        r'%s/can_access_exploration_editor_page/<exploration_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ExplorationEditorAccessValidationHandlerPage
+    ),
     get_redirect_route(
         r'%s/can_access_blog_home_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
@@ -780,9 +785,6 @@ URLS = [
         question_editor.EditableQuestionDataHandler),
 
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
-        editor.ExplorationPage),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
@@ -1224,6 +1226,10 @@ URLS.extend((
     ),
     get_redirect_route(
         r'%s/<author_username>' % feconf.BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
         oppia_root.OppiaRootPage
     )
 ))

@@ -136,28 +136,6 @@ class EditorTests(BaseEditorControllerTests):
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
 
-    def test_editor_page(self) -> None:
-        """Test access to editor pages for the sample exploration."""
-
-        # Check that non-editors can access, but not edit, the editor page.
-        response = self.get_html_response('/create/0')
-        self.assertIn(
-            b'<exploration-editor-page></exploration-editor-page>',
-            response.body)
-        self.assert_cannot_edit('0')
-
-        # Log in as an editor.
-        self.login(self.EDITOR_EMAIL)
-
-        # Check that it is now possible to access and edit the editor page.
-        response = self.get_html_response('/create/0')
-        self.assertIn(
-            b'<exploration-editor-page></exploration-editor-page>',
-            response.body)
-        self.assert_can_edit('0')
-
-        self.logout()
-
     def test_that_default_exploration_cannot_be_published(self) -> None:
         """Test that publishing a default exploration raises an error
         due to failing strict validation.
