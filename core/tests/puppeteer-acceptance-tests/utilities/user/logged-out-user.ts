@@ -795,6 +795,7 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('The Watch A Video button does not exist!');
     }
     await Promise.all([this.clickAndWaitForNavigation(watchAVideoButton)]);
+    await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
