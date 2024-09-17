@@ -26,22 +26,6 @@ from core.domain import story_fetchers
 from typing import Dict
 
 
-class ReviewTestsPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Renders the review tests page."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_story_viewer_page
-    def get(self, _: str) -> None:
-        """Handles GET requests."""
-        self.render_template('review-test-page.mainpage.html')
-
-
 class ReviewTestsPageDataHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
