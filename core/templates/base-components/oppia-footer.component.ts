@@ -19,8 +19,6 @@
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {downgradeComponent} from '@angular/upgrade/static';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
@@ -43,24 +41,20 @@ export class OppiaFooterComponent {
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   currentYear: number = new Date().getFullYear();
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
-
   BRANCH_NAME = AppConstants.BRANCH_NAME;
-
   SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
 
   versionInformationIsShown: boolean =
     this.router.url === '/about' && !AppConstants.DEV_MODE;
 
   isSubmitting: boolean = false;
-
   debounceTimeout: number = 3500;
-  private debounceTimer: any;
+  private debounceTimer: ReturnType<typeof setTimeout>;
 
   constructor(
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
     private mailingListBackendApiService: MailingListBackendApiService,
-    private platformFeatureService: PlatformFeatureService,
     private router: Router,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService
@@ -71,7 +65,7 @@ export class OppiaFooterComponent {
   }
 
   validateEmailAddress(): boolean {
-    let regex = new RegExp(AppConstants.EMAIL_REGEX);
+    const regex = new RegExp(AppConstants.EMAIL_REGEX);
     return regex.test(String(this.emailAddress));
   }
 
@@ -94,7 +88,7 @@ export class OppiaFooterComponent {
 
     this.debounceTimer = setTimeout(() => {
       // Convert null or empty string to null for consistency.
-      const userName = this.name ? String(this.name) : null;
+      const userName = this.name;
 
       this.mailingListBackendApiService
         .subscribeUserToMailingList(
@@ -104,11 +98,11 @@ export class OppiaFooterComponent {
         )
         .then(status => {
           if (status) {
-          this.alertsService.addInfoMessage('Done!', 1000);
-          this.ngbModal.open(ThanksForSubscribingModalComponent, {
-            backdrop: 'static',
-            size: 'xl',
-          });
+            this.alertsService.addInfoMessage('Done!', 1000);
+            this.ngbModal.open(ThanksForSubscribingModalComponent, {
+              backdrop: 'static',
+              size: 'xl',
+            });
           } else {
             this.alertsService.addInfoMessage(
               AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
@@ -127,7 +121,6 @@ export class OppiaFooterComponent {
         });
     }, this.debounceTimeout);
   }
-
 
   navigateToAboutPage(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
