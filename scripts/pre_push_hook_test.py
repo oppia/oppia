@@ -27,7 +27,7 @@ import sys
 from core.tests import test_utils
 from scripts import common
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from . import git_changes_utils
 from . import install_python_prod_dependencies
@@ -47,13 +47,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
             stderr: int = subprocess.PIPE
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
-        def mock_get_remote_name() -> bytes:
-            return b'remote'
+        def mock_get_remote_name() -> str:
+            return 'remote'
         def mock_get_refs() -> List[str]:
             return ['ref1', 'ref2']
         def mock_get_changed_files(
             unused_refs: List[git_changes_utils.GitRef],
-            unused_remote: str
+            unused_remote: str,
+            unused_remote_branch: Optional[str] = None
         ) -> Dict[str, Tuple[List[bytes], List[bytes]]]:
             return {
                 'branch1': ([b'A:file1', b'M:file2'], [b'file1', b'file2']),

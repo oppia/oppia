@@ -245,8 +245,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_frontend_tests_with_run_on_changed_files_in_branch(self) -> None:
         git_refs = [git_changes_utils.GitRef(
             'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
-        def mock_get_remote_name() -> bytes:
-            return b'remote'
+        def mock_get_remote_name() -> str:
+            return 'remote'
         def mock_get_refs() -> List[git_changes_utils.GitRef]:
             return git_refs
         def mock_get_changed_files(
@@ -275,6 +275,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             if file_path == 'file3.ts':
                 return 'file3.spec.ts'
             return None
+        def mock_get_parent_branch_name_for_diff() -> str:
+            return 'develop'
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_local_git_repository_remote_name',
             mock_get_remote_name)
@@ -288,14 +290,18 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             mock_get_staged_acmrt_files)
         get_file_spec_swap = self.swap(
             run_frontend_tests, 'get_file_spec', mock_get_file_spec)
+        get_parent_branch_name_for_diff_swap = self.swap(
+            git_changes_utils, 'get_parent_branch_name_for_diff',
+            mock_get_parent_branch_name_for_diff)
 
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, get_remote_name_swap:
                     with get_refs_swap, get_changed_files_swap:
                         with get_file_spec_swap, get_staged_acmrt_files_swap:
-                            run_frontend_tests.main(
-                                args=['--run_on_changed_files_in_branch'])
+                            with get_parent_branch_name_for_diff_swap:
+                                run_frontend_tests.main(
+                                    args=['--run_on_changed_files_in_branch'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
@@ -307,8 +313,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_frontend_tests_with_run_on_changed_files_in_branch_no_remote(
         self
     ) -> None:
-        def mock_get_remote_name() -> bytes:
-            return b''
+        def mock_get_remote_name() -> str:
+            return ''
 
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_local_git_repository_remote_name',
