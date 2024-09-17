@@ -693,6 +693,7 @@ class CannonicalStoryDict(TypedDict):
     url_fragment: str
     topic_url_fragment: str
     classroom_url_fragment: Optional[str]
+    classroom_name: Optional[str]
     story_is_published: bool
     completed_node_titles: List[str]
     all_node_dicts: List[story_domain.StoryNodeDict]
@@ -741,6 +742,10 @@ def get_canonical_story_dicts(
         story_summary_dict['classroom_url_fragment'] = (
             classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
+        story_summary_dict['classroom_name'] = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic.id)
+        )
         story_summary_dict['story_is_published'] = True
         story_summary_dict['completed_node_titles'] = completed_node_titles
         story_summary_dict['all_node_dicts'] = [

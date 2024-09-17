@@ -41,6 +41,7 @@ export interface StorySummaryBackendDict {
   topic_name?: string;
   topic_url_fragment?: string;
   classroom_url_fragment?: string;
+  classroom_name?: string;
 }
 
 export class StorySummary {
@@ -58,6 +59,7 @@ export class StorySummary {
     private _topicName: string | undefined,
     private _topicUrlFragment: string | undefined,
     private _classroomUrlFragment: string | undefined,
+    private _classroomName: string | undefined,
     private _publishedChaptersCount: number | undefined,
     private _totalChaptersCount: number | undefined,
     private _upcomingChaptersCount: number | undefined,
@@ -122,6 +124,10 @@ export class StorySummary {
     return this._classroomUrlFragment;
   }
 
+  getClassroomName(): string | undefined {
+    return this._classroomName;
+  }
+
   getPublishedChaptersCount(): number | undefined {
     return this._publishedChaptersCount;
   }
@@ -166,6 +172,7 @@ export class StorySummary {
       storySummaryBackendDict.topic_name,
       storySummaryBackendDict.topic_url_fragment,
       storySummaryBackendDict.classroom_url_fragment,
+      storySummaryBackendDict.classroom_name,
       storySummaryBackendDict.published_chapters_count,
       storySummaryBackendDict.total_chapters_count,
       storySummaryBackendDict.upcoming_chapters_count,

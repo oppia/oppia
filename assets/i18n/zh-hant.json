@@ -310,8 +310,6 @@
 	"I18N_CLASSROOM_HEADING": "<[classroomName]>教室",
 	"I18N_CLASSROOM_MATH_COURSE_DETAILS": "Oppia 精心策劃的數學基礎課程教授數學的基本構建，涵蓋了像是加法、乘法和分數等基本概念。一旦您掌握了這些基本概念，您就可以進入更高階的課程！每個主題都建立在前一個主題上，因此您可以從頭開始並從任何技能水準來完成課程，若您需要特定主題的幫助，也請直接進入。",
 	"I18N_CLASSROOM_MATH_NAME": "數學",
-	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING": "已經知道一些數學？",
-	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT": "回答 10 到 15 個問題來找出要從何開始。",
 	"I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON": "我們建議從<[firstTopic]>課程開始。",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "即將到來",
 	"I18N_CLASSROOM_PAGE_COURSE_DETAILS": "課程詳細內容",

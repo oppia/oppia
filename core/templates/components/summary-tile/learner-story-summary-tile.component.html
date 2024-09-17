@@ -4,6 +4,9 @@
       {{nextIncompleteNodeTitle}}
     </div>
     <mat-card class="oppia-story-dashboard-card" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
+      <div class="classroom-name-container">
+        <p class="classroom-name">{{ storySummary.getClassroomName() }}</p>
+      </div>
       <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
         <div class="story-card">
           <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
@@ -168,5 +171,27 @@
   .learner-story-summary-tile .oppia-story-dashboard-card:hover .continue-button {
     display: block;
     float: left;
+  }
+  .classroom-name-container {
+    align-items: center;
+    background: #005240;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    height: 24px;
+    justify-content: center;
+    padding: 5px;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 38px;
+  }
+  .classroom-name-container .classroom-name {
+    color: #f3f2ef;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 14px;
   }
 </style>

@@ -37,8 +37,6 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   @Input() background!: string;
   // This property will be null when the SVG uploaded is not valid.
   imageSourceInView: SafeResourceUrl | null = null;
-  height = '180px';
-  width = '320px';
 
   constructor(private svgSanitizerService: SvgSanitizerService) {}
 
@@ -63,15 +61,11 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
     } else {
       this.imageSourceInView = this.imgSrc;
     }
-    this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
-    this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
   }
 
   ngOnChanges(): void {
     if (this.imgSrc !== undefined) {
       this.updateSvgInViewIfSafe();
-      this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
-      this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
     }
   }
 }

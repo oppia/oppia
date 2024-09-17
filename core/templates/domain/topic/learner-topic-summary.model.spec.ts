@@ -62,7 +62,8 @@ describe('Learner Topic summary model', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {
@@ -106,7 +107,10 @@ describe('Learner Topic summary model', () => {
     expect(_sampleLearnerTopicSummary.getPracticeTabIsDisplayed()).toEqual(
       false
     );
-    expect(_sampleLearnerTopicSummary.getClassroom()).toEqual('math');
+    expect(_sampleLearnerTopicSummary.getClassroomUrlFragment()).toEqual(
+      'math'
+    );
+    expect(_sampleLearnerTopicSummary.getClassroomName()).toEqual('math');
     expect(_sampleLearnerTopicSummary.getThumbnailFilename()).toEqual(
       'image.svg'
     );
