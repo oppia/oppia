@@ -18,6 +18,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {log} from 'console';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({
@@ -89,6 +90,12 @@ export class AccessValidationBackendApiService {
         exploration_id: explorationId,
       }
     );
+
+    console.log('Hello');
+    console.log(url);
+    console.log(explorationId);
+
+    // console.log(this.http.get<void>(url).toPromise());
 
     return this.http.get<void>(url).toPromise();
   }

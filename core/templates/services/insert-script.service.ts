@@ -49,7 +49,7 @@ export class InsertScriptService {
           this.loadedScripts.add(script);
           this.scriptsLoading.delete(script);
           resolve();
-          if (!onLoadCb) {
+          if (onLoadCb) {
             onLoadCb();
           }
           scriptElement.onerror = error => {
