@@ -779,8 +779,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        def mock_get_remote_name() -> bytes:
-            return b''
+        def mock_get_remote_name() -> str:
+            return ''
 
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_local_git_repository_remote_name',
