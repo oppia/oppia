@@ -72,6 +72,12 @@ export class MusicNotesInputRulesService {
     answer: MusicNotesAnswer[],
     inputs: {a: number; b: number}
   ): boolean {
+    
+    //No need to check the actual length if a is greater than b
+    if(inputs.a > inputs.b) {
+      return false;
+    }
+
     var answerLength: number =
       MusicNotesInputRulesService._convertSequenceToMidi(answer).length;
     return answerLength >= inputs.a && answerLength <= inputs.b;
