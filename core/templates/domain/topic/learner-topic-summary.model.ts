@@ -38,7 +38,8 @@ export interface LearnerTopicSummaryBackendDict {
   canonical_story_summary_dict: StorySummaryBackendDict[];
   thumbnail_filename: string;
   thumbnail_bg_color: string;
-  classroom: string;
+  classroom_name: string;
+  classroom_url_fragment: string;
   practice_tab_is_displayed: boolean;
   degrees_of_mastery: DegreesOfMastery;
   skill_descriptions: SkillIdToDescriptionMap;
@@ -58,7 +59,8 @@ export class LearnerTopicSummary {
     public canonicalStorySummaryDicts: StorySummary[],
     public thumbnailFilename: string,
     public thumbnailBgColor: string,
-    public classroom: string,
+    public classroomName: string,
+    public classroomUrlFragment: string,
     public practiceTabIsDisplayed: boolean,
     public degreesOfMastery: DegreesOfMastery,
     public skillDescriptions: SkillIdToDescriptionMap,
@@ -91,7 +93,8 @@ export class LearnerTopicSummary {
       canonicalStorySummaries,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
-      topicSummaryBackendDict.classroom,
+      topicSummaryBackendDict.classroom_name,
+      topicSummaryBackendDict.classroom_url_fragment,
       topicSummaryBackendDict.practice_tab_is_displayed,
       topicSummaryBackendDict.degrees_of_mastery,
       topicSummaryBackendDict.skill_descriptions,
@@ -140,8 +143,12 @@ export class LearnerTopicSummary {
     return this.thumbnailBgColor;
   }
 
-  getClassroom(): string {
-    return this.classroom;
+  getClassroomName(): string {
+    return this.classroomName;
+  }
+
+  getClassroomUrlFragment(): string {
+    return this.classroomUrlFragment;
   }
 
   getPracticeTabIsDisplayed(): boolean {

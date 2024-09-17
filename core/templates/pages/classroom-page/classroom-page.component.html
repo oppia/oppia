@@ -55,8 +55,8 @@
         </div>
         <div class="diagnostic-test-box">
           <div class="diagnostic-test-info">
-            <h4>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING' | translate }}</h4>
-            <p>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT' | translate }}</p>
+            <h4>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_HEADING' | translate:{ classroomName: classroomData.getName() } }}</h4>
+            <p>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_TEXT' | translate:{ classroomName: classroomData.getName() } }}</p>
           </div>
           <a [routerLink]="['/diagnostic-test-player']" [queryParams]="{ classroom: classroomData.getUrlFragment() }" class="e2e-test-take-diagnostic-test">{{ 'I18N_CLASSROOM_PAGE_QUIZ_TEST_BUTTON' | translate }}</a>
         </div>

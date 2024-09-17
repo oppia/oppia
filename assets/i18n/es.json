@@ -311,8 +311,6 @@
 	"I18N_CLASSROOM_HEADING": "El <[classroomName]> aula",
 	"I18N_CLASSROOM_MATH_COURSE_DETAILS": "El curso de fundamentos matemáticos seleccionado por Oppia enseña los componentes básicos de las matemáticas, cubriendo conceptos esenciales como suma, multiplicación y fracciones. Una vez que hayas dominado estos conceptos básicos, ¡puedes pasar a lecciones más avanzadas! Cada tema se basa en el anterior, por lo que puedes comenzar desde el principio y completar las lecciones desde cualquier nivel de habilidad, o simplemente sumergirte directamente si necesitas ayuda sobre un tema en particular.",
 	"I18N_CLASSROOM_MATH_NAME": "Matemáticas",
-	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING": "¿Ya sabes algo de matemáticas?",
-	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT": "Responda a 10 o 15 preguntas para ver por dónde empezar.",
 	"I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON": "Recomendamos comenzar con la lección <[firstTopic]>.",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "Viniendo Pronto",
 	"I18N_CLASSROOM_PAGE_COURSE_DETAILS": "Detalles del curso",
