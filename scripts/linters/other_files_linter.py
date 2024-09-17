@@ -311,9 +311,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         return concurrent_task_utils.TaskResult(
             name, bool(errors), errors, errors)
 
-    # Here we use type Any because the argument 'workflow_dict' accept
+    # Here we use type Any because the argument 'workflow_dict' accepts
     # dictionaries that represents the content of workflow YAML file and
-    # that dictionaries can contain various types of values.
+    # those dictionaries can contain various types of values.
     @staticmethod
     def _check_that_workflow_steps_use_merge_action(
         workflow_dict: Dict[str, Any], workflow_path: str
@@ -333,13 +333,69 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         for job, job_dict in workflow_dict['jobs'].items():
             if (
                 job not in JOBS_EXEMPT_FROM_MERGE_REQUIREMENT and
-                MERGE_STEP not in job_dict['steps']
+                all(
+                    step.get('uses') != MERGE_STEP['uses']
+                    for step in job_dict['steps']
+                )
             ):
                 jobs_without_merge.append(job)
         return [
             '%s --> Job %s does not use the .github/actions/merge action.' % (
                 workflow_path, job)
             for job in jobs_without_merge
+        ]
+
+    def check_github_workflows_have_name(
+        self
+    ) -> concurrent_task_utils.TaskResult:
+        """Checks that all github actions workflow steps have a name.
+
+        Returns:
+            TaskResult. A TaskResult object describing any workflows
+            steps that do not have a name.
+        """
+        name = 'Github workflow steps have a name'
+        workflow_paths = {
+            os.path.join(WORKFLOWS_DIR, filename)
+            for filename in os.listdir(WORKFLOWS_DIR)
+            if re.search(WORKFLOW_FILENAME_REGEX, filename)
+        }
+        errors = []
+        for workflow_path in workflow_paths:
+            workflow_str = self.file_cache.read(workflow_path)
+            workflow_dict = yaml.load(workflow_str, Loader=yaml.Loader)
+            errors += self._check_that_workflow_steps_have_name(
+                workflow_dict, workflow_path)
+        return concurrent_task_utils.TaskResult(
+            name, bool(errors), errors, errors)
+
+    # Here we use type Any because the argument 'workflow_dict' accepts
+    # dictionaries that represents the content of workflow YAML file and
+    # those dictionaries can contain various types of values.
+    @staticmethod
+    def _check_that_workflow_steps_have_name(
+        workflow_dict: Dict[str, Any], workflow_path: str
+    ) -> List[str]:
+        """Check that workflow steps has a name.
+
+        Args:
+            workflow_dict: dict. Dictionary representation of the
+                workflow YAML file.
+            workflow_path: str. Path to workflow file.
+
+        Returns:
+            list(str). A list of error messages describing any jobs
+            with unnamed steps.
+        """
+        jobs_with_unnamed_step = []
+        for job, job_dict in workflow_dict['jobs'].items():
+            if ('steps' in job_dict and
+                    any('name' not in step for step in job_dict['steps'])):
+                jobs_with_unnamed_step.append(job)
+        return [
+            '%s --> Job %s has an unnamed step' % (
+                workflow_path, job)
+            for job in jobs_with_unnamed_step
         ]
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
@@ -356,6 +412,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         linter_stdout.append(self.check_third_party_libs_type_defs())
         linter_stdout.append(self.check_webpack_config_file())
         linter_stdout.append(self.check_github_workflows_use_merge_action())
+        linter_stdout.append(self.check_github_workflows_have_name())
 
         return linter_stdout
 
