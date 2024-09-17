@@ -122,6 +122,7 @@ export class OppiaFooterComponent {
     }, this.debounceTimeout);
   }
 
+
   navigateToAboutPage(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
       NavbarAndFooterGATrackingPages.ABOUT
