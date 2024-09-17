@@ -24,8 +24,10 @@ jobs:
         suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_accessibility.suites }}
     name: lighthouse_accessibility (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
@@ -33,13 +35,14 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
       - name: Initializing Containers
         run: |
           make build
           docker compose up angular-build -d
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-      - name: Modify Lighthouse source-maps.js
+      - name: Increase lighthouse timeout
         run: |
           # Replace the 1.5 second timeout in lighthouse for retrieving
           # sourcemaps with a 10 second timeout. This timeout is not
@@ -78,13 +81,17 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: ./.github/actions/merge
-      - uses: ./.github/actions/check-workflow-status
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
+      - name: Check workflow status
+        uses: ./.github/actions/check-workflow-status
         id: check_workflow_status
         with:
           jobs: ${{ toJson(needs) }}

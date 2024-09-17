@@ -18,8 +18,10 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
@@ -27,8 +29,10 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
-      - uses: ./.github/actions/merge
-      - uses: ./.github/actions/install-chrome
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
+      - name: Install Chrome
+        uses: ./.github/actions/install-chrome
       - name: Initialize Containers
         run: |
           make build

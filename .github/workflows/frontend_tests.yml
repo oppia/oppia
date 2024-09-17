@@ -41,7 +41,8 @@ jobs:
         num_runs: ${{ fromJson(needs.generate-job-strategy-matrix.outputs.job-strategy-matrix) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Describe filesystem
         run: |
           pwd
@@ -49,7 +50,8 @@ jobs:
           ls /home/runner/work/oppia
           ls /home/runner/work/oppia/oppia
           echo $GITHUB_WORKSPACE
-      - uses: actions/setup-python@v4
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
@@ -57,7 +59,8 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Initialize Containers
@@ -78,7 +81,8 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Report failure if failed on oppia/oppia develop branch
         uses: ./.github/actions/send-webhook-notification
         with:
