@@ -10,6 +10,10 @@ FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenanc
 
 sharding_instances := 3
 
+# This escapes any special characters and remove any spaces in the PATH. We do this to resolve errors in WSL due to windows paths.
+FIXED_PATH=$(shell echo "$(PATH)" | sed 's/ /\\ /g' | sed 's/(/\\(/g' | sed 's/)/\\)/g')
+
+
 ifeq ($(OS_NAME),Darwin)
     CHROME_VERSION := $(shell /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | awk '{print $$3}')
 else
@@ -176,9 +180,9 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(FIXED_PATH); \
 	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(FIXED_PATH); \
 	fi
 # Adding env variable for mobile view
 	@export MOBILE=${MOBILE:-false}
@@ -210,9 +214,9 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(FIXED_PATH); \
 	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(FIXED_PATH); \
 	fi
 # Adding env variable for the mobile view
 	@export MOBILE=${MOBILE:-false}
