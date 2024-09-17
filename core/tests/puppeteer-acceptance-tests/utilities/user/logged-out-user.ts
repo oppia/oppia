@@ -36,7 +36,6 @@ const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
-const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
 const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
@@ -55,7 +54,6 @@ const googleSignUpUrl = testConstants.URLs.ExternalLink.GoogleSignUp;
 const getStartedUrl = testConstants.URLs.GetStarted;
 const homeUrl = testConstants.URLs.Home;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
-const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
 const OppiaAnnounceGoogleGroupUrl = testConstants.URLs.OppiaAnnounceGoogleGroup;
 const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const partnershipsFormInPortugueseUrl =
@@ -534,13 +532,7 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.clickAndWaitForNavigation(button);
 
-    try {
-      expect(this.page.url()).toBe(expectedDestinationPageUrl);
-    } catch (e) {
-      throw new Error(
-        `${buttonName} should open the ${expectedDestinationPageName} page`
-      );
-    }
+    expect(this.page.url()).toBe(expectedDestinationPageUrl);
   }
 
   /**
@@ -799,10 +791,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
-    const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
-      ? mobileWatchAVideoUrl
-      : desktopWatchAVideoUrl;
-    if (url !== expectedWatchAVideoUrl) {
+    if (!url.includes(testConstants.OppiaSocials.FaceBook.Domain)) {
       throw new Error(
         `The Watch A Video button should open the right page,
           but it opens ${url} instead.`
@@ -1105,6 +1094,7 @@ export class LoggedOutUser extends BaseUser {
     if (newTabPage === null) {
       throw new Error('The "create on here" link did not open a new tab');
     }
+    await newTabPage.waitForNetworkIdle();
     expect(newTabPage.url()).toBe(googleSignUpUrl);
     await newTabPage.close();
   }

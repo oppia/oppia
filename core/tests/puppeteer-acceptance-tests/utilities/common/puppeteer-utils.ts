@@ -605,61 +605,61 @@ export class BaseUser {
     testPath: string,
     newPage?: Page
   ): Promise<void> {
-    try {
-      const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
-      await currentPage.mouse.move(0, 0);
-      // To wait for all images to load and the page to be stable.
-      await currentPage.waitForTimeout(5000);
+    const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
+    await currentPage.mouse.move(0, 0);
+    // To wait for all images to load and the page to be stable.
+    await currentPage.waitForTimeout(5000);
 
-      /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
-       * In general, it is set as 0.0028/0.28% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
-       * Based on the existence of the background/library banner, which are randomly selected from a set of four,
-       * failureTrigger is set in the specific percentage for the randomness of the banner in desktop mode and mobile mode.
-       */
+    /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
+     * In general, it is set as 0.0028/0.28% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
+     * Based on the existence of the background/library banner, which are randomly selected from a set of four,
+     * failureTrigger is set in the specific percentage for the randomness of the banner in desktop mode and mobile mode.
+     */
 
-      var failureTrigger = 0;
-      if (this.isViewportAtMobileWidth()) {
-        failureTrigger += 0.042;
-        if (await currentPage.$(backgroundBanner)) {
-          failureTrigger += 0.0352;
-        } else if (await currentPage.$(libraryBanner)) {
-          failureTrigger += 0.0039;
-        }
+    var failureTrigger = 0;
+    var dirName = '';
+    if (this.isViewportAtMobileWidth()) {
+      if (await this.isInProdMode()) {
+        dirName = '/prod_mobile_screenshots';
       } else {
-        failureTrigger += 0.0028;
-        if (await currentPage.$(backgroundBanner)) {
-          failureTrigger += 0.03;
-        } else if (await currentPage.$(libraryBanner)) {
-          failureTrigger += 0.006;
-        }
+        dirName = '/dev_mobile_screenshots';
       }
+      failureTrigger += 0.042;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.0352;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.0039;
+      }
+    } else {
+      if (await this.isInProdMode()) {
+        dirName = '/prod_desktop_screenshots';
+      } else {
+        dirName = '/dev_desktop_screenshots';
+      }
+      failureTrigger += 0.0028;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.03;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.006;
+      }
+    }
 
-      /*
-       * Set dumpInlineDiffToConsole as true prints the base64 string of the image that shows the difference when failed in the terminal
-       * The string can be copy-pasted to a browser address string to preview the image
-       * If you are running tests locally, you can set dumpInlineDiffToConsole as false to stop printing the base64 string
-       */
-      expect(await currentPage.screenshot()).toMatchImageSnapshot({
-        failureThreshold: failureTrigger,
-        failureThresholdType: 'percent',
-        dumpInlineDiffToConsole: true,
-        customSnapshotIdentifier: imageName,
-        customSnapshotsDir: path.join(
-          testPath,
-          (await this.isInProdMode())
-            ? this.isViewportAtMobileWidth()
-              ? '/prod_mobile_screenshots'
-              : '/prod_desktop_screenshots'
-            : this.isViewportAtMobileWidth()
-              ? '/dev_mobile_screenshots'
-              : '/dev_desktop_screenshots'
-        ),
-      });
-      if (typeof newPage !== 'undefined') {
-        await newPage.close();
-      }
-    } catch (e) {
-      throw new Error(e);
+    /*
+     * Set dumpInlineDiffToConsole as true prints the base64 string of the image that shows the difference when failed in the terminal
+     * The string can be copy-pasted to a browser address string to preview the image
+     * If you are running tests locally, you can set dumpInlineDiffToConsole as false to stop printing the base64 string
+     */
+    expect(await currentPage.screenshot()).toMatchImageSnapshot({
+      failureThreshold: failureTrigger,
+      failureThresholdType: 'percent',
+      customSnapshotIdentifier: imageName,
+      customSnapshotsDir: path.join(testPath, dirName),
+      customDiffDir: path.isAbsolute('/home/runner/work/..')
+        ? '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots'
+        : path.join(testPath, dirName, 'diff-snapshots'),
+    });
+    if (typeof newPage !== 'undefined') {
+      await newPage.close();
     }
   }
   /*
