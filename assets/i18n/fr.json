@@ -183,8 +183,6 @@
 	"I18N_CHAPTER_COMPLETION": "Félicitations pour avoir terminé ce chapitre !",
 	"I18N_CLASSROOM_MATH_COURSE_DETAILS": "Le cours sur les fondements mathématiques supervisé d’Oppia enseigne les rudiments de base des maths, couvrant les concepts essentiels comme l’addition, la multiplication et les fractions. Une fois que vous maîtriserez ces concepts de base, vous pourrez aller vers des leçons plus avancées ! Chaque sujet s’appuie sur le précédent, vous pouvez donc commencer depuis le début et terminer les leçons depuis tout niveau, ou juste vous y plonger directement si vous avez besoin d’aide sur un sujet particulier.",
 	"I18N_CLASSROOM_MATH_NAME": "Mathématiques",
-	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING": "Vous connaissez déjà un peu les mathématiques ?",
-	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT": "Répondez à un quiz de 10 à 15 questions pour savoir où commencer.",
 	"I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON": "Nous vous recommandons de commencer par la leçon <[firstTopic]>.",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "Disponible prochainement ",
 	"I18N_CLASSROOM_PAGE_COURSE_DETAILS": "Détails du cours",

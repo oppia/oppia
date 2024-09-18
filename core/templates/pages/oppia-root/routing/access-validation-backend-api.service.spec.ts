@@ -474,4 +474,46 @@ describe('Access validation backend api service', () => {
       expect(failSpy).toHaveBeenCalled();
     })
   );
+
+  it('should not validate access to review tests page with invalid access', fakeAsync(() => {
+    avbas
+      .validateAccessToReviewTestPage('staging', 'topic', 'private-story-title')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_review_tests_page/' +
+        'staging/topic/private-story-title'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Access Denied.',
+      },
+      {
+        status: 401,
+        statusText: 'Access Denied.',
+      }
+    );
+
+    flushMicrotasks();
+    expect(successSpy).not.toHaveBeenCalled();
+    expect(failSpy).toHaveBeenCalled();
+  }));
+
+  it('should validate access to review tests page with valid access', fakeAsync(() => {
+    avbas
+      .validateAccessToReviewTestPage('staging', 'topic', 'public-story-title')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_review_tests_page/' +
+        'staging/topic/public-story-title'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
 });
