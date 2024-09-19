@@ -77,7 +77,7 @@ const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
-const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
+const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
 const discardDraftDropdown = 'button.e2e-test-save-discard-toggle';
@@ -217,6 +217,7 @@ const feedbackSelector = '.e2e-test-exploration-feedback';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
+const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -288,6 +289,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.,
+   * @param {string} tags - The tags of the exploration.
    */
   async publishExplorationWithMetadata(
     title: string,
@@ -295,38 +297,71 @@ export class ExplorationEditor extends BaseUser {
     category: string,
     tags?: string
   ): Promise<string | null> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(toastMessage, {
+    const fillExplorationMetadataDetails = async () => {
+      await this.clickOn(explorationTitleInput);
+      await this.type(explorationTitleInput, `${title}`);
+      await this.clickOn(explorationGoalInput);
+      await this.type(explorationGoalInput, `${goal}`);
+      await this.clickOn(explorationCategoryDropdown);
+      await this.clickOn(`${category}`);
+      if (tags) {
+        await this.type(tagsField, tags);
+      }
+    };
+
+    const publishExploration = async () => {
+      if (this.isViewportAtMobileWidth()) {
+        await this.waitForPageToFullyLoad();
+        const element = await this.page.$(mobileNavbarOptions);
+        // If the element is not present, it means the mobile navigation bar is not expanded.
+        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+        // which expands the mobile navigation bar.
+        if (!element) {
+          await this.clickOn(mobileOptionsButton);
+        }
+        await this.clickOn(mobileChangesDropdown);
+        await this.clickOn(mobilePublishButton);
+      } else {
+        await this.clickOn(publishExplorationButton);
+      }
+    };
+
+    const confirmPublish = async () => {
+      await this.clickOn(saveExplorationChangesButton);
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
-      await this.page.waitForSelector(toastMessage, {
-        hidden: true,
-      });
-      await this.clickOn(mobileChangesDropdown);
-      await this.clickOn(mobilePublishButton);
-    } else {
-      await this.clickOn(publishExplorationButton);
-    }
-    await this.clickOn(explorationTitleInput);
-    await this.type(explorationTitleInput, `${title}`);
-    await this.clickOn(explorationGoalInput);
-    await this.type(explorationGoalInput, `${goal}`);
-    await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn(`${category}`);
-    if (tags) {
-      await this.type(tagsField, tags);
-    }
-    await this.clickOn(saveExplorationChangesButton);
-    await this.clickOn(explorationConfirmPublishButton);
-    await this.page.waitForSelector(explorationIdElement);
-    const explorationIdUrl = await this.page.$eval(
-      explorationIdElement,
-      element => (element as HTMLElement).innerText
-    );
-    const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.clickOn(explorationConfirmPublishButton);
+      await this.page.waitForSelector(explorationIdElement);
+      const explorationIdUrl = await this.page.$eval(
+        explorationIdElement,
+        element => (element as HTMLElement).innerText
+      );
+      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.clickOn(closePublishedPopUpButton);
+      return explorationId;
+    };
 
-    await this.clickOn(closePublishedPopUpButton);
-    return explorationId;
+    try {
+      await publishExploration();
+      await fillExplorationMetadataDetails();
+      return await confirmPublish();
+    } catch (error) {
+      await this.waitForPageToFullyLoad();
+
+      const errorSavingExplorationElement = await this.page.$(
+        errorSavingExplorationModal
+      );
+      if (errorSavingExplorationElement) {
+        await this.clickOn(errorSavingExplorationModal);
+        await this.page.waitForNavigation({
+          waitUntil: ['load', 'networkidle0'],
+        });
+      }
+      await publishExploration();
+      return await confirmPublish();
+    }
   }
 
   async navigateToFeedbackTab(): Promise<void> {
@@ -881,18 +916,20 @@ export class ExplorationEditor extends BaseUser {
     await this.type(commitMessage, 'Testing Testing');
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
+
+    // Toast message confirms that the draft has been saved.
+    await this.page.waitForSelector(toastMessage, {
+      visible: true,
+    });
+    await this.page.waitForSelector(toastMessage, {
+      hidden: true,
+    });
     showMessage('Exploration is saved successfully.');
     await this.waitForNetworkIdle();
   }
 
   async publishExploration(): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        visible: true,
-      });
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        hidden: true,
-      });
       await this.clickOn(mobileChangesDropdown);
       await this.clickOn(mobilePublishButton);
     } else {
