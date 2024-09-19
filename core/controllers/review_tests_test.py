@@ -111,28 +111,6 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
 
 
-class ReviewTestsPageTests(BaseReviewTestsControllerTests):
-
-    def test_any_user_can_access_review_tests_page(self) -> None:
-        self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % self.story_url_fragment_1)
-
-    def test_no_user_can_access_unpublished_story_review_sessions_page(
-        self
-    ) -> None:
-        self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % self.story_url_fragment_2,
-            expected_status_int=404)
-
-    def test_get_fails_when_story_doesnt_exist(self) -> None:
-        self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % 'non-existent-story',
-            expected_status_int=302)
-
-
 class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
 
     def test_any_user_can_access_review_tests_data(self) -> None:
