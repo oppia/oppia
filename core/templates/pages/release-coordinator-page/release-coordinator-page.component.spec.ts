@@ -76,19 +76,23 @@ describe('Release coordinator page', () => {
   const userGroupData: UserGroupsResponse = {
     userGroups: [
       UserGroup.createFromBackendDict({
-        user_group_name: 'UserGroup1',
+        user_group_id: 'userGroupId1',
+        name: 'UserGroup1',
         users: ['User1', 'User2', 'User3'],
       }),
       UserGroup.createFromBackendDict({
-        user_group_name: 'UserGroup2',
+        user_group_id: 'userGroupId2',
+        name: 'UserGroup2',
         users: ['User4', 'User5'],
       }),
       UserGroup.createFromBackendDict({
-        user_group_name: 'UserGroup3',
+        user_group_id: 'userGroupId3',
+        name: 'UserGroup3',
         users: ['User6', 'User7', 'User8'],
       }),
       UserGroup.createFromBackendDict({
-        user_group_name: 'UserGroup9',
+        user_group_id: 'userGroupId9',
+        name: 'UserGroup9',
         users: ['User12', 'User13'],
       }),
     ],
@@ -279,7 +283,7 @@ describe('Release coordinator page', () => {
       expect(component.userGroupInEditMode).toBeTrue();
     }));
 
-    describe('when clicking on save button to update user groups', () => {
+    describe('when clicking on save button to update user group', () => {
       it('should be same when no changes are present', fakeAsync(() => {
         component.ngOnInit();
         tick();
@@ -289,7 +293,7 @@ describe('Release coordinator page', () => {
           'User2',
           'User3',
         ]);
-        component.updateUserGroup(component.userGroups[0], 'UserGroup1');
+        component.updateUserGroup(component.userGroups[0]);
         expect(component.userGroups[0].users).toEqual([
           'User1',
           'User2',
@@ -302,10 +306,24 @@ describe('Release coordinator page', () => {
         tick();
 
         expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
-        component.updateUserGroup(component.userGroups[0], 'UserGroup2');
+        component.userGroups[0].userGroupName = 'UserGroup2';
+        component.updateUserGroup(component.userGroups[0]);
         expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
         expect(component.userGroupSaveError).toEqual(
-          'User group with name UserGroup2 already exists.'
+          'User group with name UserGroup2 already exist.'
+        );
+      }));
+
+      it('should not update user group name when it is empty string', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        component.userGroups[0].userGroupName = '';
+        component.updateUserGroup(component.userGroups[0]);
+        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        expect(component.userGroupSaveError).toEqual(
+          'User group name should not be empty.'
         );
       }));
 
@@ -324,7 +342,7 @@ describe('Release coordinator page', () => {
           {value: 'User10'},
           component.userGroups[0]
         );
-        component.updateUserGroup(component.userGroups[0], 'UserGroup1');
+        component.updateUserGroup(component.userGroups[0]);
         tick();
 
         expect(updateUserGroupSpy).not.toHaveBeenCalled();
@@ -341,14 +359,16 @@ describe('Release coordinator page', () => {
           'updateUserGroupAsync'
         ).and.resolveTo();
 
-        component.updateUserGroup(component.userGroups[0], 'UserGroup5');
+        component.userGroups[0].userGroupName = 'UserGroup5';
+        component.updateUserGroup(component.userGroups[0]);
         tick();
 
         expect(updateUserGroupSpy).toHaveBeenCalled();
         expect(component.statusMessage).toBe(
           'UserGroups successfully updated.'
         );
-        component.updateUserGroup(component.userGroups[0], 'UserGroup1');
+        component.userGroups[0].userGroupName = 'UserGroup1';
+        component.updateUserGroup(component.userGroups[0]);
       }));
 
       it('should not update in case of backend error', fakeAsync(() => {
@@ -370,7 +390,7 @@ describe('Release coordinator page', () => {
           {value: 'User10'},
           component.userGroups[0]
         );
-        component.updateUserGroup(component.userGroups[0], 'UserGroup1');
+        component.updateUserGroup(component.userGroups[0]);
         tick();
 
         expect(updateUserGroupSpy).toHaveBeenCalled();
@@ -386,7 +406,7 @@ describe('Release coordinator page', () => {
         component.ngOnInit();
         tick();
 
-        component.resetUserGroup(component.userGroups[0], 'UserGroup1');
+        component.resetUserGroup(component.userGroups[0]);
 
         expect(confirmSpy).not.toHaveBeenCalled();
       }));
@@ -397,7 +417,8 @@ describe('Release coordinator page', () => {
         confirmSpy.and.returnValue(true);
 
         expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
-        component.resetUserGroup(component.userGroups[0], 'UserGroup5');
+        component.userGroups[0].userGroupName = 'UserGroup5';
+        component.resetUserGroup(component.userGroups[0]);
         expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
       }));
 
@@ -415,7 +436,7 @@ describe('Release coordinator page', () => {
           {value: 'User10'},
           component.userGroups[0]
         );
-        component.resetUserGroup(component.userGroups[0], 'UserGroup1');
+        component.resetUserGroup(component.userGroups[0]);
         expect(component.userGroups[0].users.includes('User10')).toBeTrue();
 
         component.removeUserFromUserGroup(component.userGroups[0], 'User10');
@@ -493,7 +514,7 @@ describe('Release coordinator page', () => {
         result: Promise.resolve(),
       } as NgbModalRef);
       spyOn(rcbas, 'deleteUserGroupAsync').and.returnValue(Promise.resolve());
-      component.deleteUserGroup('UserGroup3');
+      component.deleteUserGroup('userGroupId3');
 
       expect(
         component.userGroups.some(userGroup => userGroup.name === 'UserGroup3')
@@ -509,7 +530,7 @@ describe('Release coordinator page', () => {
         result: Promise.reject(),
       } as NgbModalRef);
       spyOn(rcbas, 'deleteUserGroupAsync').and.returnValue(Promise.resolve());
-      component.deleteUserGroup('UserGroup1');
+      component.deleteUserGroup('userGroupId1');
 
       expect(
         component.userGroups.some(
@@ -531,7 +552,7 @@ describe('Release coordinator page', () => {
         'deleteUserGroupAsync'
       ).and.rejectWith('Internal Server Error.');
 
-      component.deleteUserGroup('UserGroup1');
+      component.deleteUserGroup('userGroupId1');
       tick();
 
       expect(deleteUserGroupSpy).toHaveBeenCalled();
@@ -557,11 +578,13 @@ describe('Release coordinator page', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.userGroupIdsToDetailsShowRecord.UserGroup1).toBeFalse();
-      component.toggleUserGroupDetailsSection('UserGroup1');
-      expect(component.userGroupIdsToDetailsShowRecord.UserGroup1).toBeTrue();
+      expect(
+        component.userGroupIdsToDetailsShowRecord.userGroupId1
+      ).toBeFalse();
+      component.toggleUserGroupDetailsSection('userGroupId1');
+      expect(component.userGroupIdsToDetailsShowRecord.userGroupId1).toBeTrue();
 
-      component.toggleUserGroupDetailsSection('UserGroup1');
+      component.toggleUserGroupDetailsSection('userGroupId1');
     }));
 
     it(
@@ -571,9 +594,9 @@ describe('Release coordinator page', () => {
         component.ngOnInit();
         tick();
 
-        component.toggleUserGroupDetailsSection('UserGroup1');
+        component.toggleUserGroupDetailsSection('userGroupId1');
         component.setUserGroupInEditMode();
-        component.toggleUserGroupDetailsSection('UserGroup2');
+        component.toggleUserGroupDetailsSection('userGroupId2');
 
         expect(component.userGroupSaveError.length > 0).toBeTrue();
       })
@@ -605,7 +628,14 @@ describe('Release coordinator page', () => {
       it('should update the user groups', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        spyOn(rcbas, 'updateUserGroupAsync').and.returnValue(Promise.resolve());
+        const userGroup = UserGroup.createFromBackendDict({
+          user_group_id: 'userGroupId8',
+          name: 'UserGroup8',
+          users: [],
+        });
+        spyOn(rcbas, 'createUserGroupAsync').and.returnValue(
+          Promise.resolve(userGroup)
+        );
 
         component.newUserGroupName = 'UserGroup8';
         component.addUserGroup();
@@ -623,7 +653,7 @@ describe('Release coordinator page', () => {
 
         let updateUserGroupSpy = spyOn(
           rcbas,
-          'updateUserGroupAsync'
+          'createUserGroupAsync'
         ).and.rejectWith('Internal Server Error.');
 
         component.newUserGroupName = 'UserGroup10';
@@ -647,7 +677,8 @@ describe('Release coordinator page', () => {
       tick();
 
       const userGroup = UserGroup.createFromBackendDict({
-        user_group_name: 'random_user_group',
+        user_group_id: 'randomUserGroupId',
+        name: 'random_user_group',
         users: ['user', 'testuser'],
       });
 

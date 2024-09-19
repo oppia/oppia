@@ -1,5 +1,3 @@
-<oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
-
 <oppia-release-coordinator-navbar [(activeTab)]="activeTab"></oppia-release-coordinator-navbar>
 
 <div align="center"
@@ -18,6 +16,9 @@
   </features-tab>
 
   <div class="oppia-tlease-coordiator-misc-tab-container" *ngIf="activeTab === TAB_ID_MISC">
+    <div *ngIf="!isPageFullyLoaded">
+      <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
+    </div>
     <div class="oppia-release-coordinator-page-card oppia-page-card oppia-long-text">
       <h3>Flush the Memory Cache</h3>
       <div class="oppia-action-buttons-container">
@@ -80,24 +81,24 @@
       <h3>Update UserGroups</h3>
       <div>
         <div *ngFor="let userGroup of userGroups">
-          <div *ngIf="!(userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupName])"
+          <div *ngIf="!(userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId])"
                class="oppia-user-group"
-               (click)="toggleUserGroupDetailsSection(userGroup.userGroupName)">
-            {{ oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] }}
+               (click)="toggleUserGroupDetailsSection(userGroup.userGroupId)">
+            {{ userGroup.userGroupName }}
           </div>
-          <div *ngIf="userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupName]"
+          <div *ngIf="userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId]"
                class="oppia-user-group">
-            <input placeholder="{{ oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] }}"
+            <input placeholder="{{ userGroup.userGroupName }}"
                    type="text"
-                   value="{{ oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] }}"
-                   [(ngModel)]="oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName]">
+                   value="{{ userGroup.userGroupName }}"
+                   [(ngModel)]="userGroup.userGroupName">
             <button mat-button matSuffix mat-icon-button
                     aria-label="Clear"
-                    (click)="deleteUserGroup(userGroup.userGroupName); $event.stopPropagation()">
+                    (click)="deleteUserGroup(userGroup.userGroupId); $event.stopPropagation()">
               <mat-icon matListIcon>close</mat-icon>
             </button>
           </div>
-          <div class="user-group-details" *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupName]">
+          <div class="user-group-details" *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]">
             <div *ngIf="!userGroupInEditMode">
               <i class="material-icons oppia-edit-icon"
                  title="Edit User Group"
@@ -158,13 +159,13 @@
               <button mat-raised-button
                       color="primary"
                       type="submit"
-                      (click)="updateUserGroup(userGroup, oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName])">
+                      (click)="updateUserGroup(userGroup)">
                 Save
               </button>
               <button mat-raised-button
                       color="warn"
                       type="button"
-                      (click)="resetUserGroup(userGroup, oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName])">
+                      (click)="resetUserGroup(userGroup)">
                 Cancel
               </button>
             </div>

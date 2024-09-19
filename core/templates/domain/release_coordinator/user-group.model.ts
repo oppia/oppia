@@ -17,7 +17,8 @@
  */
 
 export interface UserGroupBackendDict {
-  user_group_name: string;
+  user_group_id: string;
+  name: string;
   users: string[];
 }
 
@@ -25,15 +26,21 @@ export interface UserGroupBackendDict {
  * Frontend domain object representation of user groups.
  */
 export class UserGroup {
+  userGroupId: string;
   userGroupName: string;
   users: string[];
 
-  constructor(userGroupName: string, users: string[]) {
+  constructor(userGroupId: string, userGroupName: string, users: string[]) {
+    this.userGroupId = userGroupId;
     this.userGroupName = userGroupName;
     this.users = users;
   }
 
   static createFromBackendDict(backendDict: UserGroupBackendDict): UserGroup {
-    return new UserGroup(backendDict.user_group_name, backendDict.users);
+    return new UserGroup(
+      backendDict.user_group_id,
+      backendDict.name,
+      backendDict.users
+    );
   }
 }

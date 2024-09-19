@@ -64,11 +64,9 @@ class UserGroupHandlerNormalizePayloadDict(TypedDict):
     dictionary.
     """
 
-    action: str
     user_group_name: Optional[str]
     user_group_users: Optional[List[str]]
-    old_user_group_name: Optional[str]
-    user_group_to_delete: Optional[str]
+    user_group_id: Optional[str]
 
 
 class UserGroupHandler(
@@ -81,18 +79,11 @@ class UserGroupHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'POST': {
-            'action': {
+        'PUT': {
+            'user_group_id': {
                 'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        'update_user_group',
-                        'delete_user_group'
-                    ]
+                    'type': 'basestring'
                 },
-                # TODO(#13331): Remove default_value when it is confirmed that,
-                # for clearing the search indices of exploration & collection
-                # 'action' field must be provided in the payload.
                 'default_value': None
             },
             'user_group_name': {
@@ -109,16 +100,29 @@ class UserGroupHandler(
                     }
                 },
                 'default_value': None
-            },
-            'old_user_group_name': {
+            }
+        },
+        'DELETE': {
+            'user_group_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        },
+        'POST': {
+            'user_group_name': {
                 'schema': {
                     'type': 'basestring'
                 },
                 'default_value': None
             },
-            'user_group_to_delete': {
+            'user_group_users': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
                 },
                 'default_value': None
             }
@@ -128,13 +132,53 @@ class UserGroupHandler(
     @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
         """Populates the data for user groups."""
-        user_group_models = user_services.get_all_user_groups()
+        user_groups = user_services.get_all_user_group()
         all_users_usernames = user_services.get_all_users_usernames()
+        user_groups_dict_list = []
+        for user_group in user_groups:
+            user_groups_dict_list.append(user_group.to_dict())
 
         self.render_json({
-            'user_group_models': user_group_models,
+            'user_group_dicts': user_groups_dict_list,
             'all_users_usernames': all_users_usernames
         })
+
+    @acl_decorators.can_access_release_coordinator_page
+    def delete(self) -> None:
+        """Performs deletion on the specified user group."""
+        assert self.user_id is not None
+        assert self.normalized_request is not None
+        try:
+            user_group_id = self.normalized_request['user_group_id']
+            assert user_group_id is not None
+            user_services.delete_user_group(user_group_id)
+            self.render_json(self.values)
+        except Exception as e:
+            logging.exception('[RELEASE-COORDINATOR] %s', e)
+            self.render_json({'error': str(e)})
+            raise e
+
+    @acl_decorators.can_access_release_coordinator_page
+    def put(self) -> None:
+        """Updates the specified user group."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        try:
+            user_group_name = (
+                self.normalized_payload.get('user_group_name'))
+            user_group_users = (
+                self.normalized_payload.get('user_group_users'))
+            user_group_id = self.normalized_payload.get('user_group_id')
+            assert user_group_name is not None
+            assert user_group_users is not None
+            assert user_group_id is not None
+            user_services.update_user_group(
+                user_group_id, user_group_name, user_group_users)
+            self.render_json(self.values)
+        except Exception as e:
+            logging.exception('[RELEASE-COORDINATOR] %s', e)
+            self.render_json({'error': str(e)})
+            raise e
 
     @acl_decorators.can_access_release_coordinator_page
     def post(self) -> None:
@@ -143,27 +187,16 @@ class UserGroupHandler(
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        action = self.normalized_payload.get('action')
         try:
-            if action == 'update_user_group':
-                user_group_name = (
-                    self.normalized_payload.get('user_group_name'))
-                user_group_users = (
-                    self.normalized_payload.get('user_group_users'))
-                old_user_group_name = (
-                    self.normalized_payload.get('old_user_group_name'))
-                assert user_group_name is not None
-                assert user_group_users is not None
-                assert old_user_group_name is not None
-                user_services.update_user_group(
-                    user_group_name, user_group_users, old_user_group_name)
-            else:
-                assert action == 'delete_user_group'
-                user_group_to_delete = (
-                    self.normalized_payload.get('user_group_to_delete'))
-                assert user_group_to_delete is not None
-                user_services.delete_user_group(user_group_to_delete)
-            self.render_json(self.values)
+            user_group_name = (
+                self.normalized_payload.get('user_group_name'))
+            user_group_users = (
+                self.normalized_payload.get('user_group_users'))
+            assert user_group_name is not None
+            assert user_group_users is not None
+            user_group = user_services.create_new_user_group(
+                user_group_name, user_group_users)
+            self.render_json({'user_group_dict': user_group.to_dict()})
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)
             self.render_json({'error': str(e)})

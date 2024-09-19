@@ -76,9 +76,9 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   userGroupValidationError: string = '';
   userGroupSaveError: string = '';
   userGroupInEditMode: boolean = false;
-  oldUserGroupNameToNewUserGroupNameRecord: Record<string, string> = {};
   irreversibleActionMessage: string =
     'This action is irreversible. Are you sure?';
+  isPageFullyLoaded: boolean = false;
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_FEATURES: string = ReleaseCoordinatorPageConstants.TAB_ID_FEATURES;
@@ -147,16 +147,15 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     this.allUsersUsernames = data.allUsersUsernames;
     this.userGroupsBackup = new Map(
       this.userGroups.map(userGroup => [
-        userGroup.userGroupName,
+        userGroup.userGroupId,
         cloneDeep(userGroup),
       ])
     );
     for (let userGroup of this.userGroups) {
-      this.userGroupIdsToDetailsShowRecord[userGroup.userGroupName] = false;
-      this.oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] =
-        userGroup.userGroupName;
+      this.userGroupIdsToDetailsShowRecord[userGroup.userGroupId] = false;
     }
     this.loaderService.hideLoadingScreen();
+    this.isPageFullyLoaded = true;
   }
 
   toggleUserGroupDetailsSection(userGroupId: string): void {
@@ -195,13 +194,9 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
           () => {
             this.statusMessage = 'UserGroups successfully deleted.';
             this.userGroups = this.userGroups.filter(
-              userGroup => userGroup.userGroupName !== userGroupId
-            );
-            this.userGroups = this.userGroups.filter(
-              obj => obj.userGroupName !== userGroupId
+              userGroup => userGroup.userGroupId !== userGroupId
             );
             delete this.userGroupIdsToDetailsShowRecord[userGroupId];
-            delete this.oldUserGroupNameToNewUserGroupNameRecord[userGroupId];
             this.userGroupsBackup.delete(userGroupId);
             this.userGroupSaveError = '';
             this.userGroupInEditMode = false;
@@ -259,20 +254,16 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
 
     if (trimmedUserGroupName !== '') {
       this.backendApiService
-        .updateUserGroupAsync(trimmedUserGroupName, [], trimmedUserGroupName)
+        .createUserGroupAsync(trimmedUserGroupName, [])
         .then(
-          () => {
+          userGroup => {
             this.statusMessage = 'UserGroup added.';
-            let newUserGroup = new UserGroup(trimmedUserGroupName, []);
-            this.userGroups.push(newUserGroup);
-            this.userGroupIdsToDetailsShowRecord[trimmedUserGroupName] = false;
+            this.userGroups.push(userGroup);
+            this.userGroupIdsToDetailsShowRecord[userGroup.userGroupId] = false;
             this.userGroupsBackup.set(
-              trimmedUserGroupName,
-              cloneDeep(newUserGroup)
+              userGroup.userGroupId,
+              cloneDeep(userGroup)
             );
-            this.oldUserGroupNameToNewUserGroupNameRecord[
-              trimmedUserGroupName
-            ] = trimmedUserGroupName;
             this.newUserGroupName = '';
             this.cdr.detectChanges();
           },
@@ -292,32 +283,54 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     this.userGroupValidationError = '';
   }
 
-  isUserGroupUpdated(userGroup: UserGroup, newUserGroupName: string): boolean {
-    const original = this.userGroupsBackup.get(userGroup.userGroupName);
+  isUserGroupUpdated(userGroup: UserGroup): boolean {
+    const original = this.userGroupsBackup.get(userGroup.userGroupId);
     if (original === undefined) {
       throw new Error(
         'Backup not found for user group: ' + userGroup.userGroupName
       );
     }
 
-    if (userGroup.userGroupName !== newUserGroupName) {
-      return true;
-    }
-
-    return !isEqual(userGroup.users, original.users);
+    return !isEqual(userGroup, original);
   }
 
-  updateUserGroup(userGroup: UserGroup, newUserGroupName: string): void {
-    if (!this.isUserGroupUpdated(userGroup, newUserGroupName)) {
+  _getAllUserGroupNamesExceptSelf(updatedUserGroup: UserGroup): string[] {
+    let userGroupNames: string[] = [];
+    for (let userGroup of this.userGroupsBackup.values()) {
+      if (userGroup.userGroupId !== updatedUserGroup.userGroupId) {
+        userGroupNames.push(userGroup.userGroupName);
+      }
+    }
+    return userGroupNames;
+  }
+
+  updateUserGroup(userGroup: UserGroup): void {
+    if (!this.isUserGroupUpdated(userGroup)) {
       return;
     }
 
     if (
-      userGroup.userGroupName !== newUserGroupName &&
-      newUserGroupName in this.oldUserGroupNameToNewUserGroupNameRecord
+      this._getAllUserGroupNamesExceptSelf(userGroup).includes(
+        userGroup.userGroupName
+      ) === true
     ) {
       this.userGroupSaveError = '';
-      this.userGroupSaveError = `User group with name ${newUserGroupName} already exists.`;
+      this.userGroupSaveError = `User group with name ${userGroup.userGroupName} already exist.`;
+      let backup = this.userGroupsBackup.get(userGroup.userGroupId);
+      if (backup) {
+        userGroup.userGroupName = backup.userGroupName;
+        userGroup.users = backup.users;
+      }
+      return;
+    }
+
+    if (userGroup.userGroupName.trim() === '') {
+      this.userGroupSaveError = 'User group name should not be empty.';
+      let backup = this.userGroupsBackup.get(userGroup.userGroupId);
+      if (backup) {
+        userGroup.userGroupName = backup.userGroupName;
+        userGroup.users = backup.users;
+      }
       return;
     }
 
@@ -329,29 +342,16 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
 
     this.backendApiService
       .updateUserGroupAsync(
-        newUserGroupName,
-        userGroup.users,
-        userGroup.userGroupName
+        userGroup.userGroupId,
+        userGroup.userGroupName.trim(),
+        userGroup.users
       )
       .then(
         () => {
           this.statusMessage = 'UserGroups successfully updated.';
-          if (userGroup.userGroupName !== newUserGroupName) {
-            this.oldUserGroupNameToNewUserGroupNameRecord[newUserGroupName] =
-              newUserGroupName;
-            delete this.oldUserGroupNameToNewUserGroupNameRecord[
-              userGroup.userGroupName
-            ];
-            this.userGroupIdsToDetailsShowRecord[newUserGroupName] = false;
-            delete this.userGroupIdsToDetailsShowRecord[
-              userGroup.userGroupName
-            ];
-            this.userGroupsBackup.set(newUserGroupName, cloneDeep(userGroup));
-            this.userGroupsBackup.delete(userGroup.userGroupName);
-            userGroup.userGroupName = newUserGroupName;
-          }
+          this.userGroupIdsToDetailsShowRecord[userGroup.userGroupId] = false;
           this.userGroupsBackup.set(
-            userGroup.userGroupName,
+            userGroup.userGroupId,
             cloneDeep(userGroup)
           );
 
@@ -362,12 +362,17 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
         errorResponse => {
           this.statusMessage = `Server error: ${errorResponse}`;
           this.userGroupSaveError = '';
+          let backup = this.userGroupsBackup.get(userGroup.userGroupId);
+          if (backup) {
+            userGroup.userGroupName = backup.userGroupName;
+            userGroup.users = backup.users;
+          }
         }
       );
   }
 
-  resetUserGroup(userGroup: UserGroup, newUserGroupName: string): void {
-    if (this.isUserGroupUpdated(userGroup, newUserGroupName)) {
+  resetUserGroup(userGroup: UserGroup): void {
+    if (this.isUserGroupUpdated(userGroup)) {
       if (
         !this.windowRef.nativeWindow.confirm(
           'This will revert all changes you made. Are you sure?'
@@ -376,12 +381,10 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
         this.userGroupInEditMode = true;
         return;
       }
-      let backup = this.userGroupsBackup.get(userGroup.userGroupName);
+      let backup = this.userGroupsBackup.get(userGroup.userGroupId);
       if (backup) {
         userGroup.userGroupName = backup.userGroupName;
         userGroup.users = backup.users;
-        this.oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] =
-          userGroup.userGroupName;
         this.userGroupSaveError = '';
         this.userInUserGroupValidationError = '';
         this.userGroupValidationError = '';

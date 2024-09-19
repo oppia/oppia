@@ -526,6 +526,94 @@ class UserSettings:
         self.has_viewed_lesson_info_modal_once = True
 
 
+class UserGroupDict(TypedDict):
+    """Dictionary representing the UserGroup object."""
+
+    user_group_id: str
+    name: str
+    users: List[str]
+
+
+class UserGroup:
+    """A domain representation for user group."""
+
+    def __init__(
+        self,
+        user_group_id: str,
+        name: str,
+        users: List[str]
+    ) -> None:
+        """Constructs a UserGroup domain object.
+
+        Args:
+            user_group_id: str. The id of the user group.
+            name: str. The name of the user group.
+            users: List[str]. The list of users attached to user group.
+        """
+        self.user_group_id = user_group_id
+        self.name = name
+        self.users = users
+
+    def validate(self) -> None:
+        """Validate various properties of UserGroup."""
+        if not isinstance(self.name, str):
+            raise utils.ValidationError(
+                'Expected name to be a string, received %s.' % self.name)
+
+        if not isinstance(self.users, list):
+            raise utils.ValidationError(
+                'Expected \'users\' to be a list, received %s.' % self.users)
+
+    def update_name(self, updated_name: str) -> None:
+        """Update user group name.
+
+        Args:
+            updated_name: str. Updated user group name.
+        """
+        self.name = updated_name
+        self.validate()
+
+    def update_users(self, updated_users: List[str]) -> None:
+        """Update users of user group.
+
+        Args:
+            updated_users: List[str]. The updated list of users.
+        """
+        self.users = updated_users
+        self.validate()
+
+    def to_dict(self) -> UserGroupDict:
+        """Convert the UserGroup domain instance into a dictionary form
+        with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the UserGroup class information
+            in a dictionary form.
+        """
+        return {
+            'user_group_id': self.user_group_id,
+            'name': self.name,
+            'users': self.users
+        }
+
+    @classmethod
+    def from_dict(cls, user_group_dict: UserGroupDict) -> UserGroup:
+        """Returns UserGroup domain object from dictionary.
+
+        Args:
+            user_group_dict: UserGroupDict. A dictionary represention of
+                UserGroup object.
+
+        Returns:
+            UserGroup. Returns UserGroup domain object.
+        """
+        return UserGroup(
+            user_group_dict['user_group_id'],
+            user_group_dict['name'],
+            user_group_dict['users']
+        )
+
+
 class UserActionsInfo:
     """A class representing information of user actions.
     Attributes:

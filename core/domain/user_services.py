@@ -42,7 +42,7 @@ from core.platform import models
 import requests
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, TypedDict, Union,
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict,
     overload)
 
 MYPY = False
@@ -499,94 +499,138 @@ def get_user_settings_by_auth_id(
         return None
 
 
-def get_all_user_groups() -> List[Dict[str, Union[str, List[str]]]]:
-    """Return the list of user groups dictionary data having key as user-group
-    name and value as list of users associated to the user-group.
+def get_all_user_group() -> List[user_domain.UserGroup]:
+    """Return the list of user groups.
 
     Returns:
-        user_group_models_dict: List[Dict[str, Union[str, List[str]]]]. List of
-        all user groups dictionary with key as user-group name and value as
-        list of users associated to user-group.
+        user_groups_list: List[user_domain.UserGroup]. List of
+        all user groups.
     """
     user_group_models: List[user_models.UserGroupModel] = list(
         user_models.UserGroupModel.get_all())
-    user_group_models_list = []
+    user_groups_list = []
     for user_group_model in user_group_models:
-        user_group_models_dict: Dict[str, Union[str, List[str]]] = {}
-        user_group_models_dict['user_group_name'] = user_group_model.id
-        user_group_models_dict['users'] = list(
-            user_group_model.users)
-        user_group_models_list.append(user_group_models_dict)
-    return user_group_models_list
+        user_group_dict: user_domain.UserGroupDict = {
+            'user_group_id': user_group_model.id,
+            'name': user_group_model.name,
+            'users': user_group_model.users
+        }
+        user_groups_list.append(user_domain.UserGroup.from_dict(
+            user_group_dict))
+    return user_groups_list
 
 
-def delete_user_group(user_group_to_delete: str) -> None:
-    """Delete the specified user group.
+def _check_if_username_is_valid(
+    user_group_name: str, user_group_users: List[str]
+) -> None:
+    """Checks if the given list of users are valid or not.
 
     Args:
-        user_group_to_delete: str. The name of the user group that need to
-            be removed.
+        user_group_name: str. The name of the user group.
+        user_group_users: List[str]. The list of usernames for
+            which validation needs to be done.
+
+    Raises:
+        Exception. The user inside user group does not exist.
+    """
+    all_users_usernames = get_all_users_usernames()
+    for user in user_group_users:
+        if not user in all_users_usernames:
+            raise Exception(
+                f'The user {user} of user-group {user_group_name} '
+                'does not exist.')
+
+
+def create_new_user_group(
+    user_group_name: str, users: List[str]
+) -> user_domain.UserGroup:
+    """Create new user group.
+
+    Args:
+        user_group_name: str. The name of the user group.
+        users: List[str]. The users associated with the user group.
+
+    Returns:
+        UserGroup. The new user group.
+    """
+    if len(users) > 0:
+        _check_if_username_is_valid(user_group_name, users)
+    user_group_id = user_models.UserGroupModel.get_new_id('')
+    user_group_dict: user_domain.UserGroupDict = {
+        'user_group_id': user_group_id,
+        'name': user_group_name,
+        'users': users
+    }
+    user_group = user_domain.UserGroup.from_dict(user_group_dict)
+    user_group.validate()
+
+    user_models.UserGroupModel(
+        id=user_group.user_group_id,
+        name=user_group.name,
+        users=user_group.users
+    ).put()
+    return user_group
+
+
+def delete_user_group(user_group_id: str) -> None:
+    """Delete the user group with specified id.
+
+    Args:
+        user_group_id: str. The id of the user group to delete.
 
     Raises:
         Exception. The user group trying to delete does not exists.
     """
     user_group_model = user_models.UserGroupModel.get(
-        user_group_to_delete, strict=False)
+        user_group_id, strict=False)
     if user_group_model is None:
-        raise Exception(f'User group {user_group_to_delete} does not exist.')
+        raise Exception(f'User group with id {user_group_id} does not exist.')
     assert user_group_model is not None
     user_group_model.delete()
 
 
 def update_user_group(
+    user_group_id: str,
     user_group_name: str,
-    user_group_users: List[str],
-    old_user_group_name: str
+    user_group_users: List[str]
 ) -> None:
     """Updates the user group.
 
     Args:
+        user_group_id: str. The user group id.
         user_group_name: str. The new name of the user group if needs to
             be updated else old name of the user group.
         user_group_users: List[str]. The list of users for the specified
             user group.
-        old_user_group_name: str. The old name of the user group.
 
     Raises:
-        Exception. The user group trying to update does not exists.
-        Exception. The user trying to add to the user group does not exists.
+        Exception. The user group trying to update does not exist.
     """
+    user_group_model = user_models.UserGroupModel.get(
+        user_group_id, strict=False)
+    if user_group_model is None:
+        raise Exception(f'User group {user_group_name} does not exist.')
+    assert user_group_model is not None
+
     if len(user_group_users) > 0:
-        all_users_usernames = get_all_users_usernames()
-        for user in user_group_users:
-            if not user in all_users_usernames:
-                raise Exception(
-                    f'The user {user} of user-group {old_user_group_name} '
-                    'does not exists.')
+        _check_if_username_is_valid(user_group_name, user_group_users)
     if len(user_group_users) != len(set(user_group_users)):
         raise Exception(
-            f'Users list of user-group {old_user_group_name} contains '
+            f'Users list of user-group {user_group_name} contains '
             'duplicates.'
         )
-    if old_user_group_name == user_group_name:
-        user_group_model = user_models.UserGroupModel.get(
-            user_group_name, strict=False)
-        if user_group_model is None:
-            user_models.UserGroupModel(
-                id=old_user_group_name, users=user_group_users).put()
-        else:
-            user_group_model.users = user_group_users
-            user_group_model.update_timestamps()
-            user_group_model.put()
-    else:
-        user_group_model = user_models.UserGroupModel.get(
-            old_user_group_name, strict=False)
-        if user_group_model is None:
-            raise Exception(f'User group {old_user_group_name} does not exist.')
-        assert user_group_model is not None
-        user_group_model.delete()
-        user_models.UserGroupModel(
-            id=user_group_name, users=user_group_users).put()
+    user_group_dict: user_domain.UserGroupDict = {
+        'user_group_id': user_group_id,
+        'name': user_group_name,
+        'users': user_group_users
+    }
+    user_group = user_domain.UserGroup.from_dict(user_group_dict)
+    user_group.validate()
+
+    user_group_model.users = user_group_users
+    user_group_model.name = user_group_name
+    user_group_model.update_timestamps()
+    user_group_model.put()
 
 
 def get_user_roles_from_id(user_id: str) -> List[str]:

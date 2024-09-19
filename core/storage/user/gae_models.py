@@ -2380,14 +2380,13 @@ class UserGroupModel(base_models.BaseModel):
 
     This model stores the user-groups for which feature-flag or
     platform-parameters can be enabled.
-
-    ID for this model is the name of the user-group.
     """
 
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
     # The user ids of the users.
+    name = datastore_services.StringProperty(required=True, indexed=True)
     users = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
@@ -2409,6 +2408,7 @@ class UserGroupModel(base_models.BaseModel):
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
+            'name': base_models.EXPORT_POLICY.EXPORTED,
             'users': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -2458,6 +2458,7 @@ class UserGroupModel(base_models.BaseModel):
         ).fetch())
         for user_group_model in user_group_models:
             user_data[user_group_model.id] = {
+                'name': user_group_model.name,
                 'users': user_id
             }
 

@@ -508,6 +508,55 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings_model.created_on, time_of_creation)
 
 
+class UserDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        user_group_dict: user_domain.UserGroupDict = {
+            'user_group_id': 'USER_GROUP_ID',
+            'name': 'USER_GROUP_NAME',
+            'users': ['user1', 'user2', 'user3']
+        }
+        self.user_group = user_domain.UserGroup.from_dict(user_group_dict)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_user_group_name(self) -> None:
+        self.user_group.name = 2 # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected name to be a string, received 2.'):
+            self.user_group.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_user_group_users(self) -> None:
+        self.user_group.users = 2 # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected \'users\' to be a list, received 2.'):
+            self.user_group.validate()
+
+    def test_update_name_successfully(self) -> None:
+        self.user_group.update_name('USER_GROUP_NAME_NEW')
+        self.assertEqual(self.user_group.name, 'USER_GROUP_NAME_NEW')
+
+    def test_update_users_successfully(self) -> None:
+        self.user_group.update_users(['user1', 'user2'])
+        self.assertEqual(self.user_group.users, ['user1', 'user2'])
+
+    def test_to_dict_returns_correct_user_group_dict(self) -> None:
+        self.assertEqual(
+            self.user_group.to_dict(),
+            {
+                'user_group_id': 'USER_GROUP_ID',
+                'name': 'USER_GROUP_NAME',
+                'users': ['user1', 'user2', 'user3']
+            }
+        )
+
+
 class UserContributionsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
