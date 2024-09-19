@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
@@ -152,10 +151,3 @@ export class ReviewTestPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'reviewTestPage',
-  downgradeComponent({
-    component: ReviewTestPageComponent,
-  }) as angular.IDirectiveFactory
-);
