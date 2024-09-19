@@ -47,7 +47,7 @@
 	"I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_DESCRIPTION": "O nome inserido aqui aparecerá como o nome do autor nas postagens do blog que você criará. A biografia será exibida na página de postagem do blog específica do autor.",
 	"I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_HEADING": "Edite o nome e a biografia do autor",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Este cartão é bastante longo e os alunos poderão desinteressar-se. Pondere encurtá-lo ou dividi-lo em dois.",
-	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT": "Faça um teste de 10 a 15 perguntas para descobrir por onde começar.",
+	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_TEXT": "Faça um teste de 10 a 15 perguntas para descobrir por onde começar.",
 	"I18N_CLASSROOM_PAGE_HEADING": "A Página da Classe Oppia",
 	"I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "Explore mais lições",
 	"I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "Criado pela Comunidade",
