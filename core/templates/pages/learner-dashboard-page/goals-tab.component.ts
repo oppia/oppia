@@ -109,13 +109,13 @@ export class GoalsTabComponent implements OnInit {
     for (topic of this.completedGoals) {
       this.topicIdsInCompletedGoals.push(topic.id);
       this.completedGoalsTopicPageUrl.push(
-        this.getTopicPageUrl(topic.urlFragment, topic.classroom)
+        this.getTopicPageUrl(topic.urlFragment, topic.classroomUrlFragment)
       );
     }
     for (topic of this.editGoals) {
       this.topicIdsInEditGoals.push(topic.id);
       this.editGoalsTopicPageUrl.push(
-        this.getTopicPageUrl(topic.urlFragment, topic.classroom)
+        this.getTopicPageUrl(topic.urlFragment, topic.classroomUrlFragment)
       );
       this.editGoalsTopicClassification.push(
         this.getTopicClassification(topic.id)
@@ -200,14 +200,17 @@ export class GoalsTabComponent implements OnInit {
           1,
           this.getTopicClassification(topic.id)
         );
-        if (this.untrackedTopics[topic.classroom]) {
+        if (this.untrackedTopics[topic.classroomUrlFragment]) {
           let indexInNewTopics = this.untrackedTopics[
-            topic.classroom
+            topic.classroomUrlFragment
           ].findIndex(topic => topic.id === topicId);
           if (indexInNewTopics !== -1) {
-            this.untrackedTopics[topic.classroom].splice(indexInNewTopics, 1);
-            if (this.untrackedTopics[topic.classroom].length === 0) {
-              delete this.untrackedTopics[topic.classroom];
+            this.untrackedTopics[topic.classroomUrlFragment].splice(
+              indexInNewTopics,
+              1
+            );
+            if (this.untrackedTopics[topic.classroomUrlFragment].length === 0) {
+              delete this.untrackedTopics[topic.classroomUrlFragment];
             }
           }
         }
@@ -274,10 +277,10 @@ export class GoalsTabComponent implements OnInit {
           !this.topicIdsInCurrentGoals.includes(topicId) &&
           !this.topicIdsInPartiallyLearntTopics.includes(topicId)
         ) {
-          if (this.untrackedTopics[topic.classroom]) {
-            this.untrackedTopics[topic.classroom].push(topic);
+          if (this.untrackedTopics[topic.classroomUrlFragment]) {
+            this.untrackedTopics[topic.classroomUrlFragment].push(topic);
           } else {
-            this.untrackedTopics[topic.classroom] = [topic];
+            this.untrackedTopics[topic.classroomUrlFragment] = [topic];
           }
         }
       });
