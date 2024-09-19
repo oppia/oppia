@@ -725,7 +725,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.translationTopicService.onActiveTopicChanged.subscribe(() => {
         this.activeExplorationId = null;
-        this.loadOpportunities();
       })
     );
 
