@@ -752,7 +752,7 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
 
-    def test_access_topic_editor_page_with_curriculum_admin(
+    def test_access_topic_editor_page_with_curriculum_admin_right(
             self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
@@ -774,7 +774,7 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
                 expected_status_int=404)
         self.logout()
 
-    def test_access_topic_editor_page_without_curriculum_admin(self) -> None:
+    def test_access_topic_editor_page_without_curriculum_admin_right(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
             '%s/can_access_topic_editor/%s' % (
