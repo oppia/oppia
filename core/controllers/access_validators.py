@@ -529,7 +529,6 @@ class CollectionEditorAccessValidationPage(
         pass
 
 
-
 class TopicEditorAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The editor page for a single topic."""
@@ -556,13 +555,14 @@ class TopicEditorAccessValidationPage(
             topic_id: str. The ID of the topic.
 
         Raises:
-            NotFoundException: If the topic with the given ID doesn't exist.
+            NotFoundException. If the topic with the given ID doesn't exist.
         """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
             raise self.NotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
+
 
 class ReviewTestsPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
@@ -582,4 +582,3 @@ class ReviewTestsPageAccessValidationHandler(
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
-

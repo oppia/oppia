@@ -774,7 +774,8 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
                 expected_status_int=404)
         self.logout()
 
-    def test_access_topic_editor_page_without_curriculum_admin_right(self) -> None:
+    def test_access_topic_editor_page_without_curriculum_admin_right(
+            self) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
             '%s/can_access_topic_editor/%s' % (
