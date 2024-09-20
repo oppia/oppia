@@ -44,12 +44,12 @@ export class OppiaFooterComponent {
   BRANCH_NAME = AppConstants.BRANCH_NAME;
   SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
 
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   versionInformationIsShown: boolean =
     this.router.url === '/about' && !AppConstants.DEV_MODE;
 
   isSubmitting: boolean = false;
   debounceTimeout: number = 3500;
-  private debounceTimer: ReturnType<typeof setTimeout>;
 
   constructor(
     private alertsService: AlertsService,
@@ -70,26 +70,12 @@ export class OppiaFooterComponent {
   }
 
   subscribeToMailingList(): void {
-    if (this.isSubmitting) {
-      return;
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
     }
-
-    if (!this.validateEmailAddress()) {
-      this.alertsService.addInfoMessage(
-        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
-        10000
-      );
-      return;
-    }
-
-    this.isSubmitting = true;
-
-    clearTimeout(this.debounceTimer);
 
     this.debounceTimer = setTimeout(() => {
-      // Convert null or empty string to null for consistency.
-      const userName = this.name;
-
+      const userName = this.name ? String(this.name) : null;
       this.mailingListBackendApiService
         .subscribeUserToMailingList(
           String(this.emailAddress),
@@ -110,18 +96,14 @@ export class OppiaFooterComponent {
             );
           }
         })
-        .catch(errorResponse => {
+        .catch(() => {
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
             10000
           );
-        })
-        .finally(() => {
-          this.isSubmitting = false;
         });
-    }, this.debounceTimeout);
+    }, 300);
   }
-
 
   navigateToAboutPage(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
