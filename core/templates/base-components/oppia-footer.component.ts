@@ -58,7 +58,9 @@ export class OppiaFooterComponent {
     private router: Router,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService
-  ) {}
+  ) {
+    this.debounceTimer = null;
+  }
 
   getOppiaBlogUrl(): string {
     return '/blog';
