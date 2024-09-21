@@ -135,6 +135,7 @@ export class ConversationSkinComponent {
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
   responseTimeout: NodeJS.Timeout | null = null;
+  correctnessFooter: Boolean = true;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
@@ -260,6 +261,7 @@ export class ConversationSkinComponent {
       this.navigationThroughCardHistoryIsEnabled = false;
       this.checkpointCelebrationModalIsEnabled = false;
       this.skipButtonIsShown = true;
+      this.correctnessFooter = false;
     }
 
     if (!this.contextService.isInExplorationPlayerPage()) {
@@ -567,6 +569,7 @@ export class ConversationSkinComponent {
 
   isCorrectnessFooterEnabled(): boolean {
     return (
+      this.correctnessFooter &&
       this.answerIsCorrect &&
       this.playerPositionService.hasLearnerJustSubmittedAnAnswer()
     );
