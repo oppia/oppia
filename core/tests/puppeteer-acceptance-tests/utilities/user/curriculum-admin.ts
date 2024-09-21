@@ -498,7 +498,9 @@ export class CurriculumAdmin extends BaseUser {
       await this.openTopicEditor(topicName);
     } else {
       await this.clickOn(saveTopicButton);
+
       await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.page.waitForSelector(closeSaveModalButton, {visible: true});
       await this.clickOn(closeSaveModalButton);
       await this.page.waitForSelector(modalDiv, {hidden: true});
     }
@@ -1211,14 +1213,20 @@ export class CurriculumAdmin extends BaseUser {
     skillName: string
   ): Promise<void> {
     await this.goto(topicAndSkillsDashboardUrl);
+    await this.waitForPageToFullyLoad();
+
+    // If no skills or Topics is created than skills tab will not be present.
     const isTextPresent = await this.isTextPresentOnPage(
       'No topics or skills have been created yet.'
     );
+
     if (isTextPresent) {
       showMessage(`The skill "${skillName}" is not present on the Topics and Skills
       Dashboard as expected.`);
       return;
     }
+
+    // Visiting the skills tab to check if the skill is present.
     await this.clickOn(skillsTab);
     const isSkillPresent = await this.isTextPresentOnPage(skillName);
     if (isSkillPresent) {
@@ -1313,6 +1321,7 @@ export class CurriculumAdmin extends BaseUser {
     if (classroomTiles.length === 0) {
       throw new Error('No classrooms are present.');
     }
+
     let foundClassroom = false;
 
     for (let i = 0; i < classroomTiles.length; i++) {
@@ -1322,7 +1331,7 @@ export class CurriculumAdmin extends BaseUser {
       );
 
       if (currentClassroomName === classroomName) {
-        await this.clickOn(classroomTileSelector);
+        await classroomTiles[i].click();
         await this.page.waitForSelector(editClassroomConfigButton);
         await this.clickOn(editClassroomConfigButton);
         await this.page.waitForSelector(closeClassroomConfigButton);
@@ -1333,7 +1342,7 @@ export class CurriculumAdmin extends BaseUser {
     }
 
     if (!foundClassroom) {
-      throw new Error(`${classroomName} classroom do not exists.`);
+      throw new Error(`${classroomName} classroom does not exist.`);
     }
   }
 
@@ -1360,8 +1369,8 @@ export class CurriculumAdmin extends BaseUser {
   async updateClassroom(
     classroomName: string,
     teaserText: string,
-    courseDetails: string,
-    topicListIntro: string
+    topicListIntro: string,
+    courseDetails: string
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
@@ -1370,13 +1379,11 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
     await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
     await this.clickOn(classroomThumbnailContainer);
-    await this.page.waitForSelector(imageUploaderModal, {visible: true});
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
     await this.clickOn(uploadClassroomImageButton);
-    await this.page.waitForSelector(imageUploaderModal, {visible: false});
-
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
 
     await this.clickOn(classroomBannerContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
@@ -1560,9 +1567,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.createNewClassroom(classroomName, urlFragment);
     await this.updateClassroom(
       classroomName,
-      'Teaser text',
-      'Course details',
-      'Topic list intro'
+      'Welcome to Math classroom!',
+      'This course covers basic algebra and trigonometry.',
+      'In this course, you will learn the following topics: algbera and trigonometry,'
     );
     await this.addTopicToClassroom(classroomName, topicToBeAssigned);
     await this.publishClassroom(classroomName);

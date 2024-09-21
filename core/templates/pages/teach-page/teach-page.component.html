@@ -49,10 +49,10 @@
     <p class="oppia-teach-subtitle">
       {{ 'I18N_TEACH_PAGE_CREATORS_SECTION_TITLE' | translate }}
     </p>
-    <div #creatorsCarouselContainer class="oppia-teach-creators-carousel">
+    <div #creatorsCarouselContainer class="oppia-teach-creators-carousel e2e-test-teach-page-creators-carousel">
       <div class="oppia-teach-creators-carousel-item" *ngFor="let index of activeCreatorsIndices">
         <div class="oppia-teach-creators-carousel-item-header">
-          <p class="oppia-teach-subtext oppia-teach-text">{{ creatorsData[index].name | translate  }}</p>
+          <p class="oppia-teach-subtext oppia-teach-text e2e-test-teach-page-lesson-creator-name">{{ creatorsData[index].name | translate  }}</p>
           <p class="oppia-teach-subtext">{{ creatorsData[index].country | translate  }}</p>
         </div>
         <div class="oppia-teach-creators-carousel-item-image">
@@ -74,7 +74,8 @@
     </div>
     <div class="oppia-teach-creators-arrows-container">
       <button (click)="showPreviousCreators()"
-              [disabled]="creatorsCarouselLeftArrowIsDisabled">
+              [disabled]="creatorsCarouselLeftArrowIsDisabled"
+              class="e2e-test-teach-page-creators-carousel-prev-btn">
         <i class="fas"
            [ngClass]="{'oppia-disabled-icon': creatorsCarouselLeftArrowIsDisabled,
            'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL()}">
@@ -82,7 +83,8 @@
         <span class="sr-only">Previous</span>
       </button>
       <button (click)="showNextCreators()"
-              [disabled]="creatorsCarouselRightArrowIsDisabled">
+              [disabled]="creatorsCarouselRightArrowIsDisabled"
+              class="e2e-test-teach-page-creators-carousel-next-btn">
         <i class="fas"
            [ngClass]="{'oppia-disabled-icon': creatorsCarouselRightArrowIsDisabled,
            'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL()}">
@@ -138,7 +140,7 @@
         <oppia-primary-button
           buttonHref="/learn"
           (onClickPrimaryButton)="onClickExploreLessonsButton()"
-          [customClasses]="['oppia-teach-btn', 'oppia-teach-lesson-mobile-content']"
+          [customClasses]="['oppia-teach-btn', 'oppia-teach-lesson-mobile-content', 'e2e-test-teach-page-explore-lessons-button-at-the-top']"
           buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
         </oppia-primary-button>
       </div>
@@ -221,8 +223,8 @@
     <p class="oppia-teach-subtitle">
       {{ 'I18N_TEACH_PAGE_TESTIMONIALS_SECTION_TITLE' | translate}}
     </p>
-    <div class="oppia-teach-testimonials-container">
-      <button class="oppia-teach-testimonial-carousel-prev-btn"
+    <div class="oppia-teach-testimonials-container e2e-test-teach-page-testimonial-carousel">
+      <button class="oppia-teach-testimonial-carousel-prev-btn e2e-test-teach-page-testimonial-carousel-prev-btn"
               (click)="moveTestimonialCarouselToPreviousSlide()">
         <i class="oppia-teach-testimonial-carousel-prev-icon fas"
             [ngClass]="{'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL()}">
@@ -242,7 +244,7 @@
                 </picture>
               </div>
               <div class="oppia-teach-testimonial-right">
-                <p class="oppia-teach-testimonial-name">
+                <p class="oppia-teach-testimonial-name e2e-test-teach-page-testimonial-name">
                   {{ testimonial.personDetails | translate }}
                 </p>
                 <p class="oppia-teach-subtext oppia-teach-bolded-text">
@@ -259,7 +261,7 @@
           </div>
         </ng-template>
       </ngb-carousel>
-      <button class="oppia-teach-testimonial-carousel-next-btn"
+      <button class="oppia-teach-testimonial-carousel-next-btn e2e-test-teach-page-testimonial-carousel-next-btn"
               (click)="moveTestimonialCarouselToNextSlide()">
         <i class="oppia-teach-testimonial-carousel-next-icon fas"
            [ngClass]="{'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL()}">
@@ -322,14 +324,14 @@
       <oppia-primary-button
         buttonHref="/learn"
         (onClickPrimaryButton)="onClickExploreLessonsButton()"
-        [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-explore-lessons-button']"
+        [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-explore-lessons-button-at-the-bottom']"
         buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
       </oppia-primary-button>
       <oppia-primary-button
         [buttonHref]="androidUrl"
-        (onClickPrimaryButton)="onClickDownloadAndroidAppButton()"
-        [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn']"
-        buttonText="{{ 'I18N_ACTION_DOWNLOAD_ANDRIOD_APP' | translate }}">
+        (onClickPrimaryButton)="onClickGetAndroidAppButton()"
+        [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn', 'e2e-test-teach-page-download-android-app-button']"
+        buttonText="{{ 'I18N_ACTION_GET_ANDRIOD_APP' | translate }}">
       </oppia-primary-button>
     </div>
   </div>

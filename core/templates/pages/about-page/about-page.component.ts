@@ -48,8 +48,15 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     {
       title: 'I18N_ABOUT_PAGE_FEATURE_TITLE1',
       text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT1',
-      customPanelClassNames: ['feature-panel'],
-      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      customPanelClassNames: [
+        'feature-panel',
+        'e2e-test-about-page-features-panel',
+      ],
+      customTitleClassNames: [
+        'feature-title',
+        'oppia-about-platform-subtext',
+        'e2e-test-about-page-features-panel-title-desktop',
+      ],
       panelIsCollapsed: true,
     },
     {
@@ -308,8 +315,8 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
   }
 
-  onClickDownloadAndroidAppButton(): void {
-    this.siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent();
+  onClickGetAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickGetAndroidAppButtonEvent();
   }
 
   onClickDonateCTAButton(): void {

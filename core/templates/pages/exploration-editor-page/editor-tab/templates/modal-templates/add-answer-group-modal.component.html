@@ -59,11 +59,11 @@
   </form>
 
   <div class="oppia-correctness-label-editor" *ngIf="!isCurrentInteractionLinear()">
-    <input id="labelledAsCorrect"
+    <input id="labelledAsCorrectForAnswerGroupModal"
            class="e2e-test-editor-correctness-toggle mr-2"
            type="checkbox"
            [(ngModel)]="tmpOutcome.labelledAsCorrect">
-    <strong><label for="labelledAsCorrect">The answers in this group are correct</label></strong>
+    <strong><label for="labelledAsCorrectForAnswerGroupModal">The answers in this group are correct</label></strong>
   </div>
 
   <oppia-question-misconception-editor *ngIf="questionModeEnabled || tagMisconceptionsFeatureFlagIsEnabled"
