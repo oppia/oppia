@@ -1169,10 +1169,12 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_email_provider_error(self) -> None:
-        def raise_exception() -> None:
+        def mock_add_user_to_raise_exception(
+                unused_email: str, unused_tag: str, name: str) -> None:
             raise Exception('Backend error')
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_mailing_list', raise_exception)
+            user_services, 'add_user_to_mailing_list',
+            mock_add_user_to_raise_exception)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
