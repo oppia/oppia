@@ -309,3 +309,29 @@
     left: 595px;
   }
 }
+
+.oppia-learner-dash-progress-empty-div {
+  align-items: center;
+  background-color: #fff;
+  border-radius: .25em;
+  display: flex;
+  flex-direction: column;
+  height: 75vh;
+  justify-content: center;
+  max-height: 750px;
+  padding: 16px;
+  width: 100%;
+}
+
+.oppia-learner-dash-progress-empty-text {
+  color: #333;
+  font-size: 18px;
+  max-width: 522px;
+  text-align: center;
+}
+
+@media screen and (max-width: 400px) {
+  .oppia-learner-dash-progress-empty-div {
+    align-items: normal;
+  }
+}
