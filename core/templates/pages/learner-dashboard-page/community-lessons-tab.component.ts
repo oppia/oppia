@@ -29,7 +29,8 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {Subscription} from 'rxjs';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UserService} from 'services/user.service';
-
+import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {Subtopic} from 'domain/topic/subtopic.model';
 import './community-lessons-tab.component.css';
 
 interface ShowMoreInSectionDict {
@@ -46,7 +47,8 @@ export class CommunityLessonsTabComponent {
     private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
-    private userService: UserService
+    private userService: UserService,
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -124,6 +126,7 @@ export class CommunityLessonsTabComponent {
 
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
+  dataLoaded: boolean = false;
 
   ngOnInit(): void {
     var tempIncompleteLessonsList: (
@@ -184,6 +187,8 @@ export class CommunityLessonsTabComponent {
     this.displayInCommunityLessons = this.allCommunityLessons;
     this.selectedSection = this.all;
     this.dropdownEnabled = false;
+
+    this.getSubtopicMasteryData();
   }
 
   getProfileImagePngDataUrl(username: string): string {
@@ -479,5 +484,50 @@ export class CommunityLessonsTabComponent {
       this.totalIncompleteLessonsList.length === 0 &&
       this.totalCompletedLessonsList.length === 0
     );
+  }
+
+  async getSubtopicMasteryData(): Promise<void> {
+    const results = this.learnerDashboardBackendApiService.fetchSubtopicMastery(
+      [
+        ...this.partiallyLearntTopicsList.map(topic => topic.id),
+        ...this.learntTopicsList.map(topic => topic.id),
+      ]
+    );
+
+    for (const partialTopic of this.partiallyLearntTopicsList) {
+      this.partialTopicMastery.push({
+        topic: partialTopic,
+        progress: this.getSubtopicProgress(
+          partialTopic.subtopics,
+          results[partialTopic.id]
+        ),
+      });
+    }
+
+    for (const learntTopic of this.learntTopicsList) {
+      this.learntTopicMastery.push({
+        topic: learntTopic,
+        progress: this.getSubtopicProgress(
+          learntTopic.subtopics,
+          results[learntTopic.id]
+        ),
+      });
+    }
+    this.dataLoaded = true;
+  }
+
+  getSubtopicProgress(
+    allSubtopics: Subtopic[],
+    mastery: Record<string, number>
+  ): number[] {
+    const allProgress = [];
+    for (const subtopic of allSubtopics) {
+      if (mastery[subtopic.getId()] === undefined) {
+        allProgress.push(0);
+      } else {
+        allProgress.push(mastery[subtopic.getId()] * 100);
+      }
+    }
+    return allProgress;
   }
 }
