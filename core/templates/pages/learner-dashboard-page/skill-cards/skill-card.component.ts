@@ -50,7 +50,7 @@ export class SkillCardComponent {
     private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.imgUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
       AppConstants.ENTITY_TYPE.TOPIC,
       this.topic.getId(),
@@ -77,12 +77,12 @@ export class SkillCardComponent {
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
       {
         topic_url_fragment: this.topic.getUrlFragment(),
-        classroom_url_fragment: this.topic.getClassroom(),
+        classroom_url_fragment: this.topic.getClassroomName(),
         stringified_subtopic_ids: JSON.stringify([this.subtopic.getId()]),
       }
     );
     this.siteAnalyticsService.registerPracticeSessionStartEvent(
-      this.topic.getClassroom(),
+      this.topic.getClassroomName(),
       this.topic.getName(),
       [this.subtopic.getId()].toString()
     );
