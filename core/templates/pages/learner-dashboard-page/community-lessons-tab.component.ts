@@ -23,6 +23,7 @@ import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants'
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ProfileSummary} from 'domain/user/profile-summary.model';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {AppConstants} from 'app.constants';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {Subscription} from 'rxjs';
@@ -61,6 +62,8 @@ export class CommunityLessonsTabComponent {
   @Input() completedToIncompleteCollections!: string[];
   @Input() learnerDashboardRedesignFeatureFlag!: boolean;
   @Input() username!: string;
+  @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
+  @Input() learntTopicsList!: LearnerTopicSummary[];
   selectedSection!: string;
   noCommunityLessonActivity: boolean = false;
   noPlaylistActivity: boolean = false;
@@ -92,6 +95,9 @@ export class CommunityLessonsTabComponent {
 
   displayInCommunityLessons: (LearnerExplorationSummary | CollectionSummary)[] =
     [];
+
+  partialTopicMastery: {topic: LearnerTopicSummary; progress: number[]}[] = [];
+  learntTopicMastery: {topic: LearnerTopicSummary; progress: number[]}[] = [];
 
   completed: string = 'Completed';
   incomplete: string = 'Incomplete';
