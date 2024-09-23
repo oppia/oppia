@@ -182,6 +182,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'url_fragment': 'title',
             'topic_url_fragment': 'name-one',
             'classroom_url_fragment': 'staging',
+            'classroom_name': 'staging',
             'story_is_published': True,
             'completed_node_titles': [], 'all_node_dicts': []}
 
@@ -195,6 +196,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'url_fragment': 'title',
             'topic_url_fragment': 'name-one',
             'classroom_url_fragment': 'staging',
+            'classroom_name': 'staging',
             'story_is_published': True,
             'completed_node_titles': [], 'all_node_dicts': []}
 
