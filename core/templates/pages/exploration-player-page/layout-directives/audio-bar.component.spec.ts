@@ -25,6 +25,7 @@ import {
   TestBed,
   tick,
   waitForAsync,
+  flush,
 } from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -136,6 +137,34 @@ describe('Audio Bar Component', () => {
 
     expect(currentTimeSpy).toHaveBeenCalledWith(100);
   });
+
+  it('should be able to initialize the compoenent', fakeAsync(() => {
+    let params = {
+      audioTranslations: {},
+      componentName: 'feedback',
+      html: '',
+    };
+    let mockOnAutoplayAudioEventEmitter = new EventEmitter();
+    spyOnProperty(audioPlayerService, 'onAutoplayAudio').and.returnValue(
+      mockOnAutoplayAudioEventEmitter
+    );
+
+    component.ngOnInit();
+    component.isPaused = false;
+    fixture.detectChanges();
+
+    mockOnAutoplayAudioEventEmitter.emit(params);
+    voiceoverPlayerService.onActiveVoiceoverChanged.emit();
+    voiceoverPlayerService.onTranslationLanguageChanged.emit();
+
+    flush();
+    discardPeriodicTasks();
+    fixture.detectChanges();
+
+    expect(component.audioBarIsExpanded).toBeFalse();
+    expect(component.progressBarIsShown).toBeFalse();
+    expect(component.audioLoadingIndicatorIsShown).toBeFalse();
+  }));
 
   it('should set current voiceover time after the view has changed', () => {
     spyOn(audioPlayerService, 'getCurrentTime').and.returnValue(5);

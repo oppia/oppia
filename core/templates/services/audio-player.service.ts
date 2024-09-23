@@ -64,17 +64,20 @@ export class AudioPlayerService {
       .loadAudio(this.contextService.getExplorationId(), filename)
       .then(
         (loadedAudioFile: AudioFile) => {
+          console.log('Hello -----------------');
           this._currentTrack = new Howl({
             src: [URL.createObjectURL(loadedAudioFile.data)],
             format: ['mp3'],
           });
           this._currentTrack.on('load', () => {
+            console.log('hello 1');
             this._stopIntervalSubject.next();
             this._currentTrackFilename = loadedAudioFile.filename;
             this._lastPauseOrSeekPos = 0;
             successCallback();
           });
           this._currentTrack.on('end', () => {
+            console.log('hello 2');
             this._stopIntervalSubject.next();
             this._currentTrack = null;
             this._currentTrackFilename = null;

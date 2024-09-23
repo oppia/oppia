@@ -278,12 +278,11 @@ describe('InputResponsePairComponent', () => {
 
   it(
     'should return empty css class for feedback audio highlight ' +
-      'when audio player service is not playing',
+      'when voiceover player service is not playing',
     () => {
-      spyOn(
-        audioTranslationManagerService,
-        'getCurrentComponentName'
-      ).and.returnValue(AppConstants.COMPONENT_NAME_FEEDBACK);
+      spyOn(voiceoverPlayerService, 'getActiveComponentName').and.returnValue(
+        AppConstants.COMPONENT_NAME_FEEDBACK
+      );
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
       component.isLastPair = true;
 
@@ -312,10 +311,9 @@ describe('InputResponsePairComponent', () => {
     'should return empty css class for feedback audio highlight ' +
       'when current component name does not match',
     () => {
-      spyOn(
-        audioTranslationManagerService,
-        'getCurrentComponentName'
-      ).and.returnValue('sample');
+      spyOn(voiceoverPlayerService, 'getActiveComponentName').and.returnValue(
+        'sample'
+      );
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
       component.isLastPair = true;
 
