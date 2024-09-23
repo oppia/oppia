@@ -50,6 +50,7 @@ class QuestionCreationHandler(
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
+        'GET':{},
         'POST': {
             'question_dict': {
                 'schema': {
@@ -90,6 +91,8 @@ class QuestionCreationHandler(
                 }
             }
         },
+        'PUT': {},
+        'DELETE': {}
     }
 
     @acl_decorators.can_manage_question_skill_status
