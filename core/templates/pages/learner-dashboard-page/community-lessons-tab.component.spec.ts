@@ -37,7 +37,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UserService} from 'services/user.service';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
     sectionNameI18nId: null,
@@ -295,6 +295,14 @@ describe('Community lessons tab Component', () => {
     component.totalIncompleteLessonsList = [];
     explorationSummary =
       LearnerExplorationSummary.createFromBackendDict(sampleExploration);
+    component.partialTopicMastery = [];
+    component.learntTopicMastery = [];
+    component.partiallyLearntTopicsList = [
+      LearnerTopicSummary.createFromBackendDict(newTopicSummaryDict),
+    ];
+    component.learntTopicsList = [
+      LearnerTopicSummary.createFromBackendDict(learntTopicSummaryDict),
+    ];
 
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
       'default-image-url-png',
