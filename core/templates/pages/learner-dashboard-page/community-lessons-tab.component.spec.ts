@@ -21,6 +21,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
+  tick,
 } from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
@@ -35,6 +36,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UserService} from 'services/user.service';
+import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
@@ -86,6 +88,160 @@ describe('Community lessons tab Component', () => {
   let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService;
   let explorationSummary: LearnerExplorationSummary;
+  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+
+  let subtopic = {
+    skill_ids: ['skill_id_2'],
+    id: 1,
+    title: 'subtopic_name',
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#F8BF74',
+    url_fragment: 'subtopic-name',
+  };
+
+  let nodeDict1 = {
+    id: 'node_1',
+    thumbnail_filename: 'image1.png',
+    title: 'Chapter 1',
+    description: 'Description 1',
+    prerequisite_skill_ids: ['skill_1'],
+    acquired_skill_ids: ['skill_2'],
+    destination_node_ids: ['node_2'],
+    outline: 'Outline',
+    exploration_id: 'exp_1',
+    outline_is_finalized: false,
+    thumbnail_bg_color: '#a33f40',
+    status: 'Published',
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
+    unpublishing_reason: null,
+  };
+  let nodeDict2 = {
+    id: 'node_2',
+    thumbnail_filename: 'image2.png',
+    title: 'Chapter 2',
+    description: 'Description 1',
+    prerequisite_skill_ids: ['skill_1'],
+    acquired_skill_ids: ['skill_2'],
+    destination_node_ids: ['node_3'],
+    outline: 'Outline',
+    exploration_id: 'exp_2',
+    outline_is_finalized: false,
+    thumbnail_bg_color: '#a33f40',
+    status: 'Published',
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
+    unpublishing_reason: null,
+  };
+  const learntTopicSummaryDict = {
+    id: 'sample_topic_id',
+    name: 'Topic Name',
+    language_code: 'en',
+    description: 'description',
+    version: 1,
+    story_titles: ['Story 1'],
+    total_published_node_count: 2,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA',
+    classroom: 'math',
+    practice_tab_is_displayed: false,
+    canonical_story_summary_dict: [
+      {
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1', 'Chapter 2'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 2'],
+        all_node_dicts: [nodeDict1, nodeDict2],
+        url_fragment: 'story-title',
+        topic_name: 'Topic Name',
+        classroom_url_fragment: 'math',
+        topic_url_fragment: 'topic-name',
+      },
+    ],
+    url_fragment: 'topic-name',
+    subtopics: [subtopic],
+    degrees_of_mastery: {
+      skill_id_1: 1,
+      skill_id_2: 1,
+    },
+    skill_descriptions: {
+      skill_id_1: 'Skill Description 1',
+      skill_id_2: 'Skill Description 2',
+    },
+  };
+
+  let newSubtopic = {
+    skill_ids: ['skill_id_3'],
+    id: 1,
+    title: 'subtopic_name',
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#F8BF74',
+    url_fragment: 'subtopic-name',
+  };
+
+  let newNodeDict = {
+    id: 'node_1',
+    thumbnail_filename: 'image1.png',
+    title: 'Chapter 1',
+    description: 'Description 1',
+    prerequisite_skill_ids: ['skill_3'],
+    acquired_skill_ids: ['skill_3'],
+    destination_node_ids: [''],
+    outline: 'Outline',
+    exploration_id: 'exp_1',
+    outline_is_finalized: false,
+    thumbnail_bg_color: '#a33f40',
+    status: 'Published',
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
+    unpublishing_reason: null,
+  };
+
+  const newTopicSummaryDict = {
+    id: 'new_sample_topic_id',
+    name: 'New Topic Name',
+    language_code: 'en',
+    description: 'description',
+    version: 1,
+    story_titles: ['Story 1'],
+    total_published_node_count: 2,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA',
+    classroom: 'math',
+    practice_tab_is_displayed: false,
+    canonical_story_summary_dict: [
+      {
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: [''],
+        all_node_dicts: [newNodeDict],
+        url_fragment: 'new-story-title',
+        topic_name: 'New Topic Name',
+        classroom_url_fragment: 'math',
+        topic_url_fragment: 'new-topic-name',
+      },
+    ],
+    url_fragment: 'new-topic-name',
+    subtopics: [newSubtopic],
+    degrees_of_mastery: {
+      skill_id_3: 0,
+    },
+    skill_descriptions: {
+      skill_id_3: 'Skill Description 3',
+    },
+  };
 
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
@@ -124,6 +280,9 @@ describe('Community lessons tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     userService = TestBed.inject(UserService);
+    learnerDashboardBackendApiService = TestBed.inject(
+      LearnerDashboardBackendApiService
+    );
     component.incompleteExplorationsList = [];
     component.incompleteCollectionsList = [];
     component.completedExplorationsList = [];
@@ -835,4 +994,22 @@ describe('Community lessons tab Component', () => {
 
     expect(component.isLearnerStateEmpty()).toBeFalse();
   });
+
+  it('should correctly get subtopic masteries', fakeAsync(() => {
+    spyOn(learnerDashboardBackendApiService, 'fetchSubtopicMastery')
+      .withArgs(['new_sample_topic_id'])
+      .and.returnValue(Promise.resolve({new_sample_topic_id: {}}))
+      .withArgs(['sample_topic_id'])
+      .and.returnValue(Promise.resolve({sample_topic_id: {1: 1}}));
+
+    component.getSubtopicMasteryData();
+    tick();
+
+    expect(component.partialTopicMastery).toEqual([
+      {topic: component.partiallyLearntTopicsList[0], progress: [0]},
+    ]);
+    expect(component.learntTopicMastery).toEqual([
+      {topic: component.learntTopicsList[0], progress: [100]},
+    ]);
+  }));
 });
