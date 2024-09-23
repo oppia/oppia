@@ -145,7 +145,8 @@ describe('Community lessons tab Component', () => {
     total_published_node_count: 2,
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#C6DCDA',
-    classroom: 'math',
+    classroom_name: 'math',
+    classroom_url_fragment: 'math',
     practice_tab_is_displayed: false,
     canonical_story_summary_dict: [
       {
@@ -177,7 +178,7 @@ describe('Community lessons tab Component', () => {
   };
 
   let newSubtopic = {
-    skill_ids: ['skill_id_3'],
+    skill_ids: ['skill_id_3', 'skill_id_4'],
     id: 1,
     title: 'subtopic_name',
     thumbnail_filename: 'image.svg',
@@ -191,7 +192,7 @@ describe('Community lessons tab Component', () => {
     title: 'Chapter 1',
     description: 'Description 1',
     prerequisite_skill_ids: ['skill_3'],
-    acquired_skill_ids: ['skill_3'],
+    acquired_skill_ids: ['skill_4'],
     destination_node_ids: [''],
     outline: 'Outline',
     exploration_id: 'exp_1',
@@ -214,7 +215,8 @@ describe('Community lessons tab Component', () => {
     total_published_node_count: 2,
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#C6DCDA',
-    classroom: 'math',
+    classroom_name: 'math',
+    classroom_url_fragment: 'math',
     practice_tab_is_displayed: false,
     canonical_story_summary_dict: [
       {
@@ -237,9 +239,11 @@ describe('Community lessons tab Component', () => {
     subtopics: [newSubtopic],
     degrees_of_mastery: {
       skill_id_3: 0,
+      skill_id_4: 0.75,
     },
     skill_descriptions: {
       skill_id_3: 'Skill Description 3',
+      skill_id_4: 'Skill Description 5',
     },
   };
 
@@ -1027,10 +1031,10 @@ describe('Community lessons tab Component', () => {
 
   it('should correctly get subtopic masteries', fakeAsync(() => {
     spyOn(learnerDashboardBackendApiService, 'fetchSubtopicMastery')
-      .withArgs(['new_sample_topic_id'])
-      .and.returnValue(Promise.resolve({new_sample_topic_id: {}}))
-      .withArgs(['sample_topic_id'])
-      .and.returnValue(Promise.resolve({sample_topic_id: {1: 1}}));
+      .withArgs(['new_sample_topic_id', 'sample_topic_id'])
+      .and.returnValue(
+        Promise.resolve({new_sample_topic_id: {}, sample_topic_id: {1: 1}})
+      );
 
     component.getSubtopicMasteryData();
     tick();
@@ -1042,4 +1046,14 @@ describe('Community lessons tab Component', () => {
       {topic: component.learntTopicsList[0], progress: [100]},
     ]);
   }));
+
+  //TODO - check to see if acquired ids - skill_3 or skill_id_3
+  it('should correctly get total number of skills', () => {
+    const allSkills = [
+      {topic: component.partiallyLearntTopicsList[0], progress: [0, 0.75]},
+      {topic: component.partiallyLearntTopicsList[0], progress: [0, 0.75]},
+    ];
+
+    expect(allSkills.reduce(component.getTotalSkillCards, 0)).toBe(4);
+  });
 });

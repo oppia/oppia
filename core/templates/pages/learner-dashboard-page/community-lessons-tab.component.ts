@@ -488,13 +488,11 @@ export class CommunityLessonsTabComponent {
   }
 
   async getSubtopicMasteryData(): Promise<void> {
-    const results = this.learnerDashboardBackendApiService.fetchSubtopicMastery(
-      [
+    const results =
+      await this.learnerDashboardBackendApiService.fetchSubtopicMastery([
         ...this.partiallyLearntTopicsList.map(topic => topic.id),
         ...this.learntTopicsList.map(topic => topic.id),
-      ]
-    );
-
+      ]);
     for (const partialTopic of this.partiallyLearntTopicsList) {
       this.partialTopicMastery.push({
         topic: partialTopic,
@@ -530,5 +528,12 @@ export class CommunityLessonsTabComponent {
       }
     }
     return allProgress;
+  }
+
+  getTotalSkillCards(
+    acc: number,
+    curr: {topic: LearnerTopicSummary; progress: number[]}
+  ): number {
+    return acc + curr.topic.subtopics.length;
   }
 }

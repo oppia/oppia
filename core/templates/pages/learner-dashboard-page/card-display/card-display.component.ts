@@ -21,8 +21,8 @@ import {
   Input,
   ViewChild,
   HostListener,
-  AfterViewInit,
   ChangeDetectorRef,
+  AfterContentInit,
 } from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -30,7 +30,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
 })
-export class CardDisplayComponent implements AfterViewInit {
+export class CardDisplayComponent implements AfterContentInit {
   @Input() headingI18n!: string;
   @Input() numCards!: number;
   @Input() tabType!: string;
@@ -54,8 +54,9 @@ export class CardDisplayComponent implements AfterViewInit {
     this.isLanguageRTL = this.I18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  ngAfterViewInit(): void {
+  ngAfterContentInit(): void {
     this.toggleButtonVisibility = this.isToggleButtonVisible();
+
     this.cdr.detectChanges();
   }
 

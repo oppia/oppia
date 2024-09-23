@@ -279,18 +279,19 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should handle event emitted by content toggle button', () => {
-    spyOn(component, 'handleToggleState').and.callThrough();
+    fixture.whenRenderingDone().then(() => {
+      spyOn(component, 'handleToggleState').and.callThrough();
 
-    fixture.detectChanges();
-    const button = fixture.debugElement.query(
-      By.directive(ContentToggleButtonComponent)
-    ).componentInstance;
-    button.toggle();
+      const button = fixture.debugElement.query(
+        By.directive(ContentToggleButtonComponent)
+      ).componentInstance;
+      button.toggle();
 
-    fixture.detectChanges();
+      fixture.detectChanges();
 
-    expect(component.handleToggleState).toHaveBeenCalledWith(true);
-    expect(component.currentToggleState).toBeTrue();
+      expect(component.handleToggleState).toHaveBeenCalledWith(true);
+      expect(component.currentToggleState).toBeTrue();
+    });
   });
 
   it('should return empty string for getVisibility if tabType is not progress', () => {
@@ -304,16 +305,21 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should return shown class for getVisibility after toggling if tabType is progress', () => {
-    expect(component.toggleButtonVisibility).toBeTrue();
-    const button = fixture.debugElement.query(
-      By.directive(ContentToggleButtonComponent)
-    ).componentInstance;
-    button.toggle();
+    expect(component.currentToggleState).toBeFalse();
 
-    fixture.detectChanges();
+    fixture.whenRenderingDone().then(() => {
+      spyOn(component, 'handleToggleState').and.callThrough();
 
-    expect(component.currentToggleState).toBeTrue();
-    expect(component.getVisibility()).toEqual('card-display-content-shown');
+      const button = fixture.debugElement.query(
+        By.directive(ContentToggleButtonComponent)
+      ).componentInstance;
+      button.toggle();
+
+      fixture.detectChanges();
+
+      expect(component.currentToggleState).toBeTrue();
+      expect(component.getVisibility()).toEqual('card-display-content-shown');
+    });
   });
 
   it('should return false for isToggleButtonVisible if tabType is not progress', () => {

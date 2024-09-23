@@ -76,12 +76,12 @@ export class SkillCardComponent {
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
       {
         topic_url_fragment: this.topic.getUrlFragment(),
-        classroom_url_fragment: this.topic.getClassroomName(),
+        classroom_url_fragment: this.topic.getClassroomUrlFragment(),
         stringified_subtopic_ids: JSON.stringify([this.subtopic.getId()]),
       }
     );
     this.siteAnalyticsService.registerPracticeSessionStartEvent(
-      this.topic.getClassroomName(),
+      this.topic.getClassroomUrlFragment(),
       this.topic.getName(),
       [this.subtopic.getId()].toString()
     );
