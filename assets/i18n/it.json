@@ -249,6 +249,8 @@
 	"I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION": "Obiettivi completati",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Completato",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "<[numberMoved]> delle collezioni che hai completato sono state spostate nella sezione 'in avanzamento' perché nuove esplorazioni sono state aggiunte!",
+	"I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS": "Mostra meno",
+	"I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE": "Mostra altro",
 	"I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION": "Obiettivi attuali",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS": "Sembra che tu non abbia ancora completato alcuna collezione. Torna alla libreria per iniziare una nuova entusiasmante collezione!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS": "Sembra che tu non abbia ancora completato alcuna esplorazione. Torna alla libreria per iniziare una nuova entusiasmante esplorazione!",
