@@ -48,6 +48,14 @@ class QuestionCreationHandler(
 ):
     """A handler that creates the question model given a question dict."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {},
+        'PUT': {},
+        'DELETE': {}
+    }
+
     @acl_decorators.can_manage_question_skill_status
     def post(self) -> None:
         """Handles POST requests."""
