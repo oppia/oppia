@@ -458,7 +458,8 @@ export class ConversationSkinComponent {
       if (
         !this.isIframed &&
         !this._editorPreviewMode &&
-        !this.explorationPlayerStateService.isInQuestionPlayerMode()
+        !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
+        !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
       ) {
         // For the first state which is always a checkpoint.
         let firstStateName: string;
@@ -1150,7 +1151,8 @@ export class ConversationSkinComponent {
     if (
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.explorationPlayerStateService.isInQuestionPlayerMode()
+      !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
+      !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
     ) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
