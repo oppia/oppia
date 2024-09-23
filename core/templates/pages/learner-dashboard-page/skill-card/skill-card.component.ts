@@ -34,7 +34,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 export class SkillCardComponent {
   @Input() topic!: LearnerTopicSummary;
   @Input() progress!: number;
-  @Input() last!: boolean;
   @Input() subtopic!: Subtopic;
 
   imgUrl: string = '';
