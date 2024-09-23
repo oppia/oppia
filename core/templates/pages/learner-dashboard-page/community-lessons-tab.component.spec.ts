@@ -978,6 +978,11 @@ describe('Community lessons tab Component', () => {
   }));
 
   it('should return true when there are no lessons', () => {
+    component.partiallyLearntTopicsList = [];
+    component.learntTopicsList = [];
+
+    fixture.detectChanges();
+
     expect(component.isLearnerStateEmpty()).toBeTrue();
   });
 
@@ -998,6 +1003,23 @@ describe('Community lessons tab Component', () => {
   it('should return false when there are completed and in-progress lessons', () => {
     component.totalCompletedLessonsList = [explorationSummary];
     component.totalIncompleteLessonsList = [explorationSummary];
+    fixture.detectChanges();
+
+    expect(component.isLearnerStateEmpty()).toBeFalse();
+  });
+
+  it('should return false when there are in-progress skills', () => {
+    component.totalCompletedLessonsList = [];
+    component.totalIncompleteLessonsList = [];
+    fixture.detectChanges();
+
+    expect(component.isLearnerStateEmpty()).toBeFalse();
+  });
+
+  it('should return false when there are completed skills', () => {
+    component.totalCompletedLessonsList = [];
+    component.totalIncompleteLessonsList = [];
+    component.partiallyLearntTopicsList = [];
     fixture.detectChanges();
 
     expect(component.isLearnerStateEmpty()).toBeFalse();

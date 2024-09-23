@@ -478,11 +478,12 @@ export class CommunityLessonsTabComponent {
       });
   }
 
-  // TODO(#18384): Check partiallyLearntTopicsList & learntTopicsList.length (skills).
   isLearnerStateEmpty(): boolean {
     return (
       this.totalIncompleteLessonsList.length === 0 &&
-      this.totalCompletedLessonsList.length === 0
+      this.totalCompletedLessonsList.length === 0 &&
+      this.partiallyLearntTopicsList.length === 0 &&
+      this.learntTopicsList.length === 0
     );
   }
 
