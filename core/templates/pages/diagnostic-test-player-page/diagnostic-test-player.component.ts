@@ -84,11 +84,6 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       return this.diagnosticTestIsStarted && !this.diagnosticTestIsFinished;
     });
 
-    this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticCopyrightedImageUrl(
-        '/avatar/oppia_avatar_100px.svg'
-      );
-
     this.componentSubscription.add(
       this.diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.subscribe(
         (recommendedTopicIds: string[]) => {
