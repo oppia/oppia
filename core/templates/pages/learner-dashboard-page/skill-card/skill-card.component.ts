@@ -59,6 +59,7 @@ export class SkillCardComponent {
     this.checkQuestionsExist();
   }
 
+  // TODO(#18384): Currently only can select one subtopic at a time, otherwise move to tab.
   checkQuestionsExist(): void {
     if (this.subtopic.getSkillIds().length > 0) {
       this.questionBackendApiService
@@ -71,6 +72,7 @@ export class SkillCardComponent {
     }
   }
 
+  // TODO(#18384): Currently only can select one subtopic at a time, otherwise pass array of subtopic ids.
   openNewPracticeSession(): void {
     let practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,

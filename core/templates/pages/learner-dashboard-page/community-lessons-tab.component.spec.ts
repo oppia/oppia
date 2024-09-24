@@ -104,8 +104,8 @@ describe('Community lessons tab Component', () => {
     thumbnail_filename: 'image1.png',
     title: 'Chapter 1',
     description: 'Description 1',
-    prerequisite_skill_ids: ['skill_1'],
-    acquired_skill_ids: ['skill_2'],
+    prerequisite_skill_ids: ['skill_id_1'],
+    acquired_skill_ids: ['skill_id_2'],
     destination_node_ids: ['node_2'],
     outline: 'Outline',
     exploration_id: 'exp_1',
@@ -122,8 +122,8 @@ describe('Community lessons tab Component', () => {
     thumbnail_filename: 'image2.png',
     title: 'Chapter 2',
     description: 'Description 1',
-    prerequisite_skill_ids: ['skill_1'],
-    acquired_skill_ids: ['skill_2'],
+    prerequisite_skill_ids: ['skill_id_1'],
+    acquired_skill_ids: ['skill_id_2'],
     destination_node_ids: ['node_3'],
     outline: 'Outline',
     exploration_id: 'exp_2',
@@ -178,7 +178,7 @@ describe('Community lessons tab Component', () => {
   };
 
   let newSubtopic = {
-    skill_ids: ['skill_id_3', 'skill_id_4'],
+    skill_ids: ['skill_id_3'],
     id: 1,
     title: 'subtopic_name',
     thumbnail_filename: 'image.svg',
@@ -191,8 +191,8 @@ describe('Community lessons tab Component', () => {
     thumbnail_filename: 'image1.png',
     title: 'Chapter 1',
     description: 'Description 1',
-    prerequisite_skill_ids: ['skill_3'],
-    acquired_skill_ids: ['skill_4'],
+    prerequisite_skill_ids: ['skill_id_3'],
+    acquired_skill_ids: ['skill_id_4'],
     destination_node_ids: [''],
     outline: 'Outline',
     exploration_id: 'exp_1',
@@ -239,11 +239,51 @@ describe('Community lessons tab Component', () => {
     subtopics: [newSubtopic],
     degrees_of_mastery: {
       skill_id_3: 0,
-      skill_id_4: 0.75,
     },
     skill_descriptions: {
       skill_id_3: 'Skill Description 3',
-      skill_id_4: 'Skill Description 5',
+    },
+  };
+
+  const multipleTopicsSummaryDict = {
+    id: 'new_sample_topic_id',
+    name: 'New Topic Name',
+    language_code: 'en',
+    description: 'description',
+    version: 1,
+    story_titles: ['Story 1'],
+    total_published_node_count: 2,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA',
+    classroom_name: 'math',
+    classroom_url_fragment: 'math',
+    practice_tab_is_displayed: false,
+    canonical_story_summary_dict: [
+      {
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: [''],
+        all_node_dicts: [newNodeDict],
+        url_fragment: 'new-story-title',
+        topic_name: 'New Topic Name',
+        classroom_url_fragment: 'math',
+        topic_url_fragment: 'new-topic-name',
+      },
+    ],
+    url_fragment: 'new-topic-name',
+    subtopics: [newSubtopic, subtopic],
+    degrees_of_mastery: {
+      skill_id_2: 0,
+      skill_id_3: 0.75,
+    },
+    skill_descriptions: {
+      skill_id_2: 'Skill Description 2',
+      skill_id_3: 'Skill Description 3',
     },
   };
 
@@ -1047,11 +1087,13 @@ describe('Community lessons tab Component', () => {
     ]);
   }));
 
-  //TODO - check to see if acquired ids - skill_3 or skill_id_3
   it('should correctly get total number of skills', () => {
+    const multipleTopics = LearnerTopicSummary.createFromBackendDict(
+      multipleTopicsSummaryDict
+    );
     const allSkills = [
-      {topic: component.partiallyLearntTopicsList[0], progress: [0, 0.75]},
-      {topic: component.partiallyLearntTopicsList[0], progress: [0, 0.75]},
+      {topic: multipleTopics, progress: [0, 0.75]},
+      {topic: multipleTopics, progress: [0, 0.75]},
     ];
 
     expect(allSkills.reduce(component.getTotalSkillCards, 0)).toBe(4);
