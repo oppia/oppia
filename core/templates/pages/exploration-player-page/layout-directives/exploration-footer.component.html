@@ -6,7 +6,7 @@
     </div>
   </div>
   <div class="row">
-    <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
+    <div class="col-sm-5">
       <button class="oppia-lesson-info"
               #lessonInfoButton
               (keydown.escape)="learnerHasViewedLessonInfo()"
@@ -29,7 +29,7 @@
       <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
       </oppia-hint-and-solution-buttons>
     </div>
-    <div [ngClass]="{'col-sm-7': isLanguageRTL(), 'col-sm-9': !isLanguageRTL()}">
+    <div class="col-sm-7">
       <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
         <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
