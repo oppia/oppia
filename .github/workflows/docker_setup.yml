@@ -21,7 +21,8 @@ jobs:
       - name: Checkout to the Oppia repository code
         uses: actions/checkout@v3
 
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
 
       - name: Build Images
         run: |
