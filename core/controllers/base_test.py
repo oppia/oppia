@@ -222,9 +222,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            if url == '/console_errors':
-                continue
-
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
             ):
@@ -242,9 +239,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            if url == '/console_errors':
-                continue
-
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
             ):
@@ -261,9 +255,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
-
-            if url == '/console_errors':
-                continue
 
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
