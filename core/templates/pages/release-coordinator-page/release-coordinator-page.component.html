@@ -78,13 +78,19 @@
     </div>
 
     <div class="oppia-release-coordinator-page-card oppia-page-card oppia-long-text">
-      <h3>Update UserGroups</h3>
+      <h3>Manage User Groups</h3>
       <div>
         <div *ngFor="let userGroup of userGroups">
           <div *ngIf="!(userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId])"
                class="oppia-user-group"
                (click)="toggleUserGroupDetailsSection(userGroup.userGroupId)">
             {{ userGroup.userGroupName }}
+            <button mat-button matSuffix mat-icon-button
+                    aria-label="Clear"
+                    *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]"
+                    (click)="deleteUserGroup(userGroup.userGroupId); $event.stopPropagation()">
+              <mat-icon matListIcon>close</mat-icon>
+            </button>
           </div>
           <div *ngIf="userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId]"
                class="oppia-user-group">
@@ -92,11 +98,6 @@
                    type="text"
                    value="{{ userGroup.userGroupName }}"
                    [(ngModel)]="userGroup.userGroupName">
-            <button mat-button matSuffix mat-icon-button
-                    aria-label="Clear"
-                    (click)="deleteUserGroup(userGroup.userGroupId); $event.stopPropagation()">
-              <mat-icon matListIcon>close</mat-icon>
-            </button>
           </div>
           <div class="user-group-details" *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]">
             <div *ngIf="!userGroupInEditMode">
@@ -147,26 +148,25 @@
                      class="oppia-warning-text">
                     {{ userInUserGroupValidationError }}
                   </p>
-                  <p *ngIf="userGroupSaveError.length > 0"
-                     class="oppia-warning-text">
-                    {{ userGroupSaveError }}
-                  </p>
                 </div>
               </div>
             </div>
             <hr *ngIf="userGroupInEditMode">
+            <p *ngIf="userGroupSaveError.length > 0"
+               class="oppia-warning-text">
+              {{ userGroupSaveError }}
+            </p>
             <div *ngIf="userGroupInEditMode" class="row justify-content-end">
+              <button mat-raised-button
+                      type="button"
+                      (click)="resetUserGroup(userGroup)">
+                Cancel
+              </button>
               <button mat-raised-button
                       color="primary"
                       type="submit"
                       (click)="updateUserGroup(userGroup)">
                 Save
-              </button>
-              <button mat-raised-button
-                      color="warn"
-                      type="button"
-                      (click)="resetUserGroup(userGroup)">
-                Cancel
               </button>
             </div>
           </div>

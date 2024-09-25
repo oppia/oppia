@@ -503,8 +503,7 @@ def get_all_user_group() -> List[user_domain.UserGroup]:
     """Return the list of user groups.
 
     Returns:
-        user_groups_list: List[user_domain.UserGroup]. List of
-        all user groups.
+        List[user_domain.UserGroup]. List of all user groups.
     """
     user_group_models: List[user_models.UserGroupModel] = list(
         user_models.UserGroupModel.get_all())
@@ -579,7 +578,7 @@ def delete_user_group(user_group_id: str) -> None:
         user_group_id: str. The id of the user group to delete.
 
     Raises:
-        Exception. The user group trying to delete does not exists.
+        Exception. The user group trying to delete does not exist.
     """
     user_group_model = user_models.UserGroupModel.get(
         user_group_id, strict=False)
