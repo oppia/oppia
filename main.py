@@ -226,7 +226,6 @@ URLS = [
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
-    get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
 
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
 
