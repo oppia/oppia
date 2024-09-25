@@ -18,6 +18,9 @@
 
 .oppia-footer-social a {
   color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 18.75px;
 }
 
 .oppia-footer-social a:hover,
