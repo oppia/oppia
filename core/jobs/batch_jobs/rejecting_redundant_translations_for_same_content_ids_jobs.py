@@ -19,8 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -33,44 +31,66 @@ from typing import Dict, Iterable, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
     from mypy_imports import suggestion_models
+    from mypy_imports import translation_models
 
-(exp_models, suggestion_models, translation_models) = models.Registry.import_models([
-    models.Names.EXPLORATION, models.Names.SUGGESTION, models.Names.TRANSLATION
-])
+(suggestion_models, translation_models) = models.Registry.import_models([
+    models.Names.SUGGESTION, models.Names.TRANSLATION])
 
 datastore_services = models.Registry.import_datastore_services()
 
 class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
-    """Job that rejects translation suggestions with missing content ids."""
+    """Job that rejects translation suggestions in review for the content
+    with an accepted translation."""
 
     @staticmethod
-    def _reject_obsolete_suggestions(
-        suggestions: List[suggestion_models.GeneralSuggestionModel],
-        exploration: exp_domain.Exploration
-    ) -> List[suggestion_models.GeneralSuggestionModel]:
-        """Marks translation suggestion models as 'rejected' if the content ID
-        for the suggestion no longer exists. The final_reviewer_id will be set
-        to feconf.SUGGESTION_BOT_USER_ID.
+    def _reject_suggestions_in_review_for_content_with_accepted_translation(
+        entity_translation_model: translation_models.EntityTranslationsModel
+    ) -> List[Dict[str, Union[
+        str, int, suggestion_models.GeneralSuggestionModel]]]:
+        """Rejects all translation suggestions in review for the content
+        with an accepted translation, for an entity translation model.
 
         Args:
-            suggestions: list(GeneralSuggestionModel). A list of translation
-                suggestion models corresponding to the given exploration.
-            exploration: Exploration. The exploration domain object
-                associated with the suggestions.
+            entity_translation_model: (EntityTranslationsModel). An entity 
+            translation model.
 
         Returns:
-            list(GeneralSuggestionModel). List of updated suggestion models.
+            list(GeneralSuggestionModel). A list of rejected suggestions
+            for an entity translation model.
         """
-        translatable_content_ids = exploration.get_translatable_content_ids()
-        updated_suggestions = []
-        for suggestion in suggestions:
-            if suggestion.change_cmd['content_id'] in translatable_content_ids:
-                continue
-            suggestion.status = suggestion_models.STATUS_REJECTED
-            suggestion.final_reviewer_id = feconf.SUGGESTION_BOT_USER_ID
-            updated_suggestions.append(suggestion)
+        updated_suggestions: List[
+            suggestion_models.GeneralSuggestionModel] = []
+        for content_id in entity_translation_model:
+            suggestion = suggestion_models.GeneralSuggestionModel.get_all(
+                include_deleted=False).filter(
+                    (
+                        suggestion_models
+                        .GeneralSuggestionModel.suggestion_type
+                    ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                ).filter(
+                    suggestion_models.GeneralSuggestionModel.target_id == (
+                        entity_translation_model.entity_id
+                    )
+                ).filter(
+                    suggestion_models.GeneralSuggestionModel.target_version_at_submission == (
+                        entity_translation_model.entity_version
+                    )
+                ).filter(
+                    suggestion_models.GeneralSuggestionModel.change_cmd.content_id == (
+                        content_id
+                    )
+                ).filter(
+                    suggestion_models.GeneralSuggestionModel.status == (
+                        suggestion_models.STATUS_IN_REVIEW
+                    )
+                )
+
+            if(suggestion):
+                suggestion.status = suggestion_models.STATUS_REJECTED
+                suggestion.final_reviewer_id = feconf.SUGGESTION_BOT_USER_ID
+                updated_suggestions.append(suggestion)
+
         return updated_suggestions
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -79,24 +99,13 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of the job run results.
         """
-        suggestion_dicts = _get_suggestion_dicts(self.pipeline)
-        total_processed_suggestions_count_job_run_results = (
-            suggestion_dicts
-            | 'Get suggestions' >> beam.FlatMap(
-                lambda suggestions_dict: suggestions_dict['suggestions']
-            )
-            | 'Total processed suggestion count' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL PROCESSED SUGGESTIONS COUNT'))
-        )
-
-        updated_suggestions = (
-            suggestion_dicts
+        entity_translation_models = _get_entity_translation_models(self.pipeline)
+        updated_suggestion = (
+            entity_translation_models
             | 'Update suggestion models' >> beam.Map(
-                lambda suggestions_dict: self._reject_obsolete_suggestions(
-                    suggestions_dict['suggestions'],
-                    suggestions_dict['exploration'])
-                )
+                    lambda entity_translation_model: (
+                        self._reject_suggestions_in_review_for_content_with_accepted_translation(
+                            entity_translation_model)))
             | 'Flatten suggestion models' >> beam.FlatMap(lambda x: x)
         )
 
@@ -114,7 +123,6 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
 
         return (
             (
-                total_processed_suggestions_count_job_run_results,
                 updated_suggestions_count_job_run_results
             )
             | 'Combine results' >> beam.Flatten()
@@ -122,75 +130,64 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
 
 
 class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
-    """Audits translation suggestions for missing content IDs."""
+    """Audits translation suggestions in review for the content with an
+    accepted translation."""
 
     @staticmethod
-    def _get_suggestions_in_review_for_content_with_valid_translation(
-        entity_translation_dict: List[
-            Dict[str, translation_models.EntityTranslationsModel]]
-    ) -> List[suggestion_models.GeneralSuggestionModel]:
+    def _get_suggestions_in_review_for_content_with_accepted_translation(
+        entity_translation_model: translation_models.EntityTranslationsModel
+    ) -> List[Dict[str, Union[
+        str, int, suggestion_models.GeneralSuggestionModel]]]:
         """Finds the list of all translation suggestions in review for the 
-        content with a valid translation.
+        content with an accepted translation, for an entity translation model.
 
         Args:
-            entity_translation_dict: list(EntityTranslationsModel). A list 
-                of entity translation models.
+            entity_translation_model: (EntityTranslationsModel). An entity 
+            translation model.
 
         Returns:
-            list(GeneralSuggestionModel). The list of all translation
-            suggestions in review for the content with a valid translation.
+            list(dict(str, union(str, int, GeneralSuggestionModel))).
+            A list of dict containing all entity_translation_model_id,
+            entity_id, entity_version, content_id and corresponding
+            suggestions in review, for an entity translation model.
         """
-
-
-
-    @staticmethod
-    def _report_suggestions_with_missing_content_ids(
-        suggestions: List[suggestion_models.GeneralSuggestionModel],
-        exploration: exp_domain.Exploration
-    ) -> List[Dict[str, Union[str, List[Dict[str, str]]]]]:
-        """Audits translation suggestion models for missing content IDs. Reports
-        the following for each exploration:
-            - exploration ID
-            - list of missing content IDs and corresponding state names.
-
-        Args:
-            suggestions: list(GeneralSuggestionModel). A list of translation
-                suggestion models corresponding to the given exploration.
-            exploration: Exploration. The corresponding exploration domain
-                object.
-
-        Returns:
-            list(dict). Audit report result.
-        """
-        obsolete_content = []
-        obsolete_translation_suggestion_error_report: List[
-            Dict[str, Union[
-                # Exploration ID.
-                str,
-                # Obsolete content dict.
-                List[Dict[str, str]]
-            ]]
-        ] = []
-
-        translatable_content_ids = exploration.get_translatable_content_ids()
-        for suggestion in suggestions:
-            suggestion_change = suggestion.change_cmd
-            if not suggestion_change['content_id'] in translatable_content_ids:
-                obsolete_content.append(
-                    {
-                        'content_id': suggestion_change['content_id'],
-                        'state_name': suggestion_change['state_name']
-                    }
+        suggestion_dicts: List[Dict[str, Union[
+            str, int, suggestion_models.GeneralSuggestionModel]]] = []
+        for content_id in entity_translation_model:
+            suggestion = suggestion_models.GeneralSuggestionModel.get_all(
+                include_deleted=False).filter(
+                    (
+                        suggestion_models
+                        .GeneralSuggestionModel.suggestion_type
+                    ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                ).filter(
+                    suggestion_models.GeneralSuggestionModel.target_id == (
+                        entity_translation_model.entity_id
+                    )
+                ).filter(
+                    suggestion_models.GeneralSuggestionModel.target_version_at_submission == (
+                        entity_translation_model.entity_version
+                    )
+                ).filter(
+                    suggestion_models.GeneralSuggestionModel.change_cmd.content_id == (
+                        content_id
+                    )
+                ).filter(
+                    suggestion_models.GeneralSuggestionModel.status == (
+                        suggestion_models.STATUS_IN_REVIEW
+                    )
                 )
 
-        obsolete_translation_suggestion_error_report.append(
-            {
-                'exp_id': exploration.id,
-                'obsolete_content': obsolete_content,
-            }
-        )
+                if(suggestion):
+                    suggestion_dicts.append({
+                        'entity_id': entity_translation_model.entity_id,
+                        'entity_version': entity_translation_model.entity_version,
+                        'entity_translation_model_id': entity_translation_model.id,
+                        'content_id': content_id,
+                        'suggestion': suggestion
+                    })
 
-        return obsolete_translation_suggestion_error_report
+        return suggestion_dicts
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of audit job run results.
@@ -198,78 +195,52 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of results.
         """
-        suggestion_dicts = _get_suggestion_dicts(self.pipeline)
-        total_processed_suggestions_count_job_run_results = (
-            suggestion_dicts
-            | 'Get suggestions' >> beam.FlatMap(
-                lambda suggestions_dict: suggestions_dict['suggestions']
-            )
-            | 'Total processed suggestion count' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL PROCESSED SUGGESTIONS COUNT'))
-        )
-
-        suggestion_results = (
-            suggestion_dicts
-            | 'Report obsolete suggestions' >> beam.Map(
-                lambda suggestions_dict: (
-                    self._report_suggestions_with_missing_content_ids(
-                        suggestions_dict['suggestions'],
-                        suggestions_dict['exploration']
-                    )
-                ))
-            | 'Flatten reports' >> beam.FlatMap(lambda x: x)
-            | 'Filter out reports with no obsolete suggestions' >> (
-                beam.Filter(
-                    lambda report: len(report['obsolete_content']) > 0))
+        entity_translation_models = _get_entity_translation_models(self.pipeline)
+        suggestion_dicts = (
+            entity_translation_models
+            | 'Get suggestions list' >> beam.Map(
+                    lambda entity_translation_model: (
+                        self._get_suggestions_in_review_for_content_with_accepted_translation(
+                            entity_translation_model)))
+            | 'Flatten suggestions list' >> beam.FlatMap(lambda x: x)
         )
 
         job_run_results = (
-            suggestion_results
+            suggestion_dicts
             | 'Report the obsolete suggestions' >> beam.Map(
                 lambda result: (
                     job_run_result.JobRunResult.as_stdout(
-                        f'Results are - {result}'
-                    )
-                )
-            )
+                        f'Results are - {result}')))
         )
 
-        obsolete_suggestions_count_job_run_results = (
+        suggestions_to_be_rejected_count_job_run_results = (
             suggestion_results
-            | 'Flatten obsolete suggestions' >> (
-                beam.FlatMap(lambda report: report['obsolete_content']))
-            | 'Report the obsolete suggestions count' >> (
+            | 'Report the suggestions to be rejected count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'OBSOLETE SUGGESTIONS COUNT')
-            )
+                    'SUGGESTIONS TO BE REJECTED COUNT'))
         )
 
         return (
             (
                 job_run_results,
-                total_processed_suggestions_count_job_run_results,
-                obsolete_suggestions_count_job_run_results
+                suggestions_to_be_rejected_count_job_run_results
             )
             | 'Combine results' >> beam.Flatten()
         )
 
-def _get_suggestions_to_reject(
+def _get_entity_translation_models(
     pipeline: beam.Pipeline
-) -> beam.PCollection[str]:
-    """Returns a PCollection of dicts where each dict corresponds to a unique
-    exploration ID and the following key-value pairs:
-        - suggestions: Iterable of translation suggestion models corresponding
-            to the exploration ID.
-        - exploration: The corresponding exploration domain object.
+) -> beam.PCollection[translation_models.EntityTranslationsModel]:
+    """Returns a PCollection of EntityTranslationsModel.
 
     Args:
         pipeline: beam.Pipeline. A job pipeline.
 
     Returns:
-        PCollection(dict(str, Iterable(str)). The PCollection of dicts.
+        PCollection(EntityTranslationsModel). The PCollection of
+        EntityTranslationsModel.
     """
-    entity_id_to_entity_translation_model = (
+    entity_translation_models = (
         pipeline
         | 'Get all entity translation models' >> ndb_io.GetModels(
             translation_models.EntityTranslationsModel.get_all(
@@ -291,36 +262,4 @@ def _get_suggestions_to_reject(
         | 'Get list of latest entity transaltion model' >> beam.Values()
     )
 
-    exp_id_to_exploration = (
-        pipeline
-        | 'Get all exploration models' >> ndb_io.GetModels(
-            exp_models.ExplorationModel.get_all())
-        | 'Map exploration model to domain class' >> beam.Map(
-            exp_fetchers.get_exploration_from_model)
-        # PCollection<exp_id: exploration>.
-        | 'Key explorations by ID' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
-            lambda exploration: exploration.id)
-    )
-
-    suggestion_dicts = (
-        {
-            'suggestions': target_id_to_suggestion_model,
-            'explorations': exp_id_to_exploration
-        }
-        # PCollection<exp_id: {
-        #   suggestions: [suggestions],
-        #   exploration: [exploration]
-        # }>.
-        | 'Group by exploration ID' >> beam.GroupByKey()
-        | 'Remove keys' >> beam.Values() # pylint: disable=no-value-for-parameter
-        | 'Filter out explorations with no suggestions' >> beam.Filter(
-            lambda exp_id_dict: len(exp_id_dict['suggestions']) != 0)
-        | 'Get single exploration for exploration key' >> beam.Map(
-            lambda suggestions_dict: {
-                'suggestions': suggestions_dict['suggestions'],
-                # There should only be 1 exploration per exp_id.
-                'exploration': suggestions_dict['explorations'][0]
-            })
-    )
-
-    return suggestion_dicts
+    return entity_translation_models
