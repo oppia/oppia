@@ -24,7 +24,7 @@ var Constants = require('./WebdriverioConstants');
 // might take some time to establish a connection with the
 // server since the mobile tests are run on a real
 // mobile device.
-var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 60000 : 90000;
+var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 60000 : 30000;
 var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 45000;
 
 var alertToBePresent = async () => {
