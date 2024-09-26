@@ -199,10 +199,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 
-  getContextServiceForTesting(): ContextService {
-    return this.contextService;
-  }
-
   public ngAfterViewInit(): void {
     if (!OppiaAngularRootComponent.contextService) {
       OppiaAngularRootComponent.contextService = this.contextService;
