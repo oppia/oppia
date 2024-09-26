@@ -554,8 +554,8 @@ class StoryEditorAccessValidationHandlerPage(
             unused_story_id: str. The unused story ID.
         """
         pass
-      
-      
+
+
 class ReviewTestsPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
