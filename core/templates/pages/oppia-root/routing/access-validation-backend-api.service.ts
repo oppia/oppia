@@ -85,7 +85,6 @@ export class AccessValidationBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-
   validateAccessToStoryEditorPage(storyId: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.STORY_EDITOR_PAGE_ACCESS_VALIDATOR,
@@ -95,7 +94,7 @@ export class AccessValidationBackendApiService {
     );
     return this.http.get<void>(url).toPromise();
   }
-  
+
   validateAccessToReviewTestPage(
     classroomUrlFragment: string,
     topicUrlFragment: string,
