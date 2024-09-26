@@ -758,6 +758,8 @@
 	"I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION": "Objectifs atteints",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Terminé",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "<[numberMoved]> des collections que vous avez terminées ont été déplacées vers la section « En cours » parce que de nouvelles explorations leur ont été ajoutées !",
+	"I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS": "Voir moins",
+	"I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_MORE": "Afficher plus",
 	"I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION": "Continuer là où vous l’avez laissé",
 	"I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION": "Objectifs actuels",
 	"I18N_LEARNER_DASHBOARD_DECLINE_INVITATION_MODAL_BODY": "Voulez-vous vraiment refuser lʼinvitation à <b><[groupName]></b> ?",

@@ -484,6 +484,7 @@
 	"I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON": "और देखें",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "पूर्ण",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "आपके द्वारा किए गए संग्रह में से <[numberMoved]> को 'प्रगति' अनुभाग में स्थानांतरित किया गया क्योंकि उन्हें नए अन्वेषण जोड़े गए हैं!",
+	"I18N_LEARNER_DASHBOARD_CONTENT_TOGGLE_BUTTON_LESS": "कम देखें",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COLLECTION_PLAYLIST": "ऐसा लगता है कि आपकी 'बाद में चलाएं' सूची में कोई संग्रह नहीं है। लाइब्रेरी में जाएं और खुद के चुने पाठों से प्लेलिस्ट बनाएं!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS": "ऐसा लगता है कि आपने अभी तक कोई भी कलेक्शन्स पूरा नहीं किया है। एक नया रोमांचक कलेक्शन्स शुरू करने के लिए पुस्तकालय में जाएं!",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS": "ऐसा लगता है कि आपने अभी तक कोई अन्वेषण पूरा नहीं किया है। एक रोमांचक नई अन्वेषण शुरू करने के लिए पुस्तकालय पर जाएं!",
