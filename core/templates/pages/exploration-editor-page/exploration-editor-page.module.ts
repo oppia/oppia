@@ -99,7 +99,7 @@ import {MetadataVersionHistoryModalComponent} from './modal-templates/metadata-v
 import {StateVersionHistoryComponent} from './editor-tab/state-version-history/state-version-history.component';
 import {ExplorationEditorPageRootComponent} from './exploration-editor-page-root.component';
 import {CommonModule} from '@angular/common';
-// import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
+import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
 
 @NgModule({
   imports: [
@@ -108,7 +108,7 @@ import {CommonModule} from '@angular/common';
       {
         path: '',
         component: ExplorationEditorPageRootComponent,
-        // canActivate: [ExplorationEditorPageAuthGuard],
+        canActivate: [ExplorationEditorPageAuthGuard],
       },
     ]),
     InteractionExtensionsModule,

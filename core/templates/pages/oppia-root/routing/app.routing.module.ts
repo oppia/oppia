@@ -53,7 +53,7 @@ const routes: Route[] = [
       import(
         'pages/exploration-editor-page/exploration-editor-page.module'
       ).then(m => m.ExplorationEditorPageModule),
-    // canActivate: [IsLoggedInGuard],
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
