@@ -65,7 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    console_errors: commonPrefix + '/tests/console_errors.import.ts',
     blog_dashboard:
       commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     creator_dashboard:
