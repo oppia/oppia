@@ -646,3 +646,5 @@ angular.module('oppia').directive(
     component: StoryNodeEditorComponent,
   })
 );
+
+//  Comment to fix prettier checks
