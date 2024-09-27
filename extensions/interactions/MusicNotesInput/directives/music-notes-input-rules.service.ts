@@ -73,7 +73,7 @@ export class MusicNotesInputRulesService {
     inputs: {a: number; b: number}
   ): boolean {
     
-    //No need to check the actual length if a is greater than b
+    //No need to check the actual length if a is greater than b because the given range itself is invalid
     if(inputs.a > inputs.b) {
       return false;
     }
