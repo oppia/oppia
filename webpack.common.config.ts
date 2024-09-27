@@ -65,8 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    blog_dashboard:
-      commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     creator_dashboard:
       commonPrefix +
       '/pages/creator-dashboard-page/' +
