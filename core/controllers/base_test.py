@@ -209,16 +209,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            # This url is ignored since it is only needed for a protractor test.
-            # The backend tests fetch templates from
-            # core/templates/pages instead of webpack_bundles since we
-            # skip webpack compilation for backend tests.
-            # The console_errors.html template is present in
-            # core/templates/tests and we want one canonical
-            # directory for retrieving templates so we ignore this url.
-            if url == '/console_errors':
-                continue
-
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
             ):
@@ -231,9 +221,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
-
-            if url == '/console_errors':
-                continue
 
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
@@ -252,9 +239,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            if url == '/console_errors':
-                continue
-
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
             ):
@@ -271,9 +255,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
-
-            if url == '/console_errors':
-                continue
 
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
