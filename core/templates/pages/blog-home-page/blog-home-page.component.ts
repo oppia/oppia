@@ -292,6 +292,10 @@ export class BlogHomePageComponent implements OnInit {
 
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
+    if (this.searchQuery === '') {
+      this.loadInitialBlogHomePageData();
+      return;
+    }
     this.blogPostSearchService.executeSearchQuery(
       this.searchQuery,
       this.selectedTags,
@@ -307,9 +311,6 @@ export class BlogHomePageComponent implements OnInit {
         if (
           this.windowRef.nativeWindow.location.pathname === '/blog/search/find'
         ) {
-          if (searchUrlQueryString === '') {
-            this.loadInitialBlogHomePageData();
-          }
           if (siteLangCode) {
             url.searchParams.append('lang', siteLangCode);
           }
