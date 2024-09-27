@@ -307,6 +307,9 @@ export class BlogHomePageComponent implements OnInit {
         if (
           this.windowRef.nativeWindow.location.pathname === '/blog/search/find'
         ) {
+          if (searchUrlQueryString === '') {
+            this.loadInitialBlogHomePageData();
+          }
           if (siteLangCode) {
             url.searchParams.append('lang', siteLangCode);
           }
