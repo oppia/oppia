@@ -316,6 +316,11 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     ) {
       this.userGroupSaveError = '';
       this.userGroupSaveError = `User group with name ${userGroup.userGroupName} already exist.`;
+      let backup = this.userGroupsBackup.get(userGroup.userGroupId);
+      if (backup) {
+        userGroup.userGroupName = backup.userGroupName;
+        userGroup.users = backup.users;
+      }
       return;
     }
 
