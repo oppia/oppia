@@ -184,7 +184,7 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
                         'entity_version': entity_translation_model.entity_version,
                         'entity_translation_model_id': entity_translation_model.id,
                         'content_id': content_id,
-                        'suggestion': suggestion
+                        'suggestion': suggestion.id
                     })
 
         return suggestion_dicts

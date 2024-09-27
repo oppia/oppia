@@ -32,8 +32,13 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import suggestion_models
 
-(exp_models, suggestion_models) = models.Registry.import_models([
-    models.Names.EXPLORATION, models.Names.SUGGESTION
+(
+    exp_models,
+    suggestion_models,
+    translation_models) = models.Registry.import_models([
+    models.Names.EXPLORATION,
+    models.Names.SUGGESTION,
+    models.Names.TRANSLATION
 ])
 
 STATE_DICT_IN_V52 = {
@@ -91,11 +96,14 @@ STATE_DICT_IN_V52 = {
 }
 
 TRANSLATION_HTML = (
-    '<p><oppia-noninteractive-image alt-with-value="&amp;quot;'
-    '&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" '
-    'filepath-with-value="&amp;quot;img.svg&amp;quot;">'
-    '</oppia-noninteractive-image></p>'
+    '<p>another translation</p>'
 )
+
+TRANSLATED_CONTENT_DICT = {
+    'content_value': '<p>translated</p>',
+    'content_format': 'html',
+    'needs_update': False
+}
 
 CHANGE_DICT = {
     'cmd': 'add_translation',
@@ -115,14 +123,15 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
         rejecting_suggestion_for_invalid_content_ids_jobs
         .RejectTranslationSuggestionsWithMissingContentIdJob
     )
-    TARGET_ID = 'exp1'
+    TARGET_ID_1 = 'exp1'
+    TARGET_ID_2 = 'exp2'
 
     def setUp(self) -> None:
         super().setUp()
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
-            id=self.TARGET_ID,
-            title='title',
+            id=self.TARGET_ID_1,
+            title='exp 1',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
@@ -138,12 +147,54 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
-        self.put_multi([self.exp_1])
+        self.exp_2 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.TARGET_ID_2,
+            title='exp 2',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code='en',
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            # The exact schema version isn't too important here; we just
+            # conveniently had the test data set up for this version already.
+            states_schema_version=52,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
+        )
+        self.put_multi([self.exp_1, self.exp_2])
+
+        self.entity_translation_1 = self.create_model(
+            translation_models.EntityTranslatioModel,
+            entity_id=self.TARGET_ID_1,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=self.exp_1.version,
+            language_code='hi',
+            transaltions={
+                'content_0': TRANSLATED_CONTENT_DICT
+            }
+        )
+        self.entity_translation_2 = self.create_model(
+            translation_models.EntityTranslatioModel,
+            entity_id=self.TARGET_ID_2,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=self.exp_2.version,
+            language_code='hi',
+            transaltions={
+                'content_0': TRANSLATED_CONTENT_DICT
+            }
+        )
+        self.put_multi([
+            self.entity_translation_1, self.entity_translation_2])
 
     def test_no_suggestions_returns_empty_report(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_valid_suggestions_are_not_rejected(self) -> None:
+    def test_obsolete_suggestion_is_rejected(self) -> None:
         CHANGE_DICT['content_id'] = 'content_0'
         suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
@@ -152,41 +203,15 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             change_cmd=CHANGE_DICT,
             score_category='irrelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.TARGET_ID,
             target_version_at_submission=0,
-            language_code='bn'
+            language_code='hi'
         )
         suggestion.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
-            )
-        ])
-
-    def test_obsolete_suggestion_is_rejected(self) -> None:
-        CHANGE_DICT['content_id'] = 'non_existent_content_id'
-        suggestion = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id='user1',
-            change_cmd=CHANGE_DICT,
-            score_category='irrelevant',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.TARGET_ID,
-            target_version_at_submission=0,
-            language_code='bn'
-        )
-        suggestion.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
-            ),
             job_run_result.JobRunResult(
                 stdout='REJECTED SUGGESTIONS COUNT SUCCESS: 1'
             )
@@ -207,14 +232,15 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
         rejecting_suggestion_for_invalid_content_ids_jobs
         .AuditTranslationSuggestionsWithMissingContentIdJob
     )
-    TARGET_ID = 'exp2'
+     TARGET_ID_1 = 'exp1'
+    TARGET_ID_2 = 'exp2'
 
     def setUp(self) -> None:
         super().setUp()
-        self.exp_2 = self.create_model(
+        self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
-            id=self.TARGET_ID,
-            title='title',
+            id=self.TARGET_ID_1,
+            title='exp 1',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
@@ -222,64 +248,63 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             tags=['Topic'],
             blurb='blurb',
             author_notes='author notes',
+            # The exact schema version isn't too important here; we just
+            # conveniently had the test data set up for this version already.
             states_schema_version=52,
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
-        self.put_multi([self.exp_2])
+        self.exp_2 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.TARGET_ID_2,
+            title='exp 2',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code='en',
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            # The exact schema version isn't too important here; we just
+            # conveniently had the test data set up for this version already.
+            states_schema_version=52,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
+        )
+        self.put_multi([self.exp_1, self.exp_2])
+
+        self.entity_translation_1 = self.create_model(
+            translation_models.EntityTranslatioModel,
+            entity_id=self.TARGET_ID_1,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=self.exp_1.version,
+            language_code='hi',
+            transaltions={
+                'default_outcome_1': TRANSLATED_CONTENT_DICT
+            }
+        )
+        self.entity_translation_2 = self.create_model(
+            translation_models.EntityTranslatioModel,
+            entity_id=self.TARGET_ID_2,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=self.exp_2.version,
+            language_code='hi',
+            transaltions={
+                'default_outcome_1': TRANSLATED_CONTENT_DICT
+            }
+        )
+        self.put_multi([
+            self.entity_translation_1, self.entity_translation_2])
 
     def test_no_suggestions_returns_empty_report(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_obsolete_suggestions_are_reported(self) -> None:
-        CHANGE_DICT['content_id'] = 'invalid_id'
-        suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id='user1',
-            change_cmd=CHANGE_DICT,
-            score_category='irrelevant',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.TARGET_ID,
-            target_version_at_submission=0,
-            language_code='bn'
-        )
-        suggestion_model.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([
-            suggestion_model])
-
-        errored_value = (
-            '{\'exp_id\': \'exp2\', \'obsolete_content\': '
-            '[{\'content_id\': \'invalid_id\', \'state_name\': '
-            '\'Introduction\'}]}'
-        )
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult(
-                stdout='OBSOLETE SUGGESTIONS COUNT SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult.as_stdout(
-                f'Results are - {errored_value}'
-            )
-        ])
-
-        obsolete_suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(suggestion_model.id)
-        )
-        self.assertEqual(
-            obsolete_suggestion_model.status,
-            suggestion_models.STATUS_IN_REVIEW
-        )
-
     def test_non_obsolete_suggestions_are_not_reported(self) -> None:
         CHANGE_DICT['content_id'] = 'default_outcome_1'
-        CHANGE_DICT['translation_html'] = '<p>Translation for content.</p>'
         valid_suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -287,18 +312,28 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             change_cmd=CHANGE_DICT,
             score_category='irrelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.TARGET_ID,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.TARGET_ID_1,
             target_version_at_submission=0,
-            language_code='bn'
+            language_code='hi'
         )
         valid_suggestion_model.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([
             valid_suggestion_model])
 
+        errored_value = (
+            '{\'entity_id\': \'exp1\', \'entity_version\': 0, '
+            f'\'entity_translation_model_id\': \'{self.entity_translation_1.id}\','
+            f'\'content_id\': \'default_outcome_1\', \'suggestion\': \'{valid_suggestion_model.id}\''
+            '}'
+        )
+
         self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout(
+                f'Results are - {errored_value}'
+            ),
             job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
+                stdout='SUGGESTIONS TO BE REJECTED COUNT SUCCESS: 1'
             )
         ])
 
