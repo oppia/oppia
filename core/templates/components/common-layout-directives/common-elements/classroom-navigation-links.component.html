@@ -4,6 +4,7 @@
   </ng-container>
   <ng-template #content>
     <div class="classroom-navigation-links-content">
+      <span *ngIf="classroomSummaries.length === 0">No classrooms found. Visit the <a href="/classroom-admin">classroom admin</a> page in order to create a classroom. Note that you require the 'Curriculum Admin' role in order to create classrooms.</span>
       <div class="multiple-classroom-nav-links" *ngIf="classroomSummaries.length > 0">
         <div class="multiple-classrooms-intro">
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>

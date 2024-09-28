@@ -67,7 +67,6 @@ module.exports = {
   entry: {
     blog_dashboard:
       commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
-    console_errors: commonPrefix + '/tests/console_errors.import.ts',
     creator_dashboard:
       commonPrefix +
       '/pages/creator-dashboard-page/' +
@@ -93,8 +92,6 @@ module.exports = {
     practice_session:
       commonPrefix +
       '/pages/practice-session-page/practice-session-page.import.ts',
-    review_test:
-      commonPrefix + '/pages/review-test-page/review-test-page.import.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.import.ts',
     story_editor:
@@ -135,20 +132,6 @@ module.exports = {
       DIFF_EQUAL: ['diff_match_patch/lib/diff_match_patch', 'DIFF_EQUAL'],
       DIFF_INSERT: ['diff_match_patch/lib/diff_match_patch', 'DIFF_INSERT'],
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['console_errors'],
-      filename: 'console_errors.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'Contact the Oppia team, submit feedback, and learn ' +
-          'how to get involved with the Oppia project.',
-      },
-      template: commonPrefix + '/tests/console_errors.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['creator_dashboard'],
@@ -278,16 +261,6 @@ module.exports = {
         commonPrefix +
         '/pages/practice-session-page/' +
         'practice-session-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['review_test'],
-      filename: 'review-test-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),
