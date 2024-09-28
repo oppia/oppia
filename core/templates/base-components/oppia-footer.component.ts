@@ -21,7 +21,7 @@ import {Router} from '@angular/router';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subject} from 'rxjs';
-import { debounceTime,switchMap,takeUntil } from 'rxjs/operators';
+import {debounceTime, switchMap, takeUntil} from 'rxjs/operators';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
@@ -62,11 +62,13 @@ export class OppiaFooterComponent implements OnDestroy {
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService
   ) {
-    this.debounceSubject.pipe(
-      debounceTime(this.debounceTimeout),
-      switchMap(() => this.subscribeToMailingListInternal()),
-      takeUntil(this.unsubscribe$)
-    ).subscribe();
+    this.debounceSubject
+      .pipe(
+        debounceTime(this.debounceTimeout),
+        switchMap(() => this.subscribeToMailingListInternal()),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
@@ -84,10 +86,10 @@ export class OppiaFooterComponent implements OnDestroy {
   }
   subscribeToMailingList(): void {
     if (this.isSubmitting || !this.validateEmailAddress()) {
-      return; 
+      return;
     }
-    this.isSubmitting = true; 
-    this.debounceSubject.next(); 
+    this.isSubmitting = true;
+    this.debounceSubject.next();
   }
 
   private subscribeToMailingListInternal(): Promise<void> {
