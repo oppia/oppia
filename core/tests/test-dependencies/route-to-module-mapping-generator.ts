@@ -66,12 +66,6 @@ const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([
   ],
   [
     {
-      path: 'emaildashboardresult/:query_id',
-    },
-    'core/templates/pages/email-dashboard-pages/email-dashboard-result.import.ts',
-  ],
-  [
-    {
       path: 'learn/:classroom_url_fragment/:topic_url_fragment/practice/session',
     },
     'core/templates/pages/practice-session-page/practice-session-page.import.ts',
