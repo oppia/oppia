@@ -1005,9 +1005,6 @@ URLS = [
     get_redirect_route(
         r'/querystatuscheck', email_dashboard.QueryStatusCheckHandler),
     get_redirect_route(
-        r'/emaildashboardresult/<query_id>',
-        email_dashboard.EmailDashboardResultPage),
-    get_redirect_route(
         r'/emaildashboardcancelresult/<query_id>',
         email_dashboard.EmailDashboardCancelEmailHandler),
     get_redirect_route(
