@@ -456,6 +456,7 @@ import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-play
 import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/collection-editor-page-auth.guard';
 import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
 import { SubtopicViewerAuthGuard } from 'pages/subtopic-viewer-page/subtopic-viewer-auth.guard';
+import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -491,6 +492,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogDashboardPageAuthGuard', BlogDashboardPageAuthGuard],
   ['BlogHomePageBackendApiService', BlogHomePageBackendApiService],
   ['BlogDashboardPageService', BlogDashboardPageService],
   ['BlogPostPageService', BlogPostPageService],
