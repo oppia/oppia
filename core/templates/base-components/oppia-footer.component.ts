@@ -16,10 +16,12 @@
  * @fileoverview Component for the footer.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {Router} from '@angular/router';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subject} from 'rxjs';
+import { debounceTime,switchMap,takeUntil } from 'rxjs/operators';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
@@ -35,7 +37,7 @@ import './oppia-footer.component.css';
   templateUrl: './oppia-footer.component.html',
   styleUrls: ['./oppia-footer.component.css'],
 })
-export class OppiaFooterComponent {
+export class OppiaFooterComponent implements OnDestroy {
   emailAddress: string | null = null;
   name: string | null = null;
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
@@ -44,12 +46,13 @@ export class OppiaFooterComponent {
   BRANCH_NAME = AppConstants.BRANCH_NAME;
   SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
 
-  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private debounceSubject: Subject<void> = new Subject();
+  private unsubscribe$: Subject<void> = new Subject();
   versionInformationIsShown: boolean =
     this.router.url === '/about' && !AppConstants.DEV_MODE;
 
   isSubmitting: boolean = false;
-  debounceTimeout: number = 3500;
+  debounceTimeout: number = 1500;
 
   constructor(
     private alertsService: AlertsService,
@@ -59,7 +62,16 @@ export class OppiaFooterComponent {
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService
   ) {
-    this.debounceTimer = null;
+    this.debounceSubject.pipe(
+      debounceTime(this.debounceTimeout),
+      switchMap(() => this.subscribeToMailingListInternal()),
+      takeUntil(this.unsubscribe$)
+    ).subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   getOppiaBlogUrl(): string {
@@ -70,41 +82,45 @@ export class OppiaFooterComponent {
     const regex = new RegExp(AppConstants.EMAIL_REGEX);
     return regex.test(String(this.emailAddress));
   }
-
   subscribeToMailingList(): void {
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
+    if (this.isSubmitting || !this.validateEmailAddress()) {
+      return; 
     }
+    this.isSubmitting = true; 
+    this.debounceSubject.next(); 
+  }
 
-    this.debounceTimer = setTimeout(() => {
-      const userName = this.name ? String(this.name) : null;
-      this.mailingListBackendApiService
-        .subscribeUserToMailingList(
-          String(this.emailAddress),
-          userName,
-          AppConstants.MAILING_LIST_WEB_TAG
-        )
-        .then(status => {
-          if (status) {
-            this.alertsService.addInfoMessage('Done!', 1000);
-            this.ngbModal.open(ThanksForSubscribingModalComponent, {
-              backdrop: 'static',
-              size: 'xl',
-            });
-          } else {
-            this.alertsService.addInfoMessage(
-              AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
-              10000
-            );
-          }
-        })
-        .catch(() => {
+  private subscribeToMailingListInternal(): Promise<void> {
+    const userName = this.name ? String(this.name) : null;
+    return this.mailingListBackendApiService
+      .subscribeUserToMailingList(
+        String(this.emailAddress),
+        userName,
+        AppConstants.MAILING_LIST_WEB_TAG
+      )
+      .then(status => {
+        if (status) {
+          this.alertsService.addInfoMessage('Done!', 1000);
+          this.ngbModal.open(ThanksForSubscribingModalComponent, {
+            backdrop: 'static',
+            size: 'xl',
+          });
+        } else {
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
             10000
           );
-        });
-    }, 300);
+        }
+      })
+      .catch(() => {
+        this.alertsService.addInfoMessage(
+          AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
+          10000
+        );
+      })
+      .finally(() => {
+        this.isSubmitting = false;
+      });
   }
 
   navigateToAboutPage(): void {
