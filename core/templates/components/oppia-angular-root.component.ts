@@ -188,7 +188,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private injector: Injector
+    private injector: Injector,
+    private contextService: ContextService
   ) {
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
       return;
@@ -199,6 +200,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
+    if (!OppiaAngularRootComponent.contextService) {
+      OppiaAngularRootComponent.contextService = this.contextService;
+    }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
         OppiaAngularRootComponent.rteHelperService,

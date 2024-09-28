@@ -1,0 +1,58 @@
+<oppia-angular-root>
+  <oppia-base-content>
+    <navbar-pre-logo-action>
+      <oppia-blog-post-editor-pre-logo-action>
+      </oppia-blog-post-editor-pre-logo-action>
+    </navbar-pre-logo-action>
+    <navbar-breadcrumb>
+      <oppia-blog-dashboard-navbar-breadcrumb>
+      </oppia-blog-dashboard-navbar-breadcrumb>
+    </navbar-breadcrumb>
+    <content>
+      <oppia-blog-dashboard-page>
+      </oppia-blog-dashboard-page>
+    </content>
+    <page-footer></page-footer>
+  </oppia-base-content>
+</oppia-angular-root>
+
+<style>
+  button:focus {
+    border: unset;
+    outline: unset;
+  }
+@media(max-width: 768px) {
+    .collapse:not(.show) {
+        display: flex;
+    }
+    .navbar-brand {
+        display: none;
+    }
+    .oppia-navbar-brand-name.d-none {
+        /* !important is necessary otherwise d-none class of base components is not overwritten(!important
+        is being used there). */
+        display: flex !important;
+        margin-left: -10px;
+    }
+    .ng-cloak {
+        display: flex !important;
+        flex-direction: row;
+    }
+    .float-left {
+        margin-left: 5%;
+    }
+}
+@media (max-width: 500px) {
+    .float-left {
+        margin-left: 2%;
+    }
+}
+</style>
+<script>
+    // Use the normal default browser eventlistener without passive
+    // set to false.
+    // TODO(#10749): Remove workaround for passive event listeners when
+    // jQuery supports it.
+    EventTarget.prototype.addEventListener = (
+      EventTarget.prototype.addEventListener._original);
+</script>
