@@ -53,6 +53,42 @@ export class QuestionValidationService {
     );
   }
 
+  areAnswerGroupsNotEqual(question: Question): boolean {
+    let answerGroups = question._stateData.interaction.answerGroups;
+
+    // Check for duplicate rules within the same answer group.
+    for (let group of answerGroups) {
+      for (let i = 0; i < group.rules.length; i++) {
+        for (let j = i + 1; j < group.rules.length; j++) {
+          if (
+            group.rules[i].type === group.rules[j].type &&
+            JSON.stringify(group.rules[i].inputs) ===
+              JSON.stringify(group.rules[j].inputs)
+          ) {
+            return false;
+          }
+        }
+      }
+    }
+
+    // Check for duplicate rules across different answer groups.
+    for (let i = 0; i < answerGroups.length; i++) {
+      for (let j = i + 1; j < answerGroups.length; j++) {
+        for (let rule1 of answerGroups[i].rules) {
+          for (let rule2 of answerGroups[j].rules) {
+            if (
+              rule1.type === rule2.type &&
+              JSON.stringify(rule1.inputs) === JSON.stringify(rule2.inputs)
+            ) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+    return true;
+  }
+
   // Returns 'null' when the message is valid.
   getValidationErrorMessage(question: Question): string | null {
     const interaction = question.getStateData().interaction;
@@ -89,6 +125,17 @@ export class QuestionValidationService {
       if (answerGroup.outcome.labelledAsCorrect) {
         atLeastOneAnswerCorrect = true;
         continue;
+      }
+    }
+    if (
+      question._stateData.interaction.answerGroups.length > 1 ||
+      question._stateData.interaction.answerGroups[0].rules.length > 1
+    ) {
+      if (!this.areAnswerGroupsNotEqual(question)) {
+        return (
+          'Please ensure learner answer 1 in Oppia response 2' +
+          ' is not equaling the same multiple choice option as another learner answer.'
+        );
       }
     }
     if (!atLeastOneAnswerCorrect) {
