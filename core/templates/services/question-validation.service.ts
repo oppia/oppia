@@ -127,6 +127,9 @@ export class QuestionValidationService {
         continue;
       }
     }
+    if (!atLeastOneAnswerCorrect) {
+      return 'At least one answer should be marked correct';
+    }
     if (
       question._stateData.interaction.answerGroups.length > 1 ||
       question._stateData.interaction.answerGroups[0].rules.length > 1
@@ -137,9 +140,6 @@ export class QuestionValidationService {
           ' is not equaling the same multiple choice option as another learner answer.'
         );
       }
-    }
-    if (!atLeastOneAnswerCorrect) {
-      return 'At least one answer should be marked correct';
     }
     return null;
   }
