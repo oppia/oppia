@@ -39,7 +39,7 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
+class RejectTranslationSuggestionsOfTranslatedContentJob(base_jobs.JobBase):
     """Job that rejects translation suggestions in review for the content
     with an accepted translation."""
 
@@ -61,32 +61,29 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         """
         updated_suggestions: List[
             suggestion_models.GeneralSuggestionModel] = []
-        for content_id in entity_translation_model:
-            suggestion = suggestion_models.GeneralSuggestionModel.get_all(
-                include_deleted=False).filter(
-                    (
-                        suggestion_models
-                        .GeneralSuggestionModel.suggestion_type
-                    ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                ).filter(
-                    suggestion_models.GeneralSuggestionModel.target_id == (
-                        entity_translation_model.entity_id
-                    )
-                ).filter(
-                    suggestion_models.GeneralSuggestionModel.target_version_at_submission == (
-                        entity_translation_model.entity_version
-                    )
-                ).filter(
-                    suggestion_models.GeneralSuggestionModel.change_cmd.content_id == (
-                        content_id
-                    )
-                ).filter(
-                    suggestion_models.GeneralSuggestionModel.status == (
-                        suggestion_models.STATUS_IN_REVIEW
-                    )
+        content_ids=entity_translation_model.translations.keys()
+        suggestions = suggestion_models.GeneralSuggestionModel.get_all(
+            include_deleted=False).filter(
+                (
+                    suggestion_models
+                    .GeneralSuggestionModel.suggestion_type
+                ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+            ).filter(
+                suggestion_models.GeneralSuggestionModel.target_id == (
+                    entity_translation_model.entity_id
                 )
+            ).filter(
+                suggestion_models.GeneralSuggestionModel.target_version_at_submission == (
+                    entity_translation_model.entity_version
+                )
+            ).filter(
+                suggestion_models.GeneralSuggestionModel.status == (
+                    suggestion_models.STATUS_IN_REVIEW
+                )
+            )
 
-            if(suggestion):
+        for suggestion in suggestions:
+            if suggestion.change_cmd['content_id'] in content_ids:
                 suggestion.status = suggestion_models.STATUS_REJECTED
                 suggestion.final_reviewer_id = feconf.SUGGESTION_BOT_USER_ID
                 updated_suggestions.append(suggestion)
@@ -100,7 +97,7 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             PCollection. A PCollection of the job run results.
         """
         entity_translation_models = _get_entity_translation_models(self.pipeline)
-        updated_suggestion = (
+        updated_suggestions = (
             entity_translation_models
             | 'Update suggestion models' >> beam.Map(
                     lambda entity_translation_model: (
@@ -125,11 +122,10 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             (
                 updated_suggestions_count_job_run_results
             )
-            | 'Combine results' >> beam.Flatten()
         )
 
 
-class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
+class AuditTranslationSuggestionsOfTranslatedContentJob(base_jobs.JobBase):
     """Audits translation suggestions in review for the content with an
     accepted translation."""
 
@@ -153,39 +149,36 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         """
         suggestion_dicts: List[Dict[str, Union[
             str, int, suggestion_models.GeneralSuggestionModel]]] = []
-        for content_id in entity_translation_model:
-            suggestion = suggestion_models.GeneralSuggestionModel.get_all(
-                include_deleted=False).filter(
-                    (
-                        suggestion_models
-                        .GeneralSuggestionModel.suggestion_type
-                    ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                ).filter(
-                    suggestion_models.GeneralSuggestionModel.target_id == (
-                        entity_translation_model.entity_id
-                    )
-                ).filter(
-                    suggestion_models.GeneralSuggestionModel.target_version_at_submission == (
-                        entity_translation_model.entity_version
-                    )
-                ).filter(
-                    suggestion_models.GeneralSuggestionModel.change_cmd.content_id == (
-                        content_id
-                    )
-                ).filter(
-                    suggestion_models.GeneralSuggestionModel.status == (
-                        suggestion_models.STATUS_IN_REVIEW
-                    )
+        content_ids=entity_translation_model.translations.keys()
+        suggestions = suggestion_models.GeneralSuggestionModel.get_all(
+            include_deleted=False).filter(
+                (
+                    suggestion_models
+                    .GeneralSuggestionModel.suggestion_type
+                ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+            ).filter(
+                suggestion_models.GeneralSuggestionModel.target_id == (
+                    entity_translation_model.entity_id
                 )
+            ).filter(
+                suggestion_models.GeneralSuggestionModel.target_version_at_submission == (
+                    entity_translation_model.entity_version
+                )
+            ).filter(
+                suggestion_models.GeneralSuggestionModel.status == (
+                    suggestion_models.STATUS_IN_REVIEW
+                )
+            )
 
-                if(suggestion):
-                    suggestion_dicts.append({
-                        'entity_id': entity_translation_model.entity_id,
-                        'entity_version': entity_translation_model.entity_version,
-                        'entity_translation_model_id': entity_translation_model.id,
-                        'content_id': content_id,
-                        'suggestion': suggestion.id
-                    })
+        for suggestion in suggestions:
+            if suggestion.change_cmd['content_id'] in content_ids:
+                suggestion_dicts.append({
+                    'entity_id': entity_translation_model.entity_id,
+                    'entity_version': entity_translation_model.entity_version,
+                    'entity_translation_model_id': entity_translation_model.id,
+                    'content_id': suggestion.change_cmd['content_id'],
+                    'suggestion': suggestion.id
+                })
 
         return suggestion_dicts
 
@@ -214,7 +207,7 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         )
 
         suggestions_to_be_rejected_count_job_run_results = (
-            suggestion_results
+            suggestion_dicts
             | 'Report the suggestions to be rejected count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'SUGGESTIONS TO BE REJECTED COUNT'))
@@ -256,7 +249,7 @@ def _get_entity_translation_models(
         # PCollection<entity_id: entity_translation_model>.
         | 'Filter entity model with latest entity version' >> beam.MapTuple(  # pylint: disable=no-value-for-parameter
             lambda entity_id, models: (entity_id, max(
-                models, key=lambda model: model['entity_version'])))
+                models, key=lambda model: model.entity_version)))
         
         # PCollection<entity_translation_model>.
         | 'Get list of latest entity transaltion model' >> beam.Values()

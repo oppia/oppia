@@ -23,7 +23,7 @@ from __future__ import annotations
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import (
-    rejecting_suggestion_for_invalid_content_ids_jobs)
+    rejecting_redundant_translations_for_same_content_ids_jobs)
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -115,13 +115,13 @@ CHANGE_DICT = {
 }
 
 
-class RejectTranslationSuggestionsWithMissingContentIdJobTests(
+class RejectTranslationSuggestionsOfTranslatedContentJobTests(
     job_test_utils.JobTestBase
 ):
 
     JOB_CLASS = (
-        rejecting_suggestion_for_invalid_content_ids_jobs
-        .RejectTranslationSuggestionsWithMissingContentIdJob
+        rejecting_redundant_translations_for_same_content_ids_jobs
+        .RejectTranslationSuggestionsOfTranslatedContentJob
     )
     TARGET_ID_1 = 'exp1'
     TARGET_ID_2 = 'exp2'
@@ -168,26 +168,22 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
         )
         self.put_multi([self.exp_1, self.exp_2])
 
-        self.entity_translation_1 = self.create_model(
-            translation_models.EntityTranslatioModel,
-            entity_id=self.TARGET_ID_1,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_version=self.exp_1.version,
-            language_code='hi',
-            transaltions={
-                'content_0': TRANSLATED_CONTENT_DICT
-            }
-        )
-        self.entity_translation_2 = self.create_model(
-            translation_models.EntityTranslatioModel,
-            entity_id=self.TARGET_ID_2,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_version=self.exp_2.version,
-            language_code='hi',
-            transaltions={
-                'content_0': TRANSLATED_CONTENT_DICT
-            }
-        )
+        self.entity_translation_1 = (
+            translation_models.EntityTranslationsModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.TARGET_ID_1,
+            self.exp_1.version,
+            'hi',
+            {'content_0': TRANSLATED_CONTENT_DICT}
+        ))
+        self.entity_translation_2 = (
+            translation_models.EntityTranslationsModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.TARGET_ID_2,
+            self.exp_1.version,
+            'hi',
+            {'content_0': TRANSLATED_CONTENT_DICT}
+        ))
         self.put_multi([
             self.entity_translation_1, self.entity_translation_2])
 
@@ -204,7 +200,7 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             score_category='irrelevant',
             status=suggestion_models.STATUS_IN_REVIEW,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.TARGET_ID,
+            target_id=self.TARGET_ID_1,
             target_version_at_submission=0,
             language_code='hi'
         )
@@ -225,14 +221,14 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
         )
 
 
-class AuditTranslationSuggestionsWithMissingContentIdJobTests(
+class AuditTranslationSuggestionsOfTranslatedContentJobTests(
     job_test_utils.JobTestBase
 ):
     JOB_CLASS = (
-        rejecting_suggestion_for_invalid_content_ids_jobs
-        .AuditTranslationSuggestionsWithMissingContentIdJob
+        rejecting_redundant_translations_for_same_content_ids_jobs
+        .AuditTranslationSuggestionsOfTranslatedContentJob
     )
-     TARGET_ID_1 = 'exp1'
+    TARGET_ID_1 = 'exp1'
     TARGET_ID_2 = 'exp2'
 
     def setUp(self) -> None:
@@ -277,26 +273,22 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
         )
         self.put_multi([self.exp_1, self.exp_2])
 
-        self.entity_translation_1 = self.create_model(
-            translation_models.EntityTranslatioModel,
-            entity_id=self.TARGET_ID_1,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_version=self.exp_1.version,
-            language_code='hi',
-            transaltions={
-                'default_outcome_1': TRANSLATED_CONTENT_DICT
-            }
-        )
-        self.entity_translation_2 = self.create_model(
-            translation_models.EntityTranslatioModel,
-            entity_id=self.TARGET_ID_2,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_version=self.exp_2.version,
-            language_code='hi',
-            transaltions={
-                'default_outcome_1': TRANSLATED_CONTENT_DICT
-            }
-        )
+        self.entity_translation_1 = (
+            translation_models.EntityTranslationsModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.TARGET_ID_1,
+            self.exp_1.version,
+            'hi',
+            {'default_outcome_1': TRANSLATED_CONTENT_DICT}
+        ))
+        self.entity_translation_2 = (
+            translation_models.EntityTranslationsModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.TARGET_ID_2,
+            self.exp_1.version,
+            'hi',
+            {'default_outcome_1': TRANSLATED_CONTENT_DICT}
+        ))
         self.put_multi([
             self.entity_translation_1, self.entity_translation_2])
 
@@ -323,8 +315,8 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
 
         errored_value = (
             '{\'entity_id\': \'exp1\', \'entity_version\': 0, '
-            f'\'entity_translation_model_id\': \'{self.entity_translation_1.id}\','
-            f'\'content_id\': \'default_outcome_1\', \'suggestion\': \'{valid_suggestion_model.id}\''
+            f'\'entity_translation_model_id\': \'{self.entity_translation_1.id}\', '
+            f'\'content_id\': \'default_outcome_1\', \'suggestion\': {valid_suggestion_model.id}'
             '}'
         )
 
