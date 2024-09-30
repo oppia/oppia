@@ -398,6 +398,7 @@ type KeyInput =
   | 'Digit7'
   | 'Digit8'
   | 'Digit9';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -3197,9 +3198,12 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Shares the exploration.
    * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
-   * @param {string} expectedUrl - The expected URL of the shared exploration.
+   * @param {string | null} explorationId - The id of the exploration.
    */
-  async shareExploration(platform: string, expectedUrl: string): Promise<void> {
+  async shareExploration(
+    platform: string,
+    explorationId: string | null
+  ): Promise<void> {
     await this.clickOn(shareExplorationButtonSelector);
 
     await this.waitForStaticAssetsToLoad();
@@ -3214,6 +3218,25 @@ export class LoggedOutUser extends BaseUser {
       throw new Error(`No share link found for ${platform}.`);
     }
     const href = await this.page.evaluate(a => a.href, aTag);
+    let expectedUrl: string;
+    switch (platform) {
+      case 'Facebook':
+        expectedUrl =
+          testConstants.SocialsShare.Facebook.Domain +
+          explorationId +
+          testConstants.SocialsShare.Facebook.queryString;
+        break;
+      case 'Twitter':
+        expectedUrl = testConstants.SocialsShare.Twitter.Domain + explorationId;
+        break;
+      case 'Classroom':
+        expectedUrl =
+          testConstants.SocialsShare.Classroom.Domain + explorationId;
+        break;
+      default:
+        throw new Error(`Unsupported platform: ${platform}`);
+    }
+
     if (href !== expectedUrl) {
       throw new Error(
         `The ${platform} share link does not match the expected URL. Expected: ${expectedUrl}, Found: ${href}`
@@ -3685,11 +3708,11 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Shares the exploration.
    * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
-   * @param {string} expectedUrl - The expected URL of the shared exploration.
+   * @param {string} explorationId - The id of the exploration.
    */
   async shareExplorationFromLessonInfoModal(
     platform: string,
-    expectedUrl: string
+    explorationId: string | null
   ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(
@@ -3703,6 +3726,21 @@ export class LoggedOutUser extends BaseUser {
       throw new Error(`No share link found for ${platform}.`);
     }
     const href = await this.page.evaluate(a => a.href, aTag);
+    let expectedUrl: string;
+    switch (platform) {
+      case 'Facebook':
+        expectedUrl =
+          testConstants.SocialsShare.Facebook.Domain +
+          explorationId +
+          testConstants.SocialsShare.Facebook.queryString;
+        break;
+      case 'Twitter':
+        expectedUrl = testConstants.SocialsShare.Twitter.Domain + explorationId;
+        break;
+      default:
+        throw new Error(`Unsupported platform: ${platform}`);
+    }
+
     if (href !== expectedUrl) {
       throw new Error(
         `The ${platform} share link does not match the expected URL. Expected: ${expectedUrl}, Found: ${href}`
