@@ -28,6 +28,7 @@ import {
 
 import {AppConstants} from 'app.constants';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {ContextService} from 'services/context.service';
 import {log} from 'util';
 
 @Injectable({
@@ -37,7 +38,8 @@ export class ExplorationEditorPageAuthGuard implements CanActivate {
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private contextService: ContextService
   ) {}
 
   async canActivate(
@@ -45,8 +47,7 @@ export class ExplorationEditorPageAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>(resolve => {
-      let explorationId = route.paramMap.get('explorationId') || '';
-      log(route + ' ' + explorationId);
+      let explorationId = this.contextService.getExplorationId();
       this.accessValidationBackendApiService
         .validateAccessToExplorationEditorPage(explorationId)
         .then(() => {
