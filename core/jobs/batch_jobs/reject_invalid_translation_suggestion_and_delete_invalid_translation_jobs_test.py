@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Unit tests for jobs.batch_jobs.
-rejecting_suggestion_for_invalid_content_ids_jobs.
+reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from __future__ import annotations
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import (
-    rejecting_redundant_translations_for_same_content_ids_jobs)
+    reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs)
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -115,13 +115,13 @@ CHANGE_DICT = {
 }
 
 
-class RejectTranslationSuggestionsOfTranslatedContentJobTests(
+class RejectTranslationSuggestionsForTranslatedContentsJobTests(
     job_test_utils.JobTestBase
 ):
 
     JOB_CLASS = (
-        rejecting_redundant_translations_for_same_content_ids_jobs
-        .RejectTranslationSuggestionsOfTranslatedContentJob
+        reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs
+        .RejectTranslationSuggestionsForTranslatedContentsJob
     )
     TARGET_ID_1 = 'exp1'
     TARGET_ID_2 = 'exp2'
@@ -221,12 +221,12 @@ class RejectTranslationSuggestionsOfTranslatedContentJobTests(
         )
 
 
-class AuditTranslationSuggestionsOfTranslatedContentJobTests(
+class AuditTranslationSuggestionsForTranslatedContentsJobTests(
     job_test_utils.JobTestBase
 ):
     JOB_CLASS = (
-        rejecting_redundant_translations_for_same_content_ids_jobs
-        .AuditTranslationSuggestionsOfTranslatedContentJob
+        reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs
+        .AuditTranslationSuggestionsForTranslatedContentsJob
     )
     TARGET_ID_1 = 'exp1'
     TARGET_ID_2 = 'exp2'
@@ -315,8 +315,10 @@ class AuditTranslationSuggestionsOfTranslatedContentJobTests(
 
         errored_value = (
             '{\'entity_id\': \'exp1\', \'entity_version\': 0, '
-            f'\'entity_translation_model_id\': \'{self.entity_translation_1.id}\', '
-            f'\'content_id\': \'default_outcome_1\', \'suggestion\': {valid_suggestion_model.id}'
+            '\'entity_translation_model_id\': '
+            f'\'{self.entity_translation_1.id}\', '
+            '\'content_id\': \'default_outcome_1\', \'suggestion\': '
+            f'{valid_suggestion_model.id}'
             '}'
         )
 
@@ -336,4 +338,143 @@ class AuditTranslationSuggestionsOfTranslatedContentJobTests(
         self.assertEqual(
             suggestion_model.status,
             suggestion_models.STATUS_IN_REVIEW
+        )
+
+
+class DeleteTranslationsForInvalidContentIDsJobTests(
+    job_test_utils.JobTestBase
+):
+
+    JOB_CLASS = (
+        reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs
+        .DeleteTranslationsForInvalidContentIDsJob
+    )
+    TARGET_ID_1 = 'exp1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exp_1 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.TARGET_ID_1,
+            title='exp 1',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code='en',
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            # The exact schema version isn't too important here; we just
+            # conveniently had the test data set up for this version already.
+            states_schema_version=52,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
+        )
+        self.put_multi([self.exp_1])
+
+        self.entity_translation_1 = (
+            translation_models.EntityTranslationsModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.TARGET_ID_1,
+            self.exp_1.version,
+            'hi',
+            {'content_0': TRANSLATED_CONTENT_DICT}
+        ))
+        self.put_multi([self.entity_translation_1])
+
+    def test_no_invalid_translation_returns_empty_report(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_translations_with_invalid_content_id_is_deleted(self) -> None:
+        self.entity_translation_1.translations[
+            'invalid_content'] = TRANSLATED_CONTENT_DICT
+        self.put_multi([self.entity_translation_1])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='UPDATED ENTITY TRANSLATION MODELS COUNT SUCCESS: 1'
+            )
+        ])
+
+        updated_model = translation_models.EntityTranslationsModel.get(
+            self.entity_translation_1.id)
+        self.assertNotIn(
+            'invalid_content',
+            updated_model.translations.keys()
+        )
+
+
+class AuditTranslationsForInvalidContentIDsJobTests(
+    job_test_utils.JobTestBase
+):
+    JOB_CLASS = (
+        reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs
+        .AuditTranslationsForInvalidContentIDsJob
+    )
+    TARGET_ID_1 = 'exp1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exp_1 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.TARGET_ID_1,
+            title='exp 1',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code='en',
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            # The exact schema version isn't too important here; we just
+            # conveniently had the test data set up for this version already.
+            states_schema_version=52,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
+        )
+        self.put_multi([self.exp_1])
+
+        self.entity_translation_1 = (
+            translation_models.EntityTranslationsModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.TARGET_ID_1,
+            self.exp_1.version,
+            'hi',
+            {'default_outcome_1': TRANSLATED_CONTENT_DICT}
+        ))
+        self.put_multi([self.entity_translation_1])
+
+    def test_no_invalid_translation_returns_empty_report(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_translations_with_invalid_content_id_is_deleted(self) -> None:
+        self.entity_translation_1.translations[
+            'invalid_content'] = TRANSLATED_CONTENT_DICT
+        self.put_multi([self.entity_translation_1])
+
+        errored_value = (
+            '{\'entity_id\': \'exp1\', \'entity_version\': 0, '
+            '\'entity_translation_model_id\': '
+            f'\'{self.entity_translation_1.id}\', '
+            '\'content_id\': \'invalid_content\'}'
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout(
+                f'Results are - {errored_value}'
+            ),
+            job_run_result.JobRunResult(
+                stdout='TRANSLATIONS TO BE DELETED COUNT SUCCESS: 1'
+            )
+        ])
+
+        updated_model = translation_models.EntityTranslationsModel.get(
+            self.entity_translation_1.id)
+        self.assertIn(
+            'invalid_content',
+            updated_model.translations.keys()
         )
