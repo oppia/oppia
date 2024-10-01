@@ -139,6 +139,10 @@ export class MathExpressionContentEditorComponent implements OnInit {
   // and testing. MathJax 3 provides a faster and more cleaner way to
   // convert a LaTeX string to an SVG.
   private convertLatexStringToSvg(inputLatexString: string) {
+    if (typeof MathJax === 'undefined' || !MathJax.Hub) {
+      console.error('MathJax is not properly loaded.');
+      return;
+    }
     const outputElement = document.createElement('div');
     // We need to append the element with a script tag so that Mathjax
     // can typeset and convert this element. The typesetting is not

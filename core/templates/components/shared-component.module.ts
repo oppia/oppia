@@ -20,7 +20,7 @@ import 'zone.js';
 
 // Modules.
 import {CommonModule} from '@angular/common';
-import {NgModule} from '@angular/core';
+import {NgModule, NO_ERRORS_SCHEMA} from '@angular/core';
 import {AngularFireModule} from '@angular/fire';
 import {
   AngularFireAuth,
@@ -194,8 +194,12 @@ import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {RteHelperModalComponent} from 'services/rte-helper-modal.controller';
 import {DirectivesModule} from 'directives/directives.module';
-
+import {ExplorationSaveModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-save-modal.component';
+import {ConfirmDiscardChangesModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-discard-changes-modal.component';
+import {EditorReloadingModalComponent} from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
+import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
 @NgModule({
+  schemas: [NO_ERRORS_SCHEMA],
   imports: [
     BackgroundBannerModule,
     BaseModule,
@@ -374,6 +378,10 @@ import {DirectivesModule} from 'directives/directives.module';
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    ExplorationSaveModalComponent,
+    ConfirmDiscardChangesModalComponent,
+    EditorReloadingModalComponent,
+    ExplorationMetadataModalComponent,
   ],
 
   entryComponents: [
@@ -512,6 +520,10 @@ import {DirectivesModule} from 'directives/directives.module';
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    ExplorationSaveModalComponent,
+    ConfirmDiscardChangesModalComponent,
+    EditorReloadingModalComponent,
+    ExplorationMetadataModalComponent,
   ],
 
   exports: [

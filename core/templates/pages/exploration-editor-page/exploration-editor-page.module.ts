@@ -34,8 +34,6 @@ import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
 import {StateDiffModalComponent} from './modal-templates/state-diff-modal.component';
 import {PostPublishModalComponent} from './modal-templates/post-publish-modal.component';
 import {ExplorationPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
-import {EditorReloadingModalComponent} from './modal-templates/editor-reloading-modal.component';
-import {ConfirmDiscardChangesModalComponent} from './modal-templates/confirm-discard-changes-modal.component';
 import {CreateFeedbackThreadModalComponent} from './feedback-tab/templates/create-feedback-thread-modal.component';
 import {PreviewSummaryTileModalComponent} from './settings-tab/templates/preview-summary-tile-modal.component';
 import {WelcomeTranslationModalComponent} from './translation-tab/modal-templates/welcome-translation-modal.component';
@@ -54,9 +52,7 @@ import {RevertExplorationModalComponent} from './history-tab/modal-templates/rev
 import {ExplorationMetadataDiffModalComponent} from './modal-templates/exploration-metadata-diff-modal.component';
 import {ExplorationTitleEditorComponent} from './exploration-title-editor/exploration-title-editor.component';
 import {ExplorationObjectiveEditorComponent} from './exploration-objective-editor/exploration-objective-editor.component';
-import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {ExplorationSaveModalComponent} from './modal-templates/exploration-save-modal.component';
 import {EditorNavbarBreadcrumbComponent} from './editor-navigation/editor-navbar-breadcrumb.component';
 import {ExplorationGraphModalComponent} from './editor-tab/templates/modal-templates/exploration-graph-modal.component';
 import {ExplorationGraphComponent} from './editor-tab/graph-directives/exploration-graph.component';
@@ -134,9 +130,7 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
-    ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
-    EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
     PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
@@ -155,8 +149,6 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     ExplorationMetadataDiffModalComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
-    ExplorationMetadataModalComponent,
-    ExplorationSaveModalComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,
@@ -204,9 +196,7 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     WelcomeModalComponent,
     StateDiffModalComponent,
     PostPublishModalComponent,
-    ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
-    EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
     PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
@@ -225,8 +215,6 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     ExplorationMetadataDiffModalComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
-    ExplorationMetadataModalComponent,
-    ExplorationSaveModalComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,
