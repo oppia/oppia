@@ -210,20 +210,6 @@ describe('Diagnostic test player component', () => {
     );
   });
 
-  it("should be able to get Oppia's avatar image URL after initialization", () => {
-    windowRef.nativeWindow.location.search = '?classroom=math';
-    spyOn(preventPageUnloadEventService, 'addListener');
-
-    expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual('');
-
-    const avatarImageLocation =
-      '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg';
-
-    component.ngOnInit();
-
-    expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual(avatarImageLocation);
-  });
-
   it('should get classroomData after initialization', fakeAsync(() => {
     windowRef.nativeWindow.location.search = '?classroom=math';
 
