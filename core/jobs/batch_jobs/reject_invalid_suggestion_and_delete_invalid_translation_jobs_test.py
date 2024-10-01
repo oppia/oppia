@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Unit tests for jobs.batch_jobs.
-reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs.
+reject_invalid_suggestion_and_delete_invalid_translation_jobs.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from __future__ import annotations
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import (
-    reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs)
+    reject_invalid_suggestion_and_delete_invalid_translation_jobs)
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -31,6 +31,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import suggestion_models
+    from mypy_imports import translation_models
 
 (
     exp_models,
@@ -120,7 +121,7 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
 ):
 
     JOB_CLASS = (
-        reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs
+        reject_invalid_suggestion_and_delete_invalid_translation_jobs
         .RejectTranslationSuggestionsForTranslatedContentsJob
     )
     TARGET_ID_1 = 'exp1'
@@ -225,7 +226,7 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
     job_test_utils.JobTestBase
 ):
     JOB_CLASS = (
-        reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs
+        reject_invalid_suggestion_and_delete_invalid_translation_jobs
         .AuditTranslationSuggestionsForTranslatedContentsJob
     )
     TARGET_ID_1 = 'exp1'
@@ -346,7 +347,7 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
 ):
 
     JOB_CLASS = (
-        reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs
+        reject_invalid_suggestion_and_delete_invalid_translation_jobs
         .DeleteTranslationsForInvalidContentIDsJob
     )
     TARGET_ID_1 = 'exp1'
@@ -410,7 +411,7 @@ class AuditTranslationsForInvalidContentIDsJobTests(
     job_test_utils.JobTestBase
 ):
     JOB_CLASS = (
-        reject_invalid_translation_suggestion_and_delete_invalid_translation_jobs
+        reject_invalid_suggestion_and_delete_invalid_translation_jobs
         .AuditTranslationsForInvalidContentIDsJob
     )
     TARGET_ID_1 = 'exp1'

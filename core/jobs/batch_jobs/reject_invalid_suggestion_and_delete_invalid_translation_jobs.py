@@ -32,6 +32,7 @@ from typing import Dict, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import exp_models
     from mypy_imports import suggestion_models
     from mypy_imports import translation_models
 
@@ -53,8 +54,7 @@ class RejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
     @staticmethod
     def _reject_suggestions_in_review_for_translated_contents(
         entity_translation_model: translation_models.EntityTranslationsModel
-    ) -> List[Dict[str, Union[
-        str, int, suggestion_models.GeneralSuggestionModel]]]:
+    ) -> List[suggestion_models.GeneralSuggestionModel]:
         """Rejects all translation suggestions in review for the content
         with an accepted translation, for an entity translation model.
 
@@ -263,6 +263,7 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
 
         if is_updated:
             return entity_translation_model
+        return None
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of entity translation model update results.

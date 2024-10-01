@@ -804,7 +804,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                                 remote_sha1='remote_sha1'
                             )])
 
- def test_get_refs_with_empty_remote_sha(self) -> None:
+    def test_get_refs_with_empty_remote_sha(self) -> None:
         with tempfile.NamedTemporaryFile() as temp_stdin_file:
             with utils.open_file(temp_stdin_file.name, 'w') as f:
                 f.write(
