@@ -50,7 +50,7 @@ class QuestionCreationHandler(
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET':{},
+        'GET': {},
         'POST': {
             'question_dict': {
                 'schema': {
