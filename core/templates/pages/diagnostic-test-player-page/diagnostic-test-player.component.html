@@ -1,4 +1,5 @@
-<div class="diagnostic-test-container">
+<background-banner></background-banner>
+<div class="diagnostic-test-container position-relative">
   <div class="oppia-diagnostic-test-page-header">
     <button class="btn oppia-back-to-classroom-button">
       <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
@@ -112,15 +113,16 @@
   .oppia-diagnostic-test-page-header {
     align-items: center;
     display: flex;
-    margin: 3%;
+    justify-content: center;
+    padding: 3% 3% 0 3%;
+    position: relative;
   }
   .oppia-back-to-classroom-button {
-    align-items: center;
     background-color: #00645c;
     color: #fff;
-    display: flex;
-    float: right;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
+    left: 5%;
+    position: absolute;
     text-transform: uppercase;
   }
   .oppia-back-button-text-class {
@@ -260,7 +262,11 @@
   @media(max-width: 500px) {
     .oppia-introductory-card {
       margin-left: auto;
-      width: 100%;
+      width: 90%;
+    }
+    .oppia-back-to-classroom-button {
+      left: 1%;
+      position: relative;
     }
     .oppia-image {
       align-items: center;
