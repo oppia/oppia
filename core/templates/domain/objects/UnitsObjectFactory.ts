@@ -264,6 +264,43 @@ export class UnitsObjectFactory {
     }
     return new Units(this.fromStringToList(units));
   }
+
+  getPossibleUnits(units: string[]): string[]{
+    var newUnits: string[] = [];
+      units.forEach(entry => {
+        newUnits.push(entry.replace([0-9]/g,));
+      })
+
+      return units;
+  }
+
+  findDuplicatedUnit(units: string): string{
+    let unitsP: string[] = ["km","kg","m","s"];
+    var listedUnits= this.getPossibleUnits(units);
+    let unitCount: int[] = [0,0,0,0];
+
+    for(var i in listedUnits){
+      if(i == unitsP[0]){
+        unitCount[0] += 1;
+      }
+      else if(i == unitsP[0]){
+        unitCount[1] += 1;
+      }
+      else if(i == unitsP[0]){
+        unitCount[2] += 1;
+      }
+      else if(i == unitsP[0]){
+        unitCount[3] += 1;
+      }
+    }
+    for(j in unitCount){
+      if (j >= 2){
+        return " ";
+      }
+    }
+
+  }
+
 }
 
 angular

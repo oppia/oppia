@@ -845,6 +845,7 @@
     "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS": "Please ensure that the unit only contains numbers, alphabets, (, ), *, ^, /, -",
     "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_VALUE": "Please ensure that the value is either a fraction or a number",
     "I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Possible unit formats",
+    "I18N_INTERACTIONS_NUMBER_WITH_DOUBLE_UNITS": "The unit type must only be used once",
     "I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL": "At most 1 decimal point should be present.",
     "I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT": "At most 1 exponent sign (e) should be present.",
     "I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS": "At most 1 minus (-) sign should be present.",
