@@ -21,6 +21,7 @@ import datetime
 from core import feature_flag_list
 from core import feconf
 from core.constants import constants
+from core.domain import exp_fetchers
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
@@ -782,6 +783,7 @@ class ExplorationEditorPageAccessValidationHandlerTests(
     test_utils.GenericTestBase):
     """Checks the access to the story editor page and its rendering."""
 
+    exploration_id = exp_fetchers.get_new_exploration_id()
     def setUp(self) -> None:
         super().setUp()
         self.guest_username = 'guest'
@@ -792,7 +794,7 @@ class ExplorationEditorPageAccessValidationHandlerTests(
         self.get_html_response(
             '%s/can_access_exploration_editor_page/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.exploration_id
-            ), expected_status_int=302
+            ), expected_status_int=401
         )
 
     def test_access_exploration_editor_page_after_logging_in(self) -> None:
