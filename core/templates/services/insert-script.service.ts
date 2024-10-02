@@ -61,7 +61,7 @@ export class InsertScriptService {
       }
 
       const scriptLoadPromise = new Promise<void>((resolve, reject) => {
-        scriptElement.onerror = error => {
+        scriptElement.onerror = (error: ErrorEvent) => {
           this.scriptsLoading.delete(script);
           reject(error);
         };
