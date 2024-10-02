@@ -77,16 +77,36 @@ export class AccessValidationBackendApiService {
   CLASSROOMS_PAGE_ACCESS_VALIDATION =
     '/access_validation_handler/can_access_classrooms_page';
 
+  REVIEW_TESTS_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_review_tests_page/<classroom_url_fragment>/<topic_url_fragment>/<story_url_fragment>'; // eslint-disable-line max-len
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
 
   validateAccessToExplorationEditorPage(explorationId: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.EXPLORATION_EDITOR_PAGE_ACCESS_VALIDATOR,
       {
         exploration_id: explorationId,
+      }
+    );
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToReviewTestPage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    storyUrlFragment: string
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.REVIEW_TESTS_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+        story_url_fragment: storyUrlFragment,
       }
     );
     return this.http.get<void>(url).toPromise();
