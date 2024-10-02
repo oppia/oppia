@@ -294,6 +294,7 @@ export class BlogHomePageComponent implements OnInit {
     this.loaderService.showLoadingScreen('Loading');
     if (this.searchQuery === '') {
       this.loadInitialBlogHomePageData();
+      this.windowRef.nativeWindow.history.pushState({}, '', '/blog');
       return;
     }
     this.blogPostSearchService.executeSearchQuery(
