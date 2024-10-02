@@ -54,38 +54,20 @@ export class QuestionValidationService {
   }
 
   areAnswerGroupsNotEqual(question: Question): boolean {
-    let answerGroups = question._stateData.interaction.answerGroups;
+    const answerGroups = question._stateData.interaction.answerGroups;
+    const ruleSet = new Set<string>();
 
-    // Check for duplicate rules within the same answer group.
-    for (let group of answerGroups) {
-      for (let i = 0; i < group.rules.length; i++) {
-        for (let j = i + 1; j < group.rules.length; j++) {
-          if (
-            group.rules[i].type === group.rules[j].type &&
-            JSON.stringify(group.rules[i].inputs) ===
-              JSON.stringify(group.rules[j].inputs)
-          ) {
-            return false;
-          }
+    for (const group of answerGroups) {
+      for (const rule of group.rules) {
+        const ruleKey = `${rule.type}:${JSON.stringify(rule.inputs)}`;
+
+        if (ruleSet.has(ruleKey)) {
+          return false;
         }
+        ruleSet.add(ruleKey);
       }
     }
 
-    // Check for duplicate rules across different answer groups.
-    for (let i = 0; i < answerGroups.length; i++) {
-      for (let j = i + 1; j < answerGroups.length; j++) {
-        for (let rule1 of answerGroups[i].rules) {
-          for (let rule2 of answerGroups[j].rules) {
-            if (
-              rule1.type === rule2.type &&
-              JSON.stringify(rule1.inputs) === JSON.stringify(rule2.inputs)
-            ) {
-              return false;
-            }
-          }
-        }
-      }
-    }
     return true;
   }
 
