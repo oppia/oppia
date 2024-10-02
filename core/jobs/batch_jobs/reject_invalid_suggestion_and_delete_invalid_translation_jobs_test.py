@@ -21,6 +21,7 @@ reject_invalid_suggestion_and_delete_invalid_translation_jobs.
 from __future__ import annotations
 
 from core import feconf
+from core.domain import translation_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import (
     reject_invalid_suggestion_and_delete_invalid_translation_jobs)
@@ -175,7 +176,8 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             self.TARGET_ID_1,
             self.exp_1.version,
             'hi',
-            {'content_0': TRANSLATED_CONTENT_DICT}
+            {'content_0': translation_domain.TranslatedContent.from_dict(
+                TRANSLATED_CONTENT_DICT)}
         ))
         self.entity_translation_2 = (
             translation_models.EntityTranslationsModel.create_new(
@@ -183,7 +185,8 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             self.TARGET_ID_2,
             self.exp_1.version,
             'hi',
-            {'content_0': TRANSLATED_CONTENT_DICT}
+            {'content_0': translation_domain.TranslatedContent.from_dict(
+                TRANSLATED_CONTENT_DICT)}
         ))
         self.put_multi([
             self.entity_translation_1, self.entity_translation_2])
@@ -280,7 +283,8 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             self.TARGET_ID_1,
             self.exp_1.version,
             'hi',
-            {'default_outcome_1': TRANSLATED_CONTENT_DICT}
+            {'default_outcome_1': translation_domain.TranslatedContent.from_dict(
+                TRANSLATED_CONTENT_DICT)}
         ))
         self.entity_translation_2 = (
             translation_models.EntityTranslationsModel.create_new(
@@ -288,7 +292,8 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             self.TARGET_ID_2,
             self.exp_1.version,
             'hi',
-            {'default_outcome_1': TRANSLATED_CONTENT_DICT}
+            {'default_outcome_1': translation_domain.TranslatedContent.from_dict(
+                TRANSLATED_CONTENT_DICT)}
         ))
         self.put_multi([
             self.entity_translation_1, self.entity_translation_2])
@@ -381,7 +386,8 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
             self.TARGET_ID_1,
             self.exp_1.version,
             'hi',
-            {'content_0': TRANSLATED_CONTENT_DICT}
+            {'content_0': translation_domain.TranslatedContent.from_dict(
+                TRANSLATED_CONTENT_DICT)}
         ))
         self.put_multi([self.entity_translation_1])
 
@@ -445,7 +451,8 @@ class AuditTranslationsForInvalidContentIDsJobTests(
             self.TARGET_ID_1,
             self.exp_1.version,
             'hi',
-            {'default_outcome_1': TRANSLATED_CONTENT_DICT}
+            {'default_outcome_1': translation_domain.TranslatedContent.from_dict(
+                TRANSLATED_CONTENT_DICT)}
         ))
         self.put_multi([self.entity_translation_1])
 

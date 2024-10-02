@@ -248,7 +248,7 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
         """
         exp_model = exp_models.ExplorationModel.get(
                 entity_translation_model.entity_id,
-                entity_translation_model.entity_version)
+                version = entity_translation_model.entity_version)
         exp = exp_fetchers.get_exploration_from_model(exp_model)
 
         exp_content_ids = exp.get_translatable_content_ids()
@@ -322,7 +322,7 @@ class AuditTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
 
         exp_model = exp_models.ExplorationModel.get(
                 entity_translation_model.entity_id,
-                entity_translation_model.entity_version)
+                version = entity_translation_model.entity_version)
         exp = exp_fetchers.get_exploration_from_model(exp_model)
 
         exp_content_ids = exp.get_translatable_content_ids()
