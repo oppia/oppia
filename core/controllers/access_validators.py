@@ -555,4 +555,3 @@ class ExplorationEditorAccessValidationHandlerPage(
         """
 
         pass
-

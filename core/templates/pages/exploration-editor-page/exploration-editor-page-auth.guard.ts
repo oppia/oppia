@@ -29,7 +29,6 @@ import {
 import {AppConstants} from 'app.constants';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import {ContextService} from 'services/context.service';
-import {log} from 'util';
 
 @Injectable({
   providedIn: 'root',

@@ -778,7 +778,8 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
         )
 
 
-class ExplorationEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+class ExplorationEditorPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase):
     """Checks the access to the story editor page and its rendering."""
 
     def setUp(self) -> None:
