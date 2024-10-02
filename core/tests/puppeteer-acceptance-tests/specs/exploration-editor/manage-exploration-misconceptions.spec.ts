@@ -165,13 +165,6 @@ describe('Exploration Editor', function () {
     );
 
     await curriculumAdmin.publishDraftTopic('Test Topic 1');
-    await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Test Story 1',
-      'test-story-one',
-      'Test Chapter 1',
-      explorationId,
-      'Test Topic 1'
-    );
 
     await curriculumAdmin.openSkillEditor('Test Skill 1');
     await curriculumAdmin.addMisconception(
@@ -186,6 +179,14 @@ describe('Exploration Editor', function () {
       true
     );
     await curriculumAdmin.publishUpdatedSkill('Update');
+
+    await curriculumAdmin.createAndPublishStoryWithChapter(
+      'Test Story 1',
+      'test-story-one',
+      'Test Chapter 1',
+      explorationId,
+      'Test Topic 1'
+    );
     // We set an increased custom timeout since the setup takes too long unlike other specs.
   }, 400000);
 
