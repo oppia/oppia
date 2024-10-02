@@ -784,6 +784,7 @@ class ExplorationEditorPageAccessValidationHandlerTests(
     """Checks the access to the story editor page and its rendering."""
 
     exploration_id = exp_fetchers.get_new_exploration_id()
+
     def setUp(self) -> None:
         super().setUp()
         self.guest_username = 'guest'
