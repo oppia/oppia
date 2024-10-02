@@ -32,8 +32,6 @@ import {ChangesInHumanReadableFormComponent} from './changes-in-human-readable-f
 import {LostChangesModalComponent} from './modal-templates/lost-changes-modal.component';
 import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
 import {StateDiffModalComponent} from './modal-templates/state-diff-modal.component';
-import {PostPublishModalComponent} from './modal-templates/post-publish-modal.component';
-import {ExplorationPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
 import {CreateFeedbackThreadModalComponent} from './feedback-tab/templates/create-feedback-thread-modal.component';
 import {PreviewSummaryTileModalComponent} from './settings-tab/templates/preview-summary-tile-modal.component';
 import {WelcomeTranslationModalComponent} from './translation-tab/modal-templates/welcome-translation-modal.component';
@@ -50,8 +48,6 @@ import {PreviewSetParametersModalComponent} from './preview-tab/templates/previe
 import {CheckRevertExplorationModalComponent} from './history-tab/modal-templates/check-revert-exploration-modal.component';
 import {RevertExplorationModalComponent} from './history-tab/modal-templates/revert-exploration-modal.component';
 import {ExplorationMetadataDiffModalComponent} from './modal-templates/exploration-metadata-diff-modal.component';
-import {ExplorationTitleEditorComponent} from './exploration-title-editor/exploration-title-editor.component';
-import {ExplorationObjectiveEditorComponent} from './exploration-objective-editor/exploration-objective-editor.component';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {EditorNavbarBreadcrumbComponent} from './editor-navigation/editor-navbar-breadcrumb.component';
 import {ExplorationGraphModalComponent} from './editor-tab/templates/modal-templates/exploration-graph-modal.component';
@@ -129,8 +125,6 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     LostChangesModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
-    PostPublishModalComponent,
-    ExplorationPublishModalComponent,
     CreateFeedbackThreadModalComponent,
     PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
@@ -147,8 +141,6 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
     ExplorationMetadataDiffModalComponent,
-    ExplorationTitleEditorComponent,
-    ExplorationObjectiveEditorComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,
@@ -195,8 +187,6 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     LostChangesModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
-    PostPublishModalComponent,
-    ExplorationPublishModalComponent,
     CreateFeedbackThreadModalComponent,
     PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
@@ -213,8 +203,6 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
     ExplorationMetadataDiffModalComponent,
-    ExplorationTitleEditorComponent,
-    ExplorationObjectiveEditorComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,

@@ -21,14 +21,13 @@ export class InsertScriptService {
 
   loadScript(script: KNOWN_SCRIPTS, onLoadCb?: () => void): boolean {
     if (this.loadedScripts.has(script)) {
-      Promise.resolve().then(onLoadCb); // Ensure async execution of the callback.
+      Promise.resolve().then(onLoadCb);
       return false;
     }
 
     if (!this.scriptsLoading.has(script)) {
       const scriptElement = this.renderer.createElement('script');
 
-      // Set script src and attributes before defining event handlers.
       switch (script) {
         case KNOWN_SCRIPTS.DONORBOX:
           scriptElement.src = 'https://donorbox.org/widget.js';

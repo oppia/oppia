@@ -20,7 +20,7 @@ import 'zone.js';
 
 // Modules.
 import {CommonModule} from '@angular/common';
-import {NgModule, NO_ERRORS_SCHEMA} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {AngularFireModule} from '@angular/fire';
 import {
   AngularFireAuth,
@@ -171,6 +171,14 @@ import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import {FullExpandAccordionComponent} from 'pages/about-page/accordion/full-expand-accordion.component';
+import {ExplorationSaveModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-save-modal.component';
+import {ConfirmDiscardChangesModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-discard-changes-modal.component';
+import {EditorReloadingModalComponent} from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
+import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
+import {ExplorationPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
+import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
+import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.component';
+import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -194,12 +202,7 @@ import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {RteHelperModalComponent} from 'services/rte-helper-modal.controller';
 import {DirectivesModule} from 'directives/directives.module';
-import {ExplorationSaveModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-save-modal.component';
-import {ConfirmDiscardChangesModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-discard-changes-modal.component';
-import {EditorReloadingModalComponent} from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
-import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
 @NgModule({
-  schemas: [NO_ERRORS_SCHEMA],
   imports: [
     BackgroundBannerModule,
     BaseModule,
@@ -382,6 +385,10 @@ import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/m
     ConfirmDiscardChangesModalComponent,
     EditorReloadingModalComponent,
     ExplorationMetadataModalComponent,
+    ExplorationPublishModalComponent,
+    PostPublishModalComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent,
   ],
 
   entryComponents: [
@@ -524,6 +531,10 @@ import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/m
     ConfirmDiscardChangesModalComponent,
     EditorReloadingModalComponent,
     ExplorationMetadataModalComponent,
+    ExplorationPublishModalComponent,
+    PostPublishModalComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent,
   ],
 
   exports: [
@@ -672,6 +683,8 @@ import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/m
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent,
   ],
 })
 export class SharedComponentsModule {}
