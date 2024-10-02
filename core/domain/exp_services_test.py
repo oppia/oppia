@@ -64,6 +64,7 @@ from typing import (
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import feedback_models
     from mypy_imports import opportunity_models
@@ -97,6 +98,7 @@ if MYPY:  # pragma: no cover
 ])
 
 search_services = models.Registry.import_search_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # TODO(msl): Test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed.
@@ -7897,7 +7899,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
                 'state_name': 'Introduction',
                 'property_name': 'answer_groups',
                 'new_value': [{
-                    'outcome': { 
+                    'outcome': {
                         'dest': 'End',
                         'dest_if_really_stuck': None,
                         'param_changes': [],
@@ -8055,7 +8057,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
                 'state_name': 'Introduction',
                 'property_name': 'answer_groups',
                 'new_value': [{
-                    'outcome': { 
+                    'outcome': {
                         'dest': 'End',
                         'dest_if_really_stuck': None,
                         'param_changes': [],
@@ -9012,6 +9014,29 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
     def test_version_history_on_revert_exploration(self) -> None:
         old_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        # Note that these translations might not correspond to any actual text
+        # in the exploration, but this discrepancy shouldn't affect the behavior
+        # we're trying to test.
+        datastore_services.put_multi([
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.TranslatableEntityType.EXPLORATION.value,
+                self.EXP_0_ID,
+                1,
+                'ak',
+                {
+                    'content_4': {
+                        'content_value': '<p>a</p>',
+                        'content_format': 'html',
+                        'needs_update': False,
+                    },
+                },
+            )
+        ])
+        old_translations = tuple(
+            translation.to_dict()['translations'] for translation in
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID, 1)
+        )
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
@@ -9026,10 +9051,35 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                     'new_state_name': 'Another state'
                 })
             ], 'Renamed state')
+        datastore_services.put_multi([
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.TranslatableEntityType.EXPLORATION.value,
+                self.EXP_0_ID,
+                3,
+                'ak',
+                {
+                    'content_5': {
+                        'content_value': '<p>a</p>',
+                        'content_format': 'html',
+                        'needs_update': False,
+                    },
+                },
+            )
+        ])
+        pre_revert_translations = tuple(
+            translation.to_dict()['translations'] for translation in
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID, 3)
+        )
         exp_services.revert_exploration(self.owner_id, self.EXP_0_ID, 3, 1)
 
         new_model = self.version_history_model_class.get(
             self.version_history_model_class.get_instance_id(self.EXP_0_ID, 4))
+        new_translations = tuple(
+            translation.to_dict()['translations'] for translation in
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.EXP_0_ID, 4)
+        )
 
         self.assertEqual(
             old_model.state_version_history,
@@ -9041,6 +9091,8 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             old_model.metadata_last_edited_committer_id,
             new_model.metadata_last_edited_committer_id)
         self.assertEqual(old_model.committer_ids, new_model.committer_ids)
+        self.assertEqual(old_translations, new_translations)
+        self.assertNotEqual(old_translations, pre_revert_translations)
 
     def test_version_history_on_cancelled_add_state(self) -> None:
         # In this case, the version history for that state should not be
