@@ -239,15 +239,15 @@ def compute_translation_related_change(
 
 
 def compute_translation_related_changes_upon_revert(
-    current_exploration: exp_domain.Exploration,
+    reverted_exploration: exp_domain.Exploration,
     revert_to_version: int
 ) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
     """Create new EntityTranslation models corresponding to translation related
     changes upon exploration revert.
 
     Args:
-        current_exploration: Exploration. The current explortaion that is to be
-            reverted.
+        reverted_exploration: Exploration. The reverted explortaion. Note that
+            this object should already reflect the revert.
         revert_to_version: int. The version of the exploration to which the
             exploration is getting reverted to.
 
@@ -261,7 +261,7 @@ def compute_translation_related_changes_upon_revert(
         for entity_translation in (
             translation_fetchers.get_all_entity_translations_for_entity(
                 feconf.TranslatableEntityType.EXPLORATION,
-                current_exploration.id,
+                reverted_exploration.id,
                 revert_to_version
             )
         )
@@ -273,13 +273,13 @@ def compute_translation_related_changes_upon_revert(
     for entity_translation in language_code_to_entity_translation.values():
 
         translation_counts[entity_translation.language_code] = (
-            current_exploration.get_translation_count(entity_translation))
+            reverted_exploration.get_translation_count(entity_translation))
 
         new_translation_models.append(
             translation_models.EntityTranslationsModel.create_new(
                 entity_translation.entity_type,
                 entity_translation.entity_id,
-                current_exploration.version + 1,
+                reverted_exploration.version,
                 entity_translation.language_code,
                 entity_translation.to_dict()['translations']
             )
