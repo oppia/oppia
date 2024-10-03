@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.domain import topic_fetchers
 from core.jobs import base_jobs
@@ -557,8 +559,35 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             )
 
         entity_id = contributor_user_id
+        
+        logging.info(
+            'Logs for question contribution stats for user: %s.' % entity_id)
 
         for stat in question_contribution_stats:
+            logging.info(
+                'Logs for question contribution stats for topic: %s.' % 
+                stat.topic_id
+            )
+            logging.info(
+                'Logs for first contribution date: %s.' % 
+                stat.first_contribution_date
+            )
+            logging.info(
+                'Logs for last contribution date: %s.' % 
+                stat.last_contribution_date
+            )
+            print(
+                'Logs for question contribution stats for topic: %s.' % 
+                stat.topic_id
+            )
+            print(
+                'Logs for first contribution date: %s.' % 
+                stat.first_contribution_date
+            )
+            print(
+                'Logs for last contribution date: %s.' % 
+                stat.last_contribution_date
+            )
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 question_contribution_stats.remove(stat)
@@ -631,8 +660,23 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         question_reviewer_stats = list(question_reviewer_stats)
         entity_id = reviewer_user_id
+        
+        logging.info(
+            'Logs for question review stats for user: %s.' % entity_id)
 
         for stat in question_reviewer_stats:
+            logging.info(
+                'Logs for question review stats for topic: %s.' % 
+                stat.topic_id
+            )
+            logging.info(
+                'Logs for first contribution date: %s.' % 
+                stat.first_contribution_date
+            )
+            logging.info(
+                'Logs for last contribution date: %s.' % 
+                stat.last_contribution_date
+            )
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 question_reviewer_stats.remove(stat)
