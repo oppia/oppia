@@ -25,7 +25,6 @@ import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-ed
 import {ContextService} from 'services/context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
-import {ImageUploaderData} from 'domain/topics_and_skills_dashboard/image-uploader.model';
 @Component({
   selector: 'oppia-create-new-topic-modal',
   templateUrl: './create-new-topic-modal.component.html',
@@ -112,9 +111,5 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
           this.topicEditorStateService.getTopicWithNameExists();
       }
     );
-  }
-
-  onImageSave(imageUploaderData: ImageUploaderData): void {
-    this.imageData = imageUploaderData.image_data;
   }
 }
