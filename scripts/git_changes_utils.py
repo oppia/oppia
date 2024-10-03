@@ -24,11 +24,13 @@ import sys
 
 from scripts import common
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, Final, List, Optional, Set, Tuple
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
+
+EMPTY_SHA1: Final[str] = '0000000000000000000000000000000000000000'
 
 
 def get_git_remotes() -> List[str]:
@@ -331,10 +333,18 @@ def get_refs() -> List[GitRef]:
     ref_list = []
     if not sys.stdin.isatty():
         # Git provides refs in STDIN.
-        ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
+        for ref_str in sys.stdin:
+            refs = ref_str.split()
+            local_ref, local_sha = refs[0], refs[1]
+            if refs[3] == EMPTY_SHA1:
+                remote_ref, remote_sha = None, None
+            else:
+                remote_ref, remote_sha = refs[2], refs[3]
+            ref_list.append(
+                GitRef(local_ref, local_sha, remote_ref, remote_sha))
     # If git didn't provide refs or the refs are empty, use the current branch
     # to get the refs.
-    if ref_list == []:
+    if not ref_list:
         current_branch = common.get_current_branch_name()
         encoded_stdout, encoded_stderr = common.start_subprocess_for_result(
             ['git', 'show-ref', current_branch])
