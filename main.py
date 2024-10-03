@@ -226,7 +226,6 @@ URLS = [
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
-    get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
 
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
 
@@ -1003,9 +1002,6 @@ URLS = [
     get_redirect_route(
         r'/querystatuscheck', email_dashboard.QueryStatusCheckHandler),
     get_redirect_route(
-        r'/emaildashboardresult/<query_id>',
-        email_dashboard.EmailDashboardResultPage),
-    get_redirect_route(
         r'/emaildashboardcancelresult/<query_id>',
         email_dashboard.EmailDashboardCancelEmailHandler),
     get_redirect_route(
@@ -1070,8 +1066,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
