@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for Email dashboard result Page.
+ * @fileoverview Review Test page root component.
  */
 
 import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
-  selector: 'oppia-email-dashboard-result-page-root',
-  templateUrl: './email-dashboard-result-page-root.component.html',
+  selector: 'review-test-page-root',
+  templateUrl: './review-test-page-root.component.html',
 })
-export class EmailDashboardResultPageRootComponent {}
+export class ReviewTestPageRootComponent extends BaseRootComponent {
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.TITLE;
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST
+    .META as unknown as Readonly<MetaTagData>[];
+}

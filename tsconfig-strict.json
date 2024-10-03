@@ -86,7 +86,9 @@
   },
   "exclude": [
     "extensions/classifiers/proto",
-    "**/*.spec.ts"
+    "extensions/objects/**/*.spec.ts",
+    "core/templates/**/*.spec.ts",
+    "extensions/interactions/**/*.spec.ts"
   ],
   "include": [
     "core",
