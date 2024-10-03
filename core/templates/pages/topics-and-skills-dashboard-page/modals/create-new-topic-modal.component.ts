@@ -116,7 +116,5 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
 
   onImageSave(imageUploaderData: ImageUploaderData): void {
     this.imageData = imageUploaderData.image_data;
-
-    this.imageLocalStorageService.storeImageData(this.imageData);
   }
 }
