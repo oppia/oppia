@@ -4,6 +4,7 @@
   </h3>
   <i class="fa fa-times modal-close-button" (click)="cancel()"></i>
 </div>
+
 <form (submit)="save()">
   <div class="modal-body create-new-topic-form">
     <div class="create-new-topic-input-field">
@@ -52,6 +53,7 @@
         </div>
       </div>
     </div>
+
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Web Title Fragment for Web*</span></div>
       <div>
@@ -67,6 +69,7 @@
         </em>
       </span>
     </div>
+
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Description*</span></div>
       <textarea class="e2e-test-new-topic-description-field required"
@@ -81,6 +84,7 @@
         </em>
       </div>
     </div>
+
     <div class="create-new-topic-input-field">
       <label class="create-new-topic-input-label">Topic Thumbnail*</label>
       <oppia-thumbnail-uploader [previewTitle]="newlyCreatedTopic.name"
@@ -100,54 +104,66 @@
     </button>
   </div>
 </form>
+
 <style>
   .create-new-topic-form .ng-touched.invalid-field,
-  .create-new-topic-form .ng-touched.ng-empty.required {
-     outline: 1px solid #f00;
-  }
-  .create-new-topic-form .create-new-topic-input-field {
-     margin: 10px 0;
-  }
-  .create-new-topic-form .create-new-topic-input-field input, .create-new-topic-input-field textarea,.create-new-topic-input-field select {
-    border: 1px solid #b9b5b5;
-    border-radius: 5px;
-  }
-  .create-new-topic-form .create-new-topic-input-label {
-    font-weight: bold;
-  }
-  .create-new-topic-modal-header .modal-close-button {
-    display: none;
+.create-new-topic-form .ng-touched.ng-empty.required {
+  outline: 1px solid #f00;
+}
+
+.create-new-topic-form .create-new-topic-input-field {
+  margin: 10px 0;
+}
+
+.create-new-topic-form .create-new-topic-input-field input, 
+.create-new-topic-input-field textarea, 
+.create-new-topic-input-field select {
+  border: 1px solid #b9b5b5;
+  border-radius: 5px;
+}
+
+.create-new-topic-form .create-new-topic-input-label {
+  font-weight: bold;
+}
+
+.create-new-topic-modal-header .modal-close-button {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .create-new-topic .modal-dialog {
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
   }
 
-  @media screen and (max-width: 768px) {
-    .create-new-topic .modal-dialog {
-      border: 0;
-      border-radius: 0;
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-    }
-    .create-new-topic .modal-content {
-      border: 0;
-      border-radius: 0;
-      display: block;
-      min-height: 100vh;
-    }
-    .create-new-topic .modal-header {
-      align-items: center;
-      background-color: #00609c;
-      display: flex;
-    }
-    .create-new-topic .modal-header h3 {
-      color: #fff;
-    }
-    .create-new-topic .create-new-topic-input-field {
-      margin: 25px 0;
-    }
-    .create-new-topic .modal-close-button {
-      color: #fff;
-      display: block;
-      font-size: 20px;
-    }
+  .create-new-topic .modal-content {
+    border: 0;
+    border-radius: 0;
+    display: block;
+    min-height: 100vh;
   }
-</style>
+
+  .create-new-topic .modal-header {
+    align-items: center;
+    background-color: #00609c;
+    display: flex;
+  }
+
+  .create-new-topic .modal-header h3 {
+    color: #fff;
+  }
+
+  .create-new-topic .create-new-topic-input-field {
+    margin: 25px 0;
+  }
+
+  .create-new-topic .modal-close-button {
+    color: #fff;
+    display: block;
+    font-size: 20px;
+  }
+}
+

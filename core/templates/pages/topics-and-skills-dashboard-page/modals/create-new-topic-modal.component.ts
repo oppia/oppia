@@ -25,6 +25,7 @@ import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-ed
 import {ContextService} from 'services/context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageUploaderData} from 'domain/topics_and_skills_dashboard/image-uploader.model'; // Make sure the path is correct
 
 @Component({
   selector: 'oppia-create-new-topic-modal',
@@ -38,7 +39,6 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   MAX_CHARS_IN_TOPIC_NAME: number = AppConstants.MAX_CHARS_IN_TOPIC_NAME;
   MAX_CHARS_IN_TOPIC_DESCRIPTION: number =
     AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION;
-
   MAX_CHARS_IN_TOPIC_URL_FRAGMENT =
     AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
 
@@ -46,6 +46,8 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   topicNameExists: boolean = false;
   maxWebTitleFrag = AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   minWebTitleFrag = AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+
+  imageData: Blob | null = null;
 
   constructor(
     private contextService: ContextService,
@@ -62,7 +64,10 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   }
 
   save(): void {
-    this.ngbActiveModal.close(this.newlyCreatedTopic);
+    this.ngbActiveModal.close({
+      ...this.newlyCreatedTopic,
+      image_data: this.imageData,
+    });
   }
 
   cancel(): void {
@@ -108,5 +113,11 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
           this.topicEditorStateService.getTopicWithNameExists();
       }
     );
+  }
+
+  onImageSave(imageUploaderData: ImageUploaderData): void {
+    this.imageData = imageUploaderData.image_data;
+
+    this.imageLocalStorageService.storeImageData(this.imageData);
   }
 }
