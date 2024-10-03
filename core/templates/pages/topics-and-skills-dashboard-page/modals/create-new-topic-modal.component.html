@@ -5,7 +5,6 @@
 
 <form (submit)="save()">
   <div class="modal-body create-new-topic-form">
-    
     <div class="create-new-topic-input-field">
       <div>
         <span class="create-new-topic-input-label">Name*</span>
@@ -34,7 +33,7 @@
              [ngClass]="{'invalid-field': topicUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)}"
              (change)="onTopicUrlFragmentChange()">
       <div class="oppia-input-box-subtitle text-danger" 
-           [hidden]="newlyCreatedTopic.urlFragment === '' || validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)">
+           [hidden]="newlyCreatedTopic.urlFragment === '' || validUrlFragmentRegex.test(newlyCreatedTopicurlFragment)">
         <b>Please use only lowercase letters, optionally separated by hyphen.</b>
       </div>
       <div>
