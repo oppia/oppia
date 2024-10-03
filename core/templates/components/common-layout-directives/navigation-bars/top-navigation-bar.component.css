@@ -164,8 +164,8 @@
 .oppia-top-navigation-bar .language-dropdown {
   max-height: 60vh;
   overflow-y: auto;
-  width: 300px;
   overscroll-behavior: contain;
+  width: 300px;
 }
 .oppia-top-navigation-bar .learn {
   height: 66.5px;
