@@ -209,24 +209,63 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            # This url is ignored since it is only needed for a protractor test.
-            # The backend tests fetch templates from
-            # core/templates/pages instead of webpack_bundles since we
-            # skip webpack compilation for backend tests.
-            # The console_errors.html template is present in
-            # core/templates/tests and we want one canonical
-            # directory for retrieving templates so we ignore this url.
-            if url == '/console_errors':
-                continue
+            with self.swap_to_always_return(
+                secrets_services, 'get_secret', 'secret'
+            ):
+                # Some of these will 404 or 302. This is expected.
+                self.get_response_without_checking_for_errors(
+                    url, [200, 301, 302, 400, 401, 404, 405])
+
+    def test_that_no_post_results_in_500_error(self) -> None:
+        """Test that no POST request results in a 500 error."""
+
+        for route in main.URLS:
+            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
             ):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
-                    url, [200, 301, 302, 400, 401, 404])
+                    url,
+                    [200, 301, 302, 400, 401, 404, 405],
+                    http_method='POST',
+                    params={}
+                )
 
-        # TODO(#20399): Add similar tests for POST, PUT, DELETE.
+    def test_that_no_put_results_in_500_error(self) -> None:
+        """Test that no PUT request results in a 500 error."""
+
+        for route in main.URLS:
+            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
+
+            with self.swap_to_always_return(
+                secrets_services, 'get_secret', 'secret'
+            ):
+                # Some of these will 404 or 302. This is expected.
+                self.get_response_without_checking_for_errors(
+                    url,
+                    [200, 301, 302, 400, 401, 404, 405],
+                    http_method='PUT',
+                    params={}
+                )
+
+    def test_that_no_delete_results_in_500_error(self) -> None:
+        """Test that no DELETE request results in a 500 error."""
+
+        for route in main.URLS:
+            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
+
+            with self.swap_to_always_return(
+                secrets_services, 'get_secret', 'secret'
+            ):
+                # Some of these will 404 or 302. This is expected.
+                self.get_response_without_checking_for_errors(
+                    url,
+                    [200, 301, 302, 400, 401, 404, 405],
+                    http_method='DELETE',
+                    params={}
+                )
 
     def test_requests_for_missing_csrf_token(self) -> None:
         """Tests request without csrf_token results in 401 error."""
