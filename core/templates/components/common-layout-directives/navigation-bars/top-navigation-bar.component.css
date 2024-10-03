@@ -165,6 +165,7 @@
   max-height: 60vh;
   overflow-y: auto;
   width: 300px;
+  overscroll-behavior:contain;
 }
 .oppia-top-navigation-bar .learn {
   height: 66.5px;
