@@ -56,6 +56,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE,
+    loadChildren: () =>
+      import('pages/blog-dashboard-page/blog-dashboard-page.module').then(
+        m => m.BlogDashboardPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_ADMIN.ROUTE,
     loadChildren: () =>
       import('pages/blog-admin-page/blog-admin-page.module').then(
@@ -422,6 +430,14 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/collection-player-page/collection-player-page.module').then(
         m => m.CollectionPlayerPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/review-test-page/review-test-page.module').then(
+        m => m.ReviewTestPageModule
       ),
   },
 ];

@@ -3014,6 +3014,7 @@ version: 1
         self,
         url: str,
         expected_status_int_list: List[int],
+        http_method: Optional[str] = 'GET',
         params: Optional[Dict[str, str]] = None
     ) -> webtest.TestResponse:
         """Get a response, transformed to a Python object and checks for a list
@@ -3023,10 +3024,16 @@ version: 1
             url: str. The URL to fetch the response.
             expected_status_int_list: list(int). A list of integer status code
                 to expect.
+            http_method: str. The http method by which the request is to be 
+                sent.
             params: dict. A dictionary that will be encoded into a query string.
 
         Returns:
             webtest.TestResponse. The test response.
+
+        Raises:
+            Exception. If the http method is not one of GET, POST, PUT or
+                DELETE, then this exception is raised.
         """
         if params is not None:
             self.assertIsInstance(
@@ -3038,7 +3045,26 @@ version: 1
         # only produced after webpack compilation which is not performed during
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
-            response = self.testapp.get(url, params=params, expect_errors=True)
+
+            if http_method == 'GET':
+                response = self.testapp.get(
+                    url, params=params, expect_errors=True
+                )
+
+        if http_method == 'POST':
+            response = self.testapp.post(
+                url, params=params, expect_errors=True
+            )
+        elif http_method == 'PUT':
+            response = self.testapp.put(
+                url, params=params, expect_errors=True
+            )
+        elif http_method == 'DELETE':
+            response = self.testapp.delete(
+                url, params=params, expect_errors=True
+            )
+        elif http_method != 'GET':
+            raise Exception('Invalid http method %s' % http_method)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
