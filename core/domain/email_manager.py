@@ -763,14 +763,16 @@ def send_post_signup_email(
                 email_body_content_param_name
             ).default_value
         )
-        if email_subject_content_default_value == email_subject_content:
+        if not len(email_subject_content) or (
+                email_subject_content_default_value == email_subject_content):
             logging.error(
                 'Please ensure that the value for the admin platform '
                 'property SIGNUP_EMAIL_SUBJECT_CONTENT is set, before allowing '
                 'post-signup emails to be sent.'
             )
             return
-        if email_body_content_default_value == email_body_content:
+        if not len(email_body_content) or (
+                email_body_content_default_value == email_body_content):
             logging.error(
                 'Please ensure that the value for the admin platform '
                 'property SIGNUP_EMAIL_BODY_CONTENT is set, before allowing '

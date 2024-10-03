@@ -665,6 +665,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
             )
         ]
     )
@@ -1107,6 +1111,10 @@ class SignupTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
             )
         ]
     )
@@ -1309,6 +1317,12 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         [(
             platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
             'audience_id'
+        ), (
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+            'system@example.com'
+        ), (
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS,
+            False
         )]
     )
     def test_post(self) -> None:
