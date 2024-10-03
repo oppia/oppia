@@ -85,6 +85,11 @@ class RejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
                     entity_translation_model.entity_version
                 )
             ).filter(
+                suggestion_models.GeneralSuggestionModel
+                .language_code == (
+                    entity_translation_model.language_code
+                )
+            ).filter(
                 suggestion_models.GeneralSuggestionModel.status == (
                     suggestion_models.STATUS_IN_REVIEW
                 )
@@ -173,6 +178,11 @@ class AuditTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
                     entity_translation_model.entity_version
                 )
             ).filter(
+                suggestion_models.GeneralSuggestionModel
+                .language_code == (
+                    entity_translation_model.language_code
+                )
+            ).filter(
                 suggestion_models.GeneralSuggestionModel.status == (
                     suggestion_models.STATUS_IN_REVIEW
                 )
@@ -248,7 +258,8 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
         """
         exp_model = exp_models.ExplorationModel.get(
                 entity_translation_model.entity_id,
-                version = entity_translation_model.entity_version)
+                strict=True,
+                version=entity_translation_model.entity_version)
         exp = exp_fetchers.get_exploration_from_model(exp_model)
 
         exp_content_ids = exp.get_translatable_content_ids()
@@ -322,7 +333,8 @@ class AuditTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
 
         exp_model = exp_models.ExplorationModel.get(
                 entity_translation_model.entity_id,
-                version = entity_translation_model.entity_version)
+                strict=True,
+                version=entity_translation_model.entity_version)
         exp = exp_fetchers.get_exploration_from_model(exp_model)
 
         exp_content_ids = exp.get_translatable_content_ids()
