@@ -27,9 +27,10 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {AppConstants} from 'app.constants';
 import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
 import {AccessValidationBackendApiService} from '../oppia-root/routing/access-validation-backend-api.service';
+import {ContextService} from 'services/context.service';
 
 class MockAccessValidationBackendApiService {
-  validateAccessToStoryEditorPage(storyId: string) {
+  validateAccessToExplorationEditorPage(explorationId: string) {
     return Promise.resolve();
   }
 }
@@ -37,6 +38,12 @@ class MockAccessValidationBackendApiService {
 class MockRouter {
   navigate(commands: string[]): Promise<boolean> {
     return Promise.resolve(true);
+  }
+}
+
+class MockContextService {
+  getExplorationId(): string {
+    return 'expId123';
   }
 }
 
@@ -55,6 +62,7 @@ describe('ExplorationEditorPageAuthGuard', () => {
           useClass: MockAccessValidationBackendApiService,
         },
         {provide: Router, useClass: MockRouter},
+        {provide: ContextService, useClass: MockContextService},
         Location,
       ],
     });
@@ -94,7 +102,7 @@ describe('ExplorationEditorPageAuthGuard', () => {
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToExplorationEditorPage'
-    ).and.returnValue(Promise.reject());
+    ).and.returnValue(Promise.reject({status: 401}));
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
     );

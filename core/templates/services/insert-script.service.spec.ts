@@ -42,11 +42,18 @@ describe('InsertScriptService', () => {
     insertScriptService = TestBed.get(InsertScriptService);
   });
 
-  it('should insert script into html', () => {
+  it('should insert script into html', (done: jasmine.DoneFn) => {
     // First time load script.
-    expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(true);
-    // Load script again.
-    expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(false);
-    expect(insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN)).toBe(false);
+    const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+    expect(result).toBe(true);
+    // Handle the async operation for the first load.
+    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
+      // Once the script is loaded, try loading it again.
+      expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
+        false
+      );
+      expect(insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN)).toBe(false);
+      done();
+    });
   });
 });

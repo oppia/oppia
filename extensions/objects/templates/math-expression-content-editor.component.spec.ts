@@ -32,6 +32,7 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
+import {KNOWN_SCRIPTS} from 'services/insert-script.service';
 
 describe('MathExpressionContentEditorComponent', () => {
   let component: MathExpressionContentEditorComponent;
@@ -203,30 +204,44 @@ describe('MathExpressionContentEditorComponent', () => {
     component.ngOnDestroy();
   });
 
-  it(
-    "should initialise component when user clicks 'math expression' in" +
-      ' the rich text editor',
-    () => {
-      const component = TestBed.createComponent(
-        MathExpressionContentEditorComponent
-      ).componentInstance;
-      component.ngOnInit();
-      component.active = true;
-      spyOn(component.valueChanged, 'emit');
+  it("should initialise component when user clicks 'math expression' in the rich text editor", () => {
+    const component = TestBed.createComponent(
+      MathExpressionContentEditorComponent
+    ).componentInstance;
+    component.active = true;
 
-      component.ngOnInit();
+    spyOn(component['insertScriptService'], 'loadScript').and.callFake(
+      (script, onLoadCb) => {
+        if (onLoadCb) {
+          onLoadCb();
+        }
+        return true;
+      }
+    );
 
-      expect(component.svgString).toBe('');
-      expect(component.numberOfElementsInQueue).toBe(0);
-      expect(component.value.mathExpressionSvgIsBeingProcessed).toBe(true);
-      expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
-    }
-  );
+    spyOn(component.valueChanged, 'emit');
+
+    component.ngOnInit();
+
+    expect(component.svgString).toBe('');
+    expect(component.numberOfElementsInQueue).toBe(0);
+    expect(component.value.mathExpressionSvgIsBeingProcessed).toBe(true);
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
+  });
 
   it(
     'should let the user edit the existing expression when user' +
       " clicks the 'math expression' in the text editor",
     () => {
+      spyOn(component['insertScriptService'], 'loadScript').and.callFake(
+        (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
+          if (onLoadCb) {
+            onLoadCb();
+          }
+          return true;
+        }
+      );
+
       spyOn(component.valueChanged, 'emit');
 
       component.ngOnInit();
@@ -239,19 +254,43 @@ describe('MathExpressionContentEditorComponent', () => {
     }
   );
 
-  it('should close editor if the expression is not editable on initialisation', () => {
+  it('should close editor if the expression is not editable on initialisation', fakeAsync(() => {
     spyOn(component, 'closeEditor');
+    const loadScriptSpy = spyOn(
+      component.insertScriptService,
+      'loadScript'
+    ).and.callFake((script, callback) => {
+      if (script === KNOWN_SCRIPTS.MATHJAX) {
+        callback();
+      }
+      return true;
+    });
+
     component.alwaysEditable = false;
 
     component.ngOnInit();
+    flush();
 
     expect(component.closeEditor).toHaveBeenCalled();
-  });
+    expect(loadScriptSpy).toHaveBeenCalledWith(
+      KNOWN_SCRIPTS.MATHJAX,
+      jasmine.any(Function)
+    );
+  }));
 
   it(
     'should process and save math expression as an svg when user' +
       " clicks 'Done'",
-    () => {
+    fakeAsync(() => {
+      spyOn(component['insertScriptService'], 'loadScript').and.callFake(
+        (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
+          if (onLoadCb) {
+            onLoadCb();
+          }
+          return true;
+        }
+      );
+
       spyOnProperty(
         externalRteSaveService,
         'onExternalRteSave'
@@ -260,8 +299,11 @@ describe('MathExpressionContentEditorComponent', () => {
       component.localValue.label = '\\frac{x}{y}';
       component.active = true;
       component.ngOnInit();
+      tick();
 
       mockOnExternalRteSaveEventEmitter.emit();
+
+      tick();
 
       expect(component.value.svgFile).toBe(
         'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcm' +
@@ -310,15 +352,25 @@ describe('MathExpressionContentEditorComponent', () => {
         'mathImg_12345_height_3d205_width_1d784_vertical_1d306.svg'
       );
       expect(component.replaceValue).toHaveBeenCalledWith('\\frac{x}{y}');
-    }
+      flush();
+    })
   );
 
   it('should alert user when SVG validation fails', () => {
     spyOn(component.valueChanged, 'emit');
     spyOn(alertsService, 'addWarning');
+    spyOn(component['insertScriptService'], 'loadScript').and.callFake(
+      (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
+        if (onLoadCb) {
+          onLoadCb();
+        }
+        return true;
+      }
+    );
     spyOnProperty(externalRteSaveService, 'onExternalRteSave').and.returnValue(
       mockOnExternalRteSaveEventEmitter
     );
+
     component.ngOnInit();
     component.svgString = '';
 
@@ -332,12 +384,25 @@ describe('MathExpressionContentEditorComponent', () => {
   });
 
   it('should update local value when user types in the expression editor', fakeAsync(() => {
+    // Mock the InsertScriptService to resolve the script loading promise immediately.
+    spyOn(component['insertScriptService'], 'loadScript').and.callFake(
+      (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
+        if (onLoadCb) {
+          onLoadCb();
+        }
+        return true;
+      }
+    );
+
     spyOn(component.valueChanged, 'emit');
+
     component.value.raw_latex = '';
     component.ngOnInit();
     flush();
+
     component.debouncedUpdate$.next('\\frac{x}{y}');
     tick(1000);
+
     expect(component.value.raw_latex).toBe('\\frac{x}{y}');
     expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
   }));
@@ -424,6 +489,7 @@ describe('MathExpressionContentEditorComponent', () => {
   );
 
   it('should update raw latex when the user is typing', () => {
+    component.loaded = true;
     const changes: SimpleChanges = {
       value: {
         previousValue: {
@@ -437,9 +503,9 @@ describe('MathExpressionContentEditorComponent', () => {
       },
     };
     component.localValue.label = '\\frac{a}{b}';
-
+    // Trigger ngOnChanges with the simulated changes.
     component.ngOnChanges(changes);
-
+    // Expect localValue.label to be updated.
     expect(component.localValue.label).toBe('\\frac{x}{y}');
   });
 });
