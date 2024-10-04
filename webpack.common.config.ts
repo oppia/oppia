@@ -65,9 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    blog_dashboard:
-      commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
-    console_errors: commonPrefix + '/tests/console_errors.import.ts',
     creator_dashboard:
       commonPrefix +
       '/pages/creator-dashboard-page/' +
@@ -76,9 +73,6 @@ module.exports = {
       commonPrefix +
       '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
-    email_dashboard_result:
-      commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
     error: commonPrefix + '/pages/error-pages/error-page.import.ts',
     error_iframed:
       commonPrefix +
@@ -96,8 +90,6 @@ module.exports = {
     practice_session:
       commonPrefix +
       '/pages/practice-session-page/practice-session-page.import.ts',
-    review_test:
-      commonPrefix + '/pages/review-test-page/review-test-page.import.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.import.ts',
     story_editor:
@@ -140,20 +132,6 @@ module.exports = {
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
     }),
     new HtmlWebpackPlugin({
-      chunks: ['console_errors'],
-      filename: 'console_errors.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'Contact the Oppia team, submit feedback, and learn ' +
-          'how to get involved with the Oppia project.',
-      },
-      template: commonPrefix + '/tests/console_errors.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['creator_dashboard'],
       filename: 'creator-dashboard-page.mainpage.html',
       hybrid: true,
@@ -178,16 +156,6 @@ module.exports = {
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      chunks: ['email_dashboard_result'],
-      filename: 'email-dashboard-result.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/email-dashboard-pages/email-dashboard-result.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['error_iframed'],
       filename: 'error-iframed.mainpage.html',
       meta: defaultMeta,
@@ -206,18 +174,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       statusCode: 400,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['blog_dashboard'],
-      filename: 'blog-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/blog-dashboard-page/' +
-        'blog-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
@@ -291,16 +247,6 @@ module.exports = {
         commonPrefix +
         '/pages/practice-session-page/' +
         'practice-session-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['review_test'],
-      filename: 'review-test-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),

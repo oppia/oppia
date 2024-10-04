@@ -26,7 +26,7 @@
             <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
                  class="story-summary-tile">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-                [topicName]="topicSummaryTile.name" (click)="registerClassroomInProgressLessonEvent(topicSummaryTile.classroom, topicSummaryTile.name)">
+                [topicName]="topicSummaryTile.name" (click)="registerClassroomInProgressLessonEvent(topicSummaryTile.classroomName, topicSummaryTile.name)">
               </oppia-learner-story-summary-tile>
             </div>
           </div>
@@ -126,11 +126,7 @@
             </oppia-learner-topic-summary-tile>
           </ng-container>
         </oppia-card-display>
-        <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-           class="align-items-center d-inline-flex justify-content-center mb-4 oppia-learner-dash-button-lg oppia-learner-dash-button-lg--classroom text-center">
-          <span class="fas fa-arrow-right mr-2"></span>
-          {{ 'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION_LINK' | translate }}
-        </a>
+        <oppia-classroom-button [classroom]="item.key" [variant]="'blue'"></oppia-classroom-button>
       </ng-container>
        <!--TODO(#18384): Replace with saved lessons data (placeholder with explorations); affects numCards and ng-content-->
       <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [tabType]="'homeFull'" [numCards]="incompleteExplorationsList.length">
