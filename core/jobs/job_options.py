@@ -74,8 +74,10 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             # Needed by GoogleCloudOptions.
             project=oppia_project_id,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
-            temp_location=feconf.DATAFLOW_TEMP_LOCATION,
-            staging_location=feconf.DATAFLOW_STAGING_LOCATION,
+            temp_location=(
+                feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id),
+            staging_location=(
+                feconf.DATAFLOW_STAGING_LOCATION_TEMPLATE % oppia_project_id),
             # The 'use_runner_v2' is used since some of our jobs require
             # the v2 of the runner. See the docs:
             # https://cloud.google.com/dataflow/docs/guides/deploying-a-pipeline#dataflow-runner-v2
