@@ -596,7 +596,11 @@ class TopicEditorTests(
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
         ]
     )
     def test_editable_topic_handler_get(self) -> None:
@@ -716,7 +720,11 @@ class TopicEditorTests(
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
         ]
     )
     def test_editable_topic_handler_put(self) -> None:
@@ -1098,7 +1106,11 @@ class TopicPublishSendMailHandlerTests(
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
             ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            ),
         ]
     )
     def test_send_mail(self) -> None:
