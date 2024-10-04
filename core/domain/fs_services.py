@@ -463,7 +463,7 @@ def get_static_asset_url(filepath: str) -> str:
     # import happening without it:
     # exp_domain -> html_validation_service -> fs_services ->
     # platform_parameter_services -> platform_parameter_registry ->
-    # caching_services -> exp_domain
+    # caching_services -> exp_domain.
     # Caching services should be refactored to eliminate dependency on
     # multiple domain objects.
     from core.domain import platform_parameter_list

@@ -18,9 +18,6 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
 
@@ -37,6 +34,16 @@ def get_application_id() -> str:
     Raises:
         ValueError. Value can't be None for application id.
     """
+    # TODO(1149): Refactor to remove usage of inline imports.
+    # This inline import is required because of the following cicrular
+    # import happening without it:
+    # exp_domain -> html_validation_service -> fs_services ->
+    # gae_app_identity_services -> platform_parameter_services ->
+    # platform_parameter_registry -> caching_services -> exp_domain.
+    # Caching services should be refactored to eliminate dependency on
+    # multiple domain objects.
+    from core.domain import platform_parameter_list
+    from core.domain import platform_parameter_services
     oppia_project_id = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
