@@ -210,6 +210,7 @@ describe('MathExpressionContentEditorComponent', () => {
     ).componentInstance;
     component.active = true;
 
+    // eslint-disable-next-line dot-notation
     spyOn(component['insertScriptService'], 'loadScript').and.callFake(
       (script, onLoadCb) => {
         if (onLoadCb) {
@@ -233,6 +234,7 @@ describe('MathExpressionContentEditorComponent', () => {
     'should let the user edit the existing expression when user' +
       " clicks the 'math expression' in the text editor",
     () => {
+      // eslint-disable-next-line dot-notation
       spyOn(component['insertScriptService'], 'loadScript').and.callFake(
         (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
           if (onLoadCb) {
@@ -282,6 +284,7 @@ describe('MathExpressionContentEditorComponent', () => {
     'should process and save math expression as an svg when user' +
       " clicks 'Done'",
     fakeAsync(() => {
+      // eslint-disable-next-line dot-notation
       spyOn(component['insertScriptService'], 'loadScript').and.callFake(
         (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
           if (onLoadCb) {
@@ -359,6 +362,7 @@ describe('MathExpressionContentEditorComponent', () => {
   it('should alert user when SVG validation fails', () => {
     spyOn(component.valueChanged, 'emit');
     spyOn(alertsService, 'addWarning');
+    // eslint-disable-next-line dot-notation
     spyOn(component['insertScriptService'], 'loadScript').and.callFake(
       (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
         if (onLoadCb) {
@@ -384,7 +388,7 @@ describe('MathExpressionContentEditorComponent', () => {
   });
 
   it('should update local value when user types in the expression editor', fakeAsync(() => {
-    // Mock the InsertScriptService to resolve the script loading promise immediately.
+    // eslint-disable-next-line dot-notation
     spyOn(component['insertScriptService'], 'loadScript').and.callFake(
       (script: KNOWN_SCRIPTS, onLoadCb?: () => void) => {
         if (onLoadCb) {
