@@ -705,7 +705,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             'Resetting email subject.',
             [],
             platform_parameter_registry.Registry.get_platform_parameter(
-                param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
+                param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
             ).default_value
         )
         platform_parameter_registry.Registry.update_platform_parameter(
@@ -835,7 +835,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
                 param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
-                ''
+                'Welcome!'
             ),
             (
                 param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
@@ -848,28 +848,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_content_config_is_partially_modified(
         self
     ) -> None:
-        platform_parameter_registry.Registry.update_platform_parameter(
-            param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value,
-            self.admin_id,
-            'Updating email subject.',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [
-                                ['=', 'Web']
-                            ],
-                        }
-                    ],
-                    'value_when_matched': self.new_email_subject_content
-                })
-            ],
-            platform_parameter_registry.Registry.get_platform_parameter(
-                param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
-            ).default_value
-        )
-
         log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
             logging, 'error', log_new_error_counter)
@@ -917,7 +895,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
                 param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
-                ''
+                'Welcome!'
             ),
             (
                 param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
