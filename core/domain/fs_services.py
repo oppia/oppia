@@ -459,7 +459,7 @@ def get_static_asset_url(filepath: str) -> str:
         return 'http://localhost:8181/assetsstatic/%s' % (
             filepath
         )
-    
+
     oppia_project_id = (
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
