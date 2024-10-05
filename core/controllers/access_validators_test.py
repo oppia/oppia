@@ -812,16 +812,18 @@ class ExplorationEditorPageAccessValidationHandlerTests(
         )
         self.logout()
 
-    def test_get_with_disabled_exploration_id_raises_error_without_logging_in(self) -> None:
+    def test_get_with_disabled_exp_id_raises_error_not_logged_in(self) -> None:
         self.get_html_response(
             '%s/can_access_exploration_editor_page/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                feconf.DISABLED_EXPLORATION_IDS[0]),
             expected_status_int=404)
 
-    def test_get_with_disabled_exploration_id_raises_error_after_logging_in(self) -> None:
+    def test_get_with_disabled_exp_id_raises_err_after_logging_in(self) -> None:
         self.login(self.guest_email)
         self.get_html_response(
             '%s/can_access_exploration_editor_page/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                feconf.DISABLED_EXPLORATION_IDS[0]),
             expected_status_int=404)
         self.logout()
