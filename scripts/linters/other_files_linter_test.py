@@ -294,7 +294,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 ])
             elif path.endswith('fail.yml'):
                 return '\n'.join([
-                    'name: Passing workflow file',
+                    'name: Failing workflow file',
                     'on:',
                     '  push:',
                     '    branches:',
@@ -323,6 +323,57 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         with listdir_swap, read_swap:
             task_results = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_github_workflows_use_merge_action()
+            self.assertEqual(task_results.get_report(), expected)
+
+    def test_check_github_workflows_have_name_checks(self) -> None:
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['pass.yml', 'fail.yml', 'README']
+
+        def mock_read(path: str) -> str:
+            if path.endswith('pass.yml'):
+                return '\n'.join([
+                    'name: Passing workflow file',
+                    'on:',
+                    '  push:',
+                    '    branches:',
+                    '      - develop',
+                    '',
+                    'jobs:',
+                    '  run:',
+                    '    steps:',
+                    '      - name: Print',
+                    '        run: echo "oppia"',
+                ])
+            elif path.endswith('fail.yml'):
+                return '\n'.join([
+                    'name: Failing workflow file',
+                    'on:',
+                    '  push:',
+                    '    branches:',
+                    '      - develop',
+                    '',
+                    'jobs:',
+                    '  run:',
+                    '    steps:',
+                    '      - run: echo "oppia"',
+                ])
+            raise AssertionError(
+                'mock_read called with unexpected path %s' % path)
+
+        listdir_swap = self.swap_with_checks(
+            os, 'listdir', mock_listdir,
+            expected_args=[(other_files_linter.WORKFLOWS_DIR,)])
+        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+
+        expected = [
+            '%s --> Job run has an unnamed step' %
+            os.path.join(other_files_linter.WORKFLOWS_DIR, 'fail.yml'),
+            'FAILED  Github workflow steps have a name check failed',
+        ]
+
+        with listdir_swap, read_swap:
+            task_results = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_github_workflows_have_name()
             self.assertEqual(task_results.get_report(), expected)
 
     def test_perform_all_lint_checks(self) -> None:
