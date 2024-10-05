@@ -71,7 +71,7 @@ export class MusicNotesInputRulesService {
     answer: MusicNotesAnswer[],
     inputs: {a: number; b: number}
   ): boolean {
-    // No need to check the actual length if inputs.a is greater than inputs.b in comparison
+    // No need to check the actual length if inputs.a is greater than inputs.b in comparison.
     if (inputs.a > inputs.b) {
       return false;
     }
