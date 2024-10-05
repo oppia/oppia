@@ -795,7 +795,6 @@ class ExplorationEditorPageAccessValidationHandlerTests(
             self.exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-
     def test_access_exploration_editor_page_without_logging_in(self) -> None:
         self.get_html_response(
             '%s/can_access_exploration_editor_page/%s' % (
