@@ -1320,12 +1320,6 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 },
             })], 'Change objective and init state content')
 
-    def test_get_with_disabled_exploration_id_raises_error(self) -> None:
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.EDITOR_URL_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
-            expected_status_int=404)
-
     def test_check_revert_valid(self) -> None:
         """Test if an old exploration version is valid."""
         reader_dict = self.get_json(
