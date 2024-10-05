@@ -1,4 +1,6 @@
-<ng-template #contentTpl><ng-content select="content"></ng-content></ng-template>
+<ng-template #contentTpl
+  ><ng-content select="content"></ng-content
+></ng-template>
 <ng-template #footerTpl>
   <ng-container>
     <span #ref>
@@ -12,9 +14,11 @@
 
 <main>
   <div *ngIf="iframed">
-    <div aria-label="Oppia Main Content"
-         id="oppia-main-content"
-         class="e2e-test-main-content">
+    <div
+      aria-label="Oppia Main Content"
+      id="oppia-main-content"
+      class="e2e-test-main-content"
+    >
       <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
       <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
       <div [hidden]="loadingMessage">
@@ -24,60 +28,85 @@
     </div>
   </div>
   <div *ngIf="!iframed">
-    <a role="button"
-       tabindex="0"
-       (click)="skipToMainContent()"
-       (keydown.enter)="skipToMainContent()"
-       class="oppia-skip-to-content e2e-test-skip-link">
+    <a
+      role="button"
+      tabindex="0"
+      (click)="skipToMainContent()"
+      (keydown.enter)="skipToMainContent()"
+      class="oppia-skip-to-content e2e-test-skip-link"
+    >
       Skip to Main Content
     </a>
-    <oppia-promo-bar>
-    </oppia-promo-bar>
-    <div *ngIf="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
-    </div>
-    <div class="oppia-base-container e2e-test-base-container"
-         [ngClass]="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-         (swipeleft)="closeSidebarOnSwipe()">
+    <oppia-promo-bar> </oppia-promo-bar>
+    <div
+      *ngIf="isBackgroundMaskActive()"
+      class="ng-cloak oppia-background-mask"
+    ></div>
+    <div
+      class="oppia-base-container e2e-test-base-container"
+      [ngClass]="{
+        'oppia-sidebar-menu-open': isSidebarShown(),
+        'oppia-sidebar-menu-closed': !isSidebarShown()
+      }"
+      (swipeleft)="closeSidebarOnSwipe()"
+    >
       <div class="oppia-content-container e2e-test-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
-            <nav class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
-                 role="navigation"
-                 headroom>
+            <nav
+              class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
+              role="navigation"
+              headroom
+            >
               <div class="navbar-container" dir="auto">
                 <div class="oppia-base-content-pre-logo-container">
                   <ng-content select="navbar-pre-logo-action"></ng-content>
                 </div>
-                <oppia-top-navigation-bar [headerText]="getHeaderText()"
-                                          [subheaderText]="getSubheaderText()">
+                <oppia-top-navigation-bar
+                  [headerText]="getHeaderText()"
+                  [subheaderText]="getSubheaderText()"
+                >
                 </oppia-top-navigation-bar>
-                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display">
-                  <div [ngClass]="{'mr-auto': !isLanguageRTL(), 'ml-auto': isLanguageRTL()}">
+                <div
+                  class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display"
+                >
+                  <div
+                    [ngClass]="{
+                      'mr-auto': !isLanguageRTL(),
+                      'ml-auto': isLanguageRTL()
+                    }"
+                  >
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
-                  <div class="hide-on-tablet">
-                    <ng-content select="nav-options"></ng-content>
-                  </div>
+                  <ng-content select="nav-options"></ng-content>
                 </div>
               </div>
             </nav>
 
             <div class="oppia-top-of-page-padding"></div>
             <div class="navbar-mobile-container" *ngIf="isBottomNavbarShown()">
-              <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options-base"
-                 (click)="toggleMobileNavOptions()"
-                 role="button"
-                 aria-label="Mobile navbar options">
+              <i
+                class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options-base"
+                (click)="toggleMobileNavOptions()"
+                role="button"
+                aria-label="Mobile navbar options"
+              >
               </i>
-              <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
-                <div class="hide-on-desktops">
-                  <ng-content select="mobile-nav-options"></ng-content>
-                </div>
+              <div
+                class="navbar-mobile-options"
+                *ngIf="mobileNavOptionsAreShown"
+              >
+                <ng-content select="mobile-nav-options"></ng-content>
               </div>
             </div>
-            <div aria-label="Oppia Main Content" id="oppia-main-content"
-                 class="e2e-test-main-content">
-              <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
+            <div
+              aria-label="Oppia Main Content"
+              id="oppia-main-content"
+              class="e2e-test-main-content"
+            >
+              <oppia-loading-message
+                [message]="loadingMessage"
+              ></oppia-loading-message>
               <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
               <div *ngIf="!loadingMessage" aria-hidden="false">
                 <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
@@ -87,36 +116,31 @@
           </div>
         </div>
 
-        <oppia-side-navigation-bar [display]="isSidebarShown()"></oppia-side-navigation-bar>
+        <oppia-side-navigation-bar
+          [display]="isSidebarShown()"
+        ></oppia-side-navigation-bar>
       </div>
     </div>
   </div>
 
-  <div *ngIf="!hasAcknowledgedCookies()" [hidden]="loadingMessage" class="oppia-cookie-banner-container">
+  <div
+    *ngIf="!hasAcknowledgedCookies()"
+    [hidden]="loadingMessage"
+    class="oppia-cookie-banner-container"
+  >
     <div class="oppia-cookie-banner">
-      <p class="oppia-cookie-banner-explanation" [innerHTML]="'I18N_COOKIE_BANNER_EXPLANATION' | translate"></p>
-      <button (click)="acknowledgeCookies()"
-              class="btn oppia-cookie-banner-accept-button e2e-test-oppia-cookie-banner-accept-button"
-              [innerHTML]="'I18N_COOKIE_BANNER_ACKNOWLEDGE' | translate">
-      </button>
+      <p
+        class="oppia-cookie-banner-explanation"
+        [innerHTML]="'I18N_COOKIE_BANNER_EXPLANATION' | translate"
+      ></p>
+      <button
+        (click)="acknowledgeCookies()"
+        class="btn oppia-cookie-banner-accept-button e2e-test-oppia-cookie-banner-accept-button"
+        [innerHTML]="'I18N_COOKIE_BANNER_ACKNOWLEDGE' | translate"
+      ></button>
       <div class="clearfix"></div>
     </div>
   </div>
 
-  <div *ngIf="DEV_MODE" class="oppia-dev-mode e2e-test-dev-mode">
-    Dev Mode
-  </div>
+  <div *ngIf="DEV_MODE" class="oppia-dev-mode e2e-test-dev-mode">Dev Mode</div>
 </main>
-
-<style>
-  @media screen and (max-width: 992px) {
-    .hide-on-desktops {
-      display: none;
-    }
-  }
-  @media screen and (max-width: 768px) {
-    .hide-on-tablet {
-      display: none;
-    }
-  }
-</style>

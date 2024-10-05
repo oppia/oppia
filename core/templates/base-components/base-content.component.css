@@ -52,7 +52,7 @@
   padding: 10px;
 }
 .oppia-cookie-banner-container {
-  background: rgb(0,0,0,0.9);
+  background: rgb(0, 0, 0, 0.9);
   bottom: 0;
   color: #fff;
   font-family: 'Roboto', Arial, sans-serif;
@@ -84,13 +84,19 @@
   width: 168px;
 }
 
-@media(max-width: 1024px) {
+mobile-nav-options
+  oppia-topic-editor-navbar
+  ul.oppia-navbar-desktop.nav.navbar-nav.oppina-navbar-nav.float-right {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
   .oppia-cookie-banner-container .oppia-cookie-banner {
     width: 80vw;
   }
 }
 
-@media(max-width: 500px) {
+@media (max-width: 500px) {
   .oppia-cookie-banner-container .oppia-cookie-banner {
     padding: 15px 24px 0 24px;
     width: 90vw;
@@ -104,5 +110,12 @@
 @media screen and (min-width: 600px) {
   .navbar-options-display {
     display: flex !important;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 768px) {
+  .navbar-container
+    .collapse.d-lg-inline-flex.navbar-collapse.oppia-navbar-collapse.ng-cloak.navbar-options-display
+    nav-options {
+    display: none !important;
   }
 }
