@@ -16,11 +16,14 @@ jobs:
     env:
       SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'false' }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: ./.github/actions/merge
-      - uses: actions/setup-python@v4
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
+      - name: Setup Python 3.8 with pip cache
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
@@ -30,7 +33,8 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Oppia dependencies
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Check test suites to run
         id: check_test_suites_to_run
         run: >
