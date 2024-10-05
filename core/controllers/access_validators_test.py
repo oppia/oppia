@@ -782,7 +782,6 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
         )
 
 
-
 class ExplorationEditorPageAccessValidationHandlerTests(
     test_utils.GenericTestBase):
     """Checks the access to the story editor page and its rendering."""
@@ -934,4 +933,3 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             '%s/can_access_review_tests_page/staging/topic/%s'
             % (ACCESS_VALIDATION_HANDLER_PREFIX, 'non-existent-story'),
             expected_status_int=404)
-

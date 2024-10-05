@@ -528,7 +528,6 @@ class CollectionEditorAccessValidationPage(
         pass
 
 
-
 class ExplorationEditorAccessValidationHandlerPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
     ):

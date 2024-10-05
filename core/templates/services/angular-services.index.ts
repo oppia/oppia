@@ -574,8 +574,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['EmailDashboardAuthGuard', EmailDashboardAuthGuard],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
-  ['EmailDashboardResultBackendApiService',
-    EmailDashboardResultBackendApiService],
   ['ExplorationEditorPageAuthGuard', ExplorationEditorPageAuthGuard],
   ['EndExplorationBackendApiService', EndExplorationBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],

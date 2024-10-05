@@ -64,6 +64,8 @@
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
+    "extensions/interactions/dependency_html.html",
+    "core/templates/pages/exploration-editor-page/ckeditor_dependency.html",
     "extensions/ckeditor_plugins/pre/plugin.js",
     "core/templates/pages/oppia-root/index.ts",
     "core/templates/pages/lightweight-oppia-root/index.ts",
