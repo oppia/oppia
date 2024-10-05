@@ -404,7 +404,7 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             f'\'entity_id\': \'{self.exp_1.id}\', \'entity_version\': '
             f'{self.exp_1.version}, \'entity_translation_model_id\': '
             f'\'{self.entity_translation_1.id}\', \'content_id\': '
-            '\'default_outcome_1\', \'suggestion\': '
+            '\'default_outcome_1\', \'suggestion_id\': '
             f'{valid_suggestion_model.id}'
             '}'
         )
