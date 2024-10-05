@@ -87,6 +87,7 @@ export class QuestionsListService {
       this._questionSummariesForOneSkill = [];
       this._nextOffsetForQuestions = 0;
       this._moreQuestionsAvailable = true;
+      this._currentPage = 0;
     }
 
     const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
