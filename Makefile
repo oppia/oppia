@@ -233,11 +233,11 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-run_tests.check_e2e_tests_are_captured_in_ci: ## Runs the check to ensure that all e2e tests are captured in CI
+run_tests.check_tests_are_captured_in_ci: ## Runs the check to ensure that all e2e and acceptence tests are captured in CI
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 	docker compose up dev-server -d --no-deps
-	$(SHELL_PREFIX) dev-server python -m scripts.check_e2e_tests_are_captured_in_ci
+	$(SHELL_PREFIX) dev-server python -m scripts.check_tests_are_captured_in_ci
 	$(MAKE) stop
 
 run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
