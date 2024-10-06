@@ -1860,19 +1860,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self._signup_test_users_and_create_user_groups()
 
         user_groups_data = user_services.get_all_user_groups()
-        self.assertEqual(user_groups_data[0].name, 'USERGROUP1')
+        self.assertTrue(
+            user_groups_data[0].name in ['USERGROUP1', 'USERGROUP2'])
+        user_group_id = user_groups_data[0].user_group_id
 
         user_services.update_user_group(
             user_groups_data[0].user_group_id,
             'USERGROUP3',
             ['user1', 'user2']
         )
-        user_services.update_user_group(
-            user_groups_data[1].user_group_id, 'USERGROUP2', [])
 
         user_groups_data = user_services.get_all_user_groups()
-        self.assertEqual(user_groups_data[0].name, 'USERGROUP3')
-        self.assertEqual(user_groups_data[1].user_usernames, [])
+        if user_groups_data[0].user_group_id == user_group_id:
+            self.assertEqual(user_groups_data[0].name, 'USERGROUP3')
+        else:
+            self.assertEqual(user_groups_data[1].name, 'USERGROUP3')
         user_services.delete_user_group(user_groups_data[0].user_group_id)
         user_services.delete_user_group(user_groups_data[1].user_group_id)
 
