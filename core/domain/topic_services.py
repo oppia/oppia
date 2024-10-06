@@ -828,6 +828,20 @@ def publish_story(
         if node.id == story.story_contents.initial_node_id:
             _are_nodes_valid_for_publishing([node])
 
+    change_list=[]
+    for node in story.story_contents.nodes:
+        change_list.append(story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'node_id': node.id,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_STATUS),
+            'old_value': node.status,
+            'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+        }))
+
+    update_story_and_topic_summary(
+        committer_id, story_id, change_list, 'Published the story.', topic.id)
+
     topic.publish_story(story_id)
     change_list = [topic_domain.TopicChange({
         'cmd': topic_domain.CMD_PUBLISH_STORY,
@@ -869,6 +883,22 @@ def unpublish_story(
     story = story_fetchers.get_story_by_id(story_id, strict=False)
     if story is None:
         raise Exception('A story with the given ID doesn\'t exist')
+
+    change_list=[]
+    for node in story.story_contents.nodes:
+        change_list.append(story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'node_id': node.id,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_STATUS),
+            'old_value': node.status,
+            'new_value': constants.STORY_NODE_STATUS_DRAFT
+        }))
+
+    update_story_and_topic_summary(
+        committer_id, story_id, change_list, 'Unpublished the story.', topic.id)
+
+
     topic.unpublish_story(story_id)
     change_list = [topic_domain.TopicChange({
         'cmd': topic_domain.CMD_UNPUBLISH_STORY,
