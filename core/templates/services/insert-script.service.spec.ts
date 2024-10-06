@@ -81,12 +81,12 @@ describe('InsertScriptService', () => {
   });
 
   it('should handle script load error correctly', (done: jasmine.DoneFn) => {
-    const mockScriptElement = {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,
       onerror: null,
       src: '',
       setAttribute: () => {},
-    } as any;
+    };
 
     spyOn(document, 'createElement').and.returnValue(mockScriptElement);
 
@@ -109,6 +109,7 @@ describe('InsertScriptService', () => {
 
     setTimeout(() => {
       expect(
+        // eslint-disable-next-line dot-notation
         insertScriptService['scriptsLoading'].has(KNOWN_SCRIPTS.DONORBOX)
       ).toBe(false);
       done();
