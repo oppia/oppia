@@ -144,7 +144,6 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   async fetchUserGroupData(): Promise<void> {
     const data = await this.backendApiService.getUserGroupsAsync();
     this.userGroups = data.userGroups;
-    this.allUsersUsernames = data.allUsersUsernames;
     this.userGroupsBackup = new Map(
       this.userGroups.map(userGroup => [
         userGroup.userGroupId,
@@ -216,7 +215,9 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   }
 
   removeUserFromUserGroup(userGroup: UserGroup, username: string): void {
-    userGroup.users = userGroup.users.filter(obj => obj !== username);
+    userGroup.userGroupUserUsernames = userGroup.userGroupUserUsernames.filter(
+      obj => obj !== username
+    );
   }
 
   addUserToUserGroup(event: {value: string}, userGroup: UserGroup): void {
@@ -226,17 +227,13 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       return;
     }
 
-    if (userGroup.users.includes(value)) {
+    if (userGroup.userGroupUserUsernames.includes(value)) {
       this.userInUserGroupValidationError =
         `The user '${value}' already exists in the ` +
         `user group '${userGroup.userGroupName}'.`;
       return;
     }
-    if (!this.allUsersUsernames.includes(value)) {
-      this.userInUserGroupValidationError = `The user with username '${value}' does not exist.`;
-      return;
-    }
-    userGroup.users.push(value);
+    userGroup.userGroupUserUsernames.push(value);
     this.userInputToAddUserToGroup.nativeElement.value = '';
   }
 
@@ -304,8 +301,33 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     return userGroupNames;
   }
 
+  _restoreUserGroupToBackup(userGroup: UserGroup): void {
+    let backup = this.userGroupsBackup.get(userGroup.userGroupId);
+    if (backup) {
+      userGroup.userGroupName = backup.userGroupName;
+      userGroup.userGroupUserUsernames = [...backup.userGroupUserUsernames];
+    }
+    return;
+  }
+
   updateUserGroup(userGroup: UserGroup): void {
+    const ALPHANUMERIC_REGEX = /^[a-zA-Z0-9 ]+$/;
+
     if (!this.isUserGroupUpdated(userGroup)) {
+      return;
+    }
+
+    if (userGroup.userGroupName.trim() === '') {
+      this.userGroupSaveError = 'User group name should not be empty.';
+      this._restoreUserGroupToBackup(userGroup);
+      return;
+    }
+
+    if (!ALPHANUMERIC_REGEX.test(userGroup.userGroupName)) {
+      this.userGroupSaveError = '';
+      this.userGroupSaveError =
+        'User group name can only contain alphanumeric characters and spaces.';
+      this._restoreUserGroupToBackup(userGroup);
       return;
     }
 
@@ -316,21 +338,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     ) {
       this.userGroupSaveError = '';
       this.userGroupSaveError = `User group with name ${userGroup.userGroupName} already exist.`;
-      let backup = this.userGroupsBackup.get(userGroup.userGroupId);
-      if (backup) {
-        userGroup.userGroupName = backup.userGroupName;
-        userGroup.users = backup.users;
-      }
-      return;
-    }
-
-    if (userGroup.userGroupName.trim() === '') {
-      this.userGroupSaveError = 'User group name should not be empty.';
-      let backup = this.userGroupsBackup.get(userGroup.userGroupId);
-      if (backup) {
-        userGroup.userGroupName = backup.userGroupName;
-        userGroup.users = backup.users;
-      }
+      this._restoreUserGroupToBackup(userGroup);
       return;
     }
 
@@ -344,11 +352,11 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       .updateUserGroupAsync(
         userGroup.userGroupId,
         userGroup.userGroupName.trim(),
-        userGroup.users
+        userGroup.userGroupUserUsernames
       )
       .then(
         () => {
-          this.statusMessage = 'UserGroups successfully updated.';
+          this.statusMessage = `UserGroup ${userGroup.userGroupName} successfully updated.`;
           this.userGroupIdsToDetailsShowRecord[userGroup.userGroupId] = false;
           this.userGroupsBackup.set(
             userGroup.userGroupId,
@@ -360,13 +368,8 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
           this.cdr.detectChanges();
         },
         errorResponse => {
-          this.statusMessage = `Server error: ${errorResponse}`;
-          this.userGroupSaveError = '';
-          let backup = this.userGroupsBackup.get(userGroup.userGroupId);
-          if (backup) {
-            userGroup.userGroupName = backup.userGroupName;
-            userGroup.users = backup.users;
-          }
+          this.userGroupSaveError = errorResponse;
+          this._restoreUserGroupToBackup(userGroup);
         }
       );
   }
@@ -384,7 +387,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       let backup = this.userGroupsBackup.get(userGroup.userGroupId);
       if (backup) {
         userGroup.userGroupName = backup.userGroupName;
-        userGroup.users = backup.users;
+        userGroup.userGroupUserUsernames = [...backup.userGroupUserUsernames];
         this.userGroupSaveError = '';
         this.userInUserGroupValidationError = '';
         this.userGroupValidationError = '';

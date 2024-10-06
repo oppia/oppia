@@ -508,17 +508,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings_model.created_on, time_of_creation)
 
 
-class UserDomainTests(test_utils.GenericTestBase):
+class UserGroupDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        user_group_dict: user_domain.UserGroupDict = {
-            'user_group_id': 'USER_GROUP_ID',
-            'name': 'USER_GROUP_NAME',
-            'users': ['user1', 'user2', 'user3']
-        }
-        self.user_group = user_domain.UserGroup.from_dict(user_group_dict)
+        self.user_group = user_domain.UserGroup(
+            'USER_GROUP_ID', 'USERGROUPNAME', ['user1', 'user2', 'user3']
+        )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
@@ -532,27 +529,47 @@ class UserDomainTests(test_utils.GenericTestBase):
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
-    def test_validate_user_group_users(self) -> None:
-        self.user_group.users = 2 # type: ignore[assignment]
+    def test_validate_user_group_user_usernames_is_list(self) -> None:
+        self.user_group.user_usernames = 2 # type: ignore[assignment]
         with self.assertRaisesRegex(
-            Exception, 'Expected \'users\' to be a list, received 2.'):
+            Exception, 'Expected \'user_usernames\' to be a list, received 2.'):
+            self.user_group.validate()
+
+    def test_validate_each_username_is_of_string_type(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_group.user_usernames = ['user1', 2] # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected each user username to be a string, received 2.'
+        ):
+            self.user_group.validate()
+
+    def test_validate_user_group_name_follows_regex_pattern(self) -> None:
+        self.user_group.name = 'user_group_1'
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid user group name user_group_1. User group name can only '
+            'contain alphanumeric characters and spaces.'
+        ):
             self.user_group.validate()
 
     def test_update_name_successfully(self) -> None:
-        self.user_group.update_name('USER_GROUP_NAME_NEW')
-        self.assertEqual(self.user_group.name, 'USER_GROUP_NAME_NEW')
+        self.user_group.update_name('USERGROUPNEW')
+        self.assertEqual(self.user_group.name, 'USERGROUPNEW')
 
-    def test_update_users_successfully(self) -> None:
-        self.user_group.update_users(['user1', 'user2'])
-        self.assertEqual(self.user_group.users, ['user1', 'user2'])
+    def test_update_user_usernames_successfully(self) -> None:
+        self.user_group.update_user_usernames(['user1', 'user2'])
+        self.assertEqual(self.user_group.user_usernames, ['user1', 'user2'])
 
     def test_to_dict_returns_correct_user_group_dict(self) -> None:
         self.assertEqual(
             self.user_group.to_dict(),
             {
                 'user_group_id': 'USER_GROUP_ID',
-                'name': 'USER_GROUP_NAME',
-                'users': ['user1', 'user2', 'user3']
+                'name': 'USERGROUPNAME',
+                'user_usernames': ['user1', 'user2', 'user3']
             }
         )
 

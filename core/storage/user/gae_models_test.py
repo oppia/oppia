@@ -2602,11 +2602,11 @@ class UserGroupModelTests(test_utils.GenericTestBase):
         super().setUp()
         user_models.UserGroupModel(
             name=self.USER_GROUP_1,
-            users=[self.USER_1_ID, self.USER_2_ID]
+            user_ids=[self.USER_1_ID, self.USER_2_ID]
         ).put()
         user_models.UserGroupModel(
             name=self.USER_GROUP_2,
-            users=[self.USER_2_ID, self.USER_3_ID]).put()
+            user_ids=[self.USER_2_ID, self.USER_3_ID]).put()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -2624,7 +2624,7 @@ class UserGroupModelTests(test_utils.GenericTestBase):
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'name': base_models.EXPORT_POLICY.EXPORTED,
-                'users': base_models.EXPORT_POLICY.EXPORTED,
+                'user_ids': base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )
@@ -2633,7 +2633,7 @@ class UserGroupModelTests(test_utils.GenericTestBase):
         user_models.UserGroupModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserGroupModel.query(
-                user_models.UserGroupModel.users == self.USER_1_ID
+                user_models.UserGroupModel.user_ids == self.USER_1_ID
             ).get()
         )
         # Test that calling apply_deletion_policy with no existing model
@@ -2668,12 +2668,12 @@ class UserGroupModelTests(test_utils.GenericTestBase):
 
         expected_data_for_key_1 = {
             'name': self.USER_GROUP_1,
-            'users': self.USER_2_ID
+            'user_ids': self.USER_2_ID
         }
 
         expected_data_for_key_2 = {
             'name': self.USER_GROUP_2,
-            'users': self.USER_2_ID
+            'user_ids': self.USER_2_ID
         }
 
         self.assertEqual(

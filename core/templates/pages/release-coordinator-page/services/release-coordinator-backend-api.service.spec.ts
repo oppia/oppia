@@ -47,27 +47,17 @@ describe('Release coordinator backend api service', () => {
   let sampleUserGroupBackendDict1: UserGroupBackendDict = {
     user_group_id: 'UserGroup1ID',
     name: 'UserGroup1',
-    users: ['User1', 'User2', 'User3'],
+    user_usernames: ['User1', 'User2', 'User3'],
   };
   let sampleUserGroupBackendDict2: UserGroupBackendDict = {
     user_group_id: 'UserGroup2ID',
     name: 'UserGroup2',
-    users: ['User4', 'User5'],
+    user_usernames: ['User4', 'User5'],
   };
   let userGroupSampleData: UserGroupsDict = {
     user_group_dicts: [
       sampleUserGroupBackendDict1,
       sampleUserGroupBackendDict2,
-    ],
-    all_users_usernames: [
-      'User1',
-      'User2',
-      'User3',
-      'User4',
-      'User5',
-      'User6',
-      'User7',
-      'User8',
     ],
   };
 
@@ -85,7 +75,6 @@ describe('Release coordinator backend api service', () => {
       userGroups: userGroupSampleData.user_group_dicts.map(dict =>
         UserGroup.createFromBackendDict(dict)
       ),
-      allUsersUsernames: userGroupSampleData.all_users_usernames,
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
@@ -301,7 +290,7 @@ describe('Release coordinator backend api service', () => {
 
   it('should update the user group', fakeAsync(() => {
     rcbas
-      .updateUserGroupAsync('UserGroup1ID', 'USER_GROUP_1', ['user1', 'user2'])
+      .updateUserGroupAsync('UserGroup1ID', 'USERGROUP1', ['user1', 'user2'])
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
       ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL
@@ -316,7 +305,7 @@ describe('Release coordinator backend api service', () => {
 
   it('should fail to update the user group in case of errors', fakeAsync(() => {
     rcbas
-      .updateUserGroupAsync('UserGroup1ID', 'USER_GROUP_1', ['user1', 'user2'])
+      .updateUserGroupAsync('UserGroup1ID', 'USERGROUP1', ['user1', 'user2'])
       .then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
       ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL

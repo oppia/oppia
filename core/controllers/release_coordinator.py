@@ -65,7 +65,7 @@ class UserGroupHandlerNormalizePayloadDict(TypedDict):
     """
 
     user_group_name: Optional[str]
-    user_group_users: Optional[List[str]]
+    user_group_user_usernames: Optional[List[str]]
     user_group_id: Optional[str]
 
 
@@ -92,7 +92,7 @@ class UserGroupHandler(
                 },
                 'default_value': None
             },
-            'user_group_users': {
+            'user_group_user_usernames': {
                 'schema': {
                     'type': 'list',
                     'items': {
@@ -117,7 +117,7 @@ class UserGroupHandler(
                 },
                 'default_value': None
             },
-            'user_group_users': {
+            'user_group_user_usernames': {
                 'schema': {
                     'type': 'list',
                     'items': {
@@ -132,15 +132,13 @@ class UserGroupHandler(
     @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
         """Populates the data for user groups."""
-        user_groups = user_services.get_all_user_group()
-        all_users_usernames = user_services.get_all_users_usernames()
+        user_groups = user_services.get_all_user_groups()
         user_groups_dict_list = []
         for user_group in user_groups:
             user_groups_dict_list.append(user_group.to_dict())
 
         self.render_json({
-            'user_group_dicts': user_groups_dict_list,
-            'all_users_usernames': all_users_usernames
+            'user_group_dicts': user_groups_dict_list
         })
 
     @acl_decorators.can_access_release_coordinator_page
@@ -166,14 +164,14 @@ class UserGroupHandler(
         try:
             user_group_name = (
                 self.normalized_payload.get('user_group_name'))
-            user_group_users = (
-                self.normalized_payload.get('user_group_users'))
+            user_group_user_usernames = (
+                self.normalized_payload.get('user_group_user_usernames'))
             user_group_id = self.normalized_payload.get('user_group_id')
             assert user_group_name is not None
-            assert user_group_users is not None
+            assert user_group_user_usernames is not None
             assert user_group_id is not None
             user_services.update_user_group(
-                user_group_id, user_group_name, user_group_users)
+                user_group_id, user_group_name, user_group_user_usernames)
             self.render_json(self.values)
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)
@@ -190,12 +188,12 @@ class UserGroupHandler(
         try:
             user_group_name = (
                 self.normalized_payload.get('user_group_name'))
-            user_group_users = (
-                self.normalized_payload.get('user_group_users'))
+            user_group_user_usernames = (
+                self.normalized_payload.get('user_group_user_usernames'))
             assert user_group_name is not None
-            assert user_group_users is not None
+            assert user_group_user_usernames is not None
             user_group = user_services.create_new_user_group(
-                user_group_name, user_group_users)
+                user_group_name, user_group_user_usernames)
             self.render_json({'user_group_dict': user_group.to_dict()})
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)

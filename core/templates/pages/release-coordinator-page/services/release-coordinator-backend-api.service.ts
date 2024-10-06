@@ -57,12 +57,10 @@ interface CreateUserGroupBackendResponse {
 
 export interface UserGroupsDict {
   user_group_dicts: UserGroupBackendDict[];
-  all_users_usernames: string[];
 }
 
 export interface UserGroupsResponse {
   userGroups: UserGroup[];
-  allUsersUsernames: string[];
 }
 
 @Injectable({
@@ -141,11 +139,11 @@ export class ReleaseCoordinatorBackendApiService {
 
   async createUserGroupAsync(
     userGroupName: string,
-    userGroupUsers: string[]
+    userGroupUserUsernames: string[]
   ): Promise<UserGroup> {
     let payload = {
       user_group_name: userGroupName,
-      user_group_users: userGroupUsers,
+      user_group_user_usernames: userGroupUserUsernames,
     };
     return new Promise((resolve, reject) => {
       this.http
@@ -170,11 +168,11 @@ export class ReleaseCoordinatorBackendApiService {
   async updateUserGroupAsync(
     userGroupId: string,
     userGroupName: string,
-    userGroupUsers: string[]
+    userGroupUserUsernames: string[]
   ): Promise<void> {
     let payload = {
       user_group_name: userGroupName,
-      user_group_users: userGroupUsers,
+      user_group_user_usernames: userGroupUserUsernames,
       user_group_id: userGroupId,
     };
     return new Promise((resolve, reject) => {
@@ -222,7 +220,6 @@ export class ReleaseCoordinatorBackendApiService {
               userGroups: response.user_group_dicts.map(dict =>
                 UserGroup.createFromBackendDict(dict)
               ),
-              allUsersUsernames: response.all_users_usernames,
             });
           },
           errorResponse => {

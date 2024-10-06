@@ -78,40 +78,23 @@ describe('Release coordinator page', () => {
       UserGroup.createFromBackendDict({
         user_group_id: 'userGroupId1',
         name: 'UserGroup1',
-        users: ['User1', 'User2', 'User3'],
+        user_usernames: ['User1', 'User2', 'User3'],
       }),
       UserGroup.createFromBackendDict({
         user_group_id: 'userGroupId2',
         name: 'UserGroup2',
-        users: ['User4', 'User5'],
+        user_usernames: ['User4', 'User5'],
       }),
       UserGroup.createFromBackendDict({
         user_group_id: 'userGroupId3',
         name: 'UserGroup3',
-        users: ['User6', 'User7', 'User8'],
+        user_usernames: ['User6', 'User7', 'User8'],
       }),
       UserGroup.createFromBackendDict({
         user_group_id: 'userGroupId9',
         name: 'UserGroup9',
-        users: ['User12', 'User13'],
+        user_usernames: ['User12', 'User13'],
       }),
-    ],
-    allUsersUsernames: [
-      'User1',
-      'User2',
-      'User3',
-      'User4',
-      'User5',
-      'User6',
-      'User7',
-      'User8',
-      'User9',
-      'User10',
-      'User11',
-      'User12',
-      'User13',
-      'User14',
-      'User15',
     ],
   };
 
@@ -288,13 +271,13 @@ describe('Release coordinator page', () => {
         component.ngOnInit();
         tick();
 
-        expect(component.userGroups[0].users).toEqual([
+        expect(component.userGroups[0].userGroupUserUsernames).toEqual([
           'User1',
           'User2',
           'User3',
         ]);
         component.updateUserGroup(component.userGroups[0]);
-        expect(component.userGroups[0].users).toEqual([
+        expect(component.userGroups[0].userGroupUserUsernames).toEqual([
           'User1',
           'User2',
           'User3',
@@ -311,6 +294,19 @@ describe('Release coordinator page', () => {
         expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
         expect(component.userGroupSaveError).toEqual(
           'User group with name UserGroup2 already exist.'
+        );
+      }));
+
+      it('should not update user group name if does not follow regex', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        component.userGroups[0].userGroupName = 'User_Group_1';
+        component.updateUserGroup(component.userGroups[0]);
+        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        expect(component.userGroupSaveError).toEqual(
+          'User group name can only contain alphanumeric characters and spaces.'
         );
       }));
 
@@ -365,7 +361,7 @@ describe('Release coordinator page', () => {
 
         expect(updateUserGroupSpy).toHaveBeenCalled();
         expect(component.statusMessage).toBe(
-          'UserGroups successfully updated.'
+          'UserGroup UserGroup5 successfully updated.'
         );
         component.userGroups[0].userGroupName = 'UserGroup1';
         component.updateUserGroup(component.userGroups[0]);
@@ -394,9 +390,7 @@ describe('Release coordinator page', () => {
         tick();
 
         expect(updateUserGroupSpy).toHaveBeenCalled();
-        expect(component.statusMessage).toBe(
-          'Server error: Internal Server Error.'
-        );
+        expect(component.userGroupSaveError).toBe('Internal Server Error.');
         component.removeUserFromUserGroup(component.userGroups[0], 'User10');
       }));
     });
@@ -437,7 +431,9 @@ describe('Release coordinator page', () => {
           component.userGroups[0]
         );
         component.resetUserGroup(component.userGroups[0]);
-        expect(component.userGroups[0].users.includes('User10')).toBeTrue();
+        expect(
+          component.userGroups[0].userGroupUserUsernames.includes('User10')
+        ).toBeTrue();
 
         component.removeUserFromUserGroup(component.userGroups[0], 'User10');
       }));
@@ -450,7 +446,9 @@ describe('Release coordinator page', () => {
 
         component.addUserToUserGroup({value: ''}, 'UserGroup1');
 
-        expect(component.userGroups[0].users.includes('')).toBeFalse();
+        expect(
+          component.userGroups[0].userGroupUserUsernames.includes('')
+        ).toBeFalse();
       }));
 
       it('should save the new user', fakeAsync(() => {
@@ -463,12 +461,16 @@ describe('Release coordinator page', () => {
           },
         } as ElementRef;
 
-        expect(component.userGroups[0].users.includes('User11')).toBeFalse();
+        expect(
+          component.userGroups[0].userGroupUserUsernames.includes('User11')
+        ).toBeFalse();
         component.addUserToUserGroup(
           {value: 'User11'},
           component.userGroups[0]
         );
-        expect(component.userGroups[0].users.includes('User11')).toBeTrue();
+        expect(
+          component.userGroups[0].userGroupUserUsernames.includes('User11')
+        ).toBeTrue();
 
         component.removeUserFromUserGroup(component.userGroups[0], 'User11');
       }));
@@ -485,22 +487,6 @@ describe('Release coordinator page', () => {
 
         expect(component.userInUserGroupValidationError.length > 0).toBeFalse();
         component.addUserToUserGroup({value: 'User1'}, component.userGroups[0]);
-        expect(component.userInUserGroupValidationError.length > 0).toBeTrue();
-      }));
-
-      it('should not add user if username does not exists', fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-
-        component.userInputToAddUserToGroup = {
-          nativeElement: {
-            value: '',
-          },
-        } as ElementRef;
-
-        expect(component.userInUserGroupValidationError.length > 0).toBeFalse();
-        component.addUserToUserGroup({value: 'User'}, component.userGroups[0]);
-        expect(component.userGroups[0].users.includes('User')).toBeFalse();
         expect(component.userInUserGroupValidationError.length > 0).toBeTrue();
       }));
     });
@@ -571,7 +557,9 @@ describe('Release coordinator page', () => {
       tick();
       component.removeUserFromUserGroup(component.userGroups[1], 'User5');
 
-      expect(component.userGroups[1].users.includes('User5')).toBeFalse();
+      expect(
+        component.userGroups[1].userGroupUserUsernames.includes('User5')
+      ).toBeFalse();
     }));
 
     it('should toggle the user group detail section', fakeAsync(() => {

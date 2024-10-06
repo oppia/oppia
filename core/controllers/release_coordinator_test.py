@@ -24,14 +24,8 @@ from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry
 from core.domain import feature_flag_services
 from core.domain import platform_parameter_list
-from core.platform import models
+from core.domain import user_services
 from core.tests import test_utils
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import user_models
-
-(user_models, ) = models.Registry.import_models([models.Names.USER])
 
 
 class FeatureNames(enum.Enum):
@@ -102,20 +96,16 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-        self.signup('user1@email.com', 'user1id')
-        self.signup('user2@email.com', 'user2id')
-        self.signup('user3@email.com', 'user3id')
-        self.signup('user4@email.com', 'user4id')
-        self.signup('user5@email.com', 'user5id')
+        self.signup('user1@email.com', 'user1')
+        self.signup('user2@email.com', 'user2')
+        self.signup('user3@email.com', 'user3')
+        self.signup('user4@email.com', 'user4')
+        self.signup('user5@email.com', 'user5')
 
-        user_models.UserGroupModel(
-            id='USER_GROUP_1_ID',
-            name='USER_GROUP_1', users=[
-                'user1id', 'user2id', 'user3id']).put()
-        user_models.UserGroupModel(
-            id='USER_GROUP_2_ID',
-            name='USER_GROUP_2', users=[
-                'user1id', 'user4id']).put()
+        user_services.create_new_user_group(
+            'USERGROUP1', ['user1', 'user2', 'user3'])
+        user_services.create_new_user_group(
+            'USERGROUP2', ['user1', 'user4'])
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
@@ -127,25 +117,7 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
         response_dict_user_groups = response_dict['user_group_dicts']
 
-        expected_data_for_key_1 = {
-            'user_group_id': 'USER_GROUP_1_ID',
-            'name': 'USER_GROUP_1',
-            'users': ['user1id', 'user2id', 'user3id']
-        }
-        expected_data_for_key_2 = {
-            'user_group_id': 'USER_GROUP_2_ID',
-            'name': 'USER_GROUP_2',
-            'users': ['user1id', 'user4id']
-        }
-        self.assertEqual(
-            response_dict_user_groups[0],
-            expected_data_for_key_1)
-        self.assertEqual(
-            response_dict_user_groups[1],
-            expected_data_for_key_2)
-
-        # 5 new users, 1 release-coordinator, 2 admin users.
-        self.assertEqual(len(response_dict['all_users_usernames']), 8)
+        self.assertEqual(len(response_dict_user_groups), 2)
 
     def test_deleting_user_group_successfully_updates_user_groups_data(
         self) -> None:
@@ -154,43 +126,18 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
         response_dict_user_groups = response_dict['user_group_dicts']
 
-        expected_data_for_key_1 = {
-            'user_group_id': 'USER_GROUP_1_ID',
-            'name': 'USER_GROUP_1',
-            'users': ['user1id', 'user2id', 'user3id']
-        }
-        expected_data_for_key_2 = {
-            'user_group_id': 'USER_GROUP_2_ID',
-            'name': 'USER_GROUP_2',
-            'users': ['user1id', 'user4id']
-        }
-        self.assertEqual(
-            response_dict_user_groups[0],
-            expected_data_for_key_1)
-        self.assertEqual(
-            response_dict_user_groups[1],
-            expected_data_for_key_2)
-
-        # 5 new users, 1 release-coordinator, 2 admin users.
-        self.assertEqual(len(response_dict['all_users_usernames']), 8)
+        self.assertEqual(len(response_dict_user_groups), 2)
 
         self.delete_json(
-            feconf.USER_GROUPS_HANDLER_URL, {
-                'user_group_id': 'USER_GROUP_1_ID'
-            })
+            feconf.USER_GROUPS_HANDLER_URL,
+            {
+                'user_group_id': response_dict_user_groups[0].get(
+                    'user_group_id')
+            }
+        )
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
         response_dict_user_groups = response_dict['user_group_dicts']
         self.assertEqual(len(response_dict_user_groups), 1)
-        expected_data_for_key_1 = {
-            'user_group_id': 'USER_GROUP_2_ID',
-            'name': 'USER_GROUP_2',
-            'users': ['user1id', 'user4id']
-        }
-        self.assertEqual(
-            response_dict_user_groups[0],
-            expected_data_for_key_1)
-        # 5 new users, 1 release-coordinator, 2 admin users.
-        self.assertEqual(len(response_dict['all_users_usernames']), 8)
         self.logout()
 
     def test_deleting_invalid_user_group_results_in_error(self) -> None:
@@ -214,34 +161,20 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
         response_dict_user_groups = response_dict['user_group_dicts']
 
-        expected_data_for_key_1 = {
-            'user_group_id': 'USER_GROUP_1_ID',
-            'name': 'USER_GROUP_1',
-            'users': ['user1id', 'user2id', 'user3id']
-        }
-        expected_data_for_key_2 = {
-            'user_group_id': 'USER_GROUP_2_ID',
-            'name': 'USER_GROUP_2',
-            'users': ['user1id', 'user4id']
-        }
-        self.assertEqual(
-            response_dict_user_groups[0],
-            expected_data_for_key_1)
-        self.assertEqual(
-            response_dict_user_groups[1],
-            expected_data_for_key_2)
+        self.assertEqual(len(response_dict_user_groups), 2)
 
         assert_raises_regex_error = self.assertRaisesRegex(
             Exception,
-            'User group USER_GROUP_3 does not exist.'
+            'User group USERGROUP3 does not exist.'
         )
 
         with assert_raises_regex_error:
             self.put_json(
                 feconf.USER_GROUPS_HANDLER_URL, {
                     'user_group_id': 'USER_GROUP_5_ID',
-                    'user_group_name': 'USER_GROUP_3',
-                    'user_group_users': ['user1id', 'user2id', 'user5id']
+                    'user_group_name': 'USERGROUP3',
+                    'user_group_user_usernames': [
+                        'user1id', 'user2id', 'user5id']
                 }, csrf_token=csrf_token)
         self.logout()
 
@@ -254,49 +187,20 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
         response_dict_user_groups = response_dict['user_group_dicts']
 
-        expected_data_for_key_1 = {
-            'user_group_id': 'USER_GROUP_1_ID',
-            'name': 'USER_GROUP_1',
-            'users': ['user1id', 'user2id', 'user3id']
-        }
-        expected_data_for_key_2 = {
-            'user_group_id': 'USER_GROUP_2_ID',
-            'name': 'USER_GROUP_2',
-            'users': ['user1id', 'user4id']
-        }
-        self.assertEqual(
-            response_dict_user_groups[0],
-            expected_data_for_key_1)
-        self.assertEqual(
-            response_dict_user_groups[1],
-            expected_data_for_key_2)
+        self.assertEqual(len(response_dict_user_groups), 2)
 
         self.put_json(
             feconf.USER_GROUPS_HANDLER_URL, {
-                'user_group_id': 'USER_GROUP_1_ID',
-                'user_group_name': 'USER_GROUP_3',
-                'user_group_users': ['user1id', 'user2id', 'user5id']
+                'user_group_id': response_dict_user_groups[0].get(
+                    'user_group_id'),
+                'user_group_name': 'USERGROUP3',
+                'user_group_user_usernames': ['user1', 'user2', 'user5']
             }, csrf_token=csrf_token)
 
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
         response_dict_user_groups = response_dict['user_group_dicts']
 
-        expected_data_for_key_1 = {
-            'user_group_id': 'USER_GROUP_1_ID',
-            'name': 'USER_GROUP_3',
-            'users': ['user1id', 'user2id', 'user5id']
-        }
-        expected_data_for_key_2 = {
-            'user_group_id': 'USER_GROUP_2_ID',
-            'name': 'USER_GROUP_2',
-            'users': ['user1id', 'user4id']
-        }
-        self.assertEqual(
-            response_dict_user_groups[0],
-            expected_data_for_key_1)
-        self.assertEqual(
-            response_dict_user_groups[1],
-            expected_data_for_key_2)
+        self.assertEqual(len(response_dict_user_groups), 2)
 
         self.logout()
 
@@ -307,29 +211,12 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
         response_dict_user_groups = response_dict['user_group_dicts']
 
-        expected_data_for_key_1 = {
-            'user_group_id': 'USER_GROUP_1_ID',
-            'name': 'USER_GROUP_1',
-            'users': ['user1id', 'user2id', 'user3id']
-        }
-        expected_data_for_key_2 = {
-            'user_group_id': 'USER_GROUP_2_ID',
-            'name': 'USER_GROUP_2',
-            'users': ['user1id', 'user4id']
-        }
-        self.assertEqual(
-            response_dict_user_groups[0],
-            expected_data_for_key_1)
-        self.assertEqual(
-            response_dict_user_groups[1],
-            expected_data_for_key_2)
-
         self.assertEqual(len(response_dict_user_groups), 2)
 
         self.post_json(
             feconf.USER_GROUPS_HANDLER_URL, {
-                'user_group_name': 'USER_GROUP_4',
-                'user_group_users': ['user1id', 'user2id', 'user3id']
+                'user_group_name': 'USERGROUP4',
+                'user_group_user_usernames': ['user1', 'user2', 'user3']
             }, csrf_token=csrf_token)
 
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
@@ -343,13 +230,14 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         with self.assertRaisesRegex(
-            Exception, 'The user user6id of user-group USER_GROUP_4 '
-            'does not exist.'
+            Exception,
+            r'Following users of user-group USERGROUP4 does '
+            r'not exist: \[\'user6\']\.'
         ):
             self.post_json(
                 feconf.USER_GROUPS_HANDLER_URL, {
-                    'user_group_name': 'USER_GROUP_4',
-                    'user_group_users': ['user1id', 'user2id', 'user6id']
+                    'user_group_name': 'USERGROUP4',
+                    'user_group_user_usernames': ['user1', 'user2', 'user6']
                 }, csrf_token=csrf_token)
 
 

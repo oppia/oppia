@@ -111,11 +111,11 @@
               <div class="col-2">Users:</div>
               <div class="col-10">
                 <div *ngIf="!userGroupInEditMode">
-                  <span *ngIf="userGroup.users.length == 0">
+                  <span *ngIf="userGroup.userGroupUserUsernames.length == 0">
                     <em>No users, click on edit button to add.</em>
                   </span>
                   <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
-                    <mat-chip *ngFor="let user of userGroup.users"
+                    <mat-chip *ngFor="let user of userGroup.userGroupUserUsernames"
                               [selectable]="false"
                               [removable]="false">
                       <ng-container>
@@ -126,7 +126,7 @@
                 </div>
                 <div *ngIf="userGroupInEditMode">
                   <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
-                    <mat-chip *ngFor="let user of userGroup.users"
+                    <mat-chip *ngFor="let user of userGroup.userGroupUserUsernames"
                               [selectable]="true"
                               [removable]="true"
                               (removed)="removeUserFromUserGroup(userGroup, user)">

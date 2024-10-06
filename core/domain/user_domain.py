@@ -531,28 +531,31 @@ class UserGroupDict(TypedDict):
 
     user_group_id: str
     name: str
-    users: List[str]
+    user_usernames: List[str]
 
 
 class UserGroup:
     """A domain representation for user group."""
 
+    ALPHANUMERIC_REGEX = r'^[a-zA-Z0-9 ]+$'
+
     def __init__(
         self,
         user_group_id: str,
         name: str,
-        users: List[str]
+        user_usernames: List[str]
     ) -> None:
         """Constructs a UserGroup domain object.
 
         Args:
             user_group_id: str. The id of the user group.
             name: str. The name of the user group.
-            users: List[str]. The list of users attached to user group.
+            user_usernames: List[str]. The list of user usernames
+                attached to user group.
         """
         self.user_group_id = user_group_id
         self.name = name
-        self.users = users
+        self.user_usernames = user_usernames
 
     def validate(self) -> None:
         """Validate various properties of UserGroup."""
@@ -560,9 +563,24 @@ class UserGroup:
             raise utils.ValidationError(
                 'Expected name to be a string, received %s.' % self.name)
 
-        if not isinstance(self.users, list):
+        if not re.match(self.ALPHANUMERIC_REGEX, self.name):
             raise utils.ValidationError(
-                'Expected \'users\' to be a list, received %s.' % self.users)
+                'Invalid user group name %s. User group name can only '
+                'contain alphanumeric characters and spaces.' % self.name
+            )
+
+        if not isinstance(self.user_usernames, list):
+            raise utils.ValidationError(
+                'Expected \'user_usernames\' to be a list, ' +
+                'received %s.' % self.user_usernames
+            )
+
+        for user_username in self.user_usernames:
+            if not isinstance(user_username, str):
+                raise utils.ValidationError(
+                    'Expected each user username to be a string, ' +
+                    'received %s.' % user_username
+                )
 
     def update_name(self, updated_name: str) -> None:
         """Update user group name.
@@ -573,13 +591,15 @@ class UserGroup:
         self.name = updated_name
         self.validate()
 
-    def update_users(self, updated_users: List[str]) -> None:
-        """Update users of user group.
+    def update_user_usernames(
+        self, updated_user_usernames: List[str]) -> None:
+        """Update user_usernames of user group.
 
         Args:
-            updated_users: List[str]. The updated list of users.
+            updated_user_usernames: List[str]. The updated list of
+                user usernames.
         """
-        self.users = updated_users
+        self.user_usernames = updated_user_usernames
         self.validate()
 
     def to_dict(self) -> UserGroupDict:
@@ -593,7 +613,7 @@ class UserGroup:
         return {
             'user_group_id': self.user_group_id,
             'name': self.name,
-            'users': self.users
+            'user_usernames': self.user_usernames
         }
 
     @classmethod
@@ -610,7 +630,7 @@ class UserGroup:
         return UserGroup(
             user_group_dict['user_group_id'],
             user_group_dict['name'],
-            user_group_dict['users']
+            user_group_dict['user_usernames']
         )
 
 

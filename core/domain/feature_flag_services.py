@@ -245,7 +245,7 @@ def is_feature_flag_enabled(
     if user_id is not None:
         user_group_models: List[user_models.UserGroupModel] = list(
             user_models.UserGroupModel.query(
-                user_models.UserGroupModel.users == user_id
+                user_models.UserGroupModel.user_ids == user_id
             ).fetch())
 
         user_group_models_ids: List[str] = []
