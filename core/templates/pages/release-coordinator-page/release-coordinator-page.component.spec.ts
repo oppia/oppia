@@ -601,6 +601,16 @@ describe('Release coordinator page', () => {
         expect(component.userGroupValidationError.length > 0).toBeTrue();
       }));
 
+      it('should not add new user group when name fails the regex', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        component.newUserGroupName = 'User_Group_1';
+        component.addUserGroup();
+
+        expect(component.userGroupValidationError.length > 0).toBeTrue();
+      }));
+
       it('should not update when the given user group is empty string', fakeAsync(() => {
         component.ngOnInit();
         tick();

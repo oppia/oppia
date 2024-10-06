@@ -238,7 +238,15 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   }
 
   addUserGroup(): void {
+    const ALPHANUMERIC_REGEX = /^[a-zA-Z0-9 ]+$/;
     const trimmedUserGroupName = this.newUserGroupName.trim();
+
+    if (!ALPHANUMERIC_REGEX.test(trimmedUserGroupName)) {
+      this.userGroupValidationError = '';
+      this.userGroupValidationError =
+        'User group name can only contain alphanumeric characters and spaces.';
+      return;
+    }
     if (
       this.userGroups.some(
         userGroup => userGroup.userGroupName === trimmedUserGroupName
