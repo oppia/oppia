@@ -65,8 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    blog_dashboard:
-      commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     creator_dashboard:
       commonPrefix +
       '/pages/creator-dashboard-page/' +
@@ -75,9 +73,6 @@ module.exports = {
       commonPrefix +
       '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
-    email_dashboard_result:
-      commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
     error: commonPrefix + '/pages/error-pages/error-page.import.ts',
     error_iframed:
       commonPrefix +
@@ -163,16 +158,6 @@ module.exports = {
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      chunks: ['email_dashboard_result'],
-      filename: 'email-dashboard-result.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/email-dashboard-pages/email-dashboard-result.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['error_iframed'],
       filename: 'error-iframed.mainpage.html',
       meta: defaultMeta,
@@ -191,18 +176,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       statusCode: 400,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['blog_dashboard'],
-      filename: 'blog-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/blog-dashboard-page/' +
-        'blog-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
