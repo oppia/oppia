@@ -573,6 +573,15 @@ class UserGroupDomainTests(test_utils.GenericTestBase):
             }
         )
 
+    def test_user_group_from_dict(self) -> None:
+        user_group_dict = {
+            'user_group_id': 'USER_GROUP_ID',
+            'name': 'USERGROUPNAME',
+            'user_usernames': ['user1', 'user2', 'user3']
+        }
+        user_group = user_domain.UserGroup.from_dict(user_group_dict)
+        self.assertEqual(user_group.name, user_group_dict['name'])
+
 
 class UserContributionsTests(test_utils.GenericTestBase):
 
