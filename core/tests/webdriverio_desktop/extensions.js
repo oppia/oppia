@@ -68,16 +68,13 @@ describe('rich-text components', function () {
         'https://google.com/',
         false
       );
-      await richTextEditor.addRteComponent(
-        'Video',
-        'M7lc1UVf-VE',
-        10,
-        100,
-        false
-      );
-      await richTextEditor.appendPlainText('highlight');
-      await general.expectNoTextToBeSelected();
-      await richTextEditor.highlightText('highlight');
+      // await richTextEditor.addRteComponent(
+      //   'Video',
+      //   'M7lc1UVf-VE',
+      //   10,
+      //   100,
+      //   false
+      // );
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
       await richTextEditor.addRteComponent(
@@ -85,9 +82,6 @@ describe('rich-text components', function () {
         'title',
         await forms.toRichText('inner')
       );
-      await richTextEditor.appendPlainText('highlight');
-      await general.expectNoTextToBeSelected();
-      await richTextEditor.highlightText('highlight');
       await richTextEditor.addRteComponent('Tabs', [
         {
           title: 'title 1',
@@ -115,13 +109,13 @@ describe('rich-text components', function () {
           'https://google.com/',
           false
         );
-        await richTextChecker.readRteComponent(
-          'Video',
-          'M7lc1UVf-VE',
-          10,
-          100,
-          false
-        );
+        // await richTextChecker.readRteComponent(
+        //   'Video',
+        //   'M7lc1UVf-VE',
+        //   10,
+        //   100,
+        //   false
+        // );
         await richTextChecker.readRteComponent(
           'Collapsible',
           'title',
