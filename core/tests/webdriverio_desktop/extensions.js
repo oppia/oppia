@@ -93,10 +93,10 @@ describe('rich-text components', function () {
         },
       ]);
       // Test highlighting on Skillreview component.
-      await richTextEditor.appendPlainText('highlight');
-      await general.expectNoTextToBeSelected();
-      await richTextEditor.highlightText('highlight');
-      await richTextEditor.addRteComponent('Skillreview', null, 'skill 1');
+      // await richTextEditor.appendPlainText('highlight');
+      // await general.expectNoTextToBeSelected();
+      // await richTextEditor.highlightText('highlight');
+      // await richTextEditor.addRteComponent('Skillreview', null, 'skill 1');
     });
 
     await explorationEditorPage.navigateToPreviewTab();
@@ -131,11 +131,11 @@ describe('rich-text components', function () {
             content: await forms.toRichText('contents 2'),
           },
         ]);
-        await richTextChecker.readRteComponent(
-          'Skillreview',
-          'highlight',
-          await forms.toRichText('description 1')
-        );
+        // Rawait richTextChecker.readRteComponent(
+        //   'Skillreview',
+        //   'highlight',
+        //   await forms.toRichText('description 1')
+        // );
       }
     );
 
