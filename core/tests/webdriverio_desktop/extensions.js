@@ -75,6 +75,9 @@ describe('rich-text components', function () {
         100,
         false
       );
+      await richTextEditor.appendPlainText('highlight');
+      await general.expectNoTextToBeSelected();
+      await richTextEditor.highlightText('highlight');
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
       await richTextEditor.addRteComponent(
@@ -82,6 +85,9 @@ describe('rich-text components', function () {
         'title',
         await forms.toRichText('inner')
       );
+      await richTextEditor.appendPlainText('highlight');
+      await general.expectNoTextToBeSelected();
+      await richTextEditor.highlightText('highlight');
       await richTextEditor.addRteComponent('Tabs', [
         {
           title: 'title 1',
@@ -93,10 +99,10 @@ describe('rich-text components', function () {
         },
       ]);
       // Test highlighting on Skillreview component.
-      // await richTextEditor.appendPlainText('highlight');
-      // await general.expectNoTextToBeSelected();
-      // await richTextEditor.highlightText('highlight');
-      // await richTextEditor.addRteComponent('Skillreview', null, 'skill 1');
+      await richTextEditor.appendPlainText('highlight');
+      await general.expectNoTextToBeSelected();
+      await richTextEditor.highlightText('highlight');
+      await richTextEditor.addRteComponent('Skillreview', null, 'skill 1');
     });
 
     await explorationEditorPage.navigateToPreviewTab();
@@ -131,11 +137,11 @@ describe('rich-text components', function () {
             content: await forms.toRichText('contents 2'),
           },
         ]);
-        // Rawait richTextChecker.readRteComponent(
-        //   'Skillreview',
-        //   'highlight',
-        //   await forms.toRichText('description 1')
-        // );
+        await richTextChecker.readRteComponent(
+          'Skillreview',
+          'highlight',
+          await forms.toRichText('description 1')
+        );
       }
     );
 
