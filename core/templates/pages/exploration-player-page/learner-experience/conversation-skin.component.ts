@@ -135,6 +135,7 @@ export class ConversationSkinComponent {
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
   responseTimeout: NodeJS.Timeout | null = null;
+  correctnessFooterIsShown: boolean = true;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
@@ -260,6 +261,7 @@ export class ConversationSkinComponent {
       this.navigationThroughCardHistoryIsEnabled = false;
       this.checkpointCelebrationModalIsEnabled = false;
       this.skipButtonIsShown = true;
+      this.correctnessFooterIsShown = false;
     }
 
     if (!this.contextService.isInExplorationPlayerPage()) {
@@ -456,7 +458,8 @@ export class ConversationSkinComponent {
       if (
         !this.isIframed &&
         !this._editorPreviewMode &&
-        !this.explorationPlayerStateService.isInQuestionPlayerMode()
+        !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
+        !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
       ) {
         // For the first state which is always a checkpoint.
         let firstStateName: string;
@@ -567,6 +570,7 @@ export class ConversationSkinComponent {
 
   isCorrectnessFooterEnabled(): boolean {
     return (
+      this.correctnessFooterIsShown &&
       this.answerIsCorrect &&
       this.playerPositionService.hasLearnerJustSubmittedAnAnswer()
     );
@@ -1147,7 +1151,8 @@ export class ConversationSkinComponent {
     if (
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.explorationPlayerStateService.isInQuestionPlayerMode()
+      !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
+      !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
     ) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
