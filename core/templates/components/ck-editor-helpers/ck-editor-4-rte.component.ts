@@ -524,7 +524,6 @@ export class CkEditor4RteComponent
           break;
         }
       }
-      textElt.forEach(node => this.trimTextNodes(node));
       let html = elt.html();
       this.value = html;
       // Refer to the note at the top of the file for the reason behind replace.
@@ -586,14 +585,6 @@ export class CkEditor4RteComponent
   ngOnDestroy(): void {
     this.ck.destroy();
     this.subscriptions.unsubscribe();
-  }
-
-  trimTextNodes(node: Node): void {
-    if (node.nodeType === Node.TEXT_NODE) {
-      node.nodeValue = node.nodeValue.trim();
-    } else {
-      node.childNodes.forEach(child => this.trimTextNodes(child));
-    }
   }
 }
 
