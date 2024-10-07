@@ -830,7 +830,8 @@ def publish_story(
 
     serial_chapter_curriculum_admin_view_feature_is_enabled = (
         feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+            feature_flag_list.FeatureNames
+            .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
             None)
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
@@ -845,7 +846,7 @@ def publish_story(
                 'new_value': constants.STORY_NODE_STATUS_PUBLISHED
             }))
 
-        if(chapters_change_list!=[]):
+        if chapters_change_list:
             update_story_and_topic_summary(
                 committer_id, story_id, chapters_change_list,
                 'Published the story.', topic.id)
@@ -894,7 +895,8 @@ def unpublish_story(
 
     serial_chapter_curriculum_admin_view_feature_is_enabled = (
         feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+            feature_flag_list.FeatureNames
+            .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
             None)
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
@@ -909,7 +911,7 @@ def unpublish_story(
                 'new_value': constants.STORY_NODE_STATUS_DRAFT
             }))
 
-        if(chapters_change_list!=[]):
+        if chapters_change_list:
             update_story_and_topic_summary(
                 committer_id, story_id, chapters_change_list,
                 'Unpublished the story.', topic.id)
