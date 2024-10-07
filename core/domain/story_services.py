@@ -698,6 +698,8 @@ def _save_story(
         Exception. The story model and the incoming story domain
             object have different version numbers.
     """
+    logging.warning(change_list)
+    logging.warning("hello")
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
