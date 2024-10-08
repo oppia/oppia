@@ -27,6 +27,7 @@ import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 export class ExplorationEditorPageRootComponent extends BaseRootComponent {
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.TITLE;
+
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
     .EXPLORATION_EDITOR.META as unknown as Readonly<MetaTagData>[];
 }
