@@ -104,7 +104,7 @@ TRANSLATION_HTML = (
 )
 
 TRANSLATED_CONTENT_DICT = translation_domain.TranslatedContent(
-    '<p>translated</p>',
+    '<p>translated content</p>',
     translation_domain.TranslatableContentFormat.HTML, False).to_dict()
 
 CHANGE_DICT = {
