@@ -7177,7 +7177,7 @@ export default {
     },
     "EXPLORATION_EDITOR": {
       "ROUTE": "create/:exporationId",
-      "TITLE": "Oppia",
+      "TITLE": "Exploration Editor - Oppia",
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
