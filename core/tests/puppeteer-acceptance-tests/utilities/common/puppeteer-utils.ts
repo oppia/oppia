@@ -247,7 +247,7 @@ export class BaseUser {
    * Function to reload the current page.
    */
   async reloadPage(): Promise<void> {
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
     await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 
@@ -417,15 +417,11 @@ export class BaseUser {
   }
 
   /**
-   * This function validates whether an anchor tag is correctly linked
-   * to external PDFs or not. Use this particularly when interacting with
-   * buttons associated with external PDF links, because Puppeteer,
-   * in headless-mode, does not natively support the opening of external PDFs.
+   * This function validates whether an anchor tag correctly links to external PDFs or links
+   * that cannot be opened directly. Puppeteer, in headless mode, does not
+   * natively support opening external PDFs.
    */
-  async openExternalPdfLink(
-    selector: string,
-    expectedUrl: string
-  ): Promise<void> {
+  async openExternalLink(selector: string, expectedUrl: string): Promise<void> {
     await this.page.waitForSelector(selector, {visible: true});
     const href = await this.page.$eval(selector, element =>
       element.getAttribute('href')
@@ -490,7 +486,7 @@ export class BaseUser {
     }
     const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
     try {
-      await this.page.goto(explorationUrlAfterPublished);
+      await this.goto(explorationUrlAfterPublished);
       showMessage('Exploration is accessible with the URL, i.e. published.');
     } catch (error) {
       throw new Error('The exploration is not public.');
@@ -586,6 +582,37 @@ export class BaseUser {
   }
 
   /**
+   * Waits for the network to become idle on the given page.
+   *
+   * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
+   * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
+   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
+   * almost all cases and for the page to fully load.
+   *
+   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 30000, idleTime: 500}.
+   * @param {Page} page The page to wait for network idle. Defaults to the current page.
+   */
+  async waitForNetworkIdle(
+    options: {timeout?: number; idleTime?: number} = {
+      timeout: 30000,
+      idleTime: 500,
+    },
+    page: Page = this.page
+  ): Promise<void> {
+    try {
+      await page.waitForNetworkIdle(options);
+    } catch (error) {
+      if (error.message.includes('Timeout')) {
+        showMessage(
+          'Network did not become idle within the specified timeout, but we can continue.'
+        );
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
    * Function to click an anchor tag and check if it opens the expected destination
    * in a new tab. Closes the tab afterwards.
    */
@@ -610,7 +637,29 @@ export class BaseUser {
    */
   async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
     const newPage = await this.browserObject.newPage();
+
+    if (this.isViewportAtMobileWidth()) {
+      // Set viewport for mobile.
+      await newPage.setViewport({
+        width: 375,
+        height: 667,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: false,
+      });
+      await newPage.setUserAgent(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
+          'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+          'Mobile/15A372 Safari/604.1'
+      );
+    } else {
+      // Set viewport for desktop.
+      await newPage.setViewport({width: 1920, height: 1080});
+    }
+
     await newPage.bringToFront();
+    this.page = newPage;
     return newPage;
   }
 }

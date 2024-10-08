@@ -65,8 +65,6 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('testimonialsCarousel') testimonialsCarousel!: NgbCarousel;
   parentsTeachersPdfGuideLink = AppConstants.PARENTS_TEACHERS_PDF_GUIDE_LINK;
   teacherStoryTaggedBlogsLink = AppConstants.TEACHER_STORY_TAGGED_BLOGS_LINK;
-  classroomUrlFragment!: string;
-  classroomUrl!: string;
   androidUrl = `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE}`;
   displayedTestimonialId!: number;
   libraryUrl!: string;
@@ -78,8 +76,14 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     {
       title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_1_TITLE',
       text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_1_TEXT',
-      customPanelClassNames: ['oppia-teach-lesson-panel'],
-      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      customPanelClassNames: [
+        'oppia-teach-lesson-panel',
+        'e2e-test-teach-page-lesson-panel',
+      ],
+      customTitleClassNames: [
+        'oppia-teach-lesson-panel-title',
+        'e2e-test-teach-page-lesson-panel-title',
+      ],
       image: '/teach/skill-tree-image',
       altText: 'Skill tree image',
       panelIsCollapsed: true,
@@ -140,6 +144,7 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
   activeCreatorsIndices!: number[];
   creatorsCarouselLeftArrowIsDisabled = true;
   creatorsCarouselRightArrowIsDisabled = false;
+  pageIsLoaded = false;
 
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
@@ -156,12 +161,6 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.displayedTestimonialId = 0;
     this.setScreenType();
     this.testimonials = AppConstants.TESTIMONIAlS_DATA_TEACHERS;
-    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
-      '/learn/<classroomUrlFragment>',
-      {
-        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-      }
-    );
     this.libraryUrl = '/community-library';
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then(userInfo => {
@@ -175,6 +174,7 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.isWindowNarrow = this.windowDimensionsService.isWindowNarrow();
       })
     );
+    this.registerFirstTimePageViewEvent();
   }
 
   ngAfterViewInit(): void {
@@ -182,16 +182,22 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
       'scroll',
       this.toggleCreatorsCarouselArrowsDisablityStatusDesktop.bind(this)
     );
+    this.pageIsLoaded = true;
   }
 
   setScreenType(): void {
     const width = this.windowDimensionsService.getWidth();
-    if (width < 361) {
+    if (width < 553) {
       this.screenType = 'mobile';
     } else if (width < 769) {
       this.screenType = 'tablet';
     } else {
       this.screenType = 'desktop';
+    }
+    this.activeCreatorsSlideIndex = 0;
+    if (this.pageIsLoaded) {
+      this.toggleCreatorsCarouselArrowsDisablityStatusDesktop();
+      this.toggleCreatorsCarouselArrowsDisablityStatusMobile();
     }
     this.setActiveCreatorsIndices();
   }
@@ -267,18 +273,24 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.screenType !== 'desktop') {
       return;
     }
-    // The bitwise OR operator is used to convert the float to an integer.
-    const scrollLeft =
-      this.creatorsCarouselContainer.nativeElement.scrollLeft | 0;
-    const scrollWidth =
-      this.creatorsCarouselContainer.nativeElement.scrollWidth | 0;
-    const clientWidth =
-      this.creatorsCarouselContainer.nativeElement.clientWidth | 0;
+    // Here, the absolute value is used to accomodate the RTL UI logic.
+    let scrollLeft = Math.abs(
+      this.creatorsCarouselContainer.nativeElement.scrollLeft
+    );
+    let scrollWidth = Math.abs(
+      this.creatorsCarouselContainer.nativeElement.scrollWidth
+    );
+    let clientWidth = Math.abs(
+      this.creatorsCarouselContainer.nativeElement.clientWidth
+    );
+
+    scrollLeft = Math.round(scrollLeft);
+    scrollWidth = Math.round(scrollWidth);
+    clientWidth = Math.round(clientWidth);
 
     this.creatorsCarouselLeftArrowIsDisabled = scrollLeft === 0;
     this.creatorsCarouselRightArrowIsDisabled =
-      Math.abs(scrollLeft) === Math.abs(scrollWidth - clientWidth);
-    // Here, the absolute value is used to accomodate the RTL UI logic.
+      scrollLeft === scrollWidth - clientWidth;
   }
 
   moveTestimonialCarouselToPreviousSlide(): void {
@@ -295,13 +307,13 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onClickStartLearningButton(): void {
     this.siteAnalyticsService.registerClickStartLearningButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this.windowRef.nativeWindow.location.href = '/learn';
     return;
   }
 
   onClickVisitClassroomButton(): void {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this.windowRef.nativeWindow.location.href = '/learn';
     return;
   }
 
@@ -323,18 +335,26 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     return;
   }
 
-  onClickExploreLessonsButton(): void {
-    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    return;
-  }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  onClickExploreLessonsButton(): void {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+  }
+
+  onClickGetAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickGetAndroidAppButtonEvent();
+  }
+
+  registerFirstTimePageViewEvent(): void {
+    this.siteAnalyticsService.registerFirstTimePageViewEvent(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.TEACH
+    );
   }
 
   ngOnDestroy(): void {

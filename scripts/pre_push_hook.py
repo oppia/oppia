@@ -288,11 +288,13 @@ def main(args: Optional[List[str]] = None) -> None:
         install_hook()
         return
 
-    remote = git_changes_utils.get_local_git_repository_remote_name()
-    remote = remote if remote else parsed_args.remote
+    remote = (
+        parsed_args.remote if parsed_args.remote else
+        git_changes_utils.get_local_git_repository_remote_name()
+    )
     refs = git_changes_utils.get_refs()
     collected_files = git_changes_utils.get_changed_files(
-        refs, remote.decode('utf-8'))
+        refs, remote)
     # Only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and has_uncommitted_files():
         print(
@@ -356,7 +358,9 @@ def main(args: Optional[List[str]] = None) -> None:
             if js_or_ts_files:
                 frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
                 frontend_test_cmds.append(
-                    '--specs_to_run=%s --allow_no_spec'
+                    '--allow_no_spec')
+                frontend_test_cmds.append(
+                    '--specs_to_run=%s'
                         % ','.join(js_or_ts_files))
                 frontend_status = run_script_and_get_returncode(
                     frontend_test_cmds)

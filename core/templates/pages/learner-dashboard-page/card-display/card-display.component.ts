@@ -15,14 +15,22 @@
 /**
  * @fileoverview Component to display lesson cards based on tab
  */
-import {Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  ViewChild,
+  HostListener,
+  AfterViewInit,
+  ChangeDetectorRef,
+} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
-
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
 })
-export class CardDisplayComponent {
+export class CardDisplayComponent implements AfterViewInit {
   @Input() headingI18n!: string;
   @Input() numCards!: number;
   @Input() tabType!: string;
@@ -33,12 +41,34 @@ export class CardDisplayComponent {
   currentShift: number = 0;
   maxShifts: number = 0;
   lastShift: number = 0;
+  isLanguageRTL: boolean = false;
+  currentToggleState: boolean = false;
+  toggleButtonVisibility: boolean = false;
+
+  constructor(
+    private I18nLanguageCodeService: I18nLanguageCodeService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.isLanguageRTL = this.I18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  ngAfterViewInit(): void {
+    this.toggleButtonVisibility = this.isToggleButtonVisible();
+    this.cdr.detectChanges();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(): void {
+    this.toggleButtonVisibility = this.isToggleButtonVisible();
+  }
 
   getMaxShifts(width: number): number {
     return this.numCards - Math.floor(width / this.cardWidth);
   }
 
-  nextCard(num: number): void {
+  moveCard(num: number): void {
     const allCards = this.cards.nativeElement;
     this.maxShifts = this.getMaxShifts(allCards.offsetWidth);
     this.lastShift =
@@ -48,26 +78,53 @@ export class CardDisplayComponent {
 
     if (allCards !== null) {
       if (this.currentShift > num) {
-        allCards.scrollLeft -= this.shiftLeft();
+        allCards.scrollLeft -=
+          (this.isLanguageRTL ? -1 : 1) * this.goToPrevCard();
       } else {
-        allCards.scrollLeft += this.shiftRight(num);
+        allCards.scrollLeft +=
+          (this.isLanguageRTL ? -1 : 1) * this.goToNextCard(num);
       }
     }
     this.currentShift = num;
   }
 
-  shiftLeft(): number {
+  goToPrevCard(): number {
     if (this.currentShift === this.maxShifts) {
       return this.lastShift;
     }
     return this.cardWidth - (this.currentShift === 1 ? 32 : 0);
   }
 
-  shiftRight(nextShift: number): number {
+  goToNextCard(nextShift: number): number {
     if (nextShift === 1) {
       return this.cardWidth - 32;
     }
     return nextShift === this.maxShifts ? this.lastShift : this.cardWidth;
+  }
+
+  handleToggleState(updateState: boolean): void {
+    this.currentToggleState = updateState;
+  }
+
+  getVisibility(): string {
+    if (!this.tabType.includes('progress')) {
+      return '';
+    }
+    return this.currentToggleState
+      ? 'card-display-content-shown'
+      : 'card-display-content-hidden';
+  }
+
+  isToggleButtonVisible(): boolean {
+    if (this.tabType.includes('home')) {
+      return false;
+    }
+
+    return (
+      this.cards &&
+      this.cards.nativeElement &&
+      this.numCards * this.cardWidth - 16 > this.cards.nativeElement.offsetWidth
+    );
   }
 }
 

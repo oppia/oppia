@@ -20,6 +20,7 @@ import {Component, Input} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ClassroomSummaryDict} from 'domain/classroom/classroom-backend-api.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-classroom-summary-tile',
@@ -64,7 +65,7 @@ export class ClassroomSummaryTileComponent {
     if (this.isPublished()) {
       this.classroomThumbnailUrl =
         this.assetsBackendApiService.getThumbnailUrlForPreview(
-          'classroom',
+          AppConstants.ENTITY_TYPE.CLASSROOM,
           this.classroomSummary.classroom_id,
           this.classroomSummary.thumbnail_filename
         );

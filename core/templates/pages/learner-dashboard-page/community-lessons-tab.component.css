@@ -310,21 +310,28 @@
   }
 }
 
-.oppia-learner-dash-greeting {
-  color: #00645c;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 32px;
-}
-
-.oppia-learner-dash-section {
+.oppia-learner-dash-progress-empty-div {
+  align-items: center;
   background-color: #fff;
   border-radius: .25em;
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 75vh;
+  justify-content: center;
+  max-height: 750px;
   padding: 16px;
+  width: 100%;
 }
 
-.oppia-learner-dash-section-heading {
-  color: #205d86;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 24px;
+.oppia-learner-dash-progress-empty-text {
+  color: #333;
+  font-size: 18px;
+  max-width: 522px;
+  text-align: center;
+}
+
+@media screen and (max-width: 400px) {
+  .oppia-learner-dash-progress-empty-div {
+    align-items: normal;
+  }
 }

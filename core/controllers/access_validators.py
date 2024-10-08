@@ -101,15 +101,8 @@ class ClassroomsPageAccessValidationHandler(
         """Retrieves information about classrooms.
 
         Raises:
-            PageNotFoundException. The multiple classrooms
-                feature is not enabled.
             PageNotFoundException. No public classrooms are present.
         """
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value,
-            user_id=self.user_id
-        ):
-            raise self.NotFoundException
 
         classrooms = classroom_config_services.get_all_classrooms()
         has_public_classrooms = any(map(lambda c: c.is_published, classrooms))
@@ -530,6 +523,26 @@ class CollectionEditorAccessValidationPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_collection
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass
+
+
+class ReviewTestsPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to review tests page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_story_viewer_page
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass

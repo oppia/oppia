@@ -101,7 +101,7 @@
 	"I18N_DIAGNOSTIC_TEST_RESULT_GO_TO_CLASSROOM_BUTTON_TEXT": "Pergi ke kelas",
 	"I18N_DIAGNOSTIC_TEST_RESULT_HEADER_TEXT": "Tes selesai. Bagus sekali!",
 	"I18N_DIAGNOSTIC_TEST_RESULT_START_TOPIC": "Mulai <[topicName]>",
-	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC": "Kerja bagus! Sepertinya Anda sudah memiliki pemahaman yang baik tentang topik-topik di Kelas Matematika.",
+	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC": "Kerja bagus! Sepertinya Anda sudah memiliki pemahaman yang baik tentang topik-topik di Kelas <[classroomName]>.",
 	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_2_FOR_NO_TOPIC": "Jangan ragu untuk mengikuti salah satu pelajaran untuk meninjau atau memperbaiki apa yang Anda ketahui. Kami terus memperbarui Kelas dengan pelajaran baru, jadi periksa kembali.",
 	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_TWO_TOPICS": "Berdasarkan jawaban Anda, sebaiknya mulai dengan salah satu dari topik ini.",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Tarik gambar ke sini",

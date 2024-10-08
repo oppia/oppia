@@ -573,7 +573,7 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.4.0'
+OPPIA_VERSION = '3.4.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1077,7 +1077,8 @@ LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
     '/learner_dashboard_learner_groups_handler')
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
-CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
+CLASSROOM_DISPLAY_INFO_HANDLER_URL = '/classroom_display_info_handler'
+UPDATE_CLASSROOMS_ORDER_HANDLER_URL = '/update_classrooms_order'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 NEW_CLASSROOM_HANDLER_URL = '/classroom_admin/create_new'

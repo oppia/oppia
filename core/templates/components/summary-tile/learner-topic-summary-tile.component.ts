@@ -41,7 +41,6 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   thumbnailBgColor!: string;
   openInNewWindow = false;
   @Input() redesignFeatureFlag!: boolean;
-  @Input() lastCard!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -49,14 +48,17 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   ) {}
 
   getTopicLink(): string {
-    if (!this.topicSummary.classroom || !this.topicSummary.urlFragment) {
+    if (
+      !this.topicSummary.classroomUrlFragment ||
+      !this.topicSummary.urlFragment
+    ) {
       return '#';
     }
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
       {
         topic_url_fragment: this.topicSummary.urlFragment,
-        classroom_url_fragment: this.topicSummary.classroom,
+        classroom_url_fragment: this.topicSummary.classroomUrlFragment,
       }
     );
   }

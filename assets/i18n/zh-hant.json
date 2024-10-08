@@ -751,7 +751,7 @@
 	"I18N_FOOTER_NEWSLETTER_TEXT": "歡迎成為 Oppia 社群的一員！我們每兩週一次的電子報能讓您知悉新功能、課程內容，以及 Oppia 如何在全世界產生影響。",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Oppia 基金會",
 	"I18N_FOOTER_OPPIA_MISSION": "Oppia 的使命是提供一個學習平台，以滿足缺乏教育資源社區的特別需求。",
-	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "今天就<a href=\"/donate\">捐款</a>或成為<a href=\"/volunteer\" (click)=\"navigateToVolunteerPage()>志工</a>！",
+	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "今天就<a href=\"/donate\">捐款</a>或成為<a href=\"/volunteer\" (click)=\"navigateToVolunteerPage()\">志工</a>！",
 	"I18N_FOOTER_PRIVACY_POLICY": "隱私權政策",
 	"I18N_FOOTER_TEACH": "以 Oppia 教學",
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "教學/學習",
