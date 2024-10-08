@@ -486,7 +486,7 @@ export class BaseUser {
     }
     const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
     try {
-      await this.page.goto(explorationUrlAfterPublished);
+      await this.goto(explorationUrlAfterPublished);
       showMessage('Exploration is accessible with the URL, i.e. published.');
     } catch (error) {
       throw new Error('The exploration is not public.');
