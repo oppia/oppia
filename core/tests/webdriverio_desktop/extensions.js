@@ -71,8 +71,8 @@ describe('rich-text components', function () {
       await richTextEditor.addRteComponent(
         'Video',
         'M7lc1UVf-VE',
-        50,
-        90,
+        10,
+        100,
         false
       );
       // We put these last as otherwise Protractor sometimes fails to scroll to
