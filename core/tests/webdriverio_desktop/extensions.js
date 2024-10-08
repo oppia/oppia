@@ -112,8 +112,8 @@ describe('rich-text components', function () {
         await richTextChecker.readRteComponent(
           'Video',
           'M7lc1UVf-VE',
-          50,
-          90,
+          10,
+          100,
           false
         );
         await richTextChecker.readRteComponent(

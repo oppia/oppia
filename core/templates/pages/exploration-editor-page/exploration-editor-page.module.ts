@@ -33,7 +33,6 @@ import {LostChangesModalComponent} from './modal-templates/lost-changes-modal.co
 import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
 import {StateDiffModalComponent} from './modal-templates/state-diff-modal.component';
 import {CreateFeedbackThreadModalComponent} from './feedback-tab/templates/create-feedback-thread-modal.component';
-import {PreviewSummaryTileModalComponent} from './settings-tab/templates/preview-summary-tile-modal.component';
 import {WelcomeTranslationModalComponent} from './translation-tab/modal-templates/welcome-translation-modal.component';
 import {DeleteExplorationModalComponent} from './settings-tab/templates/delete-exploration-modal.component';
 import {RemoveRoleConfirmationModalComponent} from './settings-tab/templates/remove-role-confirmation-modal.component';
@@ -126,7 +125,6 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
-    PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
@@ -188,7 +186,6 @@ import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.gua
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
-    PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,

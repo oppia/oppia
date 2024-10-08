@@ -202,6 +202,7 @@ import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {RteHelperModalComponent} from 'services/rte-helper-modal.controller';
 import {DirectivesModule} from 'directives/directives.module';
+import {PreviewSummaryTileModalComponent} from 'pages/exploration-editor-page/settings-tab/templates/preview-summary-tile-modal.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -389,6 +390,7 @@ import {DirectivesModule} from 'directives/directives.module';
     PostPublishModalComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
+    PreviewSummaryTileModalComponent,
   ],
 
   entryComponents: [
@@ -535,6 +537,7 @@ import {DirectivesModule} from 'directives/directives.module';
     PostPublishModalComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
+    PreviewSummaryTileModalComponent,
   ],
 
   exports: [
