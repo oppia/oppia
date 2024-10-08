@@ -16,14 +16,23 @@
                  required="true"
                  aria-labelledby="email">
           <button class="oppia-footer-newsletter-button"
-                  [disabled]="isSubmitting || !validateEmailAddress()"
-                  (click)="subscribeToMailingList()">
-            <span>{{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}</span>
+                  [disabled]="subscriptionIsInProgress || !validateEmailAddress()"
+                  (click)="onSubscribeButtonClicked()">
+            <span *ngIf="subscriptionState === 'subscribe'">
+              {{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}
+            </span>
+            <span *ngIf="subscriptionState === 'subscribing'">
+              {{ 'I18N_SUBSCRIBING_BUTTON_TEXT' | translate }}
+            </span>
+            <span *ngIf="subscriptionState === 'subscribed'">
+              {{ 'I18N_SUBSCRIBED_BUTTON_TEXT' | translate }}
+            </span>
           </button>
         </div>
       </div>
     </div>
   </div>
+
   <div class="oppia-footer-container">
     <div class="row row-cols-2 p-0 m-0">
       <div class="oppia-mission-volunteer col-7">

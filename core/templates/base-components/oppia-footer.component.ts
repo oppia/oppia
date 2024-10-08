@@ -46,13 +46,15 @@ export class OppiaFooterComponent implements OnDestroy {
   BRANCH_NAME = AppConstants.BRANCH_NAME;
   SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
 
-  private debounceSubject: Subject<void> = new Subject();
-  private unsubscribe$: Subject<void> = new Subject();
+  private emailSubscriptionDebounce: Subject<void> = new Subject();
+  private componentIsBeingDestroyed$: Subject<void> = new Subject();
+
   versionInformationIsShown: boolean =
     this.router.url === '/about' && !AppConstants.DEV_MODE;
 
-  isSubmitting: boolean = false;
-  debounceTimeout: number = 1500;
+  subscriptionIsInProgress: boolean = false;
+  subscriptionState: 'subscribe' | 'subscribing' | 'subscribed' = 'subscribe';
+  debounceTimeoutDuration: number = 1500;
 
   constructor(
     private alertsService: AlertsService,
@@ -62,18 +64,18 @@ export class OppiaFooterComponent implements OnDestroy {
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService
   ) {
-    this.debounceSubject
+    this.emailSubscriptionDebounce
       .pipe(
-        debounceTime(this.debounceTimeout),
-        switchMap(() => this.subscribeToMailingListInternal()),
-        takeUntil(this.unsubscribe$)
+        debounceTime(this.debounceTimeoutDuration),
+        switchMap(() => this.performMailingListSubscription()),
+        takeUntil(this.componentIsBeingDestroyed$)
       )
       .subscribe();
   }
 
   ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.componentIsBeingDestroyed$.next();
+    this.componentIsBeingDestroyed$.complete();
   }
 
   getOppiaBlogUrl(): string {
@@ -84,15 +86,17 @@ export class OppiaFooterComponent implements OnDestroy {
     const regex = new RegExp(AppConstants.EMAIL_REGEX);
     return regex.test(String(this.emailAddress));
   }
-  subscribeToMailingList(): void {
-    if (this.isSubmitting || !this.validateEmailAddress()) {
+
+  onSubscribeButtonClicked(): void {
+    if (this.subscriptionIsInProgress || !this.validateEmailAddress()) {
       return;
     }
-    this.isSubmitting = true;
-    this.debounceSubject.next();
+    this.subscriptionIsInProgress = true;
+    this.subscriptionState = 'subscribing';
+    this.emailSubscriptionDebounce.next();
   }
 
-  private subscribeToMailingListInternal(): Promise<void> {
+  private performMailingListSubscription(): Promise<void> {
     const userName = this.name ? String(this.name) : null;
     return this.mailingListBackendApiService
       .subscribeUserToMailingList(
@@ -102,26 +106,29 @@ export class OppiaFooterComponent implements OnDestroy {
       )
       .then(status => {
         if (status) {
+          this.subscriptionState = 'subscribed';
           this.alertsService.addInfoMessage('Done!', 1000);
           this.ngbModal.open(ThanksForSubscribingModalComponent, {
             backdrop: 'static',
             size: 'xl',
           });
         } else {
+          this.subscriptionState = 'subscribe';
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
-            10000
+            1000
           );
         }
       })
       .catch(() => {
+        this.subscriptionState = 'subscribe';
         this.alertsService.addInfoMessage(
           AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
           10000
         );
       })
       .finally(() => {
-        this.isSubmitting = false;
+        this.subscriptionIsInProgress = false;
       });
   }
 
