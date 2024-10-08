@@ -137,4 +137,25 @@ describe('OppiaAngularRootComponent', function () {
     fixture.detectChanges();
     expect(component.direction).toEqual(newDirection);
   });
+
+  it('should set OppiaAngularRootComponent.contextService if not set', () => {
+    OppiaAngularRootComponent.contextService = undefined;
+    expect(OppiaAngularRootComponent.contextService).toBeUndefined();
+
+    component.ngAfterViewInit();
+
+    expect(OppiaAngularRootComponent.contextService).toBe(
+      // Disabled dot-notation as contextService is a private property
+      // and hence cannot be accessed without this syntax.
+      // eslint-disable-next-line dot-notation
+      component['contextService'] // Accessing the private property directly for testing.
+    );
+
+    const previousContextService = OppiaAngularRootComponent.contextService;
+
+    component.ngAfterViewInit();
+    expect(OppiaAngularRootComponent.contextService).toBe(
+      previousContextService
+    );
+  });
 });
