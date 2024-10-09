@@ -115,8 +115,6 @@
   }
 }
 
-mobile-nav-options
-  oppia-topic-editor-navbar
-  ul.oppia-navbar-desktop.nav.navbar-nav.oppina-navbar-nav.float-right {
+mobile-nav-options oppia-topic-editor-navbar ul.oppia-navbar-desktop.nav.navbar-nav.oppina-navbar-nav.float-right {
   display: none !important;
 }
