@@ -61,7 +61,9 @@
     "core/templates/AppSpec.ts",
     "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts",
-    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
+    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
+    "core/templates/pages/exploration-editor-page/ckeditor_dependency.html",
+    "extensions/interactions/dependency_html.html"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",
