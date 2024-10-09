@@ -743,7 +743,7 @@ class BaseHandler(
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert values['status_code'] in [400, 401, 404, 500]
+        assert values['status_code'] in [400, 401, 404, 405, 500]
         method = self.request.environ['REQUEST_METHOD']
 
         if method == 'GET':
@@ -774,6 +774,8 @@ class BaseHandler(
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
         if isinstance(exception, self.NotLoggedInException):
             # This checks if the response should be JSON or HTML.
             # For GET requests, there is no payload, so we check against
@@ -841,6 +843,16 @@ class BaseHandler(
             values = {
                 'error': str(exception),
                 'status_code': 500
+            }
+            self._render_exception(values)
+            return
+
+        if isinstance(exception, TypeError):
+            self.error(405)
+            values = {
+                'error': 'Invalid method %s for %s' % (
+                    request_method, handler_class_name),
+                'status_code': 405
             }
             self._render_exception(values)
             return

@@ -217,21 +217,3 @@
     margin-left: 0;
   }
 }
-
-.oppia-learner-dash-button-lg--classroom {
-  background-color: #fff;
-  border-color: #205d86;
-  color: #205d86;
-}
-
-.oppia-learner-dash-button-lg--classroom:hover {
-  background-color: #cadbda;
-  border-color: #205d86;
-  color: #205d86;
-}
-
-.oppia-learner-dash-button-lg--classroom:focus {
-  background-color: #429488;
-  border-color: #205d86;
-  color: #fff;
-}

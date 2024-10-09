@@ -24,8 +24,10 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8 with pip cache
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
@@ -35,7 +37,8 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
       - name: Cache node modules and third_party/static
         uses: actions/cache@v3
         env:
@@ -49,7 +52,8 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Oppia dependencies
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
@@ -78,8 +82,10 @@ jobs:
         suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.suites }}
     name: e2e_test (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8 with pip cache
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
@@ -89,7 +95,8 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v3
         env:
@@ -126,7 +133,8 @@ jobs:
           ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
-      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Oppia dependencies
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
@@ -190,12 +198,15 @@ jobs:
         suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.suites }}
     name: lighthouse (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v3
         env:
@@ -247,7 +258,8 @@ jobs:
       - name: (Artifact re-build) Build Webpack
         if: steps.download_artifact_1.outcome == 'failure'
         run: python -m scripts.build --prod_env
-      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Oppia dependencies
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
@@ -276,8 +288,10 @@ jobs:
           suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.suites }}
       name: acceptance_test (${{ matrix.os }}, ${{ matrix.suite.name }})
       steps:
-        - uses: actions/checkout@v3
-        - uses: actions/setup-python@v3
+        - name: Checkout repository
+          uses: actions/checkout@v3
+        - name: Setup Python 3.8 with pip cache
+          uses: actions/setup-python@v4
           with:
             python-version: '3.8.15'
             architecture: 'x64'
@@ -287,7 +301,8 @@ jobs:
               requirements.txt
               requirements_dev.in
               requirements_dev.txt
-        - uses: ./.github/actions/merge
+        - name: Merge develop branch into the current branch
+          uses: ./.github/actions/merge
         - name: Cache node modules
           uses: actions/cache@v3
           env:
@@ -324,7 +339,8 @@ jobs:
             ls -la oppia/third_party
           working-directory: /home/runner/work/oppia
           shell: bash
-        - uses: ./.github/actions/install-oppia-dependencies
+        - name: Install Oppia dependencies
+          uses: ./.github/actions/install-oppia-dependencies
         - name: (Artifact re-build) Cache third_party/static
           if: steps.download_artifact_1.outcome == 'failure'
           uses: actions/cache@v3
@@ -375,13 +391,17 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: ./.github/actions/merge
-      - uses: ./.github/actions/check-workflow-status
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
+      - name: Check workflow status
+        uses: ./.github/actions/check-workflow-status
         id: check_workflow_status
         with:
           jobs: ${{ toJson(needs) }}
