@@ -108,9 +108,7 @@
 }
 
 @media screen and (min-width: 600px) and (max-width: 768px) {
-  .navbar-container
-    .collapse.d-lg-inline-flex.navbar-collapse.oppia-navbar-collapse.ng-cloak.navbar-options-display
-    nav-options {
+  .navbar-container .collapse.d-lg-inline-flex.navbar-collapse.oppia-navbar-collapse.ng-cloak.navbar-options-display nav-options {
       display: none !important;
     }
 }
