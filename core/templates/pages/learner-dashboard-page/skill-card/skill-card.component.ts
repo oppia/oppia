@@ -53,9 +53,9 @@ export class SkillCardComponent {
     this.imgUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
       AppConstants.ENTITY_TYPE.TOPIC,
       this.topic.getId(),
-      this.subtopic.getThumbnailFilename()
+      this.subtopic.getThumbnailFilename() ?? ''
     );
-    this.imgColor = this.subtopic.getThumbnailBgColor();
+    this.imgColor = this.subtopic.getThumbnailBgColor() ?? '';
     this.checkQuestionsExist();
   }
 
