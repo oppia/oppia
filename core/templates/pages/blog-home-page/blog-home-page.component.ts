@@ -326,7 +326,7 @@ export class BlogHomePageComponent implements OnInit {
       },
       errorResponse => {
         this.alertsService.addWarning(
-          `Unable to fetch search results.Error: ${errorResponse}`
+          `Unable to fetch search results. Error: ${errorResponse}`
         );
       }
     );
