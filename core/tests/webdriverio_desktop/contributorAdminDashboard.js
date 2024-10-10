@@ -98,6 +98,7 @@ describe('Contributor Admin Dashboard', function () {
     await adminPage.addLanguageToCoordinator('translation', 'shqip (Albanian)');
     await adminPage.addLanguageToCoordinator('translation', 'العربية (Arabic)');
     await adminPage.addRole('question', 'translation admin');
+    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
     await users.logout();
 
     await users.login(QUESTION_COORDINATOR_EMAIL);
@@ -143,9 +144,6 @@ describe('Contributor Admin Dashboard', function () {
       SKILL_DESCRIPTIONS[1],
       REVIEW_MATERIALS[1]
     );
-
-    await adminPage.get();
-    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
 
     // Creating an exploration with an image.
     await creatorDashboardPage.get();
