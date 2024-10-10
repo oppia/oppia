@@ -21,7 +21,6 @@ import {
   Input,
   ViewChild,
   HostListener,
-  ChangeDetectorRef,
   AfterContentInit,
   NgZone,
 } from '@angular/core';
@@ -48,7 +47,6 @@ export class CardDisplayComponent implements AfterContentInit {
 
   constructor(
     private I18nLanguageCodeService: I18nLanguageCodeService,
-    private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) {}
 
