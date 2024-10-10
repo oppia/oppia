@@ -10,11 +10,10 @@
       <p class="skill-card-topic mb-0"> {{ topic.name }} </p>
     </div>
     <div class="align-items-center d-flex justify-content-between mt-2">
-      <circle-progress
-       [titleColor]="'#fff'"
-       [percent]="progress"
-       [unitsColor]="'#fff'"
-       [outerStrokeColor]="'#fff'"
+      <circle-progress [titleColor]="'#fff'"
+                       [percent]="progress"
+                       [unitsColor]="'#fff'"
+                       [outerStrokeColor]="'#fff'"
       >
       </circle-progress>
       <button class="oppia-learner-dash-button-sm oppia-learner-dash-button--skill" (click)="openNewPracticeSession()">
