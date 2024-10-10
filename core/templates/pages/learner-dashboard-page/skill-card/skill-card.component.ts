@@ -36,9 +36,9 @@ export class SkillCardComponent {
   @Input() progress!: number;
   @Input() subtopic!: Subtopic;
 
-  imgUrl: string = '';
-  imgColor: string = '';
-  questionStatus: boolean;
+  imgUrl!: string;
+  imgColor!: string;
+  questionStatus!: boolean;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
