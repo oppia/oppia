@@ -409,7 +409,7 @@
           </oppia-card-display>
            <!--TODO(#18384): Find max number of skill cards-->
           <oppia-card-display *ngIf="partiallyLearntTopicsList.length !== 0 && dataLoaded" [headingI18n]="'I18N_LEARNER_DASHBOARD_SKILLS'" [numCards]="partialTopicMastery.reduce(getTotalSkillCards, 0)" [tabType]="'progress'">
-            <ng-container *ngFor="let topicObj of partialTopicMastery"> 
+            <ng-container *ngFor="let topicObj of partialTopicMastery">
               <ng-container *ngFor="let subtopic of topicObj.topic.subtopics; index as i">
                 <oppia-skill-card [topic]="topicObj.topic" [progress]="topicObj.progress[i]" [subtopic]="subtopic"></oppia-skill-card>
               </ng-container>
@@ -426,7 +426,7 @@
         </oppia-card-display>
          <!--TODO(#18384): Find max number of skill cards-->
         <oppia-card-display *ngIf="learntTopicsList.length !== 0 && dataLoaded" [headingI18n]="'I18N_LEARNER_DASHBOARD_SKILLS'" [numCards]="learntTopicMastery.reduce(getTotalSkillCards, 0)" [tabType]="'progress'">
-          <ng-container *ngFor="let topicObj of learntTopicMastery"> 
+          <ng-container *ngFor="let topicObj of learntTopicMastery">
             <ng-container *ngFor="let subtopic of topicObj.topic.subtopics; index as i">
               <oppia-skill-card [topic]="topicObj.topic" [progress]="topicObj.progress[i]" [subtopic]="subtopic"></oppia-skill-card>
             </ng-container>
