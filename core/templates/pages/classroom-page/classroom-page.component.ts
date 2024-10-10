@@ -251,7 +251,14 @@ export class ClassroomPageComponent implements OnDestroy {
   }
 
   isDiagnosticTestFeatureFlagEnabled(): boolean {
-    return this.platformFeatureService.status.DiagnosticTest.isEnabled;
+    // Currently, diagnostic test functionality is only supported for the math
+    // classroom. This issue (#21091) will ensure this functionality can be
+    // enabled/disabled for any classroom from the classroom admin page.
+    // Remove the second clause here, once the issue is resolved.
+    return (
+      this.platformFeatureService.status.DiagnosticTest.isEnabled &&
+      this.classroomUrlFragment === 'math'
+    );
   }
 }
 

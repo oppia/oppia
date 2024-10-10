@@ -352,6 +352,7 @@ describe('Classroom Page Component', () => {
   it('should return correct value for diagnostic test feature flag', () => {
     expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeFalse();
 
+    component.classroomUrlFragment = 'math';
     mockPlatformFeatureService.status.DiagnosticTest.isEnabled = true;
 
     expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeTrue();
