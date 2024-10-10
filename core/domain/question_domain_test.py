@@ -742,7 +742,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v27_to_v28(self) -> None:
-        test_data = self.question_state_dict['recorded_voiceovers']
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        self.question_state_dict['recorded_voiceovers'] = {  # type: ignore[misc]
+            'voiceovers_mapping': {
+                'temp_id': {},
+                'temp_id_2': {},
+                'temp_id_3': {},
+                'temp_id_4': {}
+            }
+        }
+
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        test_data = self.question_state_dict['recorded_voiceovers']# type: ignore[misc]
+
         # Here we use MyPy ignore because we are defining an older version
         # dictionary of state which contains `content_ids_to_audio_translations`
         # key, but question_data is of type StateDict (latest version dictionary
@@ -769,8 +783,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 28)
         self.assertIn('recorded_voiceovers', test_value['state'])
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers'], test_data)
+            test_value['state']['recorded_voiceovers'], test_data) # type: ignore[misc]
 
     def test_question_state_dict_conversion_from_v28_to_v29(self) -> None:
 
@@ -834,15 +850,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'answer_groups'][0]['tagged_skill_misconception_id'])
 
     def test_question_state_dict_conversion_from_v30_to_v31(self) -> None:
-        # Here we use MyPy ignore because here we are defining an empty
-        # VoiceoverDict, for checking when this dict passes throw conversion
-        # functions, keys are populated automatically or not. So, due to the
-        # absence of keys MyPy throws an `Missing key` error. Thus to avoid
-        # the error, we used ignore here.
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {
-            'content': {
-                'audio_metadata': {}  # type: ignore[typeddict-item]
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        self.question_state_dict['recorded_voiceovers'] = { # type: ignore[misc]
+            'voiceovers_mapping': {
+                'content': {
+                    'audio_metadata': {}
+                }
             }
         }
 
@@ -850,10 +864,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'state': self.question_state_dict,
             'state_schema_version': 30
         }
-
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertNotIn(
             'duration_secs',
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][ # type: ignore[misc]
                 'content']['audio_metadata']
         )
 
@@ -861,13 +876,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 31)
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertIn(
             'duration_secs',
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][ # type: ignore[misc]
                 'content']['audio_metadata']
         )
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'][ # type: ignore[misc]
                 'content']['audio_metadata']['duration_secs'],
             0.0
         )
@@ -1047,9 +1066,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }
         ]
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {
-            'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        self.question_state_dict['recorded_voiceovers'] = { # type: ignore[misc]
+            'voiceovers_mapping': {
+                'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
+            }
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
@@ -1072,8 +1094,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['interaction']['id'],
             'MathEquationInput'
         )
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers'][
+            test_value['state']['recorded_voiceovers'][ # type: ignore[misc]
                 'voiceovers_mapping'],
             {'temp_id_3': {}}
         )
@@ -1136,7 +1160,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }
         ]
-        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = { # type: ignore[misc]
             'temp_id': {}
         }
         test_value['state_schema_version'] = 34
@@ -1192,7 +1218,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }
         ]
-        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = { # type: ignore[misc]
             'temp_id': {}
         }
         test_value['state_schema_version'] = 34
@@ -1380,7 +1408,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 }
             }
         }
-        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        test_value['state']['recorded_voiceovers'] = { # type: ignore[misc]
+            'voiceovers_mapping': {}
+         }
         test_value['state_schema_version'] = 35
 
         with self.swap_to_always_return(
@@ -1407,8 +1439,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'showChoicesInShuffledOrder': {'value': True}
             }
         )
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], # type: ignore[misc]
             {
                 'ca_choices_3': {}, 'ca_choices_4': {}, 'ca_choices_5': {},
                 'ca_choices_6': {}, 'ca_choices_7': {}, 'ca_choices_8': {},
@@ -1455,7 +1489,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 }
             }
         }
-        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {} # type: ignore[misc]
         test_value['state_schema_version'] = 35
 
         self.assertEqual(
@@ -1479,8 +1515,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'minAllowableSelectionCount': {'value': 1}
             }
         )
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], # type: ignore[misc]
             {'ca_choices_3': {}}
         )
         # Here we use MyPy ignore because the latest schema of state
@@ -1586,8 +1624,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
         self.question_state_dict['interaction']['customization_args'] = {}
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {}
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        self.question_state_dict['recorded_voiceovers'] = { # type: ignore[misc]
+            'voiceovers_mapping': {}
+        }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         self.question_state_dict['written_translations'] = { # type: ignore[misc]
@@ -1615,8 +1656,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 }
             }
         )
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], # type: ignore[misc]
             {'ca_placeholder_0': {}}
         )
         # Here we use MyPy ignore because the latest schema of state
@@ -1702,8 +1745,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
         self.question_state_dict['next_content_id_index'] = 0 # type: ignore[misc]
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {}
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        self.question_state_dict['recorded_voiceovers'] = { # type: ignore[misc]
+            'voiceovers_mapping': {}
+        }
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1725,8 +1771,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'normalizedStrSet': 'text'
             }
         )
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], # type: ignore[misc]
             {'rule_input_0': {}}
         )
 
@@ -1757,7 +1805,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
         test_value['state']['next_content_id_index'] = 0 # type: ignore[misc]
-        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {} # type: ignore[misc]
         test_value['state_schema_version'] = 40
 
         question_domain.Question.update_state_from_model(
@@ -1775,8 +1825,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'unicodeStrSet': 'text'
             }
         )
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], # type: ignore[misc]
             {'rule_input_0': {}}
         )
 

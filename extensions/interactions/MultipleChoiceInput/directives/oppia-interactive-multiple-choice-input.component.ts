@@ -22,7 +22,6 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -50,14 +49,11 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   answer;
   displayedCard!: StateCard;
   errorMessageI18nKey: string = '';
-  recordedVoiceovers!: RecordedVoiceovers;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
-    private audioTranslationManagerService: AudioTranslationManagerService,
-    private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private multipleChoiceInputOrderedChoicesService: MultipleChoiceInputOrderedChoicesService
   ) {}
@@ -116,30 +112,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
   ngOnInit(): void {
     this.choices = this.getOrderedChoices();
-    // Setup voiceover.
-    this.displayedCard = this.playerTranscriptService.getCard(
-      this.playerPositionService.getDisplayedCardIndex()
-    );
-    if (this.displayedCard) {
-      this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
-
-      // Combine labels for voiceover.
-      let combinedChoiceLabels = '';
-      for (const choice of this.choices) {
-        combinedChoiceLabels +=
-          this.audioTranslationManagerService.cleanUpHTMLforVoiceover(
-            choice.choice.html
-          );
-      }
-      // Say the choices aloud if autoplay is enabled.
-      this.audioTranslationManagerService.setSequentialAudioTranslations(
-        this.recordedVoiceovers.getBindableVoiceovers(
-          this.choices[0].choice.contentId
-        ),
-        combinedChoiceLabels,
-        this.COMPONENT_NAME_RULE_INPUT
-      );
-    }
 
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(

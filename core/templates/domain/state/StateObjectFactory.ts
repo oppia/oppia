@@ -30,10 +30,6 @@ import {
 } from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {
-  RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
-import {
   SubtitledHtmlBackendDict,
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
@@ -48,7 +44,6 @@ export interface StateBackendDict {
   content: SubtitledHtmlBackendDict;
   interaction: InteractionBackendDict;
   param_changes: readonly ParamChangeBackendDict[];
-  recorded_voiceovers: RecordedVoiceOverBackendDict;
   solicit_answer_details: boolean;
   card_is_checkpoint: boolean;
   // This property is null if no skill is linked to the State.
@@ -64,7 +59,6 @@ export class State extends BaseTranslatableObject {
   content: SubtitledHtml;
   interaction: Interaction;
   paramChanges: ParamChange[];
-  recordedVoiceovers: RecordedVoiceovers;
   solicitAnswerDetails: boolean;
   cardIsCheckpoint: boolean;
   inapplicableSkillMisconceptionIds: string[] | null;
@@ -76,7 +70,6 @@ export class State extends BaseTranslatableObject {
     content: SubtitledHtml,
     interaction: Interaction,
     paramChanges: ParamChange[],
-    recordedVoiceovers: RecordedVoiceovers,
     solicitAnswerDetails: boolean,
     cardIsCheckpoint: boolean,
     inapplicableSkillMisconceptionIds: string[] | null
@@ -88,7 +81,6 @@ export class State extends BaseTranslatableObject {
     this.content = content;
     this.interaction = interaction;
     this.paramChanges = paramChanges;
-    this.recordedVoiceovers = recordedVoiceovers;
     this.solicitAnswerDetails = solicitAnswerDetails;
     this.cardIsCheckpoint = cardIsCheckpoint;
     this.inapplicableSkillMisconceptionIds = inapplicableSkillMisconceptionIds;
@@ -115,7 +107,6 @@ export class State extends BaseTranslatableObject {
       param_changes: this.paramChanges.map(paramChange => {
         return paramChange.toBackendDict();
       }),
-      recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
       solicit_answer_details: this.solicitAnswerDetails,
       card_is_checkpoint: this.cardIsCheckpoint,
       inapplicable_skill_misconception_ids:
@@ -129,7 +120,6 @@ export class State extends BaseTranslatableObject {
     this.content = otherState.content;
     this.interaction.copy(otherState.interaction);
     this.paramChanges = otherState.paramChanges;
-    this.recordedVoiceovers = otherState.recordedVoiceovers;
     this.solicitAnswerDetails = otherState.solicitAnswerDetails;
     this.cardIsCheckpoint = otherState.cardIsCheckpoint;
   }
@@ -164,7 +154,6 @@ export class StateObjectFactory {
       content: newStateTemplate.content,
       interaction: newStateTemplate.interaction,
       param_changes: newStateTemplate.param_changes,
-      recorded_voiceovers: newStateTemplate.recorded_voiceovers,
       solicit_answer_details: newStateTemplate.solicit_answer_details,
       card_is_checkpoint: newStateTemplate.card_is_checkpoint,
       inapplicable_skill_misconception_ids:
@@ -179,8 +168,6 @@ export class StateObjectFactory {
     if (defaultOutcome !== null && newStateName !== null) {
       defaultOutcome.dest = newStateName as string;
     }
-    newState.recordedVoiceovers.addContentId(contentIdForContent);
-    newState.recordedVoiceovers.addContentId(contentIdForDefaultOutcome);
 
     return newState;
   }
@@ -197,7 +184,6 @@ export class StateObjectFactory {
       SubtitledHtml.createFromBackendDict(stateDict.content),
       this.interactionObject.createFromBackendDict(stateDict.interaction),
       this.paramchangesObject.createFromBackendList(stateDict.param_changes),
-      RecordedVoiceovers.createFromBackendDict(stateDict.recorded_voiceovers),
       stateDict.solicit_answer_details,
       stateDict.card_is_checkpoint,
       stateDict.inapplicable_skill_misconception_ids

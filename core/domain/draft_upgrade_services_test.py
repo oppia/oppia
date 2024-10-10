@@ -2301,7 +2301,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         expected_draft_change_list_v28 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': 'recorded_voiceovers',
+                'property_name': (
+                    exp_domain.DEPRECATED_STATE_PROPERTY_RECORDED_VOICEOVERS),
                 'state_name': 'State B',
                 'new_value': {'voiceovers_mapping': {
                         'content': {

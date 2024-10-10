@@ -109,6 +109,10 @@ class MockWindowRef {
         return 'http://localhost:8181/?lang=es';
       },
     },
+    navigator: {
+      onLine: true,
+      userAgent: null,
+    },
     localStorage: {
       last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {},

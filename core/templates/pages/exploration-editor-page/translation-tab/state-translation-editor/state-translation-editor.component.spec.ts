@@ -28,13 +28,13 @@ import {TranslationLanguageService} from '../services/translation-language.servi
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
 import {StateTranslationEditorComponent} from './state-translation-editor.component';
 import {MarkAudioAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {ContextService} from 'services/context.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 class MockNgbModalRef {
   result: Promise<void> = Promise.resolve();
@@ -61,6 +61,7 @@ describe('State Translation Editor Component', () => {
   let translationStatusService: TranslationStatusService;
   let state: State;
   let contextService: ContextService;
+  let entityVoiceoversService: EntityVoiceoversService;
 
   let mockActiveLanguageChangedEventEmitter = new EventEmitter<void>();
   let mockActiveLanguageIdChangedEventEmitter = new EventEmitter<string>();
@@ -99,6 +100,7 @@ describe('State Translation Editor Component', () => {
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     translationStatusService = TestBed.inject(TranslationStatusService);
     contextService = TestBed.inject(ContextService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
 
     state = stateObjectFactory.createDefaultState(
       '',
@@ -167,18 +169,10 @@ describe('State Translation Editor Component', () => {
 
   describe('on clicking save button', () => {
     it('should open model asking whether voiceover needs update', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content1: {
-            hi: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100,
-              needs_update: false,
-              duration_secs: 10,
-            },
-          },
-        },
-      });
+      spyOn(
+        entityVoiceoversService,
+        'checkVoiceoverWithGivenContentIdIsAvailable'
+      ).and.returnValue(true);
       spyOn(ngbModal, 'open').and.callThrough();
 
       component.onSaveTranslationButtonClicked();
@@ -192,18 +186,10 @@ describe('State Translation Editor Component', () => {
     });
 
     it('should not open the modal if voiceover already needs update', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content1: {
-            hi: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100,
-              needs_update: true,
-              duration_secs: 10,
-            },
-          },
-        },
-      });
+      spyOn(
+        entityVoiceoversService,
+        'checkVoiceoverWithGivenContentIdIsAvailable'
+      ).and.returnValue(false);
       spyOn(ngbModal, 'open');
 
       component.onSaveTranslationButtonClicked();
@@ -212,18 +198,11 @@ describe('State Translation Editor Component', () => {
     });
 
     it('should accept NO on voiceover needs update modal', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content1: {
-            hi: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100,
-              needs_update: false,
-              duration_secs: 10,
-            },
-          },
-        },
-      });
+      spyOn(
+        entityVoiceoversService,
+        'checkVoiceoverWithGivenContentIdIsAvailable'
+      ).and.returnValue(true);
+
       const mockNgbModalRef = new MockNgbModalRef();
       mockNgbModalRef.result = Promise.reject();
       spyOn(ngbModal, 'open').and.returnValue(mockNgbModalRef as NgbModalRef);

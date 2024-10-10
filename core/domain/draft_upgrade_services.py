@@ -1071,15 +1071,12 @@ class DraftUpgradeUtil:
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
-                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-                # Here we use cast because this 'if' condition forces change to
-                # have type EditExpStatePropertyRecordedVoiceoversCmd.
-                edit_recorded_voiceovers_cmd = cast(
-                    exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
-                    change
-                )
+                    exp_domain.DEPRECATED_STATE_PROPERTY_RECORDED_VOICEOVERS):
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.new_value, dict)
                 recorded_voiceovers_dict = (
-                    edit_recorded_voiceovers_cmd.new_value
+                    change.new_value
                 )
                 new_voiceovers_mapping = recorded_voiceovers_dict[
                     'voiceovers_mapping'
@@ -1093,7 +1090,8 @@ class DraftUpgradeUtil:
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                        exp_domain.DEPRECATED_STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
                     'state_name': change.state_name,
                     'new_value': {
                         'voiceovers_mapping': new_voiceovers_mapping
@@ -1195,7 +1193,8 @@ class DraftUpgradeUtil:
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                        exp_domain.DEPRECATED_STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
                     'state_name': change.state_name,
                     'new_value': {
                         'voiceovers_mapping': voiceovers_dict

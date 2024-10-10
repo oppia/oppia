@@ -18,10 +18,7 @@
 
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
 import {AudioFile} from 'domain/utilities/audio-file.model';
-import {
-  AudioTranslationManagerService,
-  AudioTranslations,
-} from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import {AudioTranslations} from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import {AssetsBackendApiService} from './assets-backend-api.service';
 import {ContextService} from './context.service';
 import {Howl} from 'howler';
@@ -51,7 +48,6 @@ export class AudioPlayerService {
   private _stopIntervalSubject = new Subject<void>();
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private audioTranslationManagerService: AudioTranslationManagerService,
     private contextService: ContextService,
     private ngZone: NgZone
   ) {}
@@ -68,22 +64,24 @@ export class AudioPlayerService {
       .loadAudio(this.contextService.getExplorationId(), filename)
       .then(
         (loadedAudioFile: AudioFile) => {
+          console.log('Hello -----------------');
           this._currentTrack = new Howl({
             src: [URL.createObjectURL(loadedAudioFile.data)],
             format: ['mp3'],
           });
           this._currentTrack.on('load', () => {
+            console.log('hello 1');
             this._stopIntervalSubject.next();
             this._currentTrackFilename = loadedAudioFile.filename;
             this._lastPauseOrSeekPos = 0;
             successCallback();
           });
           this._currentTrack.on('end', () => {
+            console.log('hello 2');
             this._stopIntervalSubject.next();
             this._currentTrack = null;
             this._currentTrackFilename = null;
             this._lastPauseOrSeekPos = null;
-            this.audioTranslationManagerService.clearSecondaryAudioTranslations();
           });
         },
         e => errorCallback(e)
@@ -140,7 +138,6 @@ export class AudioPlayerService {
     this._currentTrack = null;
     this._currentTrackFilename = null;
     this._lastPauseOrSeekPos = null;
-    this.audioTranslationManagerService.clearSecondaryAudioTranslations();
   }
 
   rewind(seconds: number): void {

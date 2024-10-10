@@ -54,10 +54,6 @@ import {
   Outcome,
   OutcomeBackendDict,
 } from 'domain/exploration/OutcomeObjectFactory';
-import {
-  RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
 import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
@@ -70,7 +66,6 @@ export type StatePropertyValues =
   | InteractionCustomizationArgs
   | Outcome
   | ParamChange[]
-  | RecordedVoiceovers
   | string
   | SubtitledHtml
   | BaseTranslatableObject;
@@ -81,7 +76,6 @@ export type StatePropertyDictValues =
   | InteractionCustomizationArgsBackendDict
   | OutcomeBackendDict
   | ParamChangeBackendDict[]
-  | RecordedVoiceOverBackendDict
   | string
   | SubtitledHtmlBackendDict;
 export type StatePropertyNames =
@@ -95,7 +89,6 @@ export type StatePropertyNames =
   | 'linked_skill_id'
   | 'param_changes'
   | 'param_specs'
-  | 'recorded_voiceovers'
   | 'solicit_answer_details'
   | 'solution'
   | 'state_name'
@@ -136,7 +129,6 @@ export class ChangeListService {
     answer_groups: true,
     confirmed_unclassified_answers: true,
     content: true,
-    recorded_voiceovers: true,
     default_outcome: true,
     hints: true,
     inapplicable_skill_misconception_ids: true,

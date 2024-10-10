@@ -128,9 +128,6 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'x']['contentId'] = 'rule_input_4'
         new_answer_group.rule_specs[0].inputs[
             'x']['normalizedStrSet'] = ['Divide']
-        state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
-        state.recorded_voiceovers.voiceovers_mapping[
-            'rule_input_4'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
         answer_groups: List[state_domain.AnswerGroupDict] = []
         for answer_group in state.interaction.answer_groups:
@@ -140,11 +137,6 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'state_name': 'Home',
             'property_name': 'answer_groups',
             'new_value': answer_groups
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'state_name': 'Home',
-            'property_name': 'recorded_voiceovers',
-            'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
@@ -219,9 +211,6 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'x']['contentId'] = 'rule_input_4'
         new_answer_group.rule_specs[0].inputs[
             'x']['normalizedStrSet'] = ['Multiplication']
-        state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
-        state.recorded_voiceovers.voiceovers_mapping[
-            'rule_input_4'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
@@ -231,11 +220,6 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'state_name': 'Home',
             'property_name': 'answer_groups',
             'new_value': answer_groups
-        }), exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'state_name': 'Home',
-            'property_name': 'recorded_voiceovers',
-            'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(

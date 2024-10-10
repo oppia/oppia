@@ -962,8 +962,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         question_state_data = test_question_dict['question_state_data']
         question_state_data['content']['html'] = '<p>Updated question</p>'
         question_state_data['interaction']['solution'] = new_solution_dict
-        question_state_data['recorded_voiceovers'] = (
-            state.recorded_voiceovers.to_dict())
 
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(suggestion.change_cmd.skill_difficulty, float)
@@ -2214,15 +2212,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'state_name': 'State 1',
             'new_value': self.old_content,
         })
-        recorded_voiceovers_change = exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS,
-            'state_name': 'State 1',
-            'new_value': recorded_voiceovers_dict,
-        })
         exp_services.update_exploration(
             self.editor_id, exploration.id,
-            [content_change, recorded_voiceovers_change], '')
+            [content_change], '')
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(

@@ -65,10 +65,6 @@ export class StateTranslationStatusGraphComponent {
     let stateData = this.explorationStatesService.getState(stateName);
 
     if (stateName && stateData) {
-      this.stateRecordedVoiceoversService.init(
-        stateName,
-        stateData.recordedVoiceovers
-      );
       this.stateEditorService.onRefreshStateTranslation.emit();
     }
     this.routerService.onCenterGraph.emit();

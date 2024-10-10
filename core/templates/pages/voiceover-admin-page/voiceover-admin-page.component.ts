@@ -23,12 +23,8 @@ import {
   LanguageAccentToDescription,
   LanguageCodesMapping,
   LanguageAccentMasterList,
-  VoiceArtistIdToLanguageMapping,
-  VoiceArtistIdToVoiceArtistName,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
-import {VoiceArtistLanguageMapping} from './voice-artist-language-mapping.model';
-import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
@@ -59,9 +55,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
   pageIsInitialized: boolean = false;
   languageAccentDropdownIsShown: boolean = false;
   languageAccentCodeIsPresent: boolean = false;
-  voiceArtistIdToLanguageMappingList!: VoiceArtistLanguageMapping[];
-  voiceArtistIdToLanguageMapping!: VoiceArtistIdToLanguageMapping;
-  voiceArtistIdToVoiceArtistName!: VoiceArtistIdToVoiceArtistName;
   languageAccentMasterList!: LanguageAccentMasterList;
   columnsToDisplay: string[] = [
     'voiceArtist',
@@ -87,63 +80,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.languageAccentMasterList = response.languageAccentMasterList;
         this.pageIsInitialized = true;
       });
-    this.voiceoverBackendApiService
-      .fetchVoiceArtistMetadataAsync()
-      .then(response => {
-        this.voiceArtistIdToLanguageMapping =
-          response.voiceArtistIdToLanguageMapping;
-        this.voiceArtistIdToLanguageMappingList =
-          VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
-            this.voiceArtistIdToLanguageMapping
-          );
-        this.voiceArtistsDataCount =
-          this.voiceArtistIdToLanguageMappingList.length;
-        this.voiceArtistIdToVoiceArtistName =
-          response.voiceArtistIdToVoiceArtistName;
-      });
-  }
-
-  addLanguageAccentForVoiceArtist(
-    voiceArtistId: string,
-    languageCode: string
-  ): void {
-    let languageAccentCodes = this.languageAccentMasterList[languageCode];
-    let modalRef: NgbModalRef = this.ngbModal.open(
-      AddAccentToVoiceoverLanguageModalComponent,
-      {
-        backdrop: 'static',
-      }
-    );
-    let currentLanguageAccentCode =
-      this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode];
-
-    modalRef.componentInstance.languageCode = languageCode;
-    modalRef.componentInstance.voiceArtistId = voiceArtistId;
-    modalRef.componentInstance.voiceArtistName =
-      this.voiceArtistIdToVoiceArtistName[voiceArtistId];
-    modalRef.componentInstance.languageAccentCode = currentLanguageAccentCode;
-    modalRef.componentInstance.languageAccentCodes = languageAccentCodes;
-
-    modalRef.result.then(
-      languageAccentCode => {
-        this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode] =
-          languageAccentCode;
-        this.voiceArtistIdToLanguageMappingList =
-          VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
-            this.voiceArtistIdToLanguageMapping
-          );
-        this.voiceoverBackendApiService.updateVoiceArtistToLanguageAccentAsync(
-          voiceArtistId,
-          languageCode,
-          languageAccentCode
-        );
-      },
-      () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is
-        // clicked. No further action is needed.
-      }
-    );
   }
 
   initializeLanguageAccentCodesFields(

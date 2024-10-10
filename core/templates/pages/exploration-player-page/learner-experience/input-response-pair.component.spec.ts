@@ -262,28 +262,15 @@ describe('InputResponsePairComponent', () => {
   });
 
   it('should get the css class for feedback audio highlight', () => {
-    spyOn(
-      audioTranslationManagerService,
-      'getCurrentComponentName'
-    ).and.returnValue(AppConstants.COMPONENT_NAME_FEEDBACK);
+    spyOn(voiceoverPlayerService, 'getActiveComponentName').and.returnValue(
+      AppConstants.COMPONENT_NAME_FEEDBACK
+    );
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
     component.isLastPair = false;
 
     expect(component.getFeedbackAudioHighlightClass()).toBe('');
 
     component.isLastPair = true;
-
-    expect(component.getFeedbackAudioHighlightClass()).toBe(
-      ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS
-    );
-
-    spyOn(
-      component,
-      'isVoiceoverContributionWithAccentEnabled'
-    ).and.returnValue(true);
-    spyOn(voiceoverPlayerService, 'getActiveComponentName').and.returnValue(
-      AppConstants.COMPONENT_NAME_FEEDBACK
-    );
     expect(component.getFeedbackAudioHighlightClass()).toBe(
       ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS
     );
@@ -291,12 +278,11 @@ describe('InputResponsePairComponent', () => {
 
   it(
     'should return empty css class for feedback audio highlight ' +
-      'when audio player service is not playing',
+      'when voiceover player service is not playing',
     () => {
-      spyOn(
-        audioTranslationManagerService,
-        'getCurrentComponentName'
-      ).and.returnValue(AppConstants.COMPONENT_NAME_FEEDBACK);
+      spyOn(voiceoverPlayerService, 'getActiveComponentName').and.returnValue(
+        AppConstants.COMPONENT_NAME_FEEDBACK
+      );
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
       component.isLastPair = true;
 
@@ -325,10 +311,9 @@ describe('InputResponsePairComponent', () => {
     'should return empty css class for feedback audio highlight ' +
       'when current component name does not match',
     () => {
-      spyOn(
-        audioTranslationManagerService,
-        'getCurrentComponentName'
-      ).and.returnValue('sample');
+      spyOn(voiceoverPlayerService, 'getActiveComponentName').and.returnValue(
+        'sample'
+      );
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
       component.isLastPair = true;
 

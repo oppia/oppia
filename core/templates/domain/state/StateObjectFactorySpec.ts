@@ -69,9 +69,6 @@ describe('State Object Factory', () => {
     linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {},
-    },
     solicit_answer_details: false,
     card_is_checkpoint: false,
   };
@@ -94,12 +91,6 @@ describe('State Object Factory', () => {
       content: {
         content_id: 'content_0',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content_0: {},
-          default_outcome_1: {},
-        },
       },
       inapplicable_skill_misconception_ids: [],
       interaction: {

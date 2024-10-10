@@ -26,7 +26,7 @@ import {QuestionDomainConstants} from 'domain/question/question-domain.constants
 import cloneDeep from 'lodash/cloneDeep';
 import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
-import {State, StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/StateObjectFactory';
 import {Question} from './QuestionObjectFactory';
 
 interface ApplyParams {
@@ -110,25 +110,6 @@ export class QuestionUpdateService {
     return diffList;
   }
 
-  _updateContentIdsInAssets(newState: State, oldState: State): void {
-    let newContentIds = new Set(newState.getAllContentIds());
-    let oldContentIds = new Set(oldState.getAllContentIds());
-    let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-      oldContentIds,
-      newContentIds
-    );
-    let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-      newContentIds,
-      oldContentIds
-    );
-    contentIdsToDelete.forEach(contentId => {
-      newState.recordedVoiceovers.deleteContentId(contentId);
-    });
-    contentIdsToAdd.forEach(contentId => {
-      newState.recordedVoiceovers.addContentId(contentId);
-    });
-  }
-
   setQuestionLanguageCode(question: Question, newLanguageCode: string): void {
     let oldLanguageCode = cloneDeep(question.getLanguageCode());
     this._applyPropertyChange(
@@ -208,7 +189,6 @@ export class QuestionUpdateService {
     // for creating the change to send to the backend.
     updateFunction();
     let newStateData = question.getStateData();
-    this._updateContentIdsInAssets(newStateData, oldStateData);
     this._applyPropertyChange(
       question,
       QuestionDomainConstants.QUESTION_PROPERTY_QUESTION_STATE_DATA,

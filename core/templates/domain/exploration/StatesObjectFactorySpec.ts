@@ -22,7 +22,6 @@ import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {Voiceover} from './voiceover.model';
 
 describe('States Object Factory', () => {
   let sof: StateObjectFactory = null;
@@ -45,12 +44,6 @@ describe('States Object Factory', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -93,12 +86,6 @@ describe('States Object Factory', () => {
         content_id: 'content_7',
         html: '',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content_7: {},
-          default_outcome_8: {},
-        },
-      },
       interaction: {
         id: 'EndExploration',
         answer_groups: [],
@@ -130,12 +117,6 @@ describe('States Object Factory', () => {
       content: {
         content_id: 'content_5',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content_5: {},
-          default_outcome_6: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -175,27 +156,6 @@ describe('States Object Factory', () => {
       content: {
         content_id: 'content',
         html: 'more content',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {
-            'hi-en': {
-              filename: 'myfile2.mp3',
-              file_size_bytes: 0.8,
-              needs_update: false,
-              duration_secs: 0.8,
-            },
-          },
-          default_outcome: {},
-          solution: {
-            de: {
-              filename: 'myfile9.mp3',
-              file_size_bytes: 0.5,
-              needs_update: false,
-              duration_secs: 0.5,
-            },
-          },
-        },
       },
       interaction: {
         answer_groups: [],
@@ -248,13 +208,6 @@ describe('States Object Factory', () => {
           content_id: 'content',
           html: 'content',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-          },
-        },
         interaction: {
           id: 'MultipleChoiceInput',
           customization_args: {
@@ -302,13 +255,6 @@ describe('States Object Factory', () => {
         content: {
           content_id: 'content',
           html: 'content',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-          },
         },
         interaction: {
           id: 'MultipleChoiceInput',
@@ -360,68 +306,6 @@ describe('States Object Factory', () => {
         content: {
           content_id: 'content',
           html: 'content',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'myfile1.mp3',
-                file_size_bytes: 0.5,
-                needs_update: false,
-                duration_secs: 0.5,
-              },
-              'hi-en': {
-                filename: 'myfile3.mp3',
-                file_size_bytes: 0.8,
-                needs_update: false,
-                duration_secs: 0.8,
-              },
-            },
-            default_outcome: {
-              he: {
-                filename: 'myfile10.mp3',
-                file_size_bytes: 0.5,
-                needs_update: false,
-                duration_secs: 0.5,
-              },
-            },
-            feedback_1: {
-              zh: {
-                filename: 'myfile4.mp3',
-                file_size_bytes: 1.1,
-                needs_update: false,
-                duration_secs: 1.1,
-              },
-            },
-            hint_1: {
-              es: {
-                filename: 'myfile5.mp3',
-                file_size_bytes: 0.7,
-                needs_update: false,
-                duration_secs: 0.7,
-              },
-              zh: {
-                filename: 'myfile6.mp3',
-                file_size_bytes: 0.9,
-                needs_update: false,
-                duration_secs: 0.9,
-              },
-              'hi-en': {
-                filename: 'myfile8.mp3',
-                file_size_bytes: 1.2,
-                needs_update: false,
-                duration_secs: 1.2,
-              },
-            },
-            hint_2: {
-              cs: {
-                filename: 'myfile7.mp3',
-                file_size_bytes: 0.2,
-                needs_update: false,
-                duration_secs: 0.2,
-              },
-            },
-          },
         },
         interaction: {
           answer_groups: [
@@ -546,13 +430,6 @@ describe('States Object Factory', () => {
               content_id: 'content',
               html: 'content',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-                feedback_1: {},
-              },
-            },
             interaction: {
               id: 'MultipleChoiceInput',
               customization_args: {
@@ -600,45 +477,4 @@ describe('States Object Factory', () => {
       );
     }
   );
-
-  it('should correctly get all audio language codes in states', () => {
-    const states = ssof.createFromBackendDict(statesWithVoiceoverDict);
-    expect(states.getAllVoiceoverLanguageCodes()).toEqual([
-      'en',
-      'hi-en',
-      'he',
-      'zh',
-      'es',
-      'cs',
-      'de',
-    ]);
-  });
-
-  it('should correctly get all audio translations in states', () => {
-    const states = ssof.createFromBackendDict(statesWithVoiceoverDict);
-    expect(states.getAllVoiceovers('hi-en')).toEqual({
-      'first state': [
-        Voiceover.createFromBackendDict({
-          filename: 'myfile3.mp3',
-          file_size_bytes: 0.8,
-          needs_update: false,
-          duration_secs: 0.8,
-        }),
-        Voiceover.createFromBackendDict({
-          filename: 'myfile8.mp3',
-          file_size_bytes: 1.2,
-          needs_update: false,
-          duration_secs: 1.2,
-        }),
-      ],
-      'second state': [
-        Voiceover.createFromBackendDict({
-          filename: 'myfile2.mp3',
-          file_size_bytes: 0.8,
-          needs_update: false,
-          duration_secs: 0.8,
-        }),
-      ],
-    });
-  });
 });

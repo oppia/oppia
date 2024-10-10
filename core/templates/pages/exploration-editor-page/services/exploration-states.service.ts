@@ -293,24 +293,10 @@ export class ExplorationStatesService {
 
   markTranslationAndVoiceoverNeedsUpdate(contentId: string): void {
     this.changeListService.markTranslationsAsNeedingUpdate(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
   }
 
   removeTranslationAndVoiceover(contentId: string): void {
     this.changeListService.removeTranslations(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasVoiceovers(contentId)) {
-      recordedVoiceovers.voiceoversMapping[contentId] = {};
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
     this.entityTranslationsService.removeAllTranslationsForContent(contentId);
   }
 
@@ -365,10 +351,6 @@ export class ExplorationStatesService {
     stateName: string,
     backendName: 'solution'
   ): SubtitledHtml;
-  getStatePropertyMemento(
-    stateName: string,
-    backendName: 'recorded_voiceovers'
-  ): RecordedVoiceovers;
   getStatePropertyMemento(
     stateName: string,
     backendName: 'solicit_answer_details'
@@ -456,11 +438,6 @@ export class ExplorationStatesService {
   ): void;
   saveStateProperty(
     stateName: string,
-    backendName: 'recorded_voiceovers',
-    newValue: RecordedVoiceovers
-  ): void;
-  saveStateProperty(
-    stateName: string,
     backendName: 'solicit_answer_details',
     newValue: boolean
   ): void;
@@ -512,24 +489,6 @@ export class ExplorationStatesService {
         this._verifyChangesInitialContents(backendName, newValue);
       }
 
-      if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = this._extractContentIds(backendName, oldValue);
-        let newContentIds = this._extractContentIds(backendName, newValue);
-        let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-          oldContentIds,
-          newContentIds
-        );
-        let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-          newContentIds,
-          oldContentIds
-        );
-        contentIdsToDelete.forEach(contentId => {
-          newStateData.recordedVoiceovers.deleteContentId(contentId);
-        });
-        contentIdsToAdd.forEach(contentId => {
-          newStateData.recordedVoiceovers.addContentId(contentId);
-        });
-      }
       let propertyRef = newStateData;
       for (let i = 0; i < accessorList.length - 1; i++) {
         propertyRef = propertyRef[accessorList[i]];
@@ -593,6 +552,11 @@ export class ExplorationStatesService {
 
   getStates(): States {
     return cloneDeep(this._states);
+  }
+
+  getAllContentIdsByStateName(stateName: string): string[] {
+    let allContentIds = this._states.getState(stateName).getAllContentIds();
+    return allContentIds.filter(contentId => contentId !== undefined);
   }
 
   getStateNames(): string[] {
@@ -758,21 +722,6 @@ export class ExplorationStatesService {
 
   saveSolution(stateName: string, newSolution: SubtitledHtml): void {
     this.saveStateProperty(stateName, 'solution', newSolution);
-  }
-
-  getRecordedVoiceoversMemento(stateName: string): RecordedVoiceovers {
-    return this.getStatePropertyMemento(stateName, 'recorded_voiceovers');
-  }
-
-  saveRecordedVoiceovers(
-    stateName: string,
-    newRecordedVoiceovers: RecordedVoiceovers
-  ): void {
-    this.saveStateProperty(
-      stateName,
-      'recorded_voiceovers',
-      newRecordedVoiceovers
-    );
   }
 
   getSolicitAnswerDetailsMemento(stateName: string): boolean {

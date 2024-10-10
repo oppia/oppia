@@ -155,35 +155,6 @@ export class States {
     }
     return finalStateNames;
   }
-
-  getAllVoiceoverLanguageCodes(): string[] {
-    const allLanguageCodes = new Set<string>();
-    Object.values(this._states).forEach(state => {
-      state.recordedVoiceovers.getAllContentIds().forEach(contentId => {
-        const contentLanguageCodes =
-          state.recordedVoiceovers.getLanguageCodes(contentId);
-        contentLanguageCodes.forEach(allLanguageCodes.add, allLanguageCodes);
-      });
-    });
-    return [...allLanguageCodes];
-  }
-
-  getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
-    let allAudioTranslations: VoiceoverObjectsDict = {};
-    for (let stateName in this._states) {
-      let state = this._states[stateName];
-      allAudioTranslations[stateName] = [];
-      let contentIdsList = state.recordedVoiceovers.getAllContentIds();
-      contentIdsList.forEach(contentId => {
-        let audioTranslations =
-          state.recordedVoiceovers.getBindableVoiceovers(contentId);
-        if (audioTranslations.hasOwnProperty(languageCode)) {
-          allAudioTranslations[stateName].push(audioTranslations[languageCode]);
-        }
-      });
-    }
-    return allAudioTranslations;
-  }
 }
 
 @Injectable({

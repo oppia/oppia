@@ -20,14 +20,16 @@ import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
 
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TranslationTabActiveContentIdService {
   constructor(
-    private _stateRecordedVoiceoversService: StateRecordedVoiceoversService
+    private _explorationStatesService: ExplorationStatesService,
+    private _stateEditorService: StateEditorService
   ) {}
 
   // 'activeContentId' and 'activeDataFormat' will be 'null' if active content
@@ -45,9 +47,10 @@ export class TranslationTabActiveContentIdService {
   }
 
   setActiveContent(contentId: string, dataFormat: string): void {
-    const displayStateRecordedVoiceovers =
-      this._stateRecordedVoiceoversService.displayed;
-    let allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
+    let stateName = this._stateEditorService.getActiveStateName();
+    let allContentIds =
+      this._explorationStatesService.getAllContentIdsByStateName(stateName);
+
     if (allContentIds.indexOf(contentId) === -1) {
       throw new Error('Invalid active content id: ' + contentId);
     }
