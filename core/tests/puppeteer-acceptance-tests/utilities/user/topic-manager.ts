@@ -162,6 +162,7 @@ const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
 const editConceptCardSelector = '.e2e-test-edit-concept-card';
 const saveConceptCardSelector = '.e2e-test-save-concept-card';
 const addButtonSelector = '.e2e-test-add-misconception-modal-button';
+const misconceptionCardHeader = '.oppia-misconception-card-header';
 const nameFieldSelector = '.e2e-test-misconception-name-field';
 const saveMisconceptionButton = '.e2e-test-confirm-add-misconception-button';
 const saveWorkedExamplesButton = '.e2e-test-save-worked-example-button';
@@ -1745,7 +1746,13 @@ export class TopicManager extends BaseUser {
       const element = await this.page.$(addButtonSelector);
       // If the misconceptions were collapsed in mobile view.
       if (!element) {
-        this.clickOn('Misconceptions');
+        this.clickOn(misconceptionCardHeader);
+      } else {
+        try {
+          await this.page.waitForSelector(addButtonSelector, {visible: true});
+        } catch {
+          this.clickOn(misconceptionCardHeader);
+        }
       }
     }
     await this.clickOn(addButtonSelector);
