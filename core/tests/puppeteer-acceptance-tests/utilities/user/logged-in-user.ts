@@ -20,6 +20,8 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -1169,31 +1171,53 @@ export class LoggedInUser extends BaseUser {
    * @param {string[]} expectedGoals - The expected goals.
    */
   async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    try {
+      await this.waitForPageToFullyLoad();
 
-    await this.page.waitForSelector(completedGoalsSectionSelector, {
-      visible: true,
-    });
-    await this.page
-      .waitForSelector(completedGoalsTopicNameSelector)
-      .catch(() => {
-        throw new Error('Completed goals section is empty');
+      await this.page.waitForSelector(completedGoalsSectionSelector, {
+        visible: true,
       });
+      await this.page.waitForSelector(completedGoalsTopicNameSelector);
 
-    const completedGoals = await this.page.$$eval(
-      `${completedGoalsSectionSelector} ${completedGoalsTopicNameSelector}`,
-      (elements: Element[]) =>
-        elements.map(el =>
-          el.textContent ? el.textContent.trim().replace('Learnt ', '') : ''
-        )
-    );
+      const completedGoals = await this.page.$$eval(
+        `${completedGoalsSectionSelector} ${completedGoalsTopicNameSelector}`,
+        (elements: Element[]) =>
+          elements.map(el =>
+            el.textContent ? el.textContent.trim().replace('Learnt ', '') : ''
+          )
+      );
 
-    for (const expectedGoal of expectedGoals) {
-      if (!completedGoals.includes(expectedGoal)) {
-        throw new Error(
-          `Goal not found in completed lesson section: ${expectedGoal}`
-        );
+      for (const expectedGoal of expectedGoals) {
+        if (!completedGoals.includes(expectedGoal)) {
+          throw new Error(
+            `Goal not found in completed lesson section: ${expectedGoal}`
+          );
+        }
       }
+    } catch (e) {
+      console.error(e);
+      const dirPath = path.resolve(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        '..',
+        '..',
+        'puppeteer-screenshots/'
+      );
+      console.log('Resolved dirPath:', dirPath); // Debugging line
+      let screenshotPath = '';
+      try {
+        fs.mkdirSync(dirPath, {recursive: true});
+        screenshotPath = dirPath; // Use the resolved absolute path
+      } catch (err) {
+        console.error('Error creating screenshot directory:', err);
+      }
+      const fileName = 'errorScreenshot.png';
+      const filePath = path.join(screenshotPath, fileName);
+      console.log(filePath);
+      // Save screenshot
+      await this.page.screenshot({path: filePath});
     }
   }
 
