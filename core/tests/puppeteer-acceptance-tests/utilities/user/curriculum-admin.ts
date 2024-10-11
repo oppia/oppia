@@ -1533,11 +1533,11 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.createTopic(
       topicName,
-      topicName.toLowerCase().replace(' ', '-')
+      topicName.toLowerCase().replace(/ /g, '-')
     );
     await this.createSubtopicForTopic(
       subtopicName,
-      subtopicName.toLowerCase().replace(' ', '-'),
+      subtopicName.toLowerCase().replace(/ /g, '-'),
       topicName
     );
 
