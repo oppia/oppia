@@ -79,11 +79,7 @@ export class CertificateDownloadModalComponent {
     today.setHours(0, 0, 0, 0);
     const toDate = new Date(this.toDate);
     toDate.setHours(0, 0, 0, 0);
-    if (
-      !this.fromDate ||
-      !this.toDate ||
-      new Date(this.fromDate) >= toDate
-    ) {
+    if (!this.fromDate || !this.toDate || new Date(this.fromDate) >= toDate) {
       this.errorsFound = true;
       this.errorMessage = 'Invalid date range.';
       return;
