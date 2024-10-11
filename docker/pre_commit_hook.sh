@@ -95,17 +95,7 @@ docker compose run -T --no-deps --entrypoint "/bin/sh -c \
 'git config user.name $GIT_USERNAME && git config user.email $GIT_USEREMAIL \
 && python3 $PYTHON_PRE_COMMIT_SYMLINK $@'" dev-server
 
-# Update Git config in Docker container required by npx lint-staged
-$DOCKER_EXEC_COMMAND git config user.name $(git config user.name)
-$DOCKER_EXEC_COMMAND git config user.email $(git config user.email)
-
-# Run hook in container
-CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_COMMIT_SYMLINK $@"
-echo "Running $CMD"
-
-$CMD
-
-# Save exit code from the docker command, so we can later use it to exit this pre-commit hook at end.
+# Save exit code from the docker command, so we can later use it to exit this
 # pre-commit hook at end.
 exitcode=$?
 echo "Python script exited with code $exitcode"
