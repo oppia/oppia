@@ -130,13 +130,7 @@ describe('AddGoalsModalComponent', () => {
     expect(component.checkedTopics.has('0')).toBeFalse();
     expect(firstCheckbox.nativeElement.checked).toBeFalse();
   });
-  /**
-   * Cases
-   * - New values are added, not submitted (keep old values, none)
-   * - No new values are added, keep old values
-   * - Submit with no values ???
-   * For other goals component - return values (same, new + old, old, none)
-   */
+
   it('should close modal when cancel is clicked', () => {
     expect(component).toBeTruthy();
     const cancelButton = fixture.debugElement.query(
@@ -149,10 +143,22 @@ describe('AddGoalsModalComponent', () => {
     expect(matDialogSpy.close).toHaveBeenCalled();
   });
 
-  it('should return new goals and close modal when save is clicked', () => {
+  it('should add and return new goals and close modal when save is clicked', () => {
     expect(component).toBeTruthy();
-    component.checkedTopics = new Set(['1', '2', '3']);
+    expect(component.checkedTopics).toEqual(new Set());
+
+    const checkboxes = fixture.debugElement.queryAll(By.css('mat-checkbox'));
+    spyOn(component, 'onChange');
+    checkboxes[1].nativeElement.triggerEventHandler('change', '1');
+    checkboxes[2].nativeElement.triggerEventHandler('change', '2');
+    checkboxes[2].nativeElement.triggerEventHandler('change', '3');
     fixture.detectChanges();
+
+    expect(component.onChange).toHaveBeenCalledTimes(3);
+
+    expect(component.onChange).toHaveBeenCalledWith('1');
+    expect(component.onChange).toHaveBeenCalledWith('2');
+    expect(component.onChange).toHaveBeenCalledWith('3');
 
     const saveButton = fixture.debugElement.query(
       By.css(
@@ -165,5 +171,50 @@ describe('AddGoalsModalComponent', () => {
     const actualSet = matDialogSpy.close.calls.mostRecent()
       .args[0] as Set<string>;
     expect(actualSet).toEqual(new Set(['1', '2', '3']));
+  });
+
+  it('should return previously selected goals if there is no change when save is clicked', () => {
+    TestBed.overrideProvider(MAT_DIALOG_DATA, {
+      useValue: {...data, checkedTopics: new Set(['0', '2'])},
+    });
+    fixture = TestBed.createComponent(AddGoalsModalComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const saveButton = fixture.debugElement.query(
+      By.css(
+        '.oppia-learner-dash-goals-button--modal.oppia-learner-dash-button--default'
+      )
+    );
+    saveButton.triggerEventHandler('click', null);
+
+    const actualSet = matDialogSpy.close.calls.mostRecent()
+      .args[0] as Set<string>;
+    expect(actualSet).toEqual(new Set(['0', '2']));
+  });
+
+  it('should remove a goal id and return goals without it when save is clicked', () => {
+    TestBed.overrideProvider(MAT_DIALOG_DATA, {
+      useValue: {...data, checkedTopics: new Set(['0', '2'])},
+    });
+    fixture = TestBed.createComponent(AddGoalsModalComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const checkboxes = fixture.debugElement.queryAll(By.css('mat-checkbox'));
+    spyOn(component, 'onChange');
+    checkboxes[2].nativeElement.triggerEventHandler('change', '2');
+    fixture.detectChanges();
+
+    const saveButton = fixture.debugElement.query(
+      By.css(
+        '.oppia-learner-dash-goals-button--modal.oppia-learner-dash-button--default'
+      )
+    );
+    saveButton.triggerEventHandler('click', null);
+
+    const actualSet = matDialogSpy.close.calls.mostRecent()
+      .args[0] as Set<string>;
+    expect(actualSet).toEqual(new Set(['0']));
   });
 });
