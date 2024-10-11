@@ -31,17 +31,24 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
-      - name: Initializing Containers
-        run: |
-          make build
-          docker compose up angular-build -d
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+      # Caching is disabled to avoid poisoning our cache with the
+      # changed lighthouse file.
+      #
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     path: /home/runner/work/oppia/yarn_cache
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
+      - name: Install Oppia dependencies
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Increase lighthouse timeout
         run: |
           # Replace the 1.5 second timeout in lighthouse for retrieving
@@ -59,14 +66,15 @@ jobs:
           # code has changed and this logic needs to be reviewed.
           [[ $occurrences == "1" ]]
           # Replace the target string with the replacement string.
-          sudo sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
+          sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
           echo "Replaced '$SEARCH_TARGET' with '$REPLACEMENT' in $FILEPATH"
+        shell: bash
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: ./.github/actions/install-chrome
-      - name: Run Lighthouse accessibility checks shard
+        run: python -m scripts.install_chrome_for_ci
+      - name: Run Lighthouse accessibility checks shard ${{ matrix.suite.name }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: make run_tests.lighthouse_accessibility PYTHON_ARGS="--pages ${{ join(matrix.suite.pages_to_run, ',') }}"
+        run: python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
