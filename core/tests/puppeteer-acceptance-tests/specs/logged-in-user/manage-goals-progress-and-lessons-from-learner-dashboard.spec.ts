@@ -86,46 +86,50 @@ describe('Logged-in User', function () {
     // Setup taking longer than 300000ms.
   }, 480000);
 
-  it('should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.', async function () {
-    await loggedInUser.navigateToClassroomPage('math');
-    await loggedInUser.selectAndOpenTopic('Algebra I');
-    await loggedInUser.selectChapterWithinStoryToLearn(
-      'Test Story 1',
-      'Test Chapter 1'
-    );
-    // The exploration has a single state.
-    await loggedInUser.expectExplorationCompletionToastMessage(
-      'Congratulations for completing this lesson!'
-    );
+  it(
+    'should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.',
+    async function () {
+      await loggedInUser.navigateToClassroomPage('math');
+      await loggedInUser.selectAndOpenTopic('Algebra I');
+      await loggedInUser.selectChapterWithinStoryToLearn(
+        'Test Story 1',
+        'Test Chapter 1'
+      );
+      // The exploration has a single state.
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToGoalsSection();
-    await loggedInUser.addGoals(['Algebra I']);
-    await loggedInUser.expectToolTipMessage(
-      "Successfully added to your 'Current Goals' list."
-    );
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToGoalsSection();
+      await loggedInUser.addGoals(['Algebra I']);
+      await loggedInUser.expectToolTipMessage(
+        "Successfully added to your 'Current Goals' list."
+      );
 
-    await loggedInUser.navigateToHomeSection();
-    await loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I');
-    // The exploration has a single state.
-    await loggedInUser.expectExplorationCompletionToastMessage(
-      'Congratulations for completing this lesson!'
-    );
+      await loggedInUser.navigateToHomeSection();
+      await loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I');
+      // The exploration has a single state.
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToGoalsSection();
-    await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToGoalsSection();
+      await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
 
-    await loggedInUser.navigateToProgressSection();
-    await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
+      await loggedInUser.navigateToProgressSection();
+      await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
 
-    await loggedInUser.navigateToCommunityLessonsSection();
-    await loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']);
-    await loggedInUser.verifyLessonPresenceInPlayLater(
-      'Positive Numbers',
-      false
-    );
-  }, 13432433);
+      await loggedInUser.navigateToCommunityLessonsSection();
+      await loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']);
+      await loggedInUser.verifyLessonPresenceInPlayLater(
+        'Positive Numbers',
+        false
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
