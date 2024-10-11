@@ -793,6 +793,7 @@
 /core/controllers/acl_decorators*.py @oppia/core-reviewers
 /core/controllers/base*.py @oppia/core-reviewers
 /core/controllers/firebase*.py @oppia/core-reviewers
+/core/domain/firebase*.py @oppia/core-reviewers
 /core/domain/html*.py @oppia/core-reviewers
 /core/domain/rights_manager*.py @oppia/core-reviewers
 /core/domain/role_services*.py @oppia/core-reviewers
