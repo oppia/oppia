@@ -234,7 +234,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-run_tests.check_tests_are_captured_in_ci: ## Runs the check to ensure that all e2e tests are captured in CI
+run_tests.check_tests_are_captured_in_ci: ## Runs the check to ensure that all e2e and acceptence tests are captured in CI
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 	docker compose up dev-server -d --no-deps

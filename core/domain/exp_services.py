@@ -2580,10 +2580,10 @@ def revert_exploration(
 
     revert_version_history(exploration_id, current_version, revert_to_version)
 
-    current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    reverted_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_changes_upon_revert(
-            current_exploration, revert_to_version))
+            reverted_exploration, revert_to_version))
 
     translation_and_opportunity_models_to_put: List[
         base_models.BaseModel
