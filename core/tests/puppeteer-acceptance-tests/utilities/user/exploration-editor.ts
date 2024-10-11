@@ -1236,7 +1236,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(addSkillButton);
       // If the skill menu was collapsed in mobile view.
       if (!element) {
-        this.clickOn(mobileToggleSkillCard);
+        await this.clickOn(mobileToggleSkillCard);
       }
     }
     await this.clickOn(addSkillButton);
@@ -1263,7 +1263,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        this.clickOn(toggleResponseTab);
+        await this.clickOn(toggleResponseTab);
       }
     }
     let responseTabs = await this.page.$$(responseGroupDiv);
@@ -1311,7 +1311,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        this.clickOn(toggleResponseTab);
+        await this.clickOn(toggleResponseTab);
       }
     }
     let responseTabs = await this.page.$$(responseGroupDiv);
@@ -1352,7 +1352,7 @@ export class ExplorationEditor extends BaseUser {
         const element = await this.page.$(responseGroupDiv);
         // If the responses were collapsed in mobile view.
         if (!element) {
-          this.clickOn(toggleResponseTab);
+          await this.clickOn(toggleResponseTab);
         }
       }
       await this.page.waitForSelector(misconceptionDiv, {
@@ -1403,7 +1403,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        this.clickOn(toggleResponseTab);
+        await this.clickOn(toggleResponseTab);
       }
     }
     await this.page.waitForSelector(optionalMisconceptionDiv, {
@@ -1454,11 +1454,11 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        this.clickOn(toggleResponseTab);
+        await this.clickOn(toggleResponseTab);
       }
     }
     if (!isApplicable) {
-      this.page.waitForSelector(inapplicableMisconceptionDiv);
+      await this.page.waitForSelector(inapplicableMisconceptionDiv);
     }
 
     const inapplicableMisconceptions = await this.page.$$(
@@ -1494,7 +1494,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(addSkillButton);
       // If the skill menu was collapsed in mobile view.
       if (!element) {
-        this.clickOn(mobileToggleSkillCard);
+        await this.clickOn(mobileToggleSkillCard);
       }
     }
     await this.clickOn(deleteSkillButton);
