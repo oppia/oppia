@@ -1746,13 +1746,7 @@ export class TopicManager extends BaseUser {
       const element = await this.page.$(addButtonSelector);
       // If the misconceptions were collapsed in mobile view.
       if (!element) {
-        this.clickOn(misconceptionCardHeader);
-      } else {
-        try {
-          await this.page.waitForSelector(addButtonSelector, {visible: true});
-        } catch {
-          this.clickOn(misconceptionCardHeader);
-        }
+        await this.clickOn(misconceptionCardHeader);
       }
     }
     await this.clickOn(addButtonSelector);
