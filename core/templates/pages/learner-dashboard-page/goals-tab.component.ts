@@ -287,8 +287,6 @@ export class GoalsTabComponent implements OnInit {
       });
   }
 
-  //topics: this.editGoals.map(t => ({name: t.name, id: t.id})),
-  // comma - https://stackoverflow.com/questions/19874555/how-do-i-convert-array-of-objects-into-one-object-in-javascript
   openModal(): void {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.data = {
@@ -301,9 +299,33 @@ export class GoalsTabComponent implements OnInit {
     dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
     const dialogRef = this.dialog.open(AddGoalsModalComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.checkedTopics = new Set(result);
+    dialogRef.afterClosed().subscribe(async newGoalTopics => {
+      if (newGoalTopics) {
+        for (const topicId of newGoalTopics) {
+          if (!this.checkedTopics.has(topicId)) {
+            await this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
+              topicId,
+              AppConstants.ACTIVITY_TYPE_LEARN_TOPIC
+            );
+          }
+        }
+        const topicNames = this.editGoals.reduce(
+          (obj, item) => ((obj[item.id] = item.name), obj),
+          {}
+        );
+        for (const topicId of this.checkedTopics) {
+          if (!newGoalTopics.has(topicId)) {
+            await this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
+              LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+                .CURRENT_GOALS,
+              LearnerDashboardPageConstants
+                .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LEARN_TOPIC,
+              topicId,
+              topicNames[topicId]
+            );
+          }
+        }
+        this.checkedTopics = new Set(newGoalTopics);
       }
     });
   }
