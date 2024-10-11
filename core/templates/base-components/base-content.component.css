@@ -43,7 +43,7 @@
 }
 @media (max-width: 992px) {
   .navbar-collapse {
-    display: flex !important; 
+    display: flex; 
   }
 }
 
