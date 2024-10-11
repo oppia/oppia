@@ -255,3 +255,16 @@ describe('Moderator Page Component', () => {
     );
   });
 });
+
+it('should display an error message for invalid exploration IDs', fakeAsync(() => {
+  const invalidIds = ['invalid_id_1', 'invalid_id_2'];
+  componentInstance.invalidExplorationIds = invalidIds;
+  spyOn(alertsService, 'addWarning').and.callThrough();
+
+  componentInstance.displayInvalidIdsError();
+
+  expect(alertsService.addWarning).toHaveBeenCalledWith(
+    'Exploration IDs invalid_id_1, invalid_id_2 are invalid.'
+  );
+}));
+
