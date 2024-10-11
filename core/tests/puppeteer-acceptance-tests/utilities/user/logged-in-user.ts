@@ -619,6 +619,8 @@ export class LoggedInUser extends BaseUser {
         );
       }
       await this.page.waitForSelector(toastMessageSelector, {hidden: true});
+
+      await this.waitForNetworkIdle();
     } catch (error) {
       const newError = new Error(`Failed to match toast message: ${error}`);
       newError.stack = error.stack;
@@ -1133,6 +1135,8 @@ export class LoggedInUser extends BaseUser {
    * @param {string[]} goals - The goals to add.
    */
   async addGoals(goals: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
     await this.page.waitForSelector(topicNameInEditGoalsSelector, {
       visible: true,
     });
