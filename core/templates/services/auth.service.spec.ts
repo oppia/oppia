@@ -317,14 +317,15 @@ describe('Auth service', function () {
   });
 
   it('should return a FirebaseOptions object on successful request', () => {
-    const mockResponse = `)]}'{"apiKey":"test-api-key"}`;
+    // eslint-disable-next-line  @typescript-eslint/quotes
+    const mockResponse = `')]}'{'apiKey':'test-api-key'}'`;
     const xhrSpy = jasmine.createSpyObj('XMLHttpRequest', ['open', 'send']);
     xhrSpy.status = 200;
     xhrSpy.responseText = mockResponse;
 
     spyOn(window, 'XMLHttpRequest').and.returnValue(xhrSpy);
 
-    const result = (AuthService.getConfig as any)();
+    const result: FirebaseOptions | null = AuthService.getConfig();
 
     expect(result).toEqual({apiKey: 'test-api-key'} as FirebaseOptions);
   });
@@ -332,11 +333,12 @@ describe('Auth service', function () {
   it('should return null if config is empty', () => {
     const xhrSpy = jasmine.createSpyObj('XMLHttpRequest', ['open', 'send']);
     xhrSpy.status = 200;
+    // eslint-disable-next-line  @typescript-eslint/quotes
     xhrSpy.responseText = `)]}'`;
 
     spyOn(window, 'XMLHttpRequest').and.returnValue(xhrSpy);
 
-    const result = (AuthService.getConfig as any)();
+    const result: FirebaseOptions | null = AuthService.getConfig();
 
     expect(result).toBeNull();
   });
@@ -346,7 +348,7 @@ describe('Auth service', function () {
     xhrSpy.status = 500;
     spyOn(window, 'XMLHttpRequest').and.returnValue(xhrSpy);
 
-    const result = (AuthService.getConfig as any)();
+    const result: FirebaseOptions | null = AuthService.getConfig();
 
     expect(result).toBeNull();
   });
@@ -362,7 +364,7 @@ describe('Auth service', function () {
 
     spyOn(window, 'XMLHttpRequest').and.returnValue(xhrSpy);
 
-    const result = (AuthService.getConfig as any)();
+    const result: FirebaseOptions | null = AuthService.getConfig();
 
     expect(result).toBeNull(`Expected null, found ${result}`);
   });
