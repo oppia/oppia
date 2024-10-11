@@ -278,6 +278,24 @@ describe('CardDisplayComponent', () => {
     });
   });
 
+  it('should set toggle state to true when handleToggleState is passed true', () => {
+    expect(component.currentToggleState).toBeFalse();
+    component.handleToggleState(true);
+
+    fixture.detectChanges();
+    expect(component.currentToggleState).toBeTrue();
+  });
+
+  it('should set toggle state to false when handleToggleState is passed false', () => {
+    component.currentToggleState = true;
+    fixture.detectChanges();
+
+    component.handleToggleState(false);
+
+    fixture.detectChanges();
+    expect(component.currentToggleState).toBeFalse();
+  });
+
   it('should handle event emitted by content toggle button', () => {
     fixture.whenRenderingDone().then(() => {
       spyOn(component, 'handleToggleState').and.callThrough();
