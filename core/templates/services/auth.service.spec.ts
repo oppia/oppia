@@ -23,6 +23,7 @@ import {md5} from 'hash-wasm';
 import {AuthService} from 'services/auth.service';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
 import firebase from 'firebase';
+import {FirebaseOptions} from '@angular/fire';
 
 describe('Auth service', function () {
   let authService: AuthService;
@@ -313,5 +314,56 @@ describe('Auth service', function () {
     const firebaseConfig = AuthService.getConfig();
     expect(firebaseConfig).toBe(null);
     expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
+  });
+
+  it('should return a FirebaseOptions object on successful request', () => {
+    const mockResponse = `)]}'{"apiKey":"test-api-key"}`;
+    const xhrSpy = jasmine.createSpyObj('XMLHttpRequest', ['open', 'send']);
+    xhrSpy.status = 200;
+    xhrSpy.responseText = mockResponse;
+
+    spyOn(window, 'XMLHttpRequest').and.returnValue(xhrSpy);
+
+    const result = (AuthService.getConfig as any)();
+
+    expect(result).toEqual({apiKey: 'test-api-key'} as FirebaseOptions);
+  });
+
+  it('should return null if config is empty', () => {
+    const xhrSpy = jasmine.createSpyObj('XMLHttpRequest', ['open', 'send']);
+    xhrSpy.status = 200;
+    xhrSpy.responseText = `)]}'`;
+
+    spyOn(window, 'XMLHttpRequest').and.returnValue(xhrSpy);
+
+    const result = (AuthService.getConfig as any)();
+
+    expect(result).toBeNull();
+  });
+
+  it('should handle non-200 status codes and return null', () => {
+    const xhrSpy = jasmine.createSpyObj('XMLHttpRequest', ['open', 'send']);
+    xhrSpy.status = 500;
+    spyOn(window, 'XMLHttpRequest').and.returnValue(xhrSpy);
+
+    const result = (AuthService.getConfig as any)();
+
+    expect(result).toBeNull();
+  });
+
+  it('should handle request errors and return null', () => {
+    const xhrSpy = jasmine.createSpyObj('XMLHttpRequest', ['open', 'send']);
+    xhrSpy.open.and.callFake(() => {
+      throw new Error('request failed');
+    });
+    xhrSpy.send.and.callFake(() => {
+      throw new Error('request failed');
+    });
+
+    spyOn(window, 'XMLHttpRequest').and.returnValue(xhrSpy);
+
+    const result = (AuthService.getConfig as any)();
+
+    expect(result).toBeNull(`Expected null, found ${result}`);
   });
 });
