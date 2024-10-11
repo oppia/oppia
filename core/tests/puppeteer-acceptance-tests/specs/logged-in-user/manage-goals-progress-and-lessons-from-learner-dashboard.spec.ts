@@ -114,7 +114,6 @@ describe('Logged-in User', function () {
 
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
-    await loggedInUser.page.waitForTimeout(241243455);
     await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
 
     await loggedInUser.navigateToProgressSection();
