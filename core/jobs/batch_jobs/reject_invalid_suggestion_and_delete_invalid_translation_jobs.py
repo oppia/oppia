@@ -28,7 +28,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -68,7 +68,12 @@ class RejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
         """
         updated_suggestions: List[
             suggestion_models.GeneralSuggestionModel] = []
-        content_ids = entity_translation_model.translations.keys()
+        content_ids = []
+        for content_id in entity_translation_model.translations.keys():
+            if entity_translation_model.translations[content_id][
+                'needs_update'] is False:
+                content_ids.append(content_id)
+
         suggestions = suggestion_models.GeneralSuggestionModel.get_all(
             include_deleted=False).filter(
                 (
@@ -161,7 +166,12 @@ class AuditTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
         """
         suggestion_dicts: List[Dict[str, Union[
             str, int, suggestion_models.GeneralSuggestionModel]]] = []
-        content_ids = entity_translation_model.translations.keys()
+        content_ids = []
+        for content_id in entity_translation_model.translations.keys():
+            if entity_translation_model.translations[content_id][
+                'needs_update'] is False:
+                content_ids.append(content_id)
+
         suggestions = suggestion_models.GeneralSuggestionModel.get_all(
             include_deleted=False).filter(
                 (
@@ -245,7 +255,9 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
     @staticmethod
     def _delete_translations_with_invalid_content_ids(
         entity_translation_model: translation_models.EntityTranslationsModel
-    ) -> Union[translation_models.EntityTranslationsModel, None]:
+    ) -> Optional[
+            Dict[str, Union[
+                translation_models.EntityTranslationsModel, int]]]:
         """Delete all invalid content ids for an entity translation model.
 
         Args:
@@ -253,8 +265,9 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
                 translation model.
 
         Returns:
-            Union(EntityTranslationsModel, None). An updated entity
-            translation model, if any.
+            optional(dict(Union(EntityTranslationsModel, int)). An
+            dict containing updated entity translation model and number on
+            deleted translations from it, if any.
         """
         exp_model = exp_models.ExplorationModel.get(
                 entity_translation_model.entity_id,
@@ -266,14 +279,21 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
         translated_content_ids = list(
             entity_translation_model.translations.keys())
 
+        deleted_translations_count = 0
         is_updated = False
         for content_id in translated_content_ids:
             if content_id not in exp_content_ids:
                 entity_translation_model.translations.pop(content_id)
+                deleted_translations_count += 1
                 is_updated = True
 
         if is_updated:
-            return entity_translation_model
+            result: Dict[str, Union[
+                translation_models.EntityTranslationsModel, int]] = {
+                'entity_translation_model': entity_translation_model,
+                'deleted_translations_count': deleted_translations_count
+            }
+            return result
         return None
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -284,11 +304,32 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
         """
         entity_translation_models = _get_entity_translation_models(
             self.pipeline)
-        updated_entity_translation_models = (
+        deletion_result_dicts = (
             entity_translation_models
-            | 'Update entity transltion models' >> beam.Map(
+            | 'Get deletion results' >> beam.Map(
                     self._delete_translations_with_invalid_content_ids)
             | 'Filter out None values' >> beam.Filter(lambda x: x is not None)
+        )
+
+        deleted_translations_count_job_run_results = (
+            deletion_result_dicts
+            | 'Deleted translations counts' >> beam.Map(
+                    lambda x: x['deleted_translations_count'])
+            | 'Total deleted translations count' >> (
+                beam.CombineGlobally(sum))
+            | 'Only create result for non-zero number of objects' >> (
+                beam.Filter(lambda x: x > 0))
+            | 'Report total deleted translations count' >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stdout(
+                        f'DELETED TRANSLATIONS COUNT SUCCESS: {result}'
+                    )))
+        )
+
+        updated_entity_translation_models = (
+            deletion_result_dicts
+            | 'Updated entity translation models' >> beam.Map(
+                    lambda x: x['entity_translation_model'])
         )
 
         updated_entity_translation_models_count_job_run_results = (
@@ -305,8 +346,10 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
 
         return (
             (
+                deleted_translations_count_job_run_results,
                 updated_entity_translation_models_count_job_run_results
             )
+            | 'Combine results' >> beam.Flatten()
         )
 
 
@@ -361,7 +404,7 @@ class AuditTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
             self.pipeline)
         invalid_translation_dicts = (
             entity_translation_models
-            | 'Get translations to be deleted list' >> beam.Map(
+            | 'Get invalid translation dicts' >> beam.Map(
                     self._get_translations_with_invalid_content_ids)
             | 'Flatten the list' >> beam.FlatMap(lambda x: x)
         )
@@ -374,17 +417,30 @@ class AuditTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
                         f'Results are - {result}')))
         )
 
-        invalid_content_ids_count_job_run_results = (
+        invalid_translations_count_job_run_results = (
             invalid_translation_dicts
             | 'Report translations to be deleted count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'TRANSLATIONS TO BE DELETED COUNT'))
         )
 
+        invalid_entity_translation_models_count_job_run_results = (
+            invalid_translation_dicts
+            | 'Invalid entity translation model ids' >> beam.Map(
+                    lambda x: x['entity_translation_model_id'])
+            | 'Create pair' >> beam.Map(lambda x: (x, None))
+            | 'Group pairs' >> beam.GroupByKey()
+            | 'Extract unique keys' >> beam.Map(lambda x: x[0])
+            | 'Report entity translation models to be updated count' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'ENTITY TRANSLATION MODELS TO BE UPDATED COUNT'))
+        )
+
         return (
             (
                 job_run_results,
-                invalid_content_ids_count_job_run_results
+                invalid_translations_count_job_run_results,
+                invalid_entity_translation_models_count_job_run_results
             )
             | 'Combine results' >> beam.Flatten()
         )

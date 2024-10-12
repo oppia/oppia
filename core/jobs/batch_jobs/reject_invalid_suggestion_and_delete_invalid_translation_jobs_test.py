@@ -107,6 +107,10 @@ TRANSLATED_CONTENT_DICT = translation_domain.TranslatedContent(
     '<p>translated content</p>',
     translation_domain.TranslatableContentFormat.HTML, False).to_dict()
 
+TRANSLATED_CONTENT_DICT_NEEDS_UPDATE = translation_domain.TranslatedContent(
+    '<p>translated content</p>',
+    translation_domain.TranslatableContentFormat.HTML, True).to_dict()
+
 CHANGE_DICT = {
     'cmd': 'add_translation',
     'content_id': 'content_0',
@@ -217,7 +221,8 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             self.TARGET_ID_1,
             self.exp_1.version,
             'hi',
-            {'content_0': TRANSLATED_CONTENT_DICT}
+            {'content_0': TRANSLATED_CONTENT_DICT,
+            'default_outcome_1': TRANSLATED_CONTENT_DICT_NEEDS_UPDATE}
         ))
         self.entity_translation_2 = (
             translation_models.EntityTranslationsModel.create_new(
@@ -225,7 +230,8 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             self.TARGET_ID_2,
             self.exp_1.version,
             'hi',
-            {'content_0': TRANSLATED_CONTENT_DICT}
+            {'content_0': TRANSLATED_CONTENT_DICT,
+            'default_outcome_1': TRANSLATED_CONTENT_DICT_NEEDS_UPDATE}
         ))
         self.put_multi([
             self.entity_translation_1, self.entity_translation_2])
@@ -236,7 +242,7 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
 
     def test_invalid_suggestion_is_rejected(self) -> None:
         CHANGE_DICT['content_id'] = 'content_0'
-        suggestion = self.create_model(
+        invalid_suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id='user1',
@@ -248,8 +254,24 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             target_version_at_submission=self.exp_1.version,
             language_code='hi'
         )
-        suggestion.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
+        invalid_suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([invalid_suggestion])
+
+        CHANGE_DICT['content_id'] = 'default_outcome_1'
+        valid_suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.exp_1.id,
+            target_version_at_submission=self.exp_1.version,
+            language_code='hi'
+        )
+        valid_suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([valid_suggestion])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -258,10 +280,17 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
         ])
 
         updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
-            suggestion.id)
+            invalid_suggestion.id)
         self.assertEqual(
             updated_suggestion.status,
             suggestion_models.STATUS_REJECTED
+        )
+
+        not_updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
+            valid_suggestion.id)
+        self.assertEqual(
+            not_updated_suggestion.status,
+            suggestion_models.STATUS_IN_REVIEW
         )
 
 
@@ -364,7 +393,8 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             self.TARGET_ID_1,
             self.exp_1.version,
             'hi',
-            {'default_outcome_1': TRANSLATED_CONTENT_DICT}
+            {'default_outcome_1': TRANSLATED_CONTENT_DICT,
+            'content_0': TRANSLATED_CONTENT_DICT_NEEDS_UPDATE}
         ))
         self.entity_translation_2 = (
             translation_models.EntityTranslationsModel.create_new(
@@ -372,7 +402,8 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             self.TARGET_ID_2,
             self.exp_1.version,
             'hi',
-            {'default_outcome_1': TRANSLATED_CONTENT_DICT}
+            {'default_outcome_1': TRANSLATED_CONTENT_DICT,
+            'content_0': TRANSLATED_CONTENT_DICT_NEEDS_UPDATE}
         ))
         self.put_multi([
             self.entity_translation_1, self.entity_translation_2])
@@ -383,7 +414,7 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
 
     def test_invalid_suggestions_are_reported(self) -> None:
         CHANGE_DICT['content_id'] = 'default_outcome_1'
-        valid_suggestion_model = self.create_model(
+        invalid_suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id='user1',
@@ -395,9 +426,26 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             target_version_at_submission=self.exp_1.version,
             language_code='hi'
         )
-        valid_suggestion_model.update_timestamps()
+        invalid_suggestion.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([
-            valid_suggestion_model])
+            invalid_suggestion])
+
+        CHANGE_DICT['content_id'] = 'content_0'
+        valid_suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.exp_1.id,
+            target_version_at_submission=self.exp_1.version,
+            language_code='hi'
+        )
+        valid_suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([
+            valid_suggestion])
 
         errored_value = (
             '{'
@@ -405,7 +453,7 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             f'{self.exp_1.version}, \'entity_translation_model_id\': '
             f'\'{self.entity_translation_1.id}\', \'content_id\': '
             '\'default_outcome_1\', \'suggestion_id\': '
-            f'{valid_suggestion_model.id}'
+            f'{invalid_suggestion.id}'
             '}'
         )
 
@@ -418,12 +466,21 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             )
         ])
 
-        suggestion_model = (
+        invalid_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get(
-                valid_suggestion_model.id)
+                invalid_suggestion.id)
         )
         self.assertEqual(
-            suggestion_model.status,
+            invalid_suggestion_model.status,
+            suggestion_models.STATUS_IN_REVIEW
+        )
+
+        valid_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get(
+                valid_suggestion.id)
+        )
+        self.assertEqual(
+            valid_suggestion_model.status,
             suggestion_models.STATUS_IN_REVIEW
         )
 
@@ -501,6 +558,9 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
         self.put_multi([self.entity_translation_1])
 
         self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='DELETED TRANSLATIONS COUNT SUCCESS: 1'
+            ),
             job_run_result.JobRunResult(
                 stdout='UPDATED ENTITY TRANSLATION MODELS COUNT SUCCESS: 1'
             )
@@ -599,6 +659,11 @@ class AuditTranslationsForInvalidContentIDsJobTests(
             ),
             job_run_result.JobRunResult(
                 stdout='TRANSLATIONS TO BE DELETED COUNT SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'ENTITY TRANSLATION MODELS TO BE UPDATED COUNT '
+                    'SUCCESS: 1')
             )
         ])
 
