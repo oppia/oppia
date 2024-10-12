@@ -34,7 +34,7 @@
                *ngIf="displayArea === 'progressTab'"
                [ngStyle]="{'background': 'linear-gradient(to right, #205D86 ' + getBackgroundForProgress(i) + '%,white ' + getBackgroundForProgress(i) + '%)'}">
             <span class="subtopic-mastery"
-                  [ngStyle]="{'right': subtopicMasteryPosition(i) + 'px', 'color': masteryTextColor(i)}">
+                  [ngStyle]="{'color': masteryTextColor(i)}">
               {{subtopicMasteryArray[i]}}%
             </span>
           </div>
