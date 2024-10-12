@@ -511,85 +511,92 @@ def get_all_user_groups() -> List[user_domain.UserGroup]:
         user_models.UserGroupModel.get_all())
     user_groups_list = []
     for user_group_model in user_group_models:
-        user_usernames: List[str] = []
-        for user_setting in get_users_settings(user_group_model.user_ids):
-            assert user_setting is not None
-            assert user_setting.username is not None
-            user_usernames.append(user_setting.username)
+        member_usernames: List[str] = []
+        user_ids = user_group_model.user_ids
+        user_settings_list = get_users_settings(user_ids, strict=True)
+        for user_id, user_settings in zip(user_ids, user_settings_list):
+            assert user_settings is not None, (
+                f'User settings for user ID {user_id} are None.'
+            )
+            assert user_settings.username is not None, (
+                f'Username for user ID {user_id} is None.'
+            )
+            member_usernames.append(user_settings.username)
         user_group = user_domain.UserGroup(
-            user_group_model.id, user_group_model.name, user_usernames)
+            user_group_model.id, user_group_model.name, member_usernames)
         user_groups_list.append(user_group)
     return user_groups_list
 
 
 def _check_if_usernames_are_valid(
-    user_group_name: str, user_group_user_usernames: List[str]
+    name: str, member_usernames: List[str]
 ) -> None:
     """Checks if the given list of users are valid or not.
 
     Args:
-        user_group_name: str. The name of the user group.
-        user_group_user_usernames: List[str]. The list of usernames for
+        name: str. The name of the user group.
+        member_usernames: List[str]. The list of usernames for
             which validation needs to be done.
 
     Raises:
+        Exception. The member_usernames contains duplicates.
         Exception. The user inside user group does not exist.
     """
     duplicates = [
-        username for username in user_group_user_usernames
-        if user_group_user_usernames.count(username) > 1
+        username for username in member_usernames
+        if member_usernames.count(username) > 1
     ]
     duplicates = list(set(duplicates))
     if len(duplicates) > 0:
         raise Exception(
-            f'Users list of user-group {user_group_name} contains ' +
+            f'Users list of user-group {name} contains ' +
             f'duplicates: {duplicates}.'
         )
 
     filters = [
         user_models.UserSettingsModel.username == username
-        for username in user_group_user_usernames
+        for username in member_usernames
     ]
-    existing_users: Sequence[user_models.UserSettingsModel] = (
+    existing_users_settings: Sequence[user_models.UserSettingsModel] = (
         user_models.UserSettingsModel.query(
             datastore_services.any_of(*filters)
         ).fetch()
     )
-    existing_users_usernames = [
-        user_setting.username for user_setting in existing_users
+    existing_members_usernames = [
+        user_settings.username for user_settings in existing_users_settings
     ]
     invalid_usernames = [
-        username for username in user_group_user_usernames
-        if username not in existing_users_usernames
+        username for username in member_usernames
+        if username not in existing_members_usernames
     ]
 
     if len(invalid_usernames) > 0:
         raise Exception(
-            f'Following users of user-group {user_group_name} ' +
+            f'Following users of user-group {name} ' +
             f'does not exist: {invalid_usernames}.')
 
 
 def create_new_user_group(
-    user_group_name: str, user_usernames: List[str]
+    name: str, member_usernames: List[str]
 ) -> user_domain.UserGroup:
     """Create new user group.
 
     Args:
-        user_group_name: str. The name of the user group.
-        user_usernames: List[str]. The user usernames associated with
+        name: str. The name of the user group.
+        member_usernames: List[str]. The user usernames associated with
             the user group.
 
     Returns:
         UserGroup. The new user group.
     """
-    if len(user_usernames) > 0:
-        _check_if_usernames_are_valid(user_group_name, user_usernames)
+    if len(member_usernames) > 0:
+        _check_if_usernames_are_valid(name, member_usernames)
     user_group_id = user_models.UserGroupModel.get_new_id('')
     user_group = user_domain.UserGroup(
-        user_group_id, user_group_name, user_usernames)
+        user_group_id, name, member_usernames)
     user_group.validate()
 
-    user_ids = get_multi_user_ids_from_usernames(user_usernames)
+    user_ids = get_multi_user_ids_from_usernames(member_usernames)
 
     user_models.UserGroupModel(
         id=user_group.user_group_id,
@@ -618,16 +625,16 @@ def delete_user_group(user_group_id: str) -> None:
 
 def update_user_group(
     user_group_id: str,
-    user_group_name: str,
-    user_group_user_usernames: List[str]
+    name: str,
+    member_usernames: List[str]
 ) -> None:
     """Updates the user group.
 
     Args:
         user_group_id: str. The user group id.
-        user_group_name: str. The new name of the user group if needs to
+        name: str. The new name of the user group if needs to
             be updated else old name of the user group.
-        user_group_user_usernames: List[str]. The list of user usernames for
+        member_usernames: List[str]. The list of user usernames for
             the specified user group.
 
     Raises:
@@ -636,22 +643,21 @@ def update_user_group(
     user_group_model = user_models.UserGroupModel.get(
         user_group_id, strict=False)
     if user_group_model is None:
-        raise Exception(f'User group {user_group_name} does not exist.')
+        raise Exception(f'User group {name} does not exist.')
     assert user_group_model is not None
 
-    if len(user_group_user_usernames) > 0:
-        _check_if_usernames_are_valid(
-            user_group_name, user_group_user_usernames)
+    if len(member_usernames) > 0:
+        _check_if_usernames_are_valid(name, member_usernames)
 
     user_group = user_domain.UserGroup(
-        user_group_id, user_group_name, user_group_user_usernames
+        user_group_id, name, member_usernames
     )
     user_group.validate()
 
-    user_ids = get_multi_user_ids_from_usernames(user_group_user_usernames)
+    user_ids = get_multi_user_ids_from_usernames(member_usernames)
 
     user_group_model.user_ids = user_ids
-    user_group_model.name = user_group_name
+    user_group_model.name = name
     user_group_model.update_timestamps()
     user_group_model.put()
 
@@ -1545,19 +1551,6 @@ def set_username(user_id: str, new_username: str) -> None:
             'a different one.' % new_username)
     user_settings.username = new_username
     save_user_settings(user_settings)
-
-
-def get_all_users_usernames() -> List[str]:
-    """Returns list of all users usernames.
-
-    Returns:
-        List[str]. List containing usernames of all the users.
-    """
-    all_user_models = user_models.UserSettingsModel.get_all()
-    all_users_usernames = []
-    for user_model in all_user_models:
-        all_users_usernames.append(user_model.normalized_username)
-    return all_users_usernames
 
 
 def record_agreement_to_terms(user_id: str) -> None:

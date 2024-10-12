@@ -531,7 +531,7 @@ class UserGroupDict(TypedDict):
 
     user_group_id: str
     name: str
-    user_usernames: List[str]
+    member_usernames: List[str]
 
 
 class UserGroup:
@@ -543,19 +543,19 @@ class UserGroup:
         self,
         user_group_id: str,
         name: str,
-        user_usernames: List[str]
+        member_usernames: List[str]
     ) -> None:
         """Constructs a UserGroup domain object.
 
         Args:
             user_group_id: str. The id of the user group.
             name: str. The name of the user group.
-            user_usernames: List[str]. The list of user usernames
+            member_usernames: List[str]. The list of user usernames
                 attached to user group.
         """
         self.user_group_id = user_group_id
         self.name = name
-        self.user_usernames = user_usernames
+        self.member_usernames = member_usernames
 
     def validate(self) -> None:
         """Validate various properties of UserGroup."""
@@ -569,13 +569,13 @@ class UserGroup:
                 'contain alphanumeric characters and spaces.' % self.name
             )
 
-        if not isinstance(self.user_usernames, list):
+        if not isinstance(self.member_usernames, list):
             raise utils.ValidationError(
-                'Expected \'user_usernames\' to be a list, ' +
-                'received %s.' % self.user_usernames
+                'Expected \'member_usernames\' to be a list, ' +
+                'received %s.' % self.member_usernames
             )
 
-        for user_username in self.user_usernames:
+        for user_username in self.member_usernames:
             if not isinstance(user_username, str):
                 raise utils.ValidationError(
                     'Expected each user username to be a string, ' +
@@ -591,15 +591,15 @@ class UserGroup:
         self.name = updated_name
         self.validate()
 
-    def update_user_usernames(
-        self, updated_user_usernames: List[str]) -> None:
-        """Update user_usernames of user group.
+    def update_member_usernames(
+        self, updated_member_usernames: List[str]) -> None:
+        """Update member_usernames of user group.
 
         Args:
-            updated_user_usernames: List[str]. The updated list of
+            updated_member_usernames: List[str]. The updated list of
                 user usernames.
         """
-        self.user_usernames = updated_user_usernames
+        self.member_usernames = updated_member_usernames
         self.validate()
 
     def to_dict(self) -> UserGroupDict:
@@ -613,7 +613,7 @@ class UserGroup:
         return {
             'user_group_id': self.user_group_id,
             'name': self.name,
-            'user_usernames': self.user_usernames
+            'member_usernames': self.member_usernames
         }
 
     @classmethod
@@ -630,7 +630,7 @@ class UserGroup:
         return UserGroup(
             user_group_dict['user_group_id'],
             user_group_dict['name'],
-            user_group_dict['user_usernames']
+            user_group_dict['member_usernames']
         )
 
 

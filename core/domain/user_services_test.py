@@ -1808,12 +1808,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_groups_data = user_services.get_all_user_groups()
         if user_groups_data[0].name == 'USERGROUP1':
             self.assertEqual(
-                user_groups_data[0].user_usernames,
+                user_groups_data[0].member_usernames,
                 ['user1', 'user2', 'user3']
             )
         else:
             self.assertEqual(
-                user_groups_data[0].user_usernames, ['user1', 'user2'])
+                user_groups_data[0].member_usernames, ['user1', 'user2'])
 
         user_services.delete_user_group(user_groups_data[0].user_group_id)
         user_services.delete_user_group(user_groups_data[1].user_group_id)
@@ -1892,10 +1892,26 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         if user_groups_data[0].name == 'USERGROUP1':
             self.assertEqual(
-                user_groups_data[0].user_usernames, ['user1', 'user2'])
+                user_groups_data[0].member_usernames, ['user1', 'user2'])
         else:
             self.assertEqual(
-                user_groups_data[1].user_usernames, ['user3', 'user4'])
+                user_groups_data[1].member_usernames, ['user3', 'user4'])
+
+        user_services.delete_user_group(first_user_group_id)
+        user_services.delete_user_group(second_user_group_id)
+
+    def test_update_existing_user_group_users_with_empty_list(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        first_user_group_id = user_groups_data[0].user_group_id
+        second_user_group_id = user_groups_data[1].user_group_id
+
+        user_services.update_user_group(first_user_group_id, 'USERGROUP1', [])
+        user_services.update_user_group(second_user_group_id, 'USERGROUP2', [])
+
+        user_groups_data = user_services.get_all_user_groups()
+        for user_group in user_groups_data:
+            self.assertEqual(user_group.member_usernames, [])
 
         user_services.delete_user_group(first_user_group_id)
         user_services.delete_user_group(second_user_group_id)
@@ -2365,16 +2381,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(   # pylint: disable=line-too-long
                 'invalid_user_id', 'exp_1', strict=True
             )
-
-    def test_returns_list_of_all_users_usernames(self) -> None:
-        self.signup('user1@email.com', 'user1')
-        self.signup('user2@email.com', 'user2')
-        self.signup('user3@email.com', 'user3')
-        self.signup('user4@email.com', 'user4')
-        # Count is 5 as one user already exists which is tmpsuperadm1n.
-        self.assertEqual(
-            len(user_services.get_all_users_usernames()), 5
-        )
 
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):

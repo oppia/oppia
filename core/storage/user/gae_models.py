@@ -2385,7 +2385,9 @@ class UserGroupModel(base_models.BaseModel):
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
+    # The name of the user group.
     name = datastore_services.StringProperty(required=True, indexed=True)
+    # The list of user_ids of the members of the user group.
     user_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod

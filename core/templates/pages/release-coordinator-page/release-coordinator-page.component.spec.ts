@@ -78,22 +78,22 @@ describe('Release coordinator page', () => {
       UserGroup.createFromBackendDict({
         user_group_id: 'userGroupId1',
         name: 'UserGroup1',
-        user_usernames: ['User1', 'User2', 'User3'],
+        member_usernames: ['User1', 'User2', 'User3'],
       }),
       UserGroup.createFromBackendDict({
         user_group_id: 'userGroupId2',
         name: 'UserGroup2',
-        user_usernames: ['User4', 'User5'],
+        member_usernames: ['User4', 'User5'],
       }),
       UserGroup.createFromBackendDict({
         user_group_id: 'userGroupId3',
         name: 'UserGroup3',
-        user_usernames: ['User6', 'User7', 'User8'],
+        member_usernames: ['User6', 'User7', 'User8'],
       }),
       UserGroup.createFromBackendDict({
         user_group_id: 'userGroupId9',
         name: 'UserGroup9',
-        user_usernames: ['User12', 'User13'],
+        member_usernames: ['User12', 'User13'],
       }),
     ],
   };
@@ -271,13 +271,13 @@ describe('Release coordinator page', () => {
         component.ngOnInit();
         tick();
 
-        expect(component.userGroups[0].userGroupUserUsernames).toEqual([
+        expect(component.userGroups[0].memberUsernames).toEqual([
           'User1',
           'User2',
           'User3',
         ]);
         component.updateUserGroup(component.userGroups[0]);
-        expect(component.userGroups[0].userGroupUserUsernames).toEqual([
+        expect(component.userGroups[0].memberUsernames).toEqual([
           'User1',
           'User2',
           'User3',
@@ -288,10 +288,10 @@ describe('Release coordinator page', () => {
         component.ngOnInit();
         tick();
 
-        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
-        component.userGroups[0].userGroupName = 'UserGroup2';
+        expect(component.userGroups[0].name).toEqual('UserGroup1');
+        component.userGroups[0].name = 'UserGroup2';
         component.updateUserGroup(component.userGroups[0]);
-        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        expect(component.userGroups[0].name).toEqual('UserGroup1');
         expect(component.userGroupSaveError).toEqual(
           'User group with name UserGroup2 already exist.'
         );
@@ -301,10 +301,10 @@ describe('Release coordinator page', () => {
         component.ngOnInit();
         tick();
 
-        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
-        component.userGroups[0].userGroupName = 'User_Group_1';
+        expect(component.userGroups[0].name).toEqual('UserGroup1');
+        component.userGroups[0].name = 'User_Group_1';
         component.updateUserGroup(component.userGroups[0]);
-        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        expect(component.userGroups[0].name).toEqual('UserGroup1');
         expect(component.userGroupSaveError).toEqual(
           'User group name can only contain alphanumeric characters and spaces.'
         );
@@ -314,10 +314,10 @@ describe('Release coordinator page', () => {
         component.ngOnInit();
         tick();
 
-        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
-        component.userGroups[0].userGroupName = '';
+        expect(component.userGroups[0].name).toEqual('UserGroup1');
+        component.userGroups[0].name = '';
         component.updateUserGroup(component.userGroups[0]);
-        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        expect(component.userGroups[0].name).toEqual('UserGroup1');
         expect(component.userGroupSaveError).toEqual(
           'User group name should not be empty.'
         );
@@ -355,15 +355,15 @@ describe('Release coordinator page', () => {
           'updateUserGroupAsync'
         ).and.resolveTo();
 
-        component.userGroups[0].userGroupName = 'UserGroup5';
+        component.userGroups[0].name = 'UserGroup5';
         component.updateUserGroup(component.userGroups[0]);
         tick();
 
         expect(updateUserGroupSpy).toHaveBeenCalled();
         expect(component.statusMessage).toBe(
-          'UserGroup UserGroup5 successfully updated.'
+          'User Group UserGroup5 successfully updated.'
         );
-        component.userGroups[0].userGroupName = 'UserGroup1';
+        component.userGroups[0].name = 'UserGroup1';
         component.updateUserGroup(component.userGroups[0]);
       }));
 
@@ -410,10 +410,10 @@ describe('Release coordinator page', () => {
         tick();
         confirmSpy.and.returnValue(true);
 
-        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
-        component.userGroups[0].userGroupName = 'UserGroup5';
+        expect(component.userGroups[0].name).toEqual('UserGroup1');
+        component.userGroups[0].name = 'UserGroup5';
         component.resetUserGroup(component.userGroups[0]);
-        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        expect(component.userGroups[0].name).toEqual('UserGroup1');
       }));
 
       it('should not reset the changes when canceled', fakeAsync(() => {
@@ -432,7 +432,7 @@ describe('Release coordinator page', () => {
         );
         component.resetUserGroup(component.userGroups[0]);
         expect(
-          component.userGroups[0].userGroupUserUsernames.includes('User10')
+          component.userGroups[0].memberUsernames.includes('User10')
         ).toBeTrue();
 
         component.removeUserFromUserGroup(component.userGroups[0], 'User10');
@@ -447,7 +447,7 @@ describe('Release coordinator page', () => {
         component.addUserToUserGroup({value: ''}, 'UserGroup1');
 
         expect(
-          component.userGroups[0].userGroupUserUsernames.includes('')
+          component.userGroups[0].memberUsernames.includes('')
         ).toBeFalse();
       }));
 
@@ -462,14 +462,14 @@ describe('Release coordinator page', () => {
         } as ElementRef;
 
         expect(
-          component.userGroups[0].userGroupUserUsernames.includes('User11')
+          component.userGroups[0].memberUsernames.includes('User11')
         ).toBeFalse();
         component.addUserToUserGroup(
           {value: 'User11'},
           component.userGroups[0]
         );
         expect(
-          component.userGroups[0].userGroupUserUsernames.includes('User11')
+          component.userGroups[0].memberUsernames.includes('User11')
         ).toBeTrue();
 
         component.removeUserFromUserGroup(component.userGroups[0], 'User11');
@@ -501,9 +501,11 @@ describe('Release coordinator page', () => {
       } as NgbModalRef);
       spyOn(rcbas, 'deleteUserGroupAsync').and.returnValue(Promise.resolve());
       component.deleteUserGroup('userGroupId3');
+      tick();
 
       expect(
-        component.userGroups.some(userGroup => userGroup.name === 'UserGroup3')
+        component.userGroups.some(
+          userGroup => userGroup.userGroupId === 'userGroupId3')
       ).toBeFalse();
     }));
 
@@ -520,7 +522,7 @@ describe('Release coordinator page', () => {
 
       expect(
         component.userGroups.some(
-          userGroup => userGroup.userGroupName === 'UserGroup1'
+          userGroup => userGroup.name === 'UserGroup1'
         )
       ).toBeTrue();
     }));
@@ -544,7 +546,7 @@ describe('Release coordinator page', () => {
       expect(deleteUserGroupSpy).toHaveBeenCalled();
       expect(
         component.userGroups.some(
-          userGroup => userGroup.userGroupName === 'UserGroup1'
+          userGroup => userGroup.name === 'UserGroup1'
         )
       ).toBeTrue();
       expect(component.statusMessage).toBe(
@@ -558,7 +560,7 @@ describe('Release coordinator page', () => {
       component.removeUserFromUserGroup(component.userGroups[1], 'User5');
 
       expect(
-        component.userGroups[1].userGroupUserUsernames.includes('User5')
+        component.userGroups[1].memberUsernames.includes('User5')
       ).toBeFalse();
     }));
 
@@ -619,7 +621,7 @@ describe('Release coordinator page', () => {
         component.addUserGroup();
 
         expect(
-          component.userGroups.some(userGroup => userGroup.userGroupName === '')
+          component.userGroups.some(userGroup => userGroup.name === '')
         ).toBeFalse();
       }));
 
@@ -640,7 +642,7 @@ describe('Release coordinator page', () => {
 
         expect(
           component.userGroups.some(
-            userGroup => userGroup.userGroupName === 'UserGroup8'
+            userGroup => userGroup.name === 'UserGroup8'
           )
         ).toBeFalse();
       }));
@@ -661,7 +663,7 @@ describe('Release coordinator page', () => {
         expect(updateUserGroupSpy).toHaveBeenCalled();
         expect(
           component.userGroups.some(
-            userGroup => userGroup.userGroupName === 'UserGroup10'
+            userGroup => userGroup.name === 'UserGroup10'
           )
         ).toBeFalse();
         expect(component.statusMessage).toBe(

@@ -19,7 +19,7 @@
 export interface UserGroupBackendDict {
   user_group_id: string;
   name: string;
-  user_usernames: string[];
+  member_usernames: string[];
 }
 
 /**
@@ -27,20 +27,20 @@ export interface UserGroupBackendDict {
  */
 export class UserGroup {
   userGroupId: string;
-  userGroupName: string;
-  userGroupUserUsernames: string[];
+  name: string;
+  memberUsernames: string[];
 
-  constructor(userGroupId: string, userGroupName: string, users: string[]) {
+  constructor(userGroupId: string, name: string, users: string[]) {
     this.userGroupId = userGroupId;
-    this.userGroupName = userGroupName;
-    this.userGroupUserUsernames = users;
+    this.name = name;
+    this.memberUsernames = users;
   }
 
   static createFromBackendDict(backendDict: UserGroupBackendDict): UserGroup {
     return new UserGroup(
       backendDict.user_group_id,
       backendDict.name,
-      backendDict.user_usernames
+      backendDict.member_usernames
     );
   }
 }

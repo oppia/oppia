@@ -47,12 +47,12 @@ describe('Release coordinator backend api service', () => {
   let sampleUserGroupBackendDict1: UserGroupBackendDict = {
     user_group_id: 'UserGroup1ID',
     name: 'UserGroup1',
-    user_usernames: ['User1', 'User2', 'User3'],
+    member_usernames: ['User1', 'User2', 'User3'],
   };
   let sampleUserGroupBackendDict2: UserGroupBackendDict = {
     user_group_id: 'UserGroup2ID',
     name: 'UserGroup2',
-    user_usernames: ['User4', 'User5'],
+    member_usernames: ['User4', 'User5'],
   };
   let userGroupSampleData: UserGroupsDict = {
     user_group_dicts: [
@@ -377,8 +377,8 @@ describe('Release coordinator backend api service', () => {
     req.flush({
       user_group_dict: {
         user_group_id: 'UserGroup3ID',
-        user_group_name: 'UserGroup3',
-        user_group_users: [],
+        name: 'UserGroup3',
+        member_usernames: [],
       },
     });
     flushMicrotasks();

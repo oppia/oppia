@@ -138,12 +138,12 @@ export class ReleaseCoordinatorBackendApiService {
   }
 
   async createUserGroupAsync(
-    userGroupName: string,
-    userGroupUserUsernames: string[]
+    name: string,
+    memberUsernames: string[]
   ): Promise<UserGroup> {
     let payload = {
-      user_group_name: userGroupName,
-      user_group_user_usernames: userGroupUserUsernames,
+      name: name,
+      member_usernames: memberUsernames,
     };
     return new Promise((resolve, reject) => {
       this.http
@@ -167,12 +167,12 @@ export class ReleaseCoordinatorBackendApiService {
 
   async updateUserGroupAsync(
     userGroupId: string,
-    userGroupName: string,
-    userGroupUserUsernames: string[]
+    name: string,
+    memberUsernames: string[]
   ): Promise<void> {
     let payload = {
-      user_group_name: userGroupName,
-      user_group_user_usernames: userGroupUserUsernames,
+      name: name,
+      member_usernames: memberUsernames,
       user_group_id: userGroupId,
     };
     return new Promise((resolve, reject) => {

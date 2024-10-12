@@ -84,7 +84,7 @@
           <div *ngIf="!(userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId])"
                class="oppia-user-group"
                (click)="toggleUserGroupDetailsSection(userGroup.userGroupId)">
-            {{ userGroup.userGroupName }}
+            {{ userGroup.name }}
             <button mat-button matSuffix mat-icon-button
                     aria-label="Clear"
                     *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]"
@@ -94,10 +94,10 @@
           </div>
           <div *ngIf="userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId]"
                class="oppia-user-group">
-            <input placeholder="{{ userGroup.userGroupName }}"
+            <input placeholder="{{ userGroup.name }}"
                    type="text"
-                   value="{{ userGroup.userGroupName }}"
-                   [(ngModel)]="userGroup.userGroupName">
+                   value="{{ userGroup.name }}"
+                   [(ngModel)]="userGroup.name">
           </div>
           <div class="user-group-details" *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]">
             <div *ngIf="!userGroupInEditMode">
@@ -111,11 +111,11 @@
               <div class="col-2">Users:</div>
               <div class="col-10">
                 <div *ngIf="!userGroupInEditMode">
-                  <span *ngIf="userGroup.userGroupUserUsernames.length == 0">
+                  <span *ngIf="userGroup.memberUsernames.length == 0">
                     <em>No users, click on edit button to add.</em>
                   </span>
                   <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
-                    <mat-chip *ngFor="let user of userGroup.userGroupUserUsernames"
+                    <mat-chip *ngFor="let user of userGroup.memberUsernames"
                               [selectable]="false"
                               [removable]="false">
                       <ng-container>
@@ -126,7 +126,7 @@
                 </div>
                 <div *ngIf="userGroupInEditMode">
                   <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
-                    <mat-chip *ngFor="let user of userGroup.userGroupUserUsernames"
+                    <mat-chip *ngFor="let user of userGroup.memberUsernames"
                               [selectable]="true"
                               [removable]="true"
                               (removed)="removeUserFromUserGroup(userGroup, user)">
@@ -173,7 +173,7 @@
         </div>
       </div>
       <div class="oppia-add-user-group">
-        <input placeholder="New UserGroup Name"
+        <input placeholder="New User Group Name"
                type="text"
                [(ngModel)]="newUserGroupName"
                [ngModelOptions]="{standalone: true}"
@@ -181,7 +181,7 @@
         <button class="btn oppia-add-new-user-group-btn"
                 (click)="addUserGroup()"
                 [disabled]="userGroupInEditMode">
-          + Add New UserGroup
+          + Add New User Group
         </button>
         <p *ngIf="userGroupValidationError.length > 0"
            class="oppia-warning-text">

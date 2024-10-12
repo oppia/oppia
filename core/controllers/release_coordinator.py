@@ -27,7 +27,7 @@ from core.domain import feature_flag_domain
 from core.domain import feature_flag_services as feature_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, TypedDict
 
 
 class MemoryCacheHandler(
@@ -64,14 +64,16 @@ class UserGroupHandlerNormalizePayloadDict(TypedDict):
     dictionary.
     """
 
-    user_group_name: Optional[str]
-    user_group_user_usernames: Optional[List[str]]
-    user_group_id: Optional[str]
+    user_group_id: str
+    name: str
+    member_usernames: List[str]
 
 
 class UserGroupHandler(
     base.BaseHandler[
-        UserGroupHandlerNormalizePayloadDict, Dict[str, str]]
+        UserGroupHandlerNormalizePayloadDict,
+        Dict[str, str]
+    ]
 ):
     """Handler for user groups."""
 
@@ -79,52 +81,46 @@ class UserGroupHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'PUT': {
-            'user_group_id': {
+        'POST': {
+            'name': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             },
-            'user_group_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'user_group_user_usernames': {
+            'member_usernames': {
                 'schema': {
                     'type': 'list',
                     'items': {
                         'type': 'basestring'
                     }
-                },
-                'default_value': None
+                }
+            }
+        },
+        'PUT': {
+            'user_group_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'member_usernames': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                }
             }
         },
         'DELETE': {
             'user_group_id': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
-            }
-        },
-        'POST': {
-            'user_group_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'user_group_user_usernames': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'basestring'
-                    }
-                },
-                'default_value': None
+                }
             }
         }
     }
@@ -142,63 +138,39 @@ class UserGroupHandler(
         })
 
     @acl_decorators.can_access_release_coordinator_page
-    def delete(self) -> None:
-        """Performs deletion on the specified user group."""
-        assert self.user_id is not None
-        assert self.normalized_request is not None
-        try:
-            user_group_id = self.normalized_request['user_group_id']
-            assert user_group_id is not None
-            user_services.delete_user_group(user_group_id)
-            self.render_json(self.values)
-        except Exception as e:
-            logging.exception('[RELEASE-COORDINATOR] %s', e)
-            self.render_json({'error': str(e)})
-            raise e
-
-    @acl_decorators.can_access_release_coordinator_page
-    def put(self) -> None:
-        """Updates the specified user group."""
-        assert self.user_id is not None
-        assert self.normalized_payload is not None
-        try:
-            user_group_name = (
-                self.normalized_payload.get('user_group_name'))
-            user_group_user_usernames = (
-                self.normalized_payload.get('user_group_user_usernames'))
-            user_group_id = self.normalized_payload.get('user_group_id')
-            assert user_group_name is not None
-            assert user_group_user_usernames is not None
-            assert user_group_id is not None
-            user_services.update_user_group(
-                user_group_id, user_group_name, user_group_user_usernames)
-            self.render_json(self.values)
-        except Exception as e:
-            logging.exception('[RELEASE-COORDINATOR] %s', e)
-            self.render_json({'error': str(e)})
-            raise e
-
-    @acl_decorators.can_access_release_coordinator_page
     def post(self) -> None:
         """Performs series of action based on action parameter for user
         groups.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        try:
-            user_group_name = (
-                self.normalized_payload.get('user_group_name'))
-            user_group_user_usernames = (
-                self.normalized_payload.get('user_group_user_usernames'))
-            assert user_group_name is not None
-            assert user_group_user_usernames is not None
-            user_group = user_services.create_new_user_group(
-                user_group_name, user_group_user_usernames)
-            self.render_json({'user_group_dict': user_group.to_dict()})
-        except Exception as e:
-            logging.exception('[RELEASE-COORDINATOR] %s', e)
-            self.render_json({'error': str(e)})
-            raise e
+        name = self.normalized_payload['name']
+        member_usernames = self.normalized_payload['member_usernames']
+        user_group = user_services.create_new_user_group(
+            name, member_usernames)
+        self.render_json({'user_group_dict': user_group.to_dict()})
+
+    @acl_decorators.can_access_release_coordinator_page
+    def put(self) -> None:
+        """Updates the specified user group."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+
+        user_group_id = self.normalized_payload['user_group_id']
+        name = self.normalized_payload['name']
+        member_usernames = self.normalized_payload['member_usernames']
+        user_services.update_user_group(
+            user_group_id, name, member_usernames)
+        self.render_json(self.values)
+
+    @acl_decorators.can_access_release_coordinator_page
+    def delete(self) -> None:
+        """Performs deletion on the specified user group."""
+        assert self.user_id is not None
+        assert self.normalized_request is not None
+        user_group_id = self.normalized_request['user_group_id']
+        user_services.delete_user_group(user_group_id)
+        self.render_json(self.values)
 
 
 class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):

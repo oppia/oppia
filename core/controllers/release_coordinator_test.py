@@ -172,9 +172,8 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
             self.put_json(
                 feconf.USER_GROUPS_HANDLER_URL, {
                     'user_group_id': 'USER_GROUP_5_ID',
-                    'user_group_name': 'USERGROUP3',
-                    'user_group_user_usernames': [
-                        'user1id', 'user2id', 'user5id']
+                    'name': 'USERGROUP3',
+                    'member_usernames': ['user1id', 'user2id', 'user5id']
                 }, csrf_token=csrf_token)
         self.logout()
 
@@ -193,8 +192,8 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
             feconf.USER_GROUPS_HANDLER_URL, {
                 'user_group_id': response_dict_user_groups[0].get(
                     'user_group_id'),
-                'user_group_name': 'USERGROUP3',
-                'user_group_user_usernames': ['user1', 'user2', 'user5']
+                'name': 'USERGROUP3',
+                'member_usernames': ['user1', 'user2', 'user5']
             }, csrf_token=csrf_token)
 
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
@@ -215,8 +214,8 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
 
         self.post_json(
             feconf.USER_GROUPS_HANDLER_URL, {
-                'user_group_name': 'USERGROUP4',
-                'user_group_user_usernames': ['user1', 'user2', 'user3']
+                'name': 'USERGROUP4',
+                'member_usernames': ['user1', 'user2', 'user3']
             }, csrf_token=csrf_token)
 
         response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
@@ -236,8 +235,8 @@ class UserGroupHandlerTest(test_utils.GenericTestBase):
         ):
             self.post_json(
                 feconf.USER_GROUPS_HANDLER_URL, {
-                    'user_group_name': 'USERGROUP4',
-                    'user_group_user_usernames': ['user1', 'user2', 'user6']
+                    'name': 'USERGROUP4',
+                    'member_usernames': ['user1', 'user2', 'user6']
                 }, csrf_token=csrf_token)
 
 

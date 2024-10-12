@@ -23,11 +23,11 @@ describe('UserGroupModel', () => {
     const userGroup = UserGroup.createFromBackendDict({
       user_group_id: 'UserGroupID',
       name: 'user group name',
-      user_usernames: ['user1', 'user2'],
+      member_usernames: ['user1', 'user2'],
     });
 
-    expect(userGroup.userGroupName).toEqual('user group name');
-    expect(userGroup.userGroupUserUsernames).toEqual(['user1', 'user2']);
+    expect(userGroup.name).toEqual('user group name');
+    expect(userGroup.memberUsernames).toEqual(['user1', 'user2']);
     expect(userGroup.userGroupId).toEqual('UserGroupID');
   });
 });
