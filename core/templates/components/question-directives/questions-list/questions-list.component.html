@@ -64,7 +64,7 @@
           <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
                (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
             <div class="question-data e2e-test-edit-question-button">
-              <oppia-rte-output-display class="e2e-test-question-text" classStr="question-text"
+              <oppia-rte-output-display class="e2e-test-question-text question-text"
                             [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
               </oppia-rte-output-display>
               <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())"
