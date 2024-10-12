@@ -804,6 +804,24 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                                 remote_sha1='remote_sha1'
                             )])
 
+    def test_get_refs_with_empty_remote_sha(self) -> None:
+        with tempfile.NamedTemporaryFile() as temp_stdin_file:
+            with utils.open_file(temp_stdin_file.name, 'w') as f:
+                f.write(
+                    'local_ref local_sha1 remote_ref %s' %
+                    git_changes_utils.EMPTY_SHA1)
+            with utils.open_file(temp_stdin_file.name, 'r') as f:
+                with self.swap(sys, 'stdin', f):
+                    self.assertEqual(
+                        git_changes_utils.get_refs(),
+                        [
+                            git_changes_utils.GitRef(
+                                local_ref='local_ref', local_sha1='local_sha1',
+                                remote_ref=None, remote_sha1=None
+                            )
+                        ]
+                    )
+
     def test_get_refs_without_stdin_should_use_current_branch(self) -> None:
         def mock_get_branch() -> str:
             return 'branch1'
