@@ -847,7 +847,8 @@ export class ConversationSkinComponent {
       index > 0 &&
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.explorationPlayerStateService.isInQuestionPlayerMode()
+      !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
+      !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
     ) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
