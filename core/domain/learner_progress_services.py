@@ -73,6 +73,7 @@ class DisplayableStorySummaryDict(TypedDict):
     topic_name: str
     topic_url_fragment: str
     classroom_url_fragment: str
+    classroom_name: str
 
 
 class DisplayableTopicSummaryDict(TypedDict):
@@ -89,7 +90,8 @@ class DisplayableTopicSummaryDict(TypedDict):
     thumbnail_filename: Optional[str]
     canonical_story_summary_dict: List[topic_fetchers.CannonicalStoryDict]
     url_fragment: Optional[str]
-    classroom: str
+    classroom_name: str
+    classroom_url_fragment: str
     practice_tab_is_displayed: bool
     degrees_of_mastery: Dict[str, Optional[float]]
     skill_descriptions: Tuple[Dict[str, str], List[str]]
@@ -1701,6 +1703,10 @@ def get_displayable_story_summary_dicts(
             'classroom_url_fragment': (
                 classroom_config_services
                 .get_classroom_url_fragment_for_topic_id(
+                    story.corresponding_topic_id)),
+            'classroom_name': (
+                classroom_config_services
+                .get_classroom_name_for_topic_id(
                     story.corresponding_topic_id))
         })
 
@@ -1761,7 +1767,10 @@ def get_displayable_untracked_topic_summary_dicts(
                 'canonical_story_summary_dict': (
                     topic_fetchers.get_canonical_story_dicts(user_id, topic)),
                 'url_fragment': topic.url_fragment,
-                'classroom': (
+                'classroom_name': (
+                    classroom_config_services.
+                    get_classroom_name_for_topic_id(topic.id)),
+                'classroom_url_fragment': (
                     classroom_config_services.
                     get_classroom_url_fragment_for_topic_id(topic.id)),
                 'practice_tab_is_displayed': topic.practice_tab_is_displayed,
@@ -1812,7 +1821,10 @@ def get_displayable_topic_summary_dicts(
             'canonical_story_summary_dict': (
                 topic_fetchers.get_canonical_story_dicts(user_id, topic)),
             'url_fragment': topic.url_fragment,
-            'classroom': (
+            'classroom_name': (
+                classroom_config_services.
+                get_classroom_name_for_topic_id(topic.id)),
+            'classroom_url_fragment': (
                 classroom_config_services.
                 get_classroom_url_fragment_for_topic_id(topic.id)),
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,

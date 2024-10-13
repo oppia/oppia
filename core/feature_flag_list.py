@@ -92,10 +92,8 @@ DEV_FEATURES_LIST = [
 TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
-    FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
@@ -111,6 +109,8 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.DIAGNOSTIC_TEST,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -144,7 +144,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.DIAGNOSTIC_TEST.value: (
         (
             'This flag is for the diagnostic test functionality.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
@@ -210,7 +210,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag allows voice artists to add voiceovers in a specific '
             'accent for the given language.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (

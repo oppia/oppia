@@ -24,18 +24,12 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-const EXPLORATION_ATTRIBUTION_HTML = explorationId =>
+const EXPLORATION_ATTRIBUTION_HTML = (explorationId: string | null) =>
   `<a href="http://localhost:8181/explore/${explorationId}#">Oppia</a> // <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY SA 4.0</a>`;
 const EXPLORATION_ATTRIBUTION_PRINT =
   '"Algebra Basics" by explorationEditor. Oppia. http://localhost:8181/explore/';
 
-const EXPECTED_FB_SHARE_URL = explorationId =>
-  `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=http://localhost:8181/explore/${explorationId}&display=popup&ref=plugin&src=share_button`;
-const EXPECTED_X_SHARE_URL = explorationId =>
-  `https://twitter.com/share?text=Check%20out%20this%20interactive%20lesson%20on%20Oppia%20-%20a%20free%20platform%20for%20teaching%20and%20learning!&url=http://localhost:8181/explore/${explorationId}`;
-const EXPECTED_CLASSROOM_SHARE_URL = explorationId =>
-  `https://classroom.google.com/share?url=http://localhost:8181/explore/${explorationId}`;
-const EXPECTED_EMBED_URL = explorationId =>
+const EXPECTED_EMBED_URL = (explorationId: string | null) =>
   `<iframe src="http://localhost:8181/embed/exploration/${explorationId}" width="700" height="1000">`;
 
 enum INTERACTION_TYPES {
@@ -153,18 +147,9 @@ describe('Logged-out User', function () {
         EXPLORATION_ATTRIBUTION_PRINT
       );
       await loggedOutUser.closeAttributionModal();
-      await loggedOutUser.shareExploration(
-        'Facebook',
-        EXPECTED_FB_SHARE_URL(explorationId)
-      );
-      await loggedOutUser.shareExploration(
-        'Twitter',
-        EXPECTED_X_SHARE_URL(explorationId)
-      );
-      await loggedOutUser.shareExploration(
-        'Classroom',
-        EXPECTED_CLASSROOM_SHARE_URL(explorationId)
-      );
+      await loggedOutUser.shareExploration('Facebook', explorationId);
+      await loggedOutUser.shareExploration('Twitter', explorationId);
+      await loggedOutUser.shareExploration('Classroom', explorationId);
 
       await loggedOutUser.embedThisLesson(EXPECTED_EMBED_URL(explorationId));
 

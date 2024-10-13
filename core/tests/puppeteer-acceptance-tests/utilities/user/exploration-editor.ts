@@ -77,7 +77,7 @@ const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
-const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
+const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
 const discardDraftDropdown = 'button.e2e-test-save-discard-toggle';
@@ -97,6 +97,7 @@ const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = 'button.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
 const modifyExistingTranslationsButton = '.e2e-test-modify-translations-button';
+const leaveTranslationsAsIsButton = '.e2e-test-leave-translations-as-is';
 const activeTranslationTab = '.e2e-test-active-translation-tab';
 
 const stateNodeSelector = '.e2e-test-node-label';
@@ -146,8 +147,10 @@ const skillNameInput = '.e2e-test-skill-name-input';
 const skillItem = '.e2e-test-skills-list-item';
 const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
 const deleteSkillButton = 'i.skill-delete-button';
+const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
 
 const misconceptionDiv = '.misconception-list-item';
+const misconceptionTitle = '.e2e-test-misconception-title';
 const optionalMisconceptionDiv = '.optional-misconception-list-item';
 const inapplicableMisconceptionDiv = '.optional-misconception-list-no-action';
 const optionalMisconceptionOptionsButton =
@@ -156,6 +159,7 @@ const misconceptionApplicableToggle =
   '.e2e-test-misconception-applicable-toggle';
 const responseGroupDiv = '.e2e-test-response-tab';
 const misconceptionEditorTab = '.e2e-test-open-misconception-editor';
+const toggleResponseTab = '.e2e-test-response-tab-toggle';
 
 const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
@@ -213,6 +217,7 @@ const feedbackSelector = '.e2e-test-exploration-feedback';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
+const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -284,6 +289,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.,
+   * @param {string} tags - The tags of the exploration.
    */
   async publishExplorationWithMetadata(
     title: string,
@@ -291,38 +297,71 @@ export class ExplorationEditor extends BaseUser {
     category: string,
     tags?: string
   ): Promise<string | null> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(toastMessage, {
+    const fillExplorationMetadataDetails = async () => {
+      await this.clickOn(explorationTitleInput);
+      await this.type(explorationTitleInput, `${title}`);
+      await this.clickOn(explorationGoalInput);
+      await this.type(explorationGoalInput, `${goal}`);
+      await this.clickOn(explorationCategoryDropdown);
+      await this.clickOn(`${category}`);
+      if (tags) {
+        await this.type(tagsField, tags);
+      }
+    };
+
+    const publishExploration = async () => {
+      if (this.isViewportAtMobileWidth()) {
+        await this.waitForPageToFullyLoad();
+        const element = await this.page.$(mobileNavbarOptions);
+        // If the element is not present, it means the mobile navigation bar is not expanded.
+        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+        // which expands the mobile navigation bar.
+        if (!element) {
+          await this.clickOn(mobileOptionsButton);
+        }
+        await this.clickOn(mobileChangesDropdown);
+        await this.clickOn(mobilePublishButton);
+      } else {
+        await this.clickOn(publishExplorationButton);
+      }
+    };
+
+    const confirmPublish = async () => {
+      await this.clickOn(saveExplorationChangesButton);
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
-      await this.page.waitForSelector(toastMessage, {
-        hidden: true,
-      });
-      await this.clickOn(mobileChangesDropdown);
-      await this.clickOn(mobilePublishButton);
-    } else {
-      await this.clickOn(publishExplorationButton);
-    }
-    await this.clickOn(explorationTitleInput);
-    await this.type(explorationTitleInput, `${title}`);
-    await this.clickOn(explorationGoalInput);
-    await this.type(explorationGoalInput, `${goal}`);
-    await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn(`${category}`);
-    if (tags) {
-      await this.type(tagsField, tags);
-    }
-    await this.clickOn(saveExplorationChangesButton);
-    await this.clickOn(explorationConfirmPublishButton);
-    await this.page.waitForSelector(explorationIdElement);
-    const explorationIdUrl = await this.page.$eval(
-      explorationIdElement,
-      element => (element as HTMLElement).innerText
-    );
-    const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.clickOn(explorationConfirmPublishButton);
+      await this.page.waitForSelector(explorationIdElement);
+      const explorationIdUrl = await this.page.$eval(
+        explorationIdElement,
+        element => (element as HTMLElement).innerText
+      );
+      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.clickOn(closePublishedPopUpButton);
+      return explorationId;
+    };
 
-    await this.clickOn(closePublishedPopUpButton);
-    return explorationId;
+    try {
+      await publishExploration();
+      await fillExplorationMetadataDetails();
+      return await confirmPublish();
+    } catch (error) {
+      await this.waitForPageToFullyLoad();
+
+      const errorSavingExplorationElement = await this.page.$(
+        errorSavingExplorationModal
+      );
+      if (errorSavingExplorationElement) {
+        await this.clickOn(errorSavingExplorationModal);
+        await this.page.waitForNavigation({
+          waitUntil: ['load', 'networkidle0'],
+        });
+      }
+      await publishExploration();
+      return await confirmPublish();
+    }
   }
 
   async navigateToFeedbackTab(): Promise<void> {
@@ -877,18 +916,20 @@ export class ExplorationEditor extends BaseUser {
     await this.type(commitMessage, 'Testing Testing');
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
+
+    // Toast message confirms that the draft has been saved.
+    await this.page.waitForSelector(toastMessage, {
+      visible: true,
+    });
+    await this.page.waitForSelector(toastMessage, {
+      hidden: true,
+    });
     showMessage('Exploration is saved successfully.');
     await this.waitForNetworkIdle();
   }
 
   async publishExploration(): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        visible: true,
-      });
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        hidden: true,
-      });
       await this.clickOn(mobileChangesDropdown);
       await this.clickOn(mobilePublishButton);
     } else {
@@ -1191,6 +1232,13 @@ export class ExplorationEditor extends BaseUser {
    * @param skillName - Name of the skill to be linked to state.
    */
   async addSkillToState(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(mobileToggleSkillCard);
+      }
+    }
     await this.clickOn(addSkillButton);
     await this.type(skillNameInput, skillName);
     await this.clickOn(skillItem);
@@ -1208,15 +1256,41 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isOptional: boolean
   ): Promise<void> {
+    let expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
     let responseTabs = await this.page.$$(responseGroupDiv);
+
     await responseTabs[responseIndex].click();
     await this.clickOn('Tag with misconception');
-    if (!isOptional) {
-      await this.clickOn(misconceptionName);
-    } else {
-      await this.clickOn(`(Optional) ${misconceptionName}`);
+
+    await this.page.waitForSelector(misconceptionTitle, {
+      timeout: 5000,
+      visible: true,
+    });
+    const misconceptionTitles = await this.page.$$(misconceptionTitle);
+    for (const misconceptionTitle of misconceptionTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        misconceptionTitle
+      );
+      if (title.trim() === expectedTitle) {
+        await misconceptionTitle.click();
+      }
     }
+
     await this.clickOn('Done');
+    await this.page.waitForSelector(leaveTranslationsAsIsButton, {
+      visible: true,
+    });
+    await this.clickOn(leaveTranslationsAsIsButton);
   }
 
   /**
@@ -1230,15 +1304,38 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isOptional: boolean
   ): Promise<void> {
+    let expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
     let responseTabs = await this.page.$$(responseGroupDiv);
     await responseTabs[responseIndex].click();
     await this.clickOn(misconceptionEditorTab);
-    if (!isOptional) {
-      await this.clickOn(misconceptionName);
-    } else {
-      await this.clickOn(`(Optional) ${misconceptionName}`);
+    await this.page.waitForSelector(misconceptionTitle, {
+      timeout: 5000,
+      visible: true,
+    });
+    const misconceptionTitles = await this.page.$$(misconceptionTitle);
+    for (const misconceptionTitle of misconceptionTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        misconceptionTitle
+      );
+      if (title.trim() === expectedTitle) {
+        await misconceptionTitle.click();
+      }
     }
     await this.clickOn('Save Misconception');
+    await this.page.waitForSelector(leaveTranslationsAsIsButton, {
+      visible: true,
+    });
+    await this.clickOn(leaveTranslationsAsIsButton);
   }
 
   /**
@@ -1251,6 +1348,13 @@ export class ExplorationEditor extends BaseUser {
     isPresent: boolean
   ): Promise<void> {
     try {
+      if (this.isViewportAtMobileWidth()) {
+        const element = await this.page.$(responseGroupDiv);
+        // If the responses were collapsed in mobile view.
+        if (!element) {
+          await this.clickOn(toggleResponseTab);
+        }
+      }
       await this.page.waitForSelector(misconceptionDiv, {
         timeout: 5000,
         visible: true,
@@ -1265,7 +1369,7 @@ export class ExplorationEditor extends BaseUser {
         if (title.trim() === misconceptionName) {
           if (!isPresent) {
             throw new Error(
-              `The misconception ${misconceptionName} is present, which was not expected`
+              `The misconception ${misconceptionName} is present, should be absent.`
             );
           }
           return;
@@ -1274,14 +1378,12 @@ export class ExplorationEditor extends BaseUser {
 
       if (isPresent) {
         throw new Error(
-          `The misconception ${misconceptionName} is not present, which was expected`
+          `The misconception ${misconceptionName} is not present.`
         );
       }
     } catch (error) {
       if (isPresent) {
-        throw new Error(
-          `The misconception ${misconceptionName} is not present, which was expected`
-        );
+        throw new Error('No misconceptions found.');
       }
     }
 
@@ -1297,6 +1399,13 @@ export class ExplorationEditor extends BaseUser {
   async toggleMisconceptionApplicableStatus(
     misconceptionName: string
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
     await this.page.waitForSelector(optionalMisconceptionDiv, {
       timeout: 5000,
       visible: true,
@@ -1341,7 +1450,17 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isApplicable: boolean
   ): Promise<void> {
-    await this.verifyMisconceptionPresentForState(misconceptionName, true);
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
+    if (!isApplicable) {
+      await this.page.waitForSelector(inapplicableMisconceptionDiv);
+    }
+
     const inapplicableMisconceptions = await this.page.$$(
       inapplicableMisconceptionDiv
     );
@@ -1371,6 +1490,13 @@ export class ExplorationEditor extends BaseUser {
    * Removes the attached skill from the current state card.
    */
   async removeSkillFromState(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(mobileToggleSkillCard);
+      }
+    }
     await this.clickOn(deleteSkillButton);
     await this.clickOn('Delete skill');
   }
