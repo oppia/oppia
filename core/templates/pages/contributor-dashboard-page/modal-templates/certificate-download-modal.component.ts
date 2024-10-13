@@ -75,16 +75,16 @@ export class CertificateDownloadModalComponent {
   }
 
   validateDate(): void {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const toDate = new Date(this.toDate);
-    toDate.setHours(0, 0, 0, 0);
-    if (!this.fromDate || !this.toDate || new Date(this.fromDate) >= toDate) {
+    if (
+      !this.fromDate ||
+      !this.toDate ||
+      new Date(this.fromDate) >= new Date(this.toDate)
+    ) {
       this.errorsFound = true;
       this.errorMessage = 'Invalid date range.';
       return;
     }
-    if (toDate >= today) {
+    if (new Date() < new Date(this.toDate)) {
       this.errorsFound = true;
       this.errorMessage =
         "Please select a 'To' date that is earlier than " + "today's date";
