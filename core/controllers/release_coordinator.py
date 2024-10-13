@@ -142,7 +142,6 @@ class UserGroupHandler(
         """Performs series of action based on action parameter for user
         groups.
         """
-        assert self.user_id is not None
         assert self.normalized_payload is not None
         name = self.normalized_payload['name']
         member_usernames = self.normalized_payload['member_usernames']
@@ -153,7 +152,6 @@ class UserGroupHandler(
     @acl_decorators.can_access_release_coordinator_page
     def put(self) -> None:
         """Updates the specified user group."""
-        assert self.user_id is not None
         assert self.normalized_payload is not None
 
         user_group_id = self.normalized_payload['user_group_id']
@@ -166,7 +164,6 @@ class UserGroupHandler(
     @acl_decorators.can_access_release_coordinator_page
     def delete(self) -> None:
         """Performs deletion on the specified user group."""
-        assert self.user_id is not None
         assert self.normalized_request is not None
         user_group_id = self.normalized_request['user_group_id']
         user_services.delete_user_group(user_group_id)

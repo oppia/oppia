@@ -439,6 +439,41 @@ def _delete_profile_picture(
         )
 
 
+def remove_user_from_user_groups(user_id: str) -> None:
+    """Removes the user from all user groups they are a member of.
+
+    Args:
+        user_id: str. The ID of the user to remove from user groups.
+    """
+    user_group_models: Sequence[user_models.UserGroupModel] = (
+        user_models.UserGroupModel.query(
+            user_models.UserGroupModel.user_ids == user_id).fetch()
+    )
+
+    @transaction_services.run_in_transaction_wrapper
+    def _remove_user_from_groups_transactional(
+        group_models: List[user_models.UserGroupModel]
+    ) -> None:
+        """Remove the user from a batch of user group models transactionally.
+
+        Args:
+            group_models: List[UserGroupModel]. The user group models to update.
+        """
+        for group_model in group_models:
+            if user_id in group_model.user_ids:
+                group_model.user_ids.remove(user_id)
+        user_models.UserGroupModel.update_timestamps_multi(group_models)
+        datastore_services.put_multi(group_models)
+
+    for i in range(
+        0,
+        len(user_group_models),
+        feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+    ):
+        batch = user_group_models[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
+        _remove_user_from_groups_transactional(batch)
+
+
 def delete_user(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest
 ) -> None:
@@ -459,6 +494,7 @@ def delete_user(
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
+    remove_user_from_user_groups(user_id)
     if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)

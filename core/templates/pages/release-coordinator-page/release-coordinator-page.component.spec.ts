@@ -293,7 +293,7 @@ describe('Release coordinator page', () => {
         component.updateUserGroup(component.userGroups[0]);
         expect(component.userGroups[0].name).toEqual('UserGroup1');
         expect(component.userGroupSaveError).toEqual(
-          'User group with name UserGroup2 already exist.'
+          "User group with name 'UserGroup2' already exist."
         );
       }));
 
@@ -361,7 +361,7 @@ describe('Release coordinator page', () => {
 
         expect(updateUserGroupSpy).toHaveBeenCalled();
         expect(component.statusMessage).toBe(
-          'User Group UserGroup5 successfully updated.'
+          "User group 'UserGroup5' successfully updated."
         );
         component.userGroups[0].name = 'UserGroup1';
         component.updateUserGroup(component.userGroups[0]);
@@ -505,7 +505,8 @@ describe('Release coordinator page', () => {
 
       expect(
         component.userGroups.some(
-          userGroup => userGroup.userGroupId === 'userGroupId3')
+          userGroup => userGroup.userGroupId === 'userGroupId3'
+        )
       ).toBeFalse();
     }));
 
@@ -521,9 +522,7 @@ describe('Release coordinator page', () => {
       component.deleteUserGroup('userGroupId1');
 
       expect(
-        component.userGroups.some(
-          userGroup => userGroup.name === 'UserGroup1'
-        )
+        component.userGroups.some(userGroup => userGroup.name === 'UserGroup1')
       ).toBeTrue();
     }));
 
@@ -545,9 +544,7 @@ describe('Release coordinator page', () => {
 
       expect(deleteUserGroupSpy).toHaveBeenCalled();
       expect(
-        component.userGroups.some(
-          userGroup => userGroup.name === 'UserGroup1'
-        )
+        component.userGroups.some(userGroup => userGroup.name === 'UserGroup1')
       ).toBeTrue();
       expect(component.statusMessage).toBe(
         'Server error: Internal Server Error.'
@@ -639,12 +636,13 @@ describe('Release coordinator page', () => {
 
         component.newUserGroupName = 'UserGroup8';
         component.addUserGroup();
+        tick();
 
         expect(
           component.userGroups.some(
             userGroup => userGroup.name === 'UserGroup8'
           )
-        ).toBeFalse();
+        ).toBeTrue();
       }));
 
       it('should fail in case of backend error', fakeAsync(() => {

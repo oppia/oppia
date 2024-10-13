@@ -203,7 +203,10 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       () => {
         this.backendApiService.deleteUserGroupAsync(userGroupId).then(
           () => {
-            this.statusMessage = 'User Group successfully deleted.';
+            const userGroupToDelete = this.userGroups.find(
+              userGroup => userGroup.userGroupId === userGroupId
+            );
+            this.statusMessage = `User group '${userGroupToDelete.name}' successfully deleted.`;
             this.userGroups = this.userGroups.filter(
               userGroup => userGroup.userGroupId !== userGroupId
             );
@@ -260,13 +263,10 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       return;
     }
     if (
-      this.userGroups.some(
-        userGroup => userGroup.name === trimmedUserGroupName
-      )
+      this.userGroups.some(userGroup => userGroup.name === trimmedUserGroupName)
     ) {
       this.userGroupValidationError = '';
-      this.userGroupValidationError = (
-        `The user group '${this.newUserGroupName}' already exists.`);
+      this.userGroupValidationError = `The user group '${this.newUserGroupName}' already exists.`;
       return;
     }
 
@@ -275,7 +275,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
         .createUserGroupAsync(trimmedUserGroupName, [])
         .then(
           userGroup => {
-            this.statusMessage = 'User Group added.';
+            this.statusMessage = 'User group added.';
             this.userGroups.push(userGroup);
             this.userGroupIdsToDetailsShowRecord[userGroup.userGroupId] = false;
             this.userGroupsBackup.set(
@@ -304,9 +304,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   isUserGroupUpdated(userGroup: UserGroup): boolean {
     const original = this.userGroupsBackup.get(userGroup.userGroupId);
     if (original === undefined) {
-      throw new Error(
-        'Backup not found for user group: ' + userGroup.name
-      );
+      throw new Error('Backup not found for user group: ' + userGroup.name);
     }
 
     return !isEqual(userGroup, original);
@@ -358,7 +356,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       ) === true
     ) {
       this.userGroupSaveError = '';
-      this.userGroupSaveError = `User group with name ${userGroup.name} already exist.`;
+      this.userGroupSaveError = `User group with name '${userGroup.name}' already exist.`;
       this._restoreUserGroupToBackup(userGroup);
       return;
     }
@@ -367,7 +365,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       return;
     }
 
-    this.statusMessage = 'Updating User Groups...';
+    this.statusMessage = 'Updating user groups...';
 
     this.backendApiService
       .updateUserGroupAsync(
@@ -377,7 +375,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       )
       .then(
         () => {
-          this.statusMessage = `User Group ${userGroup.name} successfully updated.`;
+          this.statusMessage = `User group '${userGroup.name}' successfully updated.`;
           this.userGroupIdsToDetailsShowRecord[userGroup.userGroupId] = false;
           this.userGroupsBackup.set(
             userGroup.userGroupId,

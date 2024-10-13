@@ -102,7 +102,7 @@
           <div class="user-group-details" *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]">
             <div *ngIf="!userGroupInEditMode">
               <i class="material-icons oppia-edit-icon"
-                 title="Edit User Group"
+                 title="Edit user group"
                  (click)="setUserGroupInEditMode()">
                 &#xE254;
               </i>
@@ -173,7 +173,7 @@
         </div>
       </div>
       <div class="oppia-add-user-group">
-        <input placeholder="New User Group Name"
+        <input placeholder="New user group name"
                type="text"
                [(ngModel)]="newUserGroupName"
                [ngModelOptions]="{standalone: true}"
@@ -181,7 +181,7 @@
         <button class="btn oppia-add-new-user-group-btn"
                 (click)="addUserGroup()"
                 [disabled]="userGroupInEditMode">
-          + Add New User Group
+          + Add new user group
         </button>
         <p *ngIf="userGroupValidationError.length > 0"
            class="oppia-warning-text">
