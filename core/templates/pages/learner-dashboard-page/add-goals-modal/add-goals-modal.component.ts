@@ -24,13 +24,13 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 })
 export class AddGoalsModalComponent {
   checkedTopics: Set<string>;
-  topics: {name: string; id: string};
+  topics: {[topicId: string]: string};
   constructor(
     public dialogRef: MatDialogRef<AddGoalsModalComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       checkedTopics: Set<string>;
-      topics: {name: string; id: string};
+      topics: {[topicId: string]: string};
     }
   ) {
     this.checkedTopics = new Set(data.checkedTopics);

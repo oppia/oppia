@@ -289,13 +289,15 @@ export class GoalsTabComponent implements OnInit {
 
   openModal(): void {
     const dialogConfig = new MatDialogConfig();
+    const allTopics = this.editGoals.reduce(
+      (obj, item) => ((obj[item.id] = item.name), obj),
+      {}
+    );
     dialogConfig.data = {
       checkedTopics: this.checkedTopics,
-      topics: this.editGoals.reduce(
-        (obj, item) => ((obj[item.name] = item.id), obj),
-        {}
-      ),
+      topics: allTopics,
     };
+
     dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
     const dialogRef = this.dialog.open(AddGoalsModalComponent, dialogConfig);
 
@@ -309,10 +311,6 @@ export class GoalsTabComponent implements OnInit {
             );
           }
         }
-        const topicNames = this.editGoals.reduce(
-          (obj, item) => ((obj[item.id] = item.name), obj),
-          {}
-        );
         for (const topicId of this.checkedTopics) {
           if (!newGoalTopics.has(topicId)) {
             await this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
@@ -321,7 +319,7 @@ export class GoalsTabComponent implements OnInit {
               LearnerDashboardPageConstants
                 .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LEARN_TOPIC,
               topicId,
-              topicNames[topicId]
+              allTopics[topicId]
             );
           }
         }
