@@ -41,10 +41,7 @@ describe('AddGoalsModalComponent', () => {
   let fixture: ComponentFixture<AddGoalsModalComponent>;
   let matDialogSpy: jasmine.SpyObj<MatDialogRef<AddGoalsModalComponent>>;
   beforeEach(waitForAsync(() => {
-    matDialogSpy = jasmine.createSpyObj('MatDialogRef', [
-      'onClose',
-      'onSubmit',
-    ]);
+    matDialogSpy = jasmine.createSpyObj('MatDialogRef', []);
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
       providers: [

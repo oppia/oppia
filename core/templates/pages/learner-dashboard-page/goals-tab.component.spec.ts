@@ -35,6 +35,14 @@ import {GoalsTabComponent} from './goals-tab.component';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
+import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
+import {By} from '@angular/platform-browser';
+import {of} from 'rxjs';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
@@ -53,9 +61,18 @@ describe('Goals tab Component', () => {
   let ngbModal: NgbModal;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
+  let matDialogSpy: jasmine.SpyObj<MatDialog>;
+  let matDialogRefSpy: jasmine.SpyObj<MatDialogRef<AddGoalsModalComponent>>;
+  let allGoals: {[key: string]: string} = {
+    'Topic Name': 'sample_topic_id',
+    'Topic Name 2': 'sample_topic_id_2',
+    'Topic Name 3': 'sample_topic_id_3',
+  };
 
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
+    matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    matDialogRefSpy = jasmine.createSpyObj('MatDialogRef', []);
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,
@@ -63,7 +80,11 @@ describe('Goals tab Component', () => {
         FormsModule,
         HttpClientTestingModule,
       ],
-      declarations: [GoalsTabComponent, MockTranslatePipe],
+      declarations: [
+        AddGoalsModalComponent,
+        GoalsTabComponent,
+        MockTranslatePipe,
+      ],
       providers: [
         LearnerDashboardActivityBackendApiService,
         LearnerDashboardIdsBackendApiService,
@@ -75,6 +96,9 @@ describe('Goals tab Component', () => {
             getResizeEvent: () => mockResizeEmitter,
           },
         },
+        {provide: MatDialog, useValue: matDialogSpy},
+        {provide: MatDialogRef, useValue: matDialogRefSpy},
+        {provide: MAT_DIALOG_DATA, useValue: {}},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -263,6 +287,7 @@ describe('Goals tab Component', () => {
     component.topicIdsInCompletedGoals = [];
     component.topicIdsInCurrentGoals = [];
     component.activityType = 'learntopic';
+    component.checkedTopics = new Set();
     fixture.detectChanges();
   });
 
@@ -413,5 +438,87 @@ describe('Goals tab Component', () => {
       fixture.detectChanges();
       expect(component.showThreeDotsDropdown[i]).toBe(false);
     }
+  });
+
+  it('should open add-goals-modal and pass correct data', () => {
+    TestBed.overrideProvider(MAT_DIALOG_DATA, {
+      useValue: {topics: allGoals, checkedTopics: new Set()},
+    });
+    matDialogSpy.open.and.returnValue(matDialogRefSpy);
+    const addGoalsButton = fixture.debugElement.query(
+      By.css('.oppia-learner-dash-button--add-goals')
+    );
+    addGoalsButton.nativeElement.click();
+
+    fixture.detectChanges();
+
+    expect(component.openModal).toHaveBeenCalled();
+    expect(matDialogSpy.open).toHaveBeenCalledWith(AddGoalsModalComponent, {
+      data: {topics: allGoals, checkedTopics: new Set()},
+      panelClass: 'oppia-learner-dash-goals-modal',
+    });
+  });
+
+  it('should add new goals if add-goals-modal returns set with new ids', () => {
+    TestBed.overrideProvider(MAT_DIALOG_DATA, {
+      useValue: {topics: allGoals, checkedTopics: new Set([])},
+    });
+    matDialogSpy.open.and.returnValue(matDialogRefSpy);
+    component.openModal();
+
+    fixture.detectChanges();
+
+    matDialogRefSpy.afterClosed.and.returnValue(
+      of(new Set(['sample_topic_id', 'sample_topic_2']))
+    );
+    matDialogRefSpy.afterClosed().subscribe();
+
+    const learnerDashBackendApiSpy = spyOn(
+      learnerDashboardActivityBackendApiService,
+      'addToLearnerGoals'
+    );
+    expect(learnerDashBackendApiSpy).toHaveBeenCalledTimes(2);
+    expect(learnerDashBackendApiSpy.calls.argsFor(0)).toEqual([
+      'sample_topic_id',
+      'learntopic',
+    ]);
+    expect(learnerDashBackendApiSpy.calls.argsFor(0)).toEqual([
+      'sample_topic_2',
+      'learntopic',
+    ]);
+    expect(component.checkedTopics).toEqual(
+      new Set(['sample_topic_id', 'sample_topic_2'])
+    );
+  });
+
+  it('should remove goals if add-goals-modal returns set with less ids than current', () => {
+    TestBed.overrideProvider(MAT_DIALOG_DATA, {
+      useValue: {
+        topics: allGoals,
+        checkedTopics: new Set(['sample_topic_id', 'sample_topic_2']),
+      },
+    });
+    matDialogSpy.open.and.returnValue(matDialogRefSpy);
+    component.openModal();
+
+    fixture.detectChanges();
+
+    matDialogRefSpy.afterClosed.and.returnValue(
+      of(new Set(['sample_topic_2']))
+    );
+    matDialogRefSpy.afterClosed().subscribe();
+
+    const learnerDashBackendApiSpy = spyOn(
+      learnerDashboardActivityBackendApiService,
+      'removeActivityModalAsync'
+    );
+    expect(learnerDashBackendApiSpy).toHaveBeenCalled();
+    expect(learnerDashBackendApiSpy.calls.argsFor(0)).toEqual([
+      'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION',
+      'I18N_DASHBOARD_LEARN_TOPIC',
+      'sample_topic_id',
+      'Topic Name',
+    ]);
+    expect(component.checkedTopics).toEqual(new Set(['sample_topic_2']));
   });
 });

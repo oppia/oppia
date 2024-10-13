@@ -42,12 +42,13 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ToastrModule} from 'ngx-toastr';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
-
+import {MatDialogModule} from '@angular/material/dialog';
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
     LessonCardModule,
+    MatDialogModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {
