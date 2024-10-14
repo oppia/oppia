@@ -108,6 +108,7 @@ export class GoalsTabComponent implements OnInit {
     );
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
     let topic: LearnerTopicSummary;
+
     for (topic of this.currentGoals) {
       this.topicIdsInCurrentGoals.push(topic.id);
       this.checkedTopics.add(topic.id);
@@ -293,6 +294,7 @@ export class GoalsTabComponent implements OnInit {
       });
   }
 
+  // TODO(#18384): Change how current goals is being modified with event emitter, currently directly modfiying parent input (original implementation).
   openModal(): void {
     const dialogConfig = new MatDialogConfig();
     const allTopics = this.editGoals.reduce(
@@ -307,6 +309,11 @@ export class GoalsTabComponent implements OnInit {
 
     dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
     const dialogRef = this.dialog.open(AddGoalsModalComponent, dialogConfig);
+
+    const allTopicSummarys = this.editGoals.reduce(
+      (obj, item) => ((obj[item.id] = item), obj),
+      {}
+    );
     dialogRef.afterClosed().subscribe(async newGoalTopics => {
       if (newGoalTopics) {
         for (const topicId of newGoalTopics) {
@@ -315,8 +322,10 @@ export class GoalsTabComponent implements OnInit {
               topicId,
               AppConstants.ACTIVITY_TYPE_LEARN_TOPIC
             );
+            this.currentGoals.push(allTopicSummarys[topicId]);
           }
         }
+        const removedIds = new Set();
         for (const topicId of this.checkedTopics) {
           if (!newGoalTopics.has(topicId)) {
             await this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
@@ -327,14 +336,15 @@ export class GoalsTabComponent implements OnInit {
               topicId,
               allTopics[topicId]
             );
+            removedIds.add(topicId);
           }
         }
         this.checkedTopics = new Set(newGoalTopics);
-        const allGoals = this.editGoals.reduce(
-          (obj, item) => ((obj[item.id] = item), obj),
-          {}
-        );
-        this.currentGoals = [...this.checkedTopics].map(c => allGoals[c]);
+        this.currentGoals.forEach((g, index) => {
+          if (removedIds.has(g.id)) {
+            this.currentGoals.splice(index, 1);
+          }
+        });
       }
     });
   }

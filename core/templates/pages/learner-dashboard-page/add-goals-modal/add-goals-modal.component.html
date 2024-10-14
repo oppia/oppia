@@ -1,7 +1,7 @@
-<div class="d-flex flex-column h-100">
+<div class="align-items-center d-flex flex-column h-100">
   <h3 class="oppia-learner-dash-goals-modal-title" mat-dialog-title> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING' | translate }} </h3>
   <p class="oppia-learner-dash-goals-modal-info"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_INSTRUCTIONS' | translate }}  </p>
-  <div class="oppia-learner-dash-goals-modal-content" mat-dialog-content>
+  <div class="oppia-learner-dash-goals-modal-content pt-1" mat-dialog-content>
     <!--TODO(#18384): What if all the goals are completed, should they be disabled and checked?-->
     <!--TODO(#18384): Topic name translate keys-->
     <ng-container *ngFor="let t of topics | keyvalue">
@@ -14,7 +14,7 @@
     </mat-checkbox>
     </ng-container>
   </div>
-  <div class="oppia-learner-dash-goals-modal-actions" mat-dialog-actions>
+  <div class="oppia-learner-dash-goals-modal-actions w-100" mat-dialog-actions>
     <button (click)="onClose()" class="oppia-learner-dash-button--inverse oppia-learner-dash-button-sm oppia-learner-dash-goals-button--modal" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL' | translate }} </button>
     <button (click)="onSubmit()" class="oppia-learner-dash-button--default oppia-learner-dash-button-sm oppia-learner-dash-goals-button--modal" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_SAVE' | translate }} </button>
   </div>
@@ -38,10 +38,10 @@
   grid-template-columns: repeat(3, 1fr); 
   grid-template-rows: auto;
   height: 100%;
+  padding-top: 12px;
   width: 100%;
 }
 
-/*not sure why it's 11 and then 6 for small*/
 .oppia-learner-dash-goals-modal-actions {
   display: flex;
   gap: 0 12px;
@@ -60,8 +60,13 @@
 }
 
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 576px) {
+  .oppia-learner-dash-goals-modal-actions {
+    gap: 0;
+  }
+
   .oppia-learner-dash-goals-button--modal {
+    max-width: 45%;
     width: 147px;
   }
 
@@ -69,15 +74,20 @@
     align-items: center;
     display: flex;
     flex-direction: column;
+    height: fit-content;
     gap: 12px 0;
     padding: 12px;
   }
 }
 
 @media screen and (max-width: 767px) {
+  .oppia-learner-dash-goals-modal-actions {
+    flex-grow: 1;
+    justify-content: center;
+  }
+
   .oppia-learner-dash-goals-modal-content{
     grid-template-columns: repeat(2, 1fr); 
   }
 }
-
 </style>

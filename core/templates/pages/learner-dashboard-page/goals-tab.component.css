@@ -388,6 +388,7 @@
   height: 48px;
   line-height: 48px;
   text-align: center;
+  transition: all 300ms ease-out;
   width: 48px;
 }
 
@@ -395,8 +396,11 @@
   color: #00645c;
 }
 
-.oppia-learner-dash-button--add-goals:hover .oppia-learner-dash-goals-add-circle .oppia-learner-dash-goals-add-text {
+.oppia-learner-dash-button--add-goals:hover .oppia-learner-dash-goals-add-circle {
   background-color: #429488;
+}
+
+.oppia-learner-dash-button--add-goals:hover .oppia-learner-dash-goals-add-text {
   color: #429488;
 }
 
@@ -414,7 +418,7 @@
   width: 75%;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 576px) {
   .oppia-learner-dash-goals-add-circle {
     height: 32px;
     line-height: 32px;
