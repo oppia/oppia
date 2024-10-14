@@ -81,6 +81,7 @@ export class GoalsTabComponent implements OnInit {
   topicIdsInEditGoals: string[] = [];
   topicIdsInPartiallyLearntTopics: string[] = [];
   checkedTopics: Set<string> = new Set();
+  completedTopics: Set<string> = new Set();
   topicToIndexMapping = {
     CURRENT: 0,
     COMPLETED: 1,
@@ -109,12 +110,14 @@ export class GoalsTabComponent implements OnInit {
     let topic: LearnerTopicSummary;
     for (topic of this.currentGoals) {
       this.topicIdsInCurrentGoals.push(topic.id);
+      this.checkedTopics.add(topic.id);
     }
     for (topic of this.completedGoals) {
       this.topicIdsInCompletedGoals.push(topic.id);
       this.completedGoalsTopicPageUrl.push(
         this.getTopicPageUrl(topic.urlFragment, topic.classroom)
       );
+      this.completedTopics.add(topic.id);
     }
     for (topic of this.editGoals) {
       this.topicIdsInEditGoals.push(topic.id);
@@ -289,18 +292,17 @@ export class GoalsTabComponent implements OnInit {
 
   openModal(): void {
     const dialogConfig = new MatDialogConfig();
-    const allTopics = this.editGoals.reduce(
-      (obj, item) => ((obj[item.id] = item.name), obj),
-      {}
-    );
     dialogConfig.data = {
       checkedTopics: this.checkedTopics,
-      topics: allTopics,
+      completedTopics: this.completedTopics,
+      topics: this.editGoals.reduce(
+        (obj, item) => ((obj[item.id] = item.name), obj),
+        {}
+      ),
     };
 
     dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
     const dialogRef = this.dialog.open(AddGoalsModalComponent, dialogConfig);
-
     dialogRef.afterClosed().subscribe(async newGoalTopics => {
       if (newGoalTopics) {
         for (const topicId of newGoalTopics) {
@@ -324,6 +326,11 @@ export class GoalsTabComponent implements OnInit {
           }
         }
         this.checkedTopics = new Set(newGoalTopics);
+        const allGoals = this.editGoals.reduce(
+          (obj, item) => ((obj[item.id] = item), obj),
+          {}
+        );
+        this.currentGoals = [...this.checkedTopics].map(c => allGoals[c]);
       }
     });
   }

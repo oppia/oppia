@@ -26,6 +26,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {By} from '@angular/platform-browser';
 const data = {
   checkedTopics: new Set(),
+  completedTopics: new Set(),
   topics: {
     Addition: '0',
     Subtraction: '1',
@@ -69,6 +70,7 @@ describe('AddGoalsModalComponent', () => {
   it('should create a component', () => {
     expect(component).toBeTruthy();
     expect(component.checkedTopics).toEqual(new Set());
+    expect(component.completedTopics).toEqual(new Set());
     expect(component.topics).toEqual({
       Addition: '0',
       Subtraction: '2',
@@ -126,6 +128,17 @@ describe('AddGoalsModalComponent', () => {
     expect(component.onChange).toHaveBeenCalledWith('0');
     expect(component.checkedTopics.has('0')).toBeFalse();
     expect(firstCheckbox.nativeElement.checked).toBeFalse();
+  });
+
+  it('should disable checkbox if completed', () => {
+    component.completedTopics = new Set(['0']);
+    const firstCheckbox = fixture.debugElement.query(
+      By.css('mat-checkbox:first-child')
+    );
+    fixture.detectChanges();
+
+    expect(firstCheckbox.nativeElement.checked).toBeTrue();
+    expect(firstCheckbox.nativeElement.disabled).toBeTrue();
   });
 
   it('should close modal when cancel is clicked', () => {
