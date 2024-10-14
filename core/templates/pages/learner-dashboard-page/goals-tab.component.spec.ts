@@ -37,6 +37,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
   MatDialog,
+  MatDialogConfig,
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
@@ -64,9 +65,9 @@ describe('Goals tab Component', () => {
   let matDialogSpy: jasmine.SpyObj<MatDialog>;
   let matDialogRefSpy: jasmine.SpyObj<MatDialogRef<AddGoalsModalComponent>>;
   let allTopics: {[key: string]: string} = {
-    'Topic Name': 'sample_topic_id',
-    'Topic Name 2': 'sample_topic_id_2',
-    'Topic Name 3': 'sample_topic_id_3',
+    sample_topic_id: 'Topic Name',
+    sample_topic_2: 'Topic Name 2',
+    sample_topic_3: 'Topic Name 3',
   };
 
   beforeEach(async(() => {
@@ -297,7 +298,6 @@ describe('Goals tab Component', () => {
     component.topicIdsInCompletedGoals = [];
     component.topicIdsInCurrentGoals = [];
     component.activityType = 'learntopic';
-    component.checkedTopics = new Set();
     fixture.detectChanges();
   });
 
@@ -451,8 +451,20 @@ describe('Goals tab Component', () => {
   });
 
   it('should open add-goals-modal when add goal button is clicked', () => {
+    component.learnerDashboardRedesignFeatureFlag = true;
+    fixture.detectChanges();
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      topics: allTopics,
+      checkedTopics: new Set(['sample_topic_id', 'sample_topic_2']),
+      completedTopics: new Set(['sample_topic_3']),
+    };
+    dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
     matDialogSpy.open.and.returnValue(matDialogRefSpy);
-    spyOn(component, 'openModal');
+    matDialogRefSpy.afterClosed.and.returnValue(of(new Set()));
+    spyOn(component, 'openModal').and.callThrough();
+
     const addGoalsButton = fixture.debugElement.query(
       By.css('.oppia-learner-dash-button--add-goals')
     );
@@ -461,69 +473,74 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(component.openModal).toHaveBeenCalled();
-    expect(matDialogSpy.open).toHaveBeenCalledWith(AddGoalsModalComponent, {
-      data: {
-        topics: allTopics,
-        checkedTopics: new Set(),
-        completedTopics: new Set(),
-      },
-      panelClass: 'oppia-learner-dash-goals-modal',
-    });
+    expect(matDialogSpy.open).toHaveBeenCalledWith(
+      AddGoalsModalComponent,
+      dialogConfig
+    );
   });
 
-  it('should add new goals if add-goals-modal returns set with new ids', () => {
-    matDialogSpy.open.and.returnValue(matDialogRefSpy);
-    component.openModal();
-
+  it('should add new goals if add-goals-modal returns set with new ids', async () => {
+    component.checkedTopics = new Set();
     fixture.detectChanges();
 
+    matDialogSpy.open.and.returnValue(matDialogRefSpy);
     matDialogRefSpy.afterClosed.and.returnValue(
       of(new Set(['sample_topic_id', 'sample_topic_2']))
     );
-    matDialogRefSpy.afterClosed().subscribe();
-
-    const learnerDashBackendApiSpy = spyOn(
+    const addToLearnerGoalsSpy = spyOn(
       learnerDashboardActivityBackendApiService,
       'addToLearnerGoals'
-    ).and.callThrough();
-    expect(learnerDashBackendApiSpy).toHaveBeenCalledTimes(2);
-    expect(learnerDashBackendApiSpy.calls.argsFor(0)).toEqual([
+    ).and.returnValue(Promise.resolve(true));
+    component.openModal();
+
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(addToLearnerGoalsSpy).toHaveBeenCalledTimes(2);
+    expect(addToLearnerGoalsSpy.calls.argsFor(0)).toEqual([
       'sample_topic_id',
       'learntopic',
     ]);
-    expect(learnerDashBackendApiSpy.calls.argsFor(1)).toEqual([
+    expect(addToLearnerGoalsSpy.calls.argsFor(1)).toEqual([
       'sample_topic_2',
       'learntopic',
     ]);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
     expect(component.checkedTopics).toEqual(
       new Set(['sample_topic_id', 'sample_topic_2'])
     );
   });
 
-  it('should remove goals if add-goals-modal returns set with less ids than current', () => {
+  it('should remove goals if add-goals-modal returns set with less ids than current', async () => {
     component.checkedTopics = new Set(['sample_topic_id', 'sample_topic_2']);
     fixture.detectChanges();
     matDialogSpy.open.and.returnValue(matDialogRefSpy);
-    component.openModal();
-
-    fixture.detectChanges();
-
     matDialogRefSpy.afterClosed.and.returnValue(
       of(new Set(['sample_topic_2']))
     );
-    matDialogRefSpy.afterClosed().subscribe();
 
-    const learnerDashBackendApiSpy = spyOn(
+    const removeActivityModalAsyncSpy = spyOn(
       learnerDashboardActivityBackendApiService,
       'removeActivityModalAsync'
-    ).and.callThrough();
-    expect(learnerDashBackendApiSpy).toHaveBeenCalled();
-    expect(learnerDashBackendApiSpy.calls.argsFor(0)).toEqual([
+    ).and.returnValue(Promise.resolve(true));
+
+    component.openModal();
+
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(removeActivityModalAsyncSpy).toHaveBeenCalled();
+    expect(removeActivityModalAsyncSpy.calls.argsFor(0)).toEqual([
       'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION',
       'I18N_DASHBOARD_LEARN_TOPIC',
       'sample_topic_id',
       'Topic Name',
     ]);
+
+    await fixture.whenStable();
+    fixture.detectChanges();
     expect(component.checkedTopics).toEqual(new Set(['sample_topic_2']));
   });
 });
