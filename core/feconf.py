@@ -1677,6 +1677,8 @@ MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 10
 
 DEFAULT_CLASSROOM_PUBLICATION_STATUS = False
 
+DEFAULT_DIAGNOSTIC_TEST_STATUS = False
+
 
 class TranslatableEntityType(enum.Enum):
     """Represents all possible entity types which support new translations

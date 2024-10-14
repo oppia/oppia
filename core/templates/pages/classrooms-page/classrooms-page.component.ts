@@ -43,6 +43,7 @@ export class ClassroomsPageComponent {
     thumbnail_filename: '',
     url_fragment: '',
     is_published: false,
+    is_diagnostic_test_enabled: false,
   };
 
   DEV_MODE = AppConstants.DEV_MODE;

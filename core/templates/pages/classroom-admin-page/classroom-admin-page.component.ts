@@ -337,6 +337,9 @@ export class ClassroomAdminPageComponent implements OnInit {
     const classroomPublicationStatusIsChanged =
       this.tempClassroomData.getIsPublished() !==
       this.classroomData.getIsPublished();
+    const classroomDiagnosticTestStatusIsChanged =
+      this.tempClassroomData.getIsDiagnosticTestEnabled() !==
+      this.classroomData.getIsDiagnosticTestEnabled();
 
     this.classroomAdminDataService.validateClassroom(
       this.tempClassroomData,
@@ -361,7 +364,8 @@ export class ClassroomAdminPageComponent implements OnInit {
       classroomTeaserTextIsChanged ||
       classroomBannerIsChanged ||
       classroomThumbnailIsChanged ||
-      classroomPublicationStatusIsChanged
+      classroomPublicationStatusIsChanged ||
+      classroomDiagnosticTestStatusIsChanged
     ) {
       this.classroomDataIsChanged = true;
     } else {
@@ -382,6 +386,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       topic_id_to_prerequisite_topic_ids:
         classroomDict.topicIdToPrerequisiteTopicIds,
       is_published: classroomDict.isPublished,
+      is_diagnostic_test_enabled: classroomDict.isDiagnosticTestEnabled,
       thumbnail_data: classroomDict.thumbnailData,
       banner_data: classroomDict.bannerData,
     };
@@ -833,6 +838,13 @@ export class ClassroomAdminPageComponent implements OnInit {
   togglePublicationStatus(): void {
     this.tempClassroomData.setIsPublished(
       !this.tempClassroomData.getIsPublished()
+    );
+    this.updateClassroomField();
+  }
+
+  toggleDiagnosticTestStatus(): void {
+    this.tempClassroomData.setIsDiagnosticTestEnabled(
+      !this.tempClassroomData.getIsDiagnosticTestEnabled()
     );
     this.updateClassroomField();
   }
