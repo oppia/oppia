@@ -498,7 +498,9 @@ export class CurriculumAdmin extends BaseUser {
       await this.openTopicEditor(topicName);
     } else {
       await this.clickOn(saveTopicButton);
+
       await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.page.waitForSelector(closeSaveModalButton, {visible: true});
       await this.clickOn(closeSaveModalButton);
       await this.page.waitForSelector(modalDiv, {hidden: true});
     }
@@ -1211,14 +1213,20 @@ export class CurriculumAdmin extends BaseUser {
     skillName: string
   ): Promise<void> {
     await this.goto(topicAndSkillsDashboardUrl);
+    await this.waitForPageToFullyLoad();
+
+    // If no skills or Topics is created than skills tab will not be present.
     const isTextPresent = await this.isTextPresentOnPage(
       'No topics or skills have been created yet.'
     );
+
     if (isTextPresent) {
       showMessage(`The skill "${skillName}" is not present on the Topics and Skills
       Dashboard as expected.`);
       return;
     }
+
+    // Visiting the skills tab to check if the skill is present.
     await this.clickOn(skillsTab);
     const isSkillPresent = await this.isTextPresentOnPage(skillName);
     if (isSkillPresent) {
@@ -1525,11 +1533,11 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.createTopic(
       topicName,
-      topicName.toLowerCase().replace(' ', '-')
+      topicName.toLowerCase().replace(/ /g, '-')
     );
     await this.createSubtopicForTopic(
       subtopicName,
-      subtopicName.toLowerCase().replace(' ', '-'),
+      subtopicName.toLowerCase().replace(/ /g, '-'),
       topicName
     );
 

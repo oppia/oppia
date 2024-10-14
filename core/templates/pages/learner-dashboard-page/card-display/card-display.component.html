@@ -11,15 +11,11 @@
     </div>
   </div>
   <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-  <div class="d-flex card-display-content-container pb-1 mb-n1" #cards>
+  <div class="d-flex card-display-content-container pb-1 mb-n1" [ngClass]="getVisibility()" #cards>
     <ng-content></ng-content>
   </div>
-  <!--TODO(#18384): Implement view more for progress tab (styling)-->
-  <!--TODO(#18384): Hide when there's enough space for all cards etc-->
-  <button *ngIf="!tabType.includes('home')" class="align-self-end card-display-more-button mt-4">
-    {{ 'I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON' | translate }}
-    <span class="fas fa-chevron-down ml-2"></span>
-  </button>
+  <!--TODO(#18384): Delete I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON key-->
+  <oppia-content-toggle-button *ngIf="toggleButtonVisibility" (contentToggleEmitter)="handleToggleState($event)"> </oppia-content-toggle-button>
 </div>
 
 <style>
@@ -49,24 +45,25 @@
     background-color: #429488;
   }
 
-  .card-display-more-button {
-    align-items: center;
-    background-color: #fff;
-    border: none;
-    border-radius: .25em;
-    color: #00645c;
-    display: flex;
-    font-weight: 500;
-    justify-content: center;
-    padding: 8px;
-  }
-
   .card-display-content-container {
     display: flex;
     gap: 0 16px;
     max-width: 100%;
     overflow-x: hidden;
     padding: .5px;
+  }
+
+  .card-display-content-hidden {
+    flex-wrap: wrap;
+    gap: 16px 16px;
+    height: 289px;
+    overflow-y: hidden;
+  }
+
+  .card-display-content-shown {
+    flex-wrap: wrap;
+    gap: 16px 16px;
+    height: 100%;
   }
 
   .card-display-heading {

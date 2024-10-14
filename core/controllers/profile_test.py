@@ -662,6 +662,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
         ]
     )
     def test_send_post_signup_email(self) -> None:
@@ -1092,6 +1096,18 @@ class SignupTests(test_utils.GenericTestBase):
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_user_settings_of_existing_user(self) -> None:
@@ -1153,10 +1169,12 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_email_provider_error(self) -> None:
-        def raise_exception() -> None:
+        def mock_add_user_to_raise_exception(
+                unused_email: str, unused_tag: str, name: str) -> None:
             raise Exception('Backend error')
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_mailing_list', raise_exception)
+            user_services, 'add_user_to_mailing_list',
+            mock_add_user_to_raise_exception)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
