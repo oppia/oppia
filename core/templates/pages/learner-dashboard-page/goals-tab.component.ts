@@ -292,13 +292,14 @@ export class GoalsTabComponent implements OnInit {
 
   openModal(): void {
     const dialogConfig = new MatDialogConfig();
+    const allTopics = this.editGoals.reduce(
+      (obj, item) => ((obj[item.id] = item.name), obj),
+      {}
+    );
     dialogConfig.data = {
       checkedTopics: this.checkedTopics,
       completedTopics: this.completedTopics,
-      topics: this.editGoals.reduce(
-        (obj, item) => ((obj[item.id] = item.name), obj),
-        {}
-      ),
+      topics: allTopics,
     };
 
     dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';

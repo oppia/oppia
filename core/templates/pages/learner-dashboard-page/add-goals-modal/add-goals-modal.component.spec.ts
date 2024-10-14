@@ -18,22 +18,23 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
-import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AddGoalsModalComponent} from './add-goals-modal.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {By} from '@angular/platform-browser';
+import {of} from 'rxjs';
 const data = {
   checkedTopics: new Set(),
   completedTopics: new Set(),
   topics: {
-    Addition: '0',
-    Subtraction: '1',
-    Multiplication: '2',
-    Division: '3',
-    Fractions: '4',
-    Exponents: '5',
+    0: 'Addition',
+    1: 'Subtraction',
+    2: 'Multiplication',
+    3: 'Divsion',
+    4: 'Fractions',
+    5: 'Exponents',
   },
 };
 
@@ -42,7 +43,11 @@ describe('AddGoalsModalComponent', () => {
   let fixture: ComponentFixture<AddGoalsModalComponent>;
   let matDialogSpy: jasmine.SpyObj<MatDialogRef<AddGoalsModalComponent>>;
   beforeEach(waitForAsync(() => {
-    matDialogSpy = jasmine.createSpyObj('MatDialogRef', []);
+    matDialogSpy = jasmine.createSpyObj('MatDialogRef', [
+      'close',
+      'afterClosed',
+    ]);
+    matDialogSpy.afterClosed.and.returnValue(of(true));
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
       providers: [
@@ -64,6 +69,7 @@ describe('AddGoalsModalComponent', () => {
     fixture = TestBed.createComponent(AddGoalsModalComponent);
     component = fixture.componentInstance;
     data.checkedTopics = new Set();
+    data.completedTopics = new Set();
     fixture.detectChanges();
   });
 
@@ -72,27 +78,22 @@ describe('AddGoalsModalComponent', () => {
     expect(component.checkedTopics).toEqual(new Set());
     expect(component.completedTopics).toEqual(new Set());
     expect(component.topics).toEqual({
-      Addition: '0',
-      Subtraction: '2',
-      Multiplication: '3',
-      Division: '4',
-      Fractions: '5',
-      Exponents: '6',
+      0: 'Addition',
+      1: 'Subtraction',
+      2: 'Multiplication',
+      3: 'Divsion',
+      4: 'Fractions',
+      5: 'Exponents',
     });
     const checkboxes = fixture.debugElement.queryAll(By.css('mat-checkbox'));
 
     checkboxes.forEach(box => expect(box.nativeElement.checked).toBeFalse());
   });
 
-  it('should intialize checked boxes of previously selected goals when component is created', () => {
-    TestBed.overrideProvider(MAT_DIALOG_DATA, {
-      useValue: {...data, checkedTopics: new Set(['0', '2'])},
-    });
-    fixture = TestBed.createComponent(AddGoalsModalComponent);
-    component = fixture.componentInstance;
+  it('should intialize checked boxes of previously selected goals', () => {
+    component.checkedTopics = new Set(['0', '2']);
     fixture.detectChanges();
 
-    expect(component.checkedTopics).toEqual(new Set(['0', '2']));
     const checkboxes = fixture.debugElement.queryAll(By.css('mat-checkbox'));
     expect(checkboxes[0].nativeElement.checked).toBeTrue();
     expect(checkboxes[2].nativeElement.checked).toBeTrue();
@@ -103,8 +104,8 @@ describe('AddGoalsModalComponent', () => {
       By.css('mat-checkbox:first-child')
     );
     expect(firstCheckbox.nativeElement.checked).toBeFalse();
-    spyOn(component, 'onChange');
-    firstCheckbox.triggerEventHandler('change', '0');
+    spyOn(component, 'onChange').and.callThrough();
+    firstCheckbox.triggerEventHandler('change', {target: {checked: true}});
 
     fixture.detectChanges();
 
@@ -121,8 +122,8 @@ describe('AddGoalsModalComponent', () => {
     fixture.detectChanges();
     expect(firstCheckbox.nativeElement.checked).toBeTrue();
 
-    spyOn(component, 'onChange');
-    firstCheckbox.triggerEventHandler('change', '0');
+    spyOn(component, 'onChange').and.callThrough();
+    firstCheckbox.triggerEventHandler('change', {target: {checked: false}});
     fixture.detectChanges();
 
     expect(component.onChange).toHaveBeenCalledWith('0');
@@ -137,7 +138,7 @@ describe('AddGoalsModalComponent', () => {
     );
     fixture.detectChanges();
 
-    expect(firstCheckbox.nativeElement.checked).toBeTrue();
+    expect(firstCheckbox.nativeElement.checked).toBeFalse();
     expect(firstCheckbox.nativeElement.disabled).toBeTrue();
   });
 
@@ -158,10 +159,10 @@ describe('AddGoalsModalComponent', () => {
     expect(component.checkedTopics).toEqual(new Set());
 
     const checkboxes = fixture.debugElement.queryAll(By.css('mat-checkbox'));
-    spyOn(component, 'onChange');
-    checkboxes[1].nativeElement.triggerEventHandler('change', '1');
-    checkboxes[2].nativeElement.triggerEventHandler('change', '2');
-    checkboxes[2].nativeElement.triggerEventHandler('change', '3');
+    spyOn(component, 'onChange').and.callThrough();
+    checkboxes[1].triggerEventHandler('change', {target: {checked: true}});
+    checkboxes[2].triggerEventHandler('change', {target: {checked: true}});
+    checkboxes[3].triggerEventHandler('change', {target: {checked: true}});
     fixture.detectChanges();
 
     expect(component.onChange).toHaveBeenCalledTimes(3);
@@ -184,11 +185,7 @@ describe('AddGoalsModalComponent', () => {
   });
 
   it('should return previously selected goals if there is no change when save is clicked', () => {
-    TestBed.overrideProvider(MAT_DIALOG_DATA, {
-      useValue: {...data, checkedTopics: new Set(['0', '2'])},
-    });
-    fixture = TestBed.createComponent(AddGoalsModalComponent);
-    component = fixture.componentInstance;
+    component.checkedTopics = new Set(['0', '2']);
     fixture.detectChanges();
 
     const saveButton = fixture.debugElement.query(
@@ -204,16 +201,12 @@ describe('AddGoalsModalComponent', () => {
   });
 
   it('should remove a goal id and return goals without it when save is clicked', () => {
-    TestBed.overrideProvider(MAT_DIALOG_DATA, {
-      useValue: {...data, checkedTopics: new Set(['0', '2'])},
-    });
-    fixture = TestBed.createComponent(AddGoalsModalComponent);
-    component = fixture.componentInstance;
+    component.checkedTopics = new Set(['0', '2']);
     fixture.detectChanges();
 
     const checkboxes = fixture.debugElement.queryAll(By.css('mat-checkbox'));
-    spyOn(component, 'onChange');
-    checkboxes[2].nativeElement.triggerEventHandler('change', '2');
+    spyOn(component, 'onChange').and.callThrough();
+    checkboxes[2].triggerEventHandler('change', {target: {checked: false}});
     fixture.detectChanges();
 
     const saveButton = fixture.debugElement.query(
