@@ -199,13 +199,19 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
         backdrop: 'static',
       }
     );
+
+    const userGroupToDelete = this.userGroups.find(
+      userGroup => userGroup.userGroupId === userGroupId
+    );
+    if (!userGroupToDelete) {
+      this.statusMessage = `User group with id '${userGroupId}' not found.`;
+      return;
+    }
+
     modalRef.result.then(
       () => {
         this.backendApiService.deleteUserGroupAsync(userGroupId).then(
           () => {
-            const userGroupToDelete = this.userGroups.find(
-              userGroup => userGroup.userGroupId === userGroupId
-            );
             this.statusMessage = `User group '${userGroupToDelete.name}' successfully deleted.`;
             this.userGroups = this.userGroups.filter(
               userGroup => userGroup.userGroupId !== userGroupId

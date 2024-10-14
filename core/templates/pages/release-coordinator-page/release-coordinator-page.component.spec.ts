@@ -526,6 +526,26 @@ describe('Release coordinator page', () => {
       ).toBeTrue();
     }));
 
+    it('should set error message when user group not found', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.resolve(),
+      } as NgbModalRef);
+      component.deleteUserGroup('userGroupId10');
+
+      expect(
+        component.userGroups.some(
+          userGroup => userGroup.userGroupId === 'UserGroup10'
+        )
+      ).toBeFalse();
+      expect(component.statusMessage).toBe(
+        "User group with id 'userGroupId10' not found."
+      );
+    }));
+
     it('should not be removed in case of backend error', fakeAsync(() => {
       component.ngOnInit();
       tick();
@@ -628,7 +648,7 @@ describe('Release coordinator page', () => {
         const userGroup = UserGroup.createFromBackendDict({
           user_group_id: 'userGroupId8',
           name: 'UserGroup8',
-          users: [],
+          member_usernames: [],
         });
         spyOn(rcbas, 'createUserGroupAsync').and.returnValue(
           Promise.resolve(userGroup)
