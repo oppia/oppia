@@ -1,4 +1,4 @@
-<div> 
+<div>
   <div *ngIf="!learnerDashboardRedesignFeatureFlag" tabindex="0" class="oppia-goals-box e2e-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
     <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
     </p>
@@ -10,26 +10,26 @@
             <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
           </div>
           <div #dropdown class="oppia-three-dots-dropdown-container"
-              (keydown.enter)="toggleThreeDotsDropdown(i)"
-              role="button"
-              aria-label="More options"
-              tabindex="0"
-              (click)="toggleThreeDotsDropdown(i)">
+               (keydown.enter)="toggleThreeDotsDropdown(i)"
+               role="button"
+               aria-label="More options"
+               tabindex="0"
+               (click)="toggleThreeDotsDropdown(i)">
             <i class="fa fa-ellipsis-v"></i>
             <div *ngIf="indexOfSelectedTopic == i" class="oppia-three-dots-dropdown">
               <div class="oppia-trash-button"
-                  (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)"
-                  tabindex="0"
-                  (keydown.enter)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
+                   (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)"
+                   tabindex="0"
+                   (keydown.enter)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
                 <i class="fa fa-trash"></i>
                 <span>{{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}</span>
               </div>
             </div>
           </div>
           <label class="oppia-current-goals-topic-name e2e-test-topic-name-in-current-goals"
-                (click)="toggleStory(i)"
-                (keydown.enter)="toggleStory(i)"
-                tabindex="0">
+                 (click)="toggleStory(i)"
+                 (keydown.enter)="toggleStory(i)"
+                 tabindex="0">
             <span [innerHTML]="'I18N_LEARN_TOPIC' | translate: { topicName: topic.name }"></span>
           </label>
           <p class="oppia-goals-story-name">
@@ -56,8 +56,8 @@
       </span>
       <div class="oppia-edit-goals-subheading">
         <img [src]="pawImageUrl"
-            alt="paw image"
-            class="oppia-svg-paw-image">
+             alt="paw image"
+             class="oppia-svg-paw-image">
         <p class="oppia-edit-goals-topic-title"><span [innerHTML]="'I18N_TOPIC_TITLE' | translate"></span></p>
         <p class="oppia-edit-goals-learn-title"><span [innerHTML]="'I18N_TOPIC_LEARN' | translate"></span></p>
       </div>
@@ -89,7 +89,7 @@
           <div class="oppia-completed-goals-content">
             <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image">
             <a [href]="completedGoalsTopicPageUrl[i]"
-              class="oppia-completed-goals-topic-name e2e-test-completed-goals-topic-name">
+               class="oppia-completed-goals-topic-name e2e-test-completed-goals-topic-name">
               <span [innerHTML]="'I18N_LEARNT_TOPIC' | translate: { topicName: topic.name }"></span>
             </a>
             <div *ngFor="let story of topic.storyTitles">
@@ -107,13 +107,13 @@
   </div>
   <div *ngIf="learnerDashboardRedesignFeatureFlag">
     <h2 class="oppia-learner-dash-greeting">  {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING' | translate: {username: username} }} </h2>
-    <div class="oppia-learner-dash-section d-flex justify-content-between"> 
+    <div class="oppia-learner-dash-section d-flex justify-content-between">
       <p class="oppia-learner-dash-goals-text mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS' | translate }} </p>
       <!--TODO(#18384): Check to see if text is part of button (text changes when hover too)-->
       <button class="oppia-learner-dash-button--add-goals align-items-center flex-grow-1 d-flex justify-content-center bg-white border-0" (click)="openModal()">
-          <span class="oppia-learner-dash-goals-add-circle">
-            <span class="fas fa-plus"></span>
-          </span>
+        <span class="oppia-learner-dash-goals-add-circle">
+          <span class="fas fa-plus"></span>
+        </span>
         <span class="oppia-learner-dash-goals-add-text">{{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_ADD_BUTTON' | translate }} </span>
       </button>
     </div>

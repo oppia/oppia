@@ -10,8 +10,8 @@
                     (change)="onChange(t.key)"
                     [checked]="checkedTopics.has(t.key)"
                     [disabled]="checkedTopics.length === 5 && !checkedTopics.has(t.key) || completedTopics.has(t.key)">
-      {{ t.value }}
-    </mat-checkbox>
+                    {{ t.value }}
+      </mat-checkbox>
     </ng-container>
   </div>
   <div class="oppia-learner-dash-goals-modal-actions w-100" mat-dialog-actions>
@@ -21,7 +21,6 @@
 </div>
 
 <style>
-  
 .oppia-learner-dash-goals-button--modal {
   height: 44px;
   width: 178px;
@@ -35,7 +34,7 @@
 .oppia-learner-dash-goals-modal-content {
   display: grid;
   gap: 0 4px;
-  grid-template-columns: repeat(3, 1fr); 
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: auto;
   height: 100%;
   padding-top: 12px;
@@ -49,8 +48,8 @@
 }
 
 .oppia-learner-dash-goals-modal-title {
-  font-weight: 500;
   font-size: 20px;
+  font-weight: 500;
   text-align: center;
 }
 
@@ -70,12 +69,12 @@
     width: 147px;
   }
 
-  .oppia-learner-dash-goals-modal-content{
+  .oppia-learner-dash-goals-modal-content {
     align-items: center;
     display: flex;
     flex-direction: column;
-    height: fit-content;
     gap: 12px 0;
+    height: fit-content;
     padding: 12px;
   }
 }
@@ -86,8 +85,9 @@
     justify-content: center;
   }
 
-  .oppia-learner-dash-goals-modal-content{
-    grid-template-columns: repeat(2, 1fr); 
+  .oppia-learner-dash-goals-modal-content {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
+x
 </style>
