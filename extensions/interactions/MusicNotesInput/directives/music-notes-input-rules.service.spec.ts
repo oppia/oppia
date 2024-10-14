@@ -951,37 +951,5 @@ describe('Music Notes Input rules service', () => {
         }
       )
     ).toBe(false);
-
-    expect(
-      mnirs.HasLengthInclusivelyBetween(
-        [
-          {
-            readableNoteName: 'C4',
-            noteDuration: {
-              num: 1,
-              den: 1,
-            },
-          },
-          {
-            readableNoteName: 'D4',
-            noteDuration: {
-              num: 1,
-              den: 1,
-            },
-          },
-          {
-            readableNoteName: 'E4',
-            noteDuration: {
-              num: 1,
-              den: 1,
-            },
-          },
-        ],
-        {
-          a: 7,
-          b: 2,
-        }
-      )
-    ).toBe(false);
   });
 });

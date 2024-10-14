@@ -67,14 +67,11 @@ export class MusicNotesInputRulesService {
     );
   }
 
+  // TODO(#20443): Validate that inputs.a <= inputs.b.
   HasLengthInclusivelyBetween(
     answer: MusicNotesAnswer[],
     inputs: {a: number; b: number}
   ): boolean {
-    // No need to check the actual length if inputs.a is greater than inputs.b in comparison.
-    if (inputs.a > inputs.b) {
-      return false;
-    }
     var answerLength: number =
       MusicNotesInputRulesService._convertSequenceToMidi(answer).length;
     return answerLength >= inputs.a && answerLength <= inputs.b;
