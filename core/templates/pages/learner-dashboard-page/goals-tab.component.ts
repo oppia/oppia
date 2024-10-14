@@ -298,8 +298,8 @@ export class GoalsTabComponent implements OnInit {
   openModal(): void {
     const dialogConfig = new MatDialogConfig();
     const allTopics: {[id: string]: string} = this.editGoals.reduce(
-      (obj, item) => ((obj[item.id] = item.name), obj),
-      {}
+      (obj: {[id: string]: string}, item) => ((obj[item.id] = item.name), obj),
+      {} as {[id: string]: string}
     );
     dialogConfig.data = {
       checkedTopics: this.checkedTopics,
@@ -311,7 +311,12 @@ export class GoalsTabComponent implements OnInit {
     const dialogRef = this.dialog.open(AddGoalsModalComponent, dialogConfig);
 
     const allTopicSummarys: {[id: string]: LearnerTopicSummary} =
-      this.editGoals.reduce((obj, item) => ((obj[item.id] = item), obj), {});
+      this.editGoals.reduce(
+        (obj: {[id: string]: LearnerTopicSummary}, item) => (
+          (obj[item.id] = item), obj
+        ),
+        {} as {[id: string]: LearnerTopicSummary}
+      );
     dialogRef.afterClosed().subscribe(async newGoalTopics => {
       if (newGoalTopics) {
         for (const topicId of newGoalTopics) {
