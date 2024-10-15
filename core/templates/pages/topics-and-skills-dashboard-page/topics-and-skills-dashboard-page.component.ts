@@ -30,11 +30,16 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ETopicPublishedOptions, TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
 import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboard-page.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 type TopicPublishedOptionsKeys = (
   keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
+type TopicStatusOptionsKeys = (
+  keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
 type TopicSortOptionsKeys = (
   keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS);
+type TopicSortingOptionsKeys = (
+  keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS);
 type SkillStatusOptionsKeys = (
   keyof typeof TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS);
 
@@ -96,7 +101,8 @@ export class TopicsAndSkillsDashboardPageComponent {
     TopicsAndSkillsDashboardBackendApiService,
     private topicsAndSkillsDashboardPageService:
     TopicsAndSkillsDashboardPageService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -110,11 +116,33 @@ export class TopicsAndSkillsDashboardPageComponent {
           key as TopicSortOptionsKeys]);
     }
 
+    if (this.platformFeatureService.status.
+      SerialChapterLaunchCurriculumAdminView.isEnabled) {
+      this.sortOptions = [];
+      for (let key in TopicsAndSkillsDashboardPageConstants
+        .TOPIC_SORTING_OPTIONS) {
+        this.sortOptions.push(
+          TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS[
+              key as TopicSortingOptionsKeys]);
+      }
+    }
+
     for (let key in TopicsAndSkillsDashboardPageConstants
       .TOPIC_PUBLISHED_OPTIONS) {
       this.statusOptions.push(
         TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS[
           key as TopicPublishedOptionsKeys]);
+    }
+
+    if (this.platformFeatureService.status.
+      SerialChapterLaunchCurriculumAdminView.isEnabled) {
+      this.statusOptions = [];
+      for (let key in TopicsAndSkillsDashboardPageConstants
+        .TOPIC_STATUS_OPTIONS) {
+        this.statusOptions.push(
+          TopicsAndSkillsDashboardPageConstants.TOPIC_STATUS_OPTIONS[
+                key as TopicStatusOptionsKeys]);
+      }
     }
 
     this.fetchSkillsDebounced = debounce(this.fetchSkills, 300);

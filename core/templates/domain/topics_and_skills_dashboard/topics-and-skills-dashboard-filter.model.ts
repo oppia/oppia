@@ -19,7 +19,9 @@
 
 import {
   ETopicPublishedOptions,
+  ETopicStatusOptions,
   ETopicSortOptions,
+  ETopicSortingOptions,
   TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
@@ -27,19 +29,20 @@ import {
 export class TopicsAndSkillsDashboardFilter {
   classroom: string;
   keywords: string[];
-  sort: ETopicSortOptions;
-  status: ETopicPublishedOptions;
+  sort: ETopicSortOptions | ETopicSortingOptions;
+  status: ETopicPublishedOptions | ETopicStatusOptions;
 
   /**
    * @param {String} classroom - classroom to filter for.
    * @param {String[]} keywords - keywords to filter for.
    * @param {ETopicSortOptions} sort - One of the values in ETopicSortOptions.
-   * @param {ETopicPublishedOptions} status - One of the values
-   *   in ETopicPublishedOptions.
+   * @param {ETopicPublishedOptions | ETopicStatusOptions} status - One of the
+   *   calues in ETopicPublishedOptions or ETopicStatusOptions.
    */
   constructor(
       classroom: string, keywords: string[],
-      sort: ETopicSortOptions, status: ETopicPublishedOptions) {
+      sort: ETopicSortOptions | ETopicSortingOptions,
+      status: ETopicPublishedOptions | ETopicStatusOptions) {
     this.classroom = classroom;
     this.keywords = keywords;
     this.sort = sort;

@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardPageService.
  */
 
-import { ETopicPublishedOptions, ETopicSortOptions } from
-// eslint-disable-next-line max-len
+import { ETopicPublishedOptions, ETopicSortOptions,
+  ETopicSortingOptions, ETopicStatusOptions } from
+  // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
@@ -27,15 +28,31 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { CreatorTopicSummary } from
   'domain/topic/creator-topic-summary.model';
+import { PlatformFeatureService } from '../../services/platform-feature.service';
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService;
+  let platformFeatureService : PlatformFeatureService;
 
   beforeEach(() => {
     tsds = new TopicsAndSkillsDashboardPageService();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
   });
 
-  it('should filter the topics', () => {
+  fit('should filter the topics', () => {
+    spyOnProperty(platformFeatureService, 'status').and.returnValue(
+      {
+        SerialChapterLaunchCurriculumAdminView: {
+          isEnabled: false
+        }
+      }
+    );
+
     const topic1 = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1581839432987.596,
       uncategorized_skill_count: 0,
@@ -129,6 +146,26 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2]);
 
+    spyOnProperty(platformFeatureService, 'status').and.returnValue(
+      {
+        SerialChapterLaunchCurriculumAdminView: {
+          isEnabled: true
+        }
+      }
+    );
+
+    filterOptions.status = ETopicStatusOptions.FullyPublished;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic3]);
+
+    filterOptions.status = ETopicStatusOptions.NotPublished;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic2]);
+
+    filterOptions.status = ETopicStatusOptions.PartiallyPublished;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic1]);
+
     filterOptions.status = ETopicPublishedOptions.All;
     filterOptions.sort = ETopicSortOptions.IncreasingUpdatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
@@ -143,6 +180,14 @@ describe('Topic and Skill dashboard page service', () => {
     expect(filteredArray).toEqual([topic3, topic2, topic1]);
 
     filterOptions.sort = ETopicSortOptions.DecreasingCreatedOn;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic1, topic2, topic3]);
+
+    filterOptions.sort = ETopicSortingOptions.DecreasingUpcomingLaunches;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic2, topic1, topic3]);
+
+    filterOptions.sort = ETopicSortOptions.DecreasingOverdueLaunches;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 

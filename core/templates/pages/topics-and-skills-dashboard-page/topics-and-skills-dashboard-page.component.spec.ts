@@ -30,10 +30,19 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboard-page.service';
+import { PlatformFeatureService } from '../../services/platform-feature.service';
 
 /**
  * @fileoverview Unit tests for the topics and skills dashboard component.
  */
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('Topics and skills dashboard page component', () => {
   let fixture: ComponentFixture<TopicsAndSkillsDashboardPageComponent>;
@@ -45,6 +54,7 @@ describe('Topics and skills dashboard page component', () => {
   let topicCreationService: TopicCreationService;
   let createNewSkillModalService: CreateNewSkillModalService;
   let topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -61,7 +71,11 @@ describe('Topics and skills dashboard page component', () => {
         TopicCreationService,
         TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService,
-        WindowDimensionsService
+        WindowDimensionsService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

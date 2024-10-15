@@ -24,10 +24,26 @@ export enum ETopicSortOptions {
   DecreasingUpdatedOn = 'Least Recently Updated',
 }
 
+export enum ETopicSortingOptions {
+  IncreasingCreatedOn = 'Newly Created',
+  DecreasingCreatedOn = 'Oldest Created',
+  IncreasingUpdatedOn = 'Most Recently Updated',
+  DecreasingUpdatedOn = 'Least Recently Updated',
+  DecreasingUpcomingLaunches = 'Most Upcoming Launches',
+  DecreasingOverdueLaunches = 'Most Launches Behind Schedule'
+}
+
 export enum ETopicPublishedOptions {
   All = 'All',
   Published = 'Published',
   NotPublished = 'Not Published'
+}
+
+export enum ETopicStatusOptions {
+  All = 'All',
+  FullyPublished = 'Fully Published',
+  PartiallyPublished = 'Partially Published',
+  NotPublished = 'Not Published',
 }
 
 export const TopicsAndSkillsDashboardPageConstants = {
@@ -38,7 +54,10 @@ export const TopicsAndSkillsDashboardPageConstants = {
   },
   TOPIC_SORT_OPTIONS: (
     AppConstants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS),
+  TOPIC_SORTING_OPTIONS: (
+    AppConstants.TOPIC_SKILL_DASHBOARD_SORTING_OPTIONS),
   TOPIC_PUBLISHED_OPTIONS: ETopicPublishedOptions,
+  TOPIC_STATUS_OPTIONS: ETopicStatusOptions,
   TOPIC_FILTER_CLASSROOM_ALL: 'All',
   SKILL_STATUS_OPTIONS: AppConstants.SKILL_STATUS_OPTIONS
 } as const;

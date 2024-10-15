@@ -28,11 +28,17 @@ import { TopicsAndSkillsDashboardFilter } from
 import { TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { filter } from 'mathjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopicsAndSkillsDashboardPageService {
+  constructor(
+    private platformFeatureService: PlatformFeatureService
+  ) {}
+
   /**
    * @param {Array} topicsArray - The original topics array
    * @param {TopicsAndSkillsDashboardFilter} filterObject -
@@ -42,9 +48,12 @@ export class TopicsAndSkillsDashboardPageService {
   getFilteredTopics(
       topicsArray: CreatorTopicSummary[],
       filterObject: TopicsAndSkillsDashboardFilter): CreatorTopicSummary[] {
-    let ESortOptions = TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;
+    let ESortOptions = (
+      TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS);
     let EPublishedOptions = (
       TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
+    let EStatusOptions = (
+      TopicsAndSkillsDashboardPageConstants.TOPIC_STATUS_OPTIONS);
     let filteredTopics = topicsArray;
 
     if (filterObject.keywords.length) {
@@ -72,17 +81,49 @@ export class TopicsAndSkillsDashboardPageService {
     }
 
     if (filterObject.status !== EPublishedOptions.All) {
-      filteredTopics = filteredTopics.filter((topic) => {
-        if (filterObject.status === EPublishedOptions.Published &&
-            topic.isPublished) {
-          return true;
-        } else if (
-          filterObject.status === EPublishedOptions.NotPublished &&
+      if (this.platformFeatureService.status.
+        SerialChapterLaunchCurriculumAdminView.isEnabled) {
+        filteredTopics = filteredTopics.filter((topic) => {
+          let fullyPublishedStoriesCount = 0;
+          let totalStories = topic.getTotalChaptersCounts().length;
+
+          for (let i = 0; i < totalStories; i++) {
+            if (topic.getTotalChaptersCounts()[i] ===
+                topic.getPublishedChaptersCounts()[i]) {
+              fullyPublishedStoriesCount++;
+            }
+          }
+          if (filterObject.status === EStatusOptions.FullyPublished &&
+                  totalStories &&
+                  totalStories === fullyPublishedStoriesCount &&
+                  topic.isPublished) {
+            return true;
+          } else if (
+            filterObject.status === EStatusOptions.PartiallyPublished && (
+                    !totalStories ||
+                    totalStories !== fullyPublishedStoriesCount) &&
+                    topic.isPublished) {
+            return true;
+          } else if (
+            filterObject.status === EStatusOptions.NotPublished &&
             !topic.isPublished) {
-          return true;
-        }
-        return false;
-      });
+            return true;
+          }
+          return false;
+        });
+      } else {
+        filteredTopics = filteredTopics.filter((topic) => {
+          if (filterObject.status === EPublishedOptions.Published &&
+            topic.isPublished) {
+            return true;
+          } else if (
+            filterObject.status === EPublishedOptions.NotPublished &&
+                    !topic.isPublished) {
+            return true;
+          }
+          return false;
+        });
+      }
     }
 
     switch (filterObject.sort) {
@@ -101,6 +142,16 @@ export class TopicsAndSkillsDashboardPageService {
       case ESortOptions.DecreasingCreatedOn:
         filteredTopics.sort(
           (a, b) => -(b.topicModelLastUpdated - a.topicModelLastUpdated));
+        break;
+      case ESortOptions.DecreasingUpcomingLaunches:
+        filteredTopics.sort(
+          (a, b) => -(a.totalUpcomingChaptersCount -
+            b.totalUpcomingChaptersCount));
+        break;
+      case ESortOptions.DecreasingOverdueLaunches:
+        filteredTopics.sort(
+          (a, b) => -(a.totalOverdueChaptersCount -
+            b.totalOverdueChaptersCount));
         break;
       default:
         throw new Error('Invalid filter by sort value provided.');
