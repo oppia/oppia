@@ -1225,6 +1225,25 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id, config_mappings[self.CONFIG_1_ID])
 
+    def test_remove_user_from_user_groups(self) -> None:
+        user_group_model = user_models.UserGroupModel(
+            id='group_1',
+            name='Test Group',
+            user_ids=[self.user_1_id, self.user_2_id]
+        )
+        user_group_model.put()
+
+        existing_user_group_model = user_models.UserGroupModel.get_by_id(
+            'group_1')
+        self.assertIn(self.user_1_id, existing_user_group_model.user_ids)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        updated_user_group_model = user_models.UserGroupModel.get_by_id(
+            'group_1')
+        self.assertNotIn(self.user_1_id, updated_user_group_model.user_ids)
+
     def test_one_config_property_when_the_deletion_is_repeated_is_pseudonymized(
         self
     ) -> None:

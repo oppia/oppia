@@ -50,6 +50,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import auth_models
     from mypy_imports import bulk_email_services
+    from mypy_imports import datastore_services
     from mypy_imports import suggestion_models
     from mypy_imports import transaction_services
     from mypy_imports import user_models
@@ -64,6 +65,7 @@ if MYPY: # pragma: no cover
 )
 
 bulk_email_services = models.Registry.import_bulk_email_services()
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -497,6 +499,167 @@ def get_user_settings_by_auth_id(
         raise Exception('User not found.')
     else:
         return None
+
+
+def get_all_user_groups() -> List[user_domain.UserGroup]:
+    """Return the list of user groups.
+
+    Returns:
+        List[user_domain.UserGroup]. List of all user groups.
+    """
+    user_group_models: List[user_models.UserGroupModel] = list(
+        user_models.UserGroupModel.get_all())
+    user_groups_list = []
+    for user_group_model in user_group_models:
+        member_usernames: List[str] = []
+        user_ids = user_group_model.user_ids
+        user_settings_list = get_users_settings(user_ids, strict=True)
+        for user_id, user_settings in zip(user_ids, user_settings_list):
+            assert user_settings is not None, (
+                f'User settings for user ID {user_id} are None.'
+            )
+            assert user_settings.username is not None, (
+                f'Username for user ID {user_id} is None.'
+            )
+            member_usernames.append(user_settings.username)
+        user_group = user_domain.UserGroup(
+            user_group_model.id, user_group_model.name, member_usernames)
+        user_groups_list.append(user_group)
+    return user_groups_list
+
+
+def _check_if_usernames_are_valid(
+    name: str, member_usernames: List[str]
+) -> None:
+    """Checks if the given list of users are valid or not.
+
+    Args:
+        name: str. The name of the user group.
+        member_usernames: List[str]. The list of usernames for
+            which validation needs to be done.
+
+    Raises:
+        Exception. The member_usernames contains duplicates.
+        Exception. The user inside user group does not exist.
+    """
+    duplicates = [
+        username for username in member_usernames
+        if member_usernames.count(username) > 1
+    ]
+    duplicates = list(set(duplicates))
+    if len(duplicates) > 0:
+        raise Exception(
+            f'Users list of user-group {name} contains ' +
+            f'duplicates: {duplicates}.'
+        )
+
+    filters = [
+        user_models.UserSettingsModel.username == username
+        for username in member_usernames
+    ]
+    existing_users_settings: Sequence[user_models.UserSettingsModel] = (
+        user_models.UserSettingsModel.query(
+            datastore_services.any_of(*filters)
+        ).fetch()
+    )
+    existing_members_usernames = [
+        user_settings.username for user_settings in existing_users_settings
+    ]
+    invalid_usernames = [
+        username for username in member_usernames
+        if username not in existing_members_usernames
+    ]
+
+    if len(invalid_usernames) > 0:
+        raise Exception(
+            f'Following users of user-group {name} ' +
+            f'does not exist: {invalid_usernames}.')
+
+
+def create_new_user_group(
+    name: str, member_usernames: List[str]
+) -> user_domain.UserGroup:
+    """Create new user group.
+
+    Args:
+        name: str. The name of the user group.
+        member_usernames: List[str]. The user usernames associated with
+            the user group.
+
+    Returns:
+        UserGroup. The new user group.
+    """
+    if len(member_usernames) > 0:
+        _check_if_usernames_are_valid(name, member_usernames)
+    user_group_id = user_models.UserGroupModel.get_new_id('')
+    user_group = user_domain.UserGroup(
+        user_group_id, name, member_usernames)
+    user_group.validate()
+
+    user_ids = get_multi_user_ids_from_usernames(member_usernames)
+
+    user_models.UserGroupModel(
+        id=user_group.user_group_id,
+        name=user_group.name,
+        user_ids=user_ids
+    ).put()
+    return user_group
+
+
+def delete_user_group(user_group_id: str) -> None:
+    """Delete the user group with specified id.
+
+    Args:
+        user_group_id: str. The id of the user group to delete.
+
+    Raises:
+        Exception. The user group trying to delete does not exist.
+    """
+    user_group_model = user_models.UserGroupModel.get(
+        user_group_id, strict=False)
+    if user_group_model is None:
+        raise Exception(f'User group with id {user_group_id} does not exist.')
+    assert user_group_model is not None
+    user_group_model.delete()
+
+
+def update_user_group(
+    user_group_id: str,
+    name: str,
+    member_usernames: List[str]
+) -> None:
+    """Updates the user group.
+
+    Args:
+        user_group_id: str. The user group id.
+        name: str. The new name of the user group if needs to
+            be updated else old name of the user group.
+        member_usernames: List[str]. The list of user usernames for
+            the specified user group.
+
+    Raises:
+        Exception. The user group trying to update does not exist.
+    """
+    user_group_model = user_models.UserGroupModel.get(
+        user_group_id, strict=False)
+    if user_group_model is None:
+        raise Exception(f'User group {name} does not exist.')
+    assert user_group_model is not None
+
+    if len(member_usernames) > 0:
+        _check_if_usernames_are_valid(name, member_usernames)
+
+    user_group = user_domain.UserGroup(
+        user_group_id, name, member_usernames
+    )
+    user_group.validate()
+
+    user_ids = get_multi_user_ids_from_usernames(member_usernames)
+
+    user_group_model.user_ids = user_ids
+    user_group_model.name = name
+    user_group_model.update_timestamps()
+    user_group_model.put()
 
 
 def get_user_roles_from_id(user_id: str) -> List[str]:
