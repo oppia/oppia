@@ -236,9 +236,6 @@ def output_variable_to_github_workflow(
         print(f'{output_variable}={output_value}', file=o)
 
 
-# split tests into docker and python environments
-# docker tests are run in docker containers
-# python tests are run in the python environment
 def split_tests_by_docker(
         test_suites: Sequence[GenericTestSuiteDict]
 ) -> tuple[Sequence[GenericTestSuiteDict], Sequence[GenericTestSuiteDict]]:
@@ -262,7 +259,6 @@ def split_tests_by_docker(
         'docker': create_ci_test_suites_dict(docker_test_suites),
         'python': create_ci_test_suites_dict(python_test_suites)
     }
-
 
 
 def output_test_suites_to_run_to_github_workflow(
