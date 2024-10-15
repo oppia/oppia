@@ -21,8 +21,6 @@ import {RouterModule} from '@angular/router';
 import {ToastrModule} from 'ngx-toastr';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
-import {StoryEditorNavbarComponent} from './navbar/story-editor-navbar.component';
-import {StoryEditorNavbarBreadcrumbComponent} from './navbar/story-editor-navbar-breadcrumb.component';
 import {StoryEditorSaveModalComponent} from './modal-templates/story-editor-save-modal.component';
 import {StoryEditorUnpublishModalComponent} from './modal-templates/story-editor-unpublish-modal.component';
 import {DraftChapterConfirmationModalComponent} from './modal-templates/draft-chapter-confirmation-modal.component';
@@ -51,11 +49,9 @@ import {StoryEditorPageRootComponent} from './story-editor-page-root.component';
     ]),
   ],
   declarations: [
-    StoryEditorNavbarBreadcrumbComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     DraftChapterConfirmationModalComponent,
-    StoryEditorNavbarComponent,
     StoryNodeEditorComponent,
     StoryPreviewTabComponent,
     ChapterEditorTabComponent,
@@ -66,11 +62,9 @@ import {StoryEditorPageRootComponent} from './story-editor-page-root.component';
     StoryEditorPageRootComponent,
   ],
   entryComponents: [
-    StoryEditorNavbarBreadcrumbComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     DraftChapterConfirmationModalComponent,
-    StoryEditorNavbarComponent,
     StoryNodeEditorComponent,
     StoryPreviewTabComponent,
     ChapterEditorTabComponent,

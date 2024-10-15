@@ -134,7 +134,9 @@ export class BaseContentComponent {
   }
 
   toggleMobileNavOptions(): void {
+    console.log('before: ', this.mobileNavOptionsAreShown);
     this.mobileNavOptionsAreShown = !this.mobileNavOptionsAreShown;
+    console.log('after: ', this.mobileNavOptionsAreShown);
   }
 
   isBackgroundMaskActive(): boolean {
