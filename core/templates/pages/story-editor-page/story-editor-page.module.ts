@@ -16,7 +16,7 @@
  * @fileoverview Module for the story editor page.
  */
 
-import {NgModule} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {ToastrModule} from 'ngx-toastr';
 import {SharedComponentsModule} from 'components/shared-component.module';
@@ -37,6 +37,7 @@ import {StoryEditorPageRootComponent} from './story-editor-page-root.component';
 import {StoryEditorNavbarComponent} from './navbar/story-editor-navbar.component';
 import {StoryEditorNavbarBreadcrumbComponent} from './navbar/story-editor-navbar-breadcrumb.component';
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
