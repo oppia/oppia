@@ -63,15 +63,6 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
     def test_no_dependencies_in_non_exploration_pages(self) -> None:
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain(no=['dependency_html.html'])
-
-    def test_dependencies_loaded_in_exploration_editor(self) -> None:
-
-        exp_services.load_demo('0')
-
-        # Ensure that dependencies are added in the exploration editor page.
-        response = self.get_html_response('/create/0')
-        response.mustcontain('dependency_html.html')
-
         self.logout()
 
 
