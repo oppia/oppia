@@ -24,7 +24,6 @@ import os
 from core import feconf
 from core import schema_utils
 from core import utils
-from core.domain import exp_services
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
