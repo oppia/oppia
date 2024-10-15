@@ -695,6 +695,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.FEATURE_FLAGS_URL,
         release_coordinator.FeatureFlagsHandler),
+    get_redirect_route(
+        r'%s' % feconf.USER_GROUPS_HANDLER_URL,
+        release_coordinator.UserGroupHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
