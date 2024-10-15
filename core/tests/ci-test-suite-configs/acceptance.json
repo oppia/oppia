@@ -2,7 +2,8 @@
   "suites": [
     {
       "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts",
+      "use_docker": true
     },
     {
       "name": "blog-editor/create-and-publish-a-blog-post-with-required-details",

@@ -57,6 +57,7 @@ class GenericTestSuiteDict(TypedDict):
 
     name: str
     module: str
+    use_docker: Optional[bool]
 
 
 class LighthouseTestSuiteDict(GenericTestSuiteDict):
@@ -231,8 +232,38 @@ def output_variable_to_github_workflow(
         output_variable: str. The name of the output variable.
         output_value: str. The value of the output variable.
     """
-    with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
-        print(f'{output_variable}={output_value}', file=o)
+    # with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
+    #     print(f'{output_variable}={output_value}', file=o)
+    pass
+
+
+# split tests into docker and python environments
+# docker tests are run in docker containers
+# python tests are run in the python environment
+def split_tests_by_docker(
+        test_suites: Sequence[GenericTestSuiteDict]
+) -> tuple[Sequence[GenericTestSuiteDict], Sequence[GenericTestSuiteDict]]:
+    """Splits the test suites into Docker and Python environments.
+
+    Args:
+        test_suites: list(dict). The test suites to split.
+
+    Returns:
+        tuple(list(dict), list(dict)). The test suites split into Docker and
+        Python environments.
+    """
+    docker_test_suites = []
+    python_test_suites = []
+    for test_suite in test_suites.get('suites', []):
+        if test_suite.get('use_docker', False):
+            docker_test_suites.append(test_suite)
+        else:
+            python_test_suites.append(test_suite)
+    return {
+        'docker': create_ci_test_suites_dict(docker_test_suites),
+        'python': create_ci_test_suites_dict(python_test_suites)
+    }
+
 
 
 def output_test_suites_to_run_to_github_workflow(
@@ -246,7 +277,9 @@ def output_test_suites_to_run_to_github_workflow(
     """
     test_suites_to_run_output = {
         'e2e': test_suites_to_run['e2e'],
-        'acceptance': test_suites_to_run['acceptance'],
+        'acceptance': split_tests_by_docker(
+            test_suites_to_run['acceptance']
+        ),
         'lighthouse_performance':
             test_suites_to_run['lighthouse_performance'],
         'lighthouse_accessibility':
