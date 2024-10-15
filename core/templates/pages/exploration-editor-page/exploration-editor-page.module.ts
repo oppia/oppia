@@ -16,7 +16,7 @@
  * @fileoverview Module for the exploration editor page.
  */
 
-import {NgModule} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
 import {JoyrideModule} from 'ngx-joyride';
@@ -93,6 +93,7 @@ import {CommonModule} from '@angular/common';
 import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     RouterModule.forChild([
