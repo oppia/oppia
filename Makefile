@@ -81,7 +81,7 @@ install_hooks:  ## Install required hooks
 	bash ./docker/pre_commit_hook.sh --install
 
 clean: ## Cleans the docker containers and volumes.
-	docker rm $$(docker ps -aq --filter="name=dev-server-run-") || true
+	docker rm $$(docker ps -aq --filter "ancestor=oppia-dev-server") || true
 	docker compose down --rmi all --volumes
 
 shell.%: ## Opens a shell in the given docker service. Example: make shell.datastore
