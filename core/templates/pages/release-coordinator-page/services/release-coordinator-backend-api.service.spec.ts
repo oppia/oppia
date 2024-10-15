@@ -22,11 +22,20 @@ import {
 } from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import {ReleaseCoordinatorBackendApiService} from './release-coordinator-backend-api.service';
+import {ReleaseCoordinatorPageConstants} from '../release-coordinator-page.constants';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
 import {BeamJob} from 'domain/jobs/beam-job.model';
 import {BeamJobRunResult} from 'domain/jobs/beam-job-run-result.model';
+import {
+  UserGroup,
+  UserGroupBackendDict,
+} from 'domain/release_coordinator/user-group.model';
+import {
+  ReleaseCoordinatorBackendApiService,
+  UserGroupsResponse,
+  UserGroupsDict,
+} from './release-coordinator-backend-api.service';
 
 describe('Release coordinator backend api service', () => {
   let rcbas: ReleaseCoordinatorBackendApiService;
@@ -34,6 +43,23 @@ describe('Release coordinator backend api service', () => {
   let csrfService: CsrfTokenService;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
+  let userGroupResponse: UserGroupsResponse;
+  let sampleUserGroupBackendDict1: UserGroupBackendDict = {
+    user_group_id: 'UserGroup1ID',
+    name: 'UserGroup1',
+    member_usernames: ['User1', 'User2', 'User3'],
+  };
+  let sampleUserGroupBackendDict2: UserGroupBackendDict = {
+    user_group_id: 'UserGroup2ID',
+    name: 'UserGroup2',
+    member_usernames: ['User4', 'User5'],
+  };
+  let userGroupSampleData: UserGroupsDict = {
+    user_group_dicts: [
+      sampleUserGroupBackendDict1,
+      sampleUserGroupBackendDict2,
+    ],
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,6 +71,11 @@ describe('Release coordinator backend api service', () => {
     csrfService = TestBed.get(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
+    userGroupResponse = {
+      userGroups: userGroupSampleData.user_group_dicts.map(dict =>
+        UserGroup.createFromBackendDict(dict)
+      ),
+    };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
@@ -222,5 +253,160 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await resultPromise).toEqual(new BeamJobRunResult('123', '456'));
+  }));
+
+  it('should return all user groups', fakeAsync(() => {
+    rcbas.getUserGroupsAsync().then(function (response) {
+      expect(response).toEqual(userGroupResponse);
+    });
+    const req = httpTestingController.expectOne(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(userGroupSampleData);
+    flushMicrotasks();
+  }));
+
+  it('should fail to get all user groups in case of errors', fakeAsync(() => {
+    rcbas.getUserGroupsAsync().then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Failed to update username.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to update username.');
+  }));
+
+  it('should update the user group', fakeAsync(() => {
+    rcbas
+      .updateUserGroupAsync('UserGroup1ID', 'USERGROUP1', ['user1', 'user2'])
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to update the user group in case of errors', fakeAsync(() => {
+    rcbas
+      .updateUserGroupAsync('UserGroup1ID', 'USERGROUP1', ['user1', 'user2'])
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush(
+      {
+        error: 'Failed to update username.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to update username.');
+  }));
+
+  it('should delete the user group', fakeAsync(() => {
+    rcbas
+      .deleteUserGroupAsync('UserGroup1ID')
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL +
+        '?user_group_id=UserGroup1ID'
+    );
+    expect(req.request.method).toEqual('DELETE');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to delete the user group in case of errors', fakeAsync(() => {
+    rcbas
+      .deleteUserGroupAsync('UserGroup1ID')
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL +
+        '?user_group_id=UserGroup1ID'
+    );
+    expect(req.request.method).toEqual('DELETE');
+    req.flush(
+      {
+        error: 'Failed to update username.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to update username.');
+  }));
+
+  it('should create the user group', fakeAsync(() => {
+    rcbas
+      .createUserGroupAsync('UserGroup3', [])
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      user_group_dict: {
+        user_group_id: 'UserGroup3ID',
+        name: 'UserGroup3',
+        member_usernames: [],
+      },
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to create the user group in case of errors', fakeAsync(() => {
+    rcbas
+      .createUserGroupAsync('UserGroup3', [])
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: 'Failed to create user group.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to create user group.');
   }));
 });
