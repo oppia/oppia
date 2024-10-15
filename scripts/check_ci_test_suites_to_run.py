@@ -232,9 +232,8 @@ def output_variable_to_github_workflow(
         output_variable: str. The name of the output variable.
         output_value: str. The value of the output variable.
     """
-    # with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
-    #     print(f'{output_variable}={output_value}', file=o)
-    pass
+    with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
+        print(f'{output_variable}={output_value}', file=o)
 
 
 # split tests into docker and python environments
