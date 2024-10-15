@@ -1575,13 +1575,16 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         feedback_thread_model.put()
 
         user_group_model = user_models.UserGroupModel(
-            id='user_group_model', users=[self.USER_ID_1]
+            id='user_group_model',
+            name='user_group_name',
+            user_ids=[self.USER_ID_1]
         )
         user_group_model.put()
 
         expected_user_group_data = {
             'user_group_model': {
-                'users': self.USER_ID_1
+                'name': 'user_group_name',
+                'user_ids': self.USER_ID_1
             }
         }
 
