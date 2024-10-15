@@ -2725,31 +2725,16 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
 
 
 class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase):
-    """Tests that search index gets cleared."""
+    """Tests that publish chapters of Length and Measurement topic."""
+
+    def setUp(self) -> None:
+        """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        
 
     def test_publish_chapters_of_length_and_measurement_topic(self) -> None:
-        exp_services.load_demo('0')
-        result_explorations = search_services.search_explorations(
-            'Welcome', [], [], 2)[0]
-        self.assertEqual(result_explorations, ['0'])
-        collection_services.load_demo('0')
-        result_collections = search_services.search_collections(
-            'Welcome', [], [], 2)[0]
-        self.assertEqual(result_collections, ['0'])
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        user_id_a = self.get_user_id_from_email(
-            self.CURRICULUM_ADMIN_EMAIL
-        )
-        blog_post = blog_services.create_new_blog_post(user_id_a)
-        change_dict: blog_services.BlogPostChangeDict = {
-            'title': 'Welcome to Oppia',
-            'thumbnail_filename': 'thumbnail.svg',
-            'content': 'Hello Blog Authors',
-            'tags': ['Math', 'Science']
-        }
-        blog_services.update_blog_post(blog_post.id, change_dict)
-        blog_services.publish_blog_post(blog_post.id)
+
 
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(

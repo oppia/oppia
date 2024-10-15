@@ -784,7 +784,9 @@ describe('Admin backend api service', () => {
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Failed to publish chapters.');
+      expect(failHandler).toHaveBeenCalledWith(
+        'Failed to publish chapters of length and measurement topic.'
+      );
     })
   );
 
