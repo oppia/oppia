@@ -4,7 +4,7 @@ Selected Misconception: {{ selectedMisconception && selectedMisconception.getNam
   <div *ngFor="let misconception of member.value">
     <button class="btn btn-secondary misconception-button" (click)="selectMisconception(misconception, member.key)"
             [ngClass]="{'misconception-button-selected': selectedMisconceptionSkillId === member.key && selectedMisconception.getId() === misconception.getId()}">
-      <strong class="d-inline">{{ misconception.isMandatory() ? '' : ' (Optional) ' }}{{ misconception.getName() }}</strong>
+      <strong class="d-inline e2e-test-misconception-title">{{ misconception.isMandatory() ? '' : ' (Optional) ' }}{{ misconception.getName() }}</strong>
       <oppia-rte-output-display class="misconception-notes-container" [rteString]="misconception.getNotes()">
       </oppia-rte-output-display>
     </button>
