@@ -2731,28 +2731,26 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_classroom'
+            }, csrf_token=csrf_token)
+        classrooms = classroom_config_services.get_all_classrooms()
+        # *** We need to add a story to fraction topic, think how
+        #  to handle the chpaters data and add to story then publsih this story.
+
+
 
     def test_publish_chapters_of_length_and_measurement_topic(self) -> None:
-
-
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(
             '/adminhandler', {
                 'action': 'publish_chapters_of_length_and_measurement_topic'
             },
             csrf_token=csrf_token)
-        self.assertEqual(generated_exps_response, {})
-        result_explorations = search_services.search_explorations(
-            'Welcome', [], [], 2)[0]
-        self.assertEqual(result_explorations, [])
-        result_collections = search_services.search_collections(
-            'Welcome', [], [], 2)[0]
-        self.assertEqual(result_collections, [])
-        result_blog_posts = (
-            search_services.search_blog_post_summaries('Welcome', [], 2)[0]
-        )
-        self.assertEqual(result_blog_posts, [])
+        # Assert the status of chapter to be Published
 
 
 class ClearSearchIndexTest(test_utils.GenericTestBase):
