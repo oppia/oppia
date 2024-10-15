@@ -26,10 +26,6 @@ export default {
   // Acceptable URL schemes for links.
   "ACCEPTABLE_SCHEMES": ["https", ""],
 
-  // The default classroom URL fragment to use when the provided classroom URL
-  // fragment in the controller is invalid.
-  "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
-
   "FEATURED_TRANSLATION_LANGUAGES": [
     {
       "language_code": "pt",
@@ -164,7 +160,8 @@ export default {
   // previous one is deleted.
   // TODO(#14645): Remove these keys once translation service is extended.
   "HACKY_TRANSLATION_KEYS": [
-    "I18N_CLASSROOM_MATH_TITLE",
+    "I18N_CLASSROOM_MATH_NAME",
+    "I18N_CLASSROOM_MATH_COURSE_DETAILS",
     "I18N_TOPIC_iX9kYCjnouWN_TITLE",
     "I18N_TOPIC_sWBXKH4PZcK6_TITLE",
     "I18N_TOPIC_C4fqwrvqWpRm_TITLE",
@@ -5138,11 +5135,11 @@ export default {
     "decimal_separator": ".",
     "ariaLabelInEnglish": "English"
   }, {
-    "code": "ar",
-    "description": "العربية (Arabic)",
-    "direction": "rtl",
-    "decimal_separator": ",",
-    "ariaLabelInEnglish": "Arabic"
+    "code": "ak",
+    "description": "Ákán (Akan)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Akan"
   }, {
     "code": "sq",
     "description": "shqip (Albanian)",
@@ -5155,6 +5152,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Amharic"
+  }, {
+    "code": "ar",
+    "description": "العربية (Arabic)",
+    "direction": "rtl",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Arabic"
   }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
@@ -5173,6 +5176,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Bangla"
+  }, {
+    "code": "ms",
+    "description": "بهاس ملايو (Bahasa Melayu)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Bahasa Melayu"
   }, {
     "code": "ca",
     "description": "català (Catalan)",
@@ -5204,11 +5213,23 @@ export default {
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Danish"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)",
+    "direction": "rtl",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Dari"
+  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)",
     "direction": "ltr",
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Dutch"
+  }, {
+    "code": "ee",
+    "description": "Eʋegbe (Ewe)",
+    "direction": "ltr",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Ewe"
   }, {
     "code": "fat",
     "description": "Fanti",
@@ -5251,6 +5272,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Greek"
+  }, {
+    "code": "gaa",
+    "description": "Gã (Ga)",
+    "direction": "ltr",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Ga"
   }, {
     "code": "ha",
     "description": "Harshen Hausa (Hausa)",
@@ -5360,17 +5387,17 @@ export default {
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Polish"
   }, {
-    "code": "prs",
-    "description": "دری (Dari)",
-    "direction": "rtl",
-    "decimal_separator": ".",
-    "ariaLabelInEnglish": "Dari"
-  }, {
     "code": "pt",
     "description": "português (Portuguese)",
     "direction": "ltr",
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Portuguese"
+  }, {
+    "code": "ps",
+    "description": "پښتو (Pashto)",
+    "direction": "rtl",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Pashto"
   }, {
     "code": "ro",
     "description": "română (Romanian)",
@@ -5425,6 +5452,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Tamil"
+  }, {
+    "code": "te",
+    "description": "తెలుగు (Telugu)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Telugu"
   }, {
     "code": "th",
     "description": "ภาษาไทย (Thai)",
@@ -6250,6 +6283,7 @@ export default {
       "html": "",
       "content_id": "content"
     },
+    "inapplicable_skill_misconception_ids": null,
     "interaction": {
       "id": null,
       "customization_args": {},
@@ -6495,7 +6529,7 @@ export default {
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
   // up to 4 bytes long.
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
-  "MAX_REVIEW_MESSAGE_LENGTH": 10000,
+  "MAX_REVIEW_MESSAGE_LENGTH": 2000,
 
   "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
     {
@@ -6598,6 +6632,24 @@ export default {
     "ADMIN": {
       "ROUTE": "admin",
       "TITLE": "Oppia Admin Panel",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "REVIEW_TEST": {
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/review-test/:story_url_fragment",
+      "TITLE": "Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6748,11 +6800,6 @@ export default {
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]
-    },
-    "ABOUT_FOUNDATION": {
-      "ROUTE": "about-foundation",
-      "TITLE": "About the Oppia Foundation | Oppia",
-      "META": []
     },
     "ERROR": {
       "ROUTE": "error",
@@ -7092,6 +7139,24 @@ export default {
         }
       ]
     },
+    "BLOG_DASHBOARD": {
+      "ROUTE": "blog-dashboard",
+      "TITLE": "Blog Dashboard - Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
     "LIBRARY_TOP_RATED": {
       "ROUTE": "community-library/top-rated",
       "TITLE": "Oppia",
@@ -7212,9 +7277,9 @@ export default {
         }
       ]
     },
-    "BLOG_DASHBOARD": {
-      "ROUTE": "blog-dashboard",
-      "TITLE": "Blog Dashboard - Oppia",
+    "CLASSROOMS": {
+      "ROUTE": "learn",
+      "TITLE": "Oppia Classrooms",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",

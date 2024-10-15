@@ -185,9 +185,10 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg'
-    );
+    this.oppiaBlackImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
     this.currentStateIsTerminal = false;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionIdIsSet = false;
@@ -211,6 +212,12 @@ export class StateEditorComponent implements OnInit, OnDestroy {
         this.stateData = stateData;
         this.stateName = this.stateEditorService.getActiveStateName();
         this.stateEditorService.setInteraction(stateData.interaction);
+        this.stateEditorService.setLinkedSkillId(stateData.linkedSkillId);
+        if (!this.stateEditorService.isInQuestionMode()) {
+          this.stateEditorService.setInapplicableSkillMisconceptionIds(
+            stateData.inapplicableSkillMisconceptionIds
+          );
+        }
         this.stateContentService.init(this.stateName, stateData.content);
         this.stateLinkedSkillIdService.init(
           this.stateName,

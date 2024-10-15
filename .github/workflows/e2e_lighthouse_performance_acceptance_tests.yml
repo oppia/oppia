@@ -12,14 +12,22 @@ on:
       - release-*
 
 jobs:
+  check_test_suites_to_run:
+    uses: ./.github/workflows/check_test_suites_to_run.yml
   build:
+    needs: check_test_suites_to_run
+    if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.count > 0 ||
+            fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.count > 0 ||
+            fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.count > 0 }}
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8 with pip cache
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
@@ -29,7 +37,8 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
       - name: Cache node modules and third_party/static
         uses: actions/cache@v3
         env:
@@ -43,7 +52,8 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Oppia dependencies
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
@@ -63,62 +73,19 @@ jobs:
           path: /home/runner/work/oppia/build_files.zip
           retention-days: 1
   e2e_test:
-    needs: build
+    needs: [check_test_suites_to_run, build]
+    if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.count > 0 }}
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        suite:
-          - name: accessibility
-          - name: additionalEditorFeatures
-          - name: additionalEditorFeaturesModals
-          - name: additionalPlayerFeatures
-          - name: adminPage
-          - name: blogDashboard
-          - name: blog
-          - name: checkpointFeatures
-          - name: classroomPage
-          - name: classroomPageFileUploadFeatures
-          - name: collections
-          - name: contributorDashboard
-          - name: contributorAdminDashboard
-          - name: coreEditorAndPlayerFeatures
-          - name: creatorDashboard
-          - name: embedding
-          - name: explorationFeedbackTab
-          - name: explorationImprovementsTab
-          - name: explorationHistoryTab
-          - name: explorationStatisticsTab
-          - name: explorationTranslationTab
-          - name: extensions
-          - name: featureGating
-          - name: feedbackUpdates
-          - name: fileUploadExtensions
-          - name: fileUploadFeatures
-            flaky_indicators: |
-              Play record button is not clickable
-              Translation tab button is not clickable
-          - name: learner
-          - name: learnerDashboard
-          - name: library
-          - name: navigation
-          - name: playVoiceovers
-          - name: preferences
-          - name: profileFeatures
-          - name: profileMenu
-          - name: publication
-          - name: skillEditor
-          - name: subscriptions
-          - name: topicsAndSkillsDashboard
-          - name: topicAndStoryEditor
-          - name: topicAndStoryEditorFileUploadFeatures
-          - name: topicAndStoryViewer
-          - name: users
-          - name: wipeout
+        suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.suites }}
     name: e2e_test (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8 with pip cache
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
@@ -128,7 +95,8 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v3
         env:
@@ -165,7 +133,8 @@ jobs:
           ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
-      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Oppia dependencies
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
@@ -219,25 +188,25 @@ jobs:
         with:
           message: "An E2E test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  lighthouse:
-    needs: build
+  lighthouse_performance:
+    needs: [check_test_suites_to_run, build]
+    if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.count > 0 }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        shard:
-          - name: 1
-            pages_to_run: splash,about,about-foundation,admin,blog-dashboard,community-library,contact,contributor-dashboard,creator-dashboard,creator-guidelines,delete-account,donate,email-dashboard,get-started,learner-dashboard,license,moderator
-          - name: 2
-            pages_to_run: preferences,privacy-policy,profile,signup,teach,topics-and-skills-dashboard,terms,thanks,volunteer,topic-viewer,story-viewer,classroom,exploration-editor,exploration-player,topic-editor,skill-editor,story-editor
-    name: lighthouse (${{ matrix.os }}, ${{ matrix.shard.name }})
+        suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.suites }}
+    name: lighthouse (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: ./.github/actions/merge
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v3
         env:
@@ -289,13 +258,14 @@ jobs:
       - name: (Artifact re-build) Build Webpack
         if: steps.download_artifact_1.outcome == 'failure'
         run: python -m scripts.build --prod_env
-      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Oppia dependencies
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      - name: Run Lighthouse performance checks shard
+      - name: Run Lighthouse performance checks shard ${{ matrix.suite.name }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ matrix.shard.pages_to_run }}
+        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Uploading puppeteer video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
@@ -309,52 +279,19 @@ jobs:
           message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   acceptance_test:
-      needs: build
+      needs: [check_test_suites_to_run, build]
+      if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.count > 0 }}
       runs-on:  ${{ matrix.os }}
       strategy:
         matrix:
           os: [ubuntu-22.04]
-          # TODO(#20467): Add exploration-editor/modify-translations-through-modal spec file
-          # to suites once the exploration_editor_can_modify_translations feature is in prod stage.
-          suite:
-            - blog-admin/assign-roles-to-users-and-change-tag-properties
-            - blog-editor/create-and-delete-draft-blog-post
-            - blog-editor/create-and-publish-a-blog-post-with-required-details
-            - blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked
-            - curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill
-            - exploration-editor/create-exploration-and-change-basic-settings
-            - exploration-editor/load-complete-and-restart-exploration-preview
-            - exploration-editor/save-draft-publish-and-discard-the-changes
-            - logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator
-            - logged-out-user/check-all-user-flow-of-donor
-            - logged-out-user/check-all-user-flow-of-parent-teacher
-            - logged-out-user/check-all-user-flow-of-partner
-            - logged-out-user/check-all-user-flow-of-volunteer
-            - logged-out-user/click-all-buttons-on-about-foundation-page
-            - logged-out-user/click-all-buttons-on-about-page
-            - logged-out-user/click-all-buttons-on-contact-us-page
-            - logged-out-user/click-all-buttons-on-donation-thanks-page
-            - logged-out-user/click-all-buttons-on-navbar
-            - logged-out-user/click-all-buttons-on-partnerships-page
-            - logged-out-user/click-all-buttons-on-teach-page
-            - logged-out-user/click-all-buttons-on-volunteer-page
-            - logged-out-user/click-all-links-in-oppia-footer
-            - logged-out-user/click-all-links-on-creator-guidelines-page
-            - logged-out-user/click-all-links-on-get-started-page
-            - logged-out-user/click-all-links-on-privacy-policy-page
-            - logged-out-user/click-all-links-on-terms-page
-            - moderator/edit-featured-activities-list
-            - moderator/view-recent-commits-and-feedback-messages
-            - practice-question-admin/add-and-remove-contribution-rights
-            - release-coordinator/update-promo-bar-message
-            - release-coordinator/flush-and-get-profile-of-redis-cache
-            - super-admin/edit-user-roles
-            - super-admin/load-dummy-data-in-dev-mode
-            - translation-admin/add-and-remove-translation-rights
-            - voiceover-admin/add-voiceover-artist-to-an-exploration
+          suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.suites }}
+      name: acceptance_test (${{ matrix.os }}, ${{ matrix.suite.name }})
       steps:
-        - uses: actions/checkout@v3
-        - uses: actions/setup-python@v3
+        - name: Checkout repository
+          uses: actions/checkout@v3
+        - name: Setup Python 3.8 with pip cache
+          uses: actions/setup-python@v4
           with:
             python-version: '3.8.15'
             architecture: 'x64'
@@ -364,7 +301,8 @@ jobs:
               requirements.txt
               requirements_dev.in
               requirements_dev.txt
-        - uses: ./.github/actions/merge
+        - name: Merge develop branch into the current branch
+          uses: ./.github/actions/merge
         - name: Cache node modules
           uses: actions/cache@v3
           env:
@@ -401,7 +339,8 @@ jobs:
             ls -la oppia/third_party
           working-directory: /home/runner/work/oppia
           shell: bash
-        - uses: ./.github/actions/install-oppia-dependencies
+        - name: Install Oppia dependencies
+          uses: ./.github/actions/install-oppia-dependencies
         - name: (Artifact re-build) Cache third_party/static
           if: steps.download_artifact_1.outcome == 'failure'
           uses: actions/cache@v3
@@ -417,16 +356,16 @@ jobs:
         - name: (Artifact re-build) Build Webpack
           if: steps.download_artifact_1.outcome == 'failure'
           run: python -m scripts.build --prod_env
-        - name: Run Desktop Acceptance Test ${{ matrix.suite }}
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
+        - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env
         - name: Uploading generated test to angular module mapping as an artifact
           if: ${{ failure() }}
           uses: actions/upload-artifact@v3
           with:
             name: generated-test-to-angular-module-mapping
-            path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite }}-generated.txt
-        - name: Run Mobile Acceptance Test ${{ matrix.suite }}
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env --mobile
+            path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite.name }}.txt
+        - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
           uses: actions/upload-artifact@v3
@@ -444,3 +383,28 @@ jobs:
           with:
             message: "An acceptance test failed on the upstream develop branch."
             webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  check_e2e_lighthouse_performance_acceptance_workflow_status:
+    needs: [check_test_suites_to_run, build, e2e_test, lighthouse_performance, acceptance_test]
+    if: always()
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
+      - name: Check workflow status
+        uses: ./.github/actions/check-workflow-status
+        id: check_workflow_status
+        with:
+          jobs: ${{ toJson(needs) }}
+      - name: Fail if workflow status is failure
+        if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
+        run: exit 1

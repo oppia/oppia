@@ -138,15 +138,12 @@
 	"I18N_SIGNUP_LOADING": "Аҭагалара",
 	"I18N_SIGNUP_REGISTRATION": "Арегистрациа",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Иҭабуп.",
-	"I18N_TOPNAV_ABOUT_OPPIA": "Oppia иазкны",
 	"I18N_TOPNAV_ADMIN_PAGE": "Админ идаҟьа",
-	"I18N_TOPNAV_BLOG": "Аблог",
 	"I18N_TOPNAV_DONATE": "Ацхыраара ҟаҵатәуп",
 	"I18N_TOPNAV_FORUM": "Афорум",
 	"I18N_TOPNAV_GET_STARTED": "Иалагатәуп",
 	"I18N_TOPNAV_LIBRARY": "Абиблиотека",
 	"I18N_TOPNAV_LOGOUT": "Иҭыҵтәуп",
-	"I18N_TOPNAV_OPPIA_FOUNDATION": "Oppia Афонд",
 	"I18N_TOPNAV_PREFERENCES": "Архиарақәа",
 	"I18N_TOPNAV_SIGN_IN": "Иҭалатәуп"
 }

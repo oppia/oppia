@@ -188,7 +188,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private injector: Injector
+    private injector: Injector,
+    private contextService: ContextService
   ) {
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
       return;
@@ -199,6 +200,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
+    if (!OppiaAngularRootComponent.contextService) {
+      OppiaAngularRootComponent.contextService = this.contextService;
+    }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
         OppiaAngularRootComponent.rteHelperService,
@@ -233,26 +237,30 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       {
         propertyType: 'name',
         propertyValue: 'msapplication-square310x310logo',
-        content: this.getAssetUrl(
+        content: this.urlInterpolationService.getStaticCopyrightedImageUrl(
           '/assets/images/logo/msapplication-large.png'
         ),
       },
       {
         propertyType: 'name',
         propertyValue: 'msapplication-wide310x150logo',
-        content: this.getAssetUrl('/assets/images/logo/msapplication-wide.png'),
+        content: this.urlInterpolationService.getStaticCopyrightedImageUrl(
+          '/assets/images/logo/msapplication-wide.png'
+        ),
       },
       {
         propertyType: 'name',
         propertyValue: 'msapplication-square150x150logo',
-        content: this.getAssetUrl(
+        content: this.urlInterpolationService.getStaticCopyrightedImageUrl(
           '/assets/images/logo/msapplication-square.png'
         ),
       },
       {
         propertyType: 'name',
         propertyValue: 'msapplication-square70x70logo',
-        content: this.getAssetUrl('/assets/images/logo/msapplication-tiny.png'),
+        content: this.urlInterpolationService.getStaticCopyrightedImageUrl(
+          '/assets/images/logo/msapplication-tiny.png'
+        ),
       },
       {
         propertyType: 'property',
@@ -276,9 +284,5 @@ export class OppiaAngularRootComponent implements AfterViewInit {
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();
-  }
-
-  getAssetUrl(path: string): string {
-    return this.urlInterpolationService.getFullStaticAssetUrl(path);
   }
 }

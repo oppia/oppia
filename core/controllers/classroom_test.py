@@ -16,7 +16,11 @@
 
 from __future__ import annotations
 
+import json
+import os
+
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
@@ -24,8 +28,10 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
+import main
 
 from typing import Callable, Dict, Union
+import webtest
 
 dummy_thumbnail_data = classroom_config_domain.ImageData(
     'thumbnail.svg', 'transparent', 1000
@@ -113,14 +119,6 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
-
-    def test_redirect_to_default_classroom(self) -> None:
-        response = self.get_html_response('/learn', expected_status_int=302)
-        self.assertEqual(
-            'http://localhost/learn/math', response.headers['location'])
-
-
 class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self) -> None:
@@ -134,6 +132,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
     def test_get(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_classroom(
+            classroom_id='test_id',
             topic_id_to_prerequisite_topic_ids={
                         self.public_topic_id_1: [],
                         self.private_topic_id: []
@@ -216,12 +215,19 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'is_published': False
         }
         expected_dict = {
+            'classroom_id': 'test_id',
             'name': 'math',
+            'url_fragment': 'math',
             'topic_summary_dicts': [
                 public_topic_1_summary_dict, private_topic_summary_dict
             ],
             'course_details': 'Course details for classroom.',
-            'topic_list_intro': 'Topics covered for classroom'
+            'topic_list_intro': 'Topics covered for classroom',
+            'teaser_text': 'Teaser Text',
+            'thumbnail_data': dummy_thumbnail_data.to_dict(),
+            'banner_data': dummy_banner_data.to_dict(),
+            'is_published': True,
+            'public_classrooms_count': 1
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -236,6 +242,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
     def setUp(self) -> None:
         super().setUp()
+        self.testapp = webtest.TestApp(main.app_without_context)
 
         self.physics_classroom_id = (
             classroom_config_services.get_new_classroom_id())
@@ -251,7 +258,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 0
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -272,7 +280,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 1
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -282,14 +291,36 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
     def test_get_classroom_id_to_classroom_name(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        classroom_id_to_classroom_name = {
-            self.math_classroom_id: 'math',
-            self.physics_classroom_id: 'physics'
-        }
-        json_response = self.get_json(feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL)
+        physics_classroom = classroom_config_services.get_classroom_by_id(
+            self.physics_classroom_id
+        )
+        # TODO (#20845): Here we use MyPy ignore because we have a
+        # Test that checks if the index is None, it returns 0. The MyPy ignore
+        # Can be removed once the index for the math classroom is populated.
+        physics_classroom.index = None # type: ignore[assignment]
+        classroom_config_services.update_classroom(physics_classroom)
+        classroom_id_to_classroom_name = [
+            {
+                'classroom_id': self.physics_classroom.classroom_id,
+                'classroom_name': self.physics_classroom.name,
+                'classroom_index': 0
+            },
+            {
+                'classroom_id': self.math_classroom.classroom_id,
+                'classroom_name': self.math_classroom.name,
+                'classroom_index': 1
+            }
+        ]
+        json_response = self.get_json(feconf.CLASSROOM_DISPLAY_INFO_HANDLER_URL)
         self.assertEqual(
-            json_response['classroom_id_to_classroom_name'],
-            classroom_id_to_classroom_name
+            sorted(
+                json_response['classroom_display_info'],
+                key=lambda x: int(x['classroom_index'])
+            ),
+            sorted(
+                classroom_id_to_classroom_name,
+                key=lambda x: int(x['classroom_index'])
+            )
         )
         self.logout()
 
@@ -322,11 +353,31 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
+        self.physics_classroom_dict['thumbnail_data']['filename'] = 'update.svg'
+        self.physics_classroom_dict['banner_data']['filename'] = 'update.png'
 
-        self.put_json(
-            classroom_handler_url, {
-                'classroom_dict': self.physics_classroom_dict
-            }, csrf_token=csrf_token)
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename1', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename1', raw_banner_image)
+        self.testapp.put(
+                    classroom_handler_url,
+                    params=params, expect_errors=False,
+                    upload_files=[thumbnail, banner]
+        )
 
         self.logout()
 
@@ -349,10 +400,28 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
 
-        response = self.put_json(
-            classroom_handler_url, {
-                'classroom_dict': self.physics_classroom_dict
-            }, csrf_token=csrf_token, expected_status_int=400)
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename2', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename2', raw_banner_image)
+        response = self._parse_json_response(self.testapp.put(
+                    classroom_handler_url,
+                    params=params, expect_errors=True,
+                    upload_files=[thumbnail, banner]
+        ), True)
 
         self.assertEqual(
             response['error'],
@@ -417,10 +486,28 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             self.public_topic_id_2: []
         }
 
-        response = self.put_json(
-            classroom_handler_url, {
-                'classroom_dict': self.physics_classroom_dict
-            }, csrf_token=csrf_token, expected_status_int=400)
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename3', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename3', raw_banner_image)
+        response = self._parse_json_response(self.testapp.put(
+                    classroom_handler_url,
+                    params=params, expect_errors=True,
+                    upload_files=[thumbnail, banner]
+        ), True)
 
         self.assertEqual(
             response['error'],
@@ -460,7 +547,8 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 0
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -571,9 +659,14 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.save_new_valid_classroom(
+        classroom1 = self.save_new_valid_classroom(
             'classroom1', 'history', 'history'
         )
+        # TODO (#20845): Here we use MyPy ignore because we have a
+        # Test that checks if the index is None, it returns 0. The MyPy ignore
+        # Can be removed once the index for the math classroom is populated.
+        classroom1.index = None # type: ignore[assignment]
+        classroom_config_services.update_classroom(classroom1)
         self.save_new_valid_classroom(
             'classroom2', 'english', 'english'
         )
@@ -586,20 +679,22 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
         )
         expected_response = [
             {
+                'classroom_id': 'classroom1',
                 'name': 'history',
                 'url_fragment': 'history',
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
                 'thumbnail_filename': 'thumbnail.svg',
-                'thumbnail_bg_color': 'transparent'
+                'thumbnail_bg_color': 'transparent', 'index': 0
             },
             {
+                'classroom_id': 'classroom2',
                 'name': 'english',
                 'url_fragment': 'english',
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
                 'thumbnail_filename': 'thumbnail.svg',
-                'thumbnail_bg_color': 'transparent'
+                'thumbnail_bg_color': 'transparent', 'index': 1
             }
         ]
 
@@ -707,3 +802,49 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
             'Schema validation for \'name\' failed: '
             'Validation failed: is_nonempty ({}) for object '
         )
+
+
+class TestUpdateClassroomIndexMappingHandler(BaseClassroomControllerTests):
+    """Test for updating classrooms order."""
+
+    def setUp(self) -> None:
+        """Set up test data and environment."""
+        super().setUp()
+        self.classroom_1 = self.save_new_valid_classroom(
+            'classroomone', 'Trigonometry', 'classroomone'
+        )
+        self.classroom_2 = self.save_new_valid_classroom(
+            'classroomtwo', 'Math', 'classroomtwo'
+        )
+
+    def test_successful_update_classroom_index(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        payload = {
+            'classroom_index_mappings': [
+                {
+                    'classroom_id': 'classroomone',
+                    'classroom_name': 'Trigonometry',
+                    'classroom_index': 1
+                },
+                {
+                    'classroom_id': 'classroomtwo',
+                    'classroom_name': 'Calculus',
+                    'classroom_index': 0
+                }
+            ]
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            feconf.UPDATE_CLASSROOMS_ORDER_HANDLER_URL, payload,
+            csrf_token
+        )
+
+        updated_classroom_1 = (
+            classroom_config_services.get_classroom_by_id('classroomone')
+        )
+        updated_classroom_2 = (
+            classroom_config_services.get_classroom_by_id('classroomtwo')
+        )
+
+        self.assertEqual(updated_classroom_1.index, 1)
+        self.assertEqual(updated_classroom_2.index, 0)

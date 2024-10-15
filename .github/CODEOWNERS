@@ -202,7 +202,6 @@
 /Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
-/scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/dev-workflow-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
 /scripts/linters/ @oppia/dev-workflow-reviewers
@@ -580,6 +579,7 @@
 /.gcloudignore @oppia/release-workflow-reviewers
 /core/controllers/release_coordinator*.py @oppia/release-workflow-reviewers
 /core/templates/pages/release-coordinator-page/ @oppia/release-workflow-reviewers
+/core/templates/domain/release_coordinator/ @oppia/release-workflow-reviewers
 /scripts/release_scripts/ @oppia/release-workflow-reviewers
 /assets/release_constants.json @oppia/release-workflow-reviewers
 
@@ -649,8 +649,25 @@
 /core/templates/pages/teach-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/thanks-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/participation-playbook/ @oppia/lace-frontend-reviewers
-/core/templates/pages/about-foundation-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/volunteer-page/ @oppia/lace-frontend-reviewers
+
+
+# Classrooms Pages.
+/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.html @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-auth.guard.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-auth.guard.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page.component.html @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page.component.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page.module.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-root.component.html @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-root.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-root.component.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.html @oppia/lace-frontend-reviewers
 
 
 # Speed Improvement team.
@@ -739,6 +756,7 @@
 # Acceptance Tests.
 /core/tests/puppeteer-acceptance-tests/ @oppia/acceptance-test-reviewers
 /core/tests/puppeteer/ @oppia/acceptance-test-reviewers
+/core/tests/test-modules-mappings/acceptance/ @oppia/acceptance-test-reviewers
 /scripts/run_acceptance_tests_test.py @oppia/acceptance-test-reviewers
 /scripts/run_acceptance_tests.py @oppia/acceptance-test-reviewers
 

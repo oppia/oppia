@@ -275,9 +275,10 @@ export class CreatorDashboardPageComponent {
     this.getHumanReadableStatus =
       this.threadStatusDisplayService.getHumanReadableStatus;
 
-    this.emptyDashboardImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/empty_dashboard.svg'
-    );
+    this.emptyDashboardImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/general/empty_dashboard.svg'
+      );
     this.canReviewActiveThread = false;
     this.updatesGivenScreenWidth();
     angular.element(this.windowRef.nativeWindow).on('resize', () => {

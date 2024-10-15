@@ -10,6 +10,10 @@ FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenanc
 
 sharding_instances := 3
 
+# This escapes any special characters and remove any spaces in the PATH. We do this to resolve errors in WSL due to windows paths.
+FIXED_PATH=$(shell echo "$(PATH)" | sed 's/ /\\ /g' | sed 's/(/\\(/g' | sed 's/)/\\)/g')
+
+
 ifeq ($(OS_NAME),Darwin)
     CHROME_VERSION := $(shell /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | awk '{print $$3}')
 else
@@ -116,6 +120,10 @@ check.dev-container-healthy:
 		exit 1; \
 	fi
 
+run-dsadmin: ## Runs DSAdmin inside the dev-server container.
+	@docker exec oppia-cloud-datastore /bin/sh -c '../dsadmin --project=dev-project-id --datastore-emulator-host=localhost:8089 &';
+	@echo 'Please visit http://localhost:8080 to access the DSAdmin.';
+
 logs.%: ## Shows the logs of the given docker service. Example: make logs.datastore
 	docker compose logs -f $*
 
@@ -172,9 +180,9 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(FIXED_PATH); \
 	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(FIXED_PATH); \
 	fi
 # Adding env variable for mobile view
 	@export MOBILE=${MOBILE:-false}
@@ -206,9 +214,9 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(FIXED_PATH); \
 	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(FIXED_PATH); \
 	fi
 # Adding env variable for the mobile view
 	@export MOBILE=${MOBILE:-false}
@@ -225,11 +233,11 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-run_tests.check_e2e_tests_are_captured_in_ci: ## Runs the check to ensure that all e2e tests are captured in CI
+run_tests.check_tests_are_captured_in_ci: ## Runs the check to ensure that all e2e and acceptence tests are captured in CI
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 	docker compose up dev-server -d --no-deps
-	$(SHELL_PREFIX) dev-server python -m scripts.check_e2e_tests_are_captured_in_ci
+	$(SHELL_PREFIX) dev-server python -m scripts.check_tests_are_captured_in_ci
 	$(MAKE) stop
 
 run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard

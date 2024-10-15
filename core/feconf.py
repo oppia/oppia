@@ -345,7 +345,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 55
+CURRENT_STATE_SCHEMA_VERSION = 56
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -421,7 +421,7 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # The default content text for the initial state of an exploration.
-DEFAULT_INIT_STATE_CONTENT_STR = ''
+DEFAULT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
@@ -573,7 +573,7 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.3.9'
+OPPIA_VERSION = '3.4.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -887,7 +887,6 @@ TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
-ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
@@ -1048,6 +1047,7 @@ UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX = (
     '/updatetranslationsuggestionhandler')
 UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
     '/updatequestionsuggestionhandler')
+USER_GROUPS_HANDLER_URL = '/user_groups_handler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
@@ -1078,7 +1078,8 @@ LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
     '/learner_dashboard_learner_groups_handler')
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
-CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
+CLASSROOM_DISPLAY_INFO_HANDLER_URL = '/classroom_display_info_handler'
+UPDATE_CLASSROOMS_ORDER_HANDLER_URL = '/update_classrooms_order'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 NEW_CLASSROOM_HANDLER_URL = '/classroom_admin/create_new'

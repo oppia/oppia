@@ -228,7 +228,7 @@ describe('Admin misc tab component ', () => {
       let regenerateTopicSpy = spyOn(
         adminBackendApiService,
         'regenerateOpportunitiesRelatedToTopicAsync'
-      ).and.returnValue(Promise.resolve(10));
+      ).and.returnValue(Promise.resolve({opportunities_count: 10}));
 
       component.regenerateOpportunitiesRelatedToTopic();
       tick();

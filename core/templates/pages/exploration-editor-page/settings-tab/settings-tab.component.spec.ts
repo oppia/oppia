@@ -396,12 +396,73 @@ describe('Settings Tab Component', () => {
     })
   );
 
+  it(
+    'should not add same exploration editor tags' +
+      'when user enter same tag, but with varying uppercase and lowercase',
+    fakeAsync(() => {
+      spyOn(component, 'saveExplorationTags').and.stub();
+      explorationTagsService.displayed = [];
+
+      component.add({
+        value: 'name',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['name']);
+
+      // When user try to enter same tag again.
+      component.add({
+        value: 'NAME',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['name']);
+    })
+  );
+
+  it(
+    'should not add exploration editor tags' +
+      'when user enter number or special character',
+    fakeAsync(() => {
+      spyOn(component, 'saveExplorationTags').and.stub();
+      explorationTagsService.displayed = [];
+
+      // When user try to enter special character.
+      component.add({
+        value: '!@#$%^&*()',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual([]);
+
+      // When user try to enter numbers.
+      component.add({
+        value: '1234567890',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual([]);
+    })
+  );
+
   it('should be able to add multiple exploration editor tags', fakeAsync(() => {
     spyOn(component, 'saveExplorationTags').and.stub();
     explorationTagsService.displayed = [];
 
     component.add({
-      value: 'tag-one',
+      value: 'tagone',
       input: {
         value: '',
       },
@@ -409,7 +470,7 @@ describe('Settings Tab Component', () => {
     tick();
 
     component.add({
-      value: 'tag-two',
+      value: 'tagtwo',
       input: {
         value: '',
       },
@@ -417,7 +478,7 @@ describe('Settings Tab Component', () => {
     tick();
 
     component.add({
-      value: 'tag-three',
+      value: 'tagthree',
       input: {
         value: '',
       },
@@ -425,9 +486,9 @@ describe('Settings Tab Component', () => {
     tick();
 
     expect(explorationTagsService.displayed).toEqual([
-      'tag-one',
-      'tag-two',
-      'tag-three',
+      'tagone',
+      'tagtwo',
+      'tagthree',
     ]);
   }));
 
@@ -1204,34 +1265,45 @@ describe('Settings Tab Component', () => {
 
   it('should toggle the preview cards', fakeAsync(() => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    component.ngOnInit();
+    tick();
+
+    expect(component.basicSettingIsShown).toEqual(false);
     component.toggleCards('settings');
     tick();
-    expect(component.basicSettingIsShown).toEqual(false);
+    expect(component.basicSettingIsShown).toEqual(true);
 
+    expect(component.advancedFeaturesIsShown).toEqual(false);
     component.toggleCards('advanced_features');
     tick();
-    expect(component.advancedFeaturesIsShown).toEqual(false);
+    expect(component.advancedFeaturesIsShown).toEqual(true);
 
+    expect(component.rolesCardIsShown).toEqual(false);
     component.toggleCards('roles');
     tick();
-    expect(component.rolesCardIsShown).toEqual(false);
+    expect(component.rolesCardIsShown).toEqual(true);
 
+    expect(component.permissionsCardIsShown).toEqual(false);
     component.toggleCards('permissions');
     tick();
-    expect(component.permissionsCardIsShown).toEqual(false);
+    expect(component.permissionsCardIsShown).toEqual(true);
 
+    expect(component.feedbackCardIsShown).toEqual(false);
     component.toggleCards('feedback');
     tick();
-    expect(component.feedbackCardIsShown).toEqual(false);
+    expect(component.feedbackCardIsShown).toEqual(true);
 
+    expect(component.controlsCardIsShown).toEqual(false);
     component.toggleCards('voice_artists');
     component.toggleCards('controls');
     tick();
-    expect(component.controlsCardIsShown).toEqual(false);
+    expect(component.controlsCardIsShown).toEqual(true);
   }));
 
   it('should not toggle the preview cards', fakeAsync(() => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    component.ngOnInit();
+    tick();
 
     mockEventEmitteruserExplorationPermissionsService.emit();
     component.toggleCards('settings');

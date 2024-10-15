@@ -4687,7 +4687,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': self.language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': translation_html,
             'data_format': 'html'
         }
@@ -4707,7 +4707,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question in the question suggestion.
         """
         with self.swap(
-            feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html_content):
+            feconf, 'DEFAULT_STATE_CONTENT_STR', question_html_content):
             content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
                 str, Union[str, float, question_domain.QuestionDict]
@@ -5410,7 +5410,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
@@ -6064,7 +6064,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
@@ -6638,7 +6638,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': self.language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
@@ -6969,7 +6969,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }

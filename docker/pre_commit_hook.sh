@@ -21,9 +21,6 @@
 # but won't have any effect
 
 
-DEV_CONTAINER="dev-server"
-DOCKER_EXEC_COMMAND="docker compose exec -T $DEV_CONTAINER "
-
 # Location of git hooks directory
 HOOKS_DIR=".git/hooks"
 
@@ -86,29 +83,22 @@ for arg in "$@"; do
     fi
 done
 
-# Check if dev-server is running and is healthy
-$(docker ps -a --format '{{json .}}' | grep $DEV_CONTAINER | jq .Status | grep -q healthy)
-is_container_running=$?
+# Get git username and email from git config
+GIT_USERNAME=$(git config user.name)
+GIT_USEREMAIL=$(git config user.email)
 
-if [ "$is_container_running" != "0" ]; then
-    # Start containers and run pre-commit hook
-    make start-devserver
-fi
+# Run pre-commit hook script inside docker container
+# We need to pass git username and email to the container, so that it can
+# configure git user.name and user.email for the commit which is checked in 
+# pre-commit hook.
+docker compose run -T --no-deps --entrypoint "/bin/sh -c \
+'git config user.name $GIT_USERNAME && git config user.email $GIT_USEREMAIL \
+&& python3 $PYTHON_PRE_COMMIT_SYMLINK $@'" dev-server
 
-# Run hook in container
-CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_COMMIT_SYMLINK $@"
-echo "Running $CMD"
-
-$CMD
-
-# Save exit code from the docker command, so we can later use it to exit this pre-commit hook at end.
+# Save exit code from the docker command, so we can later use it to exit this
+# pre-commit hook at end.
 exitcode=$?
 echo "Python script exited with code $exitcode"
-
-# Shut down containers if they were not running before pre-commit hook execution.
-if [ "$is_container_running" != "0" ]; then
-    make stop
-fi
 
 # Exit with exit code from container
 exit $exitcode

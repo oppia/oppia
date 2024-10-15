@@ -17,7 +17,7 @@
  * given langauge code.
  */
 
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
@@ -38,6 +38,7 @@ export class EntityVoiceoversService {
   public activeLanguageAccentCode!: string;
   public languageAccentCodeToEntityVoiceovers: LanguageAccentCodeToEntityVoiceovers =
     {};
+  private _voiceoversLoadedEventEmitter = new EventEmitter<void>();
 
   constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
 
@@ -90,6 +91,7 @@ export class EntityVoiceoversService {
         )
         .then(entityVoiceoversList => {
           this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
+          this._voiceoversLoadedEventEmitter.emit();
           resolve();
         });
     });
@@ -152,6 +154,10 @@ export class EntityVoiceoversService {
     }
 
     return contentIdToVoiceovers;
+  }
+
+  get onVoiceoverLoad(): EventEmitter<void> {
+    return this._voiceoversLoadedEventEmitter;
   }
 }
 

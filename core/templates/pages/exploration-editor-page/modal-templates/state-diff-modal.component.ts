@@ -22,6 +22,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {State} from 'domain/state/StateObjectFactory';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 
 export interface headersAndYamlStrs {
   leftPane: string;
@@ -54,6 +55,8 @@ export class StateDiffModalComponent
   @Input() newStateName!: string;
   @Input() oldStateName!: string;
   @Input() headers!: headersAndYamlStrs;
+  showingTranslationChanges: boolean = false;
+
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: '',
@@ -68,22 +71,42 @@ export class StateDiffModalComponent
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private historyTabYamlConversionService: HistoryTabYamlConversionService
+    private historyTabYamlConversionService: HistoryTabYamlConversionService,
+    private entityTranslationsService: EntityTranslationsService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.historyTabYamlConversionService
-      .getYamlStringFromStateOrMetadata(this.oldState)
-      .then(result => {
-        this.yamlStrs.leftPane = result;
-      });
+    if (!this.showingTranslationChanges) {
+      this.historyTabYamlConversionService
+        .getYamlStringFromStateOrMetadata(this.oldState)
+        .then(result => {
+          this.yamlStrs.leftPane = result;
+        });
 
-    this.historyTabYamlConversionService
-      .getYamlStringFromStateOrMetadata(this.newState)
-      .then(result => {
-        this.yamlStrs.rightPane = result;
-      });
+      this.historyTabYamlConversionService
+        .getYamlStringFromStateOrMetadata(this.newState)
+        .then(result => {
+          this.yamlStrs.rightPane = result;
+        });
+    } else {
+      this.historyTabYamlConversionService
+        .getYamlStringFromTranslations(
+          this.entityTranslationsService
+            .languageCodeToLastPublishedEntityTranslations
+        )
+        .then(result => {
+          this.yamlStrs.leftPane = result;
+        });
+
+      this.historyTabYamlConversionService
+        .getYamlStringFromTranslations(
+          this.entityTranslationsService.languageCodeToLatestEntityTranslations
+        )
+        .then(result => {
+          this.yamlStrs.rightPane = result;
+        });
+    }
   }
 }

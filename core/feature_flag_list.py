@@ -84,9 +84,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
-    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
-    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
 ]
 
@@ -95,11 +92,11 @@ DEV_FEATURES_LIST = [
 TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
-    FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
+    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -108,10 +105,12 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     FeatureNames.END_CHAPTER_CELEBRATION,
     FeatureNames.CHECKPOINT_CELEBRATION,
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.DIAGNOSTIC_TEST,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -120,6 +119,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
 DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ANDROID_BETA_LANDING_PAGE,
     FeatureNames.BLOG_PAGES,
+    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -141,17 +141,10 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.PROD
         )
     ),
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS.value: (
-        (
-            'This flag enables showing per-contributor accomplishments on the '
-            'contributor dashboard.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
     FeatureNames.DIAGNOSTIC_TEST.value: (
         (
             'This flag is for the diagnostic test functionality.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
@@ -217,7 +210,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag allows voice artists to add voiceovers in a specific '
             'accent for the given language.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
@@ -239,7 +232,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag allows auto-updating of the exploration voice artists '
             'link model after an exploration update.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
@@ -247,7 +240,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to promptly update '
             'translations of content they are editing in the exploration '
             'editor page.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
@@ -255,14 +248,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to view a list of '
             'misconceptions and tag answer groups with misconceptions '
             'for a curated exploration.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
         (
             'The flag enables flow for multiple classrooms '
             'and makes the classrooms page available to learners.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (

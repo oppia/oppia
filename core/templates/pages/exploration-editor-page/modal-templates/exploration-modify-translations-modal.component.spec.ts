@@ -36,7 +36,6 @@ import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFacto
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
 import {ContextService} from 'services/context.service';
-import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {FormsModule} from '@angular/forms';
@@ -54,7 +53,6 @@ describe('Modify Translations Modal Component', function () {
   let entityTranslationsService: EntityTranslationsService;
   let changeListService: ChangeListService;
   let contextService: ContextService;
-  let entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService;
   let ngbModal: NgbModal;
   let ngbActiveModal: NgbActiveModal;
   let translationLanguageService: TranslationLanguageService;
@@ -75,15 +73,12 @@ describe('Modify Translations Modal Component', function () {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     changeListService = TestBed.inject(ChangeListService);
     contextService = TestBed.inject(ContextService);
-    entityBulkTranslationsBackendApiService = TestBed.inject(
-      EntityBulkTranslationsBackendApiService
-    );
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     stateEditorService = TestBed.inject(StateEditorService);
 
-    entityTranslationsService.languageCodeToEntityTranslations = {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
       hi: EntityTranslation.createFromBackendDict({
         entity_id: 'expId',
         entity_type: 'exploration',
@@ -105,42 +100,14 @@ describe('Modify Translations Modal Component', function () {
             content_format: 'html',
             needs_update: false,
           },
+          rule1: {
+            content_value: 'Rule 1',
+            content_format: 'set_of_unicode_string',
+            needs_update: false,
+          },
         },
       }),
     };
-    spyOn(
-      entityBulkTranslationsBackendApiService,
-      'fetchEntityBulkTranslationsAsync'
-    ).and.returnValue(
-      Promise.resolve({
-        hi: {
-          entityId: 'entity1',
-          entityType: 'exploration',
-          entityVersion: 5,
-          languageCode: 'hi',
-          translationMapping: {
-            content1: {
-              translation: '<p>This is content 1.</p>',
-              dataFormat: 'html',
-              needsUpdate: true,
-            },
-          },
-        },
-        fr: {
-          entityId: 'entity1',
-          entityType: 'exploration',
-          entityVersion: 5,
-          languageCode: 'fr',
-          translationMapping: {
-            content4: {
-              translation: '<p>This is content 4.</p>',
-              dataFormat: 'html',
-              needsUpdate: false,
-            },
-          },
-        },
-      })
-    );
   });
 
   it('should check component is initialized', () => {
@@ -165,24 +132,6 @@ describe('Modify Translations Modal Component', function () {
         hi: expectedTranslation,
       });
     }));
-
-    it('should use published translations when changes do not exist', fakeAsync(() => {
-      spyOn(contextService, 'getExplorationId').and.returnValue('expId');
-      let expectedTranslation = TranslatedContent.createFromBackendDict({
-        content_value: '<p>This is content 4.</p>',
-        content_format: 'html',
-        needs_update: false,
-      });
-      expect(component.contentTranslations).toEqual({});
-
-      component.contentId = 'content4';
-      component.ngOnInit();
-      tick();
-
-      expect(component.contentTranslations).toEqual({
-        fr: expectedTranslation,
-      });
-    }));
   });
 
   it('should initialize the languageIsCheckedStatusDict properly', fakeAsync(() => {
@@ -195,6 +144,19 @@ describe('Modify Translations Modal Component', function () {
     expect(component.languageIsCheckedStatusDict).toEqual({
       hi: false,
     });
+  }));
+
+  it('should determine if data format is set of strings', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    component.contentId = 'content1';
+    component.ngOnInit();
+
+    expect(component.isSetOfStringDataFormat()).toBeFalse();
+
+    component.contentId = 'rule1';
+    component.ngOnInit();
+
+    expect(component.isSetOfStringDataFormat()).toBeTrue();
   }));
 
   it('should handle translations being removed', () => {
@@ -323,36 +285,7 @@ describe('Modify Translations Modal Component', function () {
     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 
-  it('should determine if content has displayable translations appropriately', () => {
-    component.contentTranslations = {
-      hi: TranslatedContent.createFromBackendDict({
-        content_value: 'This text needs an update.',
-        content_format: 'html',
-        needs_update: true,
-      }),
-    };
-
-    expect(component.doesContentHaveDisplayableTranslations()).toBe(false);
-
-    component.contentTranslations = {
-      hi: TranslatedContent.createFromBackendDict({
-        content_value: 'This text does not need an update.',
-        content_format: 'html',
-        needs_update: false,
-      }),
-    };
-
-    expect(component.doesContentHaveDisplayableTranslations()).toBe(true);
-  });
-
-  it('should update displayed translation content of modal appropriately', () => {
-    spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
-      {
-        cmd: 'mark_translation_needs_update_for_language',
-        content_id: 'content1',
-        language_code: 'hi',
-      },
-    ]);
+  it('should update displayed translation content of modal', () => {
     component.contentId = 'content1';
     component.contentTranslations = {
       hi: TranslatedContent.createFromBackendDict({
@@ -365,11 +298,9 @@ describe('Modify Translations Modal Component', function () {
 
     component.updateTranslationDisplayContent();
 
-    expect(component.contentTranslations.hi.needsUpdate).toBeTrue();
     expect(component.languageIsCheckedStatusDict).toEqual({
       hi: false,
     });
-    expect(component.contentHasDisplayableTranslations).toBeFalse();
     expect(component.translationsHaveLoaded).toBeTrue();
   });
 });

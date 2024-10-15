@@ -153,7 +153,7 @@ export class BlogPostEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple blog published is required.
    * This function publishes a blog post with given title.
    */
-  async publishNewBlogPost(newBlogPostTitle: string): Promise<void> {
+  async publishNewBlogPost(newBlogPostTitle: string): Promise<string> {
     await this.openBlogEditorPage();
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
@@ -161,9 +161,11 @@ export class BlogPostEditor extends BaseUser {
     await this.updateTitleTo(newBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
     await this.selectTags('News', 'International');
+    const blogId = (await this.page.url().split('/').pop()) as string;
     await this.saveTheChanges();
 
     await this.publishTheBlogPost();
+    return blogId;
   }
 
   /**
@@ -362,6 +364,8 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
+    await this.waitForPageToFullyLoad();
+
     const allPublishedBlogPosts = await this.page.$$(
       listOfBlogsInBlogDashboard
     );

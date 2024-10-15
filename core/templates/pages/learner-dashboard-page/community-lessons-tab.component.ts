@@ -59,6 +59,8 @@ export class CommunityLessonsTabComponent {
   @Input() collectionPlaylist!: CollectionSummary[];
   @Input() subscriptionsList!: ProfileSummary[];
   @Input() completedToIncompleteCollections!: string[];
+  @Input() learnerDashboardRedesignFeatureFlag!: boolean;
+  @Input() username!: string;
   selectedSection!: string;
   noCommunityLessonActivity: boolean = false;
   noPlaylistActivity: boolean = false;
@@ -463,5 +465,13 @@ export class CommunityLessonsTabComponent {
           this.totalCompletedLessonsList.length === 0;
         this.noPlaylistActivity = this.totalLessonsInPlaylist.length === 0;
       });
+  }
+
+  // TODO(#18384): Check partiallyLearntTopicsList & learntTopicsList.length (skills).
+  isLearnerStateEmpty(): boolean {
+    return (
+      this.totalIncompleteLessonsList.length === 0 &&
+      this.totalCompletedLessonsList.length === 0
+    );
   }
 }

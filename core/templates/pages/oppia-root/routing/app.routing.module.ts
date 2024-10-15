@@ -56,18 +56,18 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_ADMIN.ROUTE,
-    loadChildren: () =>
-      import('pages/blog-admin-page/blog-admin-page.module').then(
-        m => m.BlogAdminPageModule
-      ),
-    canActivate: [IsLoggedInGuard],
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE,
     loadChildren: () =>
       import('pages/blog-dashboard-page/blog-dashboard-page.module').then(
         m => m.BlogDashboardPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_ADMIN.ROUTE,
+    loadChildren: () =>
+      import('pages/blog-admin-page/blog-admin-page.module').then(
+        m => m.BlogAdminPageModule
       ),
     canActivate: [IsLoggedInGuard],
   },
@@ -93,6 +93,14 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/classrooms-page/classrooms-page.module').then(
+        m => m.ClassroomsPageModule
       ),
   },
   {
@@ -142,13 +150,6 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () =>
       import('pages/about-page/about-page.module').then(m => m.AboutPageModule),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE,
-    loadChildren: () =>
-      import('pages/about-foundation-page/about-foundation-page.module').then(
-        m => m.AboutFoundationPageModule
-      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
@@ -429,6 +430,14 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/collection-player-page/collection-player-page.module').then(
         m => m.CollectionPlayerPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/review-test-page/review-test-page.module').then(
+        m => m.ReviewTestPageModule
       ),
   },
 ];

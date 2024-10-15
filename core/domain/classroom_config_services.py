@@ -28,8 +28,10 @@ from typing import Dict, List, Literal, Optional, overload
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classroom_models
+    from mypy_imports import transaction_services
 
 (classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
+transaction_services = models.Registry.import_transaction_services()
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
@@ -60,9 +62,11 @@ def get_classroom_id_to_classroom_name_dict() -> Dict[str, str]:
         dict(str, str). A dict with classroom id as key and classroom name as
         value for all the classrooms present in the datastore.
     """
-    classrooms = get_all_classrooms()
     return {
-        classroom.classroom_id: classroom.name for classroom in classrooms
+        classroom.classroom_id: classroom.name
+        for classroom in sorted(
+            get_all_classrooms(), key=lambda classroom: classroom.index
+        )
     }
 
 
@@ -98,7 +102,8 @@ def get_classroom_from_classroom_model(
         classroom_model.teaser_text,
         classroom_model.topic_list_intro,
         classroom_model.topic_id_to_prerequisite_topic_ids,
-        classroom_model.is_published, thumbnail_data, banner_data
+        classroom_model.is_published, thumbnail_data, banner_data,
+        classroom_model.index
     )
 
 
@@ -204,15 +209,17 @@ def get_new_classroom_id() -> str:
 
 
 def update_classroom(
-    classroom: classroom_config_domain.Classroom
+    classroom: classroom_config_domain.Classroom,
+    strict: bool = False
 ) -> None:
     """Saves a Clasroom domain object to the datastore.
 
     Args:
         classroom: Classroom. The classroom domain object for the given
             classroom.
+        strict: bool. Whether to perform strict checking.
     """
-    classroom.validate()
+    classroom.validate(strict)
     classroom_model = classroom_models.ClassroomModel.get(
         classroom.classroom_id, strict=False)
 
@@ -241,6 +248,7 @@ def update_classroom(
     classroom_model.banner_size_in_bytes = (
         classroom.banner_data.size_in_bytes
     )
+    classroom_model.index = classroom.index
 
     classroom_model.update_timestamps()
     classroom_model.put()
@@ -256,6 +264,7 @@ def create_new_classroom(
             classroom.
     """
     classroom.validate()
+    classroom_count = len(get_all_classrooms())
     classroom_models.ClassroomModel.create(
         classroom.classroom_id,
         classroom.name,
@@ -271,6 +280,7 @@ def create_new_classroom(
         classroom.banner_data.filename,
         classroom.banner_data.bg_color,
         classroom.banner_data.size_in_bytes,
+        classroom_count
     )
 
 
@@ -287,13 +297,15 @@ def create_new_default_classroom(
     Returns:
         Classroom. The domain object representing a classroom.
     """
+    classroom_count = len(get_all_classrooms())
     classroom = classroom_config_domain.Classroom(
         classroom_id=classroom_id, name=name, url_fragment=url_fragment,
         teaser_text='', course_details='', topic_list_intro='',
         topic_id_to_prerequisite_topic_ids={},
         is_published=feconf.DEFAULT_CLASSROOM_PUBLICATION_STATUS,
         thumbnail_data=classroom_config_domain.ImageData('', '', 0),
-        banner_data=classroom_config_domain.ImageData('', '', 0)
+        banner_data=classroom_config_domain.ImageData('', '', 0),
+        index=classroom_count
     )
 
     classroom.require_valid_name(name)
@@ -314,6 +326,7 @@ def create_new_default_classroom(
         classroom.banner_data.filename,
         classroom.banner_data.bg_color,
         classroom.banner_data.size_in_bytes,
+        classroom.index
     )
 
     return classroom
@@ -325,4 +338,41 @@ def delete_classroom(classroom_id: str) -> None:
     Args:
         classroom_id: str. ID of the classroom which is to be deleted.
     """
+    classrooms = get_all_classrooms()
+
+    for classroom in classrooms:
+        if classroom.classroom_id == classroom_id:
+            index_to_delete = classroom.index
+            break
+
+    for classroom in classrooms:
+        if classroom.index > index_to_delete:
+            classroom.index -= 1
+            update_classroom(classroom)
+
     classroom_models.ClassroomModel.get(classroom_id).delete()
+
+
+@transaction_services.run_in_transaction_wrapper
+def update_classroom_id_to_index_mappings(
+    classroom_index_mappings: List[
+        classroom_config_domain.ClassroomIdToIndexDict
+    ]
+) -> None:
+    """Updates the index of multiple classrooms.
+
+    Args:
+        classroom_index_mappings: List[ClassroomIdToIndex]. The domain
+            objects for the given mapping.
+
+    Raises:
+        Exception. No mapping found for the given classroom ID.
+    """
+
+    for classroom_index_mapping in classroom_index_mappings:
+        classroom_id = classroom_index_mapping['classroom_id']
+        classroom_index = int(classroom_index_mapping['classroom_index'])
+
+        classroom = get_classroom_by_id(classroom_id)
+        classroom.index = classroom_index
+        update_classroom(classroom)

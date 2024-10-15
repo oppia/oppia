@@ -98,7 +98,7 @@ class SetPlatformParametersTests(test_utils.GenericTestBase):
             Exception,
             'The value for the platform parameter dummy_parameter was '
             'needed in this test, but not specified in the '
-            'set_platform_parameters decorator. Please this information in '
+            'set_platform_parameters decorator. Please use this information in '
             'the decorator.'
         ):
             platform_parameter_services.get_platform_parameter_value(
@@ -712,6 +712,21 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ):
             with self.assertRaisesRegex(Exception, ''):
                 mock_exception_func()
+
+    def test_invalid_http_method_raises_exception(self) -> None:
+        url = '/mock-url'
+        invalid_http_method = 'INVALID_METHOD'
+        expected_status_int_list = [200]
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid http method %s' % invalid_http_method
+            ):
+            self.get_response_without_checking_for_errors(
+                url=url,
+                expected_status_int_list=expected_status_int_list,
+                http_method=invalid_http_method
+            )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally

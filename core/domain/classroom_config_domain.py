@@ -38,6 +38,7 @@ class ClassroomDict(TypedDict):
     is_published: bool
     thumbnail_data: ImageDataDict
     banner_data: ImageDataDict
+    index: int
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
@@ -60,7 +61,8 @@ class Classroom:
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool,
         thumbnail_data: ImageData,
-        banner_data: ImageData
+        banner_data: ImageData,
+        index: int
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -78,6 +80,7 @@ class Classroom:
             thumbnail_data: ImageData. Image data object for classroom
                 thumbnail.
             banner_data: ImageData. Image data object for classroom banner.
+            index: int. The index of the classroom.
         """
         self.classroom_id = classroom_id
         self.name = name
@@ -90,6 +93,7 @@ class Classroom:
         self.is_published = is_published
         self.thumbnail_data = thumbnail_data
         self.banner_data = banner_data
+        self.index = index
 
     @classmethod
     def from_dict(cls, classroom_dict: ClassroomDict) -> Classroom:
@@ -112,7 +116,8 @@ class Classroom:
             classroom_dict['topic_id_to_prerequisite_topic_ids'],
             classroom_dict['is_published'],
             ImageData.from_dict(classroom_dict['thumbnail_data']),
-            ImageData.from_dict(classroom_dict['banner_data'])
+            ImageData.from_dict(classroom_dict['banner_data']),
+            classroom_dict['index']
         )
 
     def to_dict(self) -> ClassroomDict:
@@ -132,7 +137,8 @@ class Classroom:
                 self.topic_id_to_prerequisite_topic_ids),
             'is_published': self.is_published,
             'thumbnail_data': self.thumbnail_data.to_dict(),
-            'banner_data': self.banner_data.to_dict()
+            'banner_data': self.banner_data.to_dict(),
+            'index': self.index
         }
 
     def get_topic_ids(self) -> List[str]:
@@ -327,34 +333,14 @@ class Classroom:
                 )
                 visited_topic_ids_for_current_node.append(ancestor_topic_id)
 
-    def validate(self) -> None:
+    def validate(self, strict: bool = False) -> None:
         """Validates various properties of the Classroom."""
 
         if not isinstance(self.classroom_id, str):
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
                 % self.classroom_id)
-        if not isinstance(self.thumbnail_data, ImageData):
-            raise utils.ValidationError(
-                'Expected thumbnail_data of the classroom to be a string, '
-                'received: %s.' % self.thumbnail_data
-            )
-        if not isinstance(self.banner_data, ImageData):
-            raise utils.ValidationError(
-                'Expected banner_data of the classroom to be a string, '
-                'received: %s.' % self.banner_data
-            )
-        if self.thumbnail_data.filename == '':
-            raise utils.ValidationError(
-                'thumbnail_filename field should not be empty')
-        if self.banner_data.filename == '':
-            raise utils.ValidationError(
-                'banner_filename field should not be empty')
-
         self.require_valid_name(self.name)
-        self.require_valid_teaser_text(self.teaser_text)
-        self.require_valid_topic_list_intro(self.topic_list_intro)
-        self.require_valid_course_details(self.course_details)
         self.require_valid_url_fragment(self.url_fragment)
         self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
             self.topic_id_to_prerequisite_topic_ids)
@@ -362,10 +348,40 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
-        self.require_valid_bg_color(self.thumbnail_data.bg_color, True)
-        self.require_valid_bg_color(self.banner_data.bg_color, False)
-        utils.require_valid_image_filename(self.banner_data.filename)
-        utils.require_valid_thumbnail_filename(self.thumbnail_data.filename)
+
+        if strict:
+            if not isinstance(self.index, int):
+                raise utils.ValidationError(
+                    'Expected index of the classroom to be a boolean, '
+                    'received: %s.' % self.index)
+
+            if not isinstance(self.thumbnail_data, ImageData):
+                raise utils.ValidationError(
+                    'Expected thumbnail_data of the classroom to be a string, '
+                    'received: %s.' % self.thumbnail_data
+                )
+            if not isinstance(self.banner_data, ImageData):
+                raise utils.ValidationError(
+                    'Expected banner_data of the classroom to be a string, '
+                    'received: %s.' % self.banner_data
+                )
+            if self.thumbnail_data.filename == '':
+                raise utils.ValidationError(
+                    'thumbnail_filename field should not be empty')
+            if self.banner_data.filename == '':
+                raise utils.ValidationError(
+                    'banner_filename field should not be empty')
+            if not self.topic_id_to_prerequisite_topic_ids:
+                raise utils.ValidationError(
+                    'A classroom should have at least one topic.'
+                )
+            self.require_valid_teaser_text(self.teaser_text)
+            self.require_valid_topic_list_intro(self.topic_list_intro)
+            self.require_valid_course_details(self.course_details)
+            self.require_valid_bg_color(self.thumbnail_data.bg_color, True)
+            self.require_valid_bg_color(self.banner_data.bg_color, False)
+            utils.require_valid_image_filename(self.banner_data.filename)
+            utils.require_valid_thumbnail_filename(self.thumbnail_data.filename)
 
 
 class ImageDataDict(TypedDict, total=False):
@@ -424,3 +440,11 @@ class ImageData:
             'bg_color': self.bg_color,
             'size_in_bytes': self.size_in_bytes,
         }
+
+
+class ClassroomIdToIndexDict(TypedDict):
+    """Dict type for ClassroomIdToIndex object."""
+
+    classroom_id: str
+    classroom_name: str
+    classroom_index: int

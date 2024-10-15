@@ -30,10 +30,6 @@ import {APP_BASE_HREF} from '@angular/common';
 
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import {SharedComponentsModule} from 'components/shared-component.module';
-import {
-  TopicViewerNavbarBreadcrumbComponent,
-  // eslint-disable-next-line max-len
-} from 'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
 import {RequestInterceptor} from 'services/request-interceptor.service';
 import {TopicViewerPageComponent} from 'pages/topic-viewer-page/topic-viewer-page.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -55,16 +51,8 @@ import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
     TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig),
   ],
-  declarations: [
-    TopicViewerNavbarBreadcrumbComponent,
-    TopicViewerPageComponent,
-    PracticeSessionConfirmationModal,
-  ],
-  entryComponents: [
-    TopicViewerNavbarBreadcrumbComponent,
-    TopicViewerPageComponent,
-    PracticeSessionConfirmationModal,
-  ],
+  declarations: [TopicViewerPageComponent, PracticeSessionConfirmationModal],
+  entryComponents: [TopicViewerPageComponent, PracticeSessionConfirmationModal],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

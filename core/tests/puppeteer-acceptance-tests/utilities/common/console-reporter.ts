@@ -75,12 +75,21 @@ const CONSOLE_ERRORS_TO_IGNORE = [
   new RegExp(
     /https:\/\/content\.googleapis\.com\/drive\/v2internal\/viewerimpressions\?key=[^&]+&alt=json/
   ),
+  // Error related to Donorbox ReCaptcha not being iframe-able in
+  // acceptance tests. This is outside our control because it is
+  // controlled by Donorbox.
+  escapeRegExp("[Report Only] Refused to frame 'https://www.recaptcha.net/'"),
 ];
 
 const CONSOLE_ERRORS_TO_FIX = [
   // TODO(#19746): Development console error "Uncaught in Promise" on signup.
   new RegExp(
     'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
+  ),
+  // TODO(#20748): SyntaxError: Unexpected token < in JSON at position 0.
+  new RegExp(
+    'Uncaught \\(in promise\\): SyntaxError: Unexpected token < in JSON.*',
+    'm'
   ),
   // TODO(#19733): 404 (Not Found) for resources used in midi-js.
   escapeRegExp(
@@ -97,6 +106,11 @@ const CONSOLE_ERRORS_TO_FIX = [
     'ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was ' +
       "checked. Previous value: 'srcset: .*'\\. Current value: 'srcset: .*'\\."
   ),
+  // TODO(#20829): Console error "Cannot read properties of undefined (reading 'getStory')" on navigation or reload in Story Editor.
+  /Cannot read properties of undefined \(reading 'getStory'\)/,
+  /Occurred at http:\/\/localhost:8181\/story_editor\/.*\/#\/chapter_editor\/node_1 webpack:\/\/\/\..* Cannot read properties of undefined \(reading 'getStory'\)/,
+  // TODO(#20830): ExpressionChangedAfterItHasBeenCheckedError in Story Editor.
+  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'./,
 ];
 
 export class ConsoleReporter {

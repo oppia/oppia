@@ -211,12 +211,13 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} videoPath - A video path relative to /assets/videos folder.
+   * @param {string} imagePath - An image path relative to /assets/images
+   * folder.
    * @return {string} The complete url path to that image.
    */
-  getStaticVideoUrl(videoPath: string): string {
-    this.validateResourcePath(videoPath);
-    return this._getCompleteUrl('/assets', '/videos' + videoPath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    this.validateResourcePath(imagePath);
+    return '/assets' + '/copyrighted-images' + imagePath;
   }
 
   /**
@@ -235,20 +236,6 @@ export class UrlInterpolationService {
   getStaticAssetUrl(assetPath: string): string {
     this.validateResourcePath(assetPath);
     return this._getCompleteUrl('/assets', assetPath);
-  }
-
-  /**
-   * @param {string} path - A complete url path to an asset.
-   * @return {string} The url including the current url origin and the complete
-   * url path.
-   */
-  getFullStaticAssetUrl(path: string): string {
-    this.validateResourcePath(path);
-    if (this.DEV_MODE) {
-      return this.urlService.getOrigin() + path;
-    } else {
-      return this.urlService.getOrigin() + '/build' + path;
-    }
   }
 
   /**

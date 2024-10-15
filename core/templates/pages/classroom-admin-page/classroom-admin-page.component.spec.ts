@@ -26,6 +26,7 @@ import {
 } from '@angular/core/testing';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {ContextService} from 'services/context.service';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
 import {ClassroomAdminPageComponent} from 'pages/classroom-admin-page/classroom-admin-page.component';
@@ -37,6 +38,7 @@ import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import cloneDeep from 'lodash/cloneDeep';
+import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
 
 class MockNgbModal {
   open() {
@@ -46,10 +48,58 @@ class MockNgbModal {
   }
 }
 
+const dummyThumbnailData = {
+  filename: 'thumbnail.svg',
+  bg_color: 'transparent',
+  size_in_bytes: 1000,
+  image_data: new Blob([''], {type: 'image/svg+xml'}),
+};
+
+const dummyBannerData = {
+  filename: 'banner.png',
+  bg_color: 'transparent',
+  size_in_bytes: 1000,
+  image_data: new Blob([''], {type: 'image/png'}),
+};
+
+let dummyClassroomDict = {
+  classroomId: 'classroomId',
+  name: 'math',
+  urlFragment: 'math',
+  courseDetails: "Oppia's curated maths lesson.",
+  teaserText: 'Learn math',
+  topicListIntro: 'Start from the basics with our first topic.',
+  topicIdToPrerequisiteTopicIds: {},
+  isPublished: true,
+  thumbnailData: dummyThumbnailData,
+  bannerData: dummyBannerData,
+};
+
+let dummyTopicToClassroomRelations = [
+  {
+    topic_id: 'topicid1',
+    topic_name: 'topic1',
+    classroom_name: 'math',
+    classroom_url_fragment: 'math',
+  },
+  {
+    topic_id: 'topicid2',
+    topic_name: 'topic2',
+    classroom_name: null,
+    classroom_url_fragment: null,
+  },
+  {
+    topic_id: 'topicid3',
+    topic_name: 'topic3',
+    classroom_name: null,
+    classroom_url_fragment: null,
+  },
+];
+
 describe('Classroom Admin Page component ', () => {
   let component: ClassroomAdminPageComponent;
   let fixture: ComponentFixture<ClassroomAdminPageComponent>;
-
+  let contextService: ContextService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let editableTopicBackendApiService: EditableTopicBackendApiService;
   let ngbModal: NgbModal;
@@ -68,6 +118,7 @@ describe('Classroom Admin Page component ', () => {
       declarations: [ClassroomAdminPageComponent, MockTranslatePipe],
       providers: [
         AlertsService,
+        ContextService,
         ClassroomBackendApiService,
         EditableTopicBackendApiService,
         {
@@ -78,6 +129,7 @@ describe('Classroom Admin Page component ', () => {
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     fixture = TestBed.createComponent(ClassroomAdminPageComponent);
+    contextService = TestBed.inject(ContextService);
     component = fixture.componentInstance;
   });
 
@@ -91,13 +143,22 @@ describe('Classroom Admin Page component ', () => {
   });
 
   it('should initialize the component', fakeAsync(() => {
-    let response = {
-      mathClassroomId: 'math',
-      physicsClassroomId: 'physics',
-    };
+    let response = [
+      {
+        classroom_id: 'math_classroom_id',
+        classroom_name: 'math',
+        classroom_index: 1,
+      },
+      {
+        classroom_id: 'physics_classroom_id',
+        classroom_name: 'physics',
+        classroom_index: 2,
+      },
+    ];
+
     spyOn(
       classroomBackendApiService,
-      'getAllClassroomIdToClassroomNameDictAsync'
+      'getAllClassroomDisplayInfoDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
     expect(component.pageIsInitialized).toBeFalse();
@@ -106,20 +167,13 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     expect(component.pageIsInitialized).toBeTrue();
-    expect(component.classroomIdToClassroomName).toEqual(response);
+    expect(component.classroomIdToClassroomNameIndex).toEqual(response);
     expect(component.classroomCount).toEqual(2);
   }));
 
   it('should open classroom detail and update classroom properties', fakeAsync(() => {
     let response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      },
+      classroomDict: dummyClassroomDict,
     };
     spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
       Promise.resolve(response)
@@ -151,16 +205,27 @@ describe('Classroom Admin Page component ', () => {
     );
   }));
 
+  it('should display alert when unable to fetch topics to classroom relation', fakeAsync(() => {
+    spyOn(
+      classroomBackendApiService,
+      'getAllTopicsToClassroomRelation'
+    ).and.returnValue(Promise.reject(400));
+    spyOn(alertsService, 'addWarning');
+
+    component.getAllTopicsToClassroomRelation();
+    tick();
+
+    expect(
+      classroomBackendApiService.getAllTopicsToClassroomRelation
+    ).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to get topics and classrooms relation'
+    );
+  }));
+
   it('should close classroom details when already in view mode', fakeAsync(() => {
     let response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      },
+      classroomDict: dummyClassroomDict,
     };
     spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
       Promise.resolve(response)
@@ -179,16 +244,52 @@ describe('Classroom Admin Page component ', () => {
     expect(component.classroomViewerMode).toBeFalse();
   }));
 
+  it('should set topicsToClassroomRelation and filteredTopicsToClassroomRelation', fakeAsync(() => {
+    const response = [
+      {
+        topic_name: 'topic_name',
+        topic_id: 'topic_id',
+        classroom_name: null,
+        classroom_url_fragment: null,
+      },
+    ];
+    spyOn(
+      classroomBackendApiService,
+      'getAllTopicsToClassroomRelation'
+    ).and.returnValue(Promise.resolve(response));
+
+    expect(component.topicsToClassroomRelation.length).toEqual(0);
+    expect(component.filteredTopicsToClassroomRelation.length).toEqual(0);
+
+    component.getClassroomData('getAllTopicsToClassroomRelation');
+    tick();
+
+    expect(component.topicsToClassroomRelation.length).toEqual(1);
+    expect(component.filteredTopicsToClassroomRelation.length).toEqual(1);
+  }));
+
+  it('should get available topics which we can assign to a classroom', fakeAsync(() => {
+    component.topicsToClassroomRelation = dummyTopicToClassroomRelations;
+
+    const availableTopics = component.getAvailableTopics();
+    tick();
+
+    expect(availableTopics.length).toEqual(2);
+  }));
+
+  it('should filter topics by topic name', fakeAsync(() => {
+    component.topicsToClassroomRelation = dummyTopicToClassroomRelations;
+
+    component.filterTopicsByName('topic2');
+    expect(component.filteredTopicsToClassroomRelation.length).toEqual(1);
+
+    component.filterTopicsByName('');
+    expect(component.filteredTopicsToClassroomRelation.length).toEqual(2);
+  }));
+
   it('should not close classroom details while editing classroom properties', fakeAsync(() => {
     let response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      },
+      classroomDict: dummyClassroomDict,
     };
     spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
       Promise.resolve(response)
@@ -207,35 +308,36 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it('should get classroom ID to classroom name and update classroom count', fakeAsync(() => {
-    let response = {
-      mathClassroomId: 'math',
-      physicsClassroomId: 'physics',
-    };
+    let response = [
+      {
+        classroom_id: 'math_classroom_id',
+        classroom_name: 'math',
+        classroom_index: 1,
+      },
+      {
+        classroom_id: 'physics_classroom_id',
+        classroom_name: 'physics',
+        classroom_index: 2,
+      },
+    ];
     spyOn(
       classroomBackendApiService,
-      'getAllClassroomIdToClassroomNameDictAsync'
+      'getAllClassroomDisplayInfoDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
     expect(component.pageIsInitialized).toBeFalse();
 
-    component.getAllClassroomIdToClassroomName();
+    component.getAllClassroomIdToClassroomNameIndex();
     tick();
 
     expect(component.pageIsInitialized).toBeTrue();
-    expect(component.classroomIdToClassroomName).toEqual(response);
+    expect(component.classroomIdToClassroomNameIndex).toEqual(response);
     expect(component.classroomCount).toEqual(2);
   }));
 
   it('should be able to update the classroom name', () => {
     const response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      },
+      classroomDict: dummyClassroomDict,
     };
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       response.classroomDict
@@ -251,19 +353,55 @@ describe('Classroom Admin Page component ', () => {
     expect(component.classroomDataIsChanged).toBeTrue();
   });
 
+  it('should be able to update the classroom teaser text', () => {
+    const response = {
+      classroomDict: dummyClassroomDict,
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.tempClassroomData.setTeaserText('Learn math updated');
+    component.classroomDataIsChanged = false;
+
+    component.updateClassroomField();
+
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
+
+  it('should be able to update the classroom thumbnail and banner data', () => {
+    const response = {
+      classroomDict: dummyClassroomDict,
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.updateThumbnailData({
+      ...dummyThumbnailData,
+      filename: 'updated.svg',
+    });
+    component.updateBannerData({
+      ...dummyBannerData,
+      filename: 'updated.png',
+    });
+    component.classroomDataIsChanged = false;
+
+    component.updateClassroomField();
+
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
+
   it(
     'should not update the classroom field if the current changes match ' +
       'with existing ones',
     () => {
       const response = {
-        classroomDict: {
-          classroomId: 'classroomId',
-          name: 'math',
-          urlFragment: 'math',
-          courseDetails: '',
-          topicListIntro: '',
-          topicIdToPrerequisiteTopicIds: {},
-        },
+        classroomDict: dummyClassroomDict,
       };
       component.tempClassroomData =
         ExistingClassroomData.createClassroomFromDict(response.classroomDict);
@@ -287,14 +425,7 @@ describe('Classroom Admin Page component ', () => {
 
   it('should be able to update the classroom url fragment', () => {
     let response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      },
+      classroomDict: dummyClassroomDict,
     };
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       response.classroomDict
@@ -312,14 +443,7 @@ describe('Classroom Admin Page component ', () => {
 
   it('should be able to update the classroom course details', () => {
     let response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      },
+      classroomDict: dummyClassroomDict,
     };
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       response.classroomDict
@@ -328,7 +452,7 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
     component.tempClassroomData.setCourseDetails(
-      "Oppia's curated maths lesson."
+      "Oppia's curated maths lesson updated."
     );
     component.classroomDataIsChanged = false;
 
@@ -339,14 +463,7 @@ describe('Classroom Admin Page component ', () => {
 
   it('should be able to update the classroom topic list intro', () => {
     let response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      },
+      classroomDict: dummyClassroomDict,
     };
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       response.classroomDict
@@ -355,7 +472,7 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
     component.tempClassroomData.setTopicListIntro(
-      'Start from the basics with our first topic.'
+      'Start from the basics with our first topic updated.'
     );
     component.classroomDataIsChanged = false;
 
@@ -365,24 +482,30 @@ describe('Classroom Admin Page component ', () => {
   });
 
   it('should be able to convert classroom dict to the backend form', () => {
-    let classroomDict = {
-      classroomId: 'classroomId',
-      name: 'math',
-      urlFragment: 'math',
-      courseDetails: "Oppia's curated maths lesson.",
-      topicListIntro: 'Start from the basics with our first topic.',
-      topicIdToPrerequisiteTopicIds: {},
-    };
-
     let classroomBackendDict = {
       classroom_id: 'classroomId',
       name: 'math',
       url_fragment: 'math',
       course_details: "Oppia's curated maths lesson.",
+      teaser_text: 'Learn math',
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
+      is_published: true,
+      thumbnail_data: dummyThumbnailData,
+      banner_data: dummyBannerData,
     };
-
+    let classroomDict = {
+      classroomId: 'classroomId',
+      name: 'math',
+      urlFragment: 'math',
+      courseDetails: "Oppia's curated maths lesson.",
+      teaserText: 'Learn math',
+      topicListIntro: 'Start from the basics with our first topic.',
+      topicIdToPrerequisiteTopicIds: {},
+      isPublished: true,
+      thumbnailData: dummyThumbnailData,
+      bannerData: dummyBannerData,
+    };
     expect(component.convertClassroomDictToBackendForm(classroomDict)).toEqual(
       classroomBackendDict
     );
@@ -402,19 +525,11 @@ describe('Classroom Admin Page component ', () => {
     component.classroomViewerMode = false;
     component.classroomEditorMode = true;
     component.classroomDataIsChanged = true;
-    component.classroomIdToClassroomName = {};
-    let classroomDict = {
-      classroomId: 'classroomId',
-      name: 'math',
-      urlFragment: 'math',
-      courseDetails: "Oppia's curated maths lesson.",
-      topicListIntro: 'Start from the basics with our first topic.',
-      topicIdToPrerequisiteTopicIds: {},
-    };
+    component.classroomIdToClassroomNameIndex = [];
     component.tempClassroomData =
-      ExistingClassroomData.createClassroomFromDict(classroomDict);
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
     component.classroomData =
-      ExistingClassroomData.createClassroomFromDict(classroomDict);
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
 
     spyOn(
       classroomBackendApiService,
@@ -430,18 +545,10 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it('should be able handle rejection handler while saving classroom data', fakeAsync(() => {
-    let classroomDict = {
-      classroomId: 'classroomId',
-      name: 'math',
-      urlFragment: 'math',
-      courseDetails: "Oppia's curated maths lesson.",
-      topicListIntro: 'Start from the basics with our first topic.',
-      topicIdToPrerequisiteTopicIds: {},
-    };
     component.tempClassroomData =
-      ExistingClassroomData.createClassroomFromDict(classroomDict);
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
     component.classroomData =
-      ExistingClassroomData.createClassroomFromDict(classroomDict);
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
 
     spyOn(
       classroomBackendApiService,
@@ -468,8 +575,12 @@ describe('Classroom Admin Page component ', () => {
         name: 'math',
         urlFragment: 'math',
         courseDetails: "Oppia's curated maths lesson.",
+        teaserText: 'Learn math',
         topicListIntro: 'Start from the basics with our first topic.',
         topicIdToPrerequisiteTopicIds: {},
+        isPublished: true,
+        thumbnailData: dummyThumbnailData,
+        bannerData: dummyBannerData,
       });
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {},
@@ -528,15 +639,32 @@ describe('Classroom Admin Page component ', () => {
   );
 
   it('should be able to delete classroom', fakeAsync(() => {
-    component.classroomIdToClassroomName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
-    let expectedClassroom = {
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
+    const response = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 1,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 2,
+      },
+    ];
+
+    spyOn(
+      classroomBackendApiService,
+      'getAllClassroomDisplayInfoDictAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.ngOnInit();
+    tick();
+
     component.classroomCount = 3;
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
@@ -545,26 +673,48 @@ describe('Classroom Admin Page component ', () => {
     spyOn(classroomBackendApiService, 'deleteClassroomAsync').and.returnValue(
       Promise.resolve()
     );
-
-    component.deleteClassroom('mathClassroomId');
+    component.deleteClassroom('chemistryClassroomId');
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.classroomIdToClassroomName).toEqual(expectedClassroom);
     expect(component.classroomCount).toEqual(2);
   }));
 
   it('should be able to cancel modal for not deleting the classroom', fakeAsync(() => {
-    component.classroomIdToClassroomName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
-    let expectedClassroomIdToName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
+    component.classroomIdToClassroomNameIndex = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 1,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 2,
+      },
+    ];
+    let expectedClassroomIdToName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 1,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 2,
+      },
+    ];
     component.classroomCount = 3;
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
@@ -578,22 +728,42 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.classroomIdToClassroomName).toEqual(
+    expect(component.classroomIdToClassroomNameIndex).toEqual(
       expectedClassroomIdToName
     );
     expect(component.classroomCount).toEqual(3);
   }));
 
   it('should be able to create new classroom', fakeAsync(() => {
-    component.classroomIdToClassroomName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-    };
-    let expectedClassroomIdToName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
+    component.classroomIdToClassroomNameIndex = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+    ];
+    let expectedClassroomIdToName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 2,
+      },
+    ];
     let classroomDict = {
       classroom_id: 'physicsClassroomId',
       name: 'physics',
@@ -613,20 +783,36 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.classroomIdToClassroomName).toEqual(
+    expect(component.classroomIdToClassroomNameIndex).toEqual(
       expectedClassroomIdToName
     );
   }));
 
   it('should be able to cancel create classsroom modal', fakeAsync(() => {
-    component.classroomIdToClassroomName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-    };
-    let expectedClassroomIdToName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-    };
+    component.classroomIdToClassroomNameIndex = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+    ];
+    let expectedClassroomIdToName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+    ];
 
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
@@ -639,7 +825,7 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.classroomIdToClassroomName).toEqual(
+    expect(component.classroomIdToClassroomNameIndex).toEqual(
       expectedClassroomIdToName
     );
   }));
@@ -661,16 +847,8 @@ describe('Classroom Admin Page component ', () => {
       'Dummy topic 3': ['Dummy topic 1'],
     };
 
-    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
-      {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      }
-    );
+    component.tempClassroomData =
+      ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
 
     spyOn(
       editableTopicBackendApiService,
@@ -687,16 +865,22 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it('should be able to add new topic ID to classroom', fakeAsync(() => {
-    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
-      {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: {},
-      }
-    );
+    let classroomDict = {
+      classroomId: 'classroomId',
+      name: 'math',
+      urlFragment: 'math',
+      courseDetails: "Oppia's curated maths lesson.",
+      teaserText: 'Learn math',
+      topicListIntro: 'Start from the basics with our first topic.',
+      topicIdToPrerequisiteTopicIds: {},
+      isPublished: true,
+      thumbnailData: dummyThumbnailData,
+      bannerData: dummyBannerData,
+    };
+    component.tempClassroomData =
+      ExistingClassroomData.createClassroomFromDict(classroomDict);
+    component.classroomData =
+      ExistingClassroomData.createClassroomFromDict(classroomDict);
     expect(component.tempClassroomData.getTopicsCount()).toEqual(0);
     expect(
       component.tempClassroomData.getTopicIdToPrerequisiteTopicId()
@@ -711,7 +895,7 @@ describe('Classroom Admin Page component ', () => {
       'getTopicIdToTopicNameAsync'
     ).and.returnValue(Promise.resolve(topicIdToTopicName));
 
-    component.addTopicId('topicId1');
+    component.onNewTopicInputModelChange('topicId1');
 
     tick();
 
@@ -754,7 +938,7 @@ describe('Classroom Admin Page component ', () => {
   it('should remove existing error for topic ID model change', () => {
     component.topicWithGivenIdExists = false;
 
-    component.onNewTopicInputModelChange();
+    component.onNewTopicInputModelChange('DUMMY_ID');
 
     expect(component.topicWithGivenIdExists).toBeTrue();
   });
@@ -774,11 +958,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
+        ...dummyClassroomDict,
         topicIdToPrerequisiteTopicIds: {
           topicId1: [],
           topicId2: ['topicId1'],
@@ -825,11 +1005,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
+        ...dummyClassroomDict,
         topicIdToPrerequisiteTopicIds: {
           topicId1: [],
           topicId2: ['topicId1'],
@@ -876,11 +1052,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
+        ...dummyClassroomDict,
         topicIdToPrerequisiteTopicIds: {
           topicId1: [],
           topicId2: ['topicId1'],
@@ -988,11 +1160,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
+        ...dummyClassroomDict,
         topicIdToPrerequisiteTopicIds: {
           topicId1: [],
           topicId2: ['topicId1'],
@@ -1044,11 +1212,7 @@ describe('Classroom Admin Page component ', () => {
 
       component.tempClassroomData =
         ExistingClassroomData.createClassroomFromDict({
-          classroomId: 'classroomId',
-          name: 'math',
-          urlFragment: 'math',
-          courseDetails: '',
-          topicListIntro: '',
+          ...dummyClassroomDict,
           topicIdToPrerequisiteTopicIds: {
             topicId1: [],
           },
@@ -1085,11 +1249,7 @@ describe('Classroom Admin Page component ', () => {
 
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
+        ...dummyClassroomDict,
         topicIdToPrerequisiteTopicIds: {
           topicId1: [],
           topicId2: ['topicId1'],
@@ -1124,11 +1284,7 @@ describe('Classroom Admin Page component ', () => {
   it('should change list oder', () => {
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
+        ...dummyClassroomDict,
         topicIdToPrerequisiteTopicIds: {
           topicId1: [],
           topicId2: ['topicId1'],
@@ -1165,11 +1321,7 @@ describe('Classroom Admin Page component ', () => {
   it('should present a graph modal before topics dependency visualization', fakeAsync(() => {
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
+        ...dummyClassroomDict,
         topicIdToPrerequisiteTopicIds: {
           topicId1: [],
           topicId2: ['topicId1'],
@@ -1197,11 +1349,7 @@ describe('Classroom Admin Page component ', () => {
   it('should be able to cancel the topics graph visualization', fakeAsync(() => {
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
       {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
+        ...dummyClassroomDict,
         topicIdToPrerequisiteTopicIds: {
           topicId1: [],
           topicId2: ['topicId1'],
@@ -1237,4 +1385,202 @@ describe('Classroom Admin Page component ', () => {
     expect(component.getPrerequisiteLength('Dummy topic 2')).toEqual(1);
     expect(component.getPrerequisiteLength('Dummy topic 3')).toEqual(1);
   });
+
+  it('should be able to publish classroom', fakeAsync(() => {
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+        topicIdToPrerequisiteTopicIds: {
+          id: [],
+        },
+        isPublished: false,
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+
+    expect(component.allValidationErrors.length).toEqual(0);
+    spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
+    tick();
+
+    component.togglePublicationStatus();
+    component.saveClassroomData();
+    expect(component.updateClassroomData).toHaveBeenCalled();
+  }));
+
+  it('should not be able to publish classroom due to validation errors', () => {
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+        isPublished: true,
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.tempClassroomData.setClassroomName('');
+    component.classroomDataIsChanged = false;
+    component.updateClassroomField();
+
+    expect(component.allValidationErrors.length).toEqual(3);
+  });
+
+  it('should not be able to save classroom due to validation errors', () => {
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+        name: '',
+        urlFragment: '',
+        isPublished: false,
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.updateClassroomField();
+
+    expect(component.saveClassroomValidationErrors.length).toEqual(2);
+  });
+
+  it('should not save a published classroom if user deletes some data', () => {
+    spyOn(component, 'updateClassroomData');
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+        name: '',
+        urlFragment: '',
+        isPublished: true,
+        teaserText: '',
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.updateClassroomField();
+    component.saveClassroomData();
+
+    expect(component.canSaveClassroom()).toBeFalse();
+    expect(component.updateClassroomData).not.toHaveBeenCalled();
+  });
+
+  it('should be able to unpublish a published classroom', fakeAsync(() => {
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+        isPublished: true,
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+
+    spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
+    tick();
+
+    component.togglePublicationStatus();
+    component.saveClassroomData();
+    expect(component.updateClassroomData).toHaveBeenCalled();
+  }));
+
+  it(
+    'should clear custom context when ngOnDestroy is called or when' +
+      ' thumbnail/banner filename is not provided',
+    fakeAsync(() => {
+      spyOn(contextService, 'removeCustomEntityContext');
+      component.ngOnDestory();
+      expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
+
+      let response = {
+        classroomDict: {
+          ...dummyClassroomDict,
+          thumbnailData: {
+            ...dummyThumbnailData,
+            filename: '',
+          },
+        },
+      };
+      spyOn(
+        classroomBackendApiService,
+        'getClassroomDataAsync'
+      ).and.returnValue(Promise.resolve(response));
+
+      component.getClassroomData('classroomId');
+      tick();
+
+      expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
+    })
+  );
+
+  it('should open the UpdateClassroomsOrderModal and update classroom index mappings', fakeAsync(() => {
+    const modalRef = {
+      componentInstance: {},
+      result: Promise.resolve([
+        {classroom_id: 'classroomId_1', classroom_index: 2},
+      ]),
+    } as NgbModalRef;
+
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
+    spyOn(
+      classroomBackendApiService,
+      'updateClassroomIndexMappingAsync'
+    ).and.returnValue(Promise.resolve());
+
+    component.changeClassroomsOrder();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      UpdateClassroomsOrderModalComponent,
+      {backdrop: 'static'}
+    );
+    expect(
+      classroomBackendApiService.updateClassroomIndexMappingAsync
+    ).toHaveBeenCalledWith([
+      {classroom_id: 'classroomId_1', classroom_index: 2},
+    ]);
+    expect(component.classroomIdToClassroomNameIndex).toEqual([
+      {classroom_id: 'classroomId_1', classroom_index: 2},
+    ]);
+  }));
+
+  it('should set existingClassroomNames correctly when getting classroom data', fakeAsync(() => {
+    component.classroomEditorMode = false;
+    component.classroomViewerMode = false;
+    const response = {
+      classroomDict: dummyClassroomDict,
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+
+    component.classroomIdToClassroomNameIndex = [
+      {classroom_id: 'id1', classroom_name: 'Classroom 1', classroom_index: 0},
+      {classroom_id: 'id2', classroom_name: 'Classroom 2', classroom_index: 1},
+    ];
+
+    spyOn(
+      component.classroomBackendApiService,
+      'getClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.getClassroomData('id1');
+    tick();
+
+    expect(component.existingClassroomNames).toEqual(['Classroom 1']);
+  }));
 });

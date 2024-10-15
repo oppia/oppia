@@ -10,7 +10,7 @@
           [ngClass]="panel.customTitleClassNames">
 
     <p> {{ panel.title | translate }} </p>
-    <mat-icon> add </mat-icon>
+    <i class="fas fa-plus accordion-icon"></i>
   </button>
 
 </div>
@@ -25,10 +25,16 @@
       {{ accordionData[activeIndex].title | translate }}
     </p>
     <button (click)="closePanel()">
-      <mat-icon> remove </mat-icon>
+      <i class="fas fa-minus accordion-icon"></i>
     </button>
   </div>
-  <p> {{ accordionData[activeIndex].text | translate }} </p>
-  <img *ngIf="accordionData[activeIndex].image" [src]="accordionData[activeIndex].image" >
-
+  <p class="panel-content"> {{ accordionData[activeIndex].text | translate }} </p>
+  <div class="panel-image-container" *ngIf="accordionData[activeIndex].image">
+    <picture>
+      <source type="image/webp" [srcset]="getStaticImageUrl(accordionData[activeIndex].image +  '.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl(accordionData[activeIndex].image + '.png')">
+      <img [src]="getStaticImageUrl(accordionData[activeIndex].image + '.png')"
+           [alt]="accordionData[activeIndex].altText">
+    </picture>
+  </div>
 </div>

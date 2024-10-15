@@ -43,33 +43,9 @@ describe('Logged-out User in About page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open Math Classroom page with the Browse Our Lessons button.',
+    'should open the Impact Report when the "View Report" button is clicked.',
     async function () {
-      await loggedOutUser.clickBrowseOurLessonsButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Android page with the Access Android App button.',
-    async function () {
-      await loggedOutUser.clickAccessAndroidAppButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Math Classroom page with the Visit Classroom button.',
-    async function () {
-      await loggedOutUser.clickVisitClassroomButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Community Library page with the Browse Library button.',
-    async function () {
-      await loggedOutUser.clickBrowseLibraryButtonInAboutPage();
+      await loggedOutUser.clickViewReportButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -87,24 +63,6 @@ describe('Logged-out User in About page', function () {
     'should open the donorbox when the "Donate" button is clicked',
     async function () {
       await loggedOutUser.clickDonateButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Partnerships form when the "Partner with us" button is clicked',
-    async function () {
-      await loggedOutUser.clickPartnerWithUsButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the translated Partnerships form when the "Partner with us" button is clicked after the language change',
-    async function () {
-      await loggedOutUser.clickPartnerWithUsButtonInAboutPageInGivenLanguage(
-        'pt-br'
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

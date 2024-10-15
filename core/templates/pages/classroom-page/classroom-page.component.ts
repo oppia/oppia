@@ -36,6 +36,16 @@ import {PageTitleService} from 'services/page-title.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import './classroom-page.component.css';
+import {UserService} from 'services/user.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+
+export interface ClassroomTranslationKeys {
+  name: string;
+  courseDetails: string;
+  topicListIntro: string;
+  teaserText: string;
+  [key: string]: string;
+}
 
 @Component({
   selector: 'oppia-classroom-page',
@@ -48,13 +58,17 @@ export class ClassroomPageComponent implements OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   classroomDisplayName!: string;
-  classroomNameTranslationKey!: string;
   classroomUrlFragment!: string;
   bannerImageFileUrl!: string;
   classroomData!: ClassroomData;
   beginWithFirstTopicButtonText: string = '';
   begineWithFirstTopicDescriptionText: string = '';
   firstTopicUrl: string = '';
+  publicClassroomsCount!: number;
+  showPrivateClassroomBanner: boolean = false;
+  classroomThumbnail = '';
+  classroomBanner = '';
+  classroomTranslationKeys!: ClassroomTranslationKeys;
 
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
@@ -69,8 +83,40 @@ export class ClassroomPageComponent implements OnDestroy {
     private urlService: UrlService,
     private windowRef: WindowRef,
     private translateService: TranslateService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private userService: UserService,
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
+
+  setClassroomMedia(classroomData: ClassroomData): void {
+    const classroomId = classroomData.getClassroomId();
+    const thumbnailFilename = classroomData.getThumbnailData().filename;
+    const bannerFilename = classroomData.getBannerData().filename;
+
+    this.classroomThumbnail = thumbnailFilename
+      ? this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.CLASSROOM,
+          classroomId,
+          thumbnailFilename
+        )
+      : this.urlInterpolationService.getStaticImageUrl(
+          '/classroom/default-classroom-thumbnail.svg'
+        );
+
+    this.classroomBanner = bannerFilename
+      ? this.assetsBackendApiService.getImageUrlForPreview(
+          AppConstants.ENTITY_TYPE.CLASSROOM,
+          classroomId,
+          bannerFilename
+        )
+      : this.urlInterpolationService.getStaticImageUrl(
+          '/classroom/default-classroom-background.png'
+        );
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 
   ngOnInit(): void {
     this.classroomUrlFragment =
@@ -93,9 +139,15 @@ export class ClassroomPageComponent implements OnDestroy {
                 this.classroomDisplayName = this.capitalizePipe.transform(
                   classroomData.getName()
                 );
-                this.classroomNameTranslationKey =
-                  this.i18nLanguageCodeService.getClassroomTranslationKey(
-                    this.classroomDisplayName
+
+                this.setClassroomMedia(classroomData);
+
+                this.publicClassroomsCount =
+                  classroomData.getPublicClassroomsCount();
+
+                this.classroomTranslationKeys =
+                  this.i18nLanguageCodeService.getClassroomTranslationKeys(
+                    classroomData.getName()
                   );
                 this.setPageTitle();
                 this.subscribeToOnLangChange();
@@ -108,7 +160,7 @@ export class ClassroomPageComponent implements OnDestroy {
                 ) {
                   let firstTopic = classroomData.getTopicSummaries()[0].name;
                   this.firstTopicUrl =
-                    '/learn/math/' +
+                    `/learn/${classroomData.getUrlFragment()}/` +
                     classroomData.getTopicSummaries()[0].urlFragment;
 
                   this.beginWithFirstTopicButtonText =
@@ -127,6 +179,11 @@ export class ClassroomPageComponent implements OnDestroy {
                       }
                     );
                 }
+                this.userService.getUserInfoAsync().then(userInfo => {
+                  this.showPrivateClassroomBanner =
+                    userInfo.isCurriculumAdmin() &&
+                    !this.classroomData.getIsPublished();
+                });
               },
               errorResponse => {
                 if (
@@ -134,7 +191,7 @@ export class ClassroomPageComponent implements OnDestroy {
                     errorResponse.status
                   ) !== -1
                 ) {
-                  this.alertsService.addWarning('Failed to get dashboard data');
+                  this.alertsService.addWarning('Failed to get classroom data');
                 }
               }
             );
@@ -157,25 +214,34 @@ export class ClassroomPageComponent implements OnDestroy {
   }
 
   setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_CLASSROOM_PAGE_TITLE',
-      {
-        classroomName: this.classroomDisplayName,
-      }
-    );
-    this.pageTitleService.setDocumentTitle(translatedTitle);
+    if (this.isHackyClassroomTranslationDisplayed('name')) {
+      let translatedTitle = this.translateService.instant(
+        this.classroomTranslationKeys.name
+      );
+      this.pageTitleService.setDocumentTitle(translatedTitle);
+    } else {
+      this.pageTitleService.setDocumentTitle(this.classroomDisplayName);
+    }
   }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  // This method is used to choose whether to display the classroom name or
-  // the classroom name translation in the UI.
-  isHackyClassroomTranslationDisplayed(): boolean {
+  // This method is used to choose whether to display the translation
+  // for a classroom property.
+  isHackyClassroomTranslationDisplayed(property: string): boolean {
+    if (
+      !(
+        this.classroomTranslationKeys &&
+        property in this.classroomTranslationKeys
+      )
+    ) {
+      return false;
+    }
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.classroomNameTranslationKey
+        this.classroomTranslationKeys[property]
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
@@ -185,7 +251,14 @@ export class ClassroomPageComponent implements OnDestroy {
   }
 
   isDiagnosticTestFeatureFlagEnabled(): boolean {
-    return this.platformFeatureService.status.DiagnosticTest.isEnabled;
+    // Currently, diagnostic test functionality is only supported for the math
+    // classroom. This issue (#21091) will ensure this functionality can be
+    // enabled/disabled for any classroom from the classroom admin page.
+    // Remove the second clause here, once the issue is resolved.
+    return (
+      this.platformFeatureService.status.DiagnosticTest.isEnabled &&
+      this.classroomUrlFragment === 'math'
+    );
   }
 }
 

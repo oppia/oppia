@@ -68,10 +68,11 @@
         <input type="text"
                [(ngModel)]="topicIdForRegeneratingOpportunities"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-topic-id-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Regenerate">
+        <input type="submit" value="Regenerate" class="e2e-test-regenerate-opportunities-button">
         <input type="reset" value="reset">
       </div>
     </form>
@@ -86,7 +87,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="regenerateTopicSummaries()">
       <div class="form-group row">
-        <input type="submit" value="Regenerate">
+        <input type="submit" value="Regenerate" class="e2e-test-regenerate-topic-summaries-button">
       </div>
     </form>
   </div>
@@ -105,10 +106,11 @@
         <input type="text"
                [(ngModel)]="expIdToRollback"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-exploration-id-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Rollback Exploration">
+        <input type="submit" value="Rollback Exploration" class="e2e-test-rollback-exploration-button">
         <input type="reset" value="reset">
       </div>
     </form>
@@ -120,7 +122,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="sendDummyMailToAdmin()">
       <div class="form-group row">
-        <input type="submit" value="Send">
+        <input type="submit" value="Send" class="e2e-test-send-test-mail-button">
       </div>
     </form>
   </div>
@@ -135,6 +137,7 @@
         <input type="text"
                [(ngModel)]="oldUsername"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-old-username-input"
                required="true">
       </div>
       <div class="form-group row">
@@ -143,10 +146,11 @@
                [(ngModel)]="newUsername"
                [ngModelOptions]="{standalone: true}"
                required="true"
+               class="e2e-test-new-username-input"
                [maxlength]="MAX_USERNAME_LENGTH">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Update">
+        <input type="submit" value="Update" class="e2e-test-update-username-button">
       </div>
     </form>
   </div>
@@ -159,7 +163,8 @@
           (submit)="getNumberOfPendingDeletionRequestModels()">
       <div class="form-group row">
         <input type="submit"
-               value="Get number of users whose deletion is currently in-progress">
+               value="Get number of users whose deletion is currently in-progress"
+               class="e2e-test-get-deletion-request-button">
       </div>
     </form>
   </div>
@@ -219,10 +224,11 @@
         <input type="text"
                [(ngModel)]="usernameToGrant"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-username-to-grant-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Grant">
+        <input type="submit" value="Grant" class="e2e-test-grant-super-admin-button">
       </div>
     </form>
   </div>
@@ -238,6 +244,7 @@
         <input type="text"
                [(ngModel)]="blogPostId"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-blog-id-input"
                required="true">
       </div>
       <div class="form-group row">
@@ -245,6 +252,7 @@
         <input type="text"
                [(ngModel)]="authorUsername"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-blog-author-name-input"
                required="true">
       </div>
       <div class="form-group row">
@@ -253,10 +261,11 @@
                [(ngModel)]="publishedOn"
                [ngModelOptions]="{standalone: true}"
                required="true"
+               class="e2e-test-blog-published-on-input"
                placeholder="Enter in mm/dd/yyyy">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Update">
+        <input type="submit" value="Update" class="e2e-test-update-blog-post-button">
       </div>
     </form>
   </div>
@@ -273,10 +282,11 @@
         <input type="text"
                [(ngModel)]="usernameToRevoke"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-username-to-revoke-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Revoke">
+        <input type="submit" value="Revoke" class="e2e-test-revoke-super-admin-button">
       </div>
     </form>
   </div>
@@ -291,10 +301,11 @@
         <input type="text"
                [(ngModel)]="expIdToGetInteractionIdsFor"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-exploration-id-to-get-interactions-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Get">
+        <input type="submit" value="Get" class="e2e-test-get-interactions-button">
       </div>
     </form>
   </div>

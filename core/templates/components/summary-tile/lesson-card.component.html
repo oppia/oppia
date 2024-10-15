@@ -1,5 +1,4 @@
-<!--TODO(#18384): Fix when there's only one card, margin-right still appears-->
-<div class="lesson-card-container" [ngClass]="{'lesson-card-not-last': !lastCard}">
+<div class="lesson-card-container">
   <div class="align-items-center d-flex justify-content-center lesson-card-img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
     <img alt="" class="h-100" [src]="imgUrl">
     <div class="d-flex flex-column lesson-card-tags w-100">
@@ -33,11 +32,17 @@
     font-weight: 500;
     height: 36px;
     padding: 10px 8px;
+    transition: all 300ms ease-out;
     width: 122px;
   }
 
   .lesson-card-button:hover {
-    background-color: #00645c;
+    background-color: #cadbda;
+  }
+
+  .lesson-card-button:focus {
+    background-color: #429488;
+    border-color: #429488;
     color: #fff;
   }
 
@@ -86,9 +91,5 @@
   .lesson-card-desc {
     font-size: 11px;
     -webkit-line-clamp: 2;
-  }
-
-  .lesson-card-not-last {
-    margin-right: 16px;
   }
 </style>

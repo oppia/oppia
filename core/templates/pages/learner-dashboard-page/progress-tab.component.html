@@ -55,7 +55,7 @@
           <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 80 && tile[0] <= 99">
           <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 60 && tile[0] <= 79">
           <img [src]="emptyBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] > 0 && tile[0] <= 59">
-          <span class="skill-proficiency-topic-title e2e-test-skill-proficiency-topic-title" [ngStyle]="tile[0] === 0 && {'left': '51px'}">
+          <span class="skill-proficiency-topic-title e2e-test-skill-proficiency-topic-title">
           {{tile[1].name}}
           </span>
           <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')"
@@ -92,14 +92,14 @@
                         [subtopicsList]="tile[1].subtopics"
                         [displayArea]="'progressTab'"
                         [topicUrlFragment]="tile[1].urlFragment"
-                        [classroomUrlFragment]="tile[1].classroom"
+                        [classroomUrlFragment]="tile[1].classroomUrlFragment"
                         [subtopicMastery]="subtopicMastery[tile[1].id]">
           </practice-tab>
         </div>
       </div>
     </div>
   </div>
-  <div tabindex="0" class="completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+  <div tabindex="0" class="completed-stories e2e-test-compeleted-stories-section" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
        *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
@@ -158,7 +158,7 @@
     box-shadow: 0 0 4px #0000001a;
     min-height: 220px;
     opacity: 1;
-    padding: 0 0 30px 40px;
+    padding: 0 30px 30px 40px;
     width: 736px;
   }
   #setting-a-goal-link {

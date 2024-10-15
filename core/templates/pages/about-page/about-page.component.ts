@@ -16,18 +16,19 @@
  * @fileoverview Component for the about page.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {OppiaPlatformStatsData} from '../../oppia-platform-stats';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarousel, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslateService} from '@ngx-translate/core';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 
@@ -40,19 +41,22 @@ import {AccordionPanelData} from './data.model';
   styleUrls: ['./about-page.component.css'],
 })
 export class AboutPageComponent implements OnInit, OnDestroy {
+  @ViewChild('volunteerCarousel') volunteerCarousel!: NgbCarousel;
+  @ViewChild('volunteerCarouselMobile') volunteerCarouselMobile!: NgbCarousel;
+
   featuresData: AccordionPanelData[] = [
     {
       title: 'I18N_ABOUT_PAGE_FEATURE_TITLE1',
       text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT1',
-      customPanelClassNames: ['feature-panel'],
-      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
-      panelIsCollapsed: true,
-    },
-    {
-      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE2',
-      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT2',
-      customPanelClassNames: ['feature-panel'],
-      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      customPanelClassNames: [
+        'feature-panel',
+        'e2e-test-about-page-features-panel',
+      ],
+      customTitleClassNames: [
+        'feature-title',
+        'oppia-about-platform-subtext',
+        'e2e-test-about-page-features-panel-title-desktop',
+      ],
       panelIsCollapsed: true,
     },
     {
@@ -69,7 +73,20 @@ export class AboutPageComponent implements OnInit, OnDestroy {
       customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
       panelIsCollapsed: true,
     },
+    {
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE4',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT4',
+      customPanelClassNames: ['feature-panel', 'free-of-cost-panel'],
+      customTitleClassNames: [
+        'feature-title',
+        'oppia-about-platform-subtext',
+        'free-of-cost-title',
+      ],
+      panelIsCollapsed: true,
+    },
   ];
+
+  partnersData = OppiaPlatformStatsData.OPPIA_PARTNERS_DATA;
 
   oppiaWebRawBarChartData: readonly {
     country: string;
@@ -96,27 +113,28 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
   volunteerFormLink = AppConstants.VOLUNTEER_FORM_LINK;
+  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   // Volunteer CTA is the default tab.
   selectedTabIndex = 1;
   volunteerRolesDetails = [
     {
-      title: 'I18N_ABOUT_PAGE_CTA_GROWTH_TITLE',
-      iconUrl: '/icons/growth-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_GROWTH_DESCRIPTION',
+      title: 'I18N_ABOUT_PAGE_CTA_OUTREACH_TITLE',
+      iconUrl: '/icons/outreach-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_OUTREACH_DESCRIPTION',
       listItems: [
-        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM3',
+        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM3',
       ],
     },
     {
-      title: 'I18N_ABOUT_PAGE_CTA_DEV_TITLE',
-      iconUrl: '/icons/dev-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_DEV_DESCRIPTION',
+      title: 'I18N_ABOUT_PAGE_CTA_SOFTWARE_TITLE',
+      iconUrl: '/icons/software-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_SOFTWARE_DESCRIPTION',
       listItems: [
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM3',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM3',
       ],
     },
     {
@@ -162,7 +180,6 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     mobile: [[0], [1], [2], [3], [4]],
   };
   screenType!: 'desktop' | 'tablet' | 'mobile';
-  showNavigationArrowsForCarousel = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -170,7 +187,8 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -194,18 +212,18 @@ export class AboutPageComponent implements OnInit, OnDestroy {
         this.setScreenType();
       })
     );
+    this.registerFirstTimePageViewEvent();
   }
 
   setScreenType(): void {
     const width = this.windowDimensionsService.getWidth();
-    if (width < 376) {
+    if (width < 581) {
       this.screenType = 'mobile';
-    } else if (width < 769) {
+    } else if (width < 976) {
       this.screenType = 'tablet';
     } else {
       this.screenType = 'desktop';
     }
-    this.showNavigationArrowsForCarousel = width < 641;
   }
 
   setPartnershipsFormLink(): void {
@@ -265,20 +283,71 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onClickVisitClassroomButton(): void {
-    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-  }
-
-  onClickBrowseLibraryButton(): void {
-    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-  }
-
   expandPanel(index: number): void {
     this.featuresData[index].panelIsCollapsed = false;
   }
 
   closePanel(index: number): void {
     this.featuresData[index].panelIsCollapsed = true;
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  moveCarouselToPreviousSlide(): void {
+    if (this.screenType === 'mobile') {
+      this.volunteerCarouselMobile.prev();
+    } else {
+      this.volunteerCarousel.prev();
+    }
+  }
+
+  moveCarouselToNextSlide(): void {
+    if (this.screenType === 'mobile') {
+      this.volunteerCarouselMobile.next();
+    } else {
+      this.volunteerCarousel.next();
+    }
+  }
+
+  onClickExploreLessonsButton(): void {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+  }
+
+  onClickGetAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickGetAndroidAppButtonEvent();
+  }
+
+  onClickDonateCTAButton(): void {
+    this.siteAnalyticsService.registerClickDonateCTAButtonEvent();
+    this.openDonationBoxModal();
+  }
+
+  onClickVolunteerCTAButton(): void {
+    this.siteAnalyticsService.registerClickVolunteerCTAButtonEvent(
+      'CTA button at the bottom of the About page'
+    );
+  }
+
+  onClickPartnerCTAButton(): void {
+    this.siteAnalyticsService.registerClickPartnerCTAButtonEvent(
+      'CTA button at the bottom of the About page'
+    );
+  }
+
+  onClickVolunteerLearnMoreButton(): void {
+    this.siteAnalyticsService.registerClickLearnMoreVolunteerButtonEvent();
+  }
+
+  onClickPartnerLearnMoreButton(): void {
+    this.siteAnalyticsService.registerClickLearnMorePartnerButtonEvent();
+  }
+
+  registerFirstTimePageViewEvent(): void {
+    this.siteAnalyticsService.registerFirstTimePageViewEvent(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.ABOUT
+    );
   }
 
   ngOnDestroy(): void {

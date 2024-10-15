@@ -56,6 +56,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -195,8 +196,9 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
                     'content_0': {}
                 }
             },
-        'solicit_answer_details': False,
-        'card_is_checkpoint': True,
+            'solicit_answer_details': False,
+            'card_is_checkpoint': True,
+            'inapplicable_skill_misconception_ids': []
         }
     },
     'version': 3
@@ -223,6 +225,8 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     collection_id: Optional[str]
     num_dummy_exps_to_generate: Optional[int]
     num_dummy_exps_to_publish: Optional[int]
+    num_dummy_question_suggestions_generate: Optional[int]
+    skill_id: Optional[str]
     num_dummy_translation_opportunities_to_generate: Optional[int]
     data: Optional[str]
     topic_id: Optional[str]
@@ -257,6 +261,7 @@ class AdminHandler(
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
                         'generate_dummy_classroom',
+                        'generate_dummy_question_suggestions',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
@@ -301,6 +306,18 @@ class AdminHandler(
                 'default_value': None
             },
             'num_dummy_exps_to_generate': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
+            'skill_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'num_dummy_question_suggestions_generate': {
                 'schema': {
                     'type': 'int'
                 },
@@ -384,6 +401,9 @@ class AdminHandler(
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Populates the data on the admin page."""
+        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_summary_dicts = [
+            summary.to_dict() for summary in skill_summaries]
         demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
@@ -420,8 +440,7 @@ class AdminHandler(
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
             'platform_params_dicts': platform_params_dicts,
-            'user_group_models_dict': user_group_models_dict,
-            'all_users_usernames': all_users_usernames
+            'skill_list': skill_summary_dicts,
         })
 
     @acl_decorators.can_access_admin_page
@@ -456,6 +475,10 @@ class AdminHandler(
             Exception. The commit_message must be provided when the action
                 is update_platform_parameter_rules.
             InvalidInputException. The input provided is not valid.
+            Exception. The skill_id must be provided when
+                the action is generate_dummy_question_suggestions.
+            Exception. The num_dummy_question_suggestions_generate must be 
+                provided when the action is generate_dummy_question_suggestions.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -533,6 +556,25 @@ class AdminHandler(
                 self._generate_dummy_skill_and_questions()
             elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
+            elif action == 'generate_dummy_question_suggestions':
+                skill_id = self.normalized_payload.get('skill_id')
+                if skill_id is None:
+                    raise Exception(
+                        'The \'skill_id\' must be provided when'
+                        ' the action is _generate_dummy_question_suggestions.'
+                    )
+                num_dummy_question_suggestions_generate = (
+                    self.normalized_payload.get(
+                        'num_dummy_question_suggestions_generate')
+                )
+                if num_dummy_question_suggestions_generate is None:
+                    raise Exception(
+                        'The \'num_dummy_question_suggestions_generate\' must'
+                        ' be provided when the action is '
+                        '_generate_dummy_question_suggestions.'
+                    )
+                self._generate_dummy_question_suggestions(
+                    skill_id, num_dummy_question_suggestions_generate)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
                 if data is None:
@@ -1552,6 +1594,24 @@ class AdminHandler(
                 topic_id_4: [topic_id_2],
                 topic_id_5: [topic_id_2, topic_id_3]
             }
+
+            thumbnail_image = b''
+            with open(
+                'core/tests/data/thumbnail.svg', 'rt',
+                encoding='utf-8') as svg_file:
+                svg_file_content = svg_file.read()
+                thumbnail_image = svg_file_content.encode('ascii')
+            fs_services.save_original_and_compressed_versions_of_image(
+                'thumbnail.svg', feconf.ENTITY_TYPE_CLASSROOM, classroom_id_1,
+                thumbnail_image, 'thumbnail', False)
+
+            banner_image = b''
+            with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
+                banner_image = png_file.read()
+            fs_services.save_original_and_compressed_versions_of_image(
+                'banner.png', feconf.ENTITY_TYPE_CLASSROOM, classroom_id_1,
+                banner_image, 'image', False)
+
             classroom_1 = classroom_config_domain.Classroom(
                             classroom_id=classroom_id_1,
                             name='math',
@@ -1567,12 +1627,124 @@ class AdminHandler(
                             ),
                             banner_data=classroom_config_domain.ImageData(
                                 'banner.png', 'transparent', 1000
-                            )
+                            ),
+                            index=0
                         )
 
             classroom_config_services.create_new_classroom(classroom_1)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
+
+    def _generate_dummy_question_suggestions(
+            self, skill_id: str,
+            num_dummy_question_suggestions_generate: int) -> None:
+        """Generates and loads the database with a specified number of
+            suggestion question for the selected skill.
+
+        Raises:
+            Exception. Cannot load suggestion questions in production mode.
+            Exception. User does not have enough rights to generate data.
+        """
+        assert self.user_id is not None
+        if constants.DEV_MODE:
+            if ((feconf.ROLE_ID_QUESTION_ADMIN not in self.user.roles)
+                and (not user_services.can_submit_question_suggestions(
+                    self.user_id))):
+                raise Exception((
+                    'User \'%s\' must be a question submitter or question admin'
+                    ' in order to generate question suggestions.'
+                    ) % self.username)
+            for _ in range(num_dummy_question_suggestions_generate):
+                content_id_generator = translation_domain.ContentIdGenerator()
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME)
+                state = state_domain.State.create_default_state(
+                    'default_state',
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME),
+                    is_initial_state=True)
+                state.update_interaction_id('TextInput')
+                solution_dict: state_domain.SolutionDict = {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 'Solution',
+                    'explanation': {
+                        'content_id': content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
+                        'html': '<p>This is a solution.</p>',
+                    },
+                }
+                hints_list = [
+                    state_domain.Hint(
+                        state_domain.SubtitledHtml(
+                            content_id_generator.generate(
+                                translation_domain.ContentType.HINT),
+                            '<p>This is a hint.</p>')),
+                ]
+                # Ruling out None for mypy type checking,
+                # as interaction_id is already updated.
+                assert state.interaction.id is not None
+                solution = state_domain.Solution.from_dict(
+                    state.interaction.id, solution_dict)
+                state.update_interaction_solution(solution)
+                state.update_interaction_hints(hints_list)
+                state.update_interaction_customization_args({
+                    'placeholder': {
+                        'value': {
+                            'content_id': content_id_generator.generate(
+                                translation_domain.ContentType.CUSTOMIZATION_ARG, # pylint: disable=line-too-long
+                                extra_prefix='placeholder'),
+                            'unicode_str': 'Enter text here',
+                        },
+                    },
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
+                })
+                # Here, state is a State domain object and it is created using
+                # 'create_default_state' method. So, 'state' is a default_state
+                # and it is always going to contain a default_outcome. Thus to
+                # narrow down the type from Optional[Outcome] to Outcome for
+                # default_outcome, we used assert here.
+                assert state.interaction.default_outcome is not None
+                state.interaction.default_outcome.labelled_as_correct = True
+                state.interaction.default_outcome.dest = None
+                suggestion_change: Dict[
+                    str, Union[str, float, question_domain.QuestionDict]
+                ] = {
+                    'cmd': (
+                        question_domain
+                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                    'question_dict': {
+                        'id': '',
+                        'version': 0,
+                        'question_state_data': state.to_dict(),
+                        'language_code': 'en',
+                        'question_state_data_schema_version': 1,
+                        'linked_skill_ids': [skill_id],
+                        'inapplicable_skill_misconception_ids': [],
+                        'next_content_id_index': (
+                            content_id_generator.next_content_id_index)
+                    },
+                    'skill_id': skill_id,
+                    'skill_difficulty': 0.3
+                }
+
+                suggestion = suggestion_services.create_suggestion(
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    feconf.ENTITY_TYPE_SKILL,
+                    skill_id, 1,
+                    self.user_id, suggestion_change, 'test description')
+
+                (
+                    suggestion_services
+                    .update_question_contribution_stats_at_submission(
+                        suggestion))
+        else:
+            raise Exception(
+                'Cannot generate dummy question suggestion in production.')
 
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
@@ -2037,7 +2209,9 @@ class AdminSuperAdminPrivilegesHandler(
             NotFoundException. No such user exists.
         """
         assert self.normalized_payload is not None
-        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+        if self.email != parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        ):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
         username = self.normalized_payload['username']
@@ -2061,7 +2235,9 @@ class AdminSuperAdminPrivilegesHandler(
                 super admin account.
         """
         assert self.normalized_request is not None
-        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+        admin_email_address = parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
+        if self.email != admin_email_address:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
         username = self.normalized_request['username']
@@ -2070,7 +2246,7 @@ class AdminSuperAdminPrivilegesHandler(
         if user_settings is None:
             raise self.NotFoundException('No such user exists')
 
-        if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
+        if user_settings.email == admin_email_address:
             raise self.InvalidInputException(
                 'Cannot revoke privileges from the default super admin account')
 

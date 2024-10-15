@@ -18,7 +18,7 @@
   </div>
   <div class="create-button-mobile">
     <div *ngIf="(activeTab === TAB_NAME_TOPICS) && totalTopicSummaries.length">
-      <i class="fa fa-plus-circle" aria-hidden="true" (click)="createTopic()" *ngIf="userCanCreateTopic"></i>
+      <i class="fa fa-plus-circle e2e-test-create-topic-mobile-button" aria-hidden="true" (click)="createTopic()" *ngIf="userCanCreateTopic"></i>
     </div>
     <div *ngIf="activeTab === TAB_NAME_SKILLS">
       <i class="fa fa-plus-circle e2e-test-mobile-create-skill-button-secondary" aria-hidden="true" (click)="createSkill()" *ngIf="userCanCreateSkill"></i>
@@ -62,8 +62,9 @@
                 <span>Items Per Page: </span>
                 <select [(ngModel)]="itemsPerPage"
                         (change)="refreshPagination()"
-                        aria-label="Items Per Page">
-                  <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
+                        aria-label="Items Per Page"
+                        class="e2e-test-select-items-per-page-dropdown">
+                  <option *ngFor="let choice of itemsPerPageChoice" [value]="choice">{{ choice }}</option>
                 </select>
               </div>
               <div *ngIf="activeTab === TAB_NAME_TOPICS">
@@ -75,14 +76,16 @@
                   </span>
                   <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow e2e-test-topics-next-page-button"
+                   (click)="changePageByOne(MOVE_TO_NEXT_PAGE)">
+                </i>
               </div>
               <div *ngIf="activeTab === TAB_NAME_SKILLS">
                 <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
                 <span class="dashboard-list-pagination-value">
                   <span class="dashboard-list-pagination-active">{{ skillPageNumber + 1 }}</span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow e2e-test-skills-next-page-button" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
               </div>
             </div>
           </div>
@@ -122,12 +125,12 @@
                 <span *ngIf="pageNumber === idx" class="dashboard-list-pagination-active">{{ idx + 1 }}</span>
                 <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
               </span>
-              <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
+              <i class="fa fa-angle-right topic-pagination-arrow e2e-test-mobile-topics-next-page-button" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
             </div>
             <div *ngIf="activeTab === TAB_NAME_SKILLS">
               <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-active">{{ skillPageNumber + 1 }}</span>
-              <i class="fa fa-angle-right topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
+              <i class="fa fa-angle-right topic-pagination-arrow e2e-test-mobile-skills-next-page-button" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
             </div>
           </div>
         </div>
@@ -182,7 +185,8 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div *ngIf="activeTab === TAB_NAME_TOPICS">
-                  <oppia-filtered-choices-field [choices]="statusOptions"
+                  <oppia-filtered-choices-field class="e2e-test-select-topic-status-dropdown"
+                                                [choices]="statusOptions"
                                                 placeholder="Status Options"
                                                 searchLabel="Search"
                                                 [(selection)]="filterObject.status"
@@ -200,22 +204,14 @@
                 </div>
               </div>
             </div>
-            <div class="topic-skill-filter-row">
+            <div class="topic-skill-filter-row" *ngIf="activeTab === TAB_NAME_TOPICS">
               <div class="topic-skill-filter-key">
                 <span>Classroom</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div *ngIf="activeTab === TAB_NAME_TOPICS">
+                <div>
                   <oppia-filtered-choices-field class="e2e-test-select-classroom-dropdown"
                                                 [choices]="classrooms"
-                                                placeholder="Classrooms"
-                                                searchLabel="Search"
-                                                [(selection)]="filterObject.classroom"
-                                                (selectionChange)="applyFilters()">
-                  </oppia-filtered-choices-field>
-                </div>
-                <div *ngIf="activeTab === TAB_NAME_SKILLS">
-                  <oppia-filtered-choices-field [choices]="classrooms"
                                                 placeholder="Classrooms"
                                                 searchLabel="Search"
                                                 [(selection)]="filterObject.classroom"
@@ -230,7 +226,8 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div>
-                  <oppia-filtered-choices-field [choices]="sortOptions"
+                  <oppia-filtered-choices-field class="e2e-test-select-sort-dropdown"
+                                                [choices]="sortOptions"
                                                 placeholder="Sort Options"
                                                 [isSearchable]="false"
                                                 searchLabel="Search"
@@ -663,6 +660,7 @@
       font-size: 40px;
       position: fixed;
       right: 3vw;
+      z-index: 99;
     }
     .oppia-topics-and-skills-dashboard .dashboard-list-header {
       margin: 0;

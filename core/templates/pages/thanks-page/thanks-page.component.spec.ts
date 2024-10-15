@@ -39,8 +39,8 @@ describe('Thanks page', function () {
   });
 
   it('should set thanks image url when getStaticImageUrl is called', () => {
-    expect(component.getStaticImageUrl('/general/donate.png')).toBe(
-      '/assets/images/general/donate.png'
+    expect(component.getStaticCopyrightedImageUrl('/general/donate.png')).toBe(
+      '/assets/copyrighted-images/general/donate.png'
     );
   });
 });

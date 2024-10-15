@@ -35,22 +35,16 @@
         <p>{{ 'I18N_FOOTER_ABOUT_ALL_CAPS' | translate }}</p>
         <ul>
           <li>
-            <a href="/about"
+            <a (click)="navigateToAboutPage()"
                class="e2e-test-footer-about-link"
                [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
                {{ 'I18N_FOOTER_ABOUT' | translate }}
             </a>
           </li>
           <li>
-            <a href="/about-foundation"
-               class="e2e-test-footer-about-foundation-link">
-              {{ 'I18N_FOOTER_OPPIA_FOUNDATION' | translate }}
-            </a>
-          </li>
-          <li>
             <a [href]="getOppiaBlogUrl()"
                class="e2e-test-footer-blog-link">
-              {{ 'I18N_TOPNAV_BLOG' | translate }}
+              {{ 'I18N_FOOTER_BLOG' | translate }}
             </a>
           </li>
           <li>
@@ -79,7 +73,7 @@
             </a>
           </li>
           <li>
-            <a href="/teach"
+            <a (click)="navigateToTeachPage()"
                class="e2e-test-teach-link"
                [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE">
                {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}

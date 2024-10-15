@@ -36,6 +36,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {BeamJobsTabComponent} from 'pages/release-coordinator-page/beam-jobs-tab/beam-jobs-tab.component';
+import {DeleteUserGroupConfirmModalComponent} from 'pages/release-coordinator-page/modals/delete-user-group-confirm-modal.component';
 import {FeaturesTabComponent} from 'pages/release-coordinator-page/features-tab/features-tab.component';
 import {CancelBeamJobDialogComponent} from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import {StartNewBeamJobDialogComponent} from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
@@ -76,6 +77,7 @@ import {SmartRouterModule} from 'hybrid-router-module-provider';
   declarations: [
     BeamJobsTabComponent,
     CancelBeamJobDialogComponent,
+    DeleteUserGroupConfirmModalComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     ReleaseCoordinatorPageRootComponent,
@@ -85,6 +87,7 @@ import {SmartRouterModule} from 'hybrid-router-module-provider';
   ],
   entryComponents: [
     CancelBeamJobDialogComponent,
+    DeleteUserGroupConfirmModalComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     ReleaseCoordinatorPageRootComponent,

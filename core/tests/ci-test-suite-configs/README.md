@@ -2,5 +2,3 @@ This folder contains the CI test suite configs for the different test types. All
 
 - E2E: e2e.json
 - Acceptance: acceptance.json
-- Lighthouse Accessibility: lighthouse-accessibility.json
-- Lighthouse Performance: lighthouse-performance.json

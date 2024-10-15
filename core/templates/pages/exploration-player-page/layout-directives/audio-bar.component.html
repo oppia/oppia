@@ -30,7 +30,7 @@
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           </div>
           <div *ngIf="!audioLoadingIndicatorIsShown">
-            <oppia-audio-slider [value]="audioPlayerService.getCurrentTime()"
+            <oppia-audio-slider [value]="this.currentVoiceoverTime"
                                 [dir]="isLanguageRTL() ? 'rtl' : 'ltr'"
                                 [max]="audioPlayerService.getAudioDuration()"
                                 (valueChange)="setProgress($event)"

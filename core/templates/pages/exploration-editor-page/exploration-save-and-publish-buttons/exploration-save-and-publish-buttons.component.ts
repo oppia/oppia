@@ -169,7 +169,6 @@ export class ExplorationSaveAndPublishButtonsComponent
       .finally(() => {
         this.publishIsInProcess = false;
         this.loadingDotsAreShown = false;
-        this.entityTranslationsService.reset();
       });
   }
 
@@ -186,7 +185,6 @@ export class ExplorationSaveAndPublishButtonsComponent
         () => {
           this.saveIsInProcess = false;
           this.loadingDotsAreShown = false;
-          this.entityTranslationsService.reset();
         },
         () => {}
       );

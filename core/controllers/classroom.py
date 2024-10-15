@@ -22,6 +22,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import fs_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 
@@ -67,9 +68,14 @@ class ClassroomDataHandler(
         Args:
             classroom_url_fragment: str. THe classroom URL fragment.
         """
-        classroom = classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment)
+        classrooms = classroom_config_services.get_all_classrooms()
+        public_classrooms_count = 0
 
+        for c in classrooms:
+            if c.url_fragment == classroom_url_fragment:
+                classroom = c
+            if c.is_published:
+                public_classrooms_count += 1
         # Here we are asserting that classroom can never be none, because
         # in the decorator `does_classroom_exist` we are already handling
         # the None case of classroom.
@@ -121,29 +127,23 @@ class ClassroomDataHandler(
             'topic_summary_dicts': topic_summary_dicts,
             'topic_list_intro': classroom.topic_list_intro,
             'course_details': classroom.course_details,
-            'name': classroom.name
+            'name': classroom.name,
+            'url_fragment': classroom.url_fragment,
+            'teaser_text': classroom.teaser_text,
+            'is_published': classroom.is_published,
+            'thumbnail_data': classroom.thumbnail_data.to_dict(),
+            'banner_data': classroom.banner_data.to_dict(),
+            'public_classrooms_count': public_classrooms_count,
+            'classroom_id': classroom.classroom_id
         })
         self.render_json(self.values)
 
 
-class DefaultClassroomRedirectPage(
+class ClassroomDisplayInfoHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Redirects to the default classroom page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Redirects to default classroom page."""
-        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
-
-
-class ClassroomIdToNameHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Fetches a list of classroom names corresponding to the given ids."""
+    """Fetches a list of classroom name & index
+    corresponding to the given ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -151,12 +151,33 @@ class ClassroomIdToNameHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Retrieves a mapping of classroom IDs to classroom names."""
-        classroom_id_to_classroom_name = (
-            classroom_config_services.get_classroom_id_to_classroom_name_dict())
+        """Retrieves a mapping of classroom IDs to classroom name and index."""
+        classroom_id_index_mappings: List[Dict[str, str|int]] = []
+        classrooms = classroom_config_services.get_all_classrooms()
+
+        for classroom in classrooms:
+            classroom_id_index_mapping_dict: Dict[str, str|int]
+            # TODO(#20845): Remove this custom logic once we have
+            # populated the index field of the math classroom.
+            if classroom.index is not None:
+                classroom_id_index_mapping_dict = {
+                    'classroom_id': classroom.classroom_id,
+                    'classroom_name': classroom.name,
+                    'classroom_index': classroom.index
+                }
+            else:
+                classroom_id_index_mapping_dict = {
+                    'classroom_id': classroom.classroom_id,
+                    'classroom_name': classroom.name,
+                    'classroom_index': 0
+                }
+            classroom_id_index_mappings.append(classroom_id_index_mapping_dict)
 
         self.values.update({
-            'classroom_id_to_classroom_name': classroom_id_to_classroom_name
+            'classroom_display_info': sorted(
+                classroom_id_index_mappings,
+                key=lambda x: int(x['classroom_index'])
+            )
         })
         self.render_json(self.values)
 
@@ -215,9 +236,19 @@ class ClassroomHandlerNormalizedPayloadDict(TypedDict):
     classroom_dict: classroom_config_domain.Classroom
 
 
+class ClassroomHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of NewTopicHandler's
+    normalized_request dictionary.
+    """
+
+    thumbnail_image: bytes
+    banner_image: bytes
+
+
 class ClassroomHandler(
     base.BaseHandler[
-        ClassroomHandlerNormalizedPayloadDict, Dict[str, str]
+        ClassroomHandlerNormalizedPayloadDict,
+        ClassroomHandlerNormalizedRequestDict
     ]
 ):
     """Edits classroom data."""
@@ -235,6 +266,16 @@ class ClassroomHandler(
                 'schema': {
                     'type': 'object_dict',
                     'object_class': classroom_config_domain.Classroom
+                }
+            },
+            'thumbnail_image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'banner_image': {
+                'schema': {
+                    'type': 'basestring'
                 }
             }
         },
@@ -277,6 +318,7 @@ class ClassroomHandler(
                 classroom.
         """
         assert self.normalized_payload is not None
+        assert self.normalized_request is not None
         classroom = self.normalized_payload['classroom_dict']
 
         if classroom_id != classroom.classroom_id:
@@ -284,7 +326,6 @@ class ClassroomHandler(
                 'Classroom ID of the URL path argument must match with the ID '
                 'given in the classroom payload dict.'
             )
-
         classrooms = classroom_config_services.get_all_classrooms()
         invalid_topic_ids = [
             topic_id for classroom in classrooms
@@ -300,7 +341,35 @@ class ClassroomHandler(
                     'can only be assigned to one classroom.' % topic_name
                 )
 
-        classroom_config_services.update_classroom(classroom)
+        raw_thumbnail_image = self.normalized_request['thumbnail_image']
+        thumbnail_filename = classroom.thumbnail_data.filename
+        raw_banner_image = self.normalized_request['banner_image']
+        banner_filename = classroom.banner_data.filename
+        existing_classroom = classroom_config_services.get_classroom_by_id(
+            classroom_id)
+
+        if thumbnail_filename != existing_classroom.thumbnail_data.filename:
+            fs_services.validate_and_save_image(
+                raw_thumbnail_image, thumbnail_filename, 'thumbnail',
+                feconf.ENTITY_TYPE_CLASSROOM, classroom_id
+            )
+
+        if (
+            banner_filename !=
+            existing_classroom.banner_data.filename
+        ):
+            fs_services.validate_and_save_image(
+                raw_banner_image, banner_filename, 'image',
+                feconf.ENTITY_TYPE_CLASSROOM, classroom_id
+            )
+
+        for cls in classrooms:
+            if cls.classroom_id == classroom_id:
+                classroom.index = cls.index
+
+        classroom_config_services.update_classroom(
+            classroom, strict=classroom.is_published
+        )
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page
@@ -493,21 +562,114 @@ class AllClassroomsSummaryHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         classrooms = classroom_config_services.get_all_classrooms()
-        all_classrooms_summary_dicts: List[Dict[str, str|bool]] = []
+        all_classrooms_summary_dicts: List[Dict[str, str|bool|int]] = []
 
         for classroom in classrooms:
-            classroom_summary_dict: Dict[str, str|bool] = {
+            classroom_summary_dict: Dict[str, str|bool|int] = {
+                'classroom_id': classroom.classroom_id,
                 'name': classroom.name,
                 'url_fragment': classroom.url_fragment,
                 'teaser_text': classroom.teaser_text,
                 'is_published': classroom.is_published,
                 'thumbnail_filename': classroom.thumbnail_data.filename,
-                'thumbnail_bg_color': classroom.banner_data.bg_color
+                'thumbnail_bg_color': classroom.banner_data.bg_color,
+                'index': 0 if classroom.index is None else classroom.index
             }
             all_classrooms_summary_dicts.append(
                 classroom_summary_dict
             )
 
         self.render_json({
-            'all_classrooms_summary': all_classrooms_summary_dicts
+            'all_classrooms_summary': sorted(
+                all_classrooms_summary_dicts,
+                key=lambda x: int(x['index'])
+            )
         })
+
+
+class UpdateClassroomIndexMappingHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateClassroomIndexMappingHandler's
+    normalized_payload dictionary.
+    """
+
+    classroom_index_mappings: List[
+        classroom_config_domain.ClassroomIdToIndexDict
+    ]
+
+
+class UpdateClassroomIndexMappingHandler(
+    base.BaseHandler[
+        UpdateClassroomIndexMappingHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
+):
+    """Updates the order of classrooms."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'classroom_index_mappings': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [
+                            {
+                                'name': 'classroom_id',
+                                'schema': {
+                                    'type': 'basestring',
+                                    'validators': [{
+                                        'id': 'is_regex_matched',
+                                        'regex_pattern': (
+                                            constants.ENTITY_ID_REGEX
+                                        )
+                                    }]
+                                }
+                            },
+                            {
+                                'name': 'classroom_name',
+                                'schema': {
+                                    'type': 'basestring',
+                                    'validators': [{
+                                        'id': 'is_nonempty'
+                                    }]
+                                }
+                            },
+                            {
+                                'name': 'classroom_index',
+                                'schema': {
+                                    'type': 'int',
+                                    'validators': [{
+                                        'id': 'is_at_least',
+                                        'min_value': 0
+                                    }]
+                                }
+                            }
+                        ],
+                        'required': [
+                            'classroom_id', 'classroom_name',
+                            'classroom_index'
+                        ]
+                    }
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_classroom_admin_page
+    def put(self) -> None:
+        """Updates the order of classrooms.
+
+        Raise:
+            InvalidInputException: If there are validation errors
+                with classroom_order.
+        """
+        assert self.normalized_payload is not None
+        classroom_index_mappings = self.normalized_payload[
+            'classroom_index_mappings']
+
+        classroom_config_services.update_classroom_id_to_index_mappings(
+            classroom_index_mappings
+        )
+        self.render_json({})

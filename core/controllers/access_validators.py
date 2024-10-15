@@ -79,6 +79,37 @@ class ClassroomAccessValidationHandler(
         if not classroom:
             raise self.NotFoundException
 
+        if not classroom.is_published:
+            if self.user_id is None or not user_services.is_curriculum_admin(
+                self.user_id):
+                raise self.NotFoundException
+
+
+class ClassroomsPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to classrooms page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Retrieves information about classrooms.
+
+        Raises:
+            PageNotFoundException. No public classrooms are present.
+        """
+
+        classrooms = classroom_config_services.get_all_classrooms()
+        has_public_classrooms = any(map(lambda c: c.is_published, classrooms))
+
+        if not (has_public_classrooms or constants.DEV_MODE):
+            raise self.NotFoundException
+
 
 class SubtopicViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
@@ -492,6 +523,26 @@ class CollectionEditorAccessValidationPage(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_collection
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass
+
+
+class ReviewTestsPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to review tests page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_story_viewer_page
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass

@@ -1,70 +1,87 @@
-<background-banner></background-banner>
-<div>
-  <div class="oppia-classroom-viewer-container position-relative">
-    <div class="oppia-classroom-header">
-      <div class="classroom-header">{{ 'I18N_CLASSROOM_PAGE_HEADING' | translate }}</div>
-      <h1 class="classroom-name">
-        <span *ngIf="!isHackyClassroomTranslationDisplayed()">
-          {{ classroomDisplayName }}
-        </span>
-        <span *ngIf="isHackyClassroomTranslationDisplayed()">
-          {{ classroomNameTranslationKey | translate }}
-        </span>
-      </h1>
+<div class="oppia-classroom-page-container" *ngIf="classroomData">
+  <div class="classroom-top breadcrumbs-container" aria-label="Classroom banner" [style.background-image]="'url(' + classroomBanner + ')'">
+    <div *ngIf="showPrivateClassroomBanner"
+         class="classroom-admin-banner"
+    >
+      <span>{{'I18N_UNPUBLISHED_CLASSROOM_BANNER_TEXT' | translate}}</span>
     </div>
-    <div class="oppia-classroom-banner">
-      <img class="oppia-classroom-banner-img" [src]="bannerImageFileUrl" width="480" height="247" alt="">
-    </div>
-    <div class="oppia-classroom-details" *ngIf="classroomData">
-      <h2>{{ 'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate }}</h2>
-      <!-- The course details and topic list intro texts are hardcoded so that they can be translated.
-    This method should be changed when more classrooms are added in the future. -->
-      <p class="course-details">{{ 'I18N_MATH_COURSE_DETAILS' | translate }}</p>
-      <h2>{{ 'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate }}</h2>
-      <p>{{ 'I18N_MATH_TOPICS_COVERED' | translate }}</p>
-    </div>
-    <div class="oppia-classroom-page-guidance-tile-container"
-         *ngIf="classroomData && classroomData.getTopicSummaries().length > 0 && isDiagnosticTestFeatureFlagEnabled()">
-      <div class="oppia-classroom-page-guidance-tile">
-        <p>
-          <strong>{{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate }}</strong>
-        </p>
-        <p>{{ begineWithFirstTopicDescriptionText }}</p>
-        <a [href]="firstTopicUrl">
-          <span class="oppia-classroom-page-tile-button-text">
-            <strong>{{ beginWithFirstTopicButtonText }}</strong>
-          </span>
-        </a>
+    <div class="classroom-breadcrumbs">
+      <div class="desktop-breadcrumbs">
+        <a *ngIf="publicClassroomsCount === 1" href="/">{{ 'I18N_TOPNAV_HOME' | translate }}</a>
+        <a *ngIf="publicClassroomsCount > 1" href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
+        <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
+        <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
+        <span *ngIf="!isHackyClassroomTranslationDisplayed('name')">{{classroomData.getName()}}</span>
+        <span *ngIf="isHackyClassroomTranslationDisplayed('name')">{{classroomTranslationKeys.name | translate}}</span>
       </div>
-      <div class="oppia-classroom-page-guidance-tile">
-        <p>
-          <strong>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING' | translate }}</strong>
-        </p>
-        <p>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT' | translate }}</p>
-        <a href="/diagnostic-test-player" class="e2e-test-take-diagnostic-test">
-          <span class="oppia-classroom-page-tile-button-text">
-            <strong>{{ 'I18N_CLASSROOM_PAGE_TAKE_A_TEST_BUTTON' | translate }}</strong>
-          </span>
-        </a>
+      <div class="mobile-breadcrumbs">
+        <i class="fa fa-angle-left" *ngIf="!isLanguageRTL()"></i>
+        <i class="fa fa-angle-right" *ngIf="isLanguageRTL()"></i>
+        <a href="/" *ngIf="publicClassroomsCount <= 1">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
+        <a href="/learn" *ngIf="publicClassroomsCount > 1">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
       </div>
     </div>
-    <div class="oppia-topic-summary-tiles" *ngIf="classroomData">
-      <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
-           class="oppia-topic-summary-tile e2e-test-topic-summary-tile">
-        <oppia-topic-summary-tile [topicSummary]="topicSummary"
-                                  [classroomUrlFragment]="classroomUrlFragment"
-                                  [isPublished]="topicSummary.isTopicPublished()">
-        </oppia-topic-summary-tile>
+    <div class="classroom-information-container">
+      <div class="classroom-text-container">
+        <span>{{ 'I18N_CLASSROOM_HEADING' | translate:{ classroomName: classroomData.getName() } }}</span>
+        <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}" class="e2e-test-classroom-name">{{classroomData.getName()}}</h1>
+        <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}" class="e2e-test-classroom-name">{{classroomTranslationKeys.name | translate}}</h1>
+      </div>
+      <div class="classroom-thumbnail-container">
+        <img class="classroom-thumbnail" alt="Classroom thumbnail image" [src]="classroomThumbnail">
       </div>
     </div>
   </div>
+
+  <div class="classroom-content-container">
+    <div class="classroom-content">
+      <div class="content-section">
+        <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate}}</h1>
+        <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomData.getCourseDetails()}}</p>
+        <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomTranslationKeys.courseDetails | translate}}</p>
+      </div>
+      <div class="content-section">
+        <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate}}</h1>
+        <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('topicListIntro')">{{classroomData.getTopicListIntro()}}</p>
+        <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('topicListIntro')">{{ classroomTranslationKeys.topicListIntro | translate }}</p>
+      </div>
+      <div *ngIf="isDiagnosticTestFeatureFlagEnabled()" class="content-section diagnostic-test-container">
+        <div class="diagnostic-test-box">
+          <div class="diagnostic-test-info">
+            <h4>{{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate }}</h4>
+            <p>{{ beginWithFirstTopicButtonText }}</p>
+          </div>
+          <a [href]="firstTopicUrl">{{ 'I18N_START_FIRST_CLASSROOM_TOPIC' | translate }}</a>
+        </div>
+        <div class="diagnostic-test-box">
+          <div class="diagnostic-test-info">
+            <h4>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_HEADING' | translate:{ classroomName: classroomData.getName() } }}</h4>
+            <p>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_TEXT' | translate:{ classroomName: classroomData.getName() } }}</p>
+          </div>
+          <a [routerLink]="['/diagnostic-test-player']" [queryParams]="{ classroom: classroomData.getUrlFragment() }" class="e2e-test-take-diagnostic-test">{{ 'I18N_CLASSROOM_PAGE_QUIZ_TEST_BUTTON' | translate }}</a>
+        </div>
+      </div>
+      <div class="topic-tiles-container">
+        <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
+             class="oppia-topic-summary-tile e2e-test-topic-summary-tile">
+          <oppia-topic-summary-tile [topicSummary]="topicSummary"
+                                    [classroomUrlFragment]="classroomUrlFragment"
+                                    [isPublished]="topicSummary.isTopicPublished()">
+          </oppia-topic-summary-tile>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="oppia-classroom-search-container">
     <div class="oppia-classroom-search-section">
-      <div class="classroom-page-help-text initial-help-text">
-        {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING' | translate }}
-      </div>
-      <div class="classroom-page-help-text oppia-classroom-page-subheading-text">
-        {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING' | translate }}
+      <div class="search-box-text-container">
+        <span class="classroom-page-search-heading initial-help-text">
+          {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING' | translate }}
+        </span>
+        <p class="classroom-page-search-subheading">
+          {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING' | translate }}
+        </p>
       </div>
       <div class="oppia-classroom-search-bar-container">
         <oppia-search-bar [enableDropup]="true"></oppia-search-bar>

@@ -33,7 +33,9 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const acceptedBrowserAlerts = [
   '',
   'Changes that you made may not be saved.',
+  'This action is irreversible.',
   'This action is irreversible. Are you sure?',
+  'This action is irreversible. If you insist to proceed, please enter the commit message for the update',
 ];
 
 interface ClickDetails {
@@ -136,7 +138,7 @@ export class BaseUser {
   }
 
   /**
-   * Checks if the application is in development mode.
+   * Checks if the application is in production mode.
    * @returns {Promise<boolean>} Returns true if the application is in development mode,
    * false otherwise.
    */
@@ -245,7 +247,8 @@ export class BaseUser {
    * Function to reload the current page.
    */
   async reloadPage(): Promise<void> {
-    await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
+    await this.waitForPageToFullyLoad();
+    await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 
   /**
@@ -358,19 +361,6 @@ export class BaseUser {
   }
 
   /**
-   * This function retrieves the text content of a specified element.
-   */
-  async getElementText(selector: string): Promise<string> {
-    await this.page.waitForSelector(selector);
-    const element = await this.page.$(selector);
-    if (element === null) {
-      throw new Error(`No element found for the selector: ${selector}`);
-    }
-    const textContent = await this.page.evaluate(el => el.textContent, element);
-    return textContent ?? '';
-  }
-
-  /**
    * Checks if a given word is present on the page.
    * @param {string} word - The word to check.
    */
@@ -393,7 +383,8 @@ export class BaseUser {
    * This function types the text in the input field using its CSS selector.
    */
   async type(selector: string, text: string): Promise<void> {
-    await this.page.waitForSelector(selector);
+    await this.page.waitForSelector(selector, {visible: true});
+    await this.waitForElementToBeClickable(selector);
     await this.page.type(selector, text);
   }
 
@@ -402,6 +393,7 @@ export class BaseUser {
    */
   async select(selector: string, option: string): Promise<void> {
     await this.page.waitForSelector(selector);
+    await this.waitForElementToBeClickable(selector);
     await this.page.select(selector, option);
   }
 
@@ -425,16 +417,12 @@ export class BaseUser {
   }
 
   /**
-   * This function validates whether an anchor tag is correctly linked
-   * to external PDFs or not. Use this particularly when interacting with
-   * buttons associated with external PDF links, because Puppeteer,
-   * in headless-mode, does not natively support the opening of external PDFs.
+   * This function validates whether an anchor tag correctly links to external PDFs or links
+   * that cannot be opened directly. Puppeteer, in headless mode, does not
+   * natively support opening external PDFs.
    */
-  async openExternalPdfLink(
-    selector: string,
-    expectedUrl: string
-  ): Promise<void> {
-    await this.page.waitForSelector(selector);
+  async openExternalLink(selector: string, expectedUrl: string): Promise<void> {
+    await this.page.waitForSelector(selector, {visible: true});
     const href = await this.page.$eval(selector, element =>
       element.getAttribute('href')
     );
@@ -498,7 +486,7 @@ export class BaseUser {
     }
     const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
     try {
-      await this.page.goto(explorationUrlAfterPublished);
+      await this.goto(explorationUrlAfterPublished);
       showMessage('Exploration is accessible with the URL, i.e. published.');
     } catch (error) {
       throw new Error('The exploration is not public.');
@@ -525,10 +513,154 @@ export class BaseUser {
   }
 
   /**
-   * Waits for the page to fully load by checking the document's ready state.
+   * Checks if an element is visible on the page.
+   */
+  async isElementVisible(selector: string): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Waits for the static assets on the page to load.
+   */
+  async waitForStaticAssetsToLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state and waiting for the respective
+   * HTML to load completely.
+   *
+   * Caution: Using this function multiple times in the same test can increase the test execution time,
+   * as it waits for the page to fully load.
    */
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
+    await this.waitTillHTMLRendered(this.page);
+  }
+
+  /**
+   * This function waits until a page is fully rendered.
+   * It does so via checking every second if the size of the HTML content of the page is stable.
+   * If the size is stable for at least 3 checks, it considers the page fully rendered.
+   * If the size is not stable within the timeout, it stops checking.
+   * @param {Page} page - The page to wait for.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   */
+  private async waitTillHTMLRendered(
+    page: Page,
+    timeout: number = 30000
+  ): Promise<void> {
+    const checkDurationMsecs = 1000;
+    const maxChecks = timeout / checkDurationMsecs;
+    let lastHTMLSize = 0;
+    let checkCounts = 1;
+    let countStableSizeIterations = 0;
+    const minStableSizeIterations = 3;
+
+    while (checkCounts++ <= maxChecks) {
+      let html = await page.content();
+      let currentHTMLSize = html.length;
+
+      if (lastHTMLSize !== 0 && currentHTMLSize === lastHTMLSize) {
+        countStableSizeIterations++;
+      } else {
+        countStableSizeIterations = 0;
+      }
+      if (countStableSizeIterations >= minStableSizeIterations) {
+        showMessage('Page rendered fully.');
+        break;
+      }
+
+      lastHTMLSize = currentHTMLSize;
+      await page.waitForTimeout(checkDurationMsecs);
+    }
+  }
+
+  /**
+   * Waits for the network to become idle on the given page.
+   *
+   * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
+   * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
+   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
+   * almost all cases and for the page to fully load.
+   *
+   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 30000, idleTime: 500}.
+   * @param {Page} page The page to wait for network idle. Defaults to the current page.
+   */
+  async waitForNetworkIdle(
+    options: {timeout?: number; idleTime?: number} = {
+      timeout: 30000,
+      idleTime: 500,
+    },
+    page: Page = this.page
+  ): Promise<void> {
+    try {
+      await page.waitForNetworkIdle(options);
+    } catch (error) {
+      if (error.message.includes('Timeout')) {
+        showMessage(
+          'Network did not become idle within the specified timeout, but we can continue.'
+        );
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Function to click an anchor tag and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  async clickLinkAnchorToNewTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn(anchorInnerText);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Creates a new tab in the browser and switches to it.
+   */
+  async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
+    const newPage = await this.browserObject.newPage();
+
+    if (this.isViewportAtMobileWidth()) {
+      // Set viewport for mobile.
+      await newPage.setViewport({
+        width: 375,
+        height: 667,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: false,
+      });
+      await newPage.setUserAgent(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
+          'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+          'Mobile/15A372 Safari/604.1'
+      );
+    } else {
+      // Set viewport for desktop.
+      await newPage.setViewport({width: 1920, height: 1080});
+    }
+
+    await newPage.bringToFront();
+    this.page = newPage;
+    return newPage;
   }
 }
 

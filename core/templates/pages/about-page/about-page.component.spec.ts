@@ -25,15 +25,17 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MatIconModule} from '@angular/material/icon';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbAccordionModule,
+  NgbModal,
+  NgbModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
 import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 import {BarChartComponent} from './charts/bar-chart.component';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import {DonationBoxModalComponent} from '../donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from '../donate-page/thanks-for-donating-modal.component';
 import {of} from 'rxjs';
@@ -60,10 +62,10 @@ class MockTranslateService {
 describe('About Page', () => {
   let windowRef: MockWindowRef;
   let component: AboutPageComponent;
-  let siteAnalyticsService: SiteAnalyticsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
   let windowDimensionsService: WindowDimensionsService;
+  let siteAnalyticsService: SiteAnalyticsService;
   let ngbModal: NgbModal;
   let resizeEvent = new Event('resize');
 
@@ -100,16 +102,12 @@ describe('About Page', () => {
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = aboutPageComponent.componentInstance;
-
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true
-    );
   });
   beforeEach(() => {
     translateService = TestBed.inject(TranslateService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
     spyOn(ngbModal, 'open');
@@ -140,34 +138,22 @@ describe('About Page', () => {
     expect(component.setPartnershipsFormLink).toHaveBeenCalled();
   });
 
-  it('should set screen type to mobile when window width is less than or equal to 361', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(360);
+  it('should set screen type to mobile when window width is less than or equal to 580', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(580);
     component.setScreenType();
     expect(component.screenType).toEqual('mobile');
   });
 
-  it('should set screen type to tablet when window width is between 362 and 768', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(500);
+  it('should set screen type to tablet when window width is between 581 and 976', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(975);
     component.setScreenType();
     expect(component.screenType).toEqual('tablet');
   });
 
-  it('should set screen type to desktop when window width is greater than 768', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
+  it('should set screen type to desktop when window width is greater than 975', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(976);
     component.setScreenType();
     expect(component.screenType).toEqual('desktop');
-  });
-
-  it('should set showNavigationArrowsForCarousel to "false" if window width is greater than 640', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(641);
-    component.setScreenType();
-    expect(component.showNavigationArrowsForCarousel).toBeFalse();
-  });
-
-  it('should set showNavigationArrowsForCarousel to "true" if window width is lesser than 641', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(640);
-    component.setScreenType();
-    expect(component.showNavigationArrowsForCarousel).toBeTrue();
   });
 
   it('should obtain new form link whenever the selected language changes', () => {
@@ -284,6 +270,140 @@ describe('About Page', () => {
     });
   });
 
+  it('should get the correct RTL status if the current language is RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
+
+  it('should get the correct RTL status if the current language is not RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false
+    );
+    expect(component.isLanguageRTL()).toBeFalse();
+  });
+
+  it('should move the correct volunteer carousel to the previous slide', () => {
+    component.volunteerCarouselMobile = jasmine.createSpyObj('NgbCarousel', [
+      'prev',
+    ]);
+    component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['prev']);
+
+    component.screenType = 'mobile';
+    component.moveCarouselToPreviousSlide();
+    expect(component.volunteerCarouselMobile.prev).toHaveBeenCalled();
+
+    component.screenType = 'desktop';
+    component.moveCarouselToPreviousSlide();
+    expect(component.volunteerCarousel.prev).toHaveBeenCalled();
+  });
+
+  it('should move the correct volunteer carousel to the next slide', () => {
+    component.volunteerCarouselMobile = jasmine.createSpyObj('NgbCarousel', [
+      'next',
+    ]);
+    component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['next']);
+
+    component.screenType = 'mobile';
+    component.moveCarouselToNextSlide();
+    expect(component.volunteerCarouselMobile.next).toHaveBeenCalled();
+
+    component.screenType = 'desktop';
+    component.moveCarouselToNextSlide();
+    expect(component.volunteerCarousel.next).toHaveBeenCalled();
+  });
+
+  it('should record analytics when Explore Lessons is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickExploreLessonsButtonEvent'
+    ).and.callThrough();
+    component.onClickExploreLessonsButton();
+    expect(
+      siteAnalyticsService.registerClickExploreLessonsButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when Download Android App is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickGetAndroidAppButtonEvent'
+    ).and.callThrough();
+    component.onClickGetAndroidAppButton();
+    expect(
+      siteAnalyticsService.registerClickGetAndroidAppButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when Donate CTA button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickDonateCTAButtonEvent'
+    ).and.callThrough();
+    component.onClickDonateCTAButton();
+    expect(
+      siteAnalyticsService.registerClickDonateCTAButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when Volunteer CTA button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickVolunteerCTAButtonEvent'
+    ).and.callThrough();
+    component.onClickVolunteerCTAButton();
+    expect(
+      siteAnalyticsService.registerClickVolunteerCTAButtonEvent
+    ).toHaveBeenCalledWith('CTA button at the bottom of the About page');
+  });
+
+  it('should register GA event when Partner CTA button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickPartnerCTAButtonEvent'
+    ).and.callThrough();
+    component.onClickPartnerCTAButton();
+    expect(
+      siteAnalyticsService.registerClickPartnerCTAButtonEvent
+    ).toHaveBeenCalledWith('CTA button at the bottom of the About page');
+  });
+
+  it('should register GA event when Volunteer Learn More button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickLearnMoreVolunteerButtonEvent'
+    ).and.callThrough();
+    component.onClickVolunteerLearnMoreButton();
+    expect(
+      siteAnalyticsService.registerClickLearnMoreVolunteerButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when Partner Learn More button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickLearnMorePartnerButtonEvent'
+    ).and.callThrough();
+    component.onClickPartnerLearnMoreButton();
+    expect(
+      siteAnalyticsService.registerClickLearnMorePartnerButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when About Page is loaded', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerFirstTimePageViewEvent'
+    ).and.callThrough();
+    component.registerFirstTimePageViewEvent();
+    expect(
+      siteAnalyticsService.registerFirstTimePageViewEvent
+    ).toHaveBeenCalledWith(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.ABOUT
+    );
+  });
+
   it('should unsubscribe on component destruction', () => {
     component.directiveSubscriptions.add(
       translateService.onLangChange.subscribe(() => {
@@ -294,30 +414,5 @@ describe('About Page', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
-  });
-
-  it('should register correct event on calling onClickBrowseLibraryButton', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerClickBrowseLibraryButtonEvent'
-    ).and.callThrough();
-
-    component.onClickBrowseLibraryButton();
-
-    expect(
-      siteAnalyticsService.registerClickBrowseLibraryButtonEvent
-    ).toHaveBeenCalledWith();
-  });
-
-  it('should register correct event on calling onClickVisitClassroomButton', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerClickVisitClassroomButtonEvent'
-    ).and.callThrough();
-    component.onClickVisitClassroomButton();
-
-    expect(
-      siteAnalyticsService.registerClickVisitClassroomButtonEvent
-    ).toHaveBeenCalledWith();
   });
 });

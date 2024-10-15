@@ -18,10 +18,12 @@
 
 /*
   This is the user-journey of Partners:
-  1.Go to About- Foundation page via footer or navbar from the home(splash) page
-  2.Go to the partnerships page from About Foundation Page by clicking on the partnerships link.
-  3.Fill the partnerships form via any one of the 2 buttons, in any language on partnerships page.
-  This is the page flow : home page --> Foundation page --> partnerships - page
+  1.Go to About page via footer or navbar from the home(splash) page
+  2.View the Impact report on the About page.
+  3.Fill the partnerships form by clicking on the "Partner with us" button ,in any language, on the About page.
+  4.Go to the partnerships page from About Page by clicking on the "Learn more" button of partnerships tab on the About page.
+  5.Fill the partnerships form via any one of the 2 buttons, in any language on partnerships page.
+  This is the page flow : home page --> About page --> Partnerships page
   Testing - Can partners successfully fill the partnerships form if they visit the website for the first time (typically lands on home page) ?
  */
 
@@ -42,20 +44,28 @@ describe('Partner', function () {
     'should be able to navigate to partnerships page when started from home page ' +
       'and open the partnerships form in partnerships page.',
     async function () {
-      // Navigating to about foundation page via navbar from home page.
-      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      // Navigating to About page via navbar from home page.
+      await loggedOutUser.clickAboutButtonInAboutMenuOnNavbar();
       // Navigating back to home page for the next test.
       await loggedOutUser.navigateToHome();
-      // Navigating to about foundation page via footer from home page.
-      await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
+      // Navigating to About page via footer from home page.
+      await loggedOutUser.clickOnAboutLinkInFooter();
 
-      // Navigating to partnerships page by clicking on "Consider becoming a partner today" link on the about foundation page.
-      await loggedOutUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
+      // Opening the Impact report by clicking on the "View Impact Report" button on the About page.
+      await loggedOutUser.clickViewReportButtonInAboutPage();
+
+      // Opening the Partnerships form by clicking on the "Parner with us" button of Partner tab on the About page.
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPage();
+      // Opening the partnerships form by clicking the "Partner with us" button of Partner tab on the About page.
+      // after changing the language to Portuguese.
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPageInGivenLanguage(
+        'pt-br'
+      );
+      // Navigating to the Partnerships page by clicking on the Learn More button of Partner tab.
+      await loggedOutUser.clickPartnerLearnMoreButtonInAboutPage();
 
       // Opening the partnerships form by clicking the "Partner with us" button at the top of the partnerships page.
       await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPage();
-      // Navigating back to partnerships page for the next test.
-      await loggedOutUser.navigateToPartnershipsPage();
       // Opening the partnerships form by clicking the "Partner with us" button at the bottom
       // of the partnerships page after changing the language to Portuguese.
       await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(

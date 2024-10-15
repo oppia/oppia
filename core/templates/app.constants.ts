@@ -193,6 +193,7 @@ export const AppConstants = {
     STORY: 'story',
     QUESTION: 'question',
     BLOG_POST: 'blog_post',
+    CLASSROOM: 'classroom',
   },
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
@@ -234,14 +235,192 @@ export const AppConstants = {
       DISPLAY_NAME: 'Question Reviews',
     },
   },
+  LESSON_CREATORS_DATA_TEACH_PAGE: [
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_1_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_1_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_1_ROLE',
+      linkedInUrl:
+        'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
+      imagePngUrl: '/teach/creators/rita.png',
+      imageWebpUrl: '/teach/creators/rita.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_2_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_2_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_2_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/rafiat-sulaimon-54b817205/',
+      imagePngUrl: '/teach/creators/rafiat.png',
+      imageWebpUrl: '/teach/creators/rafiat.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_3_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_3_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_3_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/aanuoluwapo-adeoti-a25b93188/',
+      imagePngUrl: '/teach/creators/aanuoluwapo.png',
+      imageWebpUrl: '/teach/creators/aanuoluwapo.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_4_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_4_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_4_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/erin-c-drake/',
+      imagePngUrl: '/teach/creators/erin.png',
+      imageWebpUrl: '/teach/creators/erin.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_5_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_5_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_5_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/adewumimobolaji/',
+      imagePngUrl: '/teach/creators/adewumi.png',
+      imageWebpUrl: '/teach/creators/adewumi.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_6_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_6_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_6_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/successoghogho/',
+      imagePngUrl: '/teach/creators/successOghogho.png',
+      imageWebpUrl: '/teach/creators/successOghogho.webp',
+    },
+  ],
+  TESTIMONIAlS_DATA_TEACHERS: [
+    {
+      personDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
+      role: 'I18N_TEACH_PAGE_TESTIMONIAL_ROLE_TEACHER',
+      quote: 'I18N_TEACH_TESTIMONIAL_1',
+      imageUrl: '/teach/testimonials/riya.jpg',
+      imageUrlWebp: '/teach/testimonials/riya.webp',
+      altText: 'Riya Sogani',
+    },
+    {
+      personDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
+      role: 'I18N_TEACH_PAGE_TESTIMONIAL_ROLE_TEACHER',
+      quote: 'I18N_TEACH_TESTIMONIAL_2',
+      imageUrl: '/teach/testimonials/awad.jpg',
+      imageUrlWebp: '/teach/testimonials/awad.webp',
+      altText: 'Wala Awad',
+    },
+    {
+      personDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
+      role: 'I18N_TEACH_PAGE_TESTIMONIAL_ROLE_TEACHER',
+      quote: 'I18N_TEACH_TESTIMONIAL_3',
+      imageUrl: '/teach/testimonials/himanshu.jpg',
+      imageUrlWebp: '/teach/testimonials/himanshu.webp',
+      altText: 'Himanshu Taneja',
+    },
+  ],
   CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500],
   CONTRIBUTOR_CERTIFICATE_LOGO:
     '/assets/images/contributor_dashboard/oppia-logo.jpg',
-  PARTNERSHIPS_FORM_LINK: 'https://forms.gle/Y71U8FdhQwZpicJj8',
+  PARTNERSHIPS_FORM_LINK:
+    'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform',
   PARTNERSHIPS_FORM_TRANSLATED_LINK: {
     PREFIX:
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=',
     SUFFIX: '&_x_tr_hl=en-US&_x_tr_pto=wapp',
   },
-  VOLUNTEER_FORM_LINK: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
+  VOLUNTEER_FORM_LINK:
+    'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
+  IMPACT_REPORT_LINK:
+    'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
+  PARENTS_TEACHERS_PDF_GUIDE_LINK:
+    'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
+  TEACHER_STORY_TAGGED_BLOGS_LINK:
+    'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+  VOLUNTEER_EXPECTATIONS: [
+    'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_1',
+    'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_2',
+    'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_3',
+    'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_4',
+  ],
+  VOLUNTEER_PREFERRED_SKILLS: {
+    OUTREACH: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_SKILL4',
+        ],
+      },
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL4',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL5',
+        ],
+      },
+    ],
+    SOFTWARE: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL4',
+        ],
+      },
+    ],
+    ART_AND_DESIGN: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL3',
+        ],
+      },
+    ],
+    TRANSLATION: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL3',
+        ],
+      },
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL4',
+        ],
+      },
+    ],
+    LESSON_CREATION: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL4',
+        ],
+      },
+    ],
+  },
+  LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA: {
+    ABOUT: 'lastAboutPageViewTime',
+    TEACH: 'lastTeachPageViewTime',
+    VOLUNTEER: 'lastVolunteerPageViewTime',
+  },
+  ONE_WEEK_IN_MILLIS: 7 * 24 * 60 * 60 * 1000,
+  ONE_MONTH_IN_MILLIS: 30 * 24 * 60 * 60 * 1000,
 } as const;
+
+export enum NavbarAndFooterGATrackingPages {
+  ABOUT = 'About',
+  VOLUNTEER = 'Volunteer',
+  TEACH = 'Teach',
+}

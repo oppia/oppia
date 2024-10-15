@@ -20,9 +20,12 @@ import datetime
 
 from core import feature_flag_list
 from core import feconf
+from core.constants import constants
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -52,24 +55,59 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.save_new_valid_classroom()
+        self.save_new_valid_classroom(
+            'history', 'history', 'history', is_published=False
+        )
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:
-        self.login(self.EDITOR_EMAIL)
         self.get_html_response(
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'math'))
 
     def test_validation_returns_false_if_classroom_doesnot_exists(self) -> None:
-        self.login(self.EDITOR_EMAIL)
         self.get_json(
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'),
             expected_status_int=404)
+
+    def test_validation_returns_false_if_classroom_is_private(self) -> None:
+        self.get_json(
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'),
+            expected_status_int=404)
+
+    def test_validation_returns_true_if_curriculum_admin_visit_hidden_classroom(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'))
+
+
+class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+
+    def test_validation_returns_false_if_no_public_classrooms_are_present(
+            self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            self.get_json(
+                '%s/can_access_classrooms_page' % (
+                    ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404
+            )
+
+    def test_validation_returns_true_in_dev_mode_if_no_classroom_are_present(
+            self) -> None:
+        with self.swap(constants, 'DEV_MODE', True):
+            self.get_html_response(
+                '%s/can_access_classrooms_page' %
+                    ACCESS_VALIDATION_HANDLER_PREFIX)
+
+    def test_validation_returns_true_if_we_have_public_classrooms(
+            self) -> None:
+        self.save_new_valid_classroom()
+        self.get_html_response(
+            '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
 class CollectionViewerPageAccessValidationHandlerTests(
@@ -740,3 +778,108 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
             ACCESS_VALIDATION_HANDLER_PREFIX,
             ), expected_status_int=404
         )
+
+
+class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        """Completes the sign-up process for the various users."""
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+
+        self.topic_id = 'topic_id'
+        self.story_id_1 = 'story_id_1'
+        self.story_id_2 = 'story_id_2'
+        self.story_id_3 = 'story_id_3'
+        self.node_id = 'node_1'
+        self.node_id_2 = 'node_2'
+        self.exp_id = 'exp_id'
+        self.story_url_fragment_1 = 'public-story-title'
+        self.story_url_fragment_2 = 'private-story-title'
+
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id)
+        self.publish_exploration(self.owner_id, self.exp_id)
+
+        self.node_1: story_domain.StoryNodeDict = {
+            'id': self.node_id,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.exp_id,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
+        }
+
+        self.save_new_skill('skill_id_1', self.admin_id, description='Skill 1')
+        self.save_new_skill('skill_id_2', self.admin_id, description='Skill 2')
+
+        self.story = story_domain.Story.create_default_story(
+            self.story_id_1, 'Public Story Title', 'Description', self.topic_id,
+            self.story_url_fragment_1)
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(self.node_1)
+        ]
+        self.story.story_contents.initial_node_id = self.node_id
+        self.story.story_contents.next_node_id = self.node_id_2
+        story_services.save_new_story(self.admin_id, self.story)
+
+        self.story_2 = story_domain.Story.create_default_story(
+            self.story_id_2, 'Private Story Title', 'Description',
+            self.topic_id, self.story_url_fragment_2)
+        story_services.save_new_story(self.admin_id, self.story_2)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, 'user', name='Topic',
+            description='A new topic',
+            canonical_story_ids=[self.story_id_1, self.story_id_3],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id_1, self.admin_id)
+
+        self.login(self.VIEWER_EMAIL)
+
+    def test_any_user_can_access_review_tests_page(self) -> None:
+        self.get_html_response(
+            '%s/can_access_review_tests_page/staging/topic/%s'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_url_fragment_1),
+            expected_status_int=200)
+
+    def test_no_user_can_access_unpublished_story_review_sessions_page(
+        self
+    ) -> None:
+        self.get_json(
+            '%s/can_access_review_tests_page/staging/topic/%s'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_url_fragment_2),
+            expected_status_int=404)
+
+    def test_get_fails_when_story_doesnt_exist(self) -> None:
+        self.get_json(
+            '%s/can_access_review_tests_page/staging/topic/%s'
+            % (ACCESS_VALIDATION_HANDLER_PREFIX, 'non-existent-story'),
+            expected_status_int=404)
