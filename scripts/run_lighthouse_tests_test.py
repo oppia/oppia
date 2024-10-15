@@ -75,8 +75,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             common.NODE_BIN_PATH, lhci_path, 'autorun',
             '--config=%s' % (
                 LIGHTHOUSE_CONFIG_FILENAMES[LIGHTHOUSE_MODE_PERFORMANCE]),
-            '--max-old-space-size=4096',
-            '--no-sandbox'
+            '--max-old-space-size=4096'
         ]
         # Arguments to record in lighthouse_setup.js.
         self.extra_args = [
