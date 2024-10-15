@@ -245,12 +245,11 @@ def is_feature_flag_enabled(
     if user_id is not None:
         user_group_models: List[user_models.UserGroupModel] = list(
             user_models.UserGroupModel.query(
-                user_models.UserGroupModel.users == user_id
+                user_models.UserGroupModel.user_ids == user_id
             ).fetch())
 
-        user_group_models_ids: List[str] = []
-        for user_group_model in user_group_models:
-            user_group_models_ids.append(user_group_model.id)
+        user_group_models_ids: Set[str] = set(
+            user_group_model.id for user_group_model in user_group_models)
 
         for user_group_id in feature_flag.feature_flag_config.user_group_ids:
             if user_group_id in user_group_models_ids:
