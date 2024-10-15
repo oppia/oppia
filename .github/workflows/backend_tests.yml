@@ -27,16 +27,9 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
-      - name: Initialze Containers
+      - name: Initialize Containers
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          make build
-          sudo make run-devserver
-          make stop
+        uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Run backend test shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: make run_tests.backend PYTHON_ARGS="--generate_coverage_report --generate_time_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}"

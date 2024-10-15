@@ -26,17 +26,11 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
       - name: Initialize Containers
-        run: |
-          make build
-          sudo make run-devserver
-          make stop
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Run ESLint Tests
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: make run_tests.custom_eslint

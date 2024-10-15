@@ -1,0 +1,16 @@
+name: 'Install Dependencies'
+description: 'Install Oppia dependencies in Docker.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Free disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      shell: bash
+    - name: Initialize Containers
+      run: |
+        make build
+        sudo make run-devserver
+        make stop
+      shell: bash

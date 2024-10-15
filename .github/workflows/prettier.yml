@@ -26,17 +26,10 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
       - name: Initialize Containers
-        run: |
-          make build
-          sudo make run-devserver
-          make stop
+        uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Prettify code
         run: make run_tests.prettier
       - name: Explain how to fix the issue

@@ -55,19 +55,12 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Initialize Containers
-        run: |
-          make build
-          sudo make run-devserver
-          make stop
+        uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Run frontend tests ${{ matrix.num_runs }}
         run: make run_tests.frontend PYTHON_ARGS="--check_coverage"
       - name: Uploading fronted coverage reports as an artifact
