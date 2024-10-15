@@ -34,6 +34,8 @@ import {NewChapterTitleModalComponent} from './modal-templates/new-chapter-title
 import {toastrConfig} from 'pages/lightweight-oppia-root/app.module';
 import {StoryEditorPageAuthGuard} from './story-editor-page-auth.guard';
 import {StoryEditorPageRootComponent} from './story-editor-page-root.component';
+import {StoryEditorNavbarComponent} from './navbar/story-editor-navbar.component';
+import {StoryEditorNavbarBreadcrumbComponent} from './navbar/story-editor-navbar-breadcrumb.component';
 @NgModule({
   imports: [
     // TODO(#13443): Remove smart router module provider once all pages are
@@ -60,6 +62,8 @@ import {StoryEditorPageRootComponent} from './story-editor-page-root.component';
     StoryEditorPageComponent,
     DeleteChapterModalComponent,
     StoryEditorPageRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StoryEditorNavbarComponent,
   ],
   entryComponents: [
     StoryEditorSaveModalComponent,
@@ -72,6 +76,8 @@ import {StoryEditorPageRootComponent} from './story-editor-page-root.component';
     NewChapterTitleModalComponent,
     StoryEditorPageComponent,
     DeleteChapterModalComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StoryEditorNavbarComponent,
   ],
 })
 export class StoryEditorPageModule {}
