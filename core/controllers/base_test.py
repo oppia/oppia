@@ -227,22 +227,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             ):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
-                    url, [200, 301, 302, 400, 401, 404, 405])
-
-    def test_that_no_post_results_in_500_error(self) -> None:
-        """Test that no POST request results in a 500 error."""
-
-        for route in main.URLS:
-            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
-
-            if url == '/console_errors':
-                continue
-
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
-                # Some of these will 404 or 302. This is expected.
-                self.get_response_without_checking_for_errors(
                     url,
                     [200, 301, 302, 400, 401, 404, 405],
                     http_method='POST',
@@ -254,9 +238,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
-
-            if url == '/console_errors':
-                continue
 
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
@@ -274,9 +255,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
-
-            if url == '/console_errors':
-                continue
 
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
