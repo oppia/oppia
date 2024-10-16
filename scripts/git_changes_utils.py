@@ -32,6 +32,7 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 EMPTY_SHA1: Final[str] = '0000000000000000000000000000000000000000'
 
+
 def get_git_remotes() -> List[str]:
     """Get the list of remotes in the git repository.
 
