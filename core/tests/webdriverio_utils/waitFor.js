@@ -127,6 +127,12 @@ var presenceOf = async function (element, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function (element, errorMessage) {
+  // Per https://webdriver.io/docs/api/element/waitForDisplayed, webdriverIO
+  // does not wait for the element to exist in order to execute this command.
+  // So we need to check for it manually. This will also give a better error
+  // message (otherwise the error message just ends up being "cannot read
+  // properties of undefined (reading 'waitForDisplayed')")
+  await presenceOf(element, errorMessage);
   await element.waitForDisplayed({
     timeout: DEFAULT_WAIT_TIME_MSECS,
     timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
