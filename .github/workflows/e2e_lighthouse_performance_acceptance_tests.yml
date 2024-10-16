@@ -341,6 +341,12 @@ jobs:
           shell: bash
         - name: Install Oppia dependencies
           uses: ./.github/actions/install-oppia-dependencies
+        - name: Uploading diff screenshots as an artifact
+          if: ${{ failure() }}
+          uses: actions/upload-artifact@v3
+          with:
+            name: diff-snapshots
+            path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
         - name: (Artifact re-build) Cache third_party/static
           if: steps.download_artifact_1.outcome == 'failure'
           uses: actions/cache@v3
@@ -372,12 +378,6 @@ jobs:
           with:
             name: webpack-bundles
             path: /home/runner/work/oppia/oppia/build
-        - name: Uploading diff screenshots as an artifact
-          if: ${{ failure() }}
-          uses: actions/upload-artifact@v3
-          with:
-            name: diff-snapshots
-            path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
         - name: Report failure if failed on oppia/oppia develop branch
           if: ${{
             failure() &&
