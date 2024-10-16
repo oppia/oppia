@@ -18,7 +18,6 @@
  */
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
-var forms = require('./forms.js');
 
 var ContributorDashboardTranslateTextTab = require('../webdriverio_utils/ContributorDashboardTranslateTextTab.js');
 
@@ -44,9 +43,6 @@ var ContributorDashboardPage = function () {
   var opportunityLabelCss = '.e2e-test-opportunity-list-item-label';
   var opportunityProgressPercentageCss =
     '.e2e-test-opportunity-list-item-progress-percentage';
-  var acceptTranslationSuggestionButton = $(
-    '.e2e-test-translation-accept-button'
-  );
   var acceptQuestionSuggestionButton = $(
     '.e2e-test-question-suggestion-review-accept-button'
   );
@@ -59,8 +55,6 @@ var ContributorDashboardPage = function () {
   var questionReviewModalHeader = $(
     '.e2e-test-question-suggestion-review-modal-header'
   );
-  var translationRichTextEditorTag = $('.e2e-test-state-translation-editor');
-  var saveTranslationButton = $('.e2e-test-save-button');
   var usernameContainer = $('.e2e-test-username');
   var reviewRightsDiv = $('.e2e-test-review-rights');
   var selectorContainer = $('.e2e-test-language-selector');
@@ -212,14 +206,14 @@ var ContributorDashboardPage = function () {
       var headingElement = opportunity.$(opportunityHeadingCss);
       await waitFor.visibilityOf(
         headingElement,
-        'Opportunity heading ' + i + ' is taking too much time to ' + 'appear'
+        'Opportunity heading is taking too much time to appear'
       );
       var heading = await headingElement.getText();
 
       var subheadingElement = opportunity.$(opportunitySubheadingCss);
       await waitFor.visibilityOf(
         subheadingElement,
-        'Opportunity subheading ' + i + ' is taking too much time to appear'
+        'Opportunity subheading is taking too much time to appear'
       );
       var subheading = await subheadingElement.getText();
 
@@ -282,22 +276,6 @@ var ContributorDashboardPage = function () {
     await action.click(
       'Opportunity action button',
       opportunity.$(opportunityActionButtonCss)
-    );
-  };
-
-  this.setTranslation = async function (richTextInstructions) {
-    var richTextEditor = await forms.RichTextEditor(
-      translationRichTextEditorTag
-    );
-    await richTextEditor.clear();
-    await richTextInstructions(richTextEditor);
-    await action.click('Save Translation button', saveTranslationButton);
-  };
-
-  this.clickAcceptTranslationSuggestionButton = async function () {
-    await action.click(
-      'Translation accept button',
-      acceptTranslationSuggestionButton
     );
   };
 
