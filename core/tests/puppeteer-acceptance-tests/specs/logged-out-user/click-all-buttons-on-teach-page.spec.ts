@@ -50,6 +50,10 @@ describe('Logged-out User in Teach page', function () {
     'should open the classrooms page when "Explore Lessons" button is clicked',
     async function () {
       await loggedOutUser.clickExploreLessonsButtonAtTheBottomInTeachPage();
+      await loggedOutUser.expectScreenshotToMatch(
+        'clickExploreLessonsButtonAtTheBottomInTeachPage',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

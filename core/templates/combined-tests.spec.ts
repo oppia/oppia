@@ -87,4 +87,18 @@ jasmine.getEnv().addReporter({
 // The '@nodelib' and 'openapi3-ts' are excluded from the tests since they are
 // coming from third party library.
 const context = require.context('../../', true, /(:?)/);
-context.keys().forEach(context);
+
+// Filter out problematic modules before loading
+const filteredKeys = (context.keys() as string[]).filter((key: string) => {
+  // Exclude @bcoe, @nodelib, and other problematic modules
+  return !(
+    /@bcoe/.test(key) ||
+    /@nodelib/.test(key) ||
+    /openapi3-ts/.test(key) ||
+    // Add any other problematic patterns here
+    /fs-extra/.test(key)
+  );
+});
+
+// Load only the filtered modules
+filteredKeys.forEach((key: string) => context(key));

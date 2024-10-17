@@ -39,15 +39,31 @@ describe('Blog Editor', function () {
     async function () {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.publishNewBlogPost('This is a test blog post');
+      await blogPostEditor.expectScreenshotToMatch(
+        'publishNewBlogPost',
+        __dirname
+      );
       await blogPostEditor.navigateToPublishTab();
       await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
         'This is a test blog post'
+      );
+      await blogPostEditor.expectScreenshotToMatch(
+        'expectPublishedBlogPostWithTitleToBePresent',
+        __dirname
       );
 
       await blogPostEditor.deletePublishedBlogPostWithTitle(
         'This is a test blog post'
       );
+      await blogPostEditor.expectScreenshotToMatch(
+        'deletePublishedBlogPostWithTitle',
+        __dirname
+      );
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
+      await blogPostEditor.expectScreenshotToMatch(
+        'expectNumberOfBlogPostsToBe0',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -60,6 +76,10 @@ describe('Blog Editor', function () {
       await blogPostEditor.updateTitleTo('');
       await blogPostEditor.updateBodyTextTo('');
       await blogPostEditor.expectPublishButtonToBeDisabled();
+      await blogPostEditor.expectScreenshotToMatch(
+        'expectPublishButtonToBeDisabled',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
