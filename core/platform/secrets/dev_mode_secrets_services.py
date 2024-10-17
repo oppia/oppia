@@ -37,6 +37,8 @@ def get_secret(name: str) -> Optional[str]:
     """
     # In emulator mode we store secrets in environment variable.
     secret = json.loads(os.environ.get('SECRETS', '{}')).get(name)
+    if isinstance(secret, dict):
+        secret = json.dumps(secret)
     # The 'json.loads' returns 'Any' and we need to tighten the type.
     assert secret is None or isinstance(secret, str)
     return secret
