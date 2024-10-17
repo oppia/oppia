@@ -457,6 +457,7 @@ import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/coll
 import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
 import { SubtopicViewerAuthGuard } from 'pages/subtopic-viewer-page/subtopic-viewer-auth.guard';
 import { ExplorationEditorPageAuthGuard } from 'pages/exploration-editor-page/exploration-editor-page-auth.guard';
+import { StoryEditorPageAuthGuard } from 'pages/story-editor-page/story-editor-page-auth.guard';
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 
 
@@ -854,6 +855,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],
   ['StoryCreationBackendApiService', StoryCreationBackendApiService],
+  ['StoryEditorPageAuthGuard', StoryEditorPageAuthGuard],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryEditorStalenessDetectionService',
     StoryEditorStalenessDetectionService],
