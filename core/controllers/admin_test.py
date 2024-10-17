@@ -2748,7 +2748,6 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
-
     def test_publish_chapters_of_length_and_measurement_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_exploration(
@@ -2869,6 +2868,8 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
             self.admin_id,self.STORY_ID_1 , chapters_change_list,
                 'Changes chapter status to draft', self.TOPIC_ID_1)
         story = story_fetchers.get_story_by_id(self.STORY_ID_1, strict=False)
+        for node in story.story_contents.nodes:
+            self.assertEqual(node.status, constants.STORY_NODE_STATUS_DRAFT)
 
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(

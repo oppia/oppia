@@ -67,7 +67,7 @@ export class AdminMiscTabComponent {
     private windowRef: WindowRef
   ) {}
 
-  publishChapters(): void {
+  publishChaptersOfLengthAndMeasurementTopic(): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
