@@ -90,6 +90,10 @@ export class SideNavigationBarComponent {
     this.sidebarStatusService.closeSidebar();
   }
 
+  closeSidebarOnNavigate(): void {
+    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+  }
+
   togglelearnSubmenu(): void {
     this.learnSubmenuIsShown = !this.learnSubmenuIsShown;
   }
@@ -111,6 +115,7 @@ export class SideNavigationBarComponent {
   }
 
   navigateToAboutPage(): void {
+    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
     this.siteAnalyticsService.registerClickNavbarButtonEvent(
       NavbarAndFooterGATrackingPages.ABOUT
     );
@@ -118,6 +123,7 @@ export class SideNavigationBarComponent {
   }
 
   navigateToVolunteerPage(): void {
+    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
     this.siteAnalyticsService.registerClickNavbarButtonEvent(
       NavbarAndFooterGATrackingPages.VOLUNTEER
     );
@@ -125,6 +131,7 @@ export class SideNavigationBarComponent {
   }
 
   navigateToTeachPage(): void {
+    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
     this.siteAnalyticsService.registerClickNavbarButtonEvent(
       NavbarAndFooterGATrackingPages.TEACH
     );
