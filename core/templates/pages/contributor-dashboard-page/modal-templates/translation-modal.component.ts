@@ -401,7 +401,42 @@ export class TranslationModalComponent {
     return this.translateTextService.getActiveIndex() > 0;
   }
 
-  skipActiveTranslation(): void {
+  getTrimmedTranslationContent(): string {
+    const content = Array.isArray(this.activeWrittenTranslation)
+      ? this.activeWrittenTranslation.join('')
+      : this.activeWrittenTranslation || '';
+    return content.trim();
+  }
+
+  confirmUnsavedChanges(isSaveDisabled: boolean): boolean {
+    if (isSaveDisabled) {
+      return true;
+    }
+    console.log('sdfsdf');
+    const translationContent = this.getTrimmedTranslationContent();
+    if (translationContent !== '') {
+      return window.confirm(
+        'You have unsaved changes. Do you want to discard them?'
+      );
+    }
+    return true;
+  }
+
+  isSaveButtonDisabled(): boolean {
+    return (
+      this.loadingData ||
+      this.uploadingTranslation ||
+      this.activeWrittenTranslation === '' ||
+      this.isSubmitted()
+    );
+  }
+
+  skipActiveTranslation(popup: boolean = true): void {
+    if (popup) {
+      if (!this.confirmUnsavedChanges(this.isSaveButtonDisabled())) {
+        return;
+      }
+    }
     const translatableItem = this.translateTextService.getTextToTranslate();
     this.updateActiveState(translatableItem);
     ({more: this.moreAvailable} = translatableItem);
@@ -413,6 +448,9 @@ export class TranslationModalComponent {
   }
 
   returnToPreviousTranslation(): void {
+    if (!this.confirmUnsavedChanges(this.isSaveButtonDisabled())) {
+      return;
+    }
     const translatableItem =
       this.translateTextService.getPreviousTextToTranslate();
     this.updateActiveState(translatableItem);
@@ -637,7 +675,7 @@ export class TranslationModalComponent {
           );
           this.uploadingTranslation = false;
           if (this.moreAvailable) {
-            this.skipActiveTranslation();
+            this.skipActiveTranslation(false);
             this.resetEditor();
           } else {
             this.activeWrittenTranslation = '';
