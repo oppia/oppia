@@ -19,7 +19,6 @@
 
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
-var users = require('./users.js');
 
 var ContributorDashboardAdminPage = function () {
   var CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION = 'REVIEW_TRANSLATION';
@@ -48,11 +47,6 @@ var ContributorDashboardAdminPage = function () {
   };
   var statsTable = $('.e2e-test-stats-table');
   var expandedRow = $('.e2e-test-expanded-row');
-  var copyButton = $('.e2e-test-copy-button');
-  var doneButton = $('.e2e-test-close-rich-text-component-editor');
-  var saveButton = $('.e2e-test-save-button');
-  var textbox = $('.e2e-test-description-box');
-  var acceptButton = $('.e2e-test-translation-accept-button');
   var questionSubmitterTab = $('.e2e-test-question-submitters-tab');
   var questionReviewerTab = $('.e2e-test-question-reviewers-tab');
   var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
@@ -153,26 +147,6 @@ var ContributorDashboardAdminPage = function () {
     } else if (category === CATEGORY_SUBMIT_QUESTION) {
       return $(userQuestionContributorCss);
     }
-  };
-
-  this.copyElementWithClassName = async function (
-    elementDescription,
-    elementClassName
-  ) {
-    await action.click('Copy button', copyButton);
-    await action.click(elementDescription, elementClassName);
-    await action.setValue(
-      'Set Image description',
-      textbox,
-      'An example description'
-    );
-    await action.click('Copy Done button', doneButton);
-    await action.click('Save button', saveButton);
-    await users.logout();
-  };
-
-  this.acceptTranslation = async function () {
-    await action.click('Translation accept button', acceptButton);
   };
 
   this.navigateToQuestionSubmitterTab = async function () {
