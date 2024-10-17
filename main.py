@@ -246,6 +246,13 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CollectionEditorAccessValidationPage
     ),
+
+    get_redirect_route(
+        r'%s/can_access_story_editor_page/<story_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.StoryEditorAccessValidationHandlerPage
+    ),
+
     get_redirect_route(
         r'%s/can_access_blog_home_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
@@ -989,9 +996,6 @@ URLS = [
         skill_mastery.SubtopicMasteryDataHandler),
 
     get_redirect_route(
-        r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
-        story_editor.StoryEditorPage),
-    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
         story_editor.EditableStoryDataHandler),
     get_redirect_route(
@@ -1222,6 +1226,10 @@ URLS.extend((
     ),
     get_redirect_route(
         r'%s/<author_username>' % feconf.BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         oppia_root.OppiaRootPage
     )
 ))

@@ -29,6 +29,7 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -778,6 +779,46 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
             ACCESS_VALIDATION_HANDLER_PREFIX,
             ), expected_status_int=404
         )
+
+
+class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Checks the access to the story editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            self.story_id, self.admin_id, self.topic_id)
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[self.story_id],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+    def test_access_story_editor_page_without_logging_in(self) -> None:
+        self.get_html_response(
+            '%s/can_access_story_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id
+            ), expected_status_int=302
+        )
+
+    def test_access_story_editor_page_with_curriculum_admin(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_story_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id),
+                expected_status_int=200)
+        self.logout()
 
 
 class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
