@@ -100,7 +100,9 @@ describe('Voiceover upload features', function () {
 
   it('should upload an audio file', async function () {
     await explorationEditorTranslationTab.openUploadAudioModal();
-    await explorationEditorTranslationTab.uploadAudio('../data/cafe.mp3');
+    await explorationEditorTranslationTab.uploadAudio(
+      '../data/cafe-over-fourty-five-seconds.mp3'
+    );
 
     var playClick =
       await explorationEditorTranslationTab.playOrPauseAudioFile();
