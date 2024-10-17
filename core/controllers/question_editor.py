@@ -48,6 +48,53 @@ class QuestionCreationHandler(
 ):
     """A handler that creates the question model given a question dict."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'question_dict': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': question_domain.Question
+                }
+            },
+            'skill_ids': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring',
+                        'validators': [{
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX
+                        }]
+                    }
+                }
+            },
+            'skill_difficulties': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'float',
+                        'validators': [{
+                            'id': 'is_at_least',
+                            'min_value': 0
+                        }, {
+                            'id': 'is_at_most',
+                            'max_value': 1
+                        }]
+                    }
+                }
+            },
+            'filenames': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        },
+        'PUT': {},
+        'DELETE': {}
+    }
+
     @acl_decorators.can_manage_question_skill_status
     def post(self) -> None:
         """Handles POST requests."""
