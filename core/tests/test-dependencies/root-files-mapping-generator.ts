@@ -626,9 +626,12 @@ class RootFilesMappingGenerator {
       .map(file => path.join(CI_TEST_SUITE_CONFIGS_DIRECTORY, file));
     for (const testSuiteConfig of testSuiteConfigFiles) {
       const config = JSON.parse(fs.readFileSync(testSuiteConfig, 'utf-8'));
-      const suites = config.suites;
-      for (const suite of suites) {
-        testSuiteModules.push(suite.module);
+      const keys = Object.keys(config);
+      for (const key of keys) {
+        const suites = config[key];
+        for (const suite of suites) {
+          testSuiteModules.push(suite.module);
+        }
       }
     }
     return testSuiteModules;
