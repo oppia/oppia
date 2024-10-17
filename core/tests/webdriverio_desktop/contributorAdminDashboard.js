@@ -17,20 +17,20 @@
  */
 
 let action = require('../webdriverio_utils/action.js');
+let forms = require('../webdriverio_utils/forms.js');
 let users = require('../webdriverio_utils/users.js');
 let general = require('../webdriverio_utils/general.js');
 let waitFor = require('../webdriverio_utils/waitFor.js');
+let workflow = require('../webdriverio_utils/workflow.js');
 
 let ReleaseCoordinatorPage = require('../webdriverio_utils/ReleaseCoordinatorPage.js');
 let AdminPage = require('../webdriverio_utils/AdminPage.js');
-let forms = require('../webdriverio_utils/forms.js');
 let ContributorDashboardPage = require('../webdriverio_utils/ContributorDashboardPage.js');
 let ContributorDashboardAdminPage = require('../webdriverio_utils/ContributorDashboardAdminPage.js');
 let TopicsAndSkillsDashboardPage = require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
 let SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 let ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 let StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
-let workflow = require('../webdriverio_utils/workflow.js');
 let TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 let CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
 let Constants = require('../webdriverio_utils/WebdriverioConstants.js');
@@ -98,6 +98,7 @@ describe('Contributor Admin Dashboard', function () {
     await adminPage.addLanguageToCoordinator('translation', 'shqip (Albanian)');
     await adminPage.addLanguageToCoordinator('translation', 'العربية (Arabic)');
     await adminPage.addRole('question', 'translation admin');
+    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
     await users.logout();
 
     await users.login(QUESTION_COORDINATOR_EMAIL);
@@ -144,30 +145,23 @@ describe('Contributor Admin Dashboard', function () {
       REVIEW_MATERIALS[1]
     );
 
-    await adminPage.get();
-    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
-
-    // Creating an exploration with an image.
+    // Create a simple exploration.
     await creatorDashboardPage.get();
     await workflow.createExploration(true);
-    await explorationEditorMainTab.setContent(async function (richTextEditor) {
-      await richTextEditor.addRteComponent(
-        'Image',
-        'create',
-        ['rectangle', 'bezier', 'piechart', 'svgupload'],
-        'An svg diagram.'
-      );
-    }, true);
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Select the right option.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('EndExploration');
     let explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
-    let basicSettings = $('.e2e-test-settings-container');
+    let basicSettings = await $('.e2e-test-settings-container');
     await action.click('Basic Settings', basicSettings);
     await explorationEditorSettingsTab.setTitle('exp1');
     await explorationEditorSettingsTab.setCategory('Algebra');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(
-      'Dummy exploration for testing images'
+      'Dummy exploration for testing'
     );
     await explorationEditorPage.saveChanges('Done!');
     await workflow.publishExploration();
@@ -192,25 +186,22 @@ describe('Contributor Admin Dashboard', function () {
     await storyEditorPage.saveStory('Saving Story');
     await storyEditorPage.publishStory();
 
-    let opportunityActionButtonCss = $(
-      '.e2e-test-opportunity-list-item-button'
-    );
     await contributorDashboardPage.get();
     await waitFor.pageToFullyLoad();
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(
       'shqip (Albanian)'
     );
-    await contributorDashboardPage.waitForOpportunitiesToLoad();
-    await action.click('Opportunity button', opportunityActionButtonCss);
-    let image = $('.e2e-test-image');
-    await waitFor.visibilityOf(image, 'Test image taking too long to appear.');
-    let images = await $$('.e2e-test-image');
-    expect(images.length).toEqual(1);
-    await contributorDashboardAdminPage.copyElementWithClassName(
-      'image',
-      images[0]
+    let opportunityActionButton = await $(
+      '.e2e-test-opportunity-list-item-button'
     );
+    await contributorDashboardPage.waitForOpportunitiesToLoad();
+    await action.click('Opportunity button', opportunityActionButton);
+    await contributorDashboardPage.setTranslation(
+      await forms.toRichText('Zgjidhni opsionin e duhur.'),
+      true
+    );
+    await users.logout();
 
     // Accept suggestion as user1.
     await users.login(USER_EMAILS[1]);
@@ -225,11 +216,11 @@ describe('Contributor Admin Dashboard', function () {
     );
 
     await contributorDashboardPage.clickOpportunityActionButton(
-      '[Image]',
+      'Zgjidhni opsionin e duhur.',
       'Topic 0 for contribution / Story Title / Chapter 1'
     );
 
-    await contributorDashboardAdminPage.acceptTranslation();
+    await contributorDashboardPage.clickAcceptTranslationSuggestionButton();
     await users.logout();
 
     await users.login(USER_EMAILS[0]);
