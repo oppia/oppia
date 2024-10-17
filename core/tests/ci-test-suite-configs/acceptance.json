@@ -1,10 +1,6 @@
 {
   "suites": [
     {
-      "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
-    },
-    {
       "name": "blog-editor/create-and-publish-a-blog-post-with-required-details",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-publish-a-blog-post-with-required-details.spec.ts"
     },
@@ -283,6 +279,12 @@
     {
       "name": "topic-manager/create-and-delete-subtopic-and-story",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
+    }
+  ],
+  "docker_suites": [
+    {
+      "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
     }
   ]
 }
