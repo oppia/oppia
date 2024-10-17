@@ -19,6 +19,7 @@
   display: flex;
   float: left;
   height: 56px;
+  margin-right: 4px;
   transform: translateX(50%);
   width: 20px;
 }
