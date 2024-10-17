@@ -412,7 +412,6 @@ export class TranslationModalComponent {
     if (isSaveDisabled) {
       return true;
     }
-    console.log('sdfsdf');
     const translationContent = this.getTrimmedTranslationContent();
     if (translationContent !== '') {
       return window.confirm(
