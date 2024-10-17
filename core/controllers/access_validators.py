@@ -528,6 +528,34 @@ class CollectionEditorAccessValidationPage(
         pass
 
 
+class StoryEditorAccessValidationHandlerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """The editor page for a single story."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length',
+                    'value': constants.STORY_ID_LENGTH
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_edit_story
+    def get(self, unused_story_id: str) -> None:
+        """Renders the story editor page.
+
+        Args:
+            unused_story_id: str. The unused story ID.
+        """
+        pass
+
+
 class ReviewTestsPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):

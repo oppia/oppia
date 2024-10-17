@@ -165,29 +165,6 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
 
-    def test_can_not_access_story_editor_page_with_invalid_story_id(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        new_story_id = story_services.get_new_story_id()
-
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, new_story_id),
-            expected_status_int=404)
-
-        # Raises error 404 even when story is saved as the new story id is not
-        # associated with the topic.
-        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
-
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, new_story_id),
-            expected_status_int=404)
-
-        self.logout()
-
     def test_can_not_get_access_story_handler_with_invalid_story_id(
         self
     ) -> None:
@@ -396,24 +373,6 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX,
                 new_story_id),
             expected_status_int=404)
-        self.logout()
-
-    def test_access_story_editor_page(self) -> None:
-        """Test access to editor pages for the sample story."""
-        # Check that non-admins cannot access the editor page.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.story_id),
-            expected_status_int=401)
-        self.logout()
-
-        # Check that admins can access and edit in the editor
-        # page.
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.story_id))
         self.logout()
 
     def test_editable_story_handler_get(self) -> None:
