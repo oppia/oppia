@@ -155,17 +155,37 @@ export class ModeratorPageComponent {
   saveFeaturedActivityReferences(): void {
     this.alertsService.clearWarnings();
 
+    // Check if any exploration ID is empty.
+    for (let reference of this.displayedFeaturedActivityReferences) {
+        if (!reference.id || reference.id.trim() === '') {
+            this.alertsService.addWarning('Exploration ID cannot be empty. Please enter a valid exploration ID.');
+            return;
+        }
+    }
+
     let activityReferencesToSave = [
-      ...this.displayedFeaturedActivityReferences,
+        ...this.displayedFeaturedActivityReferences,
     ];
 
     this.moderatorPageBackendApiService
-      .saveFeaturedActivityReferencesAsync(activityReferencesToSave)
-      .then(() => {
-        this.lastSavedFeaturedActivityReferences = activityReferencesToSave;
-        this.alertsService.addSuccessMessage('Featured activities saved.');
-      });
-  }
+        .saveFeaturedActivityReferencesAsync(activityReferencesToSave)
+        .then(() => {
+            this.lastSavedFeaturedActivityReferences = activityReferencesToSave;
+            this.alertsService.addSuccessMessage('Featured activities saved.');
+        })
+        .catch(error => {
+            // Handling the error for response status 400
+            if (error.status === 400 && error.error) {
+                // Show the specific error message returned from the backend
+                this.alertsService.addWarning(error.error.error);
+            } else {
+                this.alertsService.addWarning('An unexpected error occurred. Please try again later.');
+            }
+        });
+}
+
+
+
 
   getSchema(): Schema {
     return this.FEATURED_ACTIVITY_REFERENCES_SCHEMA;
