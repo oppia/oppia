@@ -824,8 +824,6 @@ DEMO_EXPLORATIONS = {
     # NumericInput interaction.
     u'3': 'root_linear_coefficient_theorem',
     u'4': 'three_balls',
-    # TODO(bhenning): Replace demo exploration '5' with a new exploration
-    # described in #1376.
     u'6': 'boot_verbs.yaml',
     u'7': 'hola.yaml',
     # Exploration with ID 8 was removed as it contained string values inside
