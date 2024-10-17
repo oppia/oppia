@@ -94,8 +94,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
-    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
-    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
 ]
 
@@ -111,6 +109,8 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.DIAGNOSTIC_TEST,
+    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
+    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -240,7 +240,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to promptly update '
             'translations of content they are editing in the exploration '
             'editor page.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
@@ -248,7 +248,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to view a list of '
             'misconceptions and tag answer groups with misconceptions '
             'for a curated exploration.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
