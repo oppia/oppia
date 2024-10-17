@@ -53,6 +53,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'proto_files/text_classifier_pb2.py',
     'proto_files/training_job_response_payload_pb2.py',
     'docker/patched_wsgi_server.py',
+    'docker/fix_google_module.py',
 ]
 
 
