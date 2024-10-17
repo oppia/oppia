@@ -115,7 +115,8 @@ class EmailToAdminTest(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
-            (param_list.ParamName.SYSTEM_EMAIL_NAME, 'DUMMY_SYSTEM_NAME')
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, 'DUMMY_SYSTEM_NAME'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_email_to_admin_is_sent_correctly(self) -> None:
@@ -654,7 +655,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             new_email_body_content: str. The email body.
         """
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.name,
+            param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value,
             self.admin_id,
             'Updating email subject.',
             [
@@ -670,10 +671,12 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     'value_when_matched': new_email_subject_content
                 })
             ],
-            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
+            ).default_value
         )
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.SIGNUP_EMAIL_BODY_CONTENT.name,
+            param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value,
             self.admin_id,
             'Updating email body.',
             [
@@ -689,48 +692,59 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     'value_when_matched': new_email_body_content
                 })
             ],
-            email_manager.SIGNUP_EMAIL_BODY_CONTENT.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
+            ).default_value
         )
 
     def _reset_signup_email_content_platform_parameters(self) -> None:
         """Resets email content platform parameters."""
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.name,
+            param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value,
             self.admin_id,
             'Resetting email subject.',
             [],
-            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
+            ).default_value
         )
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.SIGNUP_EMAIL_BODY_CONTENT.name,
+            param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value,
             self.admin_id,
             'Resetting email body.',
             [],
-            email_manager.SIGNUP_EMAIL_BODY_CONTENT.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
+            ).default_value
         )
 
     def _reset_the_email_platform_params_value(self) -> None:
         """Resets the email name and footer platform parameters."""
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_SENDER_NAME.name,
+            param_list.ParamName.EMAIL_SENDER_NAME.value,
             self.admin_id,
             'Reset the sender name to default',
             [],
-            email_manager.EMAIL_SENDER_NAME.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.EMAIL_SENDER_NAME.value
+            ).default_value
         )
 
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_FOOTER.name,
+            param_list.ParamName.EMAIL_FOOTER.value,
             self.admin_id,
             'Reset the email footer to default',
             [],
-            email_manager.EMAIL_FOOTER.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.EMAIL_FOOTER.value
+            ).default_value
         )
 
     @test_utils.set_platform_parameters(
         [
             (param_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
-            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com')
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
@@ -768,7 +782,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 PLACEHOLDER_SUBJECT
             ),
             (param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, ''),
-            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com')
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_email_not_sent_if_content_parameter_is_not_modified(self) -> None:
@@ -818,38 +835,19 @@ class SignupEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
                 param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
-                ''
+                'Welcome!'
             ),
             (
                 param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
                 PLACEHOLDER_HTML_BODY
             ),
-            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com')
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_email_not_sent_if_content_config_is_partially_modified(
         self
     ) -> None:
-        platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.name,
-            self.admin_id,
-            'Updating email subject.',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [
-                                ['=', 'Web']
-                            ],
-                        }
-                    ],
-                    'value_when_matched': self.new_email_subject_content
-                })
-            ],
-            email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.default_value
-        )
-
         log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
             logging, 'error', log_new_error_counter)
@@ -897,14 +895,15 @@ class SignupEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (
                 param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
-                ''
+                'Welcome!'
             ),
             (
                 param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
                 'New HTML body.<script>alert(3);</script>'
             ),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_email_with_bad_content_is_not_sent(self) -> None:
@@ -963,12 +962,13 @@ class SignupEmailTests(test_utils.EmailTestBase):
             ),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_contents_of_signup_email_are_correct(self) -> None:
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_SENDER_NAME.name,
+            param_list.ParamName.EMAIL_SENDER_NAME.value,
             self.admin_id,
             'Update sender name',
             [
@@ -984,10 +984,12 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     'value_when_matched': 'Email Sender'
                 })
             ],
-            email_manager.EMAIL_SENDER_NAME.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.EMAIL_SENDER_NAME.value
+            ).default_value
         )
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_FOOTER.name,
+            param_list.ParamName.EMAIL_FOOTER.value,
             self.admin_id,
             'Update email footer',
             [
@@ -1003,7 +1005,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     'value_when_matched': self.new_footer
                 })
             ],
-            email_manager.EMAIL_FOOTER.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.EMAIL_FOOTER.value
+            ).default_value
         )
         self._set_signup_email_content_platform_parameter(
             self.new_email_subject_content, self.new_email_body_content)
@@ -1059,7 +1063,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             ),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_email_only_sent_once_for_repeated_signups_by_same_user(
@@ -1126,7 +1131,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
             ),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_email_only_sent_if_signup_was_successful(self) -> None:
@@ -1192,12 +1198,13 @@ class SignupEmailTests(test_utils.EmailTestBase):
             ),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_SENDER_NAME.name,
+            param_list.ParamName.EMAIL_SENDER_NAME.value,
             self.admin_id,
             'Update sender name',
             [
@@ -1213,10 +1220,12 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     'value_when_matched': 'Email Sender'
                 })
             ],
-            email_manager.EMAIL_SENDER_NAME.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.EMAIL_SENDER_NAME.value
+            ).default_value
         )
         platform_parameter_registry.Registry.update_platform_parameter(
-            email_manager.EMAIL_FOOTER.name,
+            param_list.ParamName.EMAIL_FOOTER.value,
             self.admin_id,
             'Update email footer',
             [
@@ -1232,7 +1241,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     'value_when_matched': self.new_footer
                 })
             ],
-            email_manager.EMAIL_FOOTER.default_value
+            platform_parameter_registry.Registry.get_platform_parameter(
+                param_list.ParamName.EMAIL_FOOTER.value
+            ).default_value
         )
         self._set_signup_email_content_platform_parameter(
             self.new_email_subject_content, self.new_email_body_content)
@@ -3302,7 +3313,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3369,7 +3382,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3436,7 +3451,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3504,7 +3521,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3572,7 +3591,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3639,7 +3660,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3706,7 +3729,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3782,7 +3807,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3873,7 +3900,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value)
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value)
         )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
@@ -3898,7 +3927,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3976,7 +4007,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4043,7 +4076,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4112,7 +4147,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4181,7 +4218,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4250,7 +4289,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4319,7 +4360,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4388,7 +4431,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4464,7 +4509,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4555,8 +4602,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value)
-        )
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
             '<br><br>'
@@ -4580,7 +4628,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -4680,7 +4730,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value)
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value)
         )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
@@ -4705,7 +4757,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                email_manager.EMAIL_FOOTER.default_value))
+                platform_parameter_registry.Registry.get_platform_parameter(
+                    param_list.ParamName.EMAIL_FOOTER.value
+                ).default_value))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -6789,7 +6843,8 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_that_correct_failure_email_is_sent(self) -> None:
@@ -6948,7 +7003,8 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_account_deletion_failed_email_is_sent_correctly(self) -> None:
@@ -7817,7 +7873,8 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+            (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_not_mergeable_change_list_email_is_sent_correctly(self) -> None:

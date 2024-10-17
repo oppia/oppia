@@ -18,27 +18,33 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core.domain import platform_parameter_list
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
 
 
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, 'some_id')]
+    )
     def test_get_application_id(self) -> None:
-        with self.swap(feconf, 'OPPIA_PROJECT_ID', 'some_id'):
-            self.assertEqual(
-                gae_app_identity_services.get_application_id(), 'some_id')
+        self.assertEqual(
+            gae_app_identity_services.get_application_id(), 'some_id')
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, '')]
+    )
     def test_get_application_id_throws_error(self) -> None:
-        with self.swap(feconf, 'OPPIA_PROJECT_ID', None):
-            with self.assertRaisesRegex(
-                ValueError, 'Value None for application id is invalid.'
-            ):
-                gae_app_identity_services.get_application_id()
+        with self.assertRaisesRegex(
+            ValueError, 'Value None for application id is invalid.'
+        ):
+            gae_app_identity_services.get_application_id()
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, 'some_id')]
+    )
     def test_get_default_gcs_bucket_name(self) -> None:
-        with self.swap(feconf, 'OPPIA_PROJECT_ID', 'some_id'):
-            self.assertEqual(
-                gae_app_identity_services.get_gcs_resource_bucket_name(),
-                'some_id-resources')
+        self.assertEqual(
+            gae_app_identity_services.get_gcs_resource_bucket_name(),
+            'some_id-resources')
