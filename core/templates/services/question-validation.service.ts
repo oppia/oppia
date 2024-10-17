@@ -53,6 +53,24 @@ export class QuestionValidationService {
     );
   }
 
+  areAnswerGroupsNotEqual(question: Question): boolean {
+    const answerGroups = question._stateData.interaction.answerGroups;
+    const ruleSet = new Set<string>();
+
+    for (const group of answerGroups) {
+      for (const rule of group.rules) {
+        const ruleKey = `${rule.type}:${JSON.stringify(rule.inputs)}`;
+
+        if (ruleSet.has(ruleKey)) {
+          return false;
+        }
+        ruleSet.add(ruleKey);
+      }
+    }
+
+    return true;
+  }
+
   // Returns 'null' when the message is valid.
   getValidationErrorMessage(question: Question): string | null {
     const interaction = question.getStateData().interaction;
@@ -93,6 +111,17 @@ export class QuestionValidationService {
     }
     if (!atLeastOneAnswerCorrect) {
       return 'At least one answer should be marked correct';
+    }
+    if (
+      question._stateData.interaction.answerGroups.length > 1 ||
+      question._stateData.interaction.answerGroups[0].rules.length > 1
+    ) {
+      if (!this.areAnswerGroupsNotEqual(question)) {
+        return (
+          'Please ensure learner answer 1 in Oppia response 2' +
+          ' is not equaling the same multiple choice option as another learner answer.'
+        );
+      }
     }
     return null;
   }
