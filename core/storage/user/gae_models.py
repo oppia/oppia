@@ -2380,20 +2380,20 @@ class UserGroupModel(base_models.BaseModel):
 
     This model stores the user-groups for which feature-flag or
     platform-parameters can be enabled.
-
-    ID for this model is the name of the user-group.
     """
 
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
-    # The user ids of the users.
-    users = datastore_services.StringProperty(repeated=True)
+    # The name of the user group.
+    name = datastore_services.StringProperty(required=True, indexed=True)
+    # The list of user_ids of the members of the user group.
+    user_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: user present
-        in the 'users' field.
+        in the 'user_ids' field.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
@@ -2409,7 +2409,8 @@ class UserGroupModel(base_models.BaseModel):
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'users': base_models.EXPORT_POLICY.EXPORTED
+            'name': base_models.EXPORT_POLICY.EXPORTED,
+            'user_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -2422,7 +2423,8 @@ class UserGroupModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.users == user_id).get(keys_only=True) is not None
+        return cls.query(
+            cls.user_ids == user_id).get(keys_only=True) is not None
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
@@ -2432,11 +2434,11 @@ class UserGroupModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         user_group_models: List[UserGroupModel] = list(cls.query(
-            cls.users == user_id
+            cls.user_ids == user_id
         ).fetch())
 
         for user_group_model in user_group_models:
-            user_group_model.users.remove(user_id)
+            user_group_model.user_ids.remove(user_id)
 
         # Delete the references to this user from other user subscribers models.
         cls.update_timestamps_multi(user_group_models)
@@ -2454,11 +2456,12 @@ class UserGroupModel(base_models.BaseModel):
         """
         user_data = {}
         user_group_models: List[UserGroupModel] = list(cls.query(
-            cls.users == user_id
+            cls.user_ids == user_id
         ).fetch())
         for user_group_model in user_group_models:
             user_data[user_group_model.id] = {
-                'users': user_id
+                'name': user_group_model.name,
+                'user_ids': user_id
             }
 
         return user_data
