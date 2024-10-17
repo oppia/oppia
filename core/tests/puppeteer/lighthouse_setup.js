@@ -20,6 +20,7 @@ var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
 const {PuppeteerScreenRecorder} = require('puppeteer-screen-recorder');
+const fs = require('fs');
 
 const ADMIN_URL = 'http://localhost:8181/admin';
 const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
@@ -33,6 +34,11 @@ var explorationEditorUrl = 'Exploration editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 var storyEditorUrl = 'Story editor not loaded';
+
+var explorationId = 'Exploration editor not loaded';
+var topicId = 'Topic editor not loaded';
+var skillId = 'Skill editor not loaded';
+var storyId = 'Story editor not loaded';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -230,6 +236,7 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.click(explorationConfirmPublish);
 
     explorationEditorUrl = await page.url();
+    explorationId = explorationEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -273,6 +280,7 @@ const getTopicEditorUrl = async function (browser, page) {
     await page.waitForSelector(createStoryButtonSelector);
 
     topicEditorUrl = await page.url();
+    topicId = topicEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -305,6 +313,7 @@ const getStoryEditorUrl = async function (browser, page) {
     await page.click(confirmStoryCreationButton);
     await page.waitForTimeout(15000);
     storyEditorUrl = await page.url();
+    storyId = storyEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -336,6 +345,7 @@ const getSkillEditorUrl = async function (browser, page) {
     skillEditorUrl = await pages[2].url();
     if (await skillEditorUrl.includes('topic_editor')) {
       skillEditorUrl = await pages[3].url();
+      skillId = skillEditorUrl.split('/')[4];
     }
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -510,6 +520,15 @@ const main = async function () {
   await getSkillEditorUrl(browser, page);
   await generateDataForTopicAndStoryPlayer(browser, page);
   await generateDataForClassroom(browser, page);
+
+  fs.writeFileSync(
+    'core/tests/puppeteer/.env',
+    `exploration_id=${explorationId}\n` +
+      `story_id=${storyId}\n` +
+      `topic_id=${topicId}\n` +
+      `skill_id=${skillId}\n`
+  );
+
   await process.stdout.write(
     [explorationEditorUrl, topicEditorUrl, storyEditorUrl, skillEditorUrl].join(
       '\n'

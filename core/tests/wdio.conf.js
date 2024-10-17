@@ -319,9 +319,8 @@ exports.config = {
     * @param {Object} context scope object the test was executed with
     */
   beforeTest: function(test, context) {
-    if (process.env.GITHUB_ACTIONS &&
-      // eslint-disable-next-line eqeqeq
-      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+    if (// eslint-disable-next-line eqeqeq
+    process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       let ffmpegArgs = [
         '-y',
         '-r', '30',
@@ -371,9 +370,8 @@ exports.config = {
    */
   afterTest: async function(
       test, context, { error, result, duration, passed, retries }) {
-    if (process.env.GITHUB_ACTIONS &&
-      // eslint-disable-next-line eqeqeq
-      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+    if (// eslint-disable-next-line eqeqeq
+    process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       ffmpegProcess.kill();
       if (passed === true && !ALL_VIDEOS && fs.existsSync(videoPath)) {
         fs.unlinkSync(videoPath);
