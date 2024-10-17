@@ -20,6 +20,7 @@ import datetime
 import enum
 import logging
 
+
 from core import feature_flag_list
 from core import feconf
 from core import utils
@@ -55,6 +56,8 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
+
+from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -2722,6 +2725,163 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.get_json(
             '/explorationdataextractionhandler', params=payload,
             expected_status_int=404)
+
+
+class PublishChaptersOfLengthAndMeasurementTopicTest(
+    test_utils.GenericTestBase):
+    """Tests that publish chapters of Length and Measurement topic."""
+
+    def setUp(self) -> None:
+        """Completes the sign-up process for the various users."""
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+
+    def test_publish_chapters_of_length_and_measurement_topic(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        TOPIC_ID_1: Final = 'bdO7c687WBBW'
+        STORY_ID_1: Final = 'OVJ4RdjxbcAf'
+        STORY_URL_FRAGMENT: Final = 'title-one'
+        NODE_ID_1: Final = 'node_1'
+        NODE_ID_2: Final = 'node_2'
+        NODE_ID_3: Final = 'node_3'
+        EXP_ID_0: Final = '0'
+        EXP_ID_1: Final = '1'
+        EXP_ID_7: Final = '7'
+        self.save_new_valid_exploration(
+            EXP_ID_0, self.admin_id, title='Title 1',
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            EXP_ID_1, self.admin_id, title='Title 2',
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            EXP_ID_7, self.admin_id, title='Title 3',
+            end_state_name='End')
+        self.publish_exploration(self.admin_id, EXP_ID_0)
+        self.publish_exploration(self.admin_id, EXP_ID_1)
+        self.publish_exploration(self.admin_id, EXP_ID_7)
+
+        story = story_domain.Story.create_default_story(
+            STORY_ID_1, 'Title', 'Description', TOPIC_ID_1,
+            STORY_URL_FRAGMENT)
+        story.meta_tag_content = 'story meta content'
+
+        self.node_1: story_domain.StoryNodeDict = {
+            'id': NODE_ID_1,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image_1.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': EXP_ID_1,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
+        }
+        self.node_2: story_domain.StoryNodeDict = {
+            'id': NODE_ID_2,
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'thumbnail_filename': 'image_2.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': EXP_ID_0,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
+        }
+        self.node_3: story_domain.StoryNodeDict = {
+            'id': NODE_ID_3,
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'thumbnail_filename': 'image_3.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': EXP_ID_7,
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(self.node_1),
+            story_domain.StoryNode.from_dict(self.node_2),
+            story_domain.StoryNode.from_dict(self.node_3)
+        ]
+        self.nodes = story.story_contents.nodes
+        story.story_contents.initial_node_id = 'node_2'
+        story.story_contents.next_node_id = 'node_4'
+        story_services.save_new_story(self.admin_id, story)
+        self.subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'sub-one-frag')
+        self.subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
+            2, 'Subtopic Title 2', 'sub-two-frag')
+        self.SKILL_ID_1 = skill_services.get_new_skill_id()
+        self.SKILL_ID_2 = skill_services.get_new_skill_id()
+        self.subtopic_1.skill_ids = [self.SKILL_ID_1]
+        self.subtopic_2.skill_ids = [self.SKILL_ID_2]
+        self.save_new_topic(
+            TOPIC_ID_1, 'user', name='Topic',
+            description='A new topic', canonical_story_ids=[story.id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_1, self.subtopic_2], next_subtopic_id=3)
+        topic_services.publish_topic(TOPIC_ID_1, self.admin_id)
+        topic_services.publish_story(
+            TOPIC_ID_1, STORY_ID_1, self.admin_id)
+        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
+        chapters_change_list = []
+        for node in story.story_contents.nodes:
+            chapters_change_list.append(story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'node_id': node.id,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_STATUS),
+                'old_value': node.status,
+                'new_value': constants.STORY_NODE_STATUS_DRAFT
+            }))
+        topic_services.update_story_and_topic_summary(
+            self.admin_id, STORY_ID_1 , chapters_change_list,
+                'Changes chapter status to draft', TOPIC_ID_1)
+        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
+        for node in story.story_contents.nodes:
+            self.assertEqual(node.status, constants.STORY_NODE_STATUS_DRAFT)
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'publish_chapters_of_length_and_measurement_topic'
+            },
+            csrf_token=csrf_token)
+        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
+        for node in story.story_contents.nodes:
+            self.assertEqual(node.status, constants.STORY_NODE_STATUS_PUBLISHED)
 
 
 class ClearSearchIndexTest(test_utils.GenericTestBase):
