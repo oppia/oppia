@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -34,10 +33,3 @@ export class ExplorationSavePromptModalComponent extends ConfirmOrCancelModal {
     this.ngbActiveModal.close();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationSavePromptModal',
-  downgradeComponent({
-    component: ExplorationSavePromptModalComponent,
-  }) as angular.IDirectiveFactory
-);

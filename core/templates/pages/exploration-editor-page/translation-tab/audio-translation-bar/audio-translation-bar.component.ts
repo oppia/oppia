@@ -25,7 +25,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {downgradeComponent} from '@angular/upgrade/static';
 import WaveSurfer from 'wavesurfer.js';
 import {Subscription} from 'rxjs';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
@@ -643,10 +642,3 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     this.waveSurfer?.un('finish', this.waveSurferOnFinishCb.bind(this));
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAudioTranslationBar',
-  downgradeComponent({
-    component: AudioTranslationBarComponent,
-  }) as angular.IDirectiveFactory
-);

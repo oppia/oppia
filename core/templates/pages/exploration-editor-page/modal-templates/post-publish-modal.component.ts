@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContextService} from 'services/context.service';
@@ -68,10 +67,3 @@ export class PostPublishModalComponent
     this.ngbActiveModal.dismiss();
   }
 }
-
-angular.module('oppia').factory(
-  'oppiaPostPublishModal',
-  downgradeComponent({
-    component: PostPublishModalComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -18,7 +18,6 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -273,10 +272,3 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaPreviewTab',
-  downgradeComponent({
-    component: PreviewTabComponent,
-  }) as angular.IDirectiveFactory
-);
