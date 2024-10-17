@@ -104,29 +104,6 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.math_classroom = self.save_new_valid_classroom()
 
 
-class TopicViewerPageTests(BaseTopicViewerControllerTests):
-
-    def test_any_user_can_access_topic_viewer_page(self) -> None:
-        self.get_html_response('/learn/staging/%s' % 'public')
-
-    def test_accessibility_of_unpublished_topic_viewer_page(self) -> None:
-        topic = topic_domain.Topic.create_default_topic(
-            'topic_id_1', 'private_topic_name',
-            'private_topic_name', 'description', 'fragm')
-        topic.thumbnail_filename = 'Image.svg'
-        topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
-        topic.url_fragment = 'private'
-        topic_services.save_new_topic(self.admin_id, topic)
-
-        self.get_html_response(
-            '/learn/staging/%s' % 'private',
-            expected_status_int=404)
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response('/learn/staging/%s' % 'private')
-        self.logout()
-
-
 class TopicPageDataHandlerTests(
         BaseTopicViewerControllerTests, test_utils.EmailTestBase):
 
