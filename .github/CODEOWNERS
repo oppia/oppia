@@ -579,6 +579,7 @@
 /.gcloudignore @oppia/release-workflow-reviewers
 /core/controllers/release_coordinator*.py @oppia/release-workflow-reviewers
 /core/templates/pages/release-coordinator-page/ @oppia/release-workflow-reviewers
+/core/templates/domain/release_coordinator/ @oppia/release-workflow-reviewers
 /scripts/release_scripts/ @oppia/release-workflow-reviewers
 /assets/release_constants.json @oppia/release-workflow-reviewers
 
