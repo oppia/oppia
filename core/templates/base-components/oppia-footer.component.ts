@@ -16,12 +16,12 @@
  * @fileoverview Component for the footer.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {Router} from '@angular/router';
 import {downgradeComponent} from '@angular/upgrade/static';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subject} from 'rxjs';
+import {debounceTime, switchMap, takeUntil} from 'rxjs/operators';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
@@ -37,43 +37,68 @@ import './oppia-footer.component.css';
   templateUrl: './oppia-footer.component.html',
   styleUrls: ['./oppia-footer.component.css'],
 })
-export class OppiaFooterComponent {
+export class OppiaFooterComponent implements OnDestroy {
   emailAddress: string | null = null;
   name: string | null = null;
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   currentYear: number = new Date().getFullYear();
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
-
   BRANCH_NAME = AppConstants.BRANCH_NAME;
-
   SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
+
+  private emailSubscriptionDebounce: Subject<void> = new Subject();
+  private componentIsBeingDestroyed$: Subject<void> = new Subject();
 
   versionInformationIsShown: boolean =
     this.router.url === '/about' && !AppConstants.DEV_MODE;
+
+  subscriptionIsInProgress: boolean = false;
+  subscriptionState: 'subscribe' | 'subscribing' | 'subscribed' = 'subscribe';
+  debounceTimeoutDuration: number = 1500;
 
   constructor(
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
     private mailingListBackendApiService: MailingListBackendApiService,
-    private platformFeatureService: PlatformFeatureService,
     private router: Router,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService
-  ) {}
+  ) {
+    this.emailSubscriptionDebounce
+      .pipe(
+        debounceTime(this.debounceTimeoutDuration),
+        switchMap(() => this.performMailingListSubscription()),
+        takeUntil(this.componentIsBeingDestroyed$)
+      )
+      .subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.componentIsBeingDestroyed$.next();
+    this.componentIsBeingDestroyed$.complete();
+  }
 
   getOppiaBlogUrl(): string {
     return '/blog';
   }
 
   validateEmailAddress(): boolean {
-    let regex = new RegExp(AppConstants.EMAIL_REGEX);
+    const regex = new RegExp(AppConstants.EMAIL_REGEX);
     return regex.test(String(this.emailAddress));
   }
 
-  subscribeToMailingList(): void {
-    // Convert null or empty string to null for consistency.
+  onSubscribeButtonClicked(): void {
+    if (this.subscriptionIsInProgress || !this.validateEmailAddress()) {
+      return;
+    }
+    this.subscriptionIsInProgress = true;
+    this.subscriptionState = 'subscribing';
+    this.emailSubscriptionDebounce.next();
+  }
+
+  private performMailingListSubscription(): Promise<void> {
     const userName = this.name ? String(this.name) : null;
-    this.mailingListBackendApiService
+    return this.mailingListBackendApiService
       .subscribeUserToMailingList(
         String(this.emailAddress),
         userName,
@@ -81,23 +106,29 @@ export class OppiaFooterComponent {
       )
       .then(status => {
         if (status) {
+          this.subscriptionState = 'subscribed';
           this.alertsService.addInfoMessage('Done!', 1000);
           this.ngbModal.open(ThanksForSubscribingModalComponent, {
             backdrop: 'static',
             size: 'xl',
           });
         } else {
+          this.subscriptionState = 'subscribe';
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
-            10000
+            1000
           );
         }
       })
-      .catch(errorResponse => {
+      .catch(() => {
+        this.subscriptionState = 'subscribe';
         this.alertsService.addInfoMessage(
           AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
           10000
         );
+      })
+      .finally(() => {
+        this.subscriptionIsInProgress = false;
       });
   }
 
