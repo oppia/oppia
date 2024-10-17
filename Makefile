@@ -96,6 +96,8 @@ stop.%: ## Stops the given docker service. Example: make stop.datastore
 update.requirements: ## Installs the python requirements for the project
 	${SHELL_PREFIX} dev-server pip install -r requirements.txt
 	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
+# Following script fixed issue with google module not being importable
+	${SHELL_PREFIX} dev-server python -m docker.fix_google_module
 
 update.package: ## Installs the npm requirements for the project
 # TODO(#18260): Permanently change the yarn configurations in `.yarnrc` when permanently moving to Docker Setup.
