@@ -16,6 +16,9 @@
  * @fileoverview Configuration for lighthouse-ci.
  */
 
+const dotenv = require('dotenv');
+
+dotenv.config({path: './core/tests/puppeteer/.env'});
 const ALL_LIGHTHOUSE_URLS = process.env.ALL_LIGHTHOUSE_URLS.split(',');
 const LIGHTHOUSE_URLS_TO_RUN = process.env.LIGHTHOUSE_URLS_TO_RUN
   ? process.env.LIGHTHOUSE_URLS_TO_RUN.split(',')
