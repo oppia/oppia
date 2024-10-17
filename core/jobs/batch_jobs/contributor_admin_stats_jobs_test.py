@@ -362,6 +362,19 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
                 last_contribution_date=self.LAST_CONTRIBUTION_DATE
         ))
 
+        self.question_contribution_model_with_invalid_dates = (
+            self.create_model(
+                suggestion_models.QuestionContributionStatsModel,
+                contributor_user_id='user3',
+                topic_id='invalid_topic1',
+                submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+                accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+                accepted_questions_without_reviewer_edits_count=(
+                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                first_contribution_date=None,
+                last_contribution_date=None
+        ))
+
         self.question_review_model_1 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
             reviewer_user_id='user1',
@@ -420,6 +433,18 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_review_model_with_invalid_dates = self.create_model(
+            suggestion_models.QuestionReviewStatsModel,
+            reviewer_user_id='user3',
+            topic_id='invalid_topic1',
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=None,
+            last_contribution_date=None
         )
 
         self.question_suggestion_rejected_model = self.create_model(
@@ -586,11 +611,13 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.question_contribution_model_3.update_timestamps()
         self.question_contribution_model_4.update_timestamps()
         self.question_contribution_model_with_invalid_topic.update_timestamps()
+        self.question_contribution_model_with_invalid_dates.update_timestamps()
         self.question_review_model_1.update_timestamps()
         self.question_review_model_2.update_timestamps()
         self.question_review_model_3.update_timestamps()
         self.question_review_model_4.update_timestamps()
         self.question_review_model_with_invalid_topic.update_timestamps()
+        self.question_review_model_with_invalid_dates.update_timestamps()
         self.question_suggestion_rejected_model.update_timestamps()
         self.question_suggestion_accepted_with_edits_model.update_timestamps()
         self.question_suggestion_accepted_model.update_timestamps()
@@ -618,11 +645,13 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             self.question_contribution_model_3,
             self.question_contribution_model_4,
             self.question_contribution_model_with_invalid_topic,
+            self.question_contribution_model_with_invalid_dates,
             self.question_review_model_1,
             self.question_review_model_2,
             self.question_review_model_3,
             self.question_review_model_4,
             self.question_review_model_with_invalid_topic,
+            self.question_review_model_with_invalid_dates,
             self.question_suggestion_rejected_model,
             self.question_suggestion_accepted_with_edits_model,
             self.question_suggestion_accepted_model,
@@ -642,6 +671,14 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 stdout='Question Submitter Models SUCCESS: 3'),
             job_run_result.JobRunResult(
                 stdout='Question Reviewer Models SUCCESS: 3'),
+            job_run_result.JobRunResult(
+                stdout='Question submitter ID: user3.'),
+            job_run_result.JobRunResult(
+                stdout='Topic ID for empty question contribution date(s): invalid_topic1'),
+            job_run_result.JobRunResult(
+                stdout='Question reviewer ID: user3.'),
+            job_run_result.JobRunResult(
+                stdout='Topic ID for empty question review date(s): invalid_topic1'),
         ])
 
         # Check for TranslationSubmitterTotalContributionStatsModel.
