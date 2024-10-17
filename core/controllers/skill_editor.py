@@ -56,45 +56,6 @@ def _require_valid_version(
             % (skill_version, version_from_payload))
 
 
-class SkillEditorPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """The editor page for a single skill."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'skill_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_edit_skill
-    def get(self, skill_id: str) -> None:
-        """Renders skill editor page.
-
-        Args:
-            skill_id: str. The skill ID.
-
-        Raises:
-            Exception. The skill with the given id doesn't exist.
-        """
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-
-        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
-
-        if skill is None:
-            raise self.NotFoundException(
-                Exception('The skill with the given id doesn\'t exist.'))
-
-        self.render_template('skill-editor-page.mainpage.html')
-
-
 def check_can_edit_skill_description(user: user_domain.UserActionsInfo) -> bool:
     """Checks whether the user can edit skill descriptions.
 

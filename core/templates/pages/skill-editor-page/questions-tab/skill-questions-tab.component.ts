@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Rubric} from 'domain/skill/rubric.model';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 import {Subscription} from 'rxjs';
@@ -62,10 +61,3 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionsTab',
-  downgradeComponent({
-    component: SkillQuestionsTabComponent,
-  }) as angular.IDirectiveFactory
-);
