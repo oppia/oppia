@@ -178,6 +178,7 @@
 	"I18N_FOOTER_NEWSLETTER_EMAIL": "Chomlec'h postel",
 	"I18N_FOOTER_NEWSLETTER_HEADING": "Koumanantiñ d'hol lizher-keloaouiñ",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "An diazezadur Oppia",
+	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "<a href=\"/donate\">Grit un donezon</a> pe deuit da vezañ un <a href=\"/volunteer\" (click)=\"navigateToVolunteerPage()\">den a-youl-vat</a> hiziv!",
 	"I18N_FOOTER_PRIVACY_POLICY": "Reolennoù prevezded",
 	"I18N_FOOTER_TEACH": "Kelenn gant Oppia",
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "KELENN/DESKIÑ",
