@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import enum
 import logging
-from typing import Final
+
 
 from core import feature_flag_list
 from core import feconf
@@ -56,6 +56,8 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
+
+from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -2725,18 +2727,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
 
-class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase):
+class PublishChaptersOfLengthAndMeasurementTopicTest(
+    test_utils.GenericTestBase):
     """Tests that publish chapters of Length and Measurement topic."""
-
-    TOPIC_ID_1: Final = 'bdO7c687WBBW'
-    STORY_ID_1: Final = 'OVJ4RdjxbcAf'
-    STORY_URL_FRAGMENT: Final = 'title-one'
-    NODE_ID_1: Final = 'node_1'
-    NODE_ID_2: Final = 'node_2'
-    NODE_ID_3: Final = 'node_3'
-    EXP_ID_0: Final = '0'
-    EXP_ID_1: Final = '1'
-    EXP_ID_7: Final = '7'
 
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
@@ -2750,26 +2743,35 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
 
     def test_publish_chapters_of_length_and_measurement_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        TOPIC_ID_1: Final = 'bdO7c687WBBW'
+        STORY_ID_1: Final = 'OVJ4RdjxbcAf'
+        STORY_URL_FRAGMENT: Final = 'title-one'
+        NODE_ID_1: Final = 'node_1'
+        NODE_ID_2: Final = 'node_2'
+        NODE_ID_3: Final = 'node_3'
+        EXP_ID_0: Final = '0'
+        EXP_ID_1: Final = '1'
+        EXP_ID_7: Final = '7'
         self.save_new_valid_exploration(
-            self.EXP_ID_0, self.admin_id, title='Title 1',
+            EXP_ID_0, self.admin_id, title='Title 1',
             end_state_name='End')
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.admin_id, title='Title 2',
+            EXP_ID_1, self.admin_id, title='Title 2',
             end_state_name='End')
         self.save_new_valid_exploration(
-            self.EXP_ID_7, self.admin_id, title='Title 3',
+            EXP_ID_7, self.admin_id, title='Title 3',
             end_state_name='End')
-        self.publish_exploration(self.admin_id, self.EXP_ID_0)
-        self.publish_exploration(self.admin_id, self.EXP_ID_1)
-        self.publish_exploration(self.admin_id, self.EXP_ID_7)
+        self.publish_exploration(self.admin_id, EXP_ID_0)
+        self.publish_exploration(self.admin_id, EXP_ID_1)
+        self.publish_exploration(self.admin_id, EXP_ID_7)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID_1, 'Title', 'Description', self.TOPIC_ID_1,
-            self.STORY_URL_FRAGMENT)
+            STORY_ID_1, 'Title', 'Description', TOPIC_ID_1,
+            STORY_URL_FRAGMENT)
         story.meta_tag_content = 'story meta content'
 
         self.node_1: story_domain.StoryNodeDict = {
-            'id': self.NODE_ID_1,
+            'id': NODE_ID_1,
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
@@ -2781,7 +2783,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_1,
+            'exploration_id': EXP_ID_1,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2789,7 +2791,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
             'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
-            'id': self.NODE_ID_2,
+            'id': NODE_ID_2,
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
@@ -2801,7 +2803,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_0,
+            'exploration_id': EXP_ID_0,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2809,7 +2811,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
             'unpublishing_reason': None
         }
         self.node_3: story_domain.StoryNodeDict = {
-            'id': self.NODE_ID_3,
+            'id': NODE_ID_3,
             'title': 'Title 3',
             'description': 'Description 3',
             'thumbnail_filename': 'image_3.svg',
@@ -2821,7 +2823,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_7,
+            'exploration_id': EXP_ID_7,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2846,14 +2848,14 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
         self.subtopic_1.skill_ids = [self.SKILL_ID_1]
         self.subtopic_2.skill_ids = [self.SKILL_ID_2]
         self.save_new_topic(
-            self.TOPIC_ID_1, 'user', name='Topic',
+            TOPIC_ID_1, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_1, self.subtopic_2], next_subtopic_id=3)
-        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_services.publish_topic(TOPIC_ID_1, self.admin_id)
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
-        story = story_fetchers.get_story_by_id(self.STORY_ID_1, strict=False)
+            TOPIC_ID_1, STORY_ID_1, self.admin_id)
+        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
         chapters_change_list = []
         for node in story.story_contents.nodes:
             chapters_change_list.append(story_domain.StoryChange({
@@ -2865,19 +2867,19 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(test_utils.GenericTestBase)
                 'new_value': constants.STORY_NODE_STATUS_DRAFT
             }))
         topic_services.update_story_and_topic_summary(
-            self.admin_id,self.STORY_ID_1 , chapters_change_list,
-                'Changes chapter status to draft', self.TOPIC_ID_1)
-        story = story_fetchers.get_story_by_id(self.STORY_ID_1, strict=False)
+            self.admin_id, STORY_ID_1 , chapters_change_list,
+                'Changes chapter status to draft', TOPIC_ID_1)
+        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
         for node in story.story_contents.nodes:
             self.assertEqual(node.status, constants.STORY_NODE_STATUS_DRAFT)
 
         csrf_token = self.get_new_csrf_token()
-        generated_exps_response = self.post_json(
+        self.post_json(
             '/adminhandler', {
                 'action': 'publish_chapters_of_length_and_measurement_topic'
             },
             csrf_token=csrf_token)
-        story = story_fetchers.get_story_by_id(self.STORY_ID_1, strict=False)
+        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
         for node in story.story_contents.nodes:
             self.assertEqual(node.status, constants.STORY_NODE_STATUS_PUBLISHED)
 
