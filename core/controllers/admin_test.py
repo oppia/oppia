@@ -57,7 +57,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 
-from typing import Final
+from typing import Final, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -2743,35 +2743,35 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
 
     def test_publish_chapters_of_length_and_measurement_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        TOPIC_ID_1: Final = 'bdO7c687WBBW'
-        STORY_ID_1: Final = 'OVJ4RdjxbcAf'
-        STORY_URL_FRAGMENT: Final = 'title-one'
-        NODE_ID_1: Final = 'node_1'
-        NODE_ID_2: Final = 'node_2'
-        NODE_ID_3: Final = 'node_3'
-        EXP_ID_0: Final = '0'
-        EXP_ID_1: Final = '1'
-        EXP_ID_7: Final = '7'
+        topicId1 = 'bdO7c687WBBW'
+        storyId1 = 'OVJ4RdjxbcAf'
+        storyUrlFragment = 'title-one'
+        nodeId1 = 'node_1'
+        nodeId2 = 'node_2'
+        nodeId3 = 'node_3'
+        expId0 = '0'
+        expId1 = '1'
+        expId7 = '7'
         self.save_new_valid_exploration(
-            EXP_ID_0, self.admin_id, title='Title 1',
+            expId0, self.admin_id, title='Title 1',
             end_state_name='End')
         self.save_new_valid_exploration(
-            EXP_ID_1, self.admin_id, title='Title 2',
+            expId1, self.admin_id, title='Title 2',
             end_state_name='End')
         self.save_new_valid_exploration(
-            EXP_ID_7, self.admin_id, title='Title 3',
+            expId7, self.admin_id, title='Title 3',
             end_state_name='End')
-        self.publish_exploration(self.admin_id, EXP_ID_0)
-        self.publish_exploration(self.admin_id, EXP_ID_1)
-        self.publish_exploration(self.admin_id, EXP_ID_7)
+        self.publish_exploration(self.admin_id, expId0)
+        self.publish_exploration(self.admin_id, expId1)
+        self.publish_exploration(self.admin_id, expId7)
 
         story = story_domain.Story.create_default_story(
-            STORY_ID_1, 'Title', 'Description', TOPIC_ID_1,
-            STORY_URL_FRAGMENT)
+            storyId1, 'Title', 'Description', topicId1,
+            storyUrlFragment)
         story.meta_tag_content = 'story meta content'
 
         self.node_1: story_domain.StoryNodeDict = {
-            'id': NODE_ID_1,
+            'id': nodeId1,
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
@@ -2783,7 +2783,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': EXP_ID_1,
+            'exploration_id': expId1,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2791,7 +2791,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
-            'id': NODE_ID_2,
+            'id': nodeId2,
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
@@ -2803,7 +2803,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': EXP_ID_0,
+            'exploration_id': expId0,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2811,7 +2811,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'unpublishing_reason': None
         }
         self.node_3: story_domain.StoryNodeDict = {
-            'id': NODE_ID_3,
+            'id': nodeId3,
             'title': 'Title 3',
             'description': 'Description 3',
             'thumbnail_filename': 'image_3.svg',
@@ -2823,7 +2823,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': EXP_ID_7,
+            'exploration_id': expId7,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2848,14 +2848,14 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
         self.subtopic_1.skill_ids = [self.SKILL_ID_1]
         self.subtopic_2.skill_ids = [self.SKILL_ID_2]
         self.save_new_topic(
-            TOPIC_ID_1, 'user', name='Topic',
+            topicId1, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_1, self.subtopic_2], next_subtopic_id=3)
-        topic_services.publish_topic(TOPIC_ID_1, self.admin_id)
+        topic_services.publish_topic(topicId1, self.admin_id)
         topic_services.publish_story(
-            TOPIC_ID_1, STORY_ID_1, self.admin_id)
-        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
+            topicId1, storyId1, self.admin_id)
+        story = story_fetchers.get_story_by_id(storyId1, strict=False) # type: ignore
         chapters_change_list = []
         for node in story.story_contents.nodes:
             chapters_change_list.append(story_domain.StoryChange({
@@ -2867,9 +2867,9 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
                 'new_value': constants.STORY_NODE_STATUS_DRAFT
             }))
         topic_services.update_story_and_topic_summary(
-            self.admin_id, STORY_ID_1 , chapters_change_list,
-                'Changes chapter status to draft', TOPIC_ID_1)
-        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
+            self.admin_id, storyId1, chapters_change_list,
+                'Changes chapter status to draft', topicId1)
+        story = story_fetchers.get_story_by_id(storyId1, strict=False) # type: ignore
         for node in story.story_contents.nodes:
             self.assertEqual(node.status, constants.STORY_NODE_STATUS_DRAFT)
 
@@ -2879,7 +2879,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
                 'action': 'publish_chapters_of_length_and_measurement_topic'
             },
             csrf_token=csrf_token)
-        story = story_fetchers.get_story_by_id(STORY_ID_1, strict=False)
+        story = story_fetchers.get_story_by_id(storyId1, strict=False) # type: ignore
         for node in story.story_contents.nodes:
             self.assertEqual(node.status, constants.STORY_NODE_STATUS_PUBLISHED)
 
