@@ -17,7 +17,6 @@
  */
 
 import {Component, HostListener} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TopicCreationService} from 'components/entity-creation-services/topic-creation.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
@@ -426,10 +425,3 @@ export class TopicsAndSkillsDashboardPageComponent {
       });
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaTopicsAndSkillsDashboardPage',
-    downgradeComponent({component: TopicsAndSkillsDashboardPageComponent})
-  );

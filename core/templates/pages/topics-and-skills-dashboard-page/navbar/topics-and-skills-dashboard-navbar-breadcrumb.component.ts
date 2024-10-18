@@ -17,17 +17,9 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-topics-and-skills-dashboard-navbar-breadcrumb',
   templateUrl: './topics-and-skills-dashboard-navbar-breadcrumb.component.html',
 })
 export class TopicsAndSkillsDashboardNavbarBreadcrumbComponent {}
-
-angular.module('oppia').directive(
-  'oppiaTopicsAndSkillsDashboardNavbarBreadcrumb',
-  downgradeComponent({
-    component: TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-  })
-);

@@ -43,21 +43,6 @@ from core.domain import topic_services
 from typing import Dict, List, Optional, TypedDict, Union
 
 
-class TopicsAndSkillsDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page showing the topics and skills dashboard."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.render_template(
-            'topics-and-skills-dashboard-page.mainpage.html')
-
-
 class TopicsAndSkillsDashboardPageDataHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
