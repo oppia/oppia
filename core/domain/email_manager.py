@@ -212,6 +212,10 @@ HTML_FOR_SUGGESTION_DESCRIPTION: Dict[
     }
 }
 
+_OPPIA_PROJECT_ID = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value)
+_OPPIA_SITE_URL = feconf.OPPIA_PROJECT_ID_TO_SITE_URL_MAP[_OPPIA_PROJECT_ID]
+
 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA: Dict[str, str] = {
     'email_body_template': (
         'Hi %s,'
@@ -246,7 +250,7 @@ ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA: Dict[str, str] = {
         'There have been <b>question suggestions</b> created on the '
         '<a href="%s%s">Contributor Dashboard page</a> where there are not '
         'enough reviewers.<br><br>' % (
-            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
+            _OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
 }
 
 ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
@@ -1827,10 +1831,10 @@ def _send_suggestions_waiting_too_long_email(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
-            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            curriculum_admin_usernames[index], _OPPIA_SITE_URL,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
-            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
+            _OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
             list_of_suggestion_descriptions)
 
         _send_email(
@@ -1897,7 +1901,7 @@ def send_reviewer_notifications(
         for reviewer_id in reviewer_ids:
             reviewer_username = user_services.get_username(reviewer_id)
             email_body = email_body_template % (
-                reviewer_username, feconf.OPPIA_SITE_URL,
+                reviewer_username, _OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
                     suggestion_descriptions))
 
@@ -1982,7 +1986,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                     'one_language_template'] % (
                         utils.get_supported_audio_language_description(
                             language_codes_that_need_reviewers.pop()),
-                        feconf.OPPIA_SITE_URL,
+                        _OPPIA_SITE_URL,
                         feconf.CONTRIBUTOR_DASHBOARD_URL))
 
         else:
@@ -1997,7 +2001,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             translation_suggestions_needing_reviewers_paragraphs.append(
                 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'multi_language_template'] % (
-                        feconf.OPPIA_SITE_URL,
+                        _OPPIA_SITE_URL,
                         feconf.CONTRIBUTOR_DASHBOARD_URL,
                         html_for_languages_that_need_more_reviewers))
         translation_suggestions_needing_reviewers_html = ''.join(
@@ -2059,7 +2063,7 @@ def _send_reviews_needed_email_to_admins(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
-            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            curriculum_admin_usernames[index], _OPPIA_SITE_URL,
             feconf.ADMIN_URL, suggestions_needing_reviewers_html)
 
         _send_email(
@@ -2155,7 +2159,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
         email_body = email_body_template % (
             reviewer_usernames[index],
-            feconf.OPPIA_SITE_URL,
+            _OPPIA_SITE_URL,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             ''.join(suggestion_descriptions),
             email_footer
@@ -2211,14 +2215,14 @@ def send_mail_to_notify_contributor_ranking_achievement(
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
                     language,
-                    feconf.OPPIA_SITE_URL,
+                    _OPPIA_SITE_URL,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
             )
         else:
             email_body = email_template['email_body_template'] % (
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
-                    feconf.OPPIA_SITE_URL,
+                    _OPPIA_SITE_URL,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
             )
 
@@ -2274,7 +2278,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
             continue
         chapters_are_overdue = True
         story_link = ('%s%s/%s' % (
-            str(feconf.OPPIA_SITE_URL),
+            str(_OPPIA_SITE_URL),
             str(feconf.STORY_EDITOR_URL_PREFIX),
             overdue_story.id
         ))
@@ -2296,7 +2300,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
             continue
         chapters_are_upcoming = True
         story_link = ('%s%s/%s' % (
-            str(feconf.OPPIA_SITE_URL),
+            str(_OPPIA_SITE_URL),
             str(feconf.STORY_EDITOR_URL_PREFIX),
             upcoming_story.id
         ))

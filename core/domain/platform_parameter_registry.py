@@ -376,7 +376,9 @@ Registry.create_platform_parameter(
     default=(
         'You can change your email preferences via the '
         '<a href="%s%s">Preferences</a> page.' % (
-            feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL)
+            feconf.OPPIA_PROJECT_ID_TO_SITE_URL_MAP[
+                Registry.get_platform_parameter(ParamName.OPPIA_PROJECT_ID)],
+            feconf.PREFERENCES_URL)
     )
 )
 
@@ -586,5 +588,5 @@ Registry.create_platform_parameter(
     'Project ID of oppia server.',
     platform_parameter_domain.DataTypes.STRING,
     # TODO(release-scripts#137): Update post the first trial release.
-    default=feconf.OPPIA_PROJECT_ID
+    default=feconf.OPPIA_DEV_PROJECT_ID
 )

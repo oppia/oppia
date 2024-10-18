@@ -60,6 +60,13 @@ EMAIL_FOOTER = (
 )
 
 
+def _get_oppia_site_url():
+    """Fetches oppia site url."""
+    oppia_project_id = param_services.get_platform_parameter_value(
+        param_list.ParamName.OPPIA_PROJECT_ID.value)
+    return feconf.OPPIA_PROJECT_ID_TO_SITE_URL_MAP[oppia_project_id]
+
+
 class FailedMLTest(test_utils.EmailTestBase):
     """Test that email functionality for sending failed ML Job emails
     works.
@@ -3312,7 +3319,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3381,7 +3388,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3450,7 +3457,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3520,7 +3527,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3590,7 +3597,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3659,7 +3666,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3728,7 +3735,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3806,7 +3813,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3899,7 +3906,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -3926,7 +3933,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4006,7 +4013,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4075,7 +4082,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4146,7 +4153,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4217,7 +4224,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4288,7 +4295,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4359,7 +4366,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4430,7 +4437,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4508,7 +4515,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4601,7 +4608,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4627,7 +4634,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -4729,7 +4736,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4756,7 +4763,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -5167,8 +5174,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5254,8 +5261,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5332,8 +5339,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5419,8 +5426,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5514,8 +5521,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5624,8 +5631,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
         expected_email_html_body_admin_2 = (
             'Hi user2,'
@@ -5652,8 +5659,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL))
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL,
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL))
 
         with self.log_new_error_ctx:
             with self.swap(
@@ -5948,7 +5955,7 @@ class NotifyReviewersNewSuggestionsTests(
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             messages[0].html, (expected_email_html_body % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL)))
+                _get_oppia_site_url(), feconf.CONTRIBUTOR_DASHBOARD_URL)))
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(
@@ -6242,7 +6249,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6295,7 +6302,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -6313,7 +6320,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6371,7 +6378,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6423,7 +6430,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -6440,7 +6447,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6505,7 +6512,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6564,7 +6571,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -6586,7 +6593,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6655,7 +6662,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -6677,7 +6684,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                _get_oppia_site_url(), feconf.ADMIN_URL, _get_oppia_site_url(),
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -8039,7 +8046,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             '</ul></li>'
             '</ol>'
             'Regards,<br> Oppia Foundation'
-        ) % (feconf.OPPIA_SITE_URL, feconf.STORY_EDITOR_URL_PREFIX)
+        ) % (_get_oppia_site_url(), feconf.STORY_EDITOR_URL_PREFIX)
         expected_email_subject = 'Chapter Publication Notifications'
 
         email_manager.send_reminder_mail_to_notify_curriculum_admins(
@@ -8103,7 +8110,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             'Regards,<br> Oppia Foundation'
         ) % (
             str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS),
-            feconf.OPPIA_SITE_URL,
+            _get_oppia_site_url(),
             feconf.STORY_EDITOR_URL_PREFIX
         )
         expected_email_subject = 'Chapter Publication Notifications'
