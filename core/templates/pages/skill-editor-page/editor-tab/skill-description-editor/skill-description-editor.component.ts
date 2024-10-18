@@ -27,7 +27,6 @@ import {
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {SkillRights} from 'domain/skill/skill-rights.model';
 
@@ -96,10 +95,3 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaSkillDescriptionEditor',
-    downgradeComponent({component: SkillDescriptionEditorComponent})
-  );
