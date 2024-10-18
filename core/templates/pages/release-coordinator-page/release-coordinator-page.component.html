@@ -16,6 +16,9 @@
   </features-tab>
 
   <div class="oppia-tlease-coordiator-misc-tab-container" *ngIf="activeTab === TAB_ID_MISC">
+    <div *ngIf="!isPageFullyLoaded">
+      <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
+    </div>
     <div class="oppia-release-coordinator-page-card oppia-page-card oppia-long-text">
       <h3>Flush the Memory Cache</h3>
       <div class="oppia-action-buttons-container">
@@ -73,9 +76,159 @@
         </div>
       </form>
     </div>
+
+    <div class="oppia-release-coordinator-page-card oppia-page-card oppia-long-text">
+      <h3>Manage User Groups</h3>
+      <div>
+        <div *ngFor="let userGroup of userGroups">
+          <div *ngIf="!(userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId])"
+               class="oppia-user-group"
+               (click)="toggleUserGroupDetailsSection(userGroup.userGroupId)">
+            {{ userGroup.name }}
+            <button mat-button matSuffix mat-icon-button
+                    aria-label="Clear"
+                    *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]"
+                    (click)="deleteUserGroup(userGroup.userGroupId); $event.stopPropagation()">
+              <mat-icon matListIcon>close</mat-icon>
+            </button>
+          </div>
+          <div *ngIf="userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId]"
+               class="oppia-user-group">
+            <input placeholder="{{ userGroup.name }}"
+                   type="text"
+                   value="{{ userGroup.name }}"
+                   [(ngModel)]="userGroup.name">
+          </div>
+          <div class="user-group-details" *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]">
+            <div *ngIf="!userGroupInEditMode">
+              <i class="material-icons oppia-edit-icon"
+                 title="Edit user group"
+                 (click)="setUserGroupInEditMode()">
+                &#xE254;
+              </i>
+            </div>
+            <div class="row">
+              <div class="col-2">Users:</div>
+              <div class="col-10">
+                <div *ngIf="!userGroupInEditMode">
+                  <span *ngIf="userGroup.memberUsernames.length == 0">
+                    <em>No users, click on edit button to add.</em>
+                  </span>
+                  <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
+                    <mat-chip *ngFor="let user of userGroup.memberUsernames"
+                              [selectable]="false"
+                              [removable]="false">
+                      <ng-container>
+                        <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
+                      </ng-container>
+                    </mat-chip>
+                  </mat-chip-list>
+                </div>
+                <div *ngIf="userGroupInEditMode">
+                  <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
+                    <mat-chip *ngFor="let user of userGroup.memberUsernames"
+                              [selectable]="true"
+                              [removable]="true"
+                              (removed)="removeUserFromUserGroup(userGroup, user)">
+                      <ng-container>
+                        <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
+                      </ng-container>
+                      <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove">
+                        <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+                      </button>
+                    </mat-chip>
+                    <input placeholder="Add Username"
+                           #userInputToAddUserToGroup
+                           [matChipInputFor]="chipList"
+                           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                           (matChipInputTokenEnd)="addUserToUserGroup($event, userGroup)"
+                           (input)="onUserGroupUserInputChange()">
+                  </mat-chip-list>
+                  <p *ngIf="userInUserGroupValidationError.length > 0"
+                     class="oppia-warning-text">
+                    {{ userInUserGroupValidationError }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <hr *ngIf="userGroupInEditMode">
+            <p *ngIf="userGroupSaveError.length > 0"
+               class="oppia-warning-text">
+              {{ userGroupSaveError }}
+            </p>
+            <div *ngIf="userGroupInEditMode" class="row justify-content-end">
+              <button mat-raised-button
+                      type="button"
+                      (click)="resetUserGroup(userGroup)">
+                Cancel
+              </button>
+              <button mat-raised-button
+                      color="primary"
+                      type="submit"
+                      (click)="updateUserGroup(userGroup)">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-add-user-group">
+        <input placeholder="New user group name"
+               type="text"
+               [(ngModel)]="newUserGroupName"
+               [ngModelOptions]="{standalone: true}"
+               (ngModelChange)="onUserGroupInputChange()">
+        <button class="btn oppia-add-new-user-group-btn"
+                (click)="addUserGroup()"
+                [disabled]="userGroupInEditMode">
+          + Add new user group
+        </button>
+        <p *ngIf="userGroupValidationError.length > 0"
+           class="oppia-warning-text">
+          {{ userGroupValidationError }}
+        </p>
+      </div>
+    </div>
   </div>
 </div>
 <style>
+  .oppia-add-new-user-group-btn {
+    background-color: #00645c;
+    color: #fff;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 12px;
+    margin-left: 10px;
+  }
+   .oppia-add-user-group {
+    margin-top: 30px;
+   }
+  .oppia-edit-icon {
+    cursor: pointer;
+    font-size: 16px;
+    position: absolute;
+    right: 10%;
+    -webkit-transition: all 200ms;
+    transition: all 200ms;
+  }
+  .oppia-warning-text {
+    color: #f00;
+    font-size: 0.8em;
+    width: 500px
+  }
+  .oppia-user-group {
+    align-items: center;
+    background: #e0f2f1;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 20px;
+    padding: 10px;
+    width: 94%;
+  }
+  .user-group-details {
+    margin: 10px 20px;
+    padding: 0 15px;
+  }
   .oppia-release-coordinator-page-tabs-container {
     padding-top: 16px;
   }

@@ -27,7 +27,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {AlertsService} from 'services/alerts.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -526,10 +525,3 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStoryEditor',
-  downgradeComponent({
-    component: StoryEditorComponent,
-  })
-);
