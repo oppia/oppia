@@ -274,7 +274,6 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
-
   it('should validate access to exploration editor page', fakeAsync(() => {
     let explorationId = 'exploration_id';
     avbas
@@ -284,7 +283,7 @@ describe('Access validation backend api service', () => {
     const req = httpTestingController.expectOne(
       '/access_validation_handler/' +
         'can_access_exploration_editor_page/exploration_id'
-      );
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 

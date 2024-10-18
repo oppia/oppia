@@ -93,7 +93,7 @@ export class AccessValidationBackendApiService {
       this.EXPLORATION_EDITOR_PAGE_ACCESS_VALIDATOR,
       {
         exploration_id: explorationId,
-     }
+      }
     );
     return this.http.get<void>(url).toPromise();
   }
