@@ -561,17 +561,22 @@ STORAGE_EMULATOR_REDIS_DB_INDEX = 2
 
 # NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
 # project id when switching to the prod server.
-OPPIA_PROJECT_ID = 'dev-project-id'
+OPPIA_DEV_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
-# This flag is used for distinguishing the prod/test environments for feature
-# gating.
-ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
+# This is used for comparing with project id to distinguis the prod/test
+# environments for feature gating.
+PROD_SERVER_ID = 'oppiaserver'
 
-# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
-# buckets. It's OK for them to be the same.
-DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
-DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
+OPPIA_PROJECT_ID_TO_SITE_URL_MAP = {
+    OPPIA_DEV_PROJECT_ID: 'http://localhost:8181',
+    'oppiatestserver': 'https://oppiatestserver.org',
+    'oppiaserver-backup-migration': 'https://oppiaserver-backup-migration.appspot.com',
+    'oppiaserver': 'https://www.oppia.org'
+}
+
+DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
+DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
 OPPIA_VERSION = '3.4.2'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
@@ -863,12 +868,6 @@ DISABLED_EXPLORATION_IDS = ['5']
 # Oppia Google Group URL.
 GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
-
-# NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
-# Change to the correct url for internal testing in the testing production
-# environment.
-# Change to the production URL when deploying to production site.
-OPPIA_SITE_URL = 'http://localhost:8181'
 
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'

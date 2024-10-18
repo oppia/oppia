@@ -25,6 +25,9 @@ import re
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 
 from typing import Final, List, Optional, TypedDict
 
@@ -50,7 +53,9 @@ def get_server_mode() -> ServerMode:
         ServerMode.DEV
         if constants.DEV_MODE
         else ServerMode.PROD
-        if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+        if feconf.PROD_SERVER_ID == (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
         else ServerMode.TEST
     )
 

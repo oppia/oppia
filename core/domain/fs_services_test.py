@@ -25,6 +25,7 @@ from core import utils
 from core.constants import constants
 from core.domain import fs_services
 from core.domain import image_services
+from core.domain import platform_parameter_list
 from core.domain import user_services
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
@@ -409,6 +410,9 @@ class GetStaticAssetUrlTests(test_utils.GenericTestBase):
                 'http://localhost:8181/assetsstatic/robots.txt'
             )
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, 'project-id')]
+    )
     def test_function_returns_correct_url_for_non_emulator_mode(self) -> None:
         with self.swap(constants, 'EMULATOR_MODE', False):
             with self.swap(feconf, 'OPPIA_PROJECT_ID', 'project-id'):

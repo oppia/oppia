@@ -121,9 +121,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
     def test_updating_dev_feature_in_test_env_raises_exception(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
             with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
-                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
-                ):
+                with self.swap(feconf, 'PROD_SERVER_ID', 'dummy-id'):
                     with self.assertRaisesRegex(
                         utils.ValidationError,
                         'Feature flag in dev stage cannot be updated in test '
@@ -137,9 +135,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
     def test_updating_dev_feature_in_prod_env_raises_exception(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
             with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
-                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
-                ):
+                with self.swap(feconf, 'PROD_SERVER_ID', 'dev-project-id'):
                     with self.assertRaisesRegex(
                         utils.ValidationError,
                         'Feature flag in dev stage cannot be updated in prod '
@@ -162,9 +158,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         )
         with swap_name_to_description_feature_stage_dict:
             with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
-                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
-                ):
+                with self.swap(feconf, 'PROD_SERVER_ID', 'dev-project-id'):
                     with self.assertRaisesRegex(
                         utils.ValidationError,
                         'Feature flag in test stage cannot be updated in prod '
