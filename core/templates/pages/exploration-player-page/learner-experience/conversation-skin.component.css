@@ -24,14 +24,14 @@ oppia-conversation-skin .supplemental-card-parent-container {
 
 .conversation-skin-next-lesson-wrapper {
   flex-wrap: wrap;
-  justify-content: flex-end;
   align-items: center;
-  overflow: hidden;
+  justify-content: flex-end;
   background-color: white;
+  overflow: hidden;
   display: flex;
   padding: 10px;
-  text-align: right;
   position: relative;
+  text-align: right;
   vertical-align: middle;
   width: 100%;
 }
