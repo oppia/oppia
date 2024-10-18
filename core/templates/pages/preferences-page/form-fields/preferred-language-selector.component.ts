@@ -43,6 +43,7 @@ export class PreferredSiteLanguageSelectorComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() preferredLanguageCode!: string;
   @Input() choices!: Language[];
+  @Input() e2eTestClass!: string;
   @Input() entity!: string;
 
   filteredChoices!: Language[];
