@@ -368,6 +368,9 @@ Registry.create_platform_parameter(
     default='Site Admin'
 )
 
+_oppia_project_id = Registry.get_platform_parameter(
+    ParamName.OPPIA_PROJECT_ID.value)
+assert isinstance(_oppia_project_id, str)
 Registry.create_platform_parameter(
     ParamName.EMAIL_FOOTER,
     'The footer to append to all outgoing emails. (This should '
@@ -376,9 +379,7 @@ Registry.create_platform_parameter(
     default=(
         'You can change your email preferences via the '
         '<a href="%s%s">Preferences</a> page.' % (
-            feconf.OPPIA_PROJECT_ID_TO_SITE_URL_MAP[
-                Registry.get_platform_parameter(
-                    ParamName.OPPIA_PROJECT_ID.value)],
+            feconf.OPPIA_PROJECT_ID_TO_SITE_URL_MAP[_oppia_project_id],
             feconf.PREFERENCES_URL)
     )
 )
