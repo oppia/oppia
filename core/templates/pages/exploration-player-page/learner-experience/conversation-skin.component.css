@@ -27,12 +27,12 @@ oppia-conversation-skin .supplemental-card-parent-container {
   background-color: white;
   display: flex;
   padding: 10px;
-  text-align: right;
   justify-content: flex-end;
-  vertical-align: middle;
+  text-align: right;
   flex-wrap: wrap;
-  position: relative;
+  vertical-align: middle;
   overflow: hidden;
+  position: relative;
   width: 100%;
 }
 
