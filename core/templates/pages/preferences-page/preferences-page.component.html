@@ -229,6 +229,7 @@
             <div *ngIf="hasPageLoaded">
               <oppia-preferred-language-selector formControlName="preferredSiteLanguageCode"
                                                  [choices]="SITE_LANGUAGE_CHOICES"
+                                                 e2eTestClass="e2e-test-site-language-selector"
                                                  entity="{{ 'I18N_PREFERENCES_SITE_LANGUAGE_LABEL' | translate }}">
               </oppia-preferred-language-selector>
             </div>
@@ -248,6 +249,7 @@
             <div *ngIf="hasPageLoaded">
               <oppia-preferred-language-selector formControlName="preferredAudioLanguageCode"
                                                  [choices]="AUDIO_LANGUAGE_CHOICES"
+                                                 e2eTestClass="e2e-test-audio-language-selector"
                                                  entity="{{ 'I18N_PREFERENCES_AUDIO_LANGUAGE_LABEL' | translate }}">
               </oppia-preferred-language-selector>
             </div>
