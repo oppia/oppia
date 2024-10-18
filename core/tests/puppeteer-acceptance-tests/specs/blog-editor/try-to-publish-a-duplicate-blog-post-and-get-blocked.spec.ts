@@ -56,9 +56,17 @@ describe('Blog Editor', function () {
       await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
         'Test-Blog'
       );
+      await blogPostEditor.expectScreenshotToMatch(
+        'expectPublishedBlogPostWithTitleToBePresent',
+        __dirname
+      );
 
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
+      await blogPostEditor.expectScreenshotToMatch(
+        'createNewBlogPostWithTitle',
+        __dirname
+      );
 
       await blogPostEditor.expectUserUnableToPublishBlogPost(
         duplicateBlogPostWarning
