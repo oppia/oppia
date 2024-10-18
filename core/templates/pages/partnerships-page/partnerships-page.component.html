@@ -629,9 +629,11 @@
   }
 
   .partner-container mat-card-content p {
+    flex-grow: 1;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1.1em;
     max-width: 500px;
+    min-height: 100px;
     padding: 0 2em;
     text-align: center;
   }
@@ -641,6 +643,7 @@
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1.1em;
     font-weight: bold;
+    margin-top: auto;
     text-decoration: none;
   }
 
@@ -674,13 +677,14 @@
     }
 
     .partner-container mat-card-content {
-      height: 400px;
+      min-height: 400px;
       padding: 2em 1em;
     }
 
     .partner-container mat-card-content p {
       font-size: 0.8em;
       max-width: 400px;
+      min-height: 80px;
     }
 
     .partner-container mat-card-content a {
@@ -695,13 +699,14 @@
     }
 
     .partner-container mat-card-content {
-      height: 400px;
+      min-height: 300px;
       padding: 2em 1em;
     }
 
     .partner-container mat-card-content p {
       font-size: 0.8em;
       max-width: 300px;
+      min-height: 60px;
     }
 
     .partner-container mat-card-content a {
