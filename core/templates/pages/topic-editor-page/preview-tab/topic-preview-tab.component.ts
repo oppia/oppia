@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {Topic} from 'domain/topic/topic-object.model';
@@ -77,10 +76,3 @@ export class TopicPreviewTabComponent {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTopicPreviewTab',
-  downgradeComponent({
-    component: TopicPreviewTabComponent,
-  }) as angular.IDirectiveFactory
-);

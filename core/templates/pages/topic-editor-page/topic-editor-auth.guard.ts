@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Guard that redirects user to 401 error page
- * if the user is not a Collection Editor.
+ * @fileoverview Guard for the topic editor page.
  */
 
 import {Location} from '@angular/common';
@@ -32,7 +31,7 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 @Injectable({
   providedIn: 'root',
 })
-export class CollectionEditorPageAuthGuard implements CanActivate {
+export class TopicEditorAuthGuard implements CanActivate {
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,
@@ -44,9 +43,22 @@ export class CollectionEditorPageAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>(resolve => {
-      const collectionId = route.paramMap.get('collection_id') || '';
+      const topicId = route.paramMap.get('topic_id');
+
+      if (!topicId) {
+        this.router
+          .navigate([
+            `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+          ])
+          .then(() => {
+            this.location.replaceState(state.url);
+            resolve(false);
+          });
+        return;
+      }
+
       this.accessValidationBackendApiService
-        .validateAccessCollectionEditorPage(collectionId)
+        .validateAccessToTopicEditorPage(topicId)
         .then(() => {
           resolve(true);
         })
