@@ -20,7 +20,6 @@ import datetime
 import enum
 import logging
 
-
 from core import feature_flag_list
 from core import feconf
 from core import utils
@@ -56,7 +55,6 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
-
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -2730,6 +2728,16 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
     test_utils.GenericTestBase):
     """Tests that publish chapters of Length and Measurement topic."""
 
+    topic_id_1 = 'bdO7c687WBBW'
+    story_id_1 = 'OVJ4RdjxbcAf'
+    story_url_fragment = 'title-one'
+    node_id_1 = 'node_1'
+    node_id_2 = 'node_2'
+    node_id_3 = 'node_3'
+    exp_id_0 = '0'
+    exp_id_1 = '1'
+    exp_id_7 = '7'
+
     def setUp(self) -> None:
         """Completes the sign-up process for the various users."""
         super().setUp()
@@ -2742,35 +2750,26 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
 
     def test_publish_chapters_of_length_and_measurement_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        topic_id_1 = 'bdO7c687WBBW'
-        story_id_1 = 'OVJ4RdjxbcAf'
-        story_url_fragment = 'title-one'
-        node_id_1 = 'node_1'
-        node_id_2 = 'node_2'
-        node_id_3 = 'node_3'
-        exp_id_0 = '0'
-        exp_id_1 = '1'
-        exp_id_7 = '7'
         self.save_new_valid_exploration(
-            exp_id_0, self.admin_id, title='Title 1',
+            self.exp_id_0, self.admin_id, title='Title 1',
             end_state_name='End')
         self.save_new_valid_exploration(
-            exp_id_1, self.admin_id, title='Title 2',
+            self.exp_id_1, self.admin_id, title='Title 2',
             end_state_name='End')
         self.save_new_valid_exploration(
-            exp_id_7, self.admin_id, title='Title 3',
+            self.exp_id_7, self.admin_id, title='Title 3',
             end_state_name='End')
-        self.publish_exploration(self.admin_id, exp_id_0)
-        self.publish_exploration(self.admin_id, exp_id_1)
-        self.publish_exploration(self.admin_id, exp_id_7)
+        self.publish_exploration(self.admin_id, self.exp_id_0)
+        self.publish_exploration(self.admin_id, self.exp_id_1)
+        self.publish_exploration(self.admin_id, self.exp_id_7)
 
         story = story_domain.Story.create_default_story(
-            story_id_1, 'Title', 'Description', topic_id_1,
-            story_url_fragment)
+            self.story_id_1, 'Title', 'Description', self.topic_id_1,
+            self.story_url_fragment)
         story.meta_tag_content = 'story meta content'
 
-        self.node_1: story_domain.StoryNodeDict = {
-            'id': node_id_1,
+        node_1: story_domain.StoryNodeDict = {
+            'id': self.node_id_1,
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
@@ -2782,15 +2781,15 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': exp_id_1,
+            'exploration_id': self.exp_id_1,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
             'first_publication_date_msecs': 200,
             'unpublishing_reason': None
         }
-        self.node_2: story_domain.StoryNodeDict = {
-            'id': node_id_2,
+        node_2: story_domain.StoryNodeDict = {
+            'id': self.node_id_2,
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
@@ -2802,15 +2801,15 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': exp_id_0,
+            'exploration_id': self.exp_id_0,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
             'first_publication_date_msecs': 200,
             'unpublishing_reason': None
         }
-        self.node_3: story_domain.StoryNodeDict = {
-            'id': node_id_3,
+        node_3: story_domain.StoryNodeDict = {
+            'id': self.node_id_3,
             'title': 'Title 3',
             'description': 'Description 3',
             'thumbnail_filename': 'image_3.svg',
@@ -2822,7 +2821,7 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': exp_id_7,
+            'exploration_id': self.exp_id_7,
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2830,47 +2829,50 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(self.node_1),
-            story_domain.StoryNode.from_dict(self.node_2),
-            story_domain.StoryNode.from_dict(self.node_3)
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
         ]
-        self.nodes = story.story_contents.nodes
         story.story_contents.initial_node_id = 'node_2'
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
-        self.subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'sub-one-frag')
-        self.subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
+        subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
             2, 'Subtopic Title 2', 'sub-two-frag')
-        self.SKILL_ID_1 = skill_services.get_new_skill_id()
-        self.SKILL_ID_2 = skill_services.get_new_skill_id()
-        self.subtopic_1.skill_ids = [self.SKILL_ID_1]
-        self.subtopic_2.skill_ids = [self.SKILL_ID_2]
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+        subtopic_1.skill_ids = [skill_id_1]
+        subtopic_2.skill_ids = [skill_id_2]
         self.save_new_topic(
-            topic_id_1, 'user', name='Topic',
+            self.topic_id_1, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_1, self.subtopic_2], next_subtopic_id=3)
-        topic_services.publish_topic(topic_id_1, self.admin_id)
+            subtopics=[subtopic_1, subtopic_2], next_subtopic_id=3)
+        topic_services.publish_topic(self.topic_id_1, self.admin_id)
         topic_services.publish_story(
-            topic_id_1, story_id_1, self.admin_id)
-        story = story_fetchers.get_story_by_id(story_id_1, strict=False) # type: ignore[misc]
+            self.topic_id_1, self.story_id_1, self.admin_id)
+        story_fetcher_1 = story_fetchers.get_story_by_id(
+            self.story_id_1, strict=False)
         chapters_change_list = []
-        for node in story.story_contents.nodes:
-            chapters_change_list.append(story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'node_id': node.id,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_STATUS),
-                'old_value': node.status,
-                'new_value': constants.STORY_NODE_STATUS_DRAFT
-            }))
+        if story_fetcher_1:
+            for node in story_fetcher_1.story_contents.nodes:
+                chapters_change_list.append(story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'node_id': node.id,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_STATUS),
+                    'old_value': node.status,
+                    'new_value': constants.STORY_NODE_STATUS_DRAFT
+                }))
         topic_services.update_story_and_topic_summary(
-            self.admin_id, story_id_1, chapters_change_list,
-                'Changes chapter status to draft', topic_id_1)
-        story = story_fetchers.get_story_by_id(story_id_1, strict=False) # type: ignore[misc]
-        for node in story.story_contents.nodes:
-            self.assertEqual(node.status, constants.STORY_NODE_STATUS_DRAFT)
+            self.admin_id, self.story_id_1, chapters_change_list,
+                'Changes chapter status to draft', self.topic_id_1)
+        story_fetcher_2 = story_fetchers.get_story_by_id(
+            self.story_id_1, strict=False)
+        if story_fetcher_2:
+            for node in story_fetcher_2.story_contents.nodes:
+                self.assertEqual(node.status, constants.STORY_NODE_STATUS_DRAFT)
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -2878,9 +2880,13 @@ class PublishChaptersOfLengthAndMeasurementTopicTest(
                 'action': 'publish_chapters_of_length_and_measurement_topic'
             },
             csrf_token=csrf_token)
-        story = story_fetchers.get_story_by_id(story_id_1, strict=False) # type: ignore[misc]
-        for node in story.story_contents.nodes:
-            self.assertEqual(node.status, constants.STORY_NODE_STATUS_PUBLISHED)
+
+        story_fetcher_3 = story_fetchers.get_story_by_id(
+            self.story_id_1, strict=False)
+        if story_fetcher_3:
+            for node in story_fetcher_3.story_contents.nodes:
+                self.assertEqual(
+                    node.status, constants.STORY_NODE_STATUS_PUBLISHED)
 
 
 class ClearSearchIndexTest(test_utils.GenericTestBase):
