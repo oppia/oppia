@@ -34,9 +34,12 @@ import {TopicRights} from 'domain/topic/topic-rights.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {downgradeComponent} from '@angular/upgrade/static';
 
+import './topic-editor-navbar.component.css';
+
 @Component({
   selector: 'oppia-topic-editor-navbar',
   templateUrl: './topic-editor-navbar.component.html',
+  styleUrls: ['./topic-editor-navbar.component.css'],
 })
 export class TopicEditorNavbarComponent
   implements OnInit, OnDestroy, AfterContentChecked
