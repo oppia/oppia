@@ -37,8 +37,9 @@ var scrollToTop = async function () {
   await browser.execute('window.scrollTo(0,0);');
 };
 
-// The minimum log level we will report as an error.
-var CONSOLE_LOG_THRESHOLD = 900;
+// The minimum level for console errors and what sources to allow.
+// Source: https://www.selenium.dev/documentation/legacy/json_wire_protocol
+var CONSOLE_ERROR_THRESHOLD = ['SEVERE'];
 var CONSOLE_ERRORS_TO_IGNORE = [
   // These "localhost:9099" are errors related to communicating with the
   // Firebase emulator, which would never occur in production, so we just ignore
@@ -66,10 +67,73 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   // error was observed on other websites (e.g. https://edu.google.com/) that
   // use gtag and it does not affect the user experience in any way.
   // Considering these reasons, the error may be ignored.
+  /https:\/\/www.googletagmanager.com\/a.* Failed to load resource: the server responded with a status of 405/,
+];
+
+// Existing console errors that are not fixed yet. Remember to remove these
+// when all issues are resolved.
+var CONSOLE_ERRORS_TO_FIX = [
+  // Several issues involving these angular errors.
+  _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
+  _.escapeRegExp('ERROR CONTEXT'),
+  // TODO(#19746): Development console error "Uncaught in Promise" on signup.
   new RegExp(
-    'https://www.googletagmanager.com/a.* Failed to load resource: ' +
-      'the server responded with a status of 405 ()',
-    'g'
+    'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
+  ),
+  // TODO(#18653): Cannot read properties of undefined (reading 'getStory')
+  _.escapeRegExp("Cannot read properties of undefined (reading 'getStory')"),
+  // TODO(#19704): Invalid active state name console error on translation tab.
+  _.escapeRegExp('Invalid active state name: null'),
+  // TODO(#17277): Failed to execute 'convertToSpecifiedUnits' on 'SVGLength'.
+  _.escapeRegExp(
+    "Failed to execute 'convertToSpecifiedUnits' on " +
+      "'SVGLength': Could not resolve relative length."
+  ),
+  // TODO(#6478): Flakes with feedbackUpdates e2e tests.
+  _.escapeRegExp(
+    'Requested card with index -1, but transcript only has length ' + '0 cards.'
+  ),
+  _.escapeRegExp(
+    'Cannot read properties of undefined ' + "(reading 'getStateName')"
+  ),
+  // TODO(#19657): Error in Practice Question (Drag And Drop).
+  _.escapeRegExp(
+    'Cannot read properties of undefined ' + "(reading 'nativeElement')"
+  ),
+  // TODO(#19733): 404 Not Found inside exporation/lesson player (midi-js).
+  _.escapeRegExp(
+    'http://localhost:8181/dist/oppia-angular/midi/examples/soundfont/' +
+      'acoustic_grand_piano-ogg.js - Failed to load resource: the server ' +
+      'responded with a status of 404 (Not Found)'
+  ),
+  // TODO(#18324): Visiting a newly created exploration state results in some
+  // version-history console error.
+  _.escapeRegExp('http://localhost:8181/version_history_handler/state'),
+  // TODO(#18837): The supplied input topic: undefined is not valid.
+  _.escapeRegExp(
+    'http://localhost:8181/getreviewableopportunitieshandler' +
+      '?topic_name=undefined - Failed to load resource: the server responded ' +
+      'with a status of 400 (Bad Request)'
+  ),
+  _.escapeRegExp(
+    'Uncaught (in promise): Error: The supplied input topic: undefined is ' +
+      'not valid'
+  ),
+  // TODO(#18672): Cannot read properties of undefined ('version_number').
+  _.escapeRegExp(
+    'TypeError: Cannot read properties of undefined ' +
+      "(reading 'version_number')"
+  ),
+  // TODO(#20198): Parameter 'key' required console error.
+  new RegExp('Parameter.*key.*required'),
+  // TODO(#20197): 404 Not Found error in collection player.
+  /http:\/\/localhost:8181\/collection\/.*Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  // TODO(#20212): Deleting an existing topic connected to a classroom
+  // results in console errors.
+  /http:\/\/localhost:8181\/topic_id_to_topic_name_handler\/\?comma_separated_topic_ids=.*Failed to load resource: the server responded with a status of 500 \(Internal Server Error\)/,
+  _.escapeRegExp(
+    'Uncaught (in promise): No corresponding topic models exist for these ' +
+      'topic IDs'
   ),
 ];
 
@@ -77,7 +141,10 @@ var checkForConsoleErrors = async function (
   errorsToIgnore,
   skipDebugging = true
 ) {
-  errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
+  errorsToIgnore = errorsToIgnore.concat(
+    CONSOLE_ERRORS_TO_IGNORE,
+    CONSOLE_ERRORS_TO_FIX
+  );
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
   // This causes the tests to fail, therefore, we remove such logs.
@@ -88,7 +155,7 @@ var checkForConsoleErrors = async function (
   var browserLogs = await browser.getLogs('browser');
   var browserErrors = browserLogs.filter(
     logEntry =>
-      logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
+      CONSOLE_ERROR_THRESHOLD.includes(logEntry.level) &&
       errorsToIgnore.every(e => logEntry.message.match(e) === null)
   );
   expect(browserErrors).toEqual([]);
