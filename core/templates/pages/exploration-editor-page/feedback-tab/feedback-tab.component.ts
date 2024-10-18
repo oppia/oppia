@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {CreateFeedbackThreadModalComponent} from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
@@ -256,10 +255,3 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaFeedbackTab',
-  downgradeComponent({
-    component: FeedbackTabComponent,
-  }) as angular.IDirectiveFactory
-);

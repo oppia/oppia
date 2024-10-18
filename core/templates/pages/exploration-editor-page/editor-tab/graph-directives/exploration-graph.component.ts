@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
@@ -121,10 +120,3 @@ export class ExplorationGraphComponent {
     return this.checkpointCountWarning;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationGraph',
-  downgradeComponent({
-    component: ExplorationGraphComponent,
-  }) as angular.IDirectiveFactory
-);

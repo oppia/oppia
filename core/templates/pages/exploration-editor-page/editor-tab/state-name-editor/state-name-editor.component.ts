@@ -18,7 +18,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -130,10 +129,3 @@ export class StateNameEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateNameEditor',
-  downgradeComponent({
-    component: StateNameEditorComponent,
-  }) as angular.IDirectiveFactory
-);

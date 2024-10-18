@@ -48,6 +48,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/exploration-editor-page/exploration-editor-page.module'
+      ).then(m => m.ExplorationEditorPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_EDITOR.ROUTE,
     loadChildren: () =>
       import('pages/story-editor-page/story-editor-page.module').then(

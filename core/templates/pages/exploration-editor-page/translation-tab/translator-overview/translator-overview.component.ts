@@ -18,7 +18,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
@@ -382,10 +381,3 @@ export class TranslatorOverviewComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTranslatorOverview',
-  downgradeComponent({
-    component: TranslatorOverviewComponent,
-  }) as angular.IDirectiveFactory
-);

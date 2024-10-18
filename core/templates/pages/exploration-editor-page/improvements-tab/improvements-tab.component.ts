@@ -19,7 +19,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HighBounceRateTask} from 'domain/improvements/high-bounce-rate-task.model';
 import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
 import {IneffectiveFeedbackLoopTask} from 'domain/improvements/ineffective-feedback-loop-task.model';
@@ -165,10 +164,3 @@ export class ImprovementsTabComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaImprovementsTab',
-  downgradeComponent({
-    component: ImprovementsTabComponent,
-  }) as angular.IDirectiveFactory
-);

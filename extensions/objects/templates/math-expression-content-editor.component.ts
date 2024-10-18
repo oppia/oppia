@@ -41,6 +41,10 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 // build to not complain.
 // TODO(#16309): Fix relative imports.
 import '../../../core/templates/mathjaxConfig';
+import {
+  InsertScriptService,
+  KNOWN_SCRIPTS,
+} from 'services/insert-script.service';
 
 interface MathExpression {
   svg_filename: string;
@@ -68,15 +72,23 @@ export class MathExpressionContentEditorComponent implements OnInit {
   placeholderText = '\\frac{x}{y}';
   active: boolean = false;
   localValue: {label: string} = {label: ''};
-
+  loaded = false;
   constructor(
     private alertsService: AlertsService,
     private externalRteSaveService: ExternalRteSaveService,
     private imageUploadHelperService: ImageUploadHelperService,
-    private svgSanitizerService: SvgSanitizerService
+    private svgSanitizerService: SvgSanitizerService,
+    private insertScriptService: InsertScriptService
   ) {}
 
   ngOnInit(): void {
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
+      this.loaded = true;
+      this.init();
+    });
+  }
+
+  private init(): void {
     // Reset the component each time the value changes (e.g. if this is
     // part of an editable list).
     this.svgString = '';
@@ -238,6 +250,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
+      this.loaded &&
       changes.value &&
       changes.value.currentValue.raw_latex !==
         changes.value.previousValue?.raw_latex

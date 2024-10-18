@@ -7,5 +7,13 @@
     <oppia-root></oppia-root>
 
     @load('pages/footer_js_libs.html')
+    <script>
+      // Load script only for exploration editor.
+      if (window.location.pathname.startsWith('/create/')) {
+        var script = document.createElement('script');
+        script.src = '/third_party/generated/js/third_party.js';
+        document.body.appendChild(script);
+      }
+    </script>
   </body>
 </html>

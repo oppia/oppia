@@ -18,7 +18,6 @@
 
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {AddAudioTranslationModalComponent} from '../modal-templates/add-audio-translation-modal.component';
 import {AlertsService} from 'services/alerts.service';
@@ -425,10 +424,3 @@ export class VoiceoverCardComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaVoiceoverCardComponent',
-  downgradeComponent({
-    component: VoiceoverCardComponent,
-  }) as angular.IDirectiveFactory
-);
