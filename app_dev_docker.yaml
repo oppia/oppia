@@ -187,4 +187,4 @@ env_variables:
   DATASTORE_HOST: "http://datastore:8089"
   DATASTORE_PROJECT_ID: "dev-project-id"
   DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
-  SECRETS: "{\"ANDROID_BUILD_SECRET\": \"android-build-secret\", \"VM_ID\": \"vm_default\", \"SHARED_SECRET_KEY\": \"1a2b3c4e\"}"
+  SECRETS: "{\"ANDROID_BUILD_SECRET\": \"android-build-secret\", \"VM_ID\": \"vm_default\", \"SHARED_SECRET_KEY\": \"1a2b3c4e\", \"FIREBASE_CONFIG_VALUES\" : {\"FIREBASE_CONFIG_API_KEY\":\"fake-api-key\",\"FIREBASE_CONFIG_AUTH_DOMAIN\":\"\",\"FIREBASE_CONFIG_PROJECT_ID\":\"dev-project-id\",\"FIREBASE_CONFIG_STORAGE_BUCKET\":\"\",\"FIREBASE_CONFIG_MESSAGING_SENDER_ID\":\"\",\"FIREBASE_CONFIG_APP_ID\":\"\",\"FIREBASE_CONFIG_GOOGLE_CLIENT_ID\":\"\"}}"

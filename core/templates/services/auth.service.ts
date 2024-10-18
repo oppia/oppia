@@ -97,6 +97,7 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 export class AuthService {
   private authServiceImpl: AuthServiceImpl;
   creds!: firebase.auth.UserCredential;
+  private static firebaseConfigDict: FirebaseOptions;
 
   constructor(
     @Optional() private angularFireAuth: AngularFireAuth | null,
@@ -111,19 +112,45 @@ export class AuthService {
     }
   }
 
+  static getConfig: () => FirebaseOptions = function () {
+    let config: string = '';
+    let request = new XMLHttpRequest();
+    try {
+      request.open('GET', '/firebase_config', false);
+      request.send(null);
+      if (request.status === 200) {
+        let jsonResponse = request.responseText.substr(
+          request.responseText.indexOf(")]}'") + 4
+        ); // Extract the JSON part.
+        config = jsonResponse;
+      }
+    } catch (e) {
+      console.error('Unable to fetch firebase config : ', e);
+    }
+    if (config === '') {
+      return null;
+    } else {
+      return JSON.parse(config);
+    }
+  };
+
   static get firebaseEmulatorIsEnabled(): boolean {
     return AppConstants.EMULATOR_MODE;
   }
 
   static get firebaseConfig(): FirebaseOptions {
-    return {
-      apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
-      authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
-      projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
-      storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
-      messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
-      appId: AppConstants.FIREBASE_CONFIG_APP_ID,
-    } as const;
+    if (AuthService.firebaseConfigDict === undefined) {
+      var config = AuthService.getConfig();
+      AuthService.firebaseConfigDict = {
+        apiKey: config.FIREBASE_CONFIG_API_KEY,
+        authDomain: config.FIREBASE_CONFIG_AUTH_DOMAIN,
+        projectId: config.FIREBASE_CONFIG_PROJECT_ID,
+        storageBucket: config.FIREBASE_CONFIG_STORAGE_BUCKET,
+        messagingSenderId: config.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+        appId: config.FIREBASE_CONFIG_APP_ID,
+      };
+    }
+    return AuthService.firebaseConfigDict;
   }
 
   static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
