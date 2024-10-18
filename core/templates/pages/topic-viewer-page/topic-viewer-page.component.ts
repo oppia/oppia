@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -205,10 +204,3 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'topicViewerPage',
-    downgradeComponent({component: TopicViewerPageComponent})
-  );
