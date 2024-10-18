@@ -60,10 +60,15 @@ EMAIL_FOOTER = (
 )
 
 
-def _get_oppia_site_url():
-    """Fetches oppia site url."""
+def _get_oppia_site_url() -> str:
+    """Fetches oppia site url using oppia project ID.
+
+    Returns:
+        str. The oppia site url.
+    """
     oppia_project_id = param_services.get_platform_parameter_value(
         param_list.ParamName.OPPIA_PROJECT_ID.value)
+    assert isinstance(oppia_project_id, str)
     return feconf.OPPIA_PROJECT_ID_TO_SITE_URL_MAP[oppia_project_id]
 
 

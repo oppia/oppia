@@ -97,7 +97,7 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
         if constants.DEV_MODE
         else platform_parameter_domain.ServerMode.PROD
         if feconf.PROD_SERVER_ID == get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_PROJECT_ID)
+            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value)
         else platform_parameter_domain.ServerMode.TEST
     )
 

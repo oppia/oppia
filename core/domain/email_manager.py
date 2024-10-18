@@ -214,6 +214,7 @@ HTML_FOR_SUGGESTION_DESCRIPTION: Dict[
 
 _OPPIA_PROJECT_ID = platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value)
+assert isinstance(_OPPIA_PROJECT_ID, str)
 _OPPIA_SITE_URL = feconf.OPPIA_PROJECT_ID_TO_SITE_URL_MAP[_OPPIA_PROJECT_ID]
 
 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA: Dict[str, str] = {
