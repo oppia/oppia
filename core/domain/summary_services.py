@@ -694,17 +694,15 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
 
 def require_activities_to_be_public(
     activity_references: List[activity_domain.ActivityReference]
-) -> None:
-    """Raises an exception if any activity reference in the list does not
-    exist, or is not public.
+) -> List[str]:
+    """Collects and returns the list of non-existent or private activity IDs.
 
     Args:
         activity_references: list(ActivityReference). A list of
             ActivityReference domain objects.
 
-    Raises:
-        Exception. Any activity reference in the list does not
-            exist, or is not public.
+    Returns:
+        List[str]. A list of invalid activity IDs (non-existent or private).
     """
     exploration_ids, collection_ids = activity_services.split_by_type(
         activity_references)
@@ -721,16 +719,19 @@ def require_activities_to_be_public(
             collection_ids),
     }]
 
+    invalid_ids = []
+
     for activities_info in activity_summaries_by_type:
         for index, summary in enumerate(activities_info['summaries']):
             if summary is None:
-                raise Exception(
-                    'Cannot feature non-existent %s with id %s' %
-                    (activities_info['type'], activities_info['ids'][index]))
-            if summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
-                raise Exception(
-                    'Cannot feature private %s with id %s' %
-                    (activities_info['type'], activities_info['ids'][index]))
+                # Collect non-existent activity IDs.
+                invalid_ids.append(activities_info['ids'][index])
+            elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
+                # Collect private activity IDs.
+                invalid_ids.append(activities_info['ids'][index])
+
+    return invalid_ids
+
 
 
 def get_featured_activity_summary_dicts(
