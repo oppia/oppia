@@ -13,7 +13,7 @@
 	"I18N_ABOUT_PAGE_TABS_ABOUT": "Om",
 	"I18N_ABOUT_PAGE_TEACH_BUTTON": "Jeg ønsker å undervise",
 	"I18N_ABOUT_PAGE_TITLE": "Om oss – Oppia",
-	"I18N_CONTACT_PAGE_HEADING": "Involver deg!",
+	"I18N_CONTACT_PAGE_HEADING": "Kontakt oss",
 	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2": "Hvis du har en medieforespørsel, send den til <a class=\"oppia-contact-mail\" href=\"mailto:press@oppia.org\">press@oppia.org</a>.",
 	"I18N_CONTINUE_REGISTRATION": "Fortsett registrering",
 	"I18N_CREATE_ACTIVITY_QUESTION": "Hva ønsker du å skape?",
@@ -183,7 +183,9 @@
 	"I18N_ONE_SUBSCRIBER_TEXT": "Du har 1 abonnent.",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Språk",
 	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Laster lyd …",
+	"I18N_SIDEBAR_CONTACT_US": "Kontakt oss",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Brukernavn kan bare ha alfanumeriske tegn.",
 	"I18N_SPLASH_TITLE": "Tenk utenfor bøkene.",
-	"I18N_TOPIC_VIEWER_STORY": "Historie"
+	"I18N_TOPIC_VIEWER_STORY": "Historie",
+	"I18N_TOPNAV_CONTACT_US": "Kontakt oss"
 }
