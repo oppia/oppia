@@ -23,12 +23,12 @@ oppia-conversation-skin .supplemental-card-parent-container {
 }
 
 .conversation-skin-next-lesson-wrapper {
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
   background-color: white;
-  overflow: hidden;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  overflow: hidden;
   padding: 10px;
   position: relative;
   text-align: right;
