@@ -20,6 +20,8 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -617,6 +619,8 @@ export class LoggedInUser extends BaseUser {
         );
       }
       await this.page.waitForSelector(toastMessageSelector, {hidden: true});
+
+      await this.waitForNetworkIdle();
     } catch (error) {
       const newError = new Error(`Failed to match toast message: ${error}`);
       newError.stack = error.stack;
@@ -1131,6 +1135,8 @@ export class LoggedInUser extends BaseUser {
    * @param {string[]} goals - The goals to add.
    */
   async addGoals(goals: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
     await this.page.waitForSelector(topicNameInEditGoalsSelector, {
       visible: true,
     });
@@ -1174,11 +1180,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(completedGoalsSectionSelector, {
       visible: true,
     });
-    await this.page
-      .waitForSelector(completedGoalsTopicNameSelector)
-      .catch(() => {
-        throw new Error('Completed goals section is empty');
-      });
+    await this.page.waitForSelector(completedGoalsTopicNameSelector);
 
     const completedGoals = await this.page.$$eval(
       `${completedGoalsSectionSelector} ${completedGoalsTopicNameSelector}`,
