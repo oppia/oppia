@@ -247,7 +247,7 @@
         <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
       </div>
       <div [hidden]="!learnSubmenuIsShown" class="oppia-community-library-section">
-        <a href="/community-library" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" tabindex="-1" class="e2e-mobile-test-library-link">
+        <a href="/community-library" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" tabindex="-1" class="e2e-mobile-test-library-link" (click)="closeSidebarOnNavigate()">
           <p class="oppia-sidebar-learn-subtext mb-2">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY_DESCRIPTION' | translate }}</p>
           <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY' | translate }}</span>
           <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
@@ -263,7 +263,7 @@
       </div>
       <div [hidden]="!getinvolvedSubmenuIsShown" class="e2e-mobile-test-sidebar-get-involved-menu">
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/partnerships" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-partnerships-button">
+          <a tabindex="-1" href="/partnerships" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-partnerships-button" (click)="closeSidebarOnNavigate()">
             <i class="fas fa-globe oppia-sidebar-submenu-icon partnerships-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
@@ -277,14 +277,14 @@
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/donate" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-donate-button">
+          <a tabindex="-1" href="/donate" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-donate-button" (click)="closeSidebarOnNavigate()">
             <i class="fas fa-heart oppia-sidebar-submenu-icon donate-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/contact" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-contact-us-button">
+          <a tabindex="-1" href="/contact" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-contact-us-button" (click)="closeSidebarOnNavigate()">
             <i class="fas fa-envelope oppia-sidebar-submenu-icon contact-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
@@ -311,7 +311,7 @@
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" target="_blank" rel="noopener" [href]="IMPACT_REPORT_LINK" class="oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-button">
+          <a tabindex="-1" target="_blank" rel="noopener" [href]="IMPACT_REPORT_LINK" class="oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-button" (click)="closeSidebarOnNavigate()">
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_IMPACT_REPORT' | translate }}</span>
             <i class="fas fa-external-link-alt launch-icon"></i>
           </a>
@@ -323,7 +323,8 @@
       <a href="/donate"
          [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
          tabindex="-1"
-         class="e2e-test-navbar-donate-mobile-button text-uppercase oppia-sidebar-menu-link">
+         class="e2e-test-navbar-donate-mobile-button text-uppercase oppia-sidebar-menu-link"
+         (click)="closeSidebarOnNavigate()">
         <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
       </a>
     </li>
