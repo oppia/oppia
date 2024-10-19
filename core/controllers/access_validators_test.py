@@ -24,6 +24,7 @@ from core.constants import constants
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -720,6 +721,66 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
             '%s/can_access_blog_author_profile_page/invalid_username' % (
             ACCESS_VALIDATION_HANDLER_PREFIX
             ), expected_status_int=404
+        )
+        self.logout()
+
+
+class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
+    """Checks the access to the topic editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+
+    def test_access_topic_editor_page_with_curriculum_admin_right(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
+                expected_status_int=200)
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
+        self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        invalid_topic_id = 'p3MBT4ndlCTX'
+
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                invalid_topic_id),
+                expected_status_int=404)
+        self.logout()
+
+    def test_access_topic_editor_page_without_curriculum_admin_right(
+            self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=401
         )
         self.logout()
 

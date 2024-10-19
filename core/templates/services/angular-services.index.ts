@@ -449,6 +449,7 @@ import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
 import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-admin-auth.guard';
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
+  import { TopicEditorAuthGuard } from 'pages/topic-editor-page/topic-editor-auth.guard';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
@@ -878,6 +879,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicCreationService', TopicCreationService],
   ['TopicEditorRoutingService', TopicEditorRoutingService],
+  ['TopicEditorAuthGuard', TopicEditorAuthGuard],
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],

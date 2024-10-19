@@ -542,54 +542,6 @@ class TopicEditorTests(
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
 
-    def test_get_can_not_access_topic_page_with_nonexistent_topic_id(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX,
-                topic_fetchers.get_new_topic_id()), expected_status_int=404)
-
-        self.logout()
-
-    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
-        self
-    ) -> None:
-        # Check that the editor page can not be accessed with an
-        # an invalid topic id.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_id'),
-            expected_status_int=404)
-        self.logout()
-
-    def test_access_topic_editor_page(self) -> None:
-        """Test access to editor pages for the sample topic."""
-
-        # Check that non-admin and topic_manager cannot access the editor
-        # page.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
-            expected_status_int=401)
-        self.logout()
-
-        # Check that admins can access the editor page.
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        self.logout()
-
-        # Check that any topic manager can access the editor page.
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        self.logout()
-
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),

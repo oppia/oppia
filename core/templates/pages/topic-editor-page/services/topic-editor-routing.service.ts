@@ -17,7 +17,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageTitleService} from 'services/page-title.service';
@@ -129,10 +128,3 @@ export class TopicEditorRoutingService {
     return this._updateViewEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TopicEditorRoutingService',
-    downgradeInjectable(TopicEditorRoutingService)
-  );
