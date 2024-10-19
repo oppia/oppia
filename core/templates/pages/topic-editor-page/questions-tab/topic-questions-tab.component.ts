@@ -44,6 +44,8 @@ export class TopicQuestionsTabComponent
   skillIdToRubricsObject!: object;
   allSkillSummaries!: ShortSkillSummary[];
   canEditQuestion!: boolean;
+  questionEditorOpened: boolean = false;
+  selectedSkillName!: string;
   selectedSkillId!: string;
   getSkillsCategorizedByTopics!: CategorizedSkills;
   getUntriagedSkillSummaries!: SkillSummary[];
@@ -81,6 +83,12 @@ export class TopicQuestionsTabComponent
         this.getUntriagedSkillSummaries = response.untriagedSkillSummaries;
       });
     this.canEditQuestion = this.topicRights.canEditTopic();
+    this.questionEditorOpened =
+      this.topicEditorStateService.isQuestionEditorOpened();
+    this.selectedSkillName = this.topicEditorStateService.getSelectedSkillName(
+      this.selectedSkillId,
+      this.allSkillSummaries
+    );
   }
 
   reinitializeQuestionsList(skillId: string): void {
@@ -108,11 +116,17 @@ export class TopicQuestionsTabComponent
         this._initTab()
       )
     );
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onQuestionEditorOpened.subscribe(() =>
+        this._initTab()
+      )
+    );
     this._initTab();
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.topicEditorStateService.toggleQuestionEditor(false);
   }
 }
 

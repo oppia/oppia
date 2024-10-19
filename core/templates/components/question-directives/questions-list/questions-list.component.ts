@@ -63,6 +63,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionsListService} from 'services/questions-list.service';
 import {QuestionValidationService} from 'services/question-validation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
+import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
 import {UtilsService} from 'services/utils.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -131,7 +132,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     private skillEditorRoutingService: SkillEditorRoutingService,
     private utilsService: UtilsService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private topicEditorStateService: TopicEditorStateService
   ) {}
 
   createQuestion(): void {
@@ -282,6 +284,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   openQuestionEditor(): void {
     this.questionUndoRedoService.clearChanges();
     this.editorIsOpen = true;
+    this.topicEditorStateService.toggleQuestionEditor(true);
     this.imageLocalStorageService.flushStoredImagesData();
     if (this.newQuestionIsBeingCreated) {
       this.contextService.setImageSaveDestinationToLocalStorage();
@@ -622,6 +625,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         () => {
           this.contextService.resetImageSaveDestination();
           this.editorIsOpen = false;
+          this.topicEditorStateService.toggleQuestionEditor(false);
           this.windowRef.nativeWindow.location.hash = null;
           this.skillEditorRoutingService.questionIsBeingCreated = false;
         },
@@ -685,6 +689,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               this.contextService.resetImageSaveDestination();
               this.saveAndPublishQuestion(commitMessage);
             }
+            this.topicEditorStateService.toggleQuestionEditor(false);
           },
           () => {
             this.questionIsBeingSaved = false;
@@ -749,6 +754,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.getQuestionSummariesForOneSkill();
         this.changeDetectorRef.detectChanges();
       })
+    );
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onQuestionEditorOpened.subscribe()
     );
 
     this.showDifficultyChoices = false;
