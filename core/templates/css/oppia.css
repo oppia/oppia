@@ -3615,6 +3615,9 @@ oppia-noninteractive-link {
     font-size: 18px;
     margin-left: 3%;
   }
+  .oppia-navbar-back-button {
+    display: none;
+  }
 }
 
 @media only screen and (max-width: 500px) {
