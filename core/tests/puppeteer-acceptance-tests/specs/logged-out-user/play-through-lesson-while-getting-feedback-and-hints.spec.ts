@@ -144,10 +144,18 @@ describe('Logged-out User', function () {
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.expectScreenshotToMatch(
+      'saveExplorationDraft',
+      __dirname
+    );
     explorationId = await explorationEditor.publishExplorationWithMetadata(
       'Algebra Basics',
       'Learn the basics of Algebra',
       'Algorithms'
+    );
+    await explorationEditor.expectScreenshotToMatch(
+      'publishExplorationWithMetadata',
+      __dirname
     );
 
     if (!explorationId) {

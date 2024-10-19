@@ -23,6 +23,13 @@ import {ConsoleReporter} from './console-reporter';
 import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-matcher';
 import {showMessage} from './show-message';
 
+var path = require('path');
+
+import {toMatchImageSnapshot} from 'jest-image-snapshot';
+expect.extend({toMatchImageSnapshot});
+const backgroundBanner = '.oppia-background-image';
+const libraryBanner = '.e2e-test-library-banner';
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -582,6 +589,80 @@ export class BaseUser {
   }
 
   /**
+   * This function takes a screenshot of the page.
+   * If there's no parameter for newPage, it checks this.page instead of newPage.
+   * If there's no image with the given filename, it stores the screenshot with the given filename in the folder:
+   *  prod_desktop_screenshots or prod_mobile_screenshots for screenshots in production mode
+   *  dev_desktop_screenshots or dev_mobile_screenshots for screenshots in development mode
+   * Otherwise, it compares the screenshot with the image named as the given string to check if they match.
+   * If they don't match, it generates an image in the folder __diff_output__ to show the difference.
+   * @param {string} imageName - The name for the image
+   * @param {string} testPath - The path of the file that called this function
+   * @param {Page|undefined} newPage - The page to take screenshot from,
+   */
+  async expectScreenshotToMatch(
+    imageName: string,
+    testPath: string,
+    newPage?: Page
+  ): Promise<void> {
+    const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
+    await currentPage.mouse.move(0, 0);
+    // To wait for all images to load and the page to be stable.
+    await currentPage.waitForTimeout(5000);
+
+    /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
+     * In general, it is set as 0.0028/0.28% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
+     * Based on the existence of the background/library banner, which are randomly selected from a set of four,
+     * failureTrigger is set in the specific percentage for the randomness of the banner in desktop mode and mobile mode.
+     */
+
+    var failureTrigger = 0;
+    var dirName = '';
+    if (this.isViewportAtMobileWidth()) {
+      if (await this.isInProdMode()) {
+        dirName = '/prod_mobile_screenshots';
+      } else {
+        dirName = '/dev_mobile_screenshots';
+      }
+      failureTrigger += 0.042;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.0352;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.0039;
+      }
+    } else {
+      if (await this.isInProdMode()) {
+        dirName = '/prod_desktop_screenshots';
+      } else {
+        dirName = '/dev_desktop_screenshots';
+      }
+      failureTrigger += 0.0028;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.03;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.006;
+      }
+    }
+
+    /*
+     * Set dumpInlineDiffToConsole as true prints the base64 string of the image that shows the difference when failed in the terminal
+     * The string can be copy-pasted to a browser address string to preview the image
+     * If you are running tests locally, you can set dumpInlineDiffToConsole as false to stop printing the base64 string
+     */
+    expect(await currentPage.screenshot()).toMatchImageSnapshot({
+      failureThreshold: failureTrigger,
+      failureThresholdType: 'percent',
+      customSnapshotIdentifier: imageName,
+      customSnapshotsDir: path.join(testPath, dirName),
+      customDiffDir: path.isAbsolute('/home/runner/work/..')
+        ? '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots'
+        : path.join(testPath, dirName, 'diff-snapshots'),
+    });
+    if (typeof newPage !== 'undefined') {
+      await newPage.close();
+    }
+  }
+  /*
    * Waits for the network to become idle on the given page.
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is

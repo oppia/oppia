@@ -16,7 +16,8 @@
     ],
     "types": [
       "node",
-      "jasmine",
+      "jest",
+      "jest-image-snapshot",
       "puppeteer"
     ],
     "lib": [
@@ -27,7 +28,6 @@
   "include": [
     "core/tests/puppeteer-acceptance-tests/specs",
     "core/tests/puppeteer-acceptance-tests/user-utilities",
-    "core/tests/puppeteer-acceptance-tests/helpers",
     "core/tests/puppeteer-acceptance-tests/functions"
   ],
 }

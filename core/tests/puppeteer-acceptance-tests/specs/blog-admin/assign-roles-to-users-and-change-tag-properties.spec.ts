@@ -60,6 +60,10 @@ describe('Blog Admin', function () {
         BLOG_RIGHTS.BLOG_ADMIN
       );
       await superAdmin.expectUserToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
+      await blogAdmin.expectScreenshotToMatch(
+        'expectUserToHaveRole_guestUsr1',
+        __dirname
+      );
 
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2',
@@ -74,6 +78,11 @@ describe('Blog Admin', function () {
         ROLES.BLOG_POST_EDITOR
       );
 
+      await blogAdmin.expectScreenshotToMatch(
+        'expectUserToHaveRole_guestUsr2',
+        __dirname
+      );
+
       await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2',
@@ -83,6 +92,10 @@ describe('Blog Admin', function () {
       await blogAdmin.expectMaximumTagLimitNotToBe(5);
       await blogAdmin.setMaximumTagLimitTo(5);
       await blogAdmin.expectMaximumTagLimitToBe(5);
+      await blogAdmin.expectScreenshotToMatch(
+        'expectMaximumTagLimitToBe5',
+        __dirname
+      );
       await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
     },
