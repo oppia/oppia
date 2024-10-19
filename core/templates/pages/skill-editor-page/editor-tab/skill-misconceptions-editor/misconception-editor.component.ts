@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
@@ -189,10 +188,3 @@ export class MisconceptionEditorComponent implements OnInit {
     this.feedbackEditorIsOpen = false;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaMisconceptionEditor',
-    downgradeComponent({component: MisconceptionEditorComponent})
-  );

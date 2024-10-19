@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -190,10 +189,3 @@ export class SkillEditorPageComponent implements OnInit {
     });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillEditorPage',
-  downgradeComponent({
-    component: SkillEditorPageComponent,
-  }) as angular.IDirectiveFactory
-);
