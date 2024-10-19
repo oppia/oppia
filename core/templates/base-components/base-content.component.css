@@ -41,6 +41,11 @@
     display: none;
   }
 }
+@media (max-width: 992px) {
+  .navbar-collapse {
+    display: flex; 
+  }
+}
 
 .show-mobile-navbar-icon {
   background-color: #e6e6e6;
