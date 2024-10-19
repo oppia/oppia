@@ -67,7 +67,7 @@ export class MusicNotesInputRulesService {
     );
   }
 
-  // TODO(#20443): Validate that inputs.a <= inputs.b.
+  // TODO(#20443): Validate that inputs.a <= inputs.b before checking actual length.
   HasLengthInclusivelyBetween(
     answer: MusicNotesAnswer[],
     inputs: {a: number; b: number}
