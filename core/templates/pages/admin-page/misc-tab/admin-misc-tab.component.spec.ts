@@ -189,6 +189,63 @@ describe('Admin misc tab component ', () => {
     );
   });
 
+  describe('when clicking on publish chapters button', () => {
+    it('should publish chapters successfully', fakeAsync(() => {
+      confirmSpy.and.returnValue(true);
+      let publishChaptersSpy = spyOn(
+        adminBackendApiService,
+        'publishChaptersAsync'
+      ).and.resolveTo();
+
+      component.publishChaptersOfLengthAndMeasurementTopic();
+      tick();
+
+      expect(publishChaptersSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Chapters published successfully.'
+      );
+    }));
+
+    it(
+      'should not publish chapters in case of backend ' + 'error',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(true);
+        let publishChaptersSpy = spyOn(
+          adminBackendApiService,
+          'publishChaptersAsync'
+        ).and.rejectWith('Internal Server Error.');
+
+        component.publishChaptersOfLengthAndMeasurementTopic();
+        tick();
+
+        expect(publishChaptersSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
+
+    it(
+      'should not request backend to publish chapters if ' +
+        'a task is still running in the queue',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(true);
+        let publishChaptersSpy = spyOn(
+          adminBackendApiService,
+          'publishChaptersAsync'
+        );
+
+        // Setting task is still running to be true.
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+
+        component.publishChaptersOfLengthAndMeasurementTopic();
+        tick();
+
+        expect(publishChaptersSpy).not.toHaveBeenCalled();
+      })
+    );
+  });
+
   describe('when clicking on regenerate topic button ', () => {
     it('should regenerate topic successfully', fakeAsync(() => {
       confirmSpy.and.returnValue(true);
