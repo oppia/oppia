@@ -47,7 +47,7 @@ EXCLUDED_PHRASES: Final = [
 ]
 
 ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
-    'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:'
+    'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:', 'docker:'
 ]
 
 ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15

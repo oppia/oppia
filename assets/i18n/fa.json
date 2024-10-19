@@ -1,4 +1,5 @@
 {
+	"I18N_ABOUT_PAGE_CTA_SOFTWARE_TITLE": "نرم‌افزار",
 	"I18N_ABOUT_PAGE_TITLE": "درباره ما - Oppia",
 	"I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "درخواست برای آموزش با Oppia",
 	"I18N_ACTION_BROWSE_EXPLORATIONS": "فهرست تجربیات ما",
@@ -281,11 +282,13 @@
 	"I18N_TOPNAV_HOME": "خانه",
 	"I18N_TOPNAV_LEARN": "یادگیری",
 	"I18N_TOPNAV_LIBRARY": "کتابخانه",
+	"I18N_TOPNAV_LIBRARY_TEXT": "کتابخانه",
 	"I18N_TOPNAV_LOGOUT": "خروج",
 	"I18N_TOPNAV_MODERATOR_PAGE": "صفحه ناظر",
 	"I18N_TOPNAV_PREFERENCES": "ترجیحات",
 	"I18N_TOPNAV_SIGN_IN": "ورود",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "آموزش با Oppia",
 	"I18N_VOLUNTEER_PAGE_BREADCRUMB": "داوطلب",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "نرم‌افزار",
 	"I18N_YES": "بله"
 }

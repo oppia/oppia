@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for DeleteChapterModal modal.
+ * @fileoverview Story Editor page root component.
  */
 
 import {Component} from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
-  selector: 'oppia-delete-chapter-modal',
-  templateUrl: './delete-chapter-modal.component.html',
+  selector: 'oppia-story-editor-page-root',
+  templateUrl: './story-editor-page-root.component.html',
 })
-export class DeleteChapterModalComponent extends ConfirmOrCancelModal {
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
-  }
+export class StoryEditorPageRootComponent extends BaseRootComponent {
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_EDITOR.TITLE;
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_EDITOR
+    .META as unknown as Readonly<MetaTagData>[];
 }
