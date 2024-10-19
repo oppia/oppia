@@ -89,6 +89,7 @@ export class TopicEditorStateService {
   private _curriculumAdminUsernames: string[] = [];
   private _classroomName: string | null = null;
   private _questionEditorOpened: boolean = false;
+  private _newQuestionEditor: boolean = false;
   private _storySummariesInitializedEventEmitter: EventEmitter<void> =
     new EventEmitter();
 
@@ -326,6 +327,10 @@ export class TopicEditorStateService {
     return this._questionEditorOpened;
   }
 
+  isNewQuestionEditor(): boolean {
+    return this._newQuestionEditor;
+  }
+
   getGroupedSkillSummaries(): object {
     return cloneDeep(this._groupedSkillSummaries);
   }
@@ -473,9 +478,26 @@ export class TopicEditorStateService {
     }
   }
 
-  toggleQuestionEditor(editorOpened: boolean): void {
-    this._questionEditorOpened = editorOpened;
-    this._questionEditorOpenedEventEmitter.emit(this._questionEditorOpened);
+  /**
+   * When the editor is opened (editorOpened is true),
+   * assign the value of newQuestion to _newQuestionEditor,
+   * and set _questionEditorOpened to true.
+   * When the editor is closed (editorOpened is false),
+   * both flags are set to false.
+   */
+  toggleQuestionEditor(
+    editorOpened: boolean,
+    newQuestion: boolean = false
+  ): void {
+    if (editorOpened) {
+      this._newQuestionEditor = newQuestion;
+      this._questionEditorOpened = true;
+    } else {
+      this._newQuestionEditor = false;
+      this._questionEditorOpened = false;
+    }
+
+    this._questionEditorOpenedEventEmitter.emit();
   }
 
   deleteSubtopicPage(topicId: string, subtopicId: number): void {

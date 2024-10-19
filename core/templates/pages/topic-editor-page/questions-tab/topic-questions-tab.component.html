@@ -1,6 +1,6 @@
 <div class="question-editor-header-container" *ngIf="questionEditorOpened">
   <mat-card class="oppia-page-card oppia-mobile-collapsible-card question-editor-header">
-    <h3>Editing question for skill: {{ selectedSkillName }}</h3>
+    <h3>{{ getEditorAction() }} question for skill: {{ selectedSkillName }}</h3>
   </mat-card>
 </div>
 <div class="select-skill-dropdown-container" *ngIf="!questionEditorOpened">

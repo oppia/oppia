@@ -170,6 +170,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
     this.newQuestionIsBeingCreated = true;
+    this.topicEditorStateService.toggleQuestionEditor(
+      true,
+      this.newQuestionIsBeingCreated
+    );
     this.editorIsOpen = true;
 
     this.skillLinkageModificationsArray = [];

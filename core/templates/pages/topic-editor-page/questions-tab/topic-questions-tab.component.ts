@@ -45,6 +45,7 @@ export class TopicQuestionsTabComponent
   allSkillSummaries!: ShortSkillSummary[];
   canEditQuestion!: boolean;
   questionEditorOpened: boolean = false;
+  newQuestionEditor: boolean = false;
   selectedSkillName!: string;
   selectedSkillId!: string;
   getSkillsCategorizedByTopics!: CategorizedSkills;
@@ -85,10 +86,15 @@ export class TopicQuestionsTabComponent
     this.canEditQuestion = this.topicRights.canEditTopic();
     this.questionEditorOpened =
       this.topicEditorStateService.isQuestionEditorOpened();
+    this.newQuestionEditor = this.topicEditorStateService.isNewQuestionEditor();
     this.selectedSkillName = this.topicEditorStateService.getSelectedSkillName(
       this.selectedSkillId,
       this.allSkillSummaries
     );
+  }
+
+  getEditorAction(): string {
+    return this.newQuestionEditor ? 'Creating new' : 'Editing';
   }
 
   reinitializeQuestionsList(skillId: string): void {
