@@ -458,5 +458,19 @@ def get_static_asset_url(filepath: str) -> str:
         return 'http://localhost:8181/assetsstatic/%s' % (
             filepath
         )
+    # TODO(1149): Refactor to remove usage of inline imports.
+    # This inline import is required because of the following cicrular
+    # import happening without it:
+    # exp_domain -> html_validation_service -> fs_services ->
+    # platform_parameter_services -> platform_parameter_registry ->
+    # caching_services -> exp_domain.
+    # Caching services should be refactored to eliminate dependency on
+    # multiple domain objects.
+    from core.domain import platform_parameter_list
+    from core.domain import platform_parameter_services
+    oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+    assert isinstance(oppia_project_id, str)
     return 'https://storage.googleapis.com/%s-static/%s' % (
-        feconf.OPPIA_PROJECT_ID, filepath)
+        oppia_project_id, filepath)

@@ -21,6 +21,8 @@ API.
 from __future__ import annotations
 
 from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import search_services
 from core.platform import models
 
@@ -30,21 +32,42 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
+datastore_services = models.Registry.import_datastore_services()
 
-# A timeout of 30 seconds is needed to avoid calls to
-# exp_services.load_demo() failing with a ReadTimeoutError
-# where loading a exploration from local yaml file takes
-# longer than ElasticSearch expects.
-ES = elasticsearch.Elasticsearch(
-    ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
-    if feconf.ES_CLOUD_ID is None else None,
-    cloud_id=feconf.ES_CLOUD_ID,
-    http_auth=(
-        (feconf.ES_USERNAME, secrets_services.get_secret('ES_PASSWORD'))
-        if feconf.ES_CLOUD_ID else None), timeout=30)
+
+class ElasticSearchClient:
+    """Cretes an Elastic Search Client."""
+
+    def __init__(self) -> None:
+        self._client: Optional[elasticsearch.Elasticsearch] = None
+
+    def get_client(self) -> elasticsearch.Elasticsearch:
+        """Creates and returns elastic search client."""
+        if self._client is None:
+            with datastore_services.get_ndb_context():
+                es_cloud_id = (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.ES_CLOUD_ID.value))
+                es_username = (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.ES_USERNAME.value))
+                self._client = elasticsearch.Elasticsearch(
+                    ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
+                    if es_cloud_id is None else None,
+                    cloud_id=es_cloud_id,
+                    http_auth=(
+                        (es_username, secrets_services.get_secret(
+                            'ES_PASSWORD'))
+                        if es_cloud_id else None), timeout=30)
+
+        return self._client
+
+
+ES = ElasticSearchClient()
 
 
 class SearchException(Exception):
@@ -92,7 +115,7 @@ def _fetch_response_from_elastic_search(
     # page" offset needs to be returned.
     num_docs_to_fetch = size + 1
     try:
-        response = ES.search(
+        response = ES.get_client().search(
             body=query_definition, index=index_name,
             params={
                 'size': num_docs_to_fetch,
@@ -127,7 +150,7 @@ def _create_index(index_name: str) -> None:
         elasticsearch.RequestError. The index already exists.
     """
     assert isinstance(index_name, str)
-    ES.indices.create(index_name)
+    ES.get_client().indices.create(index_name)
 
 
 # Here we use type Any because the argument 'documents' represents the list of
@@ -157,11 +180,13 @@ def add_documents_to_index(
         assert 'id' in document
     for document in documents:
         try:
-            response = ES.index(index_name, document, id=document['id'])
+            response = ES.get_client().index(
+                index_name, document, id=document['id'])
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and repeat the operation.
             _create_index(index_name)
-            response = ES.index(index_name, document, id=document['id'])
+            response = ES.get_client().index(
+                index_name, document, id=document['id'])
 
         if response is None or response['_shards']['failed'] > 0:
             raise SearchException('Failed to add document to index.')
@@ -182,7 +207,8 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
 
     for doc_id in doc_ids:
         try:
-            document_exists_in_index = ES.exists(index_name, doc_id)
+            document_exists_in_index = ES.get_client().exists(
+                index_name, doc_id)
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and set
             # document_exists_in_index to False.
@@ -190,7 +216,7 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
             document_exists_in_index = False
 
         if document_exists_in_index:
-            ES.delete(index_name, doc_id)
+            ES.get_client().delete(index_name, doc_id)
 
 
 def clear_index(index_name: str) -> None:
@@ -203,7 +229,7 @@ def clear_index(index_name: str) -> None:
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
     # https://stackoverflow.com/questions/57778438/delete-all-documents-from-elasticsearch-index-in-python-3-x
-    ES.delete_by_query(
+    ES.get_client().delete_by_query(
         index_name,
         {
             'query':

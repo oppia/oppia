@@ -20,7 +20,8 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.jobs import job_utils
 from core.platform import models
 from core.tests import test_utils
@@ -181,30 +182,38 @@ class GetModelIdTests(test_utils.TestBase):
 
 class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        assert isinstance(self.oppia_project_id, str)
+
     def test_get_beam_entity_from_model(self) -> None:
-        model = FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123')
+
+        model = FooModel(id='abc', project=self.oppia_project_id, prop='123')
 
         beam_entity = job_utils.get_beam_entity_from_ndb_model(model)
 
         self.assertEqual(beam_entity.key.path_elements, ('FooModel', 'abc'))
-        self.assertEqual(beam_entity.key.project, feconf.OPPIA_PROJECT_ID)
+        self.assertEqual(beam_entity.key.project, self.oppia_project_id)
         self.assertEqual(beam_entity.properties, {'prop': '123'})
 
     def test_get_model_from_beam_entity(self) -> None:
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
-                ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID,
+                ('FooModel', 'abc'), project=self.oppia_project_id,
                 namespace=self.namespace))
         beam_entity.set_properties({'prop': '123'})
 
         self.assertEqual(
-            FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123'),
+            FooModel(id='abc', project=self.oppia_project_id, prop='123'),
             job_utils.get_ndb_model_from_beam_entity(beam_entity))
 
     def test_get_beam_key_from_ndb_key(self) -> None:
         beam_key = beam_datastore_types.Key(
             ('FooModel', 'abc'),
-            project=feconf.OPPIA_PROJECT_ID,
+            project=self.oppia_project_id,
             namespace=self.namespace
         )
 
@@ -219,7 +228,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
-                ('CoreModel', 'abc'), project=feconf.OPPIA_PROJECT_ID,
+                ('CoreModel', 'abc'), project=self.oppia_project_id,
                 namespace=self.namespace))
         beam_entity.set_properties({
             'prop': 3.14,
@@ -230,12 +239,12 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
         self.assertEqual(
             CoreModel(
-                id='abc', project=feconf.OPPIA_PROJECT_ID, prop=3.14,
+                id='abc', project=self.oppia_project_id, prop=3.14,
                 created_on=utcnow),
             job_utils.get_ndb_model_from_beam_entity(beam_entity))
 
     def test_from_and_then_to_model(self) -> None:
-        model = FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123')
+        model = FooModel(id='abc', project=self.oppia_project_id, prop='123')
 
         self.assertEqual(
             model,
@@ -245,7 +254,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
     def test_from_and_then_to_beam_entity(self) -> None:
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
-                ('CoreModel', 'abc'), project=feconf.OPPIA_PROJECT_ID))
+                ('CoreModel', 'abc'), project=self.oppia_project_id))
         beam_entity.set_properties({
             'prop': 123,
             'created_on': datetime.datetime.utcnow(),

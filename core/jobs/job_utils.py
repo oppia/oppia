@@ -18,7 +18,8 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform import models
 
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
@@ -277,8 +278,12 @@ def get_beam_query_from_ndb_query(
         # its results by __key__ (the models' .key() value).
         order = ('__key__',)
 
+    oppia_project_id = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+    assert isinstance(oppia_project_id, str)
     return beam_datastore_types.Query(
-        kind=kind, namespace=namespace, project=feconf.OPPIA_PROJECT_ID,
+        kind=kind, namespace=namespace, project=oppia_project_id,
         filters=filters, order=order)
 
 

@@ -18,7 +18,8 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.jobs import job_utils
 from core.platform import models
 
@@ -101,12 +102,16 @@ class PutModels(beam.PTransform): # type: ignore[misc]
             PCollection. An empty PCollection. This is needed because all
             expand() methods need to return some PCollection.
         """
+        oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        assert isinstance(oppia_project_id, str)
         return (
             entities
             | 'Transforming the NDB models into Apache Beam entities' >> (
                 beam.Map(job_utils.get_beam_entity_from_ndb_model))
             | 'Writing the NDB models to the datastore' >> (
-                datastoreio.WriteToDatastore(feconf.OPPIA_PROJECT_ID))
+                datastoreio.WriteToDatastore(oppia_project_id))
         )
 
 
@@ -132,10 +137,14 @@ class DeleteModels(beam.PTransform): # type: ignore[misc]
             PCollection. An empty PCollection. This is needed because all
             expand() methods need to return some PCollection.
         """
+        oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        assert isinstance(oppia_project_id, str)
         return (
             entities
             | 'Transforming the NDB keys into Apache Beam keys' >> (
                 beam.Map(job_utils.get_beam_key_from_ndb_key))
             | 'Deleting the NDB keys from the datastore' >> (
-                datastoreio.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID))
+                datastoreio.DeleteFromDatastore(oppia_project_id))
         )

@@ -27,7 +27,6 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import email_services
 from core.domain import html_cleaner
-from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import platform_parameter_services
@@ -108,57 +107,6 @@ REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     }
 }
 
-EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
-        'The default sender name for outgoing emails.',
-        platform_parameter_domain.DataTypes.STRING,
-        default='Site Admin'
-    )
-)
-
-EMAIL_FOOTER: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.EMAIL_FOOTER,
-        'The footer to append to all outgoing emails. (This should '
-        'be written in HTML and include an unsubscribe link.)',
-        platform_parameter_domain.DataTypes.STRING,
-        default=(
-            'You can change your email preferences via the '
-            '<a href="%s%s">Preferences</a> page.' % (
-                feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL)
-        )
-    )
-)
-
-_PLACEHOLDER_SUBJECT: Final = 'THIS IS A PLACEHOLDER.'
-_PLACEHOLDER_HTML_BODY: Final = (
-    'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
-)
-
-SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
-        'Content of email sent after a new user signs up. Set the email '
-        'subject. These emails are only sent if the functionality is enabled '
-        'in feconf.py.',
-        platform_parameter_domain.DataTypes.STRING,
-        default=_PLACEHOLDER_SUBJECT
-    )
-)
-
-SIGNUP_EMAIL_BODY_CONTENT: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
-        'Content of email sent after a new user signs up. (The email body '
-        'should be written with HTML and not include a salutation or footer.) '
-        'These emails are only sent if the functionality is enabled in '
-        'feconf.py.',
-        platform_parameter_domain.DataTypes.STRING,
-        default=_PLACEHOLDER_HTML_BODY
-    )
-)
-
 EXPLORATION_ROLE_MANAGER: Final = 'manager rights'
 EXPLORATION_ROLE_EDITOR: Final = 'editor rights'
 EXPLORATION_ROLE_VOICE_ARTIST: Final = 'voice artist rights'
@@ -196,24 +144,6 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
     ),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
-
-UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
-    platform_parameter_domain.PlatformParameter) = (
-        PlatformParameterRegistry.create_platform_parameter(
-            (
-                platform_parameter_list.ParamName.
-                UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
-            ),
-            'Default content for the email sent after an exploration is '
-            'unpublished by a moderator. These emails are only sent if the '
-            'functionality is enabled in feconf.py. Leave this field blank '
-            'if emails should not be sent.',
-            platform_parameter_domain.DataTypes.STRING,
-            default=(
-                'I\'m writing to inform you that I have unpublished the above '
-                'exploration.')
-        )
-    )
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     'email_body_template': (
@@ -282,6 +212,11 @@ HTML_FOR_SUGGESTION_DESCRIPTION: Dict[
     }
 }
 
+_OPPIA_PROJECT_ID = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value)
+assert isinstance(_OPPIA_PROJECT_ID, str)
+_OPPIA_SITE_URL = feconf.OPPIA_PROJECT_ID_TO_SITE_URL_MAP[_OPPIA_PROJECT_ID]
+
 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA: Dict[str, str] = {
     'email_body_template': (
         'Hi %s,'
@@ -316,7 +251,7 @@ ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA: Dict[str, str] = {
         'There have been <b>question suggestions</b> created on the '
         '<a href="%s%s">Contributor Dashboard page</a> where there are not '
         'enough reviewers.<br><br>' % (
-            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
+            _OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
 }
 
 ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
@@ -592,7 +527,7 @@ def _send_email(
     if sender_name is None:
         email_sender_name = (
             platform_parameter_services.get_platform_parameter_value(
-                EMAIL_SENDER_NAME.name)
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value)
         )
         assert isinstance(email_sender_name, str)
         sender_name = email_sender_name
@@ -803,32 +738,47 @@ def send_post_signup_email(
         test_for_duplicate_email: bool. For testing duplicate emails.
     """
 
+    email_subject_content_param_name = (
+        platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
+    )
     email_subject_content = (
         platform_parameter_services.get_platform_parameter_value(
-            SIGNUP_EMAIL_SUBJECT_CONTENT.name)
+            email_subject_content_param_name)
     )
     # Here we use assert because the get_platform_parameter_value returns
     # value of type platform_parameter_domain.PlatformDataTypes and we
     # are sure that email_subject_content is of type str. This helps us
     # avoid the mypy error.
     assert isinstance(email_subject_content, str)
+    email_body_content_param_name = (
+        platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
+    )
     email_body_content = (
         platform_parameter_services.get_platform_parameter_value(
-            SIGNUP_EMAIL_BODY_CONTENT.name)
+            email_body_content_param_name)
     )
+    assert isinstance(email_body_content, str)
     if not test_for_duplicate_email:
         email_subject_content_default_value = (
-            SIGNUP_EMAIL_SUBJECT_CONTENT.default_value)
+            platform_parameter_registry.Registry.get_platform_parameter(
+                email_subject_content_param_name
+            ).default_value
+        )
         email_body_content_default_value = (
-            SIGNUP_EMAIL_BODY_CONTENT.default_value)
-        if email_subject_content_default_value == email_subject_content:
+            platform_parameter_registry.Registry.get_platform_parameter(
+                email_body_content_param_name
+            ).default_value
+        )
+        if not len(email_subject_content) or (
+                email_subject_content_default_value == email_subject_content):
             logging.error(
                 'Please ensure that the value for the admin platform '
                 'property SIGNUP_EMAIL_SUBJECT_CONTENT is set, before allowing '
                 'post-signup emails to be sent.'
             )
             return
-        if email_body_content_default_value == email_body_content:
+        if not len(email_body_content) or (
+                email_body_content_default_value == email_body_content):
             logging.error(
                 'Please ensure that the value for the admin platform '
                 'property SIGNUP_EMAIL_BODY_CONTENT is set, before allowing '
@@ -838,7 +788,7 @@ def send_post_signup_email(
 
     recipient_username = user_services.get_username(user_id)
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
         recipient_username, email_body_content, email_footer)
     noreply_email_address = (
@@ -869,7 +819,8 @@ def get_moderator_unpublish_exploration_email() -> str:
 
     unpublish_exp_email_html_body = (
         platform_parameter_services.get_platform_parameter_value(
-            UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.name)
+            platform_parameter_list.ParamName.
+            UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value)
     )
     # Ruling out the possibility of Any for mypy type checking.
     assert isinstance(unpublish_exp_email_html_body, str)
@@ -939,7 +890,7 @@ def send_moderator_action_email(
     assert callable(email_signoff_html_fn)
     email_signoff_html = email_signoff_html_fn(sender_username)
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     full_email_content = (
         '%s<br><br>%s<br><br>%s<br><br>%s' % (
             email_salutation_html, email_body, email_signoff_html,
@@ -1035,7 +986,7 @@ def send_role_notification_email(
 
     email_subject = email_subject_template % exploration_title
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+       platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     email_body = email_body_template % (
         recipient_username, inviter_username, role_description, exploration_id,
         exploration_title, rights_html, exploration_id, email_footer)
@@ -1109,7 +1060,7 @@ def send_emails_to_subscribers(
         if recipients_preferences[index].can_receive_subscription_email:
             email_footer = (
                 platform_parameter_services.get_platform_parameter_value(
-                    EMAIL_FOOTER.name))
+                    platform_parameter_list.ParamName.EMAIL_FOOTER.value))
             email_body = email_body_template % (
                 username, creator_name, exploration_id,
                 exploration_title, email_footer)
@@ -1186,7 +1137,7 @@ def send_feedback_message_email(
         (count_messages, 's') if count_messages > 1 else ('a', ''))
 
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
 
     email_body = email_body_template % (
         recipient_username, count_messages if count_messages > 1
@@ -1292,7 +1243,7 @@ def send_suggestion_email(
     can_users_receive_email = (
         can_users_receive_thread_email(recipient_list, exploration_id, True))
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     noreply_email_address = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
@@ -1362,7 +1313,7 @@ def send_instant_feedback_message_email(
 
     if recipient_preferences.can_receive_feedback_message_email:
         email_footer = platform_parameter_services.get_platform_parameter_value(
-            EMAIL_FOOTER.name)
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value)
         email_body = email_body_template % (
             recipient_username, thread_title, exploration_id,
             exploration_title, sender_username, message, email_footer)
@@ -1416,7 +1367,7 @@ def send_flag_exploration_email(
     reporter_username = user_services.get_username(reporter_id)
 
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
 
     email_body = email_body_template % (
         reporter_username, exploration_title, report_text, exploration_id,
@@ -1460,7 +1411,7 @@ def send_query_completion_email(recipient_id: str, query_id: str) -> None:
 
     recipient_username = user_services.get_username(recipient_id)
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     email_body = email_body_template % (
         recipient_username, query_id, query_id, email_footer)
     noreply_email_address = (
@@ -1500,7 +1451,7 @@ def send_query_failure_email(
 
     recipient_username = user_services.get_username(recipient_id)
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     email_body = email_body_template % (
         recipient_username, query_id, email_footer)
     noreply_email_address = (
@@ -1619,7 +1570,7 @@ def send_mail_to_onboard_new_reviewers(
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
         email_footer = platform_parameter_services.get_platform_parameter_value(
-            EMAIL_FOOTER.name)
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value)
         email_body = email_body_template % (
             recipient_username, category, category, email_footer)
         noreply_email_address = (
@@ -1674,7 +1625,7 @@ def send_mail_to_notify_users_to_review(
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
         email_footer = platform_parameter_services.get_platform_parameter_value(
-            EMAIL_FOOTER.name)
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value)
         email_body = email_body_template % (
             recipient_username, category, email_footer)
         noreply_email_address = (
@@ -1881,10 +1832,10 @@ def _send_suggestions_waiting_too_long_email(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
-            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            curriculum_admin_usernames[index], _OPPIA_SITE_URL,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
-            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
+            _OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
             list_of_suggestion_descriptions)
 
         _send_email(
@@ -1951,7 +1902,7 @@ def send_reviewer_notifications(
         for reviewer_id in reviewer_ids:
             reviewer_username = user_services.get_username(reviewer_id)
             email_body = email_body_template % (
-                reviewer_username, feconf.OPPIA_SITE_URL,
+                reviewer_username, _OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
                     suggestion_descriptions))
 
@@ -2036,7 +1987,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                     'one_language_template'] % (
                         utils.get_supported_audio_language_description(
                             language_codes_that_need_reviewers.pop()),
-                        feconf.OPPIA_SITE_URL,
+                        _OPPIA_SITE_URL,
                         feconf.CONTRIBUTOR_DASHBOARD_URL))
 
         else:
@@ -2051,7 +2002,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             translation_suggestions_needing_reviewers_paragraphs.append(
                 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'multi_language_template'] % (
-                        feconf.OPPIA_SITE_URL,
+                        _OPPIA_SITE_URL,
                         feconf.CONTRIBUTOR_DASHBOARD_URL,
                         html_for_languages_that_need_more_reviewers))
         translation_suggestions_needing_reviewers_html = ''.join(
@@ -2113,7 +2064,7 @@ def _send_reviews_needed_email_to_admins(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
-            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            curriculum_admin_usernames[index], _OPPIA_SITE_URL,
             feconf.ADMIN_URL, suggestions_needing_reviewers_html)
 
         _send_email(
@@ -2181,7 +2132,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
     ]))
 
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     noreply_email_address = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
@@ -2209,7 +2160,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
         email_body = email_body_template % (
             reviewer_usernames[index],
-            feconf.OPPIA_SITE_URL,
+            _OPPIA_SITE_URL,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             ''.join(suggestion_descriptions),
             email_footer
@@ -2265,14 +2216,14 @@ def send_mail_to_notify_contributor_ranking_achievement(
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
                     language,
-                    feconf.OPPIA_SITE_URL,
+                    _OPPIA_SITE_URL,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
             )
         else:
             email_body = email_template['email_body_template'] % (
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
-                    feconf.OPPIA_SITE_URL,
+                    _OPPIA_SITE_URL,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
             )
 
@@ -2328,7 +2279,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
             continue
         chapters_are_overdue = True
         story_link = ('%s%s/%s' % (
-            str(feconf.OPPIA_SITE_URL),
+            str(_OPPIA_SITE_URL),
             str(feconf.STORY_EDITOR_URL_PREFIX),
             overdue_story.id
         ))
@@ -2350,7 +2301,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
             continue
         chapters_are_upcoming = True
         story_link = ('%s%s/%s' % (
-            str(feconf.OPPIA_SITE_URL),
+            str(_OPPIA_SITE_URL),
             str(feconf.STORY_EDITOR_URL_PREFIX),
             upcoming_story.id
         ))

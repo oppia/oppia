@@ -27,6 +27,7 @@ import threading
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from scripts import common
 
 import psutil
@@ -222,7 +223,7 @@ def managed_firebase_auth_emulator(
     """
     emulator_args = [
         common.FIREBASE_PATH, 'emulators:start', '--only', 'auth',
-        '--project', feconf.OPPIA_PROJECT_ID,
+        '--project', feconf.OPPIA_DEV_PROJECT_ID,
         '--config', feconf.FIREBASE_EMULATOR_CONFIG_PATH,
     ]
 
@@ -290,9 +291,10 @@ def managed_cloud_datastore_emulator(
     emulator_hostport = '%s:%d' % (
         feconf.CLOUD_DATASTORE_EMULATOR_HOST,
         feconf.CLOUD_DATASTORE_EMULATOR_PORT)
+
     emulator_args = [
         common.GCLOUD_PATH, 'beta', 'emulators', 'datastore', 'start',
-        '--project', feconf.OPPIA_PROJECT_ID,
+        '--project',  feconf.OPPIA_DEV_PROJECT_ID,
         '--data-dir', common.CLOUD_DATASTORE_EMULATOR_DATA_DIR,
         '--host-port', emulator_hostport,
         '--consistency=1.0',
@@ -322,7 +324,7 @@ def managed_cloud_datastore_emulator(
 
         # Environment variables required to communicate with the emulator.
         stack.enter_context(common.swap_env(
-            'DATASTORE_DATASET', feconf.OPPIA_PROJECT_ID))
+            'DATASTORE_DATASET', feconf.OPPIA_DEV_PROJECT_ID))
         stack.enter_context(common.swap_env(
             'DATASTORE_EMULATOR_HOST', emulator_hostport))
         stack.enter_context(common.swap_env(
@@ -330,11 +332,11 @@ def managed_cloud_datastore_emulator(
         stack.enter_context(common.swap_env(
             'DATASTORE_HOST', 'http://%s' % emulator_hostport))
         stack.enter_context(common.swap_env(
-            'DATASTORE_PROJECT_ID', feconf.OPPIA_PROJECT_ID))
+            'DATASTORE_PROJECT_ID', feconf.OPPIA_DEV_PROJECT_ID))
         stack.enter_context(common.swap_env(
             'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
         stack.enter_context(common.swap_env(
-            'GOOGLE_CLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
+            'GOOGLE_CLOUD_PROJECT', feconf.OPPIA_DEV_PROJECT_ID))
 
         yield proc
 

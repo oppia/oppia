@@ -687,6 +687,10 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
             )
         ]
     )
@@ -733,6 +737,10 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
             )
         ]
     )
@@ -5689,6 +5697,10 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
             )
         ]
     )
@@ -5742,6 +5754,10 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
             )
         ]
     )
@@ -5851,6 +5867,10 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             (
                 platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
             )
         ]
     )
@@ -5876,6 +5896,10 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
             )
         ]
     )

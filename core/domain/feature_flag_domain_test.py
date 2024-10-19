@@ -197,7 +197,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow()
         )
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+            with self.swap(feconf, 'PROD_SERVER_ID', 'dummy-id'):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature flag in dev stage cannot be updated in test '
@@ -214,7 +214,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow()
         )
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+            with self.swap(feconf, 'PROD_SERVER_ID', 'dummy-id'):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature flag in dev stage cannot be updated in prod '
@@ -231,7 +231,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow()
         )
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+            with self.swap(feconf, 'PROD_SERVER_ID', 'dev-project-id'):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature flag in test stage cannot be updated in prod '
