@@ -48,6 +48,7 @@ from core.controllers import features
 from core.controllers import feedback
 from core.controllers import feedback_updates
 from core.controllers import firebase
+from core.controllers import firebase_config
 from core.controllers import improvements
 from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
@@ -1172,7 +1173,10 @@ URLS = [
     get_redirect_route(
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler),
-    get_redirect_route('/android_data', android.AndroidActivityHandler)
+    get_redirect_route('/android_data', android.AndroidActivityHandler),
+    get_redirect_route(
+        '/firebase_config',
+        firebase_config.FirebaseConfigValuesHandler)
 ]
 
 # Adding redirects for topic landing pages.
