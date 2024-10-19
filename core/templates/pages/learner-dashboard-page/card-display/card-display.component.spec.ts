@@ -278,19 +278,38 @@ describe('CardDisplayComponent', () => {
     });
   });
 
-  it('should handle event emitted by content toggle button', () => {
-    spyOn(component, 'handleToggleState').and.callThrough();
+  it('should set toggle state to true when handleToggleState is passed true', () => {
+    expect(component.currentToggleState).toBeFalse();
+    component.handleToggleState(true);
 
     fixture.detectChanges();
-    const button = fixture.debugElement.query(
-      By.directive(ContentToggleButtonComponent)
-    ).componentInstance;
-    button.toggle();
-
-    fixture.detectChanges();
-
-    expect(component.handleToggleState).toHaveBeenCalledWith(true);
     expect(component.currentToggleState).toBeTrue();
+  });
+
+  it('should set toggle state to false when handleToggleState is passed false', () => {
+    component.currentToggleState = true;
+    fixture.detectChanges();
+
+    component.handleToggleState(false);
+
+    fixture.detectChanges();
+    expect(component.currentToggleState).toBeFalse();
+  });
+
+  it('should handle event emitted by content toggle button', () => {
+    fixture.whenRenderingDone().then(() => {
+      spyOn(component, 'handleToggleState').and.callThrough();
+
+      const button = fixture.debugElement.query(
+        By.directive(ContentToggleButtonComponent)
+      ).componentInstance;
+      button.toggle();
+
+      fixture.detectChanges();
+
+      expect(component.handleToggleState).toHaveBeenCalledWith(true);
+      expect(component.currentToggleState).toBeTrue();
+    });
   });
 
   it('should return empty string for getVisibility if tabType is not progress', () => {
@@ -304,16 +323,21 @@ describe('CardDisplayComponent', () => {
   });
 
   it('should return shown class for getVisibility after toggling if tabType is progress', () => {
-    expect(component.toggleButtonVisibility).toBeTrue();
-    const button = fixture.debugElement.query(
-      By.directive(ContentToggleButtonComponent)
-    ).componentInstance;
-    button.toggle();
+    expect(component.currentToggleState).toBeFalse();
 
-    fixture.detectChanges();
+    fixture.whenRenderingDone().then(() => {
+      spyOn(component, 'handleToggleState').and.callThrough();
 
-    expect(component.currentToggleState).toBeTrue();
-    expect(component.getVisibility()).toEqual('card-display-content-shown');
+      const button = fixture.debugElement.query(
+        By.directive(ContentToggleButtonComponent)
+      ).componentInstance;
+      button.toggle();
+
+      fixture.detectChanges();
+
+      expect(component.currentToggleState).toBeTrue();
+      expect(component.getVisibility()).toEqual('card-display-content-shown');
+    });
   });
 
   it('should return false for isToggleButtonVisible if tabType is not progress', () => {
