@@ -21,6 +21,7 @@ reject_invalid_suggestion_and_delete_invalid_translation_jobs.
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import rights_domain
 from core.domain import translation_domain
@@ -33,15 +34,22 @@ from core.platform import models
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
     from mypy_imports import translation_models
 
 (
     exp_models,
+    opportunity_models,
+    story_models,
     suggestion_models,
+    topic_models,
     translation_models) = models.Registry.import_models([
     models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY,
+    models.Names.STORY,
     models.Names.SUGGESTION,
+    models.Names.TOPIC,
     models.Names.TRANSLATION
 ])
 
@@ -129,14 +137,14 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
         reject_invalid_suggestion_and_delete_invalid_translation_jobs
         .RejectTranslationSuggestionsForTranslatedContentsJob
     )
-    TARGET_ID_1 = 'exp1'
-    TARGET_ID_2 = 'exp2'
+    EXP_1_ID = 'exp1'
+    EXP_2_ID = 'exp2'
 
     def setUp(self) -> None:
         super().setUp()
 
         exploration_rights_1 = rights_domain.ActivityRights(
-            self.TARGET_ID_1, [feconf.SYSTEM_COMMITTER_ID],
+            self.EXP_1_ID, [feconf.SYSTEM_COMMITTER_ID],
             [], [], [])
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
         exp_models.ExplorationRightsModel(
@@ -151,9 +159,10 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             first_published_msec=exploration_rights_1.first_published_msec,
         ).commit(
             feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
-            id=self.TARGET_ID_1,
+            id=self.EXP_1_ID,
             title='exp 1',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
@@ -176,7 +185,7 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
         }])
 
         exploration_rights_2 = rights_domain.ActivityRights(
-            self.TARGET_ID_2, [feconf.SYSTEM_COMMITTER_ID],
+            self.EXP_2_ID, [feconf.SYSTEM_COMMITTER_ID],
             [], [], [])
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
         exp_models.ExplorationRightsModel(
@@ -191,9 +200,10 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
             first_published_msec=exploration_rights_2.first_published_msec,
         ).commit(
             feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+
         self.exp_2 = self.create_model(
             exp_models.ExplorationModel,
-            id=self.TARGET_ID_2,
+            id=self.EXP_2_ID,
             title='exp 2',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
@@ -218,7 +228,7 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
         self.entity_translation_1 = (
             translation_models.EntityTranslationsModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION,
-            self.TARGET_ID_1,
+            self.EXP_1_ID,
             self.exp_1.version,
             'hi',
             {'content_0': TRANSLATED_CONTENT_DICT,
@@ -227,7 +237,7 @@ class RejectTranslationSuggestionsForTranslatedContentsJobTests(
         self.entity_translation_2 = (
             translation_models.EntityTranslationsModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION,
-            self.TARGET_ID_2,
+            self.EXP_2_ID,
             self.exp_1.version,
             'hi',
             {'content_0': TRANSLATED_CONTENT_DICT,
@@ -301,14 +311,14 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
         reject_invalid_suggestion_and_delete_invalid_translation_jobs
         .AuditTranslationSuggestionsForTranslatedContentsJob
     )
-    TARGET_ID_1 = 'exp1'
-    TARGET_ID_2 = 'exp2'
+    EXP_1_ID = 'exp1'
+    EXP_2_ID = 'exp2'
 
     def setUp(self) -> None:
         super().setUp()
 
         exploration_rights_1 = rights_domain.ActivityRights(
-            self.TARGET_ID_1, [feconf.SYSTEM_COMMITTER_ID],
+            self.EXP_1_ID, [feconf.SYSTEM_COMMITTER_ID],
             [], [], [])
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
         exp_models.ExplorationRightsModel(
@@ -323,9 +333,10 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             first_published_msec=exploration_rights_1.first_published_msec,
         ).commit(
             feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
-            id=self.TARGET_ID_1,
+            id=self.EXP_1_ID,
             title='exp 1',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
@@ -348,7 +359,7 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
         }])
 
         exploration_rights_2 = rights_domain.ActivityRights(
-            self.TARGET_ID_2, [feconf.SYSTEM_COMMITTER_ID],
+            self.EXP_2_ID, [feconf.SYSTEM_COMMITTER_ID],
             [], [], [])
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
         exp_models.ExplorationRightsModel(
@@ -363,9 +374,10 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
             first_published_msec=exploration_rights_2.first_published_msec,
         ).commit(
             feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+
         self.exp_2 = self.create_model(
             exp_models.ExplorationModel,
-            id=self.TARGET_ID_2,
+            id=self.EXP_2_ID,
             title='exp 2',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
@@ -390,7 +402,7 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
         self.entity_translation_1 = (
             translation_models.EntityTranslationsModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION,
-            self.TARGET_ID_1,
+            self.EXP_1_ID,
             self.exp_1.version,
             'hi',
             {'default_outcome_1': TRANSLATED_CONTENT_DICT,
@@ -399,7 +411,7 @@ class AuditTranslationSuggestionsForTranslatedContentsJobTests(
         self.entity_translation_2 = (
             translation_models.EntityTranslationsModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION,
-            self.TARGET_ID_2,
+            self.EXP_2_ID,
             self.exp_1.version,
             'hi',
             {'default_outcome_1': TRANSLATED_CONTENT_DICT,
@@ -493,13 +505,15 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
         reject_invalid_suggestion_and_delete_invalid_translation_jobs
         .DeleteTranslationsForInvalidContentIDsJob
     )
-    TARGET_ID_1 = 'exp1'
+    EXP_1_ID = 'exp1'
+    TOPIC_1_ID = 'topic_1_id'
+    STORY_1_ID = 'story_1_id'
 
     def setUp(self) -> None:
         super().setUp()
 
         exploration_rights_1 = rights_domain.ActivityRights(
-            self.TARGET_ID_1, [feconf.SYSTEM_COMMITTER_ID],
+            self.EXP_1_ID, [feconf.SYSTEM_COMMITTER_ID],
             [], [], [])
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
         exp_models.ExplorationRightsModel(
@@ -514,9 +528,10 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
             first_published_msec=exploration_rights_1.first_published_msec,
         ).commit(
             feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
-            id=self.TARGET_ID_1,
+            id=self.EXP_1_ID,
             title='exp 1',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
@@ -541,12 +556,36 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
         self.entity_translation_1 = (
             translation_models.EntityTranslationsModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION,
-            self.TARGET_ID_1,
+            self.EXP_1_ID,
             self.exp_1.version,
             'hi',
             {'content_0': TRANSLATED_CONTENT_DICT}
         ))
-        self.put_multi([self.entity_translation_1])
+
+        audio_language_codes = set(
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
+        incomplete_translation_language_codes = (
+            audio_language_codes - set(['en']))
+        self.exp_opportunity_summary_model_1 = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                topic_name='topic name',
+                story_id=self.STORY_1_ID,
+                story_title='story title',
+                chapter_title='node title',
+                content_count=2,
+                incomplete_translation_language_codes=sorted(
+                    list(incomplete_translation_language_codes)),
+                translation_counts={'hi': 1},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[]
+            )
+        )
+        self.exp_opportunity_summary_model_1.update_timestamps()
+
+        self.put_multi([
+            self.entity_translation_1, self.exp_opportunity_summary_model_1])
 
     def test_no_translations_are_deleted_in_case_of_no_invalid_translations(
         self) -> None:
@@ -555,7 +594,10 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
     def test_invalid_translations_are_deleted(self) -> None:
         self.entity_translation_1.translations[
             'invalid_content'] = TRANSLATED_CONTENT_DICT
-        self.put_multi([self.entity_translation_1])
+        self.exp_opportunity_summary_model_1.translation_counts['hi'] += 1
+
+        self.put_multi([
+            self.entity_translation_1, self.exp_opportunity_summary_model_1])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -566,11 +608,20 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
             )
         ])
 
-        updated_model = translation_models.EntityTranslationsModel.get(
-            self.entity_translation_1.id)
+        updated_entity_translation_model = (
+            translation_models.EntityTranslationsModel.get(
+                self.entity_translation_1.id))
         self.assertNotIn(
             'invalid_content',
-            updated_model.translations.keys()
+            updated_entity_translation_model.translations.keys()
+        )
+
+        updated_exp_opportunity_summary_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.exp_opportunity_summary_model_1.id))
+        self.assertEqual(
+            1,
+            updated_exp_opportunity_summary_model.translation_counts['hi']
         )
 
 
@@ -581,13 +632,15 @@ class AuditTranslationsForInvalidContentIDsJobTests(
         reject_invalid_suggestion_and_delete_invalid_translation_jobs
         .AuditTranslationsForInvalidContentIDsJob
     )
-    TARGET_ID_1 = 'exp1'
+    EXP_1_ID = 'exp1'
+    TOPIC_1_ID = 'topic_1_id'
+    STORY_1_ID = 'story_1_id'
 
     def setUp(self) -> None:
         super().setUp()
 
         exploration_rights_1 = rights_domain.ActivityRights(
-            self.TARGET_ID_1, [feconf.SYSTEM_COMMITTER_ID],
+            self.EXP_1_ID, [feconf.SYSTEM_COMMITTER_ID],
             [], [], [])
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
         exp_models.ExplorationRightsModel(
@@ -602,9 +655,10 @@ class AuditTranslationsForInvalidContentIDsJobTests(
             first_published_msec=exploration_rights_1.first_published_msec,
         ).commit(
             feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
-            id=self.TARGET_ID_1,
+            id=self.EXP_1_ID,
             title='exp 1',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
@@ -629,12 +683,36 @@ class AuditTranslationsForInvalidContentIDsJobTests(
         self.entity_translation_1 = (
             translation_models.EntityTranslationsModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION,
-            self.TARGET_ID_1,
+            self.EXP_1_ID,
             self.exp_1.version,
             'hi',
             {'default_outcome_1': TRANSLATED_CONTENT_DICT}
         ))
-        self.put_multi([self.entity_translation_1])
+
+        audio_language_codes = set(
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
+        incomplete_translation_language_codes = (
+            audio_language_codes - set(['en']))
+        self.exp_opportunity_summary_model_1 = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                topic_name='topic name',
+                story_id=self.STORY_1_ID,
+                story_title='story title',
+                chapter_title='node title',
+                content_count=2,
+                incomplete_translation_language_codes=sorted(
+                    list(incomplete_translation_language_codes)),
+                translation_counts={'hi': 1},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[]
+            )
+        )
+        self.exp_opportunity_summary_model_1.update_timestamps()
+
+        self.put_multi([
+            self.entity_translation_1, self.exp_opportunity_summary_model_1])
 
     def test_no_translations_are_reported_in_case_of_no_invalid_translations(
         self) -> None:
@@ -643,7 +721,10 @@ class AuditTranslationsForInvalidContentIDsJobTests(
     def test_invalid_translations_are_reported(self) -> None:
         self.entity_translation_1.translations[
             'invalid_content'] = TRANSLATED_CONTENT_DICT
-        self.put_multi([self.entity_translation_1])
+        self.exp_opportunity_summary_model_1.translation_counts['hi'] += 1
+
+        self.put_multi([
+            self.entity_translation_1, self.exp_opportunity_summary_model_1])
 
         errored_value = (
             '{'
@@ -667,9 +748,18 @@ class AuditTranslationsForInvalidContentIDsJobTests(
             )
         ])
 
-        updated_model = translation_models.EntityTranslationsModel.get(
-            self.entity_translation_1.id)
+        updated_entity_translation_model = (
+            translation_models.EntityTranslationsModel.get(
+                self.entity_translation_1.id))
         self.assertIn(
             'invalid_content',
-            updated_model.translations.keys()
+            updated_entity_translation_model.translations.keys()
+        )
+
+        updated_exp_opportunity_summary_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.exp_opportunity_summary_model_1.id))
+        self.assertEqual(
+            2,
+            updated_exp_opportunity_summary_model.translation_counts['hi']
         )

@@ -28,19 +28,22 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
     from mypy_imports import translation_models
 
 (
     exp_models,
+    opportunity_models,
     suggestion_models,
     translation_models) = models.Registry.import_models([
         models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
         models.Names.SUGGESTION,
         models.Names.TRANSLATION])
 
@@ -296,6 +299,57 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
             return result
         return None
 
+    @staticmethod
+    def _compute_updated_exp_opportunity_model(
+        entity_translation_model: translation_models.EntityTranslationsModel
+    ) -> opportunity_models.ExplorationOpportunitySummaryModel:
+        """Compute exploration opportunity model with updated translation
+        count for an updated entity translation model.
+
+        Args:
+            entity_translation_model: (EntityTranslationsModel). An entity 
+                translation model.
+
+        Returns:
+            (ExplorationOpportunitySummaryModel). An exploration opportunity
+            model with updated translation count.
+        """
+        exp_opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                entity_translation_model.entity_id))
+
+        new_translation_count = len(
+            entity_translation_model.translations.keys())
+
+        exp_opportunity_model.translation_counts[
+            entity_translation_model.language_code] = new_translation_count
+
+        return exp_opportunity_model
+
+    @staticmethod
+    def _get_latest_model(
+        entity_id: str, entity_translation_models: List[
+            translation_models.EntityTranslationsModel]) -> Tuple[
+               str, translation_models.EntityTranslationsModel]:
+        """Returns latest entity translation model from a list of entity
+        translation models.
+
+        Args:
+            entity_id: str. Id of the entity for which the latest entity
+                translation model has to be computed.
+            entity_translation_models: list(EntityTranslationsModel). A
+                list of entity translation models.
+
+        Returns:
+            (tuple(str, EntityTranslationsModel)). A tuple of entity id
+            and latest entity translation model corresponding to it.
+        """
+        latest_model = entity_translation_models[0]
+        for model in entity_translation_models:
+            if model.entity_version > latest_model.entity_version:
+                latest_model = model
+        return entity_id, latest_model
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of entity translation model update results.
 
@@ -339,8 +393,32 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
                     'UPDATED ENTITY TRANSLATION MODELS COUNT'))
         )
 
-        unused_put_results = (
+        latest_version_updated_entity_translation_models = (
             updated_entity_translation_models
+            # PCollection<entity_id: entity_translation_model>.
+            | 'Add entity id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.entity_id)
+            # PCollection<entity_id: list(entity_translation_model)>.
+            | 'Group by entity id' >> beam.GroupByKey()
+            # PCollection<entity_id: entity_translation_model>.
+            | 'Filter model with latest entity version' >> beam.MapTuple(
+                self._get_latest_model)
+            # PCollection<entity_translation_model>.
+            | 'Get list of latest entity transaltion model' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
+
+        updated_exp_opportunity_models = (
+            latest_version_updated_entity_translation_models
+            | 'Get updated explortion opportunity models' >> beam.Map(
+                    self._compute_updated_exp_opportunity_model)
+        )
+
+        unused_put_results = (
+            (
+                updated_entity_translation_models,
+                updated_exp_opportunity_models
+            )
+            | 'Merge lists' >> beam.Flatten()
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
