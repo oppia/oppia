@@ -34,22 +34,6 @@ from core.domain import topic_fetchers
 from typing import Dict
 
 
-class TopicViewerPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Renders the topic viewer page."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_topic_viewer_page
-    def get(self, _: str) -> None:
-        """Handles GET requests."""
-
-        self.render_template('topic-viewer-page.mainpage.html')
-
-
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Manages the data that needs to be displayed to a learner on the topic
     viewer page.
