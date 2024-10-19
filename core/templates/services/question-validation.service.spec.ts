@@ -85,7 +85,7 @@ describe('Question Validation Service', () => {
               rule_specs: [
                 {
                   rule_type: 'Equals',
-                  inputs: {x: 10},
+                  inputs: {x: 9},
                 },
               ],
               tagged_skill_misconception_id: null,
@@ -320,5 +320,76 @@ describe('Question Validation Service', () => {
         'Please enter a question.'
       );
     });
+
+    it(
+      'should return error message if duplicate response is present' +
+        ' in the answerGroup for multipleChoiceInput interaction',
+      () => {
+        const question =
+          questionObjectFactory.createFromBackendDict(mockQuestionDict);
+
+        question._stateData.interaction.answerGroups = [
+          {
+            rules: [
+              {
+                type: 'Equals',
+                inputs: {
+                  x: 0,
+                },
+                inputTypes: {
+                  x: 'NonnegativeInt',
+                },
+              },
+            ],
+            outcome: {
+              dest: null,
+              destIfReallyStuck: null,
+              feedback: {
+                _html: '<p>wg</p>',
+                _contentId: 'feedback_14',
+              },
+              labelledAsCorrect: true,
+              paramChanges: [],
+              refresherExplorationId: null,
+              missingPrerequisiteSkillId: null,
+            },
+            trainingData: [],
+            taggedSkillMisconceptionId: null,
+          },
+          {
+            rules: [
+              {
+                type: 'Equals',
+                inputs: {
+                  x: 0,
+                },
+                inputTypes: {
+                  x: 'NonnegativeInt',
+                },
+              },
+            ],
+            outcome: {
+              dest: null,
+              destIfReallyStuck: null,
+              feedback: {
+                _html: '<p>dsc</p>',
+                _contentId: 'feedback_16',
+              },
+              labelledAsCorrect: true,
+              paramChanges: [],
+              refresherExplorationId: null,
+              missingPrerequisiteSkillId: null,
+            },
+            trainingData: [],
+            taggedSkillMisconceptionId: null,
+          },
+        ];
+
+        expect(qvs.getValidationErrorMessage(question)).toEqual(
+          'Please ensure learner answer 1 in Oppia response 2' +
+            ' is not equaling the same multiple choice option as another learner answer.'
+        );
+      }
+    );
   });
 });
