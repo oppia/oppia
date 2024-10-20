@@ -242,11 +242,13 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
       let start: number = value[1];
       let end: number = value[2];
-      if (start === 0 && end === 0) {
+      if (value[0] === '') {
+        this.updateRteErrorMessage(
+          'Please ensure that the Youtube URL or id is valid.'
+        );
         return;
       }
-
-      if (start >= end) {
+      if (start !== 0 && start >= end) {
         this.updateRteErrorMessage(
           'Please ensure that the start time of the video is earlier than ' +
             'the end time.'
