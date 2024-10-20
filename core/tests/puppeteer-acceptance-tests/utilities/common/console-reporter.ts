@@ -67,6 +67,13 @@ const CONSOLE_ERRORS_TO_IGNORE = [
       'the server responded with a status of 405 ()',
     'g'
   ),
+  // Error occurs due to third_party script which loads as expected
+  // everytime but only sometimes gives this error.
+  new RegExp(
+    'http://localhost:8181/third_party/generated/js/third_party.js ' +
+      'Failed to load resource: the server responded with a status ' +
+      'of 404 (Not Found)'
+  ),
   // Error occurs due to ExpressionChangedAfterItHasBeenCheckedError.
   // This can be removed after solving the issue #20189.
   new RegExp('ERROR CONTEXT JSHandle@object.*'),

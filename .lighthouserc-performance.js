@@ -165,15 +165,7 @@ module.exports = {
         {
           matchingUrlPattern: 'http://[^/]+/create/.*$',
           assertions: {
-            'errors-in-console': [
-              'error',
-              {
-                minScore: 1,
-                ignorePatterns: [
-                  'TypeError: angular.module\\(\\.\\.\\.\\)\\.directive\\(\\.\\.\\.\\)\\.animation is not a function',
-                ],
-              },
-            ],
+            'errors-in-console': ['error', {minScore: 1}],
             // TODO(#13465): Change this maxLength to 0 once images are migrated.
             'modern-image-formats': [
               'error',
