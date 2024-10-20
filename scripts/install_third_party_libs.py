@@ -167,9 +167,34 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
 
+def make_google_module_importable_by_python(google_module_path: str) -> None:
+    """Adds an empty __init__.py file to the google module if they do not
+    exist. This solves the bug mentioned below where namespace packages
+    sometimes install modules without __init__.py files (python requires
+    modules to have __init__.py files in order to recognize them as modules
+    and import them):
+    https://github.com/googleapis/python-ndb/issues/518
+
+    Args:
+        google_module_path: str. The path to the google module.
+    """
+    print(
+        'Checking that all google library modules contain __init__.py files...')
+    for path_list in os.walk(google_module_path):
+        root_path = path_list[0]
+        if not root_path.endswith('__pycache__'):
+            with utils.open_file(
+                os.path.join(root_path, '__init__.py'), 'a'):
+                # If the file doesn't exist, it is created. If it does exist,
+                # this open does nothing.
+                pass
+
+
 def main() -> None:
     """Install third-party libraries for Oppia."""
     if feconf.OPPIA_IS_DOCKERIZED:
+        make_google_module_importable_by_python(
+            google_module_path='/app/oppia/third_party/python_libs/google')
         return
 
     setup.main(args=[])
@@ -210,22 +235,13 @@ def main() -> None:
                 common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
             os.path.join(correct_google_path, 'pyglib'))
 
-    # The following for loop populates all of the google modules with
+    # The following function populates all of the google modules with
     # the correct __init__.py files if they do not exist. This solves the bug
     # mentioned below where namespace packages sometimes install modules without
     # __init__.py files (python requires modules to have __init__.py files in
     # in order to recognize them as modules and import them):
     # https://github.com/googleapis/python-ndb/issues/518
-    print(
-        'Checking that all google library modules contain __init__.py files...')
-    for path_list in os.walk(correct_google_path):
-        root_path = path_list[0]
-        if not root_path.endswith('__pycache__'):
-            with utils.open_file(
-                os.path.join(root_path, '__init__.py'), 'a'):
-                # If the file doesn't exist, it is created. If it does exist,
-                # this open does nothing.
-                pass
+    make_google_module_importable_by_python(correct_google_path)
 
     if common.is_windows_os():
         tweak_yarn_executable()

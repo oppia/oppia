@@ -26,35 +26,23 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.in
-            requirements.txt
-            requirements_dev.in
-            requirements_dev.txt
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
-      - name: Cache node modules and third_party/static
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: |
-            /home/runner/work/oppia/yarn_cache
-            /home/runner/work/oppia/oppia/third_party/static
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock', 'dependencies.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Initialze Containers
+        run: |
+          make build
+          sudo make run-devserver
+          make stop
       - name: Third Party Size Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.third_party_size_check
+        run: make run_tests.third_party_size_check
       - name: Run Lint Checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: PYTHONIOENCODING=utf-8 python -m scripts.linters.run_lint_checks --shard ${{ matrix.shard }} --verbose
+        run: make run_tests.lint PYTHON_ARGS="--shard ${{ matrix.shard }} --verbose"
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification

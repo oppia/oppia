@@ -25,31 +25,25 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
-      - name: Cache node modules and third_party/static
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: |
-            /home/runner/work/oppia/yarn_cache
-            /home/runner/work/oppia/oppia/third_party/static
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock', 'dependencies.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
-      - name: Install chrome
-        run: python -m scripts.install_chrome_for_ci
-      - name: Check that test files are captured in CI
-        run: python -m scripts.check_tests_are_captured_in_ci
+      - name: Install Chrome
+        uses: ./.github/actions/install-chrome
+      - name: Initialize Containers
+        run: |
+          make build
+          sudo make run-devserver
+          make stop
+      - name: Check that all e2e test files are captured in wdio.conf.js
+        run: make run_tests.check_tests_are_captured_in_ci
       - name: Run typescript tests
-        run: python -m scripts.run_typescript_checks
+        run: make run_tests.typescript
       - name: Run typescript tests in strict mode
-        run: python -m scripts.run_typescript_checks --strict_checks
+        run: make run_tests.typescript PYTHON_ARGS="--strict_checks"
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
