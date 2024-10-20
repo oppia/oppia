@@ -77,6 +77,8 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     story_node_jobs)
 from core.jobs.batch_jobs import manual_voice_artist_name_job        # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import voiceover_migration_job             # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
+    reject_invalid_suggestion_and_delete_invalid_translation_jobs)
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
