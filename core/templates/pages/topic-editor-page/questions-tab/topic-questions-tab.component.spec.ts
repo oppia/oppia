@@ -32,6 +32,7 @@ import {
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TopicQuestionsTabComponent} from './topic-questions-tab.component';
+import {QuestionsListComponent} from '../../../components/question-directives/questions-list/questions-list.component';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {Topic} from 'domain/topic/topic-object.model';
 
@@ -101,6 +102,7 @@ class MockTopicsAndSkillsDashboardBackendApiService {
 
 describe('Topic questions tab', () => {
   let component: TopicQuestionsTabComponent;
+  let questionsListComponent: QuestionsListComponent;
   let fixture: ComponentFixture<TopicQuestionsTabComponent>;
   let topicEditorStateService: TopicEditorStateService;
   let focusManagerService: FocusManagerService;
@@ -113,7 +115,7 @@ describe('Topic questions tab', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [TopicQuestionsTabComponent],
+      declarations: [TopicQuestionsTabComponent, QuestionsListComponent],
       providers: [
         TopicsAndSkillsDashboardBackendApiService,
         {
@@ -128,6 +130,10 @@ describe('Topic questions tab', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicQuestionsTabComponent);
     component = fixture.componentInstance;
+    const questionsListFixture = TestBed.createComponent(
+      QuestionsListComponent
+    );
+    questionsListComponent = questionsListFixture.componentInstance;
     qls = TestBed.inject(QuestionsListService);
     focusManagerService = TestBed.inject(FocusManagerService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
@@ -267,5 +273,30 @@ describe('Topic questions tab', () => {
     expect(component.allSkillSummaries).toEqual(allSkillSummaries);
     expect(component.topicRights).toEqual(topicRights);
     expect(component.topic).toBe(topic);
+  });
+
+  describe('should change drop-down to a heading when the questionEditor is opened', () => {
+    it('should return "Creating new" when creating a new question', () => {
+      spyOn(questionsListComponent, 'createQuestion').and.callThrough();
+      spyOn(topicEditorStateService, 'toggleQuestionEditor').and.callThrough();
+
+      questionsListComponent.createQuestion();
+      expect(topicEditorStateService.toggleQuestionEditor).toHaveBeenCalledWith(
+        true,
+        true
+      );
+      expect(component.getEditorAction()).toBe('Creating new');
+    });
+
+    it('should return "Editing" when editing a question', () => {
+      spyOn(questionsListComponent, 'openQuestionEditor').and.callThrough();
+      spyOn(topicEditorStateService, 'toggleQuestionEditor').and.callThrough();
+
+      questionsListComponent.openQuestionEditor();
+      expect(topicEditorStateService.toggleQuestionEditor).toHaveBeenCalledWith(
+        true
+      );
+      expect(component.getEditorAction()).toBe('Editing');
+    });
   });
 });
