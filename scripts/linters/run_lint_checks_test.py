@@ -119,7 +119,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             ['No files to check'], self.linter_stdout)
 
     def test_main_with_non_other_shard(self) -> None:
-        return True
         mock_shards = {
             '1': [
                 'a/',
@@ -149,7 +148,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             with self.install_swap, self.oppia_is_dockerized_swap:
                 with get_filenames_from_path_swap:
                     run_lint_checks.main(args=['--shard', '1'])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertFalse(True)
 
     def test_main_with_invalid_shards(self) -> None:
         def mock_get_filepaths_from_path(
@@ -288,13 +287,12 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_only_check_file_extensions_arg(self) -> None:
-        return True
         with self.print_swap, self.sys_swap:
             with self.install_swap, self.oppia_is_dockerized_swap:
                 run_lint_checks.main(
                     args=['--path=%s' % VALID_TS_FILEPATH,
                           '--only-check-file-extensions=ts'])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertFalse(True)
 
     def test_main_with_only_check_file_extensions_arg_with_js_ts_options(
         self
