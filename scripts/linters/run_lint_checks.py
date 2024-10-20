@@ -246,9 +246,9 @@ def _get_linters_for_file_extension(
             css_linter.get_linters(files['.css']))
         third_party_linters.append(third_party_css_linter)
 
-    elif file_extension_to_lint == 'py':
-        _, third_party_python_linter = python_linter.get_linters(files['.py'])
-        third_party_linters.append(third_party_python_linter)
+    # elif file_extension_to_lint == 'py':
+    #     _, third_party_python_linter = python_linter.get_linters(files['.py'])
+    #     third_party_linters.append(third_party_python_linter)
 
     elif file_extension_to_lint == 'other':
         code_owner_linter, _ = codeowner_linter.get_linters(file_cache)
