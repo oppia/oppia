@@ -1,5 +1,5 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
-  <div *ngIf="shouldRenderLessonInfoTooltip()" aria-live="assertive">
+  <div *ngIf="!iframed && shouldRenderLessonInfoTooltip()" aria-live="assertive">
     <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()" (keydown.enter)="learnerHasViewedLessonInfo()" tabindex="0"></div>
     <div class="lesson-info-tooltip lesson-info-tooltip-add-ons"
          [innerHTML]="'I18N_LESSON_INFO_TOOLTIP_MESSAGE' | translate">
