@@ -357,6 +357,10 @@ var StoryEditorPage = function () {
   };
 
   this.expectNumberOfChaptersToBe = async function (count) {
+    await waitFor.visibilityOf(
+      chapterTitle,
+      'Chapter Title Field takes too long to appear'
+    );
     var chapterTitles = await chapterTitlesSelector();
     expect(chapterTitles.length).toEqual(count);
   };
