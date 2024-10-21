@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -74,10 +73,3 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationTitleEditor',
-  downgradeComponent({
-    component: ExplorationTitleEditorComponent,
-  })
-);

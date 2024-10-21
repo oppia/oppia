@@ -74,6 +74,9 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/' +
     'can_access_collection_editor_page/<collection_id>';
 
+  EXPLORATION_EDITOR_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_exploration_editor_page/<exploration_id>';
+
   CLASSROOMS_PAGE_ACCESS_VALIDATION =
     '/access_validation_handler/can_access_classrooms_page';
 
@@ -84,6 +87,16 @@ export class AccessValidationBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  validateAccessToExplorationEditorPage(explorationId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.EXPLORATION_EDITOR_PAGE_ACCESS_VALIDATOR,
+      {
+        exploration_id: explorationId,
+      }
+    );
+    return this.http.get<void>(url).toPromise();
+  }
 
   validateAccessToStoryEditorPage(storyId: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
@@ -108,7 +121,6 @@ export class AccessValidationBackendApiService {
         story_url_fragment: storyUrlFragment,
       }
     );
-
     return this.http.get<void>(url).toPromise();
   }
 

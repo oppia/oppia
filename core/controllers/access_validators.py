@@ -528,6 +528,34 @@ class CollectionEditorAccessValidationPage(
         pass
 
 
+class ExplorationEditorAccessValidationHandlerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
+    """The editor page for a single exploration."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                   }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_play_exploration
+    def get(self, unused_exploration_id: str) -> None:
+        """Renders an exploration editor page.
+
+        Args:
+            unused_exploration_id: str. The unused exploration ID.
+        """
+        pass
+
+
 class StoryEditorAccessValidationHandlerPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
