@@ -420,15 +420,11 @@ export class ExplorationFooterComponent {
   }
 
   shouldRenderLessonInfoTooltip(): boolean {
-    const shouldRenderLessonInfoTooltip =
+    const lessonInfoTooltipShouldBeShown =
       !this.footerIsInQuestionPlayerMode &&
       !this.hasLearnerHasViewedLessonInfoTooltip() &&
       this.getMostRecentlyReachedCheckpointIndex() === 2;
-
-    if (shouldRenderLessonInfoTooltip) {
-      this.lessonInfoButton.nativeElement.focus();
-    }
-    return shouldRenderLessonInfoTooltip;
+    return lessonInfoTooltipShouldBeShown;
   }
 
   learnerHasViewedLessonInfo(): void {
