@@ -69,7 +69,7 @@ const CONSOLE_ERRORS_TO_IGNORE = [
   ),
   // Error occurs due to third_party script which loads as expected
   // everytime but only sometimes gives this error.
-  new RegExp(
+  escapeRegExp(
     'http://localhost:8181/third_party/generated/js/third_party.js ' +
       'Failed to load resource: the server responded with a status ' +
       'of 404 (Not Found)'
