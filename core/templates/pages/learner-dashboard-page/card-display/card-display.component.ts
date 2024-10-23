@@ -21,8 +21,8 @@ import {
   Input,
   ViewChild,
   HostListener,
-  AfterViewInit,
-  ChangeDetectorRef,
+  AfterContentInit,
+  NgZone,
 } from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -30,7 +30,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
 })
-export class CardDisplayComponent implements AfterViewInit {
+export class CardDisplayComponent implements AfterContentInit {
   @Input() headingI18n!: string;
   @Input() numCards!: number;
   @Input() tabType!: string;
@@ -47,21 +47,25 @@ export class CardDisplayComponent implements AfterViewInit {
 
   constructor(
     private I18nLanguageCodeService: I18nLanguageCodeService,
-    private cdr: ChangeDetectorRef
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
     this.isLanguageRTL = this.I18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  ngAfterViewInit(): void {
-    this.toggleButtonVisibility = this.isToggleButtonVisible();
-    this.cdr.detectChanges();
+  ngAfterContentInit(): void {
+    this.ngZone.onStable.subscribe(() => {
+      this.toggleButtonVisibility = this.isToggleButtonVisible();
+    });
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(): void {
     this.toggleButtonVisibility = this.isToggleButtonVisible();
+    if (!this.toggleButtonVisibility) {
+      this.currentToggleState = false;
+    }
   }
 
   getMaxShifts(width: number): number {
