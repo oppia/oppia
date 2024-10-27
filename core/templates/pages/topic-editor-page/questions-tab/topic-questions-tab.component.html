@@ -1,4 +1,9 @@
-<div class="select-skill-dropdown-container">
+<div class="question-editor-header-container" *ngIf="questionEditorOpened">
+  <mat-card class="oppia-page-card oppia-mobile-collapsible-card question-editor-header">
+    <h3>{{ getEditorAction() }} question for skill: {{ selectedSkillName }}</h3>
+  </mat-card>
+</div>
+<div class="select-skill-dropdown-container" *ngIf="!questionEditorOpened">
   <mat-form-field class="form-field e2e-test-select-skill-dropdown"
                   appearance="fill"
                   *ngIf="allSkillSummaries.length > 0">
@@ -42,6 +47,7 @@
     margin: 0 auto;
     width: 70%;
   }
+  .question-editor-header-container,
   .select-skill-dropdown-container {
     margin: 0 auto;
     width: 70%;
@@ -51,5 +57,13 @@
   }
   .question-list-container {
     margin-top: -30px;
+  }
+  @media screen and (max-width: 768px) {
+    .question-editor-header-container {
+      width: 100%;
+    }
+    .question-editor-header {
+      margin-bottom: 45px;
+    }
   }
 </style>
