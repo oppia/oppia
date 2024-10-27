@@ -1,6 +1,6 @@
 <div class="question-editor-container">
   <div *ngIf="editorIsOpen" class="question-editor-parent">
-    <mat-card class="oppia-page-card oppia-mobile-collapsible-card">
+    <mat-card class="oppia-page-card oppia-question-editor-page-card oppia-mobile-collapsible-card">
       <div class="difficulty-card-header oppia-mobile-collapsible-card-header" (click)="toggleDifficultyCard()">
         <h3>Difficulty</h3>
         <i class="fa fa-caret-down"
@@ -328,6 +328,10 @@
   }
   .list-group {
     gap: 10px;
+  }
+  .oppia-question-editor-page-card {
+    margin-bottom: 0;
+    margin-top: 0;
   }
   @media screen and (max-width: 768px) {
     .question-editor-container {
