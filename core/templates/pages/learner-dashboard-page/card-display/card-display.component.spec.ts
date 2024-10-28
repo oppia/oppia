@@ -61,7 +61,7 @@ describe('CardDisplayComponent', () => {
     TestBed.inject(TranslateService);
 
     component.numCards = 5;
-    component.tabType = 'progress';
+    component.controlType = 'toggle';
     component.headingI18n = 'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION';
     component.isLanguageRTL = false;
     component.toggleButtonVisibility = false;
@@ -312,17 +312,17 @@ describe('CardDisplayComponent', () => {
     });
   });
 
-  it('should return empty string for getVisibility if tabType is not progress', () => {
-    component.tabType = 'home';
+  it('should return empty string for getVisibility if controlType is arrow', () => {
+    component.controlType = 'arrow';
     fixture.detectChanges();
     expect(component.getVisibility()).toEqual('');
   });
 
-  it('should return hidden class for getVisibility if tabType is progress', () => {
+  it('should return hidden class for getVisibility if controlType is toggle', () => {
     expect(component.getVisibility()).toEqual('card-display-content-hidden');
   });
 
-  it('should return shown class for getVisibility after toggling if tabType is progress', () => {
+  it('should return shown class for getVisibility after toggling if controlType is toggle', () => {
     expect(component.currentToggleState).toBeFalse();
 
     fixture.whenRenderingDone().then(() => {
@@ -340,13 +340,13 @@ describe('CardDisplayComponent', () => {
     });
   });
 
-  it('should return false for isToggleButtonVisible if tabType is not progress', () => {
-    component.tabType = 'home';
+  it('should return false for isToggleButtonVisible if controlType is arrow', () => {
+    component.controlType = 'arrow';
     fixture.detectChanges();
     expect(component.isToggleButtonVisible()).toBeFalse();
   });
 
-  it('should return false for isToggleButtonVisible if tabType is progress and all the cards fit', () => {
+  it('should return false for isToggleButtonVisible if controlType is toggle and all the cards fit', () => {
     offsetWidthGetterSpy.and.returnValue(600);
     component.numCards = 2;
     fixture.detectChanges();
@@ -354,7 +354,7 @@ describe('CardDisplayComponent', () => {
     expect(component.isToggleButtonVisible()).toBeFalse();
   });
 
-  it('should return true for isToggleButtonVisible if tabType is progress and all the cards do not fit', () => {
+  it('should return true for isToggleButtonVisible if controlType is toggle and all the cards do not fit', () => {
     expect(component.isToggleButtonVisible()).toBeTrue();
   });
 
@@ -387,5 +387,58 @@ describe('CardDisplayComponent', () => {
     expect(component.onResize).toHaveBeenCalled();
     expect(component.isToggleButtonVisible).toHaveBeenCalled();
     expect(component.toggleButtonVisibility).toBeTrue();
+  });
+
+  it('should return false for isArrowButtonVisible if controlType is arrow', () => {
+    component.controlType = 'arrow';
+    fixture.detectChanges();
+    expect(component.isArrowButtonVisible()).toBeTrue();
+  });
+
+  it('should return false for isArrowButtonVisible if controlType is arrow and all the cards fit', () => {
+    component.controlType = 'arrow';
+    offsetWidthGetterSpy.and.returnValue(600);
+    component.numCards = 2;
+    fixture.detectChanges();
+
+    expect(component.isArrowButtonVisible()).toBeFalse();
+  });
+
+  it('should return true for isArrowButtonVisible if controlType is arrow and all the cards do not fit', () => {
+    component.controlType = 'arrow';
+    expect(component.isArrowButtonVisible()).toBeTrue();
+  });
+
+  it('should resize and be able to fit number of cards, hiding arrow buttons', () => {
+    component.controlType = 'arrow';
+    component.numCards = 3;
+    offsetWidthGetterSpy.and.returnValue(1000);
+
+    spyOn(component, 'isArrowButtonVisible').and.callThrough();
+    spyOn(component, 'onResize').and.callThrough();
+    window.dispatchEvent(new Event('resize'));
+    fixture.detectChanges();
+
+    expect(component.onResize).toHaveBeenCalled();
+    expect(component.isArrowButtonVisible).toHaveBeenCalled();
+    expect(component.arrowButtonVisibility).toBeFalse();
+  });
+
+  it('should resize to smaller screen and be no longer able to fit cards, showing arrow buttons', () => {
+    component.controlType = 'arrow';
+    component.numCards = 3;
+    component.arrowButtonVisibility = false;
+    offsetWidthGetterSpy.and.returnValue(1000);
+    fixture.detectChanges();
+
+    offsetWidthGetterSpy.and.returnValue(500);
+    spyOn(component, 'isArrowButtonVisible').and.callThrough();
+    spyOn(component, 'onResize').and.callThrough();
+    window.dispatchEvent(new Event('resize'));
+    fixture.detectChanges();
+
+    expect(component.onResize).toHaveBeenCalled();
+    expect(component.isArrowButtonVisible).toHaveBeenCalled();
+    expect(component.arrowButtonVisibility).toBeTrue();
   });
 });

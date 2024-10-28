@@ -48,6 +48,10 @@ export class HomeTabComponent {
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() username!: string;
   @Input() redesignFeatureFlag!: boolean;
+  @Input() totalLessonsInPlaylists!: (
+    | LearnerExplorationSummary
+    | CollectionSummary
+  )[];
   currentGoalsLength!: number;
   classroomUrlFragment!: string;
   goalTopicsLength!: number;

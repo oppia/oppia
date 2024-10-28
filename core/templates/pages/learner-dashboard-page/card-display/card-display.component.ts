@@ -33,7 +33,8 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 export class CardDisplayComponent implements AfterContentInit {
   @Input() headingI18n!: string;
   @Input() numCards!: number;
-  @Input() tabType!: string;
+  @Input() controlType: string = 'arrow';
+  @Input() displayMaxWidth: string = '100%';
   @Input() cardWidth: number = 232;
 
   @ViewChild('cards', {static: false}) cards!: ElementRef;
@@ -44,6 +45,7 @@ export class CardDisplayComponent implements AfterContentInit {
   isLanguageRTL: boolean = false;
   currentToggleState: boolean = false;
   toggleButtonVisibility: boolean = false;
+  arrowButtonVisibility: boolean = false;
 
   constructor(
     private I18nLanguageCodeService: I18nLanguageCodeService,
@@ -57,12 +59,14 @@ export class CardDisplayComponent implements AfterContentInit {
   ngAfterContentInit(): void {
     this.ngZone.onStable.subscribe(() => {
       this.toggleButtonVisibility = this.isToggleButtonVisible();
+      this.arrowButtonVisibility = this.isArrowButtonVisible();
     });
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(): void {
     this.toggleButtonVisibility = this.isToggleButtonVisible();
+    this.arrowButtonVisibility = this.isArrowButtonVisible();
     if (!this.toggleButtonVisibility) {
       this.currentToggleState = false;
     }
@@ -111,7 +115,7 @@ export class CardDisplayComponent implements AfterContentInit {
   }
 
   getVisibility(): string {
-    if (!this.tabType.includes('progress')) {
+    if (this.controlType === 'arrow') {
       return '';
     }
     return this.currentToggleState
@@ -120,7 +124,7 @@ export class CardDisplayComponent implements AfterContentInit {
   }
 
   isToggleButtonVisible(): boolean {
-    if (this.tabType.includes('home')) {
+    if (this.controlType === 'arrow') {
       return false;
     }
 
@@ -128,6 +132,20 @@ export class CardDisplayComponent implements AfterContentInit {
       this.cards &&
       this.cards.nativeElement &&
       this.numCards * this.cardWidth - 16 > this.cards.nativeElement.offsetWidth
+    );
+  }
+
+  isArrowButtonVisible(): boolean {
+    if (this.controlType === 'toggle') {
+      return false;
+    }
+
+    return (
+      this.cards &&
+      this.cards.nativeElement &&
+      this.numCards > 1 &&
+      (this.numCards - 1) * this.cardWidth + (this.cardWidth - 32) >
+        this.cards.nativeElement.offsetWidth
     );
   }
 }

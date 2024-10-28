@@ -63,7 +63,6 @@ export class CommunityLessonsTabComponent {
   @Input() subscriptionsList!: ProfileSummary[];
   @Input() completedToIncompleteCollections!: string[];
   @Input() learnerDashboardRedesignFeatureFlag!: boolean;
-  @Input() username!: string;
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntTopicsList!: LearnerTopicSummary[];
   selectedSection!: string;

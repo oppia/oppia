@@ -1107,6 +1107,45 @@ describe('Learner dashboard page', () => {
       })
     );
 
+    it('should return home greeting when current tab is set to home', () => {
+      component.activeSection = 'I18N_LEARNER_DASHBOARD_HOME_SECTION';
+      fixture.detectChanges();
+
+      expect(component.getDashboardTabHeading()).toBe(
+        'I18N_LEARNER_DASHBOARD_HOME_SECTION_HEADING'
+      );
+    });
+
+    it('should return goal greeting when current tab is set to goals', () => {
+      component.activeSection = 'I18N_LEARNER_DASHBOARD_GOALS_SECTION';
+      fixture.detectChanges();
+
+      expect(component.getDashboardTabHeading()).toBe(
+        'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING'
+      );
+    });
+
+    // TODO(#18384): Change community-lessons to progress.
+    it('should return progress greeting when current tab is set to progress', () => {
+      component.activeSection =
+        'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION';
+      fixture.detectChanges();
+
+      expect(component.getDashboardTabHeading()).toBe(
+        'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING'
+      );
+    });
+
+    // TODO(#18384): Change community-lessons to progress.
+    it('should return default greeting when current tab is not valid', () => {
+      component.activeSection = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      fixture.detectChanges();
+
+      expect(component.getDashboardTabHeading()).toBe(
+        'No valid I18N key for heading of I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION'
+      );
+    });
+
     it('should unsubscribe upon component destruction', () => {
       spyOn(component.directiveSubscriptions, 'unsubscribe');
 
