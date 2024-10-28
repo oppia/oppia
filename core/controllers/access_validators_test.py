@@ -111,6 +111,51 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
+class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Checks the access to the blog home page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+
+    def test_any_user_can_access_topic_viewer_page(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_classroom'
+            }, csrf_token=csrf_token)
+        self.logout()
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_viewer_page/%s/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'fraction'),
+            expected_status_int=200)
+
+    def test_accessibility_of_unpublished_topic_viewer_page(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1', 'private_topic_name',
+            'private_topic_name', 'description', 'fragm')
+        topic.thumbnail_filename = 'Image.svg'
+        topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic.url_fragment = 'private'
+        topic_services.save_new_topic(self.admin_id, topic)
+
+        self.get_json(
+            '%s/can_access_topic_viewer_page/staging/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'private'),
+            expected_status_int=404)
+        self.logout()
+
+
 class CollectionViewerPageAccessValidationHandlerTests(
         test_utils.GenericTestBase):
     """Test for collection page access validation."""

@@ -214,6 +214,7 @@ import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-pa
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { EmailDashboardDataService } from 'pages/email-dashboard-pages/email-dashboard-data.service';
+import { TopicViewerAccessGuard } from 'pages/topic-viewer-page/topic-viewer-page-auth.guard';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -879,6 +880,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TopicCreationService', TopicCreationService],
   ['TopicEditorRoutingService', TopicEditorRoutingService],
   ['TopicEditorStateService', TopicEditorStateService],
+  ['TopicViewerAccessGuard', TopicViewerAccessGuard],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
   ['TopicUpdateService', TopicUpdateService],

@@ -5734,8 +5734,9 @@ class TopicViewerTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_access_topic_viewer_page
-        def get(self, unused_topic_name: str) -> None:
-            self.render_template('topic-viewer-page.mainpage.html')
+        def get(self, _: str) -> None:
+            """Handles GET requests."""
+            pass
 
     def setUp(self) -> None:
         super().setUp()
@@ -5786,13 +5787,6 @@ class TopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_topic_data/staging/topic',
-                expected_status_int=200)
-
-    def test_can_access_topic_when_all_url_fragments_are_valid(self) -> None:
-        topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_html_response(
-                '/mock_topic_page/staging/topic',
                 expected_status_int=200)
 
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(
