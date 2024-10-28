@@ -587,6 +587,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
                 this.questionUndoRedoService.clearChanges();
                 this.editorIsOpen = false;
                 this.questionIsBeingSaved = false;
+                this.questionsListService.resetPageNumber();
                 this.questionsListService.getQuestionSummariesAsync(
                   this.selectedSkillId,
                   true,
