@@ -203,6 +203,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
     pathMatch: 'full',
+    canActivate: [IsLoggedInGuard],
     loadChildren: () =>
       import('pages/delete-account-page/delete-account-page.module').then(
         m => m.DeleteAccountPageModule
@@ -228,6 +229,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
     pathMatch: 'full',
+    canActivate: [IsLoggedInGuard],
     loadChildren: () =>
       import('pages/feedback-updates-page/feedback-updates-page.module').then(
         m => m.FeedbackUpdatesPageModule
