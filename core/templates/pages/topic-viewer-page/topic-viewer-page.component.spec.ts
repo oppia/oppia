@@ -24,7 +24,7 @@ import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 
-import {TopicViewerPageComponent} from 'pages/topic-viewer-page/topic-viewer-page.component';
+import {TopicViewerPageComponent} from './topic-viewer-page.component';
 import {AlertsService} from 'services/alerts.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
