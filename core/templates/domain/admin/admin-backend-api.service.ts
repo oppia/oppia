@@ -339,12 +339,6 @@ export class AdminBackendApiService {
     });
   }
 
-  async publishChaptersAsync(): Promise<void> {
-    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'publish_chapters_of_length_and_measurement_topic',
-    });
-  }
-
   // Admin Misc Tab Services.
   async clearSearchIndexAsync(): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL);
