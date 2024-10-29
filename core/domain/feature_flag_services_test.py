@@ -604,10 +604,10 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         (user_1_id, user_2_id, user_3_id) = (
             self._signup_multiple_users_and_return_ids())
         user_models.UserGroupModel(
-            id=self.USER_GROUP_1, users=[
+            id=self.USER_GROUP_1, name='USER_GROUP_1', user_ids=[
                 user_1_id, user_2_id, user_3_id]).put()
         user_models.UserGroupModel(
-            id=self.USER_GROUP_2, users=[
+            id=self.USER_GROUP_2, name='USER_GROUP_2', user_ids=[
                 user_1_id, user_2_id]).put()
         swap_name_to_description_feature_stage_registry_dict = (
             self._swap_name_to_description_feature_stage_registry())

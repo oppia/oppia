@@ -25,6 +25,7 @@ from core.controllers import base
 from core.domain import caching_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_services as feature_services
+from core.domain import user_services
 
 from typing import Dict, List, TypedDict
 
@@ -56,6 +57,117 @@ class MemoryCacheHandler(
         """Flushes the memory cache."""
         caching_services.flush_memory_caches()
         self.render_json({})
+
+
+class UserGroupHandlerNormalizePayloadDict(TypedDict):
+    """Dict representation of UserGroupHandler's normalized_payload
+    dictionary.
+    """
+
+    user_group_id: str
+    name: str
+    member_usernames: List[str]
+
+
+class UserGroupHandler(
+    base.BaseHandler[
+        UserGroupHandlerNormalizePayloadDict,
+        Dict[str, str]
+    ]
+):
+    """Handler for user groups."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'member_usernames': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        },
+        'PUT': {
+            'user_group_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'member_usernames': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        },
+        'DELETE': {
+            'user_group_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_release_coordinator_page
+    def get(self) -> None:
+        """Populates the data for user groups."""
+        user_groups = user_services.get_all_user_groups()
+        user_groups_dict_list = []
+        for user_group in user_groups:
+            user_groups_dict_list.append(user_group.to_dict())
+
+        self.render_json({
+            'user_group_dicts': user_groups_dict_list
+        })
+
+    @acl_decorators.can_access_release_coordinator_page
+    def post(self) -> None:
+        """Performs series of action based on action parameter for user
+        groups.
+        """
+        assert self.normalized_payload is not None
+        name = self.normalized_payload['name']
+        member_usernames = self.normalized_payload['member_usernames']
+        user_group = user_services.create_new_user_group(
+            name, member_usernames)
+        self.render_json({'user_group_dict': user_group.to_dict()})
+
+    @acl_decorators.can_access_release_coordinator_page
+    def put(self) -> None:
+        """Updates the specified user group."""
+        assert self.normalized_payload is not None
+
+        user_group_id = self.normalized_payload['user_group_id']
+        name = self.normalized_payload['name']
+        member_usernames = self.normalized_payload['member_usernames']
+        user_services.update_user_group(
+            user_group_id, name, member_usernames)
+        self.render_json(self.values)
+
+    @acl_decorators.can_access_release_coordinator_page
+    def delete(self) -> None:
+        """Performs deletion on the specified user group."""
+        assert self.normalized_request is not None
+        user_group_id = self.normalized_request['user_group_id']
+        user_services.delete_user_group(user_group_id)
+        self.render_json(self.values)
 
 
 class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):

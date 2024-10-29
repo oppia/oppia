@@ -85,7 +85,6 @@
   </ng-container>
 
   <div *ngIf="redesignFeatureFlag">
-    <p class="oppia-learner-dash-greeting mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
     <div class="oppia-learner-dash-section" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
       <p class="oppia-learner-dash-section-heading">
         {{ (continueWhereYouLeftOffList.length !== 0 ?
@@ -97,18 +96,16 @@
       </p>
       <div class="d-flex flex-wrap justify-content-between w-100">
         <!--TODO(#18384): Replace with all lessons in progress data (only contains classroom cards); affects ngIf, numCards, ng-content-->
-        <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" [numCards]="1" [tabType]="'home'">
+        <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" [numCards]="1" [displayMaxWidth]="'fit-content'">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
-              <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [displayArea]="'homeTab'"
-                [topicName]="topicSummaryTile.name">
-              </oppia-learner-story-summary-tile>
+              <lesson-card [story]="storySummaryTile" [topic]="topicSummaryTile.name"> </lesson-card>
             </ng-container>
           </ng-container>
         </oppia-card-display>
         <!--TODO(#18384): Replace with recommended lessons data (placeholder with explorations); affects numCards and ng-content-->
         <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
-        <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
+        <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="incompleteExplorationsList.length" [displayMaxWidth]="'fit-content'">
           <ng-container *ngFor="let lesson of incompleteExplorationsList">
             <lesson-card [story]="lesson"></lesson-card>
           </ng-container>
@@ -120,7 +117,7 @@
       <!--TODO(#18384): Add search bar -->
       <!--TODO(#18384): Replace with classroom topic data, only untracked topics at the moment; affects heading-->
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
-        <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION'" [numCards]="item.value.length" [tabType]="'homeFull'" [cardWidth]="226">
+        <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION'" [numCards]="item.value.length" [cardWidth]="226">
           <ng-container *ngFor="let topicSummaryTile of item.value">
             <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
             </oppia-learner-topic-summary-tile>
@@ -129,8 +126,8 @@
         <oppia-classroom-button [classroom]="item.key" [variant]="'blue'"></oppia-classroom-button>
       </ng-container>
        <!--TODO(#18384): Replace with saved lessons data (placeholder with explorations); affects numCards and ng-content-->
-      <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [tabType]="'homeFull'" [numCards]="incompleteExplorationsList.length">
-        <ng-container *ngFor="let lesson of incompleteExplorationsList">
+      <oppia-card-display *ngIf="totalLessonsInPlaylists.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [numCards]="totalLessonsInPlaylists.length">
+        <ng-container *ngFor="let lesson of totalLessonsInPlaylists">
           <lesson-card [story]="lesson"></lesson-card>
         </ng-container>
       </oppia-card-display>

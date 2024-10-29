@@ -172,6 +172,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
+  totalLessonsInPlaylists: (LearnerExplorationSummary | CollectionSummary)[] =
+    [];
 
   constructor(
     private alertsService: AlertsService,
@@ -552,6 +554,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           this.loaderService.hideLoadingScreen();
           this.communityLessonsDataLoaded = true;
+          this.totalLessonsInPlaylists = [
+            ...this.explorationPlaylist,
+            ...this.collectionPlaylist,
+          ];
           // So that focus is applied after the loading screen has dissapeared.
           this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
         }, 0);
@@ -559,5 +565,23 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       .catch(errorResponse => {
         // This is placed here in order to satisfy Unit tests.
       });
+  }
+
+  getDashboardTabHeading(): string {
+    switch (this.activeSection) {
+      // TODO(#18384): Change community-lessons to progress.
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .HOME:
+        return 'I18N_LEARNER_DASHBOARD_HOME_SECTION_HEADING';
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .COMMUNITY_LESSONS:
+        return 'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING';
+      // TODO(#18384): I18N key is in en.json & qqq.json after #21143.
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .GOALS:
+        return 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING';
+      default:
+        return `No valid I18N key for heading of ${this.activeSection}`;
+    }
   }
 }

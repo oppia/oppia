@@ -1,6 +1,6 @@
 <div class="question-editor-container">
   <div *ngIf="editorIsOpen" class="question-editor-parent">
-    <mat-card class="oppia-page-card oppia-mobile-collapsible-card">
+    <mat-card class="oppia-page-card oppia-question-editor-page-card oppia-mobile-collapsible-card">
       <div class="difficulty-card-header oppia-mobile-collapsible-card-header" (click)="toggleDifficultyCard()">
         <h3>Difficulty</h3>
         <i class="fa fa-caret-down"
@@ -64,7 +64,7 @@
           <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
                (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
             <div class="question-data e2e-test-edit-question-button">
-              <oppia-rte-output-display class="e2e-test-question-text" classStr="question-text"
+              <oppia-rte-output-display class="e2e-test-question-text question-text"
                             [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
               </oppia-rte-output-display>
               <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())"
@@ -214,6 +214,7 @@
     cursor: pointer;
     display: flex;
     flex-wrap: wrap;
+    gap: 4px;
     justify-content: space-between;
   }
   .create-question-header {
@@ -221,7 +222,8 @@
     margin: 0;
   }
   .question-text {
-    width: 90%;
+    flex: 1;
+    max-width: 90%;
   }
   .page-navigation-arrows {
     float: right;
@@ -326,6 +328,10 @@
   }
   .list-group {
     gap: 10px;
+  }
+  .oppia-question-editor-page-card {
+    margin-bottom: 0;
+    margin-top: 0;
   }
   @media screen and (max-width: 768px) {
     .question-editor-container {

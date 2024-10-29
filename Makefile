@@ -81,6 +81,7 @@ install_hooks:  ## Install required hooks
 	bash ./docker/pre_commit_hook.sh --install
 
 clean: ## Cleans the docker containers and volumes.
+	docker rm $$(docker ps -aq --filter "ancestor=oppia-dev-server") || true
 	docker compose down --rmi all --volumes
 
 shell.%: ## Opens a shell in the given docker service. Example: make shell.datastore
@@ -96,6 +97,8 @@ stop.%: ## Stops the given docker service. Example: make stop.datastore
 update.requirements: ## Installs the python requirements for the project
 	${SHELL_PREFIX} dev-server pip install -r requirements.txt
 	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
+# Following script fixed issue with google module not being importable
+	${SHELL_PREFIX} dev-server python -m docker.fix_google_module
 
 update.package: ## Installs the npm requirements for the project
 # TODO(#18260): Permanently change the yarn configurations in `.yarnrc` when permanently moving to Docker Setup.
@@ -130,19 +133,19 @@ logs.%: ## Shows the logs of the given docker service. Example: make logs.datast
 restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
-run_tests.prettier: ## Formats the code using prettier.
+run_tests.prettier: ## Runs the prettier checks
 	docker compose run --no-deps --entrypoint "npx prettier --check ." dev-server
 
 run_tests.third_party_size_check: ## Runs the third party size check
 	docker compose run --no-deps --entrypoint "python -m scripts.third_party_size_check" dev-server
 
 run_tests.lint: ## Runs the linter tests
-	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server
 
 run_tests.backend: ## Runs the backend tests
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
-	docker compose up datastore dev-server redis firebase -d --no-deps || $(MAKE) stop
+	docker compose up datastore dev-server redis firebase -d --no-deps 
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
@@ -158,19 +161,19 @@ run_tests.check_overall_backend_test_coverage: ## Runs the check for overall bac
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
 
 run_tests.typescript: ## Runs the typescript checks
-	docker compose run --no-deps --entrypoint "python -m scripts.run_typescript_checks $(PYTHON_ARGS)" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "python -m scripts.run_typescript_checks $(PYTHON_ARGS)" dev-server
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server
 
 run_tests.mypy: ## Runs mypy checks
-	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server
 
 run_tests.check_backend_associated_tests: ## Runs the backend associate tests
-	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server
 
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 ## Flag for Acceptance tests
@@ -227,7 +230,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG:-false} || $(MAKE) stop
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG:-false}
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'

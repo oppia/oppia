@@ -115,8 +115,9 @@
       </mat-card>
     </div>
     <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dash-tab overflow-hidden px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
-      <div class="d-flex w-100"
+      <div class="d-flex flex-column w-100"
            [ngClass]="{'oppia-learner-dashboard-main-content-container pl-5': !windowIsNarrow && !isShowRedesignedLearnerDashboardActive(), 'justify-content-center': windowIsNarrow}">
+        <p class="oppia-learner-dash-greeting mt-4"> {{ getDashboardTabHeading() | translate: {username: username} }} </p>
         <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
@@ -126,6 +127,7 @@
                           [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                           [untrackedTopics]="untrackedTopics"
                           [username]="username"
+                          [totalLessonsInPlaylists]="totalLessonsInPlaylists"
                           (setActiveSection)="setActiveSection($event)">
           </oppia-home-tab>
         </div>
@@ -166,9 +168,10 @@
                                        [explorationPlaylist]="explorationPlaylist"
                                        [collectionPlaylist]="collectionPlaylist"
                                        [subscriptionsList]="subscriptionsList"
+                                       [partiallyLearntTopicsList]="partiallyLearntTopicsList"
+                                       [learntTopicsList]="learntTopicsList"
                                        [completedToIncompleteCollections]="completedToIncompleteCollections"
-                                       [learnerDashboardRedesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
-                                       [username]="username">
+                                       [learnerDashboardRedesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
           </oppia-community-lessons-tab>
         </div>
       </div>

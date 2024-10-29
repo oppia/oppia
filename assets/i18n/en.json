@@ -925,6 +925,7 @@
     "I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION": "Recommended for you",
     "I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION": "Lesson you saved for later",
     "I18N_LEARNER_DASHBOARD_HOME_SECTION": "Home",
+    "I18N_LEARNER_DASHBOARD_HOME_SECTION_HEADING": "Welcome, <[username]>!",
     "I18N_LEARNER_DASHBOARD_INCOMPLETE": "Incomplete",
     "I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "In Progress",
     "I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE": "It looks like you haven't tried any of our explorations yet.",

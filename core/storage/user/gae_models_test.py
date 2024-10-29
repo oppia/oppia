@@ -2601,9 +2601,12 @@ class UserGroupModelTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         user_models.UserGroupModel(
-            id=self.USER_GROUP_1, users=[self.USER_1_ID, self.USER_2_ID]).put()
+            name=self.USER_GROUP_1,
+            user_ids=[self.USER_1_ID, self.USER_2_ID]
+        ).put()
         user_models.UserGroupModel(
-            id=self.USER_GROUP_2, users=[self.USER_2_ID, self.USER_3_ID]).put()
+            name=self.USER_GROUP_2,
+            user_ids=[self.USER_2_ID, self.USER_3_ID]).put()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -2620,7 +2623,8 @@ class UserGroupModelTests(test_utils.GenericTestBase):
             user_models.UserGroupModel.get_export_policy(), {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'users': base_models.EXPORT_POLICY.EXPORTED,
+                'name': base_models.EXPORT_POLICY.EXPORTED,
+                'user_ids': base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )
@@ -2629,7 +2633,7 @@ class UserGroupModelTests(test_utils.GenericTestBase):
         user_models.UserGroupModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserGroupModel.query(
-                user_models.UserGroupModel.users == self.USER_1_ID
+                user_models.UserGroupModel.user_ids == self.USER_1_ID
             ).get()
         )
         # Test that calling apply_deletion_policy with no existing model
@@ -2660,15 +2664,22 @@ class UserGroupModelTests(test_utils.GenericTestBase):
     def test_export_data_nontrivial(self) -> None:
         user_data = user_models.UserGroupModel.export_data(
             self.USER_2_ID)
-        test_data = {
-            self.USER_GROUP_1: {
-                'users': self.USER_2_ID,
-            },
-            self.USER_GROUP_2: {
-                'users': self.USER_2_ID,
-            }
+        user_data_keys = list(user_data.keys())
+
+        expected_data_for_key_1 = {
+            'name': self.USER_GROUP_1,
+            'user_ids': self.USER_2_ID
         }
-        self.assertEqual(user_data, test_data)
+
+        expected_data_for_key_2 = {
+            'name': self.USER_GROUP_2,
+            'user_ids': self.USER_2_ID
+        }
+
+        self.assertEqual(
+            user_data[user_data_keys[0]], expected_data_for_key_1)
+        self.assertEqual(
+            user_data[user_data_keys[1]], expected_data_for_key_2)
 
 
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):

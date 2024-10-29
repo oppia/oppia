@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import newChapterConstants from 'assets/constants';
@@ -227,10 +226,3 @@ export class NewChapterTitleModalComponent implements OnInit {
     this.updateExplorationId();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNewChapterTitleModal',
-  downgradeComponent({
-    component: NewChapterTitleModalComponent,
-  }) as angular.IDirectiveFactory
-);
