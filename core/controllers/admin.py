@@ -256,7 +256,6 @@ class AdminHandler(
                         'generate_dummy_explorations',
                         'generate_dummy_translation_opportunities',
                         'clear_search_index',
-                        'publish_chapters_of_length_and_measurement_topic',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
@@ -525,11 +524,6 @@ class AdminHandler(
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
                 search_services.clear_blog_post_summaries_search_index()
-            elif action == 'publish_chapters_of_length_and_measurement_topic':
-                # This is the real topic_id and story_id
-                # of the length and measurement topic.
-                topic_services.publish_story(
-                    'bdO7c687WBBW', 'OVJ4RdjxbcAf', self.user_id)
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':

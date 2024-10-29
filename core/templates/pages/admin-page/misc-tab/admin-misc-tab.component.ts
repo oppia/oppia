@@ -67,25 +67,6 @@ export class AdminMiscTabComponent {
     private windowRef: WindowRef
   ) {}
 
-  publishChaptersOfLengthAndMeasurementTopic(): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-
-    this.setStatusMessage.emit('Publishing chapters...');
-    this.adminTaskManagerService.startTask();
-    this.adminBackendApiService.publishChaptersAsync().then(
-      () => {
-        this.setStatusMessage.emit('Chapters published successfully.');
-        this.adminTaskManagerService.finishTask();
-      },
-      errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-        this.adminTaskManagerService.finishTask();
-      }
-    );
-  }
-
   clearSearchIndex(): void {
     if (
       this.adminTaskManagerService.isTaskRunning() ||
