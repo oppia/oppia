@@ -22,10 +22,10 @@ jobs:
           fetch-depth: 0
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
-      - name: Setup Python 3.8 with pip cache
+      - name: Setup Python 3.9.20 with pip cache
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8.15'
+          python-version: '3.9.20'
           architecture: 'x64'
           cache: 'pip'
           cache-dependency-path: |

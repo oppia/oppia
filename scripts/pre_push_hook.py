@@ -39,8 +39,17 @@ import sys
 from types import TracebackType
 from typing import Final, List, Optional, Type
 
-# `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
-# the current working directory so that Git knows where to find python_utils.
+# When executing Python scripts using `python -m ...` from oppia/oppia,
+# Python adds the repository root to sys.path. See the documentation at
+#
+#   https://docs.python.org/3.9/library/sys.html#sys.path
+#
+# However, when git executes pre_push_hook.py from its symlink in
+# /.git/hooks, the shebang #!/usr/bin/env python at the top of this file
+# causes the python interpreter to execute this hook directly rather than
+# as a discovered module. So, Python instead adds /.git/hooks to sys.path,
+# rather than the opipa/oppia root. To correct this problem, we add the
+# current working directory to sys.path.
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import install_python_prod_dependencies # isort:skip  # pylint: disable=wrong-import-position
