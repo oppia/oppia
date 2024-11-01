@@ -25,6 +25,7 @@ import copy
 import datetime
 import functools
 import inspect
+import io
 import itertools
 import json
 import logging
@@ -33,7 +34,6 @@ import os
 import random
 import re
 import string
-from types import TracebackType
 import unittest
 
 from core import feature_flag_list
@@ -87,9 +87,9 @@ from scripts import common
 import elasticsearch
 import requests_mock
 from typing import (
-    IO, Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
-    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set, Tuple,
-    Type, TypedDict, TypeVar, Union, cast, overload
+    Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
+    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set,
+    Tuple, Type, TypedDict, TypeVar, Union, cast, overload
 )
 import webapp2
 import webtest
@@ -1505,93 +1505,24 @@ class TestBase(unittest.TestCase):
         """
         captured_logs: List[str] = []
 
-        class ListStream(IO[str]):
+        class ListStream(io.StringIO):
             """Stream-like object that appends writes to the captured logs."""
 
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with IO's write().
-            def write(self, msg: str) -> None:  # type: ignore[override]
-                """Appends stripped messages to captured logs."""
+            def write(self, msg: str) -> int:
+                """Appends stripped messages to captured logs.
+
+                Args:
+                    msg: str. The string to be written.
+
+                Returns:
+                    int. The length of the written string in bytes.
+                """
                 captured_logs.append(msg.strip())
+                return len(msg.strip())
 
             def flush(self) -> None:
                 """Does nothing."""
                 pass
-
-            # Here, class ListStream inherits from IO and making an instance
-            # below but due to the absence of some methods MyPy throws an error
-            # that 'Cannot instantiate abstract class 'ListStream' with abstract
-            # attributes'. So, to suppress the error, we defined all the methods
-            # that was present in super class. Since these are just added for
-            # type checking, we don't need to test them and so have excluded
-            # them from the coverage checks.
-            @property
-            def mode(self) -> str:
-                pass  # pragma: no cover
-
-            @property
-            def name(self) -> str:
-                pass  # pragma: no cover
-
-            def close(self) -> None:
-                pass  # pragma: no cover
-
-            @property
-            def closed(self) -> bool:
-                pass  # pragma: no cover
-
-            def fileno(self) -> int:
-                pass  # pragma: no cover
-
-            def isatty(self) -> bool:
-                pass  # pragma: no cover
-
-            def read(self, n: int = -1) -> str:
-                pass  # pragma: no cover
-
-            def readable(self) -> bool:
-                pass  # pragma: no cover
-
-            def readline(self, limit: int = -1) -> str:
-                pass  # pragma: no cover
-
-            def readlines(self, hint: int = -1) -> List[str]:
-                pass  # pragma: no cover
-
-            def seek(self, offset: int, whence: int = 0) -> int:
-                pass  # pragma: no cover
-
-            def seekable(self) -> bool:
-                pass  # pragma: no cover
-
-            def tell(self) -> int:
-                pass  # pragma: no cover
-
-            def truncate(self, size: Optional[int] = None) -> int:
-                pass  # pragma: no cover
-
-            def writable(self) -> bool:
-                pass  # pragma: no cover
-
-            def writelines(self, lines: Iterable[str]) -> None:
-                pass  # pragma: no cover
-
-            def __enter__(self) -> IO[str]:
-                pass  # pragma: no cover
-
-            def __exit__(
-                self,
-                type: Optional[Type[BaseException]], # pylint: disable=redefined-builtin
-                value: Optional[BaseException],
-                traceback: Optional[TracebackType]
-            ) -> None:
-                pass  # pragma: no cover
-
-            def __iter__(self) -> Iterator[str]:
-                pass  # pragma: no cover
-
-            def __next__(self) -> str:
-                pass  # pragma: no cover
 
         list_stream_handler = logging.StreamHandler(ListStream())
 

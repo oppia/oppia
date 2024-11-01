@@ -26,10 +26,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python 3.8
+      - name: Setup Python 3.9.20
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8.15'
+          python-version: '3.9.20'
           architecture: 'x64'
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
@@ -91,10 +91,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python 3.8
+      - name: Setup Python 3.9.20
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8.15'
+          python-version: '3.9.20'
           architecture: 'x64'
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge

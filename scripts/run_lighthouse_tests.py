@@ -25,17 +25,12 @@ import re
 import subprocess
 import sys
 
+from core import feconf
+from core.constants import constants
+from scripts import build
+from scripts import common
+from scripts import servers
 from typing import Final, List, Optional
-
-# TODO(#15567): This can be removed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common  # isort:skip pylint: disable=wrong-import-position
-
-from core import feconf # isort:skip
-from core.constants import constants  # isort:skip
-from scripts import build  # isort:skip
-from scripts import servers  # isort:skip
 
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'

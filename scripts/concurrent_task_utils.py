@@ -152,7 +152,7 @@ def _check_all_tasks(tasks: List[TaskThread]) -> None:
     running_tasks_data = []
 
     for task in tasks:
-        if task.isAlive():
+        if task.is_alive():
             running_tasks_data.append('  %s (started %s)' % (
                 task.name,
                 time.strftime('%H:%M:%S', time.localtime(task.start_time))
