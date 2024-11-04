@@ -95,21 +95,6 @@ class OldCreatorDashboardRedirectPage(
         self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
 
-class CreatorDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page showing the user's creator dashboard."""
-
-    ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self) -> None:
-
-        self.render_template('creator-dashboard-page.mainpage.html')
-
-
 class CreatorDashboardHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of CreatorDashboardHandler's normalized_payload
     dictionary.
