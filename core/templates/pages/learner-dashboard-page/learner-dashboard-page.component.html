@@ -137,7 +137,8 @@
                            [completedGoals]="learntTopicsList"
                            [untrackedTopics]="untrackedTopics"
                            [partiallyLearntTopicsList]="partiallyLearntTopicsList"
-                           [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
+                           [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics"
+                           [learnerDashboardRedesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
           </oppia-goals-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !windowIsNarrow">
