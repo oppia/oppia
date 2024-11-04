@@ -576,7 +576,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .COMMUNITY_LESSONS:
         return 'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING';
-      // TODO(#18384): I18N key is in en.json & qqq.json after #21143.
       case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .GOALS:
         return 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING';

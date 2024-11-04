@@ -44,12 +44,14 @@ import {ViewLearnerGroupDetailsModalComponent} from './modal-templates/view-lear
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ToastrModule} from 'ngx-toastr';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-
+import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
+import {MatDialogModule} from '@angular/material/dialog';
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
     LessonCardModule,
+    MatDialogModule,
     SkillCardModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
@@ -60,6 +62,7 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
     ]),
   ],
   declarations: [
+    AddGoalsModalComponent,
     CardDisplayComponent,
     ClassroomButtonComponent,
     ContentToggleButtonComponent,
@@ -80,6 +83,7 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
     ViewLearnerGroupDetailsModalComponent,
   ],
   entryComponents: [
+    AddGoalsModalComponent,
     CardDisplayComponent,
     ClassroomButtonComponent,
     ContentToggleButtonComponent,
