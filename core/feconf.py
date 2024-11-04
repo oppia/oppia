@@ -504,11 +504,23 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings() -> Dict[str, int]:
-    """Returns a copy of the empty ratings object.
+    """Returns a deep copy of the empty ratings dictionary.
+    This function is used to obtain a fresh copy of the empty ratings
+    dictionary. This can be useful in scenarios where a new ratings
+    dictionary is needed without any pre-existing data.
 
     Returns:
-        dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
-        ratings.
+        dict. A deep copy of the _EMPTY_RATINGS dictionary. The structure
+        of this dictionary is as follows:
+        {
+            '5': 0,
+            '4': 0,
+            '3': 0,
+            '2': 0,
+            '1': 0
+        }
+        Each key represents a rating value, and the corresponding value
+        represents the count of ratings for that value, initialized to 0.
     """
     return copy.deepcopy(_EMPTY_RATINGS)
 
