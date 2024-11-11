@@ -1,5 +1,5 @@
 <div class="navbar-header e2e-test-navbar-header oppia-top-navigation-bar">
-  <a *ngIf="windowIsNarrow"
+  <a *ngIf="windowIsNarrow && !pageIsIframed"
      (click)="toggleSidebar($event)"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 e2e-mobile-test-navbar-button ml-0"
      tabindex="0">
@@ -13,23 +13,38 @@
        &#10005;
     </i>
   </a>
-  <a class="oppia-navbar-brand-name oppia-transition-200 e2e-test-oppia-main-logo d-sm-block"
-     href="/"
-     [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
-     [ngClass]="windowIsNarrow ? 'oppia-logo-small ml-0' : 'oppia-logo-wide'">
-    <picture>
-      <source type="image/webp"
-              [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
-      <source type="image/png"
-              [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
-      <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
-           class="oppia-logo"
-           alt="Oppia Home"
-           [ngStyle]="!windowIsNarrow && {'width': '90px'}">
-    </picture>
-  </a>
+  <div class="oppia-navbar-brand-name oppia-transition-200 e2e-test-oppia-main-logo d-sm-block">
+    <ng-container *ngIf="pageIsIframed; else anchorTemplate">
+      <picture>
+        <source type="image/webp"
+                [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
+        <source type="image/png"
+                [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
+        <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
+             class="oppia-logo"
+             alt="Oppia Home"
+             [ngStyle]="!windowIsNarrow && {'width': '90px'}">
+      </picture>
+    </ng-container>
+    <ng-template #anchorTemplate>
+      <a href="/"
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
+         [ngClass]="windowIsNarrow ? 'oppia-logo-small ml-0' : 'oppia-logo-wide'">
+        <picture>
+          <source type="image/webp"
+                  [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
+          <source type="image/png"
+                  [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
+          <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
+               class="oppia-logo"
+               alt="Oppia Home"
+               [ngStyle]="!windowIsNarrow && {'width': '90px'}">
+        </picture>
+      </a>
+    </ng-template>
+  </div>
 </div>
-<div *ngIf="!windowIsNarrow" class="nav-mobile-header-text-container oppia-top-navigation-bar">
+<div *ngIf="!windowIsNarrow && !pageIsIframed" class="nav-mobile-header-text-container oppia-top-navigation-bar">
   <span *ngIf="headerText?.length"
         class="nav-mobile-header-editor">
     {{ headerText }}
@@ -45,7 +60,7 @@
   <ul class="nav oppia-navbar-nav"
       *ngIf="standardNavIsShown">
     <li>
-      <ul *ngIf="!windowIsNarrow"
+      <ul *ngIf="!windowIsNarrow && !pageIsIframed"
           class="nav oppia-navbar-tabs">
         <li [ngClass]="{'open' : activeMenuName === 'homeMenu'}"
             *ngIf="userIsLoggedIn"
@@ -301,7 +316,7 @@
       </ul>
     </li>
   </ul>
-  <ul class="nav oppia-navbar-nav oppia-navbar-tabs oppia-navbar-profile">
+  <ul class="nav oppia-navbar-nav oppia-navbar-tabs">
     <li ngbDropdown
         #languageDropdown="ngbDropdown"
         class="nav-item oppia-navbar-clickable-dropdown dropdown"
@@ -312,14 +327,15 @@
       <div class="oppia-navbar-button-container dropdown langbtnContainer">
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button e2e-test-language-dropdown langbtn"
-                (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
+                (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+                [ngClass]="{'oppia-language-dropdown-button-embedded': pageIsIframed}">
           <i class="fas fa-globe language-icon langi"></i>
           <span class="mobile-view-language-code lngcd" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
           <span class="desktop-view-language-code" *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
         </button>
       </div>
-      <ul ngbDropdownMenu
-          class="dropdown-menu oppia-navbar-dropdown language-dropdown"
+      <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown language-dropdown"
+          [ngClass]="{'oppia-embedded-navbar-dropdown': pageIsIframed}"
           [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
           (mouseover)="openSubmenu($event, 'languageMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
@@ -341,7 +357,7 @@
     <li [ngClass]="{'open' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         #profileDropdown="ngbDropdown"
-        *ngIf="userIsLoggedIn"
+        *ngIf="userIsLoggedIn && !pageIsIframed"
         class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown pfl">
       <a [attr.aria-expanded]="profileDropdown.isOpen() ? 'true' : 'false'"
          (click)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
@@ -496,7 +512,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="!userIsLoggedIn && username !== ''"
+        *ngIf="!userIsLoggedIn && username !== '' && !pageIsIframed"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
@@ -524,7 +540,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="username === ''"
+        *ngIf="username === '' && !pageIsIframed"
         class="oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container oppia-navbar-button-container-extra-info">
       </div>
@@ -535,6 +551,18 @@
   .dropdn {
     position: absolute;
     z-index: 500;
+  }
+  /*
+    Added this because Bootstrap was behaving unexpectedly by
+    adding CSS which was breaking the dropdown position while
+    in the embedded player.
+  */
+  .oppia-embedded-navbar-dropdown {
+    left: auto !important;
+    position: absolute;
+    top: auto !important;
+    transform: translate(0, 0) !important;
+    will-change: auto !important;
   }
   @media only screen and (max-width: 335px) {
     :lang(ar) .sinin {
@@ -604,6 +632,10 @@
     :lang(ar) .pfl {
       position: relative;
       top: 6rem;
+    }
+    .oppia-language-dropdown-button-embedded {
+      margin-top: 8px;
+      padding: 0 1px 2px 2px;
     }
   }
 
