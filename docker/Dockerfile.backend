@@ -1,5 +1,5 @@
 # Added platform flag here because -- https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc
-FROM --platform=linux/amd64 python:3.8.17-slim-buster AS backend
+FROM --platform=linux/amd64 python:3.9.20-bullseye AS backend
 
 ENV OPPIA_IS_DOCKERIZED="true"
 

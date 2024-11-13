@@ -52,6 +52,7 @@ import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api
 import {AudioPreloaderService} from '../services/audio-preloader.service';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {ExplorationObjectFactory} from 'domain/exploration/ExplorationObjectFactory';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -114,6 +115,7 @@ describe('Content language selector component', () => {
   let audioPreloaderService: AudioPreloaderService;
   let voiceoverPlayerService: VoiceoverPlayerService;
   let playerPositionService: PlayerPositionService;
+  let explorationObjectFactory: ExplorationObjectFactory;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -162,6 +164,7 @@ describe('Content language selector component', () => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
     playerPositionService = TestBed.inject(PlayerPositionService);
+    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     windowRef = TestBed.inject(WindowRef);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -213,6 +216,38 @@ describe('Content language selector component', () => {
     spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
     spyOn(audioTranslationLanguageService, 'setCurrentAudioLanguageCode');
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('Hola');
+
+    const explorationDict = {
+      title: 'My Title',
+      init_state_name: 'Introduction',
+      language_code: 'en',
+      auto_tts_enabled: false,
+      states: {},
+      param_specs: {},
+      param_changes: [],
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      version: 1,
+      draft_change_list_id: 0,
+      next_content_id_index: 4,
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        edits_allowed: true,
+      },
+    };
+    audioPreloaderService.exploration =
+      explorationObjectFactory.createFromBackendDict(explorationDict);
 
     component.ngOnInit();
     flush();

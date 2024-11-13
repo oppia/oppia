@@ -1,106 +1,120 @@
-<div tabindex="0" class="oppia-goals-box e2e-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
-  <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
-  </p>
-  <div *ngIf="currentGoals.length > 0">
-    <div *ngFor="let topic of currentGoals; let i = index">
-      <div class="oppia-current-goals-content e2e-test-topic-in-current-goals">
-        <div class="oppia-arrow-button">
-          <i class="fa fa-caret-right" aria-hidden="true" *ngIf="!currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
-          <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
+<div>
+  <div *ngIf="!learnerDashboardRedesignFeatureFlag" tabindex="0" class="oppia-goals-box e2e-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
+    <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
+    </p>
+    <div *ngIf="currentGoals.length > 0">
+      <div *ngFor="let topic of currentGoals; let i = index">
+        <div class="oppia-current-goals-content e2e-test-topic-in-current-goals">
+          <div class="oppia-arrow-button">
+            <i class="fa fa-caret-right" aria-hidden="true" *ngIf="!currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
+            <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
+          </div>
+          <div #dropdown class="oppia-three-dots-dropdown-container"
+               (keydown.enter)="toggleThreeDotsDropdown(i)"
+               role="button"
+               aria-label="More options"
+               tabindex="0"
+               (click)="toggleThreeDotsDropdown(i)">
+            <i class="fa fa-ellipsis-v"></i>
+            <div *ngIf="indexOfSelectedTopic == i" class="oppia-three-dots-dropdown">
+              <div class="oppia-trash-button"
+                   (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)"
+                   tabindex="0"
+                   (keydown.enter)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
+                <i class="fa fa-trash"></i>
+                <span>{{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}</span>
+              </div>
+            </div>
+          </div>
+          <label class="oppia-current-goals-topic-name e2e-test-topic-name-in-current-goals"
+                 (click)="toggleStory(i)"
+                 (keydown.enter)="toggleStory(i)"
+                 tabindex="0">
+            <span [innerHTML]="'I18N_LEARN_TOPIC' | translate: { topicName: topic.name }"></span>
+          </label>
+          <p class="oppia-goals-story-name">
+            <span [innerHTML]="'I18N_COMPLETE_CHAPTER' | translate: { topicName: topic.name }"></span>
+          </p>
+          <div *ngIf="currentGoalsStoryIsShown[i]">
+            <oppia-learner-topic-goals-summary-tile [topicSummary]="topic"
+                                                    [displayArea]="'goalsTab'"
+                                                    [topicName]="topic.name">
+            </oppia-learner-topic-goals-summary-tile>
+          </div>
         </div>
-        <div #dropdown class="oppia-three-dots-dropdown-container"
-             (keydown.enter)="toggleThreeDotsDropdown(i)"
-             role="button"
-             aria-label="More options"
-             tabindex="0"
-             (click)="toggleThreeDotsDropdown(i)">
-          <i class="fa fa-ellipsis-v"></i>
-          <div *ngIf="indexOfSelectedTopic == i" class="oppia-three-dots-dropdown">
-            <div class="oppia-trash-button"
-                 (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)"
-                 tabindex="0"
-                 (keydown.enter)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
-              <i class="fa fa-trash"></i>
-              <span>{{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}</span>
+      </div>
+    </div>
+    <div *ngIf="currentGoals.length == 0" class="oppia-empty-goals-content">
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CURRENT_GOALS_SECTION' | translate"></p>
+    </div>
+    <div tabindex="0" class="oppia-goals-box e2e-test-edit-goals-section">
+      <p class="oppia-edit-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION' | translate"> </p>
+      <span class="oppia-input-box-subtitle">
+        <em>
+          <span [innerHTML]="'I18N_GOAL_LIMIT' | translate: { limit: MAX_CURRENT_GOALS_LENGTH }"></span>
+        </em>
+      </span>
+      <div class="oppia-edit-goals-subheading">
+        <img [src]="pawImageUrl"
+             alt="paw image"
+             class="oppia-svg-paw-image">
+        <p class="oppia-edit-goals-topic-title"><span [innerHTML]="'I18N_TOPIC_TITLE' | translate"></span></p>
+        <p class="oppia-edit-goals-learn-title"><span [innerHTML]="'I18N_TOPIC_LEARN' | translate"></span></p>
+      </div>
+      <div *ngFor="let topic of editGoals; let i = index">
+        <div class="oppia-edit-goals-content">
+          <a [href]="editGoalsTopicPageUrl[i]" class="oppia-goals-topic-name e2e-test-topic-name-in-edit-goals">
+            {{topic.name}}
+            <p *ngIf="editGoalsTopicBelongToLearntToPartiallyLearntTopic[i]" class="oppia-new-story-content" [innerHTML]="'I18N_LEARNER_DASHBOARD_NEW_STORY_CONTENT' | translate">
+            </p>
+          </a>
+          <img [src]="bookImageUrl" alt="book image" class="oppia-svg-book-image" *ngIf="editGoalsTopicClassification[i] == 1" ngbTooltip="You have completed this topic.">
+          <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 2"
+                        class="one oppia-checkbox e2e-test-add-topic-to-current-goals-button"
+                        (click)="this.currentGoals.length !== this.MAX_CURRENT_GOALS_LENGTH && addToLearnerGoals(topic, topic.id, i)"
+                        [disabled]="this.currentGoals.length === this.MAX_CURRENT_GOALS_LENGTH">
+          </mat-checkbox>
+          <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 0"  checked class="oppia-checkbox"
+                        (click)="addToLearnerGoals(topic, topic.id, i)">
+          </mat-checkbox>
+        </div>
+      </div>
+    </div>
+    <div tabindex="0" class="oppia-goals-box e2e-test-completed-goals-section">
+      <p class="oppia-goals-title"
+        [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION' | translate">
+      </p>
+      <div *ngIf="completedGoals.length > 0">
+        <div *ngFor="let topic of completedGoals; let i = index">
+          <div class="oppia-completed-goals-content">
+            <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image">
+            <a [href]="completedGoalsTopicPageUrl[i]"
+               class="oppia-completed-goals-topic-name e2e-test-completed-goals-topic-name">
+              <span [innerHTML]="'I18N_LEARNT_TOPIC' | translate: { topicName: topic.name }"></span>
+            </a>
+            <div *ngFor="let story of topic.storyTitles">
+              <p class="oppia-goals-story-name">
+                <span [innerHTML]="'I18N_COMPLETED_STORY' | translate: { story: story }"></span>
+              </p>
             </div>
           </div>
         </div>
-        <label class="oppia-current-goals-topic-name e2e-test-topic-name-in-current-goals"
-               (click)="toggleStory(i)"
-               (keydown.enter)="toggleStory(i)"
-               tabindex="0">
-          <span [innerHTML]="'I18N_LEARN_TOPIC' | translate: { topicName: topic.name }"></span>
-        </label>
-        <p class="oppia-goals-story-name">
-          <span [innerHTML]="'I18N_COMPLETE_CHAPTER' | translate: { topicName: topic.name }"></span>
-        </p>
-        <div *ngIf="currentGoalsStoryIsShown[i]">
-          <oppia-learner-topic-goals-summary-tile [topicSummary]="topic"
-                                                  [displayArea]="'goalsTab'"
-                                                  [topicName]="topic.name">
-          </oppia-learner-topic-goals-summary-tile>
-        </div>
+      </div>
+      <div *ngIf="completedGoals.length == 0" class="oppia-empty-goals-content">
+        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_GOALS_SECTION' | translate"></p>
       </div>
     </div>
   </div>
-  <div *ngIf="currentGoals.length == 0" class="oppia-empty-goals-content">
-    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CURRENT_GOALS_SECTION' | translate"></p>
-  </div>
-</div>
-<div tabindex="0" class="oppia-goals-box e2e-test-edit-goals-section">
-  <p class="oppia-edit-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION' | translate"> </p>
-  <span class="oppia-input-box-subtitle">
-    <em>
-      <span [innerHTML]="'I18N_GOAL_LIMIT' | translate: { limit: MAX_CURRENT_GOALS_LENGTH }"></span>
-    </em>
-  </span>
-  <div class="oppia-edit-goals-subheading">
-    <img [src]="pawImageUrl"
-         alt="paw image"
-         class="oppia-svg-paw-image">
-    <p class="oppia-edit-goals-topic-title"><span [innerHTML]="'I18N_TOPIC_TITLE' | translate"></span></p>
-    <p class="oppia-edit-goals-learn-title"><span [innerHTML]="'I18N_TOPIC_LEARN' | translate"></span></p>
-  </div>
-  <div *ngFor="let topic of editGoals; let i = index">
-    <div class="oppia-edit-goals-content">
-      <a [href]="editGoalsTopicPageUrl[i]" class="oppia-goals-topic-name e2e-test-topic-name-in-edit-goals">
-        {{topic.name}}
-        <p *ngIf="editGoalsTopicBelongToLearntToPartiallyLearntTopic[i]" class="oppia-new-story-content" [innerHTML]="'I18N_LEARNER_DASHBOARD_NEW_STORY_CONTENT' | translate">
-        </p>
-      </a>
-      <img [src]="bookImageUrl" alt="book image" class="oppia-svg-book-image" *ngIf="editGoalsTopicClassification[i] == 1" ngbTooltip="You have completed this topic.">
-      <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 2"
-                    class="one oppia-checkbox e2e-test-add-topic-to-current-goals-button"
-                    (click)="this.currentGoals.length !== this.MAX_CURRENT_GOALS_LENGTH && addToLearnerGoals(topic, topic.id, i)"
-                    [disabled]="this.currentGoals.length === this.MAX_CURRENT_GOALS_LENGTH">
-      </mat-checkbox>
-      <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 0"  checked class="oppia-checkbox"
-                    (click)="addToLearnerGoals(topic, topic.id, i)">
-      </mat-checkbox>
+  <div *ngIf="learnerDashboardRedesignFeatureFlag">
+    <div class="oppia-learner-dash-section d-flex justify-content-between">
+      <p class="oppia-learner-dash-goals-text mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS' | translate }} </p>
+      <!--TODO(#18384): Check to see if text is part of button (text changes when hover too)-->
+      <button class="oppia-learner-dash-button--add-goals align-items-center flex-grow-1 d-flex justify-content-center bg-white border-0" (click)="openModal()">
+        <span class="oppia-learner-dash-goals-add-circle">
+          <span class="fas fa-plus"></span>
+        </span>
+        <span class="oppia-learner-dash-goals-add-text">{{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_ADD_BUTTON' | translate }} </span>
+      </button>
     </div>
-  </div>
-</div>
-<div tabindex="0" class="oppia-goals-box e2e-test-completed-goals-section">
-  <p class="oppia-goals-title"
-     [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION' | translate">
-  </p>
-  <div *ngIf="completedGoals.length > 0">
-    <div *ngFor="let topic of completedGoals; let i = index">
-      <div class="oppia-completed-goals-content">
-        <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image">
-        <a [href]="completedGoalsTopicPageUrl[i]"
-           class="oppia-completed-goals-topic-name e2e-test-completed-goals-topic-name">
-          <span [innerHTML]="'I18N_LEARNT_TOPIC' | translate: { topicName: topic.name }"></span>
-        </a>
-        <div *ngFor="let story of topic.storyTitles">
-          <p class="oppia-goals-story-name">
-            <span [innerHTML]="'I18N_COMPLETED_STORY' | translate: { story: story }"></span>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div *ngIf="completedGoals.length == 0" class="oppia-empty-goals-content">
-    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_GOALS_SECTION' | translate"></p>
   </div>
 </div>

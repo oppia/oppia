@@ -122,8 +122,8 @@ class SetupTests(test_utils.GenericTestBase):
         self.cd_swap = self.swap(common, 'CD', MockCD)
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
-        self.version_info_py38_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=8, micro=15)
+        self.version_info_py39_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=9, micro=20)
         )
         self.python2_print_swap = self.swap_with_checks(
             builtins,
@@ -161,7 +161,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertFalse(check_function_calls['makedirs_is_called'])
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py38_swap:
+        with self.version_info_py39_swap:
             setup.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(
@@ -224,7 +224,7 @@ class SetupTests(test_utils.GenericTestBase):
     def test_python_version_testing_with_python2_wrong_code(self) -> None:
         check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
 
-        with self.python2_print_swap, self.version_info_py38_swap:
+        with self.python2_print_swap, self.version_info_py39_swap:
             with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):
                 setup.test_python_version()
 

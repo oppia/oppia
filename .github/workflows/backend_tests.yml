@@ -22,10 +22,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python 3.8
+      - name: Setup Python 3.9.20
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8.15'
+          python-version: '3.9.20'
           architecture: 'x64'
       - name: Initialize Containers
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -60,10 +60,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python 3.8
+      - name: Setup Python 3.9.20
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8.15'
+          python-version: '3.9.20'
           architecture: 'x64'
       - name: Install coverage
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -130,10 +130,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python 3.8
+      - name: Setup Python 3.9.20
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8.15'
+          python-version: '3.9.20'
           architecture: 'x64'
       - name: Download time report for shard 1
         uses: actions/download-artifact@v3

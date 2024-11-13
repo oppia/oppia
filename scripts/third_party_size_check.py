@@ -25,14 +25,8 @@ import fnmatch
 import os
 import sys
 
-# TODO(#15567): This can be removed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
-
-from core import utils  # isort:skip
-
-from typing import List  # isort:skip
+from core import utils
+from typing import List
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000

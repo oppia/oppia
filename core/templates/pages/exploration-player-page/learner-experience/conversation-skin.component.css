@@ -54,6 +54,10 @@ oppia-conversation-skin .supplemental-card-parent-container {
   width: 100%;
 }
 
+.conversation-skin-cards-container-embedded {
+  padding: 10px 14px 0 !important;
+}
+
 .conversation-skin-help-card-content {
   padding: 12px;
 }

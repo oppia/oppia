@@ -26,6 +26,7 @@ var ContributorDashboardPage = function () {
   var navigateToTranslateTextTabButton = $('.e2e-test-translateTextTab');
   var submitQuestionTabButton = $('.e2e-test-submitQuestionTab');
   var myContributionTabButton = $('.e2e-test-myContributionTab');
+  var availableTaskLabel = $('.e2e-test-available-task-label');
   var opportunityLoadingPlaceholder = $(
     '.e2e-test-opportunity-loading-placeholder'
   );
@@ -339,6 +340,13 @@ var ContributorDashboardPage = function () {
   this.navigateToMyContributionTab = async function () {
     await action.click('My Contribution tab button', myContributionTabButton);
     await this.waitForOpportunitiesToLoad();
+  };
+
+  this.waitForAvailableTaskLabelToAppear = async function () {
+    await waitFor.visibilityOf(
+      availableTaskLabel,
+      'Opportunity taking too long to appear.'
+    );
   };
 
   this.selectTranslationReviewButton = async function () {

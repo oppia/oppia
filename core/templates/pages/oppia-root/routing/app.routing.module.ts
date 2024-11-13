@@ -80,6 +80,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.ROUTE,
+    loadChildren: () =>
+      import('pages/creator-dashboard-page/creator-dashboard-page.module').then(
+        m => m.CreatorDashboardPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_VIEWER.ROUTE,
     loadChildren: () =>
       import('pages/topic-viewer-page/topic-viewer-page.module').then(

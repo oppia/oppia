@@ -38,7 +38,7 @@ export class AudioPreloaderService {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  private exploration!: Exploration;
+  public exploration!: Exploration;
   private audioLoadedCallback!: (_: string) => void;
   // The following property can be null, when there is no recently
   // requested audio filename.
@@ -113,7 +113,6 @@ export class AudioPreloaderService {
     if (languageCode === null) {
       return [];
     }
-    let allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
     const initialStateName = this.exploration.getInitialState().name;
     let bfsTraversalOfStates: string[] = [];
     if (initialStateName !== null) {
@@ -147,6 +146,7 @@ export class AudioPreloaderService {
           }
         }
       } else {
+        let allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
         for (const voiceover of allVoiceovers[stateName]) {
           audioFilenamesInBfsOrder.push(voiceover.filename);
         }

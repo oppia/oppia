@@ -504,11 +504,23 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings() -> Dict[str, int]:
-    """Returns a copy of the empty ratings object.
+    """Returns a deep copy of the empty ratings dictionary.
+    This function is used to obtain a fresh copy of the empty ratings
+    dictionary. This can be useful in scenarios where a new ratings
+    dictionary is needed without any pre-existing data.
 
     Returns:
-        dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
-        ratings.
+        dict. A deep copy of the _EMPTY_RATINGS dictionary. The structure
+        of this dictionary is as follows:
+        {
+            '5': 0,
+            '4': 0,
+            '3': 0,
+            '2': 0,
+            '1': 0
+        }
+        Each key represents a rating value, and the corresponding value
+        represents the count of ratings for that value, initialized to 0.
     """
     return copy.deepcopy(_EMPTY_RATINGS)
 
@@ -573,7 +585,7 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.4.2'
+OPPIA_VERSION = '3.4.3'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -824,8 +836,6 @@ DEMO_EXPLORATIONS = {
     # NumericInput interaction.
     u'3': 'root_linear_coefficient_theorem',
     u'4': 'three_balls',
-    # TODO(bhenning): Replace demo exploration '5' with a new exploration
-    # described in #1376.
     u'6': 'boot_verbs.yaml',
     u'7': 'hola.yaml',
     # Exploration with ID 8 was removed as it contained string values inside
