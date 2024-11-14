@@ -20,15 +20,17 @@ import {HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 
 // Components.
-import { MaintenancePageComponent } from './maintenance-page.component';
+import {MaintenancePageComponent} from './maintenance-page.component';
 
 // Miscellaneous.
 import {CookieModule} from 'ngx-cookie';
-import { MatCardModule } from '@angular/material/card';
-import { CommonModule } from '@angular/common';
+import {MatCardModule} from '@angular/material/card';
+import {CommonModule} from '@angular/common';
+import {BrowserModule} from '@angular/platform-browser';
 
 @NgModule({
   imports: [
+    BrowserModule,
     CookieModule.forRoot(),
     CommonModule,
     MatCardModule,

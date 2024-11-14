@@ -243,6 +243,7 @@ def build_js_files(
     else:
         main(args=[])
         common.run_ng_compilation(project_name=project_name)
+        print(f'{project_name} is built')
         if not feconf.OPPIA_IS_DOCKERIZED:
             run_webpack_compilation(source_maps=source_maps)
 
