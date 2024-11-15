@@ -40,14 +40,14 @@ jobs:
           message: "A backend test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
       - name: Upload time report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ format('backend_test_time_shard_{0}', matrix.shard) }}
           path: backend_test_time_report.json
           retention-days: 1
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ format('backend_test_coverage_shard_{0}', matrix.shard) }}
           include-hidden-files: true
@@ -76,31 +76,31 @@ jobs:
           make stop
       - name: Download coverage report for shard 1
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_coverage_shard_1
           path: coverage/coverage_1
       - name: Download coverage report for shard 2
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_coverage_shard_2
           path: coverage/coverage_2
       - name: Download coverage report for shard 3
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_coverage_shard_3
           path: coverage/coverage_3
       - name: Download coverage report for shard 4
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_coverage_shard_4
           path: coverage/coverage_4
       - name: Download coverage report for shard 5
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_coverage_shard_5
           path: coverage/coverage_5
@@ -136,27 +136,27 @@ jobs:
           python-version: '3.9.20'
           architecture: 'x64'
       - name: Download time report for shard 1
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_time_shard_1
           path: backend_test_time_reports_artifacts/backend_test_time_1
       - name: Download time report for shard 2
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_time_shard_2
           path: backend_test_time_reports_artifacts/backend_test_time_2
       - name: Download time report for shard 3
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_time_shard_3
           path: backend_test_time_reports_artifacts/backend_test_time_3
       - name: Download time report for shard 4
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_time_shard_4
           path: backend_test_time_reports_artifacts/backend_test_time_4
       - name: Download time report for shard 5
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_test_time_shard_5
           path: backend_test_time_reports_artifacts/backend_test_time_5
@@ -170,7 +170,7 @@ jobs:
         shell: bash
       - name: Upload test times artifact
         if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend_test_times
           path: backend_test_times.txt

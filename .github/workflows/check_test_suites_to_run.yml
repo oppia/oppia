@@ -43,7 +43,7 @@ jobs:
           --github_base_ref="origin/${{ github.event.pull_request.base.ref }}"
           ${{ env.SHOULD_OUTPUT_ALL_TESTS == 'true' && '--output_all_test_suites' || '' }}
       - name: Upload root files mapping as a github artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: root-files-mapping
           path: root-files-mapping.json

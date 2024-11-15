@@ -67,7 +67,7 @@ jobs:
           zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
         working-directory: /home/runner/work/oppia
       - name: Upload build files artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build_files
           path: /home/runner/work/oppia/build_files.zip
@@ -110,7 +110,7 @@ jobs:
             ${{ runner.os }}-
       - name: Attempt to download build files artifact
         id: download_artifact_1
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         continue-on-error: true
         with:
           name: build_files
@@ -166,19 +166,19 @@ jobs:
             --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: webdriverio-video
           path: /home/runner/work/oppia/webdriverio-video
       - name: Uploading webdriverio screenshots as Artifacts
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: webdriverio-screenshots
           path: /home/runner/work/oppia/webdriverio-screenshots
       - name: Uploading webpack bundles as an artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles
           path: /home/runner/work/oppia/oppia/build
@@ -220,7 +220,7 @@ jobs:
             ${{ runner.os }}-
       - name: Attempt to download build files artifact
         id: download_artifact_1
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         continue-on-error: true
         with:
           name: build_files
@@ -268,7 +268,7 @@ jobs:
         run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Uploading puppeteer video as Artifacts
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with: 
           name: lhci-puppeteer-video
           path: /home/runner/work/oppia/lhci-puppeteer-video/video.mp4
@@ -316,7 +316,7 @@ jobs:
               ${{ runner.os }}-
         - name: Attempt to download build files artifact
           id: download_artifact_1
-          uses: actions/download-artifact@v3
+          uses: actions/download-artifact@v4
           continue-on-error: true
           with:
             name: build_files
@@ -360,7 +360,7 @@ jobs:
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env
         - name: Uploading generated test to angular module mapping as an artifact
           if: ${{ failure() }}
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: generated-test-to-angular-module-mapping
             path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite.name }}.txt
@@ -368,7 +368,7 @@ jobs:
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: webpack-bundles
             path: /home/runner/work/oppia/oppia/build
