@@ -65,7 +65,7 @@ jobs:
         run: make run_tests.frontend PYTHON_ARGS="--check_coverage"
       - name: Uploading fronted coverage reports as an artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
