@@ -99,7 +99,7 @@
         <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" [numCards]="1" [displayMaxWidth]="'fit-content'">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
-              <lesson-card [story]="storySummaryTile" [topic]="topicSummaryTile.name"> </lesson-card>
+              <lesson-card [story]="storySummaryTile" [topic]="topicSummaryTile.name" [isGoal]="currentGoalIds.has(topicSummaryTile.id)"> </lesson-card>
             </ng-container>
           </ng-container>
         </oppia-card-display>

@@ -337,6 +337,7 @@ describe('Community lessons tab Component', () => {
     component.completedToIncompleteCollections = [];
     component.totalCompletedLessonsList = [];
     component.totalIncompleteLessonsList = [];
+    component.currentGoals = [];
     explorationSummary =
       LearnerExplorationSummary.createFromBackendDict(sampleExploration);
     component.partialTopicMastery = [];

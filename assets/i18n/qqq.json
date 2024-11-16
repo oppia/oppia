@@ -957,6 +957,7 @@
 	"I18N_LEARNER_DASHBOARD_PAGE_TITLE": "Text displayed on the browser tab when on the Learner dashboard page.",
 	"I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION": "Text for the playlist section in the learner dashboard. Will contain all the explorations and collections which the user wants to play later but doesn't have the time at the moment.",
 	"I18N_LEARNER_DASHBOARD_PROGRESS_SECTION": "Text for the progress section in the learner dashboard. Will contain all the topics in progress and stories completed by the user.\n{{identical|Progress}}",
+	"I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_CLASSROOM": "Text for classroom lessons section in progress tab of learner dashboard",
 	"I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_EMPTY_DESC": "Text description for progress section when there are no in-progress or completed lessons - describes navigating to math classroom",
 	"I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING": "Heading text for the progress tab in the learner dashboard",
 	"I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE": "Text that appears in the learner playlist section. It tells the learner that he/she can rearrage the activities in the order he/she wants to play them.",

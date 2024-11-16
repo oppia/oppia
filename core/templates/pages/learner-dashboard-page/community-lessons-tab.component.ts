@@ -65,6 +65,7 @@ export class CommunityLessonsTabComponent {
   @Input() learnerDashboardRedesignFeatureFlag!: boolean;
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntTopicsList!: LearnerTopicSummary[];
+  @Input() currentGoals!: LearnerTopicSummary[];
   selectedSection!: string;
   noCommunityLessonActivity: boolean = false;
   noPlaylistActivity: boolean = false;
@@ -99,6 +100,7 @@ export class CommunityLessonsTabComponent {
 
   partialTopicMastery: {topic: LearnerTopicSummary; progress: number[]}[] = [];
   learntTopicMastery: {topic: LearnerTopicSummary; progress: number[]}[] = [];
+  currentGoalIds: Set<string> = new Set();
 
   completed: string = 'Completed';
   incomplete: string = 'Incomplete';
@@ -186,6 +188,7 @@ export class CommunityLessonsTabComponent {
     this.displayInCommunityLessons = this.allCommunityLessons;
     this.selectedSection = this.all;
     this.dropdownEnabled = false;
+    this.currentGoalIds = new Set(this.currentGoals.map(g => g.id));
 
     this.getSubtopicMasteryData();
   }
