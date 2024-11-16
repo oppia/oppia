@@ -957,6 +957,7 @@
     "I18N_LEARNER_DASHBOARD_PAGE_TITLE": "Learner Dashboard | Oppia",
     "I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION": "Play Later",
     "I18N_LEARNER_DASHBOARD_PROGRESS_SECTION": "Progress",
+    "I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_CLASSROOM": "Classroom Lessons",
     "I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_EMPTY_DESC": "It looks like you don't have any lessons in progress or completed. Head over to Oppia's Classroom to start your first lesson!",
     "I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING": "<[username]>'s Progress",
     "I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE": "Drag and rearrange the activities in the order in which you want to play them!",
