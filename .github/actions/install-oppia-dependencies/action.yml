@@ -6,11 +6,6 @@ runs:
     - name: Setup python by installing wheel
       run: pip install wheel==0.35.0
       shell: bash
-    - name: Install python 2 for GAE
-      run: |
-        sudo apt update
-        sudo apt install python2 -y
-      shell: bash
     - name: Check Yarn Cache
       run: |
         # Move outside repository root to ignore the configs in

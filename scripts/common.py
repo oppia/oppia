@@ -90,7 +90,7 @@ GOOGLE_CLOUD_SDK_HOME = (
     if feconf.OPPIA_IS_DOCKERIZED
     else os.path.join(
         OPPIA_TOOLS_DIR_ABS_PATH,
-        'google-cloud-sdk-364.0.0',
+        'google-cloud-sdk-500.0.0',
         'google-cloud-sdk'
     )
 )

@@ -60,7 +60,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             # should also be updated.
             common.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-364.0.0-linux-x86_64.tar.gz',
+                'google-cloud-sdk-500.0.0-linux-x86_64.tar.gz',
                 'gcloud-sdk.tar.gz')
         except Exception as e:
             print('Error downloading Google Cloud SDK. Exiting.')
@@ -69,7 +69,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-364.0.0/'))
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/'))
         tar.close()
 
         os.remove('gcloud-sdk.tar.gz')
