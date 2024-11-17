@@ -36,6 +36,7 @@ module.exports = merge(common, {
     // See https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
       GA_ANALYTICS_ID: JSON.stringify(analyticsConstants.GA_ANALYTICS_ID),
+      GTM_ANALYTICS_ID: JSON.stringify(analyticsConstants.GTM_ANALYTICS_ID),
       SITE_NAME_FOR_ANALYTICS: JSON.stringify(
         analyticsConstants.SITE_NAME_FOR_ANALYTICS
       ),
