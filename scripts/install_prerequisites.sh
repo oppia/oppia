@@ -54,12 +54,3 @@ sudo apt-get install libxml2-dev
 sudo apt-get install libxmlsec1-dev
 sudo apt-get install libffi-dev
 sudo apt-get install liblzma-dev
-
-# Check if the Python 2 is available and if so install it. This is needed
-# because the dev_appserver requires Python 2 to work. See Google Cloud docs:
-# https://cloud.google.com/appengine/docs/standard/python3/testing-and-deploying-your-app#local-dev-server
-NUMBER_OF_LINES=$(sudo apt list python2 | wc -l)
-if [ $NUMBER_OF_LINES -eq 2 ];
-then
-  sudo apt-get install python2
-fi

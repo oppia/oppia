@@ -223,12 +223,6 @@ def main() -> None:
                 common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
             os.path.join(correct_google_path, 'appengine'))
 
-    if not os.path.isdir(os.path.join(correct_google_path, 'net')):
-        shutil.copytree(
-            os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
-            os.path.join(correct_google_path, 'net'))
-
     if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
         shutil.copytree(
             os.path.join(

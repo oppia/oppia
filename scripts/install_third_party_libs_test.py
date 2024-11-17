@@ -416,7 +416,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_isdir(path: str) -> bool:
             directories_that_do_not_exist = {
                 os.path.join(correct_google_path, 'appengine'),
-                os.path.join(correct_google_path, 'net'),
                 os.path.join(correct_google_path, 'pyglib'),
                 correct_google_path
             }
@@ -436,10 +435,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 os.path.join(
                     common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
                 os.path.join(correct_google_path, 'appengine')),
-            (
-                os.path.join(
-                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
-                os.path.join(correct_google_path, 'net')),
             (
                 os.path.join(
                     common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
