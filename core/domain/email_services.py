@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import re
 
+from core import feconf
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services
 from core.platform import models
@@ -100,7 +101,7 @@ def send_mail(
             utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
-        bcc_admin: bool. Whether to bcc ADMIN_EMAIL_ADDRESS on the email.
+        bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
 
     Raises:
         Exception. The configuration in feconf.py forbids emails from being
@@ -126,11 +127,7 @@ def send_mail(
     if not _is_sender_email_valid(sender_email):
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
-    admin_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-    assert isinstance(admin_email_address, str)
-    bcc = [admin_email_address] if bcc_admin else None
+    bcc = [feconf.ADMIN_EMAIL_ADDRESS] if bcc_admin else None
     response = email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject,
         plaintext_body, html_body, bcc, '', None)

@@ -80,12 +80,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         self.delete_json('/memorycachehandler')
 
         response = self.get_json('/memorycachehandler')
-        # Cache contains platform parameters post flushing since user services
-        # are accessed in call to get json and platform parameters are again
-        # cached.
-        self.assertEqual(
-            response['total_keys_stored'],
-            len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST))
+        self.assertEqual(response['total_keys_stored'], 0)
 
 
 class UserGroupHandlerTest(test_utils.GenericTestBase):
