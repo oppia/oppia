@@ -63,7 +63,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   mainChapterCardIsShown = true;
   explorationInputButtonsAreShown = false;
   chapterOutlineButtonsAreShown = false;
-  skillIdToSummaryMap = {};
+  acquiredSkillIdToSummaryMap = {};
+  prerequisiteSkillIdToSummaryMap = {};
   chapterOutlineIsShown: boolean = false;
   chapterTodoCardIsShown: boolean = false;
   prerequisiteSkillIsShown: boolean = false;
@@ -138,8 +139,6 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
     this._recalculateAvailableNodes();
 
-    let skillSummaries = this.storyEditorStateService.getSkillSummaries();
-
     this.topicsAndSkillsDashboardBackendApiService
       .fetchDashboardDataAsync()
       .then(response => {
@@ -148,10 +147,14 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
         this.skillInfoHasLoaded = true;
       });
 
-    for (let idx in skillSummaries) {
-      this.skillIdToSummaryMap[skillSummaries[idx].id] =
-        skillSummaries[idx].description;
-    }
+    this.getSkillsDescription(
+      this.prerequisiteSkillIds,
+      this.prerequisiteSkillIdToSummaryMap
+    );
+    this.getSkillsDescription(
+      this.acquiredSkillIds,
+      this.acquiredSkillIdToSummaryMap
+    );
 
     this.isStoryPublished = this.storyEditorStateService.isStoryPublished;
     this.currentTitle = this.nodeIdToTitleMap[this.nodeId];
@@ -179,15 +182,15 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     return '/skill_editor/' + skillId;
   }
 
-  getPrerequisiteSkillsDescription(): void {
-    const skills = this.prerequisiteSkillIds;
-
-    if (skills && skills.length > 0) {
-      this.skillBackendApiService.fetchMultiSkillsAsync(skills).then(
+  getSkillsDescription(
+    skillIds: string[],
+    targetSkillIdToSummaryMap: {[key: string]: string}
+  ): void {
+    if (skillIds && skillIds.length > 0) {
+      this.skillBackendApiService.fetchMultiSkillsAsync(skillIds).then(
         response => {
-          for (let idx in response) {
-            this.skillIdToSummaryMap[response[idx].getId()] =
-              response[idx].getDescription();
+          for (let skill of response) {
+            targetSkillIdToSummaryMap[skill._id] = skill._description;
           }
         },
         error => {
@@ -414,7 +417,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       summary => {
         try {
-          this.skillIdToSummaryMap[summary.id] = summary.description;
+          this.prerequisiteSkillIdToSummaryMap[summary.id] =
+            summary.description;
           this.storyUpdateService.addPrerequisiteSkillIdToNode(
             this.story,
             this.nodeId,
@@ -462,6 +466,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       summary => {
         try {
+          this.acquiredSkillIdToSummaryMap[summary.id] = summary.description;
           this.storyUpdateService.addAcquiredSkillIdToNode(
             this.story,
             this.nodeId,
