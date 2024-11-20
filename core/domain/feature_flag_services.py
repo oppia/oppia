@@ -72,7 +72,7 @@ def update_feature_flag(
         rollout_percentage: int. The percentage of logged-in users for which
             the feature will be enabled. This value is ignored if the
             force_enable_for_all_users property is set to True.
-        user_group_ids: List[str]. The list of ids of UserGroup objects.
+        user_group_ids: List[str]. The list of ids of UserGroupModel.
 
     Raises:
         FeatureFlagNotFoundException. Feature flag trying to update does

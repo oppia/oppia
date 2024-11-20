@@ -246,9 +246,14 @@ class FeatureFlagsHandler(
         feature_flags_dict = []
         for feature_flag in feature_flags:
             feature_flags_dict.append(feature_flag.to_dict())
+        user_groups = user_services.get_all_user_groups()
+        user_group_dicts = []
+        for user_group in user_groups:
+            user_group_dicts.append(user_group.to_dict())
         self.render_json({
             'feature_flags': feature_flags_dict,
-            'server_stage': feature_flag_domain.get_server_mode().value
+            'server_stage': feature_flag_domain.get_server_mode().value,
+            'user_group_dicts': user_group_dicts
         })
 
     @acl_decorators.can_access_release_coordinator_page
