@@ -243,6 +243,15 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.signup('user1@email.com', 'user1')
+        self.signup('user2@email.com', 'user2')
+        self.signup('user3@email.com', 'user3')
+        self.signup('user4@email.com', 'user4')
+
+        user_services.create_new_user_group(
+            'USERGROUP1', ['user1', 'user2', 'user3'])
+        user_services.create_new_user_group(
+            'USERGROUP2', ['user1', 'user4'])
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
@@ -269,7 +278,9 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_handler_includes_all_feature_flags(self) -> None:
+    def test_get_handler_includes_all_feature_flags_and_user_groups(
+        self
+    ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_flag_services,
@@ -303,6 +314,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                             'last_updated': None
                         }
                     ])
+                self.assertEqual(
+                    len(response_dict['user_group_dicts']), 2)
         self.logout()
 
     def test_post_with_flag_changes_updates_feature_flags(self) -> None:
