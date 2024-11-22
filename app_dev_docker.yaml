@@ -6,8 +6,9 @@ instance_class: F2
 # #6534 on oppia/oppia).
 version: default
 # Timeout is set to 60 so that the gunicorn workers don't die while sending
-# the Apache Beam jobs to Google Cloud Dataflow.
-entrypoint: gunicorn --timeout 60 --bind :$PORT main:app
+# the Apache Beam jobs to Google Cloud Dataflow. Log level is set to 'warning'
+# because the info logs are very noisy.
+entrypoint: gunicorn --timeout 60 --log-level warning --bind :$PORT main:app
 
 inbound_services:
 - warmup
@@ -188,3 +189,7 @@ env_variables:
   DATASTORE_PROJECT_ID: "dev-project-id"
   DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
   SECRETS: "{\"ANDROID_BUILD_SECRET\": \"android-build-secret\", \"VM_ID\": \"vm_default\", \"SHARED_SECRET_KEY\": \"1a2b3c4e\"}"
+# These environment variables control GRPC logging verbosity. See
+# https://stackoverflow.com/a/78803598.
+  GRPC_VERBOSITY: "ERROR"
+  GLOG_minloglevel: "2"

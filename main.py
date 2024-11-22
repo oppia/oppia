@@ -101,7 +101,7 @@ datastore_services = models.Registry.import_datastore_services()
 # Cloud Logging is disabled in emulator mode, since it is unnecessary and
 # creates a lot of noise.
 if not constants.EMULATOR_MODE:
-    # Instantiates a client and rtrieves a Cloud Logging handler based on the
+    # Instantiates a client and retrieves a Cloud Logging handler based on the
     # environment you're running in and integrates the handler with the Python
     # logging module.
     client = google.cloud.logging.Client()
