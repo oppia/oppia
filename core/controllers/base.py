@@ -805,9 +805,6 @@ class BaseHandler(
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.exception(
-            'Exception raised at %s: %s', self.request.uri, exception)
-
         if isinstance(exception, self.NotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
             self.error(404)
@@ -818,7 +815,8 @@ class BaseHandler(
             self._render_exception(values)
             return
 
-        logging.exception('Exception raised: %s', exception)
+        logging.exception(
+            'Exception raised at %s: %s', self.request.uri, exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)

@@ -1148,9 +1148,9 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                     exp_id, 'invalid_state_name'),
                 expected_status_int=404)
 
-        self.assertEqual(len(observed_log_messages), 3)
+        self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(
-            observed_log_messages[:2],
+            observed_log_messages,
             [
                 'Could not find state: invalid_state_name',
                 'Available states: [\'Introduction\']'
