@@ -20,23 +20,13 @@ jobs:
         shard: ['other']
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Python 3.9.20 with pip cache
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
         with:
-          python-version: '3.9.20'
-          architecture: 'x64'
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
-      - name: Merge develop branch into the current branch
-        uses: ./.github/actions/merge
-      - name: Initialze Containers
-        run: |
-          make build
-          sudo make run-devserver
-          make stop
+          use_cache: false
+      - name: Initialize Docker containers
+        uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Third Party Size Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: make run_tests.third_party_size_check

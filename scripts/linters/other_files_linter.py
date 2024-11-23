@@ -67,18 +67,6 @@ _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX: Final = r'\.(yaml)|(yml)$'
 GIT_COMMIT_HASH_REGEX: Final = r'^git\+https:\/\/github\.com\/.*#(.*)$'
-MERGE_STEP: Final = {'uses': './.github/actions/merge'}
-WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
-    'backend_tests.yml',
-    'develop_commit_notification.yml',
-    'pending-review-notification.yml',
-    'revert-web-wiki-updates.yml',
-    'frontend_tests.yml',
-    'developer_onboarding_notification.yml'
-)
-JOBS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = [
-    'check_test_suites_to_run'
-]
 
 THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
@@ -286,65 +274,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_github_workflows_use_merge_action(
-        self
-    ) -> concurrent_task_utils.TaskResult:
-        """Checks that all github actions workflows use the merge action.
-
-        Returns:
-            TaskResult. A TaskResult object describing any workflows
-            that failed to use the merge action.
-        """
-        name = 'Github workflows use merge action'
-        workflow_paths = {
-            os.path.join(WORKFLOWS_DIR, filename)
-            for filename in os.listdir(WORKFLOWS_DIR)
-            if re.search(WORKFLOW_FILENAME_REGEX, filename)
-            if filename not in WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT
-        }
-        errors = []
-        for workflow_path in workflow_paths:
-            workflow_str = self.file_cache.read(workflow_path)
-            workflow_dict = yaml.load(workflow_str, Loader=yaml.Loader)
-            errors += self._check_that_workflow_steps_use_merge_action(
-                workflow_dict, workflow_path)
-        return concurrent_task_utils.TaskResult(
-            name, bool(errors), errors, errors)
-
-    # Here we use type Any because the argument 'workflow_dict' accepts
-    # dictionaries that represents the content of workflow YAML file and
-    # those dictionaries can contain various types of values.
-    @staticmethod
-    def _check_that_workflow_steps_use_merge_action(
-        workflow_dict: Dict[str, Any], workflow_path: str
-    ) -> List[str]:
-        """Check that a workflow uses the merge action.
-
-        Args:
-            workflow_dict: dict. Dictionary representation of the
-                workflow YAML file.
-            workflow_path: str. Path to workflow file.
-
-        Returns:
-            list(str). A list of error messages describing any jobs
-            failing to use the merge action.
-        """
-        jobs_without_merge = []
-        for job, job_dict in workflow_dict['jobs'].items():
-            if (
-                job not in JOBS_EXEMPT_FROM_MERGE_REQUIREMENT and
-                all(
-                    step.get('uses') != MERGE_STEP['uses']
-                    for step in job_dict['steps']
-                )
-            ):
-                jobs_without_merge.append(job)
-        return [
-            '%s --> Job %s does not use the .github/actions/merge action.' % (
-                workflow_path, job)
-            for job in jobs_without_merge
-        ]
-
     def check_github_workflows_have_name(
         self
     ) -> concurrent_task_utils.TaskResult:
@@ -411,7 +340,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         linter_stdout.append(self.check_skip_files_in_app_dev_yaml())
         linter_stdout.append(self.check_third_party_libs_type_defs())
         linter_stdout.append(self.check_webpack_config_file())
-        linter_stdout.append(self.check_github_workflows_use_merge_action())
         linter_stdout.append(self.check_github_workflows_have_name())
 
         return linter_stdout

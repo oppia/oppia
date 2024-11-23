@@ -22,9 +22,14 @@ runs:
         # Move back to the repository root.
         cd -
       shell: bash
-    - name: Install third party
-      run: python -m scripts.install_third_party_libs
-      shell: bash
+    - name: Install third party (retries on error)
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 3
+        retry_on: error
+        shell: bash
+        timeout_minutes: 30
+        command: python -m scripts.install_third_party_libs
     - name: Check Yarn Cache
       # Check the yarn cache again to see what packages were just
       # installed.
