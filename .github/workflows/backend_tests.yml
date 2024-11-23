@@ -21,13 +21,12 @@ jobs:
         shard: [1, 2, 3, 4, 5]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Python 3.9.20
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
         with:
-          python-version: '3.9.20'
-          architecture: 'x64'
-      - name: Initialize Containers
+          use_cache: false
+      - name: Initialize Docker containers
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Run backend test shard
@@ -59,16 +58,15 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Python 3.9.20
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
         with:
-          python-version: '3.9.20'
-          architecture: 'x64'
+          use_cache: false
       - name: Install coverage
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install coverage
-      - name: Initialze Containers
+      - name: Initialize Containers
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
           make build
@@ -129,12 +127,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Python 3.9.20
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
         with:
-          python-version: '3.9.20'
-          architecture: 'x64'
+          use_cache: false
       - name: Download time report for shard 1
         uses: actions/download-artifact@v4
         with:

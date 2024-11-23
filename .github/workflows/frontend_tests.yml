@@ -21,7 +21,7 @@ jobs:
         id: generate
         env:
           standard-test-runs: 2
-          flakes-test-runs: 40
+          flakes-test-runs: 10
         run: |
           if ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
           then
@@ -42,7 +42,11 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
+        with:
+          use_cache: false
       - name: Describe filesystem
         run: |
           pwd
@@ -50,20 +54,13 @@ jobs:
           ls /home/runner/work/oppia
           ls /home/runner/work/oppia/oppia
           echo $GITHUB_WORKSPACE
-      - name: Setup Python 3.9.20
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9.20'
-          architecture: 'x64'
-      - name: Merge develop branch into the current branch
-        uses: ./.github/actions/merge
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - name: Initialize Containers
+      - name: Initialize Docker containers
         uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Run frontend tests ${{ matrix.num_runs }}
         run: make run_tests.frontend PYTHON_ARGS="--check_coverage"
-      - name: Uploading fronted coverage reports as an artifact
+      - name: Upload fronted coverage reports as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:

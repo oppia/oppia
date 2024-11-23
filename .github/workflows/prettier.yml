@@ -20,15 +20,12 @@ jobs:
         os: [ubuntu-22.04]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Python 3.9.20
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
         with:
-          python-version: '3.9.20'
-          architecture: 'x64'
-      - name: Merge develop branch into the current branch
-        uses: ./.github/actions/merge
-      - name: Initialize Containers
+          use_cache: false
+      - name: Initialize Docker containers
         uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Prettify code
         run: make run_tests.prettier

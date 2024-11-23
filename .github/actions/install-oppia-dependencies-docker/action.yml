@@ -8,9 +8,14 @@ runs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       shell: bash
-    - name: Initialize Containers
-      run: |
-        make build
-        sudo make run-devserver
-        make stop
-      shell: bash
+    - name: Initialize Docker containers (retries on error)
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 3
+        retry_on: error
+        shell: bash
+        timeout_minutes: 30
+        command: |
+          make build
+          sudo make run-devserver
+          make stop

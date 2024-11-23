@@ -19,25 +19,15 @@ jobs:
         os: [ubuntu-22.04]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Python 3.9.20
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
         with:
-          python-version: '3.9.20'
-          architecture: 'x64'
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
-      - name: Merge develop branch into the current branch
-        uses: ./.github/actions/merge
+          use_cache: false
       - name: Install Chrome
         uses: ./.github/actions/install-chrome
       - name: Initialize Containers
-        run: |
-          make build
-          sudo make run-devserver
-          make stop
+        uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Check that all e2e test files are captured in wdio.conf.js
         run: make run_tests.check_tests_are_captured_in_ci
       - name: Run typescript tests
