@@ -18,7 +18,8 @@ jobs:
     needs: check_test_suites_to_run
     if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.count > 0 ||
             fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.count > 0 ||
-            fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.count > 0 }}
+            fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.docker.count > 0 ||
+            fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.python.count > 0 }}
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -259,12 +260,12 @@ jobs:
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   acceptance_test:
       needs: [check_test_suites_to_run, build]
-      if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.count > 0 }}
+      if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.python.count > 0 }}
       runs-on:  ${{ matrix.os }}
       strategy:
         matrix:
           os: [ubuntu-22.04]
-          suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.suites }}
+          suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.python.suites }}
       name: acceptance_test (${{ matrix.os }}, ${{ matrix.suite.name }})
       steps:
         - name: Checkout repository
@@ -342,6 +343,58 @@ jobs:
           with:
             name: webpack-bundles
             path: /home/runner/work/oppia/oppia/build
+        - name: Report failure if failed on oppia/oppia develop branch
+          if: ${{
+            failure() &&
+            github.event_name == 'push' &&
+            github.repository == 'oppia/oppia' &&
+            github.ref == 'refs/heads/develop'
+            }}
+          uses: ./.github/actions/send-webhook-notification
+          with:
+            message: "An acceptance test failed on the upstream develop branch."
+            webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  acceptance_test_with_docker:
+      needs: [check_test_suites_to_run]
+      if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.docker.count > 0 }}
+      runs-on:  ${{ matrix.os }}
+      strategy:
+        matrix:
+          os: [ubuntu-22.04]
+          suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.docker.suites }}
+      name: acceptance_test (${{ matrix.os }}, ${{ matrix.suite.name }})
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+        - name: Setup Python 3.8
+          uses: actions/setup-python@v3
+          with:
+            python-version: '3.8.15'
+            architecture: 'x64'
+        - name: Free disk space
+          run: |
+            sudo rm -rf /usr/share/dotnet
+            sudo rm -rf "$AGENT_TOOLSDIRECTORY" 
+        - name: Merge develop branch into the current branch
+          uses: ./.github/actions/merge
+        - name: Install Chrome
+          uses: ./.github/actions/install-chrome
+        - name: Initializing Containers
+          run: |
+            make build
+            docker compose up angular-build -d
+            # This is required as lighthouse tests are run on the host machine and not in the docker container.
+            sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+        - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite.name }}
+        - name: Uploading generated test to angular module mapping as an artifact
+          if: ${{ failure() }}
+          uses: actions/upload-artifact@v3
+          with:
+            name: generated-test-to-angular-module-mapping
+            path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite.name }}.txt
+        - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite.name }} MOBILE=true
         - name: Report failure if failed on oppia/oppia develop branch
           if: ${{
             failure() &&

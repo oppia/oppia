@@ -57,6 +57,7 @@ class GenericTestSuiteDict(TypedDict):
 
     name: str
     module: str
+    environment: str
 
 
 class LighthouseTestSuiteDict(GenericTestSuiteDict):
@@ -105,6 +106,8 @@ LIGHTHOUSE_PAGES_CONFIG_FILE_PATH: Final = os.path.join(
     'core', 'tests', 'lighthouse-pages.json')
 CI_TEST_SUITE_CONFIGS_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'ci-test-suite-configs')
+DEFAULT_SUITE = 'suites'
+DOCKER_SUITE = 'docker_suites'
 TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'test-modules-mappings')
 
@@ -235,6 +238,32 @@ def output_variable_to_github_workflow(
         print(f'{output_variable}={output_value}', file=o)
 
 
+def split_tests_by_docker(
+        test_suites: CITestSuitesDict
+) -> dict[str, CITestSuitesDict]:
+    """Splits the test suites into Docker and Python environments.
+
+    Args:
+        test_suites: list(dict). The test suites to split.
+
+    Returns:
+        tuple(list(dict), list(dict)). The test suites split into Docker and
+        Python environments.
+    """
+    docker_test_suites = []
+    python_test_suites = []
+    for test_suite in test_suites.get('suites', []):
+        print(test_suite)
+        if test_suite.get('environment', 'python') == 'docker':
+            docker_test_suites.append(test_suite)
+        else:
+            python_test_suites.append(test_suite)
+    return {
+        'docker': create_ci_test_suites_dict(docker_test_suites),
+        'python': create_ci_test_suites_dict(python_test_suites)
+    }
+
+
 def output_test_suites_to_run_to_github_workflow(
     test_suites_to_run: CITestSuitesToRunDict
 ) -> None:
@@ -246,7 +275,9 @@ def output_test_suites_to_run_to_github_workflow(
     """
     test_suites_to_run_output = {
         'e2e': test_suites_to_run['e2e'],
-        'acceptance': test_suites_to_run['acceptance'],
+        'acceptance': split_tests_by_docker(
+            test_suites_to_run['acceptance']
+        ),
         'lighthouse_performance':
             test_suites_to_run['lighthouse_performance'],
         'lighthouse_accessibility':
@@ -275,7 +306,13 @@ def get_test_suites_from_config(
         list(dict). The test suites from the configuration file.
     """
     with open(test_suites_config_file_path, 'r', encoding='utf-8') as f:
-        suites: List[GenericTestSuiteDict] = json.load(f)['suites']
+        test_suites = json.load(f)
+        suites: List[GenericTestSuiteDict] = test_suites[DEFAULT_SUITE]
+        if DOCKER_SUITE in test_suites.keys():
+            docker_suites = test_suites[DOCKER_SUITE]
+            for docker_suite in docker_suites:
+                docker_suite['environment'] = 'docker'
+            suites.extend(docker_suites)
         return suites
 
 
@@ -321,6 +358,7 @@ def partition_lighthouse_pages_into_test_suites(
                     str(i // LIGHTHOUSE_PAGES_PER_SHARD + 1)
                 ),
                 'module': lighthouse_module,
+                'environment': 'python',
                 'pages_to_run': []
             }
         assert current_lighthouse_test_suite is not None
