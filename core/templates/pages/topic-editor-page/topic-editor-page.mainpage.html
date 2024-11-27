@@ -12,12 +12,12 @@
             </oppia-topic-editor-navbar-breadcrumb>
           </navbar-breadcrumb>
 
-          <nav-options>
+          <nav-options class="hide-on-mobile">
             <oppia-topic-editor-navbar>
             </oppia-topic-editor-navbar>
           </nav-options>
 
-          <mobile-nav-options>
+          <mobile-nav-options class="hide-on-desktop">
             <oppia-topic-editor-navbar>
             </oppia-topic-editor-navbar>
           </mobile-nav-options>
@@ -35,3 +35,20 @@
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>
   </body>
 </html>
+
+
+<style>
+  @media (min-width: 778px) {
+    /* this property hides mobile-nav-options on desktops */
+    .hide-on-desktop {
+      display: none;
+    }
+  }
+
+  @media (max-width: 778px) {
+    /* this property hides nav-options on mobiles */
+    .hide-on-mobile {
+      display: none;
+    }
+  }
+</style>
