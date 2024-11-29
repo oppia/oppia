@@ -479,20 +479,14 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   goToNextPage(): void {
     this.questionsListService.incrementPageNumber();
-    this.questionsListService.getQuestionSummariesAsync(
-      this.selectedSkillId,
-      true,
-      false
-    );
+    this.questionsListService
+      .getQuestionSummariesAsync(this.selectedSkillId, true, false)
+      .then(() => this.getQuestionSummariesForOneSkill());
   }
 
   goToPreviousPage(): void {
     this.questionsListService.decrementPageNumber();
-    this.questionsListService.getQuestionSummariesAsync(
-      this.selectedSkillId,
-      false,
-      false
-    );
+    this.getQuestionSummariesForOneSkill();
   }
 
   showUnaddressedSkillMisconceptionWarning(
