@@ -15,7 +15,7 @@
     <ng-content></ng-content>
   </div>
   <!--TODO(#18384): Delete I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON key-->
-  <oppia-content-toggle-button *ngIf="toggleButtonVisibility" (contentToggleEmitter)="handleToggleState($event)"> </oppia-content-toggle-button>
+  <oppia-content-toggle-button [ngClass]="mt-4" *ngIf="toggleButtonVisibility" (contentToggleEmitter)="handleToggleState($event)"> </oppia-content-toggle-button>
 </div>
 
 <style>

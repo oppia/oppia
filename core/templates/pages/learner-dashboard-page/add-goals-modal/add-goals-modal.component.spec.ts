@@ -138,7 +138,7 @@ describe('AddGoalsModalComponent', () => {
     );
     fixture.detectChanges();
 
-    expect(firstCheckbox.nativeElement.checked).toBeFalse();
+    expect(firstCheckbox.nativeElement.checked).toBeTrue();
     expect(firstCheckbox.nativeElement.disabled).toBeTrue();
   });
 
@@ -146,7 +146,7 @@ describe('AddGoalsModalComponent', () => {
     expect(component).toBeTruthy();
     const cancelButton = fixture.debugElement.query(
       By.css(
-        '.oppia-learner-dash-goals-button--modal.oppia-learner-dash-button--inverse'
+        '.oppia-learner-dash-button--modal.oppia-learner-dash-button--inverse'
       )
     );
     cancelButton.triggerEventHandler('click', null);
@@ -173,7 +173,7 @@ describe('AddGoalsModalComponent', () => {
 
     const saveButton = fixture.debugElement.query(
       By.css(
-        '.oppia-learner-dash-goals-button--modal.oppia-learner-dash-button--default'
+        '.oppia-learner-dash-button--modal.oppia-learner-dash-button--default'
       )
     );
     saveButton.triggerEventHandler('click', null);
@@ -190,7 +190,7 @@ describe('AddGoalsModalComponent', () => {
 
     const saveButton = fixture.debugElement.query(
       By.css(
-        '.oppia-learner-dash-goals-button--modal.oppia-learner-dash-button--default'
+        '.oppia-learner-dash-button--modal.oppia-learner-dash-button--default'
       )
     );
     saveButton.triggerEventHandler('click', null);
@@ -211,7 +211,7 @@ describe('AddGoalsModalComponent', () => {
 
     const saveButton = fixture.debugElement.query(
       By.css(
-        '.oppia-learner-dash-goals-button--modal.oppia-learner-dash-button--default'
+        '.oppia-learner-dash-button--modal.oppia-learner-dash-button--default'
       )
     );
     saveButton.triggerEventHandler('click', null);

@@ -69,6 +69,7 @@ describe('Goals tab Component', () => {
     sample_topic_2: 'Topic Name 2',
     sample_topic_3: 'Topic Name 3',
   };
+  let sampleTopic: LearnerTopicSummary;
 
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
@@ -301,6 +302,10 @@ describe('Goals tab Component', () => {
     component.topicIdsInCompletedGoals = [];
     component.topicIdsInCurrentGoals = [];
     component.activityType = 'learntopic';
+
+    sampleTopic = LearnerTopicSummary.createFromBackendDict(
+      learnerTopicSummaryBackendDict1
+    );
     fixture.detectChanges();
   });
 
@@ -545,5 +550,21 @@ describe('Goals tab Component', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     expect(component.checkedTopics).toEqual(new Set(['sample_topic_2']));
+  });
+
+  it('should remove goal based on topicId and topicName', async () => {
+    component.checkedTopics = new Set(['sample_topic_id', 'sample_topic_2']);
+    const removeActivityModalAsyncSpy = spyOn(
+      learnerDashboardActivityBackendApiService,
+      'removeActivityModalAsync'
+    ).and.returnValue(Promise.resolve(true));
+
+    component.removeGoal('sample_topic_2', 'Topic Name 2');
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(removeActivityModalAsyncSpy).toHaveBeenCalled();
+    expect(component.checkedTopics).toEqual(new Set(['sample_topic_id']));
+    expect(component.currentGoals).toEqual([sampleTopic]);
   });
 });
