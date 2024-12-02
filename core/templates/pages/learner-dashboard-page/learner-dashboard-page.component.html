@@ -1,4 +1,4 @@
-<background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && !isShowRedesignedLearnerDashboardActive && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
+<background-banner *ngIf="!isShowRedesignedLearnerDashboardActive() && (!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME))"></background-banner>
 <div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
      class="position-relative" [ngClass]="{'oppia-learner-dash-container w-100' : isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-container' : !isShowRedesignedLearnerDashboardActive()}">
   <div [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"

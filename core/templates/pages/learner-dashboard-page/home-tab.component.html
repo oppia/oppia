@@ -85,14 +85,10 @@
   </ng-container>
 
   <div *ngIf="redesignFeatureFlag">
-    <div class="oppia-learner-dash-section" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
+     <!--TODO(#18384): Only checks if there are lessons in-progress, hiding recommendations otherwise (isNonemptyObject(untrackedTopics) not sure what this does)-->
+    <div class="oppia-learner-dash-section" *ngIf="continueWhereYouLeftOffList.length !== 0">
       <p class="oppia-learner-dash-section-heading">
-        {{ (continueWhereYouLeftOffList.length !== 0 ?
-            'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION'
-          :
-            'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING'
-          ) | translate
-        }}
+        {{ 'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
       </p>
       <div class="d-flex flex-wrap justify-content-between w-100">
         <!--TODO(#18384): Replace with all lessons in progress data (only contains classroom cards); affects ngIf, numCards, ng-content-->

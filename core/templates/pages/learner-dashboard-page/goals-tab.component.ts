@@ -350,4 +350,23 @@ export class GoalsTabComponent implements OnInit {
       }
     });
   }
+
+  async removeGoal(topicId: string, topicName: string): Promise<void> {
+    await this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .CURRENT_GOALS,
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+        .LEARN_TOPIC,
+      topicId,
+      topicName
+    );
+
+    for (let i = 0; i < this.currentGoals.length; i++) {
+      if (this.currentGoals[i].id === topicId) {
+        this.currentGoals.splice(i, 1);
+        this.checkedTopics.delete(topicId);
+        break;
+      }
+    }
+  }
 }
