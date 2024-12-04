@@ -231,8 +231,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
 
 
 class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
-    """Test the handler for initialising exploration with
-    state_classifier_mapping.
+    """Test the handler for retrieving exploration pre-tests.
     """
 
     def setUp(self) -> None:

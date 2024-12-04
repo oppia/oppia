@@ -55,12 +55,6 @@ NODE_VERSION = '16.13.0'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
-# Buf version.
-BUF_VERSION = '0.29.0'
-
-# Must match the version of protobuf in requirements_dev.in.
-PROTOC_VERSION = '3.18.3'
-
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
 # 2. Extract the cli in the folder that it was downloaded, most likely
@@ -189,7 +183,6 @@ NODEMODULES_WDIO_BIN_PATH = (
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
-    os.path.join(CURR_DIR, 'proto_files'),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]

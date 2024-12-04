@@ -13,22 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating new frontend instances of Classifier
- *     domain objects.
+ * @fileoverview A sample TS spec file.
  */
 
-export class Classifier {
-  algorithmId: string;
-  classifierData: ArrayBuffer;
-  algorithmVersion: number;
-
-  constructor(
-    algorithmId: string,
-    classifierData: ArrayBuffer,
-    algorithmVersion: number
-  ) {
-    this.algorithmId = algorithmId;
-    this.classifierData = classifierData;
-    this.algorithmVersion = algorithmVersion;
-  }
-}
+describe('Empty test', () => {
+  describe('Test addition', () => {
+    it('should verify that 2 + 2 = 4', () => {
+      expect(2 + 2).toEqual(4);
+    });
+  });
+});

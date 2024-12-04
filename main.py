@@ -30,7 +30,6 @@ from core.controllers import beam_jobs
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
 from core.controllers import blog_homepage
-from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
@@ -1092,11 +1091,6 @@ URLS = [
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
-
-    get_redirect_route(
-        r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
-    get_redirect_route(
-        r'/ml/nextjobhandler', classifier.NextJobHandler),
 
     get_redirect_route(
         r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',

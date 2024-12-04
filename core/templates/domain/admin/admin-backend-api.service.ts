@@ -70,11 +70,6 @@ export interface ClassroomPageData {
   topic_list_intro: string;
 }
 
-export interface VmidSharedSecretKeyMapping {
-  shared_secret_key: string;
-  vm_id: string;
-}
-
 export interface AdminPageDataBackendDict {
   demo_explorations: string[][];
   demo_collections: string[][];

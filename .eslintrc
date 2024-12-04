@@ -124,7 +124,7 @@
       }
     },
     {
-      // We exclude spec files to the no-testonly check
+      // We exclude spec files from the no-testonly check
       "files": ["*spec.js", "*spec.ts"],
       "rules": {
         "oppia/no-testonly": "off"

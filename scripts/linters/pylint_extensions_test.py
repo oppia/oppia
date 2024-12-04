@@ -51,7 +51,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""self.post_json('/ml/\\trainedclassifierhandler',
+                u"""self.post_json('/some/\\url',
                 self.payload, expect_errors=True, expected_status_int=401)
                 if (a > 1 and
                         b > 2):
@@ -76,7 +76,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""self.post_json('/ml/\\trainedclassifierhandler',
+                u"""self.post_json('/some/\\url',
                 self.payload, expect_errors=True, expected_status_int=401)
 
                 if (a > 1 and
@@ -2751,7 +2751,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we use MyPy ignore because stubs of protobuf are not
+                # Here we use MyPy ignore because stubs of this lib are not
                 # available yet.
 
                 variable_one: str = '123'
@@ -2802,7 +2802,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # TODO(#sll): Here we use MyPy ignore because stubs of this lib
                 # are not available yet.
 
                 def foo(exp_id: str) -> str:  # type: ignore
@@ -2842,7 +2842,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # TODO(#sll): Here we use MyPy ignore because stubs of this lib
                 # are not available yet.
                 def foo(exp_id: str) -> str:  # type: ignore[arg-type]
                     return 'hi' #@
@@ -2850,7 +2850,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 def foo(exp_id: str) -> str:  # type: ignore
                     return 'hi' #@
 
-                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # TODO(#sll): Here we use MyPy ignore because stubs of this lib
                 # are not available yet.
                 def foo(exp_id: str) -> str:  # type: ignore[misc]
                     return 'hi' #@
@@ -2881,7 +2881,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # TODO(#sll): Here we use MyPy ignore because stubs of this lib
                 # are not available yet.
 
                 def foo(exp_id: str) -> str:  # type: ignore[arg-type]
@@ -2947,7 +2947,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                func(proto_buff_stuff: object) #@
+                func(variable_123: object) #@
                 """
             )
         node_with_object_type.file = filename
@@ -3003,7 +3003,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                     'key': 'value'
                 }
 
-                def func(proto_buff_stuff: object) -> None:
+                def func(variable_123: object) -> None:
                     pass
 
                 # Some other contents of the module.
@@ -3284,12 +3284,12 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                     'key': 'value'
                 }
 
-                # Here we use object because stubs of protobuf are not
+                # Here we use object because stubs of this lib are not
                 # available yet. So, instead of Any we used object here.
-                def save_classifier_data(
+                def baz(
                     exp_id: str,
                     job_id: str,
-                    classifier_data_proto: object
+                    variable_123: object
                 ) -> None:
                     pass #@
                 """
@@ -3315,7 +3315,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we use object because stubs of protobuf are not
+                # Here we use object because stubs of this lib are not
                 # available yet. So, instead of Any we used object here.
                 def foo(exp_id: object) -> object:
                     return 'hi' #@
@@ -3344,7 +3344,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we use object because stubs of protobuf are not
+                # Here we use object because stubs of this lib are not
                 # available yet. So, instead of Any we used object here.
 
                 variable_one: str = '123'
@@ -3389,7 +3389,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we use object because stubs of protobuf are not
+                # Here we use object because stubs of this lib are not
                 # available yet. So, instead of Any we used object here.
 
                 variable_one: str = '123'
@@ -3423,7 +3423,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # TODO(#sll): Here we use object because stubs of protobuf
+                # TODO(#sll): Here we use object because stubs of this lib
                 # are not available yet. So, instead of Any we used object
                 # here.
                 def foo(exp_id: object) -> object:

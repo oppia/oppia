@@ -30,7 +30,6 @@ import {
   ParamSpecsBackendDict,
   ParamSpecsObjectFactory,
 } from 'domain/exploration/ParamSpecsObjectFactory';
-import {StateClassifierMappingService} from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import {AlertsService} from 'services/alerts.service';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {ContextService} from 'services/context.service';
@@ -176,7 +175,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private stateClassifierMappingService: StateClassifierMappingService,
     private stateEditorRefreshService: StateEditorRefreshService,
     private stateEditorService: StateEditorService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
@@ -241,10 +239,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
       this.explorationFeaturesService.init(explorationData, featuresData);
 
-      this.stateClassifierMappingService.init(
-        this.contextService.getExplorationId(),
-        explorationData.version
-      );
       this.explorationStatesService.init(
         explorationData.states,
         (explorationData as ExplorationData).exploration_is_linked_to_story

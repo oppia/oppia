@@ -18,15 +18,13 @@ from __future__ import annotations
 
 import argparse
 import os
-import pathlib
 import shutil
 import subprocess
-import zipfile
 
 from core import feconf
 from scripts import install_python_dev_dependencies
 
-from typing import Final, List
+from typing import Final
 
 if not feconf.OPPIA_IS_DOCKERIZED:
     install_python_dev_dependencies.main(['--assert_compiled'])
@@ -45,40 +43,6 @@ _PARSER: Final = argparse.ArgumentParser(
     description="""
 Installation script for Oppia third-party libraries.
 """)
-
-# Download locations for buf binary.
-BUF_BASE_URL: Final = (
-    'https://github.com/bufbuild/buf/releases/download/v0.29.0/')
-
-BUF_LINUX_FILES: Final = [
-    'buf-Linux-x86_64', 'protoc-gen-buf-check-lint-Linux-x86_64',
-    'protoc-gen-buf-check-breaking-Linux-x86_64']
-BUF_DARWIN_FILES: Final = [
-    'buf-Darwin-x86_64', 'protoc-gen-buf-check-lint-Darwin-x86_64',
-    'protoc-gen-buf-check-breaking-Darwin-x86_64']
-
-# Download URL of protoc compiler.
-PROTOC_URL: Final = (
-    'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
-    common.PROTOC_VERSION)
-PROTOC_LINUX_FILE: Final = 'protoc-%s-linux-x86_64.zip' % (
-    common.PROTOC_VERSION
-)
-PROTOC_DARWIN_FILE: Final = 'protoc-%s-osx-x86_64.zip' % (
-    common.PROTOC_VERSION
-)
-
-# Path of the buf executable.
-BUF_DIR: Final = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
-PROTOC_DIR: Final = os.path.join(BUF_DIR, 'protoc')
-# Path of files which needs to be compiled by protobuf.
-PROTO_FILES_PATHS: Final = [
-    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
-# Path to typescript plugin required to compile ts compatible files from proto.
-PROTOC_GEN_TS_PATH: Final = os.path.join(
-    common.NODE_MODULES_PATH, 'protoc-gen-ts'
-)
 
 
 def tweak_yarn_executable() -> None:
@@ -99,72 +63,6 @@ def get_yarn_command() -> str:
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
-
-
-def install_buf_and_protoc() -> None:
-    """Installs buf and protoc for Linux or Darwin, depending upon the
-    platform.
-    """
-    buf_files = BUF_DARWIN_FILES if common.is_mac_os() else BUF_LINUX_FILES
-    protoc_file = (
-        PROTOC_DARWIN_FILE if common.is_mac_os() else PROTOC_LINUX_FILE)
-    buf_path = os.path.join(BUF_DIR, buf_files[0])
-    protoc_path = os.path.join(PROTOC_DIR, 'bin', 'protoc')
-
-    if os.path.isfile(buf_path) and os.path.isfile(protoc_path):
-        return
-
-    common.ensure_directory_exists(BUF_DIR)
-    for bin_file in buf_files:
-        common.url_retrieve('%s/%s' % (
-            BUF_BASE_URL, bin_file), os.path.join(BUF_DIR, bin_file))
-    common.url_retrieve('%s/%s' % (
-        PROTOC_URL, protoc_file), os.path.join(BUF_DIR, protoc_file))
-    try:
-        with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
-            zfile.extractall(path=PROTOC_DIR)
-        os.remove(os.path.join(BUF_DIR, protoc_file))
-    except Exception as e:
-        raise Exception('Error installing protoc binary') from e
-    common.recursive_chmod(buf_path, 0o744)
-    common.recursive_chmod(protoc_path, 0o744)
-
-
-def compile_protobuf_files(proto_files_paths: List[str]) -> None:
-    """Compiles protobuf files using buf.
-
-    Raises:
-        Exception. If there is any error in compiling the proto files.
-    """
-    proto_env = os.environ.copy()
-    proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_DIR)
-    proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_GEN_TS_PATH)
-    buf_path = os.path.join(
-        BUF_DIR,
-        BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])
-    for path in proto_files_paths:
-        command = [
-            buf_path, 'generate', path]
-        process = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            env=proto_env)
-        stdout, stderr = process.communicate()
-        if process.returncode == 0:
-            print(stdout)
-        else:
-            print(stderr)
-            raise Exception('Error compiling proto files at %s' % path)
-
-    # Since there is no simple configuration for imports when using protobuf to
-    # generate Python files we need to manually fix the imports.
-    # See: https://github.com/protocolbuffers/protobuf/issues/1491
-    compiled_protobuf_dir = (
-        pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files')))
-    for p in compiled_protobuf_dir.iterdir():
-        if p.suffix == '.py':
-            common.inplace_replace_file(
-                p.absolute().as_posix(),
-                r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
 
 def make_google_module_importable_by_python(google_module_path: str) -> None:
@@ -242,12 +140,6 @@ def main() -> None:
 
     # Install third-party node modules needed for the build process.
     subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
-
-    # Compile protobuf files.
-    print('Installing buf and protoc binary.')
-    install_buf_and_protoc()
-    print('Compiling protobuf files.')
-    compile_protobuf_files(PROTO_FILES_PATHS)
 
     # Install pre-commit script.
     print('Installing pre-commit hook for git')

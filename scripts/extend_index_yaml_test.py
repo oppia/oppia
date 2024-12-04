@@ -226,7 +226,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 """
         web_inf_index_xml = """
 <datastore-indexes autoGenerate="true">    
-    <datastore-index kind="ClassifierTrainingJobModel" ancestor="false" source="auto">
+    <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="status" direction="asc"/>
         <property name="next_scheduled_check_time" direction="asc"/>
     </datastore-index>
@@ -247,7 +247,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
   - name: last_updated
     direction: desc
 
-- kind: ClassifierTrainingJobModel
+- kind: TestModel
   properties:
   - name: status
   - name: next_scheduled_check_time
@@ -321,7 +321,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
   - name: last_updated
     direction: desc
 
-- kind: ClassifierTrainingJobModel
+- kind: TestModel
   properties:
   - name: task
   - name: status
@@ -329,7 +329,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 """
         web_inf_index_xml = """
 <datastore-indexes autoGenerate="true">    
-    <datastore-index kind="ClassifierTrainingJobModel" ancestor="false" source="auto">
+    <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="status" direction="asc"/>
         <property name="next_scheduled_check_time" direction="asc"/>
     </datastore-index>
@@ -349,13 +349,13 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
   - name: last_updated
     direction: desc
 
-- kind: ClassifierTrainingJobModel
+- kind: TestModel
   properties:
   - name: task
   - name: status
   - name: next_scheduled_check_time
 
-- kind: ClassifierTrainingJobModel
+- kind: TestModel
   properties:
   - name: status
   - name: next_scheduled_check_time
@@ -381,12 +381,12 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 """
         web_inf_index_xml = """
 <datastore-indexes autoGenerate="true">    
-    <datastore-index kind="ClassifierTrainingJobModel" ancestor="false" source="auto">
+    <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="task" direction="asc"/>
         <property name="status" direction="asc"/>
         <property name="next_scheduled_check_time" direction="asc"/>
     </datastore-index>
-    <datastore-index kind="ClassifierTrainingJobModel" ancestor="false" source="auto">
+    <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="status" direction="asc"/>
         <property name="next_scheduled_check_time" direction="asc"/>
     </datastore-index>
@@ -406,13 +406,13 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
   - name: last_updated
     direction: desc
 
-- kind: ClassifierTrainingJobModel
+- kind: TestModel
   properties:
   - name: task
   - name: status
   - name: next_scheduled_check_time
 
-- kind: ClassifierTrainingJobModel
+- kind: TestModel
   properties:
   - name: status
   - name: next_scheduled_check_time
@@ -445,12 +445,12 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
         <property name="story_ids2" direction="asc"/>
         <property name="last_updated" direction="desc"/>
     </datastore-index>  
-    <datastore-index kind="ClassifierTrainingJobModel" ancestor="false" source="auto">
+    <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="task" direction="asc"/>
         <property name="status" direction="asc"/>
         <property name="next_scheduled_check_time" direction="asc"/>
     </datastore-index>
-    <datastore-index kind="ClassifierTrainingJobModel" ancestor="false" source="auto">
+    <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="status" direction="asc"/>
         <property name="next_scheduled_check_time" direction="asc"/>
     </datastore-index>
@@ -479,13 +479,13 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
   - name: last_updated
     direction: desc
 
-- kind: ClassifierTrainingJobModel
+- kind: TestModel
   properties:
   - name: task
   - name: status
   - name: next_scheduled_check_time
 
-- kind: ClassifierTrainingJobModel
+- kind: TestModel
   properties:
   - name: status
   - name: next_scheduled_check_time
