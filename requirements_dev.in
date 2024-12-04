@@ -10,7 +10,6 @@ esprima==4.0.1
 future==0.18.3
 grpcio==1.54.0
 isort==5.12.0
-protobuf==3.18.3
 psutil==5.9.5
 pycodestyle==2.10.0
 pylint==2.17.2

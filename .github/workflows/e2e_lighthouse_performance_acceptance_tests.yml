@@ -56,7 +56,7 @@ jobs:
         # We avoid using ../ or absolute paths because unzip treats these as
         # security issues and will refuse to follow them.
         run: |
-          zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
+          zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/app.yaml oppia/assets/hashes.json oppia/backend_prod_files oppia/dist
         working-directory: /home/runner/work/oppia
       - name: Upload build files artifact
         uses: actions/upload-artifact@v4

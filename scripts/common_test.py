@@ -37,7 +37,6 @@ from urllib import request as urlrequest
 from core import feconf
 from core import utils
 from core.tests import test_utils
-from scripts import install_python_dev_dependencies
 from scripts import servers
 
 from typing import Generator, List, Literal, NoReturn
@@ -166,22 +165,6 @@ class CommonTests(test_utils.GenericTestBase):
             yield server.server_address[1]
         finally:
             server.server_close()
-
-    def test_protoc_version_matches_protobuf(self) -> None:
-        """Check that common.PROTOC_VERSION matches the version of protobuf in
-        requirements.in.
-        """
-        with open(
-            install_python_dev_dependencies.REQUIREMENTS_DEV_FILE_PATH,
-            'r',
-            encoding='utf-8',
-        ) as f:
-            for line in f:
-                if line.startswith('protobuf'):
-                    line = line.strip()
-                    protobuf_version = line.split('==')[1]
-                    break
-        self.assertEqual(common.PROTOC_VERSION, protobuf_version)
 
     def test_is_x64_architecture_in_x86(self) -> None:
         maxsize_swap = self.swap(sys, 'maxsize', 1)

@@ -25,9 +25,6 @@
       "app.constants": [
         "core/templates/app.constants"
       ],
-      "classifiers/*": [
-        "extensions/classifiers/*"
-      ],
       "components/*": [
         "core/templates/components/*"
       ],
@@ -85,7 +82,6 @@
     ]
   },
   "exclude": [
-    "extensions/classifiers/proto",
     "extensions/objects/**/*.spec.ts",
     "core/templates/**/*.spec.ts",
     "extensions/interactions/**/*.spec.ts"

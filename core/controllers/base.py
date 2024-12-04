@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import abc
 import base64
 import datetime
 import functools
@@ -35,7 +34,6 @@ from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
-from core.domain import classifier_domain
 from core.domain import user_services
 
 from typing import (
@@ -1021,40 +1019,3 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
         self.render_json({
             'token': csrf_token,
         })
-
-
-class OppiaMLVMHandler(
-    BaseHandler[_NormalizedPayloadDictType, _NormalizedRequestDictType]
-):
-    """Base class for the handlers that communicate with Oppia-ML VM instances.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
-    # contain different schemas with different types of values, like str,
-    # complex Dicts and etc.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
-    # contain different schemas with different types of values, like str,
-    # complex Dicts and etc.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}
-
-    @abc.abstractmethod
-    def extract_request_message_vm_id_and_signature(
-        self
-    ) -> classifier_domain.OppiaMLAuthInfo:
-        """Returns the OppiaMLAuthInfo domain object containing
-        information from the incoming request that is necessary for
-        authentication.
-
-        Since incoming request can be either a protobuf serialized binary or
-        a JSON object, the derived classes must implement the necessary
-        logic to decode the incoming request and return a tuple of size 3
-        where message is at index 0, vm_id is at index 1 and signature is at
-        index 2.
-
-        Raises:
-            NotImplementedError. The derived child classes must implement the
-                necessary logic as described above.
-        """
-        raise NotImplementedError

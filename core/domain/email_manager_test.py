@@ -59,43 +59,6 @@ EMAIL_FOOTER = (
 )
 
 
-class FailedMLTest(test_utils.EmailTestBase):
-    """Test that email functionality for sending failed ML Job emails
-    works.
-    """
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.ADMIN_USERNAME = 'admusername'
-        self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
-        self.signup(
-            feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME, True)
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
-
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER)
-        ]
-    )
-    def test_send_failed_ml_email(self) -> None:
-        with self.can_send_feedback_email_ctx:
-            # Make sure there are no emails already sent.
-            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-
-            # Send job failure email with mock Job ID.
-            email_manager.send_job_failure_email('123ABC')
-
-            # Make sure emails are sent.
-            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
-            expected_subject = 'Failed ML Job'
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].subject, expected_subject)
-
-
 class EmailToAdminTest(test_utils.EmailTestBase):
     """Test that emails are correctly sent to the admin."""
 

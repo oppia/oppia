@@ -83,7 +83,6 @@ check_dev_mode_is_true()
 
 # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
 OPPIA_IS_DOCKERIZED = bool(os.environ.get('OPPIA_IS_DOCKERIZED', False))
-CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -146,7 +145,6 @@ class ValidModelNames(enum.Enum):
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
-    CLASSIFIER = 'classifier'
     CLASSROOM = 'classroom'
     COLLECTION = 'collection'
     CONFIG = 'CONFIG'
@@ -171,42 +169,6 @@ class ValidModelNames(enum.Enum):
     VOICEOVER = 'voiceover'
 
 
-# A mapping of interaction ids to classifier properties.
-# TODO(#10217): As of now we support only one algorithm per interaction.
-# However, we do have the necessary storage infrastructure to support multiple
-# algorithms per interaction. Hence, whenever we find a secondary algorithm
-# candidate for any of the supported interactions, the logical functions to
-# support multiple algorithms need to be implemented.
-
-
-class ClassifierDict(TypedDict):
-    """Representing INTERACTION_CLASSIFIER_MAPPING dict values."""
-
-    algorithm_id: str
-    algorithm_version: int
-
-
-INTERACTION_CLASSIFIER_MAPPING: Dict[str, ClassifierDict] = {
-    'TextInput': {
-        'algorithm_id': 'TextClassifier',
-        'algorithm_version': 1
-    },
-}
-
-# Classifier job time to live (in mins).
-CLASSIFIER_JOB_TTL_MINS = 5
-TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
-TRAINING_JOB_STATUS_FAILED = 'FAILED'
-TRAINING_JOB_STATUS_NEW = 'NEW'
-TRAINING_JOB_STATUS_PENDING = 'PENDING'
-
-ALLOWED_TRAINING_JOB_STATUSES: List[str] = [
-    TRAINING_JOB_STATUS_COMPLETE,
-    TRAINING_JOB_STATUS_FAILED,
-    TRAINING_JOB_STATUS_NEW,
-    TRAINING_JOB_STATUS_PENDING
-]
-
 # Allowed formats of how HTML is present in rule specs.
 HTML_RULE_VARIABLE_FORMAT_SET = 'set'
 HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
@@ -229,14 +191,6 @@ MAX_CHARS_IN_BLOG_POST_URL = (
     + len('-')
     + constants.BLOG_POST_ID_LENGTH
 )
-
-ALLOWED_TRAINING_JOB_STATUS_CHANGES: Dict[str, List[str]] = {
-    TRAINING_JOB_STATUS_COMPLETE: [],
-    TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
-    TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
-                                  TRAINING_JOB_STATUS_FAILED],
-    TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
-}
 
 # Allowed formats of how HTML is present in rule specs.
 HTML_RULE_VARIABLE_FORMAT_SET = 'set'
@@ -278,15 +232,6 @@ MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
 # The maximum number of goals allowed in the learner goals of the learner.
 MAX_CURRENT_GOALS_COUNT = 5
-
-# The minimum number of training samples required for training a classifier.
-MIN_TOTAL_TRAINING_EXAMPLES = 50
-
-# The minimum number of assigned labels required for training a classifier.
-MIN_ASSIGNED_LABELS = 2
-
-# Default label for classification algorithms.
-DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -459,11 +404,6 @@ DEFAULT_TOPIC_DESCRIPTION = ''
 DEFAULT_ABBREVIATED_TOPIC_NAME = ''
 # Default content id for the subtopic page's content.
 DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
-
-# Default ID of VM which is used for training classifier.
-DEFAULT_VM_ID = 'vm_default'
-# Shared secret key for default VM.
-DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
 IMAGE_FORMAT_JPEG = 'jpeg'
 IMAGE_FORMAT_PNG = 'png'
@@ -680,9 +620,7 @@ BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
 BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
 BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
-BULK_EMAIL_INTENT_ML_JOB_FAILURE = 'bulk_email_ml_job_failure'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
-EMAIL_INTENT_ML_JOB_FAILURE = 'email_ml_job_failure'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
@@ -1145,8 +1083,6 @@ MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with app.constants.ts.
-ENABLE_ML_CLASSIFIERS = False
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.

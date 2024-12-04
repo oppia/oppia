@@ -39,7 +39,7 @@ ruleTester.run('constant-declaration', rule, {
       filename: 'foo/bar.constants.ajs.ts',
     },
     {
-      code: `export const ClassifiersExtensionConstants = {
+      code: `export const SampleConstants = {
       PythonProgramTokenType: {
         COMMENT: 'COMMENT',
         NL: 'NL',

@@ -128,13 +128,13 @@ handlers:
   upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   secure: always
   expiration: "0"
-# Serve PNG images for interactions, rich_text_components, objects, classifiers,
+# Serve PNG images for interactions, rich_text_components, objects, 
 # and custom ckeditor plugins under extensions in dev mode. This regex allows
 # us to recursively serve PNG images scripts under the five specified
 # directories. "\1" and "\2" insert capture groups from the url pattern.
-- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
+- url: /extensions/(interactions|rich_text_components|objects|ckeditor_plugins)/(.*\.(png))$
   static_files: extensions/\1/\2
-  upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
+  upload: extensions/(interactions|rich_text_components|objects|ckeditor_plugins)/(.*\.(png))$
   secure: always
   expiration: "0"
 - url: /extensions/ckeditor_plugins/(.*\.(js))$
@@ -181,7 +181,7 @@ env_variables:
   DATASTORE_HOST: "http://localhost:8089"
   DATASTORE_PROJECT_ID: "dev-project-id"
   DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
-  SECRETS: "{\"ANDROID_BUILD_SECRET\": \"android-build-secret\", \"VM_ID\": \"vm_default\", \"SHARED_SECRET_KEY\": \"1a2b3c4e\"}"
+  SECRETS: "{\"ANDROID_BUILD_SECRET\": \"android-build-secret\"}"
 # These environment variables control GRPC logging verbosity. See
 # https://stackoverflow.com/a/78803598.
   GRPC_VERBOSITY: "ERROR"

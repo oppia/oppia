@@ -99,8 +99,10 @@ export const AppConstants = {
   LOADING_INDICATOR_URL: '/activity/loadingIndicator.gif',
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
   // Feature still in development.
-  // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-  ENABLE_ML_CLASSIFIERS: false,
+  // NOTE TO DEVELOPERS: This should only be turned on after we have
+  // infrastructure to process answer-group-specific training data for ML
+  // classification.
+  ENABLE_TRAINING_DATA_UI: false,
   // Feature still in development.
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION:
     'The current solution does not lead to another card.',

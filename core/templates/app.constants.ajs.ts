@@ -116,10 +116,12 @@ angular
   .module('oppia')
   .constant('OBJECT_EDITOR_URL_PREFIX', AppConstants.OBJECT_EDITOR_URL_PREFIX);
 // Feature still in development.
-// NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
+// NOTE TO DEVELOPERS: This should only be turned on after we have
+// infrastructure to process answer-group-specific training data for ML
+// classification.
 angular
   .module('oppia')
-  .constant('ENABLE_ML_CLASSIFIERS', AppConstants.ENABLE_ML_CLASSIFIERS);
+  .constant('ENABLE_TRAINING_DATA_UI', AppConstants.ENABLE_TRAINING_DATA_UI);
 // Feature still in development.
 angular
   .module('oppia')

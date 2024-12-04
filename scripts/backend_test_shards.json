@@ -180,7 +180,6 @@
         "core.domain.stats_domain_test",
         "core.domain.caching_services_test",
         "core.domain.email_manager_test",
-        "core.domain.classifier_domain_test",
         "core.domain.wipeout_domain_test",
         "core.domain.learner_playlist_services_test",
         "core.domain.state_domain_test",
@@ -271,7 +270,6 @@
         "core.platform.email.mailgun_email_services_test",
         "core.storage.story.gae_models_test",
         "core.storage.audit.gae_models_test",
-        "core.storage.classifier.gae_models_test",
         "core.domain.user_query_domain_test",
         "core.storage.blog.gae_models_test",
         "core.storage.classroom.gae_models_test",
@@ -312,7 +310,6 @@
         "core.domain.contribution_stats_services_test"
     ],
     "5": [
-        "core.controllers.classifier_test",
         "core.controllers.suggestion_test",
         "core.controllers.voice_artist_test",
         "core.jobs.batch_jobs.skill_migration_jobs_test",
@@ -360,7 +357,6 @@
         "scripts.run_tests_test",
         "core.controllers.collection_viewer_test",
         "core.domain.rating_services_test",
-        "core.domain.classifier_services_test",
         "core.controllers.recent_commits_test",
         "core.domain.search_services_test",
         "core.domain.role_services_test",

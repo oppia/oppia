@@ -344,7 +344,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   isMLEnabled(): boolean {
-    return AppConstants.ENABLE_ML_CLASSIFIERS;
+    return AppConstants.ENABLE_TRAINING_DATA_UI;
   }
 
   /**

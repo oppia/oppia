@@ -22,15 +22,12 @@ import {Injectable} from '@angular/core';
 import {AlertsService} from 'services/alerts.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {AppService} from 'services/app.service';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
 import {InteractionAnswer, TextInputAnswer} from 'interactions/answer-defs';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
-import {PredictionAlgorithmRegistryService} from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import {State} from 'domain/state/StateObjectFactory';
-import {StateClassifierMappingService} from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import {
   InteractionRuleInputs,
   TranslatableSetOfNormalizedString,
@@ -47,10 +44,7 @@ export interface InteractionRulesService {
 export class AnswerClassificationService {
   constructor(
     private alertsService: AlertsService,
-    private appService: AppService,
-    private interactionSpecsService: InteractionSpecsService,
-    private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
-    private stateClassifierMappingService: StateClassifierMappingService
+    private interactionSpecsService: InteractionSpecsService
   ) {}
 
   /**
@@ -172,45 +166,6 @@ export class AnswerClassificationService {
               null,
               ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION
             );
-          }
-        }
-      }
-      if (this.appService.isMachineLearningClassificationEnabled()) {
-        const classifier =
-          this.stateClassifierMappingService.getClassifier(stateName);
-        if (
-          classifier &&
-          classifier.classifierData &&
-          classifier.algorithmId &&
-          classifier.algorithmVersion
-        ) {
-          const predictionService =
-            this.predictionAlgorithmRegistryService.getPredictionService(
-              classifier.algorithmId,
-              classifier.algorithmVersion
-            );
-          // If prediction service exists, we run classifier. We return the
-          // default outcome otherwise.
-          if (predictionService) {
-            const predictedAnswerGroupIndex = predictionService.predict(
-              classifier.classifierData,
-              answer
-            );
-            if (predictedAnswerGroupIndex === -1) {
-              answerClassificationResult = new AnswerClassificationResult(
-                defaultOutcome as Outcome,
-                answerGroups.length,
-                0,
-                ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
-              );
-            } else {
-              answerClassificationResult = new AnswerClassificationResult(
-                answerGroups[predictedAnswerGroupIndex].outcome,
-                predictedAnswerGroupIndex,
-                null,
-                ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION
-              );
-            }
           }
         }
       }
