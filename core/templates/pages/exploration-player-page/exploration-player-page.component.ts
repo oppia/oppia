@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
@@ -140,10 +139,3 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationPlayerPage',
-  downgradeComponent({
-    component: ExplorationPlayerPageComponent,
-  }) as angular.IDirectiveFactory
-);

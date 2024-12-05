@@ -712,13 +712,11 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.USER_GROUPS_HANDLER_URL,
         release_coordinator.UserGroupHandler),
-
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
-        reader.ExplorationPage),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
-        reader.ExplorationEmbedPage),
+        r'%s/can_access_exploration_player_page/<exploration_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ExplorationPlayerAccessValidationPage
+    ),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
@@ -1225,6 +1223,14 @@ URLS.extend((
         oppia_root.OppiaRootPage),
     get_redirect_route(
         r'/learn/<classroom_url_fragment>',
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(

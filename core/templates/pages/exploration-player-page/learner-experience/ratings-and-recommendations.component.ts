@@ -18,7 +18,6 @@
  */
 
 import {Component, Input, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -219,10 +218,3 @@ export class RatingsAndRecommendationsComponent {
     return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRatingsAndRecommendations',
-  downgradeComponent({
-    component: RatingsAndRecommendationsComponent,
-  }) as angular.IDirectiveFactory
-);

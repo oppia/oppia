@@ -20,7 +20,6 @@ import {Subscription} from 'rxjs';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ServicesConstants} from 'services/services.constants';
 import {ChangeDetectorRef, Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AlertsService} from 'services/alerts.service';
 import {AudioPlayerService} from 'services/audio-player.service';
@@ -1760,10 +1759,3 @@ export class ConversationSkinComponent {
     }, TIME_NUM_CARDS_CHANGE_MSEC);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaConversationSkin',
-  downgradeComponent({
-    component: ConversationSkinComponent,
-  }) as angular.IDirectiveFactory
-);
