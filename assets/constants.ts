@@ -6841,6 +6841,22 @@ export default {
       "TITLE": "I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE",
       "META": []
     },
+    "ERROR_IFRAMED": {
+      "ROUTE": "error/iframed",
+      "TITLE": "Error Iframed - Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Error Iframed Page"
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Error Iframed Page"
+        }
+      ]
+    },
     "EXPLORATION_PLAYER": {
       "ROUTE": "explore/:exploration_id",
       "TITLE": "",

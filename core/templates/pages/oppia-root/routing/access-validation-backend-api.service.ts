@@ -16,7 +16,7 @@
  * @fileoverview Backend Api Service for access validation.
  */
 
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -81,6 +81,9 @@ export class AccessValidationBackendApiService {
   CLASSROOMS_PAGE_ACCESS_VALIDATION =
     '/access_validation_handler/can_access_classrooms_page';
 
+  EXPLORATION_PLAYER_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_exploration_player_page/<exploration_id>';
+
   REVIEW_TESTS_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_review_tests_page/<classroom_url_fragment>/<topic_url_fragment>/<story_url_fragment>'; // eslint-disable-line max-len
 
@@ -97,6 +100,22 @@ export class AccessValidationBackendApiService {
       }
     );
     return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToExplorationPlayerPage(
+    explorationId: string,
+    version: string | null
+  ): Promise<void> {
+    const url = this.urlInterpolationService.interpolateUrl(
+      this.EXPLORATION_PLAYER_PAGE_ACCESS_VALIDATOR,
+      {
+        exploration_id: explorationId,
+      }
+    );
+
+    const params = version ? new HttpParams().set('v', version) : undefined;
+
+    return this.http.get<void>(url, {params}).toPromise();
   }
 
   validateAccessToReviewTestPage(

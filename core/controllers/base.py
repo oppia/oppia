@@ -684,7 +684,6 @@ class BaseHandler(
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
-
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
                 self.response.headers['X-Frame-Options'] = (
@@ -713,10 +712,7 @@ class BaseHandler(
 
         if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
-            if self.iframed:
-                self.render_template(
-                    'error-iframed-page.mainpage.html', iframe_restriction=None)
-            elif values['status_code'] == 404:
+            if values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
                 # That's why 404 status code is treated differently.

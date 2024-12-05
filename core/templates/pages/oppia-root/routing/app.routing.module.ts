@@ -494,6 +494,13 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
 
 // Error routes.
 routes.push(
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/error-pages/error-iframed-page/error-iframed-page.module'
+      ).then(m => m.ErrorIframedPageModule),
+  },
   // Route to register all the custom error pages on oppia.
   {
     path: `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/:status_code`,

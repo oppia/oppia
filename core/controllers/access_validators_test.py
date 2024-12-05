@@ -361,6 +361,90 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
             ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
+class ExplorationPlayerAccessValidationPageTests(
+        test_utils.GenericTestBase):
+    """Test for exploration player access validation."""
+
+    def setUp(self) -> None:
+        """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
+
+        self.exploration = self.save_new_valid_exploration(
+            'asaB1nm2UGVI', self.editor_id, title=self.UNICODE_TEST_STRING,
+            category=self.UNICODE_TEST_STRING)
+
+        self.publish_exploration(self.editor_id, self.exploration.id)
+
+    def test_exploration_player_page_with_invalid_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/invalid' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+            expected_status_int=404)
+
+    def test_exploration_player_page_with_valid_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id),
+            expected_status_int=200)
+
+    def test_exploration_player_page_raises_error_with_invalid_exploration_version( # pylint: disable=line-too-long
+        self) -> None:
+
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id), params={
+                'v': 10,
+            }, expected_status_int=404
+        )
+
+    def test_exploration_player_page_with_valid_exploration_version(
+        self) -> None:
+
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id), params={
+                'v': self.exploration.version,
+                'parent': True,
+            }, expected_status_int=200
+        )
+
+    def test_handler_raises_error_with_invaild_collection(self) -> None:
+        self.login(self.OWNER_EMAIL)
+
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id), params={
+                'v': self.exploration.version,
+                'collection_id': 'aZ9_______12'
+            }, expected_status_int=404
+        )
+        self.logout()
+
+    def test_handler_with_valid_collection(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        col_id = 'aZ9_______12'
+        self.save_new_valid_collection(col_id, self.owner_id)
+
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id), params={
+                'v': self.exploration.version,
+                'collection_id': col_id
+            }, expected_status_int=200
+        )
+        self.logout()
+
+
 class DiagnosticTestPlayerPageAccessValidationHandlerTests(
         test_utils.GenericTestBase):
     """Test for diagnostic test player access validation."""

@@ -18,7 +18,6 @@
  */
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
@@ -442,10 +441,3 @@ export class ExplorationFooterComponent {
     return this.learnerHasViewedLessonInfoTooltip;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaExplorationFooter',
-    downgradeComponent({component: ExplorationFooterComponent})
-  );
