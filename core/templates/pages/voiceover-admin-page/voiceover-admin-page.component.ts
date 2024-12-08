@@ -29,6 +29,7 @@ import {
 import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
 import {VoiceArtistLanguageMapping} from './voice-artist-language-mapping.model';
 import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
@@ -48,7 +49,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   constructor(
     private ngbModal: NgbModal,
-    private voiceoverBackendApiService: VoiceoverBackendApiService
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
@@ -101,6 +103,11 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.voiceArtistIdToVoiceArtistName =
           response.voiceArtistIdToVoiceArtistName;
       });
+  }
+
+  isLabelingVoiceArtistFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.LabelAccentToVoiceArtist
+      .isEnabled;
   }
 
   addLanguageAccentForVoiceArtist(
