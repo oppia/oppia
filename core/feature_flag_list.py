@@ -59,6 +59,9 @@ class FeatureNames(enum.Enum):
         'exploration_editor_can_tag_misconceptions')
     ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
     REDESIGNED_TOPIC_VIEWER_PAGE = 'redesigned_topic_viewer_page'
+    AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP = (
+        'automatic_voiceover_regeneration_from_exp')
+    LABEL_ACCENT_TO_VOICE_ARTIST = 'label_accent_to_voice_artist'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -84,7 +87,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -111,6 +115,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
+    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -263,6 +268,20 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
             feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
+        (
+            'The flag enables the automatic regeneration of voiceovers '
+            'directly from the exploration editor page.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST.value: (
+        (
+            'The flag enables the voice artist accent labeling feature '
+            'on the voiceover admin page.',
+            feature_flag_domain.ServerMode.PROD
         )
     )
 }

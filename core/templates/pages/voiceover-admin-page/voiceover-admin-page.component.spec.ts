@@ -33,6 +33,8 @@ import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {MatTableModule} from '@angular/material/table';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 class MockNgbModal {
   open() {
@@ -42,11 +44,22 @@ class MockNgbModal {
   }
 }
 
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      LabelAccentToVoiceArtist: {
+        isEnabled: true,
+      },
+    };
+  }
+}
+
 describe('Voiceover Admin Page component ', () => {
   let component: VoiceoverAdminPageComponent;
   let fixture: ComponentFixture<VoiceoverAdminPageComponent>;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let ngbModal: NgbModal;
+  let platformFeatureService: PlatformFeatureService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -66,6 +79,10 @@ describe('Voiceover Admin Page component ', () => {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -73,6 +90,7 @@ describe('Voiceover Admin Page component ', () => {
     component = fixture.componentInstance;
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
   });
 
   it('should initialize the component', fakeAsync(() => {
@@ -319,4 +337,24 @@ describe('Voiceover Admin Page component ', () => {
       ''
     );
   }));
+
+  it('should disable voice artist accent labeling feature flag', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      LabelAccentToVoiceArtist: {
+        isEnabled: false,
+      },
+    } as FeatureStatusChecker);
+
+    expect(component.isLabelingVoiceArtistFeatureEnabled()).toBeFalse();
+  });
+
+  it('should enable voice artist accent labeling feature flag', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      LabelAccentToVoiceArtist: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
+
+    expect(component.isLabelingVoiceArtistFeatureEnabled()).toBeTrue();
+  });
 });
