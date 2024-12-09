@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import textwrap
+
 from core import feconf
 from core.constants import constants
 from core.domain import email_services
@@ -225,3 +227,36 @@ class EmailServicesTest(test_utils.EmailTestBase):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=True)
+
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
+    def test_loggable_email_string_generation(self) -> None:
+        """Tests that loggable email string is generated correctly."""
+        msg_body = (
+            """
+            EmailService.SendMail
+            From: %s
+            To: %s
+            Subject: %s
+            Body:
+                Content-type: text/plain
+                Data length: %d
+            Body:
+                Content-type: text/html
+                Data length: %d
+
+            Bcc: None
+            Reply_to: None
+            Recipient Variables:
+                Length: 0
+            """ % (
+                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                'subject', 4, 4))
+
+        self.assertEqual(
+            textwrap.dedent(msg_body),
+            email_services.convert_email_to_loggable_string(
+                feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
+                'subject', 'body', 'html'
+            ))
