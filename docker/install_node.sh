@@ -39,7 +39,7 @@ if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then
     rm node-download.zip
 else
     extension=".tar.gz"
-    if [ "$(python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ] || [ "$(uname -m)" = "x86_64" ]; then
+    if [ "$(getconf LONG_BIT)" = "64" ] || [ "$(uname -m)" = "x86_64" ]; then
         if [ "$OS_NAME" = "Darwin" ]; then
             node_file_name="node-v16.13.0-darwin-x64"
         elif [ "$OS_NAME" = "Linux" ]; then
