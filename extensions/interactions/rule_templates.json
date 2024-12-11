@@ -151,7 +151,7 @@
   },
   "NumberWithUnits": {
     "IsEqualTo": {
-        "description": "is equal to {{f|NumberWithUnits}}"
+        "description": "has the same value and units as {{f|NumberWithUnits}}"
     },
     "IsEquivalentTo": {
         "description": "is equivalent to {{f|NumberWithUnits}}"
