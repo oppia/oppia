@@ -199,7 +199,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	fi
 	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
 	cp -r ./core/tests/puppeteer-acceptance-tests/data ./core/tests/puppeteer-acceptance-tests/build/
-	SPEC_NAME=$(suite) ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/puppeteer-acceptance-tests/specs/$(suite).spec.js
+	SPEC_NAME=$(suite) ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jest --config="./core/tests/puppeteer-acceptance-tests/jest.config.js" ./core/tests/puppeteer-acceptance-tests/specs/$(suite).spec.ts --detectOpenHandles --forceExit
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
