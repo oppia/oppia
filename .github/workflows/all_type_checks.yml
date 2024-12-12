@@ -1,4 +1,4 @@
-name: Test coverage and Typescript test
+name: Type checks
 on:
   merge_group:
     types: [checks_requested]
@@ -12,13 +12,34 @@ on:
       - release-*
 
 jobs:
-  e2e_acceptance_coverage_and_typescript_tests:
-    runs-on:  ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
+  backend_type_checks:
+    name: Backend
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
+        with:
+          use_cache: false
+      - name: Initialize Docker containers
+        run: |
+          make build
+          make stop
+      - name: Run Mypy type checks
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: make run_tests.mypy
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Python type checks failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  frontend_type_checks:
+    name: Frontend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
@@ -28,8 +49,6 @@ jobs:
         uses: ./.github/actions/install-chrome
       - name: Initialize Containers
         uses: ./.github/actions/install-oppia-dependencies-docker
-      - name: Check that all e2e test files are captured in wdio.conf.js
-        run: make run_tests.check_tests_are_captured_in_ci
       - name: Run typescript tests
         run: make run_tests.typescript
       - name: Run typescript tests in strict mode

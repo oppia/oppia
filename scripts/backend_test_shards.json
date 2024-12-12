@@ -214,7 +214,6 @@
         "core.domain.skill_fetchers_test",
         "scripts.run_e2e_tests_test",
         "scripts.run_acceptance_tests_test",
-        "scripts.install_chrome_for_ci_test",
         "scripts.run_mypy_checks_test",
         "scripts.linters.pylint_extensions_test",
         "core.domain.html_cleaner_test",

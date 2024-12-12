@@ -12,21 +12,17 @@ on:
 jobs:
   send_notifications:
     name: Send pending review notifications
-    runs-on:  ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
+      - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
       - name: Notify reviewers
         # SHA1 hash of the develop commit.
-        uses: oppia/stale-review-request-notifier@9765c6aac4a37f69cdb2a4ad0078b722d2364b3d
+        uses: oppia/stale-review-request-notifier@48e428b1f531a0b1dc24beb361cd4352af0a084d
         with:
           category-name: Notify\ Reviewers
-          discussion-title: Pending\ Reviews
           repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
           review-turnaround-hours: 48
       - name: Report if failed

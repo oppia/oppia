@@ -1,4 +1,4 @@
-name: Frontend Karma tests
+name: Frontend unit tests
 on:
   merge_group:
     types: [checks_requested]
@@ -13,6 +13,7 @@ on:
 
 jobs:
   generate-job-strategy-matrix:
+    name: Generate job strategy matrix
     runs-on: ubuntu-22.04
     outputs:
       job-strategy-matrix: ${{ steps.generate.outputs.job-strategy-matrix }}
@@ -32,16 +33,16 @@ jobs:
             echo "job-strategy-matrix=$JOB_STRATEGY_MATRIX" >> $GITHUB_OUTPUT
           fi
   frontend-karma-tests:
+    name: Run all tests
     needs: generate-job-strategy-matrix
-    runs-on:  ${{ matrix.os }}
+    runs-on: ubuntu-22.04
     strategy:
       max-parallel: 25
       matrix:
-        os: [ubuntu-22.04]
         num_runs: ${{ fromJson(needs.generate-job-strategy-matrix.outputs.job-strategy-matrix) }}
       fail-fast: false
     steps:
-      - name: Checkout repository
+      - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
@@ -58,7 +59,7 @@ jobs:
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Initialize Docker containers
         uses: ./.github/actions/install-oppia-dependencies-docker
-      - name: Run frontend tests ${{ matrix.num_runs }}
+      - name: Run frontend tests (attempt ${{ matrix.num_runs }})
         run: make run_tests.frontend PYTHON_ARGS="--check_coverage"
       - name: Upload fronted coverage reports as an artifact
         if: ${{ failure() }}
@@ -67,6 +68,7 @@ jobs:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
   report-failure:
+    name: Report failure
     needs: frontend-karma-tests
     runs-on: ubuntu-22.04
     if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
