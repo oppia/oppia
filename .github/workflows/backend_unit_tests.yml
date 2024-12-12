@@ -1,4 +1,4 @@
-name: Backend tests
+name: Backend unit tests
 on:
   merge_group:
     types: [checks_requested]
@@ -12,15 +12,32 @@ on:
       - release-*
 
 jobs:
+  run_backend_associated_test_file_checks:
+    name: Verify associated test files
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up Python
+        uses: ./.github/actions/merge-develop-and-setup-python
+        with:
+          use_cache: false
+      - name: Run backend associated test file check
+        run: make run_tests.check_backend_associated_tests
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Some backend files lack an associated test file."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   run_tests:
-    name: Run backend tests
-    runs-on:  ${{ matrix.os }}
+    name: Shard ${{ matrix.shard }}
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        os: [ubuntu-22.04]
         shard: [1, 2, 3, 4, 5]
     steps:
-      - name: Checkout repository
+      - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
@@ -53,11 +70,11 @@ jobs:
           path: .coverage
           retention-days: 1
   check_combined_coverage:
-    name: Check combined backend test coverage
+    name: Check coverage
     needs: run_tests
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
+      - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
@@ -122,11 +139,11 @@ jobs:
           message: "Backend coverage checks failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   check_backend_test_times:
-    name: Check backend test times
+    name: Check test times
     needs: run_tests
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
+      - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python

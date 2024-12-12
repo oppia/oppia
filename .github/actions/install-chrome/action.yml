@@ -8,12 +8,14 @@ runs:
       name: Install Chrome (retries on error)
       uses: nick-fields/retry@v3
       env:
+        # This must be one of the versions available from
+        # github.com/webnicer/chrome-downloads.
         CHROME_VERSION: "102.0.5005.61-1"
       with:
         max_attempts: 3
         retry_on: error
         shell: bash
-        timeout_minutes: 30
+        timeout_minutes: 10
         command: |
           sudo apt-get update
           sudo apt-get install libappindicator3-1
