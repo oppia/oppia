@@ -646,8 +646,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   onMouseMoveOnImageArea(e: MouseEvent): void {
-    e.preventDefault();
-
     const coords = this.getEventCoorindatesRelativeToImageContainer(e);
 
     if (this.userIsDraggingCropArea) {
@@ -662,7 +660,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   onMouseDownOnCropArea(e: MouseEvent): void {
-    e.preventDefault();
     const coords = this.getEventCoorindatesRelativeToImageContainer(e);
     const position = this.mousePositionWithinCropArea;
 
@@ -679,7 +676,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   onMouseUpOnCropArea(e: MouseEvent): void {
-    e.preventDefault();
     this.userIsDraggingCropArea = false;
     this.userIsResizingCropArea = false;
   }

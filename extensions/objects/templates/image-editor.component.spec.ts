@@ -1598,14 +1598,12 @@ describe('ImageEditor', () => {
       ' the crop area',
     () => {
       let dummyMouseEvent = new MouseEvent('Mouseover');
-      spyOn(MouseEvent.prototype, 'preventDefault');
 
       component.userIsDraggingCropArea = true;
       component.userIsResizingCropArea = true;
 
       component.onMouseUpOnCropArea(dummyMouseEvent);
 
-      expect(dummyMouseEvent.preventDefault).toHaveBeenCalled();
       expect(component.userIsDraggingCropArea).toBe(false);
       expect(component.userIsResizingCropArea).toBe(false);
     }
