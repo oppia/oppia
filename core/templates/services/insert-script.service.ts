@@ -22,41 +22,83 @@ import {downgradeInjectable} from '@angular/upgrade/static';
 export enum KNOWN_SCRIPTS {
   DONORBOX = 'DONORBOX',
   UNKNOWN = 'UNKNOWN',
+  MATHJAX = 'MATHJAX',
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class InsertScriptService {
-  private loadedScripts: Set<string> = new Set<string>();
+  // Set of scripts that have already loaded.
+  private fullyLoadedScripts: Set<string> = new Set<string>();
+  // Maps scripts that are currently still loading along with their on-load-callback promises.
+  private partiallyLoadedScripts: Map<string, Promise<void>> = new Map();
   private renderer: Renderer2;
 
   constructor(rendererFactory: RendererFactory2) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
-  loadScript(script: KNOWN_SCRIPTS): boolean {
-    if (this.loadedScripts.has(script)) {
-      return false;
-    }
-    const scriptElement = document.createElement('script');
-    switch (script) {
-      case KNOWN_SCRIPTS.DONORBOX:
-        scriptElement.src = 'https://donorbox.org/widget.js';
-        scriptElement.setAttribute('paypalExpress', 'false');
-        scriptElement.async = true;
-        this.appendChild(script, scriptElement);
-        break;
-      default: {
-        return false;
-      }
-    }
-    return true;
+  hasScriptLoaded(script: KNOWN_SCRIPTS): boolean {
+    return this.fullyLoadedScripts.has(script);
   }
 
-  private appendChild(script: KNOWN_SCRIPTS, scriptElement: HTMLElement): void {
-    this.renderer.appendChild(document.body, scriptElement);
-    this.loadedScripts.add(script);
+  loadScript(script: KNOWN_SCRIPTS, onLoadCb?: () => void): boolean {
+    // If the script is already loaded, it does not load again.
+    if (this.hasScriptLoaded(script)) {
+      Promise.resolve().then(onLoadCb);
+      return false;
+    }
+    // The loading method continues only if the script is not in partiallyLoadedScripts.
+    // This is to prevent the same script from creating multiple promises to load. This can
+    // happen for both the MATHJAX and DONORBOX scripts.
+    // The same script can create multiple promises as we call loadScript in the ngOnInit
+    // function of the component needing the script. If on exploration editor, you open the
+    // math expression editor, the MATHJAX script starts loading. If you close the editor
+    // before it loads completely and reopen it again, another promise will be created
+    // for the MATHJAX script due to loadScript being called by the ngOnInit function again.
+    // Hence, we need the partiallyLoadedScripts Map and these checks to prevent this from
+    // happening.
+    if (!this.partiallyLoadedScripts.has(script)) {
+      const scriptElement = this.renderer.createElement('script');
+
+      switch (script) {
+        case KNOWN_SCRIPTS.DONORBOX:
+          scriptElement.src = 'https://donorbox.org/widget.js';
+          scriptElement.setAttribute('paypalExpress', 'false');
+          scriptElement.async = true;
+          break;
+        case KNOWN_SCRIPTS.MATHJAX:
+          scriptElement.src =
+            '/third_party/static/MathJax-2.7.5/MathJax.js?config=default';
+          break;
+        default:
+          return false;
+      }
+      const scriptLoadPromise = new Promise<void>((resolve, reject) => {
+        scriptElement.onerror = (error: ErrorEvent) => {
+          this.partiallyLoadedScripts.delete(script);
+          reject(error);
+        };
+
+        scriptElement.onload = () => {
+          this.fullyLoadedScripts.add(script);
+          this.partiallyLoadedScripts.delete(script);
+          resolve();
+          if (onLoadCb) {
+            onLoadCb();
+          }
+        };
+      });
+
+      this.partiallyLoadedScripts.set(script, scriptLoadPromise);
+      this.renderer.appendChild(document.body, scriptElement);
+    }
+
+    this.partiallyLoadedScripts.get(script)?.then(onLoadCb, () => {
+      console.error('Script loading failed:', script);
+    });
+    return true;
   }
 }
 
