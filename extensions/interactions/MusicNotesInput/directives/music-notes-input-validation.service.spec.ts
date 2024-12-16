@@ -28,11 +28,19 @@ import {
   OutcomeObjectFactory,
 } from 'domain/exploration/OutcomeObjectFactory';
 
+import {AppConstants} from 'app.constants';
+import {Rule} from 'domain/exploration/rule.model';
+import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import cloneDeep from 'lodash/cloneDeep';
+
 describe('MusicNotesInputValidationService', () => {
   let validatorService: MusicNotesInputValidationService;
+  let customizationArgs: MusicNotesInputCustomizationArgs;
 
   let currentState: string;
-  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let answerGroups: AnswerGroup[],
+    goodAnswerGroups: AnswerGroup[],
+    goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
@@ -76,5 +84,46 @@ describe('MusicNotesInputValidationService', () => {
       goodDefaultOutcome
     );
     expect(warnings).toEqual([]);
+  });
+
+  it('should throw error when rule HasLengthInclusivelyBetween is invalid', () => {
+    var answerGroup = agof.createNew(
+      [
+        Rule.createNew(
+          'HasLengthInclusivelyBetween',
+          {
+            a: 5,
+            b: 0,
+          },
+          {
+            a: 'NonnegativeInt',
+            b: 'NonnegativeInt',
+          }
+        ),
+      ],
+      goodDefaultOutcome,
+      [],
+      null
+    );
+
+    answerGroups = [answerGroup, cloneDeep(answerGroup)];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The rule in response group 1 is invalid. 5 is more than 0',
+      },
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The rule in response group 2 is invalid. 5 is more than 0',
+      },
+    ]);
   });
 });
