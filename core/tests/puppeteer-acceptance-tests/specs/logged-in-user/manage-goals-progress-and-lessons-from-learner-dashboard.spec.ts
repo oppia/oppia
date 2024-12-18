@@ -100,7 +100,7 @@ describe('Logged-in User', function () {
         'Congratulations for completing this lesson!'
       );
 
-      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
       await loggedInUser.navigateToGoalsSection();
       await loggedInUser.addGoals(['Algebra I']);
       await loggedInUser.expectToolTipMessage(
@@ -114,7 +114,7 @@ describe('Logged-in User', function () {
         'Congratulations for completing this lesson!'
       );
 
-      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
       await loggedInUser.navigateToGoalsSection();
       await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
 
