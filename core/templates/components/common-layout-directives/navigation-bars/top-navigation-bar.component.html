@@ -431,14 +431,14 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/learner-dashboard"
-             class="dropdown-item nav-link e2e-test-learner-dashboard-link">
+             class="dropdown-item nav-link e2e-test-learner-dashboard-menu-link">
             <span [innerHTML]="'I18N_TOPNAV_LEARNER_DASHBOARD' | translate"></span>
           </a>
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/contributor-dashboard"
-             class="dropdown-item nav-link e2e-test-learner-dashboard-link">
+             class="dropdown-item nav-link e2e-test-learner-dashboard-menu-link">
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
           </a>
         </li>
@@ -493,7 +493,7 @@
         <li class="nav-item" *ngIf="FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE"
-             class="dropdown-item nav-link e2e-test-learner-dashboard-link">
+             class="dropdown-item nav-link e2e-test-learner-dashboard-menu-link">
             <span [innerHTML]="'I18N_TOPNAV_FEEDBACK_UPDATES' | translate"></span>
             <span *ngIf="unreadThreadsCount !== 0">({{ unreadThreadsCount }})</span>
           </a>
