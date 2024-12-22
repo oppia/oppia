@@ -1,5 +1,5 @@
 # The platform flag is added because of https://stackoverflow.com/a/71611002
-FROM --platform=linux/amd64 python:3.9.20-bullseye AS backend
+FROM --platform=linux/amd64 python:3.9.20-slim-bullseye AS backend
 
 ENV OPPIA_IS_DOCKERIZED="true"
 
