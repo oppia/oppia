@@ -522,3 +522,38 @@ jobs:
       - name: Fail if workflow status is failure
         if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
         run: exit 1
+  trigger_build_and_deploy:
+    name: Trigger build and deploy
+    needs: [check_workflow_statuses]
+    runs-on: ubuntu-22.04
+    # Only broadcast this for commits to develop branch in the oppia/oppia repo.
+    # Further checks to ensure that the relevant commit can be deployed (e.g.
+    # the commit is not an older commit than the latest deployed commit) are
+    # done in the build_release_candidate script.
+    if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+    steps:
+      - name: Set environment variables
+        id: set_env
+        run: |
+          echo "VERSION=auto-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+        shell: bash
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        with:
+          app_id: ${{ secrets.NOTIFICATIONS_TOKEN_GENERATOR_GH_APP_ID }}
+          private_key: ${{ secrets.NOTIFICATIONS_TOKEN_GENERATOR_GH_APP_PRIVATE_KEY }}
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@87c5425cae5ba8b5bc7da27674076c78588babf3
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          repository: oppia/release-scripts
+          event-type: develop-commit
+          client-payload: '{
+            "version": "${{ env.VERSION }}",
+            "app_name": "oppiatestserver",
+            "maintenance_mode": "false",
+            "sha": "${{ github.sha }}",
+            "build_was_manually_triggered": "false",
+            "repo_owner": "${{ github.repository_owner }}"
+          }'
