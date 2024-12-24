@@ -632,7 +632,11 @@ def convert_millisecs_time_to_datetime_object(
         datetime. An object of type datetime.datetime corresponding to
         the given milliseconds.
     """
-    return datetime.datetime.fromtimestamp(date_time_msecs / 1000.0)
+    return (
+        datetime.datetime.fromtimestamp(
+            date_time_msecs / 1000.0, tz=datetime.timezone.utc
+        )
+    )
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:

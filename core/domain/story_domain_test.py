@@ -717,7 +717,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_node_update_planned_publication_date(self) -> None:
         self.story.story_contents.nodes[0].planned_publication_date = None
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.now(datetime.timezone.utc)
         current_time_msecs = utils.get_time_in_millisecs(current_time)
         self.story.update_node_planned_publication_date(
             'node_1', current_time_msecs)
@@ -727,7 +727,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_node_update_last_modified(self) -> None:
         self.story.story_contents.nodes[0].last_modified = None
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.now(datetime.timezone.utc)
         current_time_msecs = utils.get_time_in_millisecs(current_time)
         self.story.update_node_last_modified('node_1', current_time_msecs)
         self.assertEqual(
@@ -735,7 +735,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_node_update_first_publication_date(self) -> None:
         self.story.story_contents.nodes[0].first_publication_date = None
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.now(datetime.timezone.utc)
         current_time_msecs = utils.get_time_in_millisecs(current_time)
         self.story.update_node_first_publication_date(
             'node_1', current_time_msecs)
