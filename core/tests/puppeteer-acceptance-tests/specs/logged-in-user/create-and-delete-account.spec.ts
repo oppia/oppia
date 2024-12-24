@@ -39,6 +39,7 @@ describe('Logged-in User', function () {
   it(
     'should be able to create an account, validate email, check admin suggestion, verify terms of use, login and delete account',
     async function () {
+      // Calling openBrowser since we didn't use createNewUser to create loggedInUser2 as it needs a username and a email.
       await loggedInUser2.openBrowser();
       await loggedInUser2.navigateToSignUpPage();
 
@@ -76,6 +77,9 @@ describe('Logged-in User', function () {
 
       // After confirmation of account deletion, user is redirected to /pending-account-deletion page.
       await loggedInUser2.expectToBeOnPage('pending account deletion');
+      // Calling closeBrowser since we didn't call createNewUser for loggedInUser2, so loggedInUser2 is not in the array activeUsers.
+      // UserFactory.closeAllBrowsers closes all browsers based on activeUsers. Therefore, closeBrowser is called to close loggedInUser2's browser.
+      await loggedInUser2.closeBrowser();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
