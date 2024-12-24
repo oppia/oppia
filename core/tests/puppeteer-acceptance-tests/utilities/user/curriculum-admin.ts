@@ -170,8 +170,7 @@ const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
 const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
 const classroomBannerContainer = '.e2e-test-classroom-banner-container';
-const uploadClassroomImageButton = '.e2e-test-photo-upload-submit';
-const imageUploaderModal = '.e2e-test-thumbnail-editor';
+const imageUploaderModal = '.e2e-test-image-uploader-modal';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
 const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
@@ -500,7 +499,10 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.page.waitForSelector(closeSaveModalButton, {visible: true});
+      await this.page.waitForSelector(
+        `${closeSaveModalButton}:not([disabled])`,
+        {visible: true}
+      );
       await this.clickOn(closeSaveModalButton);
       await this.page.waitForSelector(modalDiv, {hidden: true});
     }
@@ -1379,17 +1381,19 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
     await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
     await this.clickOn(classroomThumbnailContainer);
+
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.clickOn(uploadClassroomImageButton);
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.page.waitForSelector(uploadPhotoButton, {hidden: true});
 
     await this.clickOn(classroomBannerContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
     await this.uploadFile(classroomBannerImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadClassroomImageButton);
+    await this.clickOn(uploadPhotoButton);
+    await this.page.waitForSelector(imageUploaderModal, {hidden: true});
+
     await this.clickOn(saveClassroomButton);
 
     showMessage(`Updated ${classroomName} classroom.`);
