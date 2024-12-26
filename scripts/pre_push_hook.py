@@ -325,12 +325,15 @@ def main(args: Optional[List[str]] = None) -> None:
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
-            mypy_check_status = execute_mypy_checks()
-            if mypy_check_status != 0:
-                print(
-                    'Push failed, please correct the mypy type annotation '
-                    'issues above.')
-                sys.exit(mypy_check_status)
+            # When using Docker, we run MYPY checks in docker/pre_push_hook.sh
+            # itself.
+            if not feconf.OPPIA_IS_DOCKERIZED:
+                mypy_check_status = execute_mypy_checks()
+                if mypy_check_status != 0:
+                    print(
+                        'Push failed, please correct the mypy type annotation '
+                        'issues above.')
+                    sys.exit(mypy_check_status)
 
             backend_associated_test_file_check_status = (
                 run_script_and_get_returncode(
