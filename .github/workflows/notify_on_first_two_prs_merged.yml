@@ -4,12 +4,14 @@ on:
   pull_request_target:
     types: [closed]
 
-permissions: write-all
+permissions: read-all
 
 jobs:
   comment-on-merge:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
     runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write 
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
