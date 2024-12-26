@@ -621,24 +621,6 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
     return datetime_obj.timestamp() * 1000.0
 
 
-def convert_millisecs_time_to_datetime_object(
-        date_time_msecs: float) -> datetime.datetime:
-    """Returns the datetime object from the given date time in milliseconds.
-
-    Args:
-        date_time_msecs: float. Date time represented in milliseconds.
-
-    Returns:
-        datetime. An object of type datetime.datetime corresponding to
-        the given milliseconds.
-    """
-    return (
-        datetime.datetime.fromtimestamp(
-            date_time_msecs / 1000.0, tz=datetime.timezone.utc
-        )
-    )
-
-
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
     """Returns a human-readable string representing the naive datetime object.
 
