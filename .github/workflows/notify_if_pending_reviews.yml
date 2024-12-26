@@ -8,11 +8,14 @@ on:
   # So, we add the workflow_dispatch event here to allow triggering this
   # workflow manually if needed.
   workflow_dispatch:
+permissions: read-all
 
 jobs:
   send_notifications:
     name: Send pending review notifications
     runs-on: ubuntu-22.04
+    permissions:
+      discussions: write
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4

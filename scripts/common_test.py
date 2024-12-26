@@ -40,6 +40,7 @@ from core.tests import test_utils
 from scripts import servers
 
 from typing import Generator, List, Literal, NoReturn
+import yaml
 
 from . import common
 
@@ -1389,3 +1390,25 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(
                 common.start_subprocess_for_result(['cmd']),
                 (b'test\n', b''))
+
+    def test_workflow_permissions_set_to_read_all(self) -> None:
+        workflows_dir = os.path.join(os.getcwd(), '.github', 'workflows')
+        self.assertTrue(
+            os.path.isdir(workflows_dir),
+            f'{workflows_dir} directory not found.'
+        )
+
+        for filename in os.listdir(workflows_dir):
+            if filename.endswith(('.yaml', '.yml')):
+                filepath = os.path.join(workflows_dir, filename)
+                with open(filepath, 'r', encoding='utf-8') as file:
+                    try:
+                        workflow_data = yaml.safe_load(file)
+                        permissions = workflow_data.get('permissions')
+                        self.assertEqual(
+                            permissions, 'read-all',
+                            f'Workflow file "{filename}" is missing a '
+                            '"permissions: read-all" field.'
+                        )
+                    except yaml.YAMLError as e:
+                        self.fail(f'Error parsing file "{filename}": {str(e)}')

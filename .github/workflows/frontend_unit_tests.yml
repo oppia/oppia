@@ -1,4 +1,5 @@
 name: Frontend unit tests
+permissions: read-all
 on:
   merge_group:
     types: [checks_requested]

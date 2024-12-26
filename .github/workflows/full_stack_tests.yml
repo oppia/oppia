@@ -1,4 +1,5 @@
 name: Full-stack tests
+permissions: read-all
 on:
   merge_group:
     types: [checks_requested]
