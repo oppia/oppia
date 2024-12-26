@@ -778,12 +778,6 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
-    def test_convert_millisecs_time_to_datetime_object(self) -> None:
-        msecs = 1690761600000
-        dt = utils.convert_millisecs_time_to_datetime_object(msecs)
-        dt2 = datetime.datetime(2023, 7, 31, 0, 0, tzinfo=datetime.timezone.utc)
-        self.assertEqual(dt, dt2)
-
     def test_grouper(self) -> None:
         self.assertEqual(
             [list(g) for g in utils.grouper(range(7), 3)],

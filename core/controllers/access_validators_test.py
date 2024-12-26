@@ -995,8 +995,8 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': self.exp_id,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
