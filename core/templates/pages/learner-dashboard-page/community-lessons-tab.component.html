@@ -430,7 +430,7 @@
         <oppia-card-display *ngIf="learntTopicsList.length !== 0 && dataLoaded" [headingI18n]="'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_CLASSROOM'" [numCards]="learntTopicMastery.length" [controlType]="'toggle'">
           <ng-container *ngFor="let topicObj of learntTopicMastery">
             <ng-container *ngFor="let story of topicObj.topic.canonicalStorySummaryDicts; index as i">
-              <lesson-card [story]="story" [topic]="topicObj.topic.name"> </lesson-card>
+              <lesson-card [story]="story" [topic]="topicObj.topic.name" [isGoal]="completedGoalIds.has(topicObj.id)"> </lesson-card>
             </ng-container>
           </ng-container>
         </oppia-card-display>
