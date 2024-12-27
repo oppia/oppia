@@ -29,6 +29,8 @@ import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -96,6 +98,77 @@ describe('Home tab Component', () => {
       first_publication_date_msecs: 200.0,
       unpublishing_reason: null,
     };
+
+    let nodeDict2 = {
+      id: 'node_2',
+      thumbnail_filename: 'image.png',
+      title: 'Title 2',
+      description: 'Description 2',
+      prerequisite_skill_ids: ['skill_2'],
+      acquired_skill_ids: ['skill_3'],
+      destination_node_ids: ['node_3'],
+      outline: 'Outline',
+      exploration_id: 'exp_id_2',
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null,
+    };
+
+    let nodeDict3 = {
+      id: 'node_3',
+      thumbnail_filename: 'image.png',
+      title: 'Title 3',
+      description: 'Description 2',
+      prerequisite_skill_ids: ['skill_3'],
+      acquired_skill_ids: ['skill_4'],
+      destination_node_ids: ['node_4'],
+      outline: 'Outline',
+      exploration_id: 'exp_id_3',
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null,
+    };
+
+    let inProgressStorySummary = {
+      id: '1',
+      title: 'Started Story Title',
+      description: 'Story Description',
+      node_titles: ['Title 1', 'Title 2', 'Title 3'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      story_is_published: true,
+      completed_node_titles: ['Title 1'],
+      url_fragment: 'story-title',
+      all_node_dicts: [nodeDict, nodeDict2, nodeDict3],
+      topic_name: 'Topic',
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'topic',
+    };
+
+    let lastLessonStorySummary = {
+      id: '2',
+      title: 'Incomplete Story Title',
+      description: 'Story Description',
+      node_titles: ['Title 1', 'Title 2', 'Title 3'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      story_is_published: true,
+      completed_node_titles: ['Title 1', 'Title 2'],
+      url_fragment: 'story-title',
+      all_node_dicts: [nodeDict, nodeDict2, nodeDict3],
+      topic_name: 'Topic',
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'topic',
+    };
+
     const learnerTopicSummaryBackendDict1 = {
       id: 'sample_topic_id',
       name: 'Topic Name',
@@ -122,6 +195,8 @@ describe('Home tab Component', () => {
           url_fragment: 'story-title',
           all_node_dicts: [nodeDict],
         },
+        inProgressStorySummary,
+        lastLessonStorySummary,
       ],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
@@ -144,7 +219,11 @@ describe('Home tab Component', () => {
         learnerTopicSummaryBackendDict1
       ),
     ];
-    component.partiallyLearntTopicsList = [];
+    component.partiallyLearntTopicsList = [
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict1
+      ),
+    ];
     component.untrackedTopics = {};
     component.username = 'username';
     fixture.detectChanges();
@@ -283,5 +362,60 @@ describe('Home tab Component', () => {
     expect(
       siteAnalyticsService.registerInProgressClassroomLessonEngagedWithEvent
     ).toHaveBeenCalled();
+  });
+
+  it('should get the correct number of stories that have available story nodes to recommend', () => {
+    expect(component.storySummariesWithAvailableNodes).toEqual(new Set(['1']));
+  });
+
+  it('should get the correct number in-progress lessons (explorations, collections, and classrooms)', () => {
+    const sampleExploration = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+
+    const sampleCollection = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on: 1591296635736.666,
+      status: 'public',
+      category: 'Algebra',
+      title: 'Test Title',
+      node_count: 0,
+    };
+    component.incompleteCollectionsList = [
+      CollectionSummary.createFromBackendDict(sampleCollection),
+    ];
+    component.incompleteExplorationsList = [
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+    ];
+
+    fixture.detectChanges();
+    expect(component.getTotalInProgressLessons()).toBe(4);
   });
 });

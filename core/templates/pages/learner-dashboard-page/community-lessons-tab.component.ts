@@ -101,6 +101,7 @@ export class CommunityLessonsTabComponent {
   partialTopicMastery: {topic: LearnerTopicSummary; progress: number[]}[] = [];
   learntTopicMastery: {topic: LearnerTopicSummary; progress: number[]}[] = [];
   currentGoalIds: Set<string> = new Set();
+  completedGoalIds: Set<string> = new Set();
 
   completed: string = 'Completed';
   incomplete: string = 'Incomplete';
@@ -189,6 +190,7 @@ export class CommunityLessonsTabComponent {
     this.selectedSection = this.all;
     this.dropdownEnabled = false;
     this.currentGoalIds = new Set(this.currentGoals.map(g => g.id));
+    this.completedGoalIds = new Set(this.learntTopicsList.map(t => t.id));
 
     this.getSubtopicMasteryData();
   }
