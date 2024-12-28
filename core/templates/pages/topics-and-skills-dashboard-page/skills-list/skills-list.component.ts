@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {MergeSkillModalComponent} from 'components/skill-selector/merge-skill-modal.component';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
@@ -325,10 +324,3 @@ export class SkillsListComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaSkillsList',
-    downgradeComponent({component: SkillsListComponent})
-  );

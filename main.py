@@ -608,9 +608,6 @@ URLS = [
         feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
         feedback_updates.FeedbackThreadHandler),
     get_redirect_route(
-        r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
-        topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
-    get_redirect_route(
         r'%s' % feconf.MERGE_SKILLS_URL,
         topics_and_skills_dashboard.MergeSkillHandler),
     get_redirect_route(
