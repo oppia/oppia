@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-select-topics',
@@ -67,10 +66,3 @@ export class SelectTopicsComponent {
     return this.filteredTopics;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaSelectTopics',
-    downgradeComponent({component: SelectTopicsComponent})
-  );
