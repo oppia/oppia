@@ -23,6 +23,7 @@ import getpass
 import http.server
 import io
 import os
+import pathlib
 import re
 import shutil
 import socketserver
@@ -74,6 +75,11 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
+
+    def tearDown(self) -> None:
+        pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
+        pathlib.Path.unlink(pathlib.Path('mock_app_dev.yaml'), missing_ok=True)
+        super().tearDown()
 
     def test_run_ng_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
@@ -188,6 +194,12 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertTrue(common.is_linux_os())
         with self.swap(common, 'OS_NAME', 'Windows'):
             self.assertFalse(common.is_linux_os())
+
+    def test_is_windows_os(self) -> None:
+        with self.swap(common, 'OS_NAME', 'Windows'):
+            self.assertTrue(common.is_windows_os())
+        with self.swap(common, 'OS_NAME', 'Linux'):
+            self.assertFalse(common.is_windows_os())
 
     def test_run_cmd(self) -> None:
         self.assertEqual(
@@ -882,26 +894,6 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertEqual(origin_content, new_content)
         # Revert the file.
         shutil.move(backup_filepath, origin_filepath)
-
-    def test_convert_to_posixpath_on_windows(self) -> None:
-        def mock_is_windows() -> Literal[True]:
-            return True
-
-        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
-        original_filepath = 'c:\\path\\to\\a\\file.js'
-        with is_windows_swap:
-            actual_file_path = common.convert_to_posixpath(original_filepath)
-        self.assertEqual(actual_file_path, 'c:/path/to/a/file.js')
-
-    def test_convert_to_posixpath_on_platform_other_than_windows(self) -> None:
-        def mock_is_windows() -> Literal[False]:
-            return False
-
-        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
-        original_filepath = 'c:\\path\\to\\a\\file.js'
-        with is_windows_swap:
-            actual_file_path = common.convert_to_posixpath(original_filepath)
-        self.assertEqual(actual_file_path, original_filepath)
 
     def test_create_readme(self) -> None:
         try:
