@@ -1,4 +1,4 @@
-name: PR Merge Comment
+name: Celebrate initial contributions
 
 on:
   pull_request_target:
@@ -26,7 +26,7 @@ jobs:
           echo "OWNER=${OWNER}" >> $GITHUB_ENV
       - name: Count merged PRs
         id: count-prs
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -39,9 +39,10 @@ jobs:
             const prCount = data.items.filter(pr => pr.pull_request.merged_at).length;
             core.exportVariable('PR_COUNT', prCount);
       - name: Comment on the PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          retries: 3
           script: |
             const prCount = parseInt(process.env.PR_COUNT);
             const author = process.env.AUTHOR;
@@ -62,10 +63,21 @@ jobs:
             }
               
             if (prCount === 1 || prCount === 2) {
-              await github.rest.issues.createComment({
-                owner: process.env.OWNER,
-                repo: process.env.REPO,
-                issue_number: prNumber,
-                body: message
-              });
+              // GitHub rate-limits REST API requests to 15 per second (see
+              // (https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#about-secondary-rate-limits ).
+              // The timeout here is used to handle the case where multiple PRs
+              // are merged in a group through the merge queue, which causes
+              // this action to run simultaneously for all of them. Having a
+              // random timeout means that, in most cases, the REST API calls
+              // will happen at different times, and thus not trigger the rate
+              // limit. Note that the comment will still be posted within 60
+              // seconds of the merge.
+              setTimeout(async function() {
+                await github.rest.issues.createComment({
+                  owner: process.env.OWNER,
+                  repo: process.env.REPO,
+                  issue_number: prNumber,
+                  body: message
+                });
+              }, Math.random() * 60000)
             }
