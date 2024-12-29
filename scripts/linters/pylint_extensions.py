@@ -33,7 +33,7 @@ from typing import (
     Dict, Final, Generator, List, Optional, Pattern, Set, Tuple, TypedDict
 )
 
-from .. import docstrings_checker
+from . import docstrings_checker
 
 # List of punctuation symbols that can be used at the end of
 # comments and docstrings.

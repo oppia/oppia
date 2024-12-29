@@ -13,8 +13,6 @@ omit =
     */scripts/install_python_dev_dependencies.py
     */scripts/install_python_prod_dependencies.py
     */scripts/install_third_party_libs.py
-    */scripts/setup.py
-    */scripts/setup_gae.py
     */scripts/run_acceptance_tests.py
 # The above files in the scripts folder will be deleted once the migration to Docker is complete.
 # Currently, the backend tests for these files are failing when runnning within the Docker container.

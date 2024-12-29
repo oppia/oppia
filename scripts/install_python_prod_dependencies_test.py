@@ -287,8 +287,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url',
-                    '--generate-hashes', 'requirements.in',
+                    'pip-compile', '--no-emit-index-url', '--quiet',
+                    '--strip-extras', '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
@@ -338,8 +338,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url',
-                    '--generate-hashes', 'requirements.in',
+                    'pip-compile', '--no-emit-index-url', '--quiet',
+                    '--strip-extras', '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
@@ -419,8 +419,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url',
-                    '--generate-hashes', 'requirements.in',
+                    'pip-compile', '--no-emit-index-url', '--quiet',
+                    '--strip-extras', '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [
@@ -467,8 +467,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.cmd_token_list, [
             [
-                'pip-compile', '--no-emit-index-url',
-                '--generate-hashes', 'requirements.in',
+                'pip-compile', '--no-emit-index-url', '--quiet',
+                '--strip-extras', '--generate-hashes', 'requirements.in',
                 '--output-file', 'requirements.txt',
             ],
         ])
@@ -501,8 +501,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.cmd_token_list, [
             [
-                'pip-compile', '--no-emit-index-url',
-                '--generate-hashes', 'requirements.in',
+                'pip-compile', '--no-emit-index-url', '--quiet',
+                '--strip-extras', '--generate-hashes', 'requirements.in',
                 '--output-file', 'requirements.txt',
             ],
         ])
@@ -570,8 +570,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', '--no-emit-index-url',
-                    '--generate-hashes', 'requirements.in',
+                    'pip-compile', '--no-emit-index-url', '--quiet',
+                    '--strip-extras', '--generate-hashes', 'requirements.in',
                     '--output-file', 'requirements.txt',
                 ],
                 [

@@ -24,7 +24,6 @@ import shutil
 import subprocess
 
 from core.tests import test_utils
-from scripts import common
 
 import psutil
 from typing import List, Tuple
@@ -63,31 +62,6 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertIn(
-            'pre-commit hook file is now executable!', self.print_arr)
-
-    def test_install_hook_with_existing_symlink_in_windows_os(self) -> None:
-        oppia_dir = os.getcwd()
-        hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
-        pre_commit_file = os.path.join(hooks_dir, 'pre-commit')
-        def mock_islink(unused_file: str) -> bool:
-            return True
-        def mock_exists(unused_file: str) -> bool:
-            return True
-        def mock_is_windows() -> bool:
-            return True
-
-        islink_swap = self.swap_with_checks(
-            os.path, 'islink', mock_islink,
-            expected_args=((pre_commit_file,),))
-        exists_swap = self.swap_with_checks(
-            os.path, 'exists', mock_exists,
-            expected_args=((pre_commit_file,),))
-        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
-
-        with islink_swap, exists_swap, self.print_swap, is_windows_swap:
-            pre_commit_hook.install_hook()
-        self.assertTrue('Symlink already exists' in self.print_arr)
-        self.assertNotIn(
             'pre-commit hook file is now executable!', self.print_arr)
 
     def test_install_hook_with_error_in_making_pre_push_executable(
@@ -378,12 +352,19 @@ class PreCommitHookTests(test_utils.GenericTestBase):
 
     def test_main_without_install_arg_and_errors(self) -> None:
         check_function_calls = {
-            'check_changes_in_config_is_called': False
+            'check_changes_in_config_is_called': False,
+            'check_npx_subprocess_is_called': False
         }
         def mock_func() -> bool:
             return False
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
+        def mock_npx_subprocess(  # pylint: disable=unused-argument
+                cmds: List[str], shell: bool, check: bool) -> None:
+            self.assertTrue(cmds[0].endswith('npx'))
+            self.assertEqual(cmds[1], 'lint-staged')
+            check_function_calls['check_npx_subprocess_is_called'] = True
+
         package_lock_swap = self.swap(
             pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
         package_lock_in_current_folder_swap = self.swap(
@@ -393,8 +374,12 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         check_config_swap = self.swap(
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
+        npx_subprocess_swap = self.swap(
+            subprocess, 'run', mock_npx_subprocess)
         with package_lock_swap, package_lock_in_current_folder_swap:
-            with check_config_swap:
+            with check_config_swap, npx_subprocess_swap:
                 pre_commit_hook.main(args=[])
         self.assertTrue(
             check_function_calls['check_changes_in_config_is_called'])
+        self.assertTrue(
+            check_function_calls['check_npx_subprocess_is_called'])

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/check_overall_backend_test_coverage.py."""
+"""Unit tests for scripts/check_backend_test_coverage.py."""
 
 from __future__ import annotations
 
@@ -22,12 +22,12 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-from scripts import check_overall_backend_test_coverage
+from scripts import check_backend_test_coverage
 from scripts import common
 
 
 class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
-    """Unit tests for scripts/check_overall_backend_test_coverage.py."""
+    """Unit tests for scripts/check_backend_test_coverage.py."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -65,7 +65,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             'Run backend tests before running this script. '
             '\nOUTPUT: No data to report.\nERROR: None'
         ):
-            check_overall_backend_test_coverage.main()
+            check_backend_test_coverage.main()
 
     def test_failure_to_execute_coverage_command_throws_error(self) -> None:
         class MockProcess:
@@ -89,7 +89,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             'Failed to calculate coverage because subprocess failed. '
             '\nOUTPUT: Some error occured.\nERROR: Some error.'
         ):
-            check_overall_backend_test_coverage.main()
+            check_backend_test_coverage.main()
 
     def test_error_in_parsing_coverage_report_throws_error(self) -> None:
         class MockProcess:
@@ -110,7 +110,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError, 'Error in parsing coverage report.'
         ):
-            check_overall_backend_test_coverage.main()
+            check_backend_test_coverage.main()
 
     def test_overall_backend_coverage_checks_failed(self) -> None:
         class MockProcess:
@@ -132,7 +132,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             expected_args=((1,),))
 
         with self.print_swap, swap_sys_exit, swap_subprocess_run:
-            check_overall_backend_test_coverage.main()
+            check_backend_test_coverage.main()
 
         self.assertIn(
             'Backend overall line coverage checks failed.', self.print_arr)
@@ -154,7 +154,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             }])
 
         with self.print_swap, swap_subprocess_run:
-            check_overall_backend_test_coverage.main()
+            check_backend_test_coverage.main()
 
         self.assertIn(
             'Backend overall line coverage checks passed.', self.print_arr)

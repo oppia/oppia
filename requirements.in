@@ -1,6 +1,6 @@
 # NOTE TO DEVELOPERS: If you make changes to this file, please run
 #
-#    python -m scripts.install_third_party
+#    python -m scripts.install_third_party_libs
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
 apache-beam[gcp]==2.43.0

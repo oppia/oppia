@@ -342,11 +342,6 @@ def managed_cloud_datastore_emulator(
 @contextlib.contextmanager
 def managed_redis_server() -> Iterator[psutil.Process]:
     """Run the redis server within a context manager that ends it gracefully."""
-    if common.is_windows_os():
-        raise Exception(
-            'The redis command line interface is not installed because your '
-            'machine is on the Windows operating system. The redis server '
-            'cannot start.')
 
     # Check if a redis dump file currently exists. This file contains residual
     # data from a previous run of the redis server. If it exists, removes the

@@ -613,7 +613,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 '\n',
                 'Please fix these discrepancies by editing the '
                 '`requirements.in`\nfile or running '
-                '`scripts.install_third_party` to regenerate\nthe '
+                '`scripts.install_third_party_libs` to regenerate\nthe '
                 '`third_party/python_libs` directory.\n\n'
             ])
 
@@ -650,7 +650,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 '\n',
                 'Please fix these discrepancies by editing the '
                 '`requirements.in`\nfile or running '
-                '`scripts.install_third_party` to regenerate\nthe '
+                '`scripts.install_third_party_libs` to regenerate\nthe '
                 '`third_party/python_libs` directory.\n\n'
             ])
 

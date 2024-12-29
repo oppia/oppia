@@ -310,10 +310,8 @@ def is_x64_architecture() -> bool:
     return sys.maxsize > 2**32
 
 
-NODE_BIN_PATH = os.path.join(
-    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
-NPX_BIN_PATH = os.path.join(
-    NODE_PATH, '' if is_windows_os() else 'bin', 'npx')
+NODE_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'node')
+NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([
@@ -640,21 +638,6 @@ def get_personal_access_token() -> str:
             'access token at https://github.com/settings/tokens and re-run '
             'the script')
     return personal_access_token
-
-
-def convert_to_posixpath(file_path: str) -> str:
-    """Converts a Windows style filepath to posixpath format. If the operating
-    system is not Windows, this function does nothing.
-
-    Args:
-        file_path: str. The path to be converted.
-
-    Returns:
-        str. Returns a posixpath version of the file path.
-    """
-    if not is_windows_os():
-        return file_path
-    return file_path.replace('\\', '/')
 
 
 def create_readme(dir_path: str, readme_content: str) -> None:
