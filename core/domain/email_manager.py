@@ -488,7 +488,8 @@ def _send_email(
     sender_email: str,
     bcc_admin: bool = False,
     sender_name: Optional[str] = None,
-    recipient_email: Optional[str] = None
+    recipient_email: Optional[str] = None,
+    attachments: Optional[List[Dict[str, str]]] = None
 ) -> None:
     """Sends an email to the given recipient.
 
@@ -513,6 +514,9 @@ def _send_email(
             This should only be used when the user with user_id equal to
             recipient_id does not exist or is deleted and their email cannot be
             retrieved via get_email_from_user_id.
+        attachments: list(dict)|None. Optional argument. A list of
+            dictionaries, where each dictionary includes the keys `filename`
+            and `path` with their corresponding values.
     """
 
     if sender_name is None:
@@ -559,7 +563,8 @@ def _send_email(
 
         email_services.send_mail(
             sender_name_email, recipient_email_address, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin)
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
+            attachments=attachments)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email_address, sender_id, sender_name_email,
             intent, email_subject, cleaned_html_body, datetime.datetime.utcnow()
@@ -576,7 +581,8 @@ def _send_bulk_mail(
     email_html_body: str,
     sender_email: str,
     sender_name: str,
-    instance_id: str
+    instance_id: str,
+    attachments: Optional[List[Dict[str, str]]] = None
 ) -> None:
     """Sends an email to all given recipients.
 
@@ -590,6 +596,9 @@ def _send_bulk_mail(
         sender_name: str. The name to be shown in the "sender" field of the
             email.
         instance_id: str. The ID of the BulkEmailModel entity instance.
+        attachments: list(dict)|None. Optional argument. A list of
+            dictionaries, where each dictionary includes the keys `filename`
+            and `path` with their corresponding values.
     """
     require_sender_id_is_valid(intent, sender_id)
 
@@ -621,7 +630,7 @@ def _send_bulk_mail(
 
         email_services.send_bulk_mail(
             sender_name_email, recipient_emails, email_subject,
-            cleaned_plaintext_body, cleaned_html_body)
+            cleaned_plaintext_body, cleaned_html_body, attachments)
 
         email_models.BulkEmailModel.create(
             instance_id, sender_id, sender_name_email, intent,
