@@ -977,9 +977,6 @@ def save_user_settings(user_settings: user_domain.UserSettings) -> None:
 
     Args:
         user_settings: UserSettings. The user setting domain object to be saved.
-
-    Returns:
-        UserSettingsModel. The updated user settings model that was saved.
     """
     user_model = convert_to_user_settings_model(user_settings)
     user_model.update_timestamps()

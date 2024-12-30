@@ -826,7 +826,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
-        expected_outcome_list = [u'new suggestion content']
+        expected_outcome_list = ['new suggestion content']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self) -> None:
@@ -897,7 +897,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date)
 
         actual_outcome_list = suggestion.get_target_entity_html_strings()
-        expected_outcome_list = [u'Old content.']
+        expected_outcome_list = ['Old content.']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_get_target_entity_html_with_none_old_value(self) -> None:
@@ -1719,7 +1719,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         actual_outcome_list = suggestion.get_all_html_content_strings()
 
         expected_outcome_list = [
-            u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
+            '<p>This is translated html.</p>', '<p>This is a content.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_get_all_html_content_strings_for_content_lists(self) -> None:
@@ -2581,7 +2581,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [
-            u'', u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>']
+            '', '', '<p>This is a hint.</p>', '<p>This is a solution.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self) -> None:

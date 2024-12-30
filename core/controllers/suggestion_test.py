@@ -410,8 +410,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'review_message': u'suggestion accepted!'
+                'action': 'accept',
+                'review_message': 'suggestion accepted!'
             },
             csrf_token=csrf_token,
             expected_status_int=500
@@ -744,7 +744,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s/resubmit/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, 'invalid_suggestion_id'), {
                     'summary_message': 'summary message',
-                    'action': u'resubmit',
+                    'action': 'resubmit',
                     'change_cmd': {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1535,9 +1535,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
+                'action': 'accept',
+                'commit_message': 'commit message',
+                'review_message': 'Accepted'
             }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -2241,8 +2241,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'review_message': u'This looks good!',
+                'action': 'accept',
+                'review_message': 'This looks good!',
             }, csrf_token=csrf_token)
 
         suggestion_post_accept = self.get_json(
@@ -2423,8 +2423,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion.target_id,
             suggestion.suggestion_id), {
-                'action': u'accept',
-                'review_message': u'This looks good!',
+                'action': 'accept',
+                'review_message': 'This looks good!',
             }, csrf_token=csrf_token)
 
         self.logout()
@@ -2750,8 +2750,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'review_message': u'Accepted!',
+                'action': 'accept',
+                'review_message': 'Accepted!',
             }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -2779,8 +2779,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
             suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'review_message': u'Accepted!'
+                'action': 'accept',
+                'review_message': 'Accepted!'
             }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
