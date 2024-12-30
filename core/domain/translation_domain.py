@@ -24,8 +24,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import Dict, List, Optional, Union
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Optional, TypedDict, Union
 
 from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
@@ -148,12 +147,6 @@ class TranslatedContent:
     English, then 'B' is a TranslatedContent instance that represents this
     class.
     A (TranslatableContent) -----(translation)-----> B (TranslatedContent).
-
-    Args:
-        content_value: ContentValueType. Represents translation of translatable
-            content.
-        content_format: TranslatableContentFormat. The format of the content.
-        needs_update: bool. Whether the translation needs an update or not.
     """
 
     def __init__(
@@ -169,7 +162,7 @@ class TranslatedContent:
                 translated.
             content_format: TranslatableContentFormat. The format of the
                 content.
-            needs_update: bool. Whether the translated content needs update.
+            needs_update: bool. Whether the translated content needs an update.
         """
         self.content_value = content_value
         self.content_format = content_format
@@ -504,15 +497,6 @@ class EntityTranslation:
 
     NOTE: This domain object corresponds to EntityTranslationsModel in the
     storage layer.
-
-    Args:
-        entity_id: str. The id of the corresponding entity.
-        entity_type: TranslatableEntityType. The type
-            of the corresponding entity.
-        entity_version: str. The version of the corresponding entity.
-        language_code: str. The language code for the corresponding entity.
-        translations: dict(str, TranslatedContent). A dict representing
-            content-id as keys and TranslatedContent instance as values.
     """
 
     def __init__(
@@ -526,13 +510,13 @@ class EntityTranslation:
         """Constructs an TranslatableContent domain object.
 
         Args:
-            entity_id: str. The ID of the entity.
-            entity_type: TranslatableEntityType. The type of the entity.
-            entity_version: int. The version of the entity.
-            language_code: str. The langauge code for the translated contents
-                language.
-            translations: dict(str, TranslatedContent). The translations dict
-                containing content_id as key and TranslatedContent as value.
+            entity_id: str. The ID of the corresponding entity.
+            entity_type: TranslatableEntityType. The type of the corresponding
+                entity.
+            entity_version: int. The version of the corresponding entity.
+            language_code: str. The language code for the translations.
+            translations: dict(str, TranslatedContent). A dict mapping each
+                content_id in the entity to its TranslatedContent.
         """
         self.entity_id = entity_id
         self.entity_type = entity_type.value

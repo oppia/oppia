@@ -913,9 +913,6 @@ def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
-
-    Returns:
-        str. JS code loading hashes as JSON into variable.
     """
     # Only some of the hashes are needed in the frontend.
     filtered_hashes = filter_hashes(file_hashes)
@@ -924,7 +921,7 @@ def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
     with utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
         hashes_json_file.write(
             str(json.dumps(filtered_hashes, ensure_ascii=False)))
-        hashes_json_file.write(u'\n')
+        hashes_json_file.write('\n')
 
 
 def minify_func(source_path: str, target_path: str, filename: str) -> None:

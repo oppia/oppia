@@ -23,7 +23,7 @@ from core.domain import change_domain
 from core.tests import test_utils
 
 
-# TODO (#14219): Update these tests to fully cover file change_domain.py.
+# TODO(#14219): Update these tests to fully cover file change_domain.py.
 class ChangeDomainTests(test_utils.GenericTestBase):
 
     def test_that_domain_object_is_created_correctly(self) -> None:

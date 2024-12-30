@@ -108,11 +108,11 @@ class Collapsible(BaseRteComponent):
         super(Collapsible, cls).validate(value_dict)
         content = value_dict['content-with-value']
         inner_soup = bs4.BeautifulSoup(content, 'html.parser')
-        collapsible = inner_soup.findAll(
+        collapsible_components = inner_soup.findAll(
             name='oppia-noninteractive-collapsible')
-        tabs = inner_soup.findAll(
+        tabs_components = inner_soup.findAll(
             name='oppia-noninteractive-tabs')
-        if len(collapsible) or len(tabs):
+        if collapsible_components or tabs_components:
             raise utils.ValidationError('Nested tabs and collapsible')
 
 
@@ -167,11 +167,11 @@ class Tabs(BaseRteComponent):
         for tab_content in tab_contents:
             inner_soup = (
                 bs4.BeautifulSoup(tab_content['content'], 'html.parser'))
-            collapsible = inner_soup.findAll(
+            collapsible_components = inner_soup.findAll(
                 name='oppia-noninteractive-collapsible')
-            tabs = inner_soup.findAll(
+            tabs_components = inner_soup.findAll(
                 name='oppia-noninteractive-tabs')
-            if len(collapsible) or len(tabs):
+            if collapsible_components or tabs_components:
                 raise utils.ValidationError('Nested tabs and collapsible')
 
 

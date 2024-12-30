@@ -1074,7 +1074,7 @@ def get_chapter_notifications_stories_list() -> List[
                     if node.is_node_behind_schedule():
                         overdue_chapters.append(node.title)
 
-                if len(upcoming_chapters) or len(overdue_chapters):
+                if upcoming_chapters or overdue_chapters:
                     story_timeliness = story_domain.StoryPublicationTimeliness(
                         story.id, story.title, topic_model.name,
                         overdue_chapters, upcoming_chapters)

@@ -632,7 +632,7 @@ class BuildTests(test_utils.GenericTestBase):
         setattr(temp_file, 'name', temp_file_name)
         with utils.open_file(
             '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
-            tmp.write(u'Some content.')
+            tmp.write('Some content.')
 
         extensions_dirnames_to_dirpaths = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
@@ -749,7 +749,7 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
         with utils.open_file(mock_yaml_filepath, 'w') as tmp:
-            tmp.write(u'Initial content in mock_app.yaml')
+            tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
@@ -830,7 +830,7 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', 'some_file.txt')
         with utils.open_file('some_file.txt', 'w') as tmp:
-            tmp.write(u'Some content.')
+            tmp.write('Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
 
         build.safe_delete_file('some_file.txt')

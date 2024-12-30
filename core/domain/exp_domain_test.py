@@ -3187,7 +3187,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
         interaction.customization_args = {
-            15: state_domain.InteractionCustomizationArg('', {  # type: ignore[dict-item, no-untyped-call]
+            15: state_domain.InteractionCustomizationArg('', {  # type: ignore[dict-item]
                 'type': 'unicode'
             })
         }

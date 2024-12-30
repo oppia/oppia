@@ -720,7 +720,7 @@ def send_post_signup_email(
                 email_body_content_param_name
             ).default_value
         )
-        if not len(email_subject_content) or (
+        if not email_subject_content or (
                 email_subject_content_default_value == email_subject_content):
             logging.error(
                 'Please ensure that the value for the admin platform '
@@ -728,7 +728,7 @@ def send_post_signup_email(
                 'post-signup emails to be sent.'
             )
             return
-        if not len(email_body_content) or (
+        if not email_body_content or (
                 email_body_content_default_value == email_body_content):
             logging.error(
                 'Please ensure that the value for the admin platform '
