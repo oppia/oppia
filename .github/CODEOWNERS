@@ -544,7 +544,6 @@
 # Python typing
 /mypy.ini @oppia/dev-workflow-reviewers
 /mypy_imports*.py @oppia/dev-workflow-reviewers
-/mypy_requirements.txt @oppia/dev-workflow-reviewers
 /stubs/ @oppia/dev-workflow-reviewers
 /scripts/run_mypy_checks*.py @oppia/dev-workflow-reviewers
 
