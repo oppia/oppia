@@ -45,14 +45,11 @@ RUN npm install typescript@4.1.6
 # Installing python dependencies from the requirements_dev.txt file
 COPY requirements.txt .
 COPY requirements_dev.txt .
-COPY mypy_requirements.txt .
 
 RUN pip install --require-hashes --no-deps -r requirements.txt -t /app/oppia/third_party/python_libs
 RUN pip install --require-hashes --no-deps -r requirements_dev.txt
-RUN pip install -r mypy_requirements.txt -t /app/oppia/third_party/python3_libs
 RUN pip download --no-deps -r requirements.txt -d /root/.cache
 RUN pip download --no-deps -r requirements_dev.txt -d /root/.cache
-RUN pip download -r mypy_requirements.txt -d /root/.cache
 
 # Installing third party dependencies
 COPY scripts/install_dependencies_json_packages.py ./scripts/install_dependencies_json_packages.py
