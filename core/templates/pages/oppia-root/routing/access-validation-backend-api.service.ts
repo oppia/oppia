@@ -74,6 +74,9 @@ export class AccessValidationBackendApiService {
   COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
+  SKILL_EDITOR_ACCESS_VALIDATION_URL =
+    '/access_validation_handler/can_access_skill_editor/<skill_id>';
+
   COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/' +
     'can_access_collection_editor_page/<collection_id>';
@@ -259,6 +262,17 @@ export class AccessValidationBackendApiService {
     return this.http
       .get<void>(this.LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR)
       .toPromise();
+  }
+
+  validateAccessToSkillEditorPage(skillId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.SKILL_EDITOR_ACCESS_VALIDATION_URL,
+      {
+        skill_id: skillId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
   }
 
   validateAccessToDiagnosticTestPlayerPage(): Promise<void> {

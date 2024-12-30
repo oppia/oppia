@@ -6958,6 +6958,23 @@ export default {
         }
       ]
     },
+    "SKILL_EDITOR": {
+      "ROUTE": "skill_editor/:skill_id",
+      "TITLE": "Skill Editor",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Edit and manage skills with the Skill Editor in Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Edit and manage skills with the Skill Editor in Oppia."
+        }
+      ]
+    },
     "DONATE": {
       "ROUTE": "donate",
       "TITLE": "I18N_DONATE_PAGE_BROWSER_TAB_TITLE",

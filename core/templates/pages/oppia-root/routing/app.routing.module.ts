@@ -468,6 +468,14 @@ const routes: Route[] = [
       ),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/skill-editor-page/skill-editor-page.module').then(
+        m => m.SkillEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
