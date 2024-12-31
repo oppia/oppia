@@ -456,9 +456,25 @@ jobs:
         id: check_workflow_status
         with:
           jobs: ${{ toJson(needs) }}
+      - name: Leave a comment on the PR if workflow failed
+        if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
+        uses: ./.github/actions/post-comment
+        with:
+          owner: ${{ github.event.repository.owner.login }}
+          repo: ${{ github.event.repository.name }}
+          issue_number: ${{ github.event.number }}
+          message: >
+            🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like
+            the CI checks are failing on your PR. Please look at the logs and
+            follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
+            to fix them, or report the error as a flake. Thanks!
       - name: Fail if workflow status is failure
         if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
-        run: exit 1
+        run: |
+          exit 1
+        shell: bash
+    permissions:
+      pull-requests: write
   trigger_build_and_deploy:
     name: Trigger build and deploy
     needs: [check_workflow_statuses]
