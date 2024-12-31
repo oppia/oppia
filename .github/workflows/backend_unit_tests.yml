@@ -24,8 +24,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Run backend associated test file check
         run: make run_tests.check_backend_associated_tests
       - name: Report failure if failed on oppia/oppia develop branch
@@ -45,8 +43,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Initialize Docker containers
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-oppia-dependencies-docker
@@ -83,12 +79,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Install coverage
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install coverage
-      - name: Initialize Containers
+      - name: Initialize Docker Containers
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
           make build
@@ -169,8 +163,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Download time report for shard 1
         uses: actions/download-artifact@v4
         with:

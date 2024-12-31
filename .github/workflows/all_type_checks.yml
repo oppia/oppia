@@ -24,8 +24,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Initialize Docker containers
         run: |
           make build
@@ -47,11 +45,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Install Chrome
         uses: ./.github/actions/install-chrome
-      - name: Initialize Containers
+      - name: Initialize Docker Containers
         uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Run typescript tests
         run: make run_tests.typescript
