@@ -164,10 +164,6 @@ def install_node() -> None:
                 subprocess.check_call(['./configure'])
                 subprocess.check_call(['make'])
 
-        # Change ownership of node_modules.
-        common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
-        common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
-
     print('Node is installed.')
 
 
@@ -417,8 +413,10 @@ def main() -> None:
     test_python_version()
     clean_pyc_files()
 
-    # Create OPPIA_TOOLS_DIR if it doesn't exist.
+    # Create OPPIA_TOOLS_DIR and THIRD_PARTY_DIR if either doesn't exist. Note
+    # that THIRD_PARTY_DIR is needed by install_gcloud_sdk().
     pathlib.Path(common.OPPIA_TOOLS_DIR).mkdir(exist_ok=True)
+    pathlib.Path(common.THIRD_PARTY_DIR).mkdir(exist_ok=True)
 
     install_node()
     install_yarn()
@@ -437,7 +435,6 @@ def main() -> None:
     # directory will be deployed to production.
     common.print_each_string_after_two_new_lines([
         'Installing third-party Python and JS libs in third_party directory'])
-    pathlib.Path(common.THIRD_PARTY_DIR).mkdir(exist_ok=True)
     common.create_readme(
         common.THIRD_PARTY_DIR,
         'This folder contains third-party libraries used in Oppia codebase.\n'
@@ -451,6 +448,8 @@ def main() -> None:
     common.print_each_string_after_two_new_lines([
         'Installing third-party Node modules in node_modules directory'])
     pathlib.Path(common.NODE_MODULES_PATH).mkdir(exist_ok=True)
+    common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
+    common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
     common.create_readme(
         common.NODE_MODULES_PATH,
         'This folder contains node utilities used in Oppia codebase.\n'

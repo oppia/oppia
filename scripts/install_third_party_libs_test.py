@@ -381,8 +381,6 @@ class SetupTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.check_function_calls = {
-            'recursive_chown_is_called': False,
-            'recursive_chmod_is_called': False,
             'rename_is_called': False,
         }
         self.urls: List[str] = []
@@ -392,12 +390,6 @@ class SetupTests(test_utils.GenericTestBase):
             url: str, unused_filename: str
         ) -> None:
             self.urls.append(url)
-        def mock_recursive_chown(
-            unused_path: str, unused_uid: str, unused_gid: str
-        ) -> None:
-            self.check_function_calls['recursive_chown_is_called'] = True
-        def mock_recursive_chmod(unused_path: str, unused_mode: str) -> None:
-            self.check_function_calls['recursive_chmod_is_called'] = True
         def mock_uname() -> List[str]:
             return ['Linux']
         def mock_rename(unused_path1: str, unused_path2: str) -> None:
@@ -423,10 +415,6 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'is_x64_architecture', True)
         self.is_x64_architecture_false_swap = self.swap_to_always_return(
             common, 'is_x64_architecture', False)
-        self.chown_swap = self.swap(
-            common, 'recursive_chown', mock_recursive_chown)
-        self.chmod_swap = self.swap(
-            common, 'recursive_chmod', mock_recursive_chmod)
         self.uname_swap = self.swap(os, 'uname', mock_uname)
         self.rename_swap = self.swap(os, 'rename', mock_rename)
         self.isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
@@ -552,8 +540,8 @@ class SetupTests(test_utils.GenericTestBase):
 
         with self.test_py_swap, os_name_swap:
             with self.download_swap, self.rename_swap, self.exists_false_swap:
-                with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    with self.is_x64_architecture_true_swap, self.chown_swap:
+                with self.delete_swap, self.isfile_swap:
+                    with self.is_x64_architecture_true_swap:
                         install_third_party_libs.install_node()
 
         for item, status in self.check_function_calls.items():
@@ -570,9 +558,9 @@ class SetupTests(test_utils.GenericTestBase):
             all_cmd_tokens.extend(cmd_tokens)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
-        with self.test_py_swap, os_name_swap, self.chown_swap:
+        with self.test_py_swap, os_name_swap:
             with self.download_swap, self.rename_swap, self.exists_false_swap:
-                with self.chmod_swap, self.delete_swap, self.isfile_swap:
+                with self.delete_swap, self.isfile_swap:
                     with self.is_x64_architecture_false_swap, self.cd_swap:
                         with check_call_swap:
                             install_third_party_libs.install_node()
@@ -587,9 +575,9 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_linux_x64(self) -> None:
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
 
-        with self.test_py_swap, os_name_swap, self.chown_swap:
+        with self.test_py_swap, os_name_swap:
             with self.download_swap, self.rename_swap, self.exists_false_swap:
-                with self.chmod_swap, self.delete_swap, self.isfile_swap:
+                with self.delete_swap, self.isfile_swap:
                     with self.is_x64_architecture_true_swap:
                         install_third_party_libs.install_node()
 
@@ -610,8 +598,8 @@ class SetupTests(test_utils.GenericTestBase):
 
         with self.test_py_swap, os_name_swap, check_call_swap:
             with self.download_swap, self.rename_swap, self.cd_swap:
-                with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    with self.is_x64_architecture_false_swap, self.chown_swap:
+                with self.delete_swap, self.isfile_swap:
+                    with self.is_x64_architecture_false_swap:
                         with self.exists_false_swap:
                             install_third_party_libs.install_node()
 
@@ -628,7 +616,7 @@ class SetupTests(test_utils.GenericTestBase):
     ) -> None:
         os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
 
-        with self.test_py_swap, os_name_swap, self.chown_swap:
+        with self.test_py_swap, os_name_swap:
             with self.rename_swap, self.exists_false_swap:
                 with self.assertRaisesRegex(
                     Exception, 'System\'s Operating System is not compatible.'
@@ -644,7 +632,7 @@ class SetupTests(test_utils.GenericTestBase):
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
         print_swap = self.swap(builtins, 'print', mock_print)
 
-        with self.test_py_swap, self.chown_swap, print_swap:
+        with self.test_py_swap, print_swap:
             with self.rename_swap, self.exists_true_swap, os_name_swap:
                 install_third_party_libs.install_node()
 
