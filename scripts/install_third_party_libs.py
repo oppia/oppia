@@ -420,7 +420,6 @@ def main() -> None:
 
     install_node()
     install_yarn()
-    install_gcloud_sdk()
     install_redis_cli()
     install_elasticsearch_dev_server()
 
@@ -442,6 +441,11 @@ def main() -> None:
         'the start.py script.\n')
     install_python_prod_dependencies.main()
     install_dependencies_json_packages.main()
+
+    # The install_gcloud_sdk() function needs the Python third-party libs
+    # "google" folder to exist first, so we only do the installation here after
+    # the Python dependencies are installed.
+    install_gcloud_sdk()
 
     # Install third-party node modules in node_modules/ directory, to be used
     # when generating files in the build process.
