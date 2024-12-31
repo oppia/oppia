@@ -50,8 +50,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Describe filesystem
         run: |
           pwd
@@ -99,7 +97,7 @@ jobs:
     if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Report failure if failed on oppia/oppia develop branch
         uses: ./.github/actions/send-webhook-notification
         with:

@@ -24,8 +24,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Initialize Docker containers
         uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Third Party Size Check
@@ -48,8 +46,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Initialize Docker containers
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-oppia-dependencies-docker
@@ -70,8 +66,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up Python
         uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
       - name: Initialize Docker containers
         uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Prettify code
