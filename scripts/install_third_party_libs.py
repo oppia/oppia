@@ -210,6 +210,16 @@ def install_gcloud_sdk() -> None:
 
         os.remove('gcloud-sdk.tar.gz')
 
+        # Install specific google cloud components for the Google Cloud SDK. The
+        # --quiet flag specifically tells the gcloud program to autofill all
+        # prompts with default values. In this case, that means accepting all
+        # installations of gcloud packages.
+        subprocess.run([
+            common.GCLOUD_PATH, 'components', 'install', 'beta',
+            'cloud-datastore-emulator', 'app-engine-python',
+            'app-engine-python-extras', '--quiet',
+        ], check=True)
+
         # Address the problem of multiple google paths confusing the python
         # interpreter. Namely, there are two modules named google/, one that is
         # installed with google cloud libraries and another that comes with the
@@ -243,15 +253,6 @@ def install_gcloud_sdk() -> None:
 
     sys.path.append('.')
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    # Install specific google cloud components for the Google Cloud SDK. The
-    # --quiet flag specifically tells the gcloud program to autofill all
-    # prompts with default values. In this case, that means accepting all
-    # installations of gcloud packages.
-    subprocess.run([
-        common.GCLOUD_PATH, 'components', 'install', 'beta',
-        'cloud-datastore-emulator', 'app-engine-python',
-        'app-engine-python-extras', '--quiet',
-    ], check=True)
 
     print('Google Cloud SDK is installed.')
 
