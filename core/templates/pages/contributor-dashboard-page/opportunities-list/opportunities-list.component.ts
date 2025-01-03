@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, Output, EventEmitter, NgZone} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
@@ -302,10 +301,3 @@ export class OpportunitiesListComponent {
     this.fetchAndLoadOpportunities();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaOpportunitiesList',
-    downgradeComponent({component: OpportunitiesListComponent})
-  );

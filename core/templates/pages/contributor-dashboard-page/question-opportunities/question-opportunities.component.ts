@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
@@ -189,10 +188,3 @@ export class QuestionOpportunitiesComponent implements OnInit {
     });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionOpportunities',
-  downgradeComponent({
-    component: QuestionOpportunitiesComponent,
-  }) as angular.IDirectiveFactory
-);

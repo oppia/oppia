@@ -65,10 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    contributor_dashboard:
-      commonPrefix +
-      '/pages/contributor-dashboard-page/' +
-      'contributor-dashboard-page.import.ts',
     error: commonPrefix + '/pages/error-pages/error-page.import.ts',
     exploration_editor:
       commonPrefix +
@@ -112,18 +108,6 @@ module.exports = {
       DIFF_EQUAL: ['diff_match_patch/lib/diff_match_patch', 'DIFF_EQUAL'],
       DIFF_INSERT: ['diff_match_patch/lib/diff_match_patch', 'DIFF_INSERT'],
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['contributor_dashboard'],
-      filename: 'contributor-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/contributor-dashboard-page/' +
-        'contributor-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
