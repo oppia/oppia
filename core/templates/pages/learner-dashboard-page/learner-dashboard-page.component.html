@@ -2,7 +2,7 @@
 <div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
      class="position-relative" [ngClass]="{'oppia-learner-dash-container w-100' : isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-container' : !isShowRedesignedLearnerDashboardActive()}">
   <div [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
-       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'row oppia-row': !isShowRedesignedLearnerDashboardActive() ,'d-flex justify-content-center oppia-learner-dash-content': isShowRedesignedLearnerDashboardActive()}">
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'row oppia-row': !isShowRedesignedLearnerDashboardActive() ,'oppia-learner-dash-content': isShowRedesignedLearnerDashboardActive()}">
     <div class="col-md-3 oppia-learner-dashboard-side-content"
          *ngIf="!windowIsNarrow && !isShowRedesignedLearnerDashboardActive()">
       <mat-card class="oppia-learner-dashboard-main-menu">
