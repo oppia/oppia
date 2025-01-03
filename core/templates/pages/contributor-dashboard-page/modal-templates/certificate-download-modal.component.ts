@@ -18,7 +18,6 @@
 
 import {Component, Input} from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {
@@ -321,10 +320,3 @@ export class CertificateDownloadModalComponent {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'certificateDownloadModal',
-    downgradeComponent({component: CertificateDownloadModalComponent})
-  );
