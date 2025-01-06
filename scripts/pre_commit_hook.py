@@ -191,7 +191,7 @@ def check_changes_in_config() -> None:
 
 def run_prettier() -> None:
     """Runs prettier formatter."""
-    subprocess.run([NPX_PATH, 'lint-staged'], shell=True, check=True)
+    subprocess.run([NPX_PATH, 'lint-staged'], check=True)
 
 
 def main(args: Optional[List[str]] = None) -> None:
