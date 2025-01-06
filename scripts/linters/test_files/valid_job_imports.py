@@ -51,6 +51,9 @@ from core.jobs.batch_jobs import (                                   # pylint: d
 from core.jobs.batch_jobs import contributor_admin_stats_jobs        # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     story_node_jobs)
+from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
+    reject_invalid_suggestion_and_delete_invalid_translation_jobs)
+    
 
 class FakeClass:
     """This is a fake docstring for valid syntax purposes."""

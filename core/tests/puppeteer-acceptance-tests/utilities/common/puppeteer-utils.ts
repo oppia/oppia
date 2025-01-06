@@ -23,6 +23,13 @@ import {ConsoleReporter} from './console-reporter';
 import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-matcher';
 import {showMessage} from './show-message';
 
+var path = require('path');
+
+import {toMatchImageSnapshot} from 'jest-image-snapshot';
+expect.extend({toMatchImageSnapshot});
+const backgroundBanner = '.oppia-background-image';
+const libraryBanner = '.e2e-test-library-banner';
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -582,6 +589,96 @@ export class BaseUser {
   }
 
   /**
+   * This function takes a screenshot of the page.
+   * If there's no image with the given filename, it stores the screenshot with the given filename in the folder:
+   *   - prod-desktop-screenshots or prod-mobile-screenshots for screenshots in production mode
+   *   - dev-desktop-screenshots or dev-mobile-screenshots for screenshots in development mode
+   * Otherwise, it compares the screenshot with the image named as the given string
+   * to check if they match. If they don't match, it generates an image in the folder
+   * diff-snapshots to show the difference. To check the folder on CI, download the artifact folder
+   * diff-snapshots from the github workflow.
+   * To replace the screenshot(s), simply delete the screenshot(s) and rerun the acceptance test.
+   * Name the image by describing what the page is, and add 'with..' if there's something notable in the screenshots.
+   * @param {string} imageName - The name for the image
+   * @param {string} testPath - The path of the file that called this function
+   * @param {Page|undefined} newPage - The page to take screenshot from. If not
+   *     specified, uses this.page instead.
+   */
+  async expectScreenshotToMatch(
+    imageName: string,
+    testPath: string,
+    newPage?: Page
+  ): Promise<void> {
+    const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
+    await currentPage.mouse.move(0, 0);
+    // To wait for all images to load and the page to be stable.
+    await currentPage.waitForTimeout(5000);
+
+    /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
+     * In general, it is set as 0.0028/0.28% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
+     * Based on the existence of the background/library banner, which are randomly selected from a set of four,
+     * failureTrigger is set in the specific percentage for the randomness of the banner in desktop mode and mobile mode.
+     */
+    var failureTrigger = 0;
+    var dirName = '';
+    if (this.isViewportAtMobileWidth()) {
+      if (await this.isInProdMode()) {
+        dirName = '/prod-mobile-screenshots';
+      } else {
+        dirName = '/dev-mobile-screenshots';
+      }
+      failureTrigger += 0.042;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.0352;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.0039;
+      }
+    } else {
+      if (await this.isInProdMode()) {
+        dirName = '/prod-desktop-screenshots';
+      } else {
+        dirName = '/dev-desktop-screenshots';
+      }
+      failureTrigger += 0.0028;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.03;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.006;
+      }
+    }
+
+    try {
+      expect(await currentPage.screenshot()).toMatchImageSnapshot({
+        failureThreshold: failureTrigger,
+        failureThresholdType: 'percent',
+        customSnapshotIdentifier: imageName,
+        customSnapshotsDir: path.join(testPath, dirName),
+        /*
+         * The following checks if the tests are running on CI. If it is, the folder diff-snapshots will be uploaded as
+         * artifacts in the github workflow.
+         */
+        customDiffDir: __dirname.startsWith('/home/runner')
+          ? path.join(
+              '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots',
+              path.basename(dirName)
+            )
+          : path.join(testPath, dirName, 'diff-snapshots'),
+      });
+      if (typeof newPage !== 'undefined') {
+        await newPage.close();
+      }
+    } catch (error) {
+      if (__dirname.startsWith('/home/runner')) {
+        throw new Error(
+          error.message +
+            '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).'
+        );
+      } else {
+        throw new Error(error.message);
+      }
+    }
+  }
+  /*
    * Waits for the network to become idle on the given page.
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is

@@ -55,7 +55,7 @@ describe('Topic Manager User Journey', function () {
         'A comprehensive course on advanced mathematics',
         'mathematics, advanced, course',
         'Advanced Mathematics Course',
-        testConstants.data.blogPostThumbnailImage
+        testConstants.data.curriculumAdminThumbnailImage
       );
 
       await topicManager.verifyStatusOfPracticeTab('disabled');

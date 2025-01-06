@@ -690,7 +690,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
-        state_name = u'state name'
+        state_name = 'state name'
         version = 1
 
         exp_details: IncompleteExplorationDetailsDict = {
@@ -708,7 +708,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self._get_incomplete_exp_details(self.user_id, self.EXP_ID_0),
             exp_details)
 
-        state_name = u'new_state_name'
+        state_name = 'new_state_name'
         version = 2
 
         modified_exp_details: IncompleteExplorationDetailsDict = {

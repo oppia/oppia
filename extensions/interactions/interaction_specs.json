@@ -57,7 +57,7 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "IsEqualTo": "is equal to {{f|NumberWithUnits}}",
+      "IsEqualTo": "has the same value and units as {{f|NumberWithUnits}}",
       "IsEquivalentTo": "is equivalent to {{f|NumberWithUnits}}"
     }
   },

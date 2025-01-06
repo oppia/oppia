@@ -94,9 +94,9 @@ describe('SkillCardComponent', () => {
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
-    planned_publication_date_msecs: 100,
-    last_modified_msecs: 100,
-    first_publication_date_msecs: 200,
+    planned_publication_date_msecs: 100.0,
+    last_modified_msecs: 100.0,
+    first_publication_date_msecs: 200.0,
     unpublishing_reason: null,
   };
   let nodeDict2 = {
@@ -112,9 +112,9 @@ describe('SkillCardComponent', () => {
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
-    planned_publication_date_msecs: 100,
-    last_modified_msecs: 100,
-    first_publication_date_msecs: 200,
+    planned_publication_date_msecs: 100.0,
+    last_modified_msecs: 100.0,
+    first_publication_date_msecs: 200.0,
     unpublishing_reason: null,
   };
   const learnerTopicSummaryBackendDict1 = {

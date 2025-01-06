@@ -51,27 +51,6 @@ class EntityVoiceovers:
 
     NOTE: This domain object corresponds to EntityVoiceoversModel in the
     storage layer.
-
-    Args:
-        entity_id: str. The id of the corresponding entity.
-        entity_type: str. The type of the corresponding entity.
-        entity_version: str. The version of the corresponding entity.
-        language_accent_code: str. The language-accent code in which the
-            voiceover is stored.
-        voiceovers_mapping: dict(str, dict(VoiceoverType, VoiceoverDict)). A
-            dict containing content IDs as keys and nested dicts as values.
-            Each nested dict contains VoiceoverType as keys and VoiceoverDict
-            as values.
-        automated_voiceovers_audio_offsets_msecs: dict(str, list(dict)). A
-            dictionary where each key represents a content ID, and the
-            corresponding value is a list of dictionaries. Each dictionary
-            contains two keys: 'token', which holds a string representing a word
-            or punctionation from the content, and 'audio_offset_msec',
-            which stores a float value representing the associated time offset
-            in the audio in msecs. Note: This field only contains the audio
-            offset for automated voiceovers that are synthesized from Azure.
-            These audio offsets are not provided or stored for manual
-            voiceovers.
     """
 
     def __init__(
@@ -88,11 +67,11 @@ class EntityVoiceovers:
         """Constructs an EntityVoiceovers domain object.
 
         Args:
-            entity_id: str. The ID of the entity.
-            entity_type: str. The type of the entity.
-            entity_version: int. The version of the entity.
-            language_accent_code: str. The language-accent code of the
-                given voiceover.
+            entity_id: str. The ID of the corresponding entity.
+            entity_type: str. The type of the corresponding entity.
+            entity_version: int. The version of the corresponding entity.
+            language_accent_code: str. The language-accent code in which the
+                voiceovers are stored.
             voiceovers_mapping: dict(str, dict(VoiceoverType, VoiceoverDict)). A
                 dict containing content IDs as keys and nested dicts as values.
                 Each nested dict contains VoiceoverType as keys and

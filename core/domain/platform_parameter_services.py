@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import copy
 import json
+import logging
 import os
 
 from core import feconf
@@ -92,6 +93,10 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
         mode but not on the main website, and "prod" if Oppia is running in
         full production mode on the main website.
     """
+    # TODO(release-scripts#137): Remove once project ID is verified on all
+    # servers.
+    logging.info('Logging project ID for debugging: %s' % (
+        os.environ['GOOGLE_CLOUD_PROJECT']))
     return (
         platform_parameter_domain.ServerMode.DEV
         if constants.DEV_MODE

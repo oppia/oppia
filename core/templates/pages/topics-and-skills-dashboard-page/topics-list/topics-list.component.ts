@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, EventEmitter, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
@@ -293,10 +292,3 @@ export class TopicsListComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaTopicsList',
-    downgradeComponent({component: TopicsListComponent})
-  );

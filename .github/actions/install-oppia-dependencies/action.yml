@@ -22,7 +22,42 @@ runs:
         # Move back to the repository root.
         cd -
       shell: bash
-    - name: Install third party (retries on error)
+    # Production pip dependencies are installed in a custom folder rather than
+    # the pip cache (see "Caching Python dependencies" in the README at
+    # https://github.com/actions/setup-python?tab=readme-ov-file).
+    #
+    # This means that using the cache provided by the setup-python action above
+    # doesn't work for global dependencies. So, instead, we follow the "Best
+    # Practice" in this comment and cache that directory directly:
+    # https://github.com/actions/setup-python/issues/881#issuecomment-2147747696
+    #
+    # Note that, in the case of a cache miss, the cache is populated when the
+    # job completes successfully. See
+    # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#cache-hits-and-misses
+    - name: Write the exact Python version to a file for cache-busting.
+      run: |
+        echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
+      shell: bash
+    - name: Cache third_party and node_modules
+      id: restore_third_party_and_node_modules_cache
+      uses: actions/cache@v4
+      with:
+        # We don't use the restore-keys option, since the hash in the key
+        # should fully define the cache. See https://stackoverflow.com/a/74620917
+        # for some useful context on cases in which restore-keys is useful.
+        #
+        # Note that we need to include install_python_dev_dependencies.py in
+        # the cache key because it has the version numbers for pip, pip-tools
+        # and setuptools.
+        key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'yarn.lock', 'requirements_dev.txt', 'requirements.txt', 'dependencies.json',  'scripts/install_python_dev_dependencies.py') }}
+        path: |
+          /home/runner/work/oppia/oppia_tools
+          /home/runner/work/oppia/yarn_cache
+          /home/runner/work/oppia/oppia/node_modules
+          /home/runner/work/oppia/oppia/third_party/python_libs
+          /home/runner/work/oppia/oppia/third_party/static
+    - name: Install third-party libs on cache miss (retries on error)
+      if: steps.restore_third_party_and_node_modules_cache.outputs.cache-hit == false
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
