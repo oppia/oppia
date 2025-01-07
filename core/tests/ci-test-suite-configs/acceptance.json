@@ -1,6 +1,56 @@
 {
   "suites": [
     {
+      "name": "exploration-editor/create-exploration-and-change-basic-settings",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
+    },
+    {
+      "name": "exploration-editor/manage-exploration-misconceptions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
+    },
+    {
+      "name": "exploration-editor/modify-translations-through-modal",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts"
+    },
+    {
+      "name": "exploration-editor/publish-the-exploration-with-an-interaction",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/publish-the-exploration-with-an-interaction.spec.ts"
+    },
+    {
+      "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts"
+    },
+    {
+      "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
+    },
+    {
+      "name": "logged-out-user/visit-classroom-index-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/visit-classroom-index-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/track-and-resume-exploration-progress-via-url",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/track-and-resume-exploration-progress-via-url.spec.ts"
+    },
+    {
+      "name": "super-admin/load-dummy-data-in-dev-mode",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/load-dummy-data-in-dev-mode.spec.ts"
+    },
+    {
+      "name": "release-coordinator/edit-feature-rollout-configuration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/edit-feature-rollout-configuration.spec.ts"
+    },
+    {
+      "name": "release-coordinator/update-promo-bar-message",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/update-promo-bar-message.spec.ts"
+    }
+  ],
+  "docker_suites": [
+    {
+      "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
+    },
+    {
       "name": "blog-editor/create-and-publish-a-blog-post-with-required-details",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-publish-a-blog-post-with-required-details.spec.ts"
     },
@@ -23,22 +73,6 @@
     {
       "name": "exploration-editor/load-complete-and-restart-exploration-preview",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/load-complete-and-restart-exploration-preview.spec.ts"
-    },
-    {
-      "name": "exploration-editor/create-exploration-and-change-basic-settings",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
-    },
-    {
-      "name": "exploration-editor/manage-exploration-misconceptions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
-    },
-    {
-      "name": "exploration-editor/modify-translations-through-modal",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts"
-    },
-    {
-      "name": "exploration-editor/publish-the-exploration-with-an-interaction",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/publish-the-exploration-with-an-interaction.spec.ts"
     },
     {
       "name": "exploration-editor/save-draft-publish-and-discard-the-changes",
@@ -117,10 +151,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-volunteer-page.spec.ts"
     },
     {
-      "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts"
-    },
-    {
       "name": "logged-out-user/click-all-buttons-on-contact-us-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-contact-us-page.spec.ts"
     },
@@ -149,10 +179,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donate-page.spec.ts"
     },
     {
-      "name": "logged-out-user/visit-classroom-index-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/visit-classroom-index-page.spec.ts"
-    },
-    {
       "name": "logged-out-user/browse-and-search-for-lessons-in-community-library",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/browse-and-search-for-lessons-in-community-library.spec.ts"
     },
@@ -169,10 +195,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it.spec.ts"
     },
     {
-      "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
-    },
-    {
       "name": "logged-out-user/change-site-language-and-engage-with-original-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/change-site-language-and-engage-with-original-exploration.spec.ts"
     },
@@ -183,10 +205,6 @@
     {
       "name": "logged-out-user/sign-in-and-save-exploration-progress",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/sign-in-and-save-exploration-progress.spec.ts"
-    },
-    {
-      "name": "logged-out-user/track-and-resume-exploration-progress-via-url",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/track-and-resume-exploration-progress-via-url.spec.ts"
     },
     {
       "name": "moderator/edit-featured-activities-list",
@@ -213,10 +231,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-user-roles.spec.ts"
     },
     {
-      "name": "super-admin/load-dummy-data-in-dev-mode",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/load-dummy-data-in-dev-mode.spec.ts"
-    },
-    {
       "name": "super-admin/edit-platform-parameters",
       "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-platform-parameters.spec.ts"
     },
@@ -229,16 +243,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/run-a-beam-job-and-copy-the-output.spec.ts"
     },
     {
-      "name": "release-coordinator/edit-feature-rollout-configuration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/edit-feature-rollout-configuration.spec.ts"
-    },
-    {
       "name": "release-coordinator/flush-and-get-profile-of-redis-cache",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/flush-and-get-profile-of-redis-cache.spec.ts"
-    },
-    {
-      "name": "release-coordinator/update-promo-bar-message",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/update-promo-bar-message.spec.ts"
     },
     {
       "name": "topic-manager/browse-skills-on-topics-and-skills-dashboard",
@@ -279,12 +285,6 @@
     {
       "name": "topic-manager/create-and-delete-subtopic-and-story",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
-    }
-  ],
-  "docker_suites": [
-    {
-      "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
     }
   ]
 }
