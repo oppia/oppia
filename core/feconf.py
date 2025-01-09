@@ -157,6 +157,7 @@ class ValidModelNames(enum.Enum):
     OPPORTUNITY = 'opportunity'
     QUESTION = 'question'
     RECOMMENDATIONS = 'recommendations'
+    REDIS_CLIENT = 'redis_client'
     SKILL = 'skill'
     STATISTICS = 'statistics'
     AUTH = 'auth'

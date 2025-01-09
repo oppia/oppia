@@ -62,6 +62,7 @@ from core.storage.learner_group import gae_models as learner_group_models
 from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.question import gae_models as question_models
 from core.storage.recommendations import gae_models as recommendations_models
+from core.storage.redis import gae_models as redis_client_models
 from core.storage.skill import gae_models as skill_models
 from core.storage.statistics import gae_models as stats_models
 from core.storage.story import gae_models as story_models
@@ -100,6 +101,7 @@ __all__ = [
     'platform_taskqueue_services',
     'question_models',
     'recommendations_models',
+    'redis_client_models',
     'search_services',
     'secrets_services',
     'skill_models',

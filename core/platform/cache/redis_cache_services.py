@@ -20,24 +20,44 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import caching_domain
+from core.platform import models
 
 import redis
 from typing import Dict, List, Optional
 
-# Redis client for our own implementation of caching.
-OPPIA_REDIS_CLIENT = redis.StrictRedis(
-    host=feconf.REDISHOST,
-    port=feconf.REDISPORT,
-    db=feconf.OPPIA_REDIS_DB_INDEX,
-    decode_responses=True
-)
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+    from mypy_imports import redis_client_models
 
-# Redis client for the Cloud NDB cache.
-CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
-    host=feconf.REDISHOST,
-    port=feconf.REDISPORT,
-    db=feconf.CLOUD_NDB_REDIS_DB_INDEX
-)
+datastore_services = models.Registry.import_datastore_services()
+(redis_client_models,) = models.Registry.import_models([
+    models.Names.REDIS_CLIENT
+])
+
+
+# Redis client for our own implementation of caching.
+with datastore_services.get_ndb_context():
+    REDIS_CLIENT_ENTITY = (
+        redis_client_models.RedisClientModel.get(
+            redis_client_models.REDIS_CLIENT_ID, strict=False))
+
+IS_REDIS_INITIALIZED = False
+if REDIS_CLIENT_ENTITY:
+    IS_REDIS_INITIALIZED = True
+    OPPIA_REDIS_CLIENT = redis.StrictRedis(
+        host=REDIS_CLIENT_ENTITY.redishost,
+        port=feconf.REDISPORT,
+        db=feconf.OPPIA_REDIS_DB_INDEX,
+        decode_responses=True
+    )
+
+    # Redis client for the Cloud NDB cache.
+    CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
+        host=REDIS_CLIENT_ENTITY.redishost,
+        port=feconf.REDISPORT,
+        db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+    )
 
 
 def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
@@ -50,20 +70,23 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
-    memory_stats = caching_domain.MemoryCacheStats(
-        redis_full_profile['total.allocated'],
-        redis_full_profile['peak.allocated'],
-        redis_full_profile['keys.count']
-    )
+    if IS_REDIS_INITIALIZED:
+        redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
+        memory_stats = caching_domain.MemoryCacheStats(
+            redis_full_profile['total.allocated'],
+            redis_full_profile['peak.allocated'],
+            redis_full_profile['keys.count']
+        )
 
-    return memory_stats
+        return memory_stats
+    return caching_domain.MemoryCacheStats(0, 0, 0)
 
 
 def flush_caches() -> None:
     """Wipes the Redis caches clean."""
-    OPPIA_REDIS_CLIENT.flushdb()
-    CLOUD_NDB_REDIS_CLIENT.flushdb()
+    if IS_REDIS_INITIALIZED:
+        OPPIA_REDIS_CLIENT.flushdb()
+        CLOUD_NDB_REDIS_CLIENT.flushdb()
 
 
 def get_multi(keys: List[str]) -> List[Optional[str]]:
@@ -77,7 +100,9 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
         that are passed in.
     """
     assert isinstance(keys, list)
-    return OPPIA_REDIS_CLIENT.mget(keys)
+    if IS_REDIS_INITIALIZED:
+        return OPPIA_REDIS_CLIENT.mget(keys)
+    return []
 
 
 def set_multi(key_value_mapping: Dict[str, str]) -> bool:
@@ -92,7 +117,9 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
+    if IS_REDIS_INITIALIZED:
+        return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
+    return False
 
 
 def delete_multi(keys: List[str]) -> int:
@@ -106,4 +133,6 @@ def delete_multi(keys: List[str]) -> int:
     """
     for key in keys:
         assert isinstance(key, str)
-    return OPPIA_REDIS_CLIENT.delete(*keys)
+    if IS_REDIS_INITIALIZED:
+        return OPPIA_REDIS_CLIENT.delete(*keys)
+    return 0
