@@ -22,10 +22,10 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Check that all e2e and acceptance test files are captured in wdio.conf.js and core/tests/ci-test-suite-configs
-        run: make run_tests.check_tests_are_captured_in_ci
+        run: python -m scripts.check_tests_are_captured_in_ci
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -44,10 +44,8 @@ jobs:
           # This fetches all git refs, which is needed in the
           # check_ci_test_suites_to_run script below.
           fetch-depth: 0
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - id: compute_test_suites
         name: Check test suites to run
         env:
@@ -66,15 +64,12 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
-            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.docker.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
   e2e_test:
@@ -88,10 +83,8 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
       - name: Install Chrome
@@ -147,14 +140,12 @@ jobs:
     strategy:
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
-    name: Acceptance (${{ matrix.suite.name }} -- Python installation)
+    name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
       - name: Generate modified suite name for artifacts
@@ -198,66 +189,6 @@ jobs:
         with:
           message: "An acceptance test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  acceptance_test_with_docker_installation:
-    needs: [check_test_suites_to_run, build]
-    runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.docker.count > 0 }}
-    strategy:
-      matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.docker.suites }}
-    name: Acceptance (${{ matrix.suite.name }})
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - name: Install Chrome
-        uses: ./.github/actions/install-chrome
-      - name: Initializing Containers
-        run: |
-          make build
-          docker compose up angular-build -d
-          # This is required as acceptance tests are run on the host machine and not in the docker container.
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-      - name: Generate modified suite name for artifacts
-        id: generate_suite_name_for_artifacts
-        # Replace slashes in the filename with underscores.
-        run: |
-          SUITE_NAME=${{ matrix.suite.name }}
-          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite.name }}
-      - name: Uploading generated test to angular module mapping as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite.name }}.txt
-      - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite.name }} MOBILE=true
-      - name: Uploading diff screenshots as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          # Note: The path must be kept in sync with the one specified in
-          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
-          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{
-          failure() &&
-          github.event_name == 'push' &&
-          github.repository == 'oppia/oppia' &&
-          github.ref == 'refs/heads/develop'
-          }}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "An acceptance test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   lighthouse_accessibility_test:
     needs: [check_test_suites_to_run]
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.count > 0 }}
@@ -269,10 +200,8 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Install Chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-chrome
@@ -298,10 +227,8 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
       - name: Install Chrome
@@ -337,7 +264,6 @@ jobs:
       - check_test_suites_to_run
       - e2e_test
       - acceptance_test_with_python_installation
-      - acceptance_test_with_docker_installation
       - lighthouse_accessibility_test
       - lighthouse_performance_test
     if: always()
@@ -345,8 +271,8 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Check workflow status
         uses: ./.github/actions/check-workflow-status
         id: check_workflow_status
