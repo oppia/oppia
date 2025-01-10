@@ -342,11 +342,6 @@ def managed_cloud_datastore_emulator(
 @contextlib.contextmanager
 def managed_redis_server() -> Iterator[psutil.Process]:
     """Run the redis server within a context manager that ends it gracefully."""
-    if common.is_windows_os():
-        raise Exception(
-            'The redis command line interface is not installed because your '
-            'machine is on the Windows operating system. The redis server '
-            'cannot start.')
 
     # Check if a redis dump file currently exists. This file contains residual
     # data from a previous run of the redis server. If it exists, removes the
@@ -777,8 +772,7 @@ def managed_acceptance_tests_server(
     acceptance_tests_args = [
         nodemodules_jest_bin_path,
         '%s' % os.path.join(puppeteer_acceptance_tests_dir_path, suite_name),
-        '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js', 
-        '--detectOpenHandles --forceExit'
+        '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js'
     ]
 
     # OK to use shell=True here because we are passing string literals,

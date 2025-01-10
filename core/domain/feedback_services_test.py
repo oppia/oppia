@@ -317,16 +317,16 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     THREAD_ID: Final = 'thread_id'
 
     EXPECTED_THREAD_DICT: ExpectedThreadDict = {
-        'status': u'open',
+        'status': 'open',
         'summary': None,
         'original_author_id': None,
-        'subject': u'a subject'
+        'subject': 'a subject'
     }
     EXPECTED_THREAD_DICT_VIEWER: ExpectedThreadViewerDict = {
-        'status': u'open',
+        'status': 'open',
         'summary': None,
         'original_author_id': None,
-        'subject': u'a subject second'
+        'subject': 'a subject second'
     }
 
     USER_EMAIL: Final = 'user@example.com'

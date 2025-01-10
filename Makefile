@@ -155,9 +155,9 @@ run_tests.backend: ## Runs the backend tests
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-run_tests.check_overall_backend_test_coverage: ## Runs the check for overall backend test coverage
+run_tests.check_backend_test_coverage: ## Runs the check for overall backend test coverage
 	$(MAKE) start-devserver
-	$(SHELL_PREFIX) dev-server python -m scripts.check_overall_backend_test_coverage
+	$(SHELL_PREFIX) dev-server python -m scripts.check_backend_test_coverage
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
@@ -199,7 +199,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	fi
 	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
 	cp -r ./core/tests/puppeteer-acceptance-tests/data ./core/tests/puppeteer-acceptance-tests/build/
-	SPEC_NAME=$(suite) ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jest --config="./core/tests/puppeteer-acceptance-tests/jest.config.js" ./core/tests/puppeteer-acceptance-tests/specs/$(suite).spec.ts --detectOpenHandles --forceExit
+	SPEC_NAME=$(suite) ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jest --config="./core/tests/puppeteer-acceptance-tests/jest.config.js" ./core/tests/puppeteer-acceptance-tests/specs/$(suite).spec.ts
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'

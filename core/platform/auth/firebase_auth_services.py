@@ -84,9 +84,6 @@ def establish_firebase_connection() -> None:
     when it's called more than once, however, so we make this function
     idempotent by trying to "get" the app first.
 
-    Returns:
-        firebase_admin.App. The App being by the Firebase SDK.
-
     Raises:
         ValueError. The Firebase app has a genuine problem.
     """

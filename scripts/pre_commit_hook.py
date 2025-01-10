@@ -46,7 +46,6 @@ import sys
 # rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
-from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 from typing import Final, List, Optional, Tuple  # isort:skip  # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
@@ -64,6 +63,8 @@ KEYS_UPDATED_IN_CONSTANTS: Final = [
     b'FIREBASE_CONFIG_APP_ID', b'FIREBASE_CONFIG_AUTH_DOMAIN',
     b'FIREBASE_CONFIG_MESSAGING_SENDER_ID', b'FIREBASE_CONFIG_PROJECT_ID',
     b'FIREBASE_CONFIG_STORAGE_BUCKET', b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID']
+NPX_PATH: Final = os.path.join(
+    os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx')
 
 
 def install_hook() -> None:
@@ -98,13 +99,11 @@ def install_hook() -> None:
             print('Copied file to .git/hooks directory')
 
     print('Making pre-commit hook file executable ...')
-    if not common.is_windows_os():
-        _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
-
-        if not err_chmod_cmd:
-            print('pre-commit hook file is now executable!')
-        else:
-            raise ValueError(err_chmod_cmd)
+    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
+    if not err_chmod_cmd:
+        print('pre-commit hook file is now executable!')
+    else:
+        raise ValueError(err_chmod_cmd)
 
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
@@ -192,7 +191,7 @@ def check_changes_in_config() -> None:
 
 def run_prettier() -> None:
     """Runs prettier formatter."""
-    subprocess.run('npx lint-staged', shell=True, check=True)
+    subprocess.run([NPX_PATH, 'lint-staged'], check=True)
 
 
 def main(args: Optional[List[str]] = None) -> None:

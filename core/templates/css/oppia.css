@@ -1943,6 +1943,7 @@ pre.oppia-pre-wrapped-text {
   display: block;
   margin-left: auto;
   margin-right: auto;
+  object-fit: contain;
 }
 
 /* Styles for the statistics page. */

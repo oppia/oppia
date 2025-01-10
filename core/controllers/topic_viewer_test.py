@@ -143,13 +143,13 @@ class TopicPageDataHandlerTests(
             }],
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [{
-                u'thumbnail_filename': u'image.svg',
-                u'thumbnail_bg_color': u'#FFFFFF',
-                u'thumbnail_size_in_bytes': 21131,
-                u'skill_ids': [self.skill_id_2],
-                u'id': 1,
-                u'title': u'subtopic_name',
-                u'url_fragment': u'subtopic-name'}],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': '#FFFFFF',
+                'thumbnail_size_in_bytes': 21131,
+                'skill_ids': [self.skill_id_2],
+                'id': 1,
+                'title': 'subtopic_name',
+                'url_fragment': 'subtopic-name'}],
             'degrees_of_mastery': {
                 self.skill_id_1: None,
                 self.skill_id_2: None
@@ -222,13 +222,13 @@ class TopicPageDataHandlerTests(
             }],
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [{
-                u'thumbnail_filename': u'image.svg',
-                u'thumbnail_bg_color': u'#FFFFFF',
-                u'thumbnail_size_in_bytes': 21131,
-                u'skill_ids': [self.skill_id_2],
-                u'id': 1,
-                u'title': u'subtopic_name',
-                u'url_fragment': u'subtopic-name'}],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': '#FFFFFF',
+                'thumbnail_size_in_bytes': 21131,
+                'skill_ids': [self.skill_id_2],
+                'id': 1,
+                'title': 'subtopic_name',
+                'url_fragment': 'subtopic-name'}],
             'degrees_of_mastery': {
                 self.skill_id_1: 0.3,
                 self.skill_id_2: 0.5

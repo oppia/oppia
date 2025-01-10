@@ -94,46 +94,35 @@ disallowed-functions-and-replacements-regex=
 [SIMILARITIES]
 
 allowed-type-ignore-error-codes=
+    arg-type,
+    assignment,
     attr-defined,
-    union-attr,
     call-overload,
+    dict-item,
+    func-returns-value,
+    index,
+    list-item,
+    misc,
     override,
     return,
-    assignment,
-    list-item,
-    dict-item,
-    typeddict-item,
-    func-returns-value,
-    misc,
-    arg-type,
     type-arg,
-    no-untyped-def,
-    no-untyped-call,
-    no-any-return,
-    call-arg,
-    index
+    typeddict-item,
+    union-attr
 
 ignore-imports=yes
 
 [MESSAGES CONTROL]
 
 disable=abstract-method,
-        ungrouped-imports,
-        arguments-differ,
+        arguments-renamed,
         broad-except,
-        consider-using-ternary,
+        broad-exception-raised,
+        consider-using-f-string,
         duplicate-code,
-        fixme,
-        inconsistent-return-statements,
-        len-as-condition,
+        import-outside-toplevel,
         logging-not-lazy,
-        multiple-constructor-doc,
         no-else-return,
         no-member,
-        not-context-manager,
-        redundant-returns-doc,
-# TODO(#12912): Python interpreter migration to 3.8.15 causing failing lint check. Fix it later.
-        redundant-u-string-prefix,
         too-many-arguments,
         too-many-boolean-expressions,
         too-many-branches,
@@ -143,22 +132,19 @@ disable=abstract-method,
         too-many-nested-blocks,
         too-many-public-methods,
         too-many-statements,
+        ungrouped-imports,
+        unnecessary-lambda-assignment,
+        unnecessary-pass,
         wrong-import-order,
 # TODO(#12912): Remove these after the Python 3 migration.
-        arguments-renamed,
+        arguments-differ,
         consider-using-with,
-        import-outside-toplevel,
-        not-an-iterable,
-        unnecessary-pass,
-        consider-using-f-string,
-# TODO(#14322): Reinstate this.
-        missing-type-doc,
         # Pylint considers imports to be cyclic even when the cycle is
         # broken by putting imports inside functions so they aren't
         # executed upon module import.
         cyclic-import,
-        broad-exception-raised,
-        unnecessary-lambda-assignment,
+# TODO(#14322): Reinstate this.
+        missing-type-doc,
 
 [REPORTS]
 
