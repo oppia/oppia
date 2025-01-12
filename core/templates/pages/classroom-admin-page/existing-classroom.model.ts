@@ -79,6 +79,7 @@ export class ExistingClassroomData
     topicListIntro: string,
     topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds,
     isPublished: boolean,
+    isDiagnosticTestEnabled: boolean,
     thumbnailData: ImageData,
     bannerData: ImageData
   ) {
