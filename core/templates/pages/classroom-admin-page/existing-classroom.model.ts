@@ -213,7 +213,7 @@ export class ExistingClassroomData
       isPublished: this._isPublished,
       thumbnailData: this._thumbnail_data,
       bannerData: this._banner_data,
-      isDiagnosticTestEnabled: false
+      isDiagnosticTestEnabled: this._isDiagnosticTestEnabled
     };
     return classroomDict;
   }

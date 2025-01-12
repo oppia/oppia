@@ -125,7 +125,6 @@ export class ClassroomPageComponent implements OnDestroy {
       this.urlInterpolationService.getStaticImageUrl('/splash/books.svg');
 
     this.loaderService.showLoadingScreen('Loading');
-    this.isDiagnosticTestFeatureFlagEnabled();
 
     this.accessValidationBackendApiService
       .validateAccessToClassroomPage(this.classroomUrlFragment)

@@ -46,7 +46,7 @@ class Classroom:
         topic_ids: List[str],
         course_details: str,
         topic_list_intro: str,
-        is_diagnostic_test_enabled: bool = False,
+        is_diagnostic_test_enabled: bool,
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -56,6 +56,7 @@ class Classroom:
             topic_ids: list(str). List of topic ids attached to the classroom.
             course_details: str. Course details for the classroom.
             topic_list_intro: str. Topic list introduction for the classroom.
+            is_diagnostic_test_enabled: bool. Whether the diagnostic test is enabled.
         """
         self.name = name
         self.url_fragment = url_fragment
@@ -82,12 +83,21 @@ class Classroom:
         }
     @classmethod
     def from_dict(cls, classroom_dict: ClassroomDict) -> Classroom:
+        """Creates a Classroom domain object from a dictionary.
+
+        Args:
+            classroom_dict: ClassroomDict. A dictionary representation of the
+                Classroom object.
+
+        Returns:
+            Classroom. The corresponding Classroom domain object.
+        """
         return cls(
             name=classroom_dict['name'],
             url_fragment=classroom_dict['url_fragment'],
             topic_ids=classroom_dict['topic_ids'],
             course_details=classroom_dict['course_details'],
             topic_list_intro=classroom_dict['topic_list_intro'],
-            is_diagnostic_test_enabled=classroom_dict.get('is_diagnostic_test_enabled', False)
+            is_diagnostic_test_enabled=classroom_dict['is_diagnostic_test_enabled']
         )
 
