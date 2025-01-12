@@ -1187,7 +1187,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
                 target_id=self.EXP_1_ID,
                 target_version_at_submission=0,
                 language_code=self.LANG_1,
-                created_on=datetime.datetime.utcnow()
+                created_on=mocked_now
             )
             suggestion_1_model.update_timestamps()
             suggestion_2_model = self.create_model(
@@ -1209,7 +1209,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
                 target_id=self.EXP_1_ID,
                 target_version_at_submission=0,
                 language_code=self.LANG_1,
-                created_on=datetime.datetime.utcnow() - datetime.timedelta(days=2)
+                created_on=mocked_now - datetime.timedelta(days=2)
             )
             suggestion_2_model.update_timestamps()
             suggestion_3_model = self.create_model(
@@ -1231,7 +1231,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
                 target_id=self.EXP_1_ID,
                 target_version_at_submission=0,
                 language_code=self.LANG_1,
-                created_on=datetime.datetime.utcnow() - datetime.timedelta(days=1)
+                created_on=mocked_now - datetime.timedelta(days=1)
             )
             suggestion_3_model.update_timestamps()
             suggestion_models.GeneralSuggestionModel.put_multi([
