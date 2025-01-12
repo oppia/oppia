@@ -175,36 +175,15 @@
               <span *ngIf="classroomViewerMode">
                 {{ tempClassroomData.getIsDiagnosticTestEnabled() ? 'Enabled' : 'Disabled' }}
               </span>
+
               <div class="oppia-on-off-switch" *ngIf="!classroomViewerMode">
                 <input
-                  *ngIf="tempClassroomData.getIsDiagnosticTestEnabled()"
                   type="checkbox"
                   class="sr-only"
                   aria-label="Toggle diagnostic test status"
-                  checked
-                  (click)="toggleDiagnosticTestStatus()"
-                >
-                <input
-                  *ngIf="tempClassroomData.getIsDiagnosticTestEnabled()"
-                  type="checkbox"
-                  class="oppia-on-off-switch-checkbox"
                   id="diagnostic-switch"
-                  checked
-                  (click)="toggleDiagnosticTestStatus()"
-                >
-                <input
-                  *ngIf="!tempClassroomData.getIsDiagnosticTestEnabled()"
-                  type="checkbox"
-                  class="sr-only"
-                  aria-label="Toggle diagnostic test status"
-                  (click)="toggleDiagnosticTestStatus()"
-                >
-                <input
-                  *ngIf="!tempClassroomData.getIsDiagnosticTestEnabled()"
-                  type="checkbox"
-                  class="oppia-on-off-switch-checkbox"
-                  id="diagnostic-switch"
-                  (click)="toggleDiagnosticTestStatus()"
+                  [checked]="tempClassroomData.getIsDiagnosticTestEnabled()"
+                  (change)="toggleDiagnosticTestStatus($event)"
                 >
                 <label
                   class="oppia-on-off-switch-label e2e-test-toggle-diagnostic-test-status-btn"
