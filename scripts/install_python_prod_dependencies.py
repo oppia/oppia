@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Installation script for Oppia python backend libraries."""
 
 from __future__ import annotations
@@ -35,11 +34,11 @@ from . import common
 MismatchType = Dict[str, Tuple[Optional[str], Optional[str]]]
 ValidatedMismatchType = Dict[str, Tuple[str, Optional[str]]]
 
-# This is the version that is set in install_prerequisites.sh.
 GIT_DIRECT_URL_REQUIREMENT_PATTERN: Final = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
-    re.compile(r'^(git\+git://github\.com/.*?@[0-9a-f]{40})#egg=([^\s]*)'))
+    re.compile(r'^(git\+git://github\.com/.*?@[0-9a-f]{40})#egg=([^\s]*)')
+)
 
 
 def normalize_python_library_name(library_name: str) -> str:
@@ -136,8 +135,7 @@ def _get_requirements_file_contents() -> Dict[str, str]:
         Exception. Given URL is invalid.
     """
     requirements_contents: Dict[str, str] = collections.defaultdict()
-    with utils.open_file(
-        common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+    with utils.open_file(common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
         trimmed_lines = (line.strip() for line in f.readlines())
         for line_num, line in enumerate(trimmed_lines, start=1):
             if not line or line.startswith('#') or line.startswith('--hash='):
@@ -149,9 +147,10 @@ def _get_requirements_file_contents() -> Dict[str, str]:
                     raise Exception(
                         '%r on line %d of %s does not match '
                         'GIT_DIRECT_URL_REQUIREMENT_PATTERN=%r' % (
-                            line, line_num,
-                            common.COMPILED_REQUIREMENTS_FILE_PATH,
-                            GIT_DIRECT_URL_REQUIREMENT_PATTERN.pattern))
+                            line, line_num, common.COMPILED_REQUIREMENTS_FILE_PATH,
+                            GIT_DIRECT_URL_REQUIREMENT_PATTERN.pattern
+                        )
+                    )
                 library_name, version_string = match.group(2, 1)
 
             else:
@@ -161,8 +160,7 @@ def _get_requirements_file_contents() -> Dict[str, str]:
             # e.g 'Flask' is the same library as 'flask'. Therefore, we
             # normalize all library names in order to compare libraries without
             # ambiguities.
-            normalized_library_name = (
-                normalize_python_library_name(library_name))
+            normalized_library_name = (normalize_python_library_name(library_name))
             requirements_contents[normalized_library_name] = version_string
     return requirements_contents
 
@@ -194,15 +192,14 @@ def _get_third_party_python_libs_directory_contents() -> Dict[str, str]:
         predicate=_dist_has_meta_data
     )
 
-    installed_packages = {
-        pkg.project_name: pkg.version for pkg in standard_packages
-    }
+    installed_packages = {pkg.project_name: pkg.version for pkg in standard_packages}
 
     for pkg in direct_url_packages:
         metadata = json.loads(pkg.get_metadata('direct_url.json'))
         version_string = '%s+%s@%s' % (
             metadata['vcs_info']['vcs'], metadata['url'],
-            metadata['vcs_info']['commit_id'])
+            metadata['vcs_info']['commit_id']
+        )
         installed_packages[pkg.project_name] = version_string
 
     # Libraries with different case are considered equivalent libraries:
@@ -232,16 +229,15 @@ def _remove_metadata(library_name: str, version_string: str) -> None:
             metadata for.
     """
     possible_normalized_directory_names = (
-        _get_possible_normalized_metadata_directory_names(
-            library_name, version_string))
+        _get_possible_normalized_metadata_directory_names(library_name, version_string)
+    )
     normalized_to_original_dirnames = {
         normalize_directory_name(name): name
         for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
-        if os.path.isdir(
-            os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
+        if os.path.isdir(os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
     }
-    for (normalized_dirname, original_dirname) in (
-            normalized_to_original_dirnames.items()):
+    for (normalized_dirname,
+         original_dirname) in (normalized_to_original_dirnames.items()):
         # Python metadata directory names contain a python library name that
         # does not have uniform case. However, python libraries are equivalent
         # regardless of their case. Therefore, in order to check if a python
@@ -251,7 +247,8 @@ def _remove_metadata(library_name: str, version_string: str) -> None:
         # convention: <library_name>-<library-version>.
         if normalized_dirname in possible_normalized_directory_names:
             path_to_delete = os.path.join(
-                common.THIRD_PARTY_PYTHON_LIBS_DIR, original_dirname)
+                common.THIRD_PARTY_PYTHON_LIBS_DIR, original_dirname
+            )
             shutil.rmtree(path_to_delete)
 
 
@@ -300,14 +297,10 @@ def _rectify_third_party_directory(mismatches: MismatchType) -> None:
                 shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
             _reinstall_all_dependencies()
             return
-        validated_mismatches[library_name] = (
-            requirements_version, directory_version
-        )
+        validated_mismatches[library_name] = (requirements_version, directory_version)
 
     git_mismatches, pip_mismatches = (
-        utils.partition(
-            validated_mismatches.items(), predicate=_is_git_url_mismatch
-        )
+        utils.partition(validated_mismatches.items(), predicate=_is_git_url_mismatch)
     )
 
     for normalized_library_name, versions in git_mismatches:
@@ -320,9 +313,11 @@ def _rectify_third_party_directory(mismatches: MismatchType) -> None:
 
     for normalized_library_name, versions in pip_mismatches:
         requirements_version = (
-            pkg_resources.parse_version(versions[0]) if versions[0] else None)
+            pkg_resources.parse_version(versions[0]) if versions[0] else None
+        )
         directory_version = (
-            pkg_resources.parse_version(versions[1]) if versions[1] else None)
+            pkg_resources.parse_version(versions[1]) if versions[1] else None
+        )
 
         # The library listed in 'requirements.txt' is not in the
         # 'third_party/python_libs' directory.
@@ -335,9 +330,7 @@ def _rectify_third_party_directory(mismatches: MismatchType) -> None:
             _remove_metadata(normalized_library_name, str(directory_version))
 
 
-def _is_git_url_mismatch(
-    mismatch_item: Tuple[str, ValidatedMismatchType]
-) -> bool:
+def _is_git_url_mismatch(mismatch_item: Tuple[str, ValidatedMismatchType]) -> bool:
     """Returns whether the given mismatch item is for a GitHub URL."""
     _, (required, _) = mismatch_item
     return required.startswith('git')
@@ -355,12 +348,11 @@ def _install_direct_url(library_name: str, direct_url: str) -> None:
         '%s#egg=%s' % (direct_url, library_name),
         common.THIRD_PARTY_PYTHON_LIBS_DIR,
         upgrade=True,
-        no_dependencies=True)
+        no_dependencies=True
+    )
 
 
-def _get_pip_versioned_package_string(
-    library_name: str, version_string: str
-) -> str:
+def _get_pip_versioned_package_string(library_name: str, version_string: str) -> str:
     """Returns the standard 'library==version' string for the given values.
 
     Args:
@@ -394,8 +386,7 @@ def _reinstall_all_dependencies() -> None:
     'requirements.txt' file to the 'third_party/python_libs' folder.
     """
     _pip_install_requirements(
-        common.THIRD_PARTY_PYTHON_LIBS_DIR,
-        common.COMPILED_REQUIREMENTS_FILE_PATH
+        common.THIRD_PARTY_PYTHON_LIBS_DIR, common.COMPILED_REQUIREMENTS_FILE_PATH
     )
 
 
@@ -421,21 +412,20 @@ def _get_possible_normalized_metadata_directory_names(
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
     return {
+        normalize_directory_name('%s-%s.dist-info' % (library_name, version_string)),
         normalize_directory_name(
-            '%s-%s.dist-info' % (library_name, version_string)),
+            '%s-%s.dist-info' % (library_name.replace('-', '_'), version_string)
+        ),
+        normalize_directory_name('%s-%s.egg-info' % (library_name, version_string)),
         normalize_directory_name(
-            '%s-%s.dist-info' % (
-                library_name.replace('-', '_'), version_string)),
+            '%s-%s.egg-info' % (library_name.replace('-', '_'), version_string)
+        ),
         normalize_directory_name(
-            '%s-%s.egg-info' % (library_name, version_string)),
+            '%s-%s-py3.9.egg-info' % (library_name, version_string)
+        ),
         normalize_directory_name(
-            '%s-%s.egg-info' % (
-                library_name.replace('-', '_'), version_string)),
-        normalize_directory_name(
-            '%s-%s-py3.9.egg-info' % (library_name, version_string)),
-        normalize_directory_name(
-            '%s-%s-py3.9.egg-info' % (
-                library_name.replace('-', '_'), version_string))
+            '%s-%s-py3.9.egg-info' % (library_name.replace('-', '_'), version_string)
+        )
     }
 
 
@@ -451,24 +441,30 @@ def verify_pip_is_installed() -> None:
         # okay that we don't use it.
         import pip  # pylint: disable=unused-import
     except ImportError as e:
-        common.print_each_string_after_two_new_lines([
-            'Pip is required to install Oppia dependencies, but pip wasn\'t '
-            'found on your local machine.',
-            'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
-            'page:'])
+        common.print_each_string_after_two_new_lines(
+            [
+                'Pip is required to install Oppia dependencies, but pip wasn\'t '
+                'found on your local machine.',
+                'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
+                'page:'
+            ]
+        )
 
         if common.is_mac_os():
             print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-                'OS%29')
+                'OS%29'
+            )
         elif common.is_linux_os():
             print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-                '%29')
+                '%29'
+            )
         else:
             print(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-                'Windows%29')
+                'Windows%29'
+            )
         raise ImportError('Error importing pip: %s' % e) from e
 
 
@@ -486,15 +482,14 @@ def _run_pip_command(cmd_parts: List[str]) -> None:
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
     process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        encoding='utf-8')
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8'
+    )
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print(stdout)
     elif 'can\'t combine user with prefix' in stderr:
         print('Trying by setting --user and --prefix flags.')
-        subprocess.check_call(
-            command + ['--user', '--prefix=', '--system'])
+        subprocess.check_call(command + ['--user', '--prefix=', '--system'])
     else:
         print(stderr)
         print('Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
@@ -523,14 +518,12 @@ def pip_install(
     if no_dependencies:
         additional_pip_args.append('--no-dependencies')
 
-    _run_pip_command([
-        'install', versioned_package, '--target', install_path
-    ] + additional_pip_args)
+    _run_pip_command(
+        ['install', versioned_package, '--target', install_path] + additional_pip_args
+    )
 
 
-def _pip_install_requirements(
-    install_path: str, requirements_path: str
-) -> None:
+def _pip_install_requirements(install_path: str, requirements_path: str) -> None:
     """Installs third party libraries from requirements files with pip.
 
     Args:
@@ -538,10 +531,12 @@ def _pip_install_requirements(
         requirements_path: str. The path to the requirements file.
     """
     verify_pip_is_installed()
-    _run_pip_command([
-        'install', '--require-hashes', '--no-deps', '--target',
-        install_path, '--no-dependencies', '-r', requirements_path, '--upgrade'
-    ])
+    _run_pip_command(
+        [
+            'install', '--require-hashes', '--no-deps', '--target', install_path,
+            '--no-dependencies', '-r', requirements_path, '--upgrade'
+        ]
+    )
 
 
 def get_mismatches() -> MismatchType:
@@ -579,21 +574,24 @@ def get_mismatches() -> MismatchType:
         # Library exists in the directory and the requirements file.
         if normalized_library_name in directory_contents:
             # Library matches but version doesn't match.
-            if (directory_contents[normalized_library_name] !=
-                    requirements_contents[normalized_library_name]):
+            if (directory_contents[normalized_library_name]
+                    != requirements_contents[normalized_library_name]):
                 mismatches[normalized_library_name] = (
                     requirements_contents[normalized_library_name],
-                    directory_contents[normalized_library_name])
+                    directory_contents[normalized_library_name]
+                )
         # Library exists in the requirements file but not in the directory.
         else:
             mismatches[normalized_library_name] = (
-                requirements_contents[normalized_library_name], None)
+                requirements_contents[normalized_library_name], None
+            )
 
     for normalized_library_name in directory_contents:
         # Library exists in the directory but is not in the requirements file.
         if normalized_library_name not in requirements_contents:
             mismatches[normalized_library_name] = (
-                None, directory_contents[normalized_library_name])
+                None, directory_contents[normalized_library_name]
+            )
 
     return mismatches
 
@@ -634,14 +632,15 @@ def validate_metadata_directories() -> None:
         # is installed.
         possible_normalized_directory_names = (
             _get_possible_normalized_metadata_directory_names(
-                normalized_library_name, version_string))
+                normalized_library_name, version_string
+            )
+        )
         # If any of the possible metadata directory names show up in the
         # directory, that is confirmation that <library_name> was installed
         # correctly with the correct metadata.
-        if not any(
-                normalized_directory_name in normalized_directory_names
-                for normalized_directory_name in
-                possible_normalized_directory_names):
+        if not any(normalized_directory_name in normalized_directory_names
+                   for normalized_directory_name in possible_normalized_directory_names
+                   ):
             raise Exception(
                 'The python library %s was installed without the correct '
                 'metadata folders which may indicate that the convention for '
@@ -650,7 +649,8 @@ def validate_metadata_directories() -> None:
                 'assumptions in the '
                 '_get_possible_normalized_metadata_directory_names'
                 ' function for what metadata directory names can be.' %
-                normalized_library_name)
+                normalized_library_name
+            )
 
 
 def main() -> None:
@@ -662,30 +662,30 @@ def main() -> None:
     verify_pip_is_installed()
     print('Regenerating "requirements.txt" file...')
     install_python_dev_dependencies.compile_pip_requirements(
-        'requirements.in', 'requirements.txt')
+        'requirements.in', 'requirements.txt'
+    )
     # Adds a note to the beginning of the 'requirements.txt' file to make sure
     # developers understand that they should not append or change this
     # autogenerated file.
-    with utils.open_file(
-        common.COMPILED_REQUIREMENTS_FILE_PATH, 'r+') as f:
+    with utils.open_file(common.COMPILED_REQUIREMENTS_FILE_PATH, 'r+') as f:
         content = f.read()
         f.seek(0, 0)
         f.write(
             '# Developers: Please do not modify this auto-generated file. If\n'
             '# you want to add, remove, upgrade, or downgrade libraries,\n'
             '# please change the `requirements.in` file, and then follow\n'
-            '# the instructions there to regenerate this file.\n' + content)
+            '# the instructions there to regenerate this file.\n' + content
+        )
 
     mismatches = get_mismatches()
     if mismatches:
         _rectify_third_party_directory(mismatches)
         validate_metadata_directories()
     else:
-        print(
-            'All third-party Python libraries are already installed correctly.')
+        print('All third-party Python libraries are already installed correctly.')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when this Python file is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

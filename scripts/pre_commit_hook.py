@@ -45,6 +45,7 @@ import sys
 # rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
+from core import feconf  # isort:skip # pylint: disable=wrong-import-position
 from typing import Final, List, Optional, Tuple  # isort:skip  # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
@@ -63,7 +64,9 @@ KEYS_UPDATED_IN_CONSTANTS: Final = [
     b'FIREBASE_CONFIG_PROJECT_ID', b'FIREBASE_CONFIG_STORAGE_BUCKET',
     b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID'
 ]
-NPX_PATH: Final = os.path.join(os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx')
+NPX_CMD: Final = 'npx' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
+    os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx'
+)
 
 
 def install_hook() -> None:
@@ -190,7 +193,7 @@ def check_changes_in_config() -> None:
 
 def run_formatters() -> None:
     """Runs prettier and YAPF formatters."""
-    subprocess.run([NPX_PATH, 'lint-staged'], check=True)
+    subprocess.run([NPX_CMD, 'lint-staged'], check=True)
 
 
 def main(args: Optional[List[str]] = None) -> None:
