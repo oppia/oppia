@@ -145,6 +145,7 @@ disable=abstract-method,
         cyclic-import,
 # TODO(#14322): Reinstate this.
         missing-type-doc,
+        superfluous-parens,
 
 [REPORTS]
 
