@@ -1081,16 +1081,6 @@ export class ExplorationEditor extends BaseUser {
     responseIsCorrect: boolean,
     isLastResponse: boolean = true
   ): Promise<void> {
-    this.page.on('console', msg => console.log(`Browser Log: ${msg.text()}`));
-     await this.page.evaluate(() => {
-      const logActiveElement = () => {
-        const activeTag = document.activeElement?.tagName;
-        const activeClass = document.activeElement?.className;
-        console.log(`Focus changed to: Tag: ${activeTag} Class: ${activeClass}`);
-      };
-      document.addEventListener('focusin', logActiveElement);
-      logActiveElement();
-    });
     switch (interactionType) {
       case 'Number Input':
         await this.page.waitForSelector(floatFormInput);
@@ -1103,18 +1093,7 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
           visible: true,
         });
-        await this.page.evaluate(() => {
-          var activeTag1 = document.activeElement?.tagName;
-          var activeClass1 = document.activeElement?.className;
-          console.log(`Before timeout Focus changed to: Tag: ${activeTag1} Class: ${activeClass1}`);
-        });
-        setTimeout(()=>{}, 5000);
-        await this.page.evaluate(() => {
-          var activeTag1 = document.activeElement?.tagName;
-          var activeClass1 = document.activeElement?.className;
-          console.log(`Before timeout Focus changed to: Tag: ${activeTag1} Class: ${activeClass1}`);
-        });
-        // await this.page.click(responseModalHeaderSelector);
+        await this.page.waitForTimeout(5000);
         await this.clickOn(multipleChoiceResponseDropdown);
         await this.page.waitForSelector(multipleChoiceResponseOption, {
           visible: true,
@@ -1179,10 +1158,6 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(addAnotherResponseButton);
     }
-    await this.page.evaluate(() => {
-      document.removeEventListener('focusin', document['logActiveElement']);
-    });
-    this.page.removeListener('console', msg => console.log(`Browser Log: ${msg.text()}`));
   }
 
   /**
