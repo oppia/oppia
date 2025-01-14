@@ -554,9 +554,9 @@ class ElasticSearchStub:
         Args:
             index_name: str. The index that was not found.
 
-        Returns:
+        Raises:
             elasticsearch.NotFoundError. A manually-constructed error
-            indicating that the index was not found.
+                indicating that the index was not found.
         """
         raise elasticsearch.NotFoundError(
             404, 'index_not_found_exception', {
@@ -757,7 +757,7 @@ class ElasticSearchStub:
             'total': index_size,
             'batches': 1,
             'requests_per_second': -1.0,
-            'retries': {u'search': 0, u'bulk': 0},
+            'retries': {'search': 0, 'bulk': 0},
             'timed_out': False,
             'deleted': index_size
         }
@@ -2951,7 +2951,7 @@ version: 1
             url: str. The URL to fetch the response.
             expected_status_int_list: list(int). A list of integer status code
                 to expect.
-            http_method: str. The http method by which the request is to be 
+            http_method: str. The http method by which the request is to be
                 sent.
             params: dict. A dictionary that will be encoded into a query string.
 
@@ -4324,7 +4324,8 @@ class EmailMessageMock:
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
             Dict[str, Dict[str, Union[str, int]]]
-        ] = None
+        ] = None,
+        attachments: Optional[List[Dict[str, str]]] = None
     ) -> None:
         """Inits a mock email message with all the necessary data.
 
@@ -4355,6 +4356,9 @@ class EmailMessageMock:
                     subject = 'Hey, %recipient.first%'
                 For more information about this format, see:
                 https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
+            attachments: list(dict)|None. Optional argument. A list of
+                dictionaries, where each dictionary includes the keys `filename`
+                and `path` with their corresponding values.
         """
         self.sender = sender_email
         self.to = recipient_email
@@ -4364,6 +4368,7 @@ class EmailMessageMock:
         self.bcc = bcc
         self.reply_to = reply_to
         self.recipient_variables = recipient_variables
+        self.attachments = attachments
 
 
 class GenericEmailTestBase(GenericTestBase):
@@ -4403,7 +4408,8 @@ class GenericEmailTestBase(GenericTestBase):
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
             Dict[str, Dict[str, Union[str, int]]]
-        ] = None
+        ] = None,
+        attachments: Optional[List[Dict[str, str]]] = None
     ) -> bool:
         """Mocks sending an email to each email in recipient_emails.
 
@@ -4434,6 +4440,9 @@ class GenericEmailTestBase(GenericTestBase):
                     subject = 'Hey, %recipient.first%'
                 For more information about this format, see:
                 https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
+            attachments: list(dict)|None. Optional argument. A list of
+                dictionaries, where each dictionary includes the keys `filename`
+                and `path` with their corresponding values.
 
         Returns:
             bool. Whether the emails are sent successfully.
@@ -4446,7 +4455,8 @@ class GenericEmailTestBase(GenericTestBase):
             sender_email, recipient_emails, subject, plaintext_body, html_body,
             bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
             recipient_variables=(
-                recipient_variables if recipient_variables else None))
+                recipient_variables if recipient_variables else None),
+            attachments=attachments if attachments else None)
         for recipient_email in recipient_emails:
             self.emails_dict[recipient_email].append(new_email)
         return True

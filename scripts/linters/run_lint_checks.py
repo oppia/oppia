@@ -478,8 +478,7 @@ def _get_all_filepaths(
                 namespace=namespace)
     else:
         all_filepaths = _get_changed_filepaths()
-    # TODO(#12912): The pylint complains about 'pattern' being used out of the
-    # comprehension, which is not true, this needs to be investigated and fixed.
+
     all_matching_filepaths = [
         filename for filename in all_filepaths if not
         any(
@@ -665,8 +664,8 @@ def main(args: Optional[List[str]] = None) -> None:
         if file_extension_type in ('js', 'ts'):
             if len(files['.js'] + files['.ts']) == 0:
                 continue
-        elif (not file_extension_type == 'other' and not
-              len(files['.%s' % file_extension_type])):
+        elif (not file_extension_type == 'other' and
+              not files['.%s' % file_extension_type]):
             continue
         custom_linter, third_party_linter = _get_linters_for_file_extension(
             file_extension_type, namespace, files)

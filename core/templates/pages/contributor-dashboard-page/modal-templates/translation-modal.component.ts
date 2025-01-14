@@ -25,7 +25,6 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AlertsService} from 'services/alerts.service';
@@ -41,7 +40,6 @@ import {
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {UserService} from 'services/user.service';
 import {AppConstants} from 'app.constants';
-import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
@@ -196,9 +194,7 @@ export class TranslationModalComponent {
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly wds: WindowDimensionsService
-  ) {
-    this.contextService = OppiaAngularRootComponent.contextService;
-  }
+  ) {}
 
   public get expansionTabType(): typeof ExpansionTabType {
     return ExpansionTabType;
@@ -663,10 +659,3 @@ export class TranslationModalComponent {
     this.activeModal.close(this.activeWrittenTranslation);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaTranslationModal',
-    downgradeComponent({component: TranslationModalComponent})
-  );

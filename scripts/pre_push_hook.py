@@ -146,8 +146,7 @@ def execute_mypy_checks() -> int:
     Returns:
         int. The return code from mypy checks.
     """
-    task = subprocess.Popen(
-        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install'])
+    task = subprocess.Popen([PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE])
     task.communicate()
     return task.returncode
 
@@ -174,7 +173,7 @@ def has_uncommitted_files() -> bool:
     uncommitted_files = subprocess.check_output(
         GIT_IS_DIRTY_CMD.split(' '), encoding='utf-8'
     )
-    return bool(len(uncommitted_files))
+    return bool(uncommitted_files)
 
 
 def install_hook() -> None:

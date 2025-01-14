@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
@@ -867,10 +866,3 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     $(document).off('click', this.closeDropdownWhenClickedOutside);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaContributionsAndReview',
-  downgradeComponent({
-    component: ContributionsAndReview,
-  }) as angular.IDirectiveFactory
-);

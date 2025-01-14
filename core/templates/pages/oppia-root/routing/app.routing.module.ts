@@ -56,6 +56,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/contributor-dashboard-page/contributor-dashboard-page.module'
+      ).then(m => m.ContributorDashboardPageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () =>
       import('pages/moderator-page/moderator-page.module').then(
@@ -466,6 +474,14 @@ const routes: Route[] = [
       import('pages/collection-player-page/collection-player-page.module').then(
         m => m.CollectionPlayerPageModule
       ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/skill-editor-page/skill-editor-page.module').then(
+        m => m.SkillEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE,
