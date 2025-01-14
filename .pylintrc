@@ -60,7 +60,7 @@ bad-functions=apply
 
 [FORMAT]
 
-max-line-length=80
+max-line-length=88
 ignore-long-lines=^.*#\stype:\signore.*$|^\s*(# )?<?https?://\S+>?$
 
 indent-string='    '
