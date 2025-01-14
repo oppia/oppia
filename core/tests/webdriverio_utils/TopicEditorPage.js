@@ -114,6 +114,7 @@ var TopicEditorPage = function () {
   var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
   var subtopicsSelector = async function () {
     await waitFor.pageToFullyLoad();
+    await browser.pause(60000);
     // let singleSubtopic = $('.e2e-test-subtopic');
     //   await waitFor.presenceOf(
     //     singleSubtopic,
@@ -290,7 +291,14 @@ var TopicEditorPage = function () {
   };
 
   this.expectNumberOfSubtopicsToBe = async function (count) {
-    var subtopics = await subtopicsSelector();
+    await waitFor.pageToFullyLoad();
+    waitFor.visibilityOf(
+      addSubtopicButton, 'Add subtopic button taking too long to appear.'
+    );
+    // var subtopics = await subtopicsSelector();
+    await browser.pause(60000);
+    var subtopics = await $$('.e2e-test-subtopic');
+    console.log(subtopics);
     expect(subtopics.length).toEqual(count);
   };
 
