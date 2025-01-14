@@ -68,7 +68,6 @@ export class ExistingClassroomData
   _topicIdToTopicName!: TopicIdToTopicName;
   _isPublished: boolean;
   _isDiagnosticTestEnabled: boolean;
-  _urlFragment: string;
   _thumbnail_data: ImageData;
   _banner_data: ImageData;
 
@@ -100,14 +99,6 @@ export class ExistingClassroomData
     this._banner_data = bannerData;
     this._isDiagnosticTestEnabled = isDiagnosticTestEnabled;
   }
-
-  getName(): string {
-    return this._name;
-}
-
-  setName(value: string): void {
-    this._name = value;
-}
 
   getCourseDetails(): string {
     return this._courseDetails;
@@ -167,14 +158,6 @@ export class ExistingClassroomData
 
   setIsDiagnosticTestEnabled(status: boolean): void {
     this._isDiagnosticTestEnabled = status;
-  }
-
-  getUrlFragment(): string {
-    return this._urlFragment;
-  }
-
-  setUrlFragment(value: string): void {
-    this._urlFragment = value;
   }
 
   setTopicIdToPrerequisiteTopicId(
