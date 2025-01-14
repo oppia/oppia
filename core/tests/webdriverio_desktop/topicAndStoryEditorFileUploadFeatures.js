@@ -111,35 +111,35 @@ describe('Topic editor functionality', function () {
     );
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToSubtopicWithIndex(0);
-    // await topicEditorPage.changeSubtopicTitle('Modified Title');
-    // await topicEditorPage.changeSubtopicPageContents('Subtopic Contents');
-    // await topicEditorPage.submitSubtopicThumbnail(
-    //   '../data/test2_svg.svg',
-    //   true
-    // );
-    // var updatedSubtopicThumbnailSrc =
-    //   await topicEditorPage.getSubtopicThumbnailSource();
-    // expect(defaultThumbnailSrc).not.toEqual(updatedSubtopicThumbnailSrc);
-    // await topicEditorPage.saveTopic('Edited subtopic.');
+    await topicEditorPage.changeSubtopicTitle('Modified Title');
+    await topicEditorPage.changeSubtopicPageContents('Subtopic Contents');
+    await topicEditorPage.submitSubtopicThumbnail(
+      '../data/test2_svg.svg',
+      true
+    );
+    var updatedSubtopicThumbnailSrc =
+      await topicEditorPage.getSubtopicThumbnailSource();
+    expect(defaultThumbnailSrc).not.toEqual(updatedSubtopicThumbnailSrc);
+    await topicEditorPage.saveTopic('Edited subtopic.');
 
-    // await topicsAndSkillsDashboardPage.get();
-    // await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
-    // expect(await topicEditorPage.getTopicThumbnailSource()).not.toEqual(
-    //   defaultThumbnailSrc
-    // );
-    // await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    expect(await topicEditorPage.getTopicThumbnailSource()).not.toEqual(
+      defaultThumbnailSrc
+    );
+    await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
 
-    // await topicEditorPage.expectTitleOfSubtopicWithIndexToMatch(
-    //   'Modified Title',
-    //   0
-    // );
-    // await topicEditorPage.navigateToSubtopicWithIndex(0);
-    // expect(await topicEditorPage.getSubtopicThumbnailSource()).not.toEqual(
-    //   defaultThumbnailSrc
-    // );
-    // await topicEditorPage.expectSubtopicPageContentsToMatch(
-    //   'Subtopic Contents'
-    // );
+    await topicEditorPage.expectTitleOfSubtopicWithIndexToMatch(
+      'Modified Title',
+      0
+    );
+    await topicEditorPage.navigateToSubtopicWithIndex(0);
+    expect(await topicEditorPage.getSubtopicThumbnailSource()).not.toEqual(
+      defaultThumbnailSrc
+    );
+    await topicEditorPage.expectSubtopicPageContentsToMatch(
+      'Subtopic Contents'
+    );
   });
 
   it('should publish and unpublish a story correctly', async function () {
