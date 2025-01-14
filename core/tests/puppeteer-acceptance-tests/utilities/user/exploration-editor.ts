@@ -1103,13 +1103,17 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
           visible: true,
         });
-        var activeTag1 = document.activeElement?.tagName;
-        var activeClass1 = document.activeElement?.className;
-        console.log(`Before timeout Focus changed to: Tag: ${activeTag1} Class: ${activeClass1}`);
+        await this.page.evaluate(() => {
+          var activeTag1 = document.activeElement?.tagName;
+          var activeClass1 = document.activeElement?.className;
+          console.log(`Before timeout Focus changed to: Tag: ${activeTag1} Class: ${activeClass1}`);
+        });
         setTimeout(()=>{}, 5000);
-        activeTag1 = document.activeElement?.tagName;
-        activeClass1 = document.activeElement?.className;
-        console.log(`After timeout Focus changed to: Tag: ${activeTag1} Class: ${activeClass1}`);
+        await this.page.evaluate(() => {
+          var activeTag1 = document.activeElement?.tagName;
+          var activeClass1 = document.activeElement?.className;
+          console.log(`Before timeout Focus changed to: Tag: ${activeTag1} Class: ${activeClass1}`);
+        });
         // await this.page.click(responseModalHeaderSelector);
         await this.clickOn(multipleChoiceResponseDropdown);
         await this.page.waitForSelector(multipleChoiceResponseOption, {
