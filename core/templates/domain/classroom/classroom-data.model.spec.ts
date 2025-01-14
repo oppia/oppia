@@ -78,6 +78,7 @@ describe('Classroom data model', () => {
     );
     expect(classroomData.getTeaserText()).toEqual('Learn math');
     expect(classroomData.getIsPublished()).toBeTrue();
+    expect(classroomData.getIsDiagnosticTestEnabled()).toBeTrue();
     expect(classroomData.getThumbnailData().filename).toEqual('thumbnail.svg');
     expect(classroomData.getThumbnailData().size_in_bytes).toEqual(100);
     expect(classroomData.getThumbnailData().bg_color).toEqual('transparent');

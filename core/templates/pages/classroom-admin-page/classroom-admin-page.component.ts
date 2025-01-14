@@ -382,7 +382,6 @@ export class ClassroomAdminPageComponent implements OnInit {
       topic_id_to_prerequisite_topic_ids:
         classroomDict.topicIdToPrerequisiteTopicIds,
       is_published: classroomDict.isPublished,
-      is_diagnostic_test_enabled: classroomDict.isDiagnosticTestEnabled,
       thumbnail_data: classroomDict.thumbnailData,
       banner_data: classroomDict.bannerData,
     };
@@ -839,46 +838,10 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   toggleDiagnosticTestStatus(): void {
-    if (!this.tempClassroomData) {
-      this.alertsService.addWarning('Classroom data is not loaded yet.');
-      return;
-    }
-
-    const currentStatus = this.tempClassroomData.getIsDiagnosticTestEnabled();
-    this.tempClassroomData.setIsDiagnosticTestEnabled(!currentStatus);
-
-    const classroomId = this.tempClassroomData.getClassroomId();
-    const classroomDict = this.generateClassroomDict();
-
-    this.classroomBackendApiService.updateClassroomDataAsync(classroomId, classroomDict).then(
-      () => {
-        this.alertsService.addSuccessMessage('Diagnostic Test status updated successfully.');
-      },
-      (error) => {
-        console.error('Error updating diagnostic test status:', error);
-        this.alertsService.addWarning('Failed to update diagnostic test status.');
-      }
+    this.tempClassroomData.setIsDiagnosticTestEnabled(
+      !this.tempClassroomData.getIsDiagnosticTestEnabled()
     );
-  }
-
-  private generateClassroomDict(): ClassroomBackendDict {
-    if (!this.tempClassroomData) {
-      throw new Error('Classroom data is not available.');
-    }
-
-    return {
-      classroom_id: this.tempClassroomData.getClassroomId(),
-      name: this.tempClassroomData.getName(),
-      url_fragment: this.tempClassroomData.getUrlFragment(),
-      course_details: this.tempClassroomData.getCourseDetails(),
-      teaser_text: this.tempClassroomData.getTeaserText(),
-      topic_list_intro: this.tempClassroomData.getTopicListIntro(),
-      is_diagnostic_test_enabled: this.tempClassroomData.getIsDiagnosticTestEnabled(),
-      topic_id_to_prerequisite_topic_ids: this.tempClassroomData.getTopicIdToPrerequisiteTopicId(),
-      is_published: this.tempClassroomData.getIsPublished(),
-      thumbnail_data: this.tempClassroomData.getThumbnailData(),
-      banner_data: this.tempClassroomData.getBannerData(),
-    };
+    this.updateClassroomField();
   }
 
   canSaveClassroom(): boolean {
@@ -898,6 +861,5 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   ngOnDestory(): void {
     this.contextService.removeCustomEntityContext();
-    this.loadClassroomData();
   }
 }
