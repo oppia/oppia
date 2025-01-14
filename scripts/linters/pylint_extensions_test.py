@@ -3704,7 +3704,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
+
 
     def setUp(self) -> None:
         super().setUp()

@@ -1800,68 +1800,6 @@ class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
-class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[misc]
-    """Checks if there is a single empty line below the fileoverview docstring.
-    Note: The check assumes that all files have a file overview. This
-    assumption is justified because Pylint has an inbuilt check
-    (missing-docstring) for missing file overviews.
-    """
-
-    __implements__ = interfaces.IAstroidChecker
-    name = 'space_between_imports_and_file-overview'
-    priority = -1
-    msgs = {
-        'C0024': (
-            'Please add an empty line below the fileoverview docstring.',
-            'no-empty-line-provided-below-fileoverview',
-            'please provide an empty line below the fileoverview.'
-        ),
-        'C0025': (
-            'Single empty line should be provided below the fileoverview.',
-            'only-a-single-empty-line-should-be-provided',
-            'please provide an empty line below the fileoverview.'
-        )
-    }
-
-    def visit_module(self, node: astroid.Module) -> None:
-        """Visit a module to ensure that there is a blank line below
-        file overview docstring.
-
-        Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
-        """
-        # Check if the given node has docstring.
-        if node.doc is None:
-            return
-        line_number = node.fromlineno
-        # Iterate till the start of docstring.
-        while True:
-            line = linecache.getline(node.root().file, line_number).strip()
-            if line.startswith(('\'', '"')):
-                break
-
-            line_number += 1
-
-        doc_length = len(node.doc.split('\n'))
-        line_number += doc_length
-        first_line_after_doc = linecache.getline(
-            node.root().file, line_number).strip()
-        second_line_after_doc = linecache.getline(
-            node.root().file, line_number + 1).strip()
-        if first_line_after_doc != '':
-            self.add_message(
-                'no-empty-line-provided-below-fileoverview', node=node)
-        elif second_line_after_doc == '':
-            self.add_message(
-                'only-a-single-empty-line-should-be-provided', node=node)
-
-
-# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
-# pylint library and absences of stubs in pylint, forces MyPy to
-# assume that BaseChecker class has attributes of type Any.
-# Thus to avoid MyPy's error
-# (Class cannot subclass 'BaseChecker' (has type 'Any')),
-# we added an ignore here.
 class SingleLinePragmaChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Custom pylint checker which checks if pylint pragma is used to disable
     a rule for a single line only.
@@ -2980,7 +2918,6 @@ def register(linter: lint.PyLinter) -> None:
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
-    linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
     linter.register_checker(TypeIgnoreCommentChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
