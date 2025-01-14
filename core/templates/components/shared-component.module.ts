@@ -194,6 +194,7 @@ import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {RteHelperModalComponent} from 'services/rte-helper-modal.controller';
 import {DirectivesModule} from 'directives/directives.module';
+import {ConfirmationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/confirmation-modal.component';
 
 @NgModule({
   imports: [
@@ -373,6 +374,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RteHelperModalComponent,
     UndoSnackbarComponent,
     TranslationModalComponent,
+    ConfirmationModalComponent,
     FullExpandAccordionComponent,
   ],
 
@@ -511,6 +513,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RteHelperModalComponent,
     UndoSnackbarComponent,
     TranslationModalComponent,
+    ConfirmationModalComponent,
     FullExpandAccordionComponent,
   ],
 
@@ -659,6 +662,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RteHelperModalComponent,
     UndoSnackbarComponent,
     TranslationModalComponent,
+    ConfirmationModalComponent,
     FullExpandAccordionComponent,
   ],
 })

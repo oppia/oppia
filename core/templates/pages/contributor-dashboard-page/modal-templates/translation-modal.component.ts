@@ -25,7 +25,7 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AlertsService} from 'services/alerts.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -51,6 +51,7 @@ import {
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {ConfirmationModalComponent} from './confirmation-modal.component';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -136,6 +137,7 @@ export class TranslationModalComponent {
   textToTranslate: string | string[] = '';
   activeStatus!: Status;
   activeLanguageCode!: string;
+  hasUnsavedChanges: boolean = false;
   HTML_SCHEMA!: {
     type: string;
     ui_config: UiConfig;
@@ -184,6 +186,7 @@ export class TranslationModalComponent {
 
   constructor(
     public readonly activeModal: NgbActiveModal,
+    private readonly modalService: NgbModal,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
     private readonly contextService: ContextService,
@@ -388,6 +391,7 @@ export class TranslationModalComponent {
 
   updateHtml($event: string): void {
     if ($event !== this.activeWrittenTranslation) {
+      this.hasUnsavedChanges = true;
       this.activeWrittenTranslation = $event;
       this.changeDetectorRef.detectChanges();
     }
@@ -409,11 +413,40 @@ export class TranslationModalComponent {
   }
 
   returnToPreviousTranslation(): void {
-    const translatableItem =
-      this.translateTextService.getPreviousTextToTranslate();
-    this.updateActiveState(translatableItem);
-    this.moreAvailable = true;
-    this.resetEditor();
+    if (this.hasUnsavedChanges && this.activeWrittenTranslation !== '') {
+      const modalRef = this.modalService.open(ConfirmationModalComponent, {
+        centered: true,
+        backdrop: 'static',
+      });
+
+      modalRef.componentInstance.content = {
+        title: 'Unsaved Changes',
+        message:
+          'You have unsaved changes. Are you sure you want to go back? Your changes will be lost.',
+        confirmText: 'Discard Changes',
+        cancelText: 'Continue Editing',
+      };
+
+      modalRef.result.then(
+        result => {
+          if (result === 'confirm') {
+            this.hasUnsavedChanges = false;
+            const translatableItem =
+              this.translateTextService.getPreviousTextToTranslate();
+            this.updateActiveState(translatableItem);
+            this.moreAvailable = true;
+            this.resetEditor();
+          }
+        },
+        () => {}
+      );
+    } else {
+      const translatableItem =
+        this.translateTextService.getPreviousTextToTranslate();
+      this.updateActiveState(translatableItem);
+      this.moreAvailable = true;
+      this.resetEditor();
+    }
   }
 
   isSetOfStringDataFormat(): boolean {
