@@ -1113,6 +1113,41 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
+    def test_entry_point_with_invalid_exploration_id_type(
+        self,
+    ) -> None:
+        self.entry_point.topic_id = 'valid_topic1'
+        self.entry_point.story_id = 'valid_story1'
+        self.entry_point.exploration_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Exploration id should be a string, received: %r' % (
+                    self.entry_point.exploration_id)):
+            self.entry_point.require_valid_entry_point_exploration(
+                exploration_id=self.entry_point.exploration_id,
+                story_id=self.entry_point.story_id,
+            )
+
+    def test_entry_point_with_mismatched_story_id_and_exploration_id(
+        self
+    ) -> None:
+        self.entry_point.topic_id = 'valid_topic1'
+        self.entry_point.story_id = 'valid_story1'
+        self.entry_point.exploration_id = 'invalid_exploration'
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Exploration with id %s is not part of story with id of %s' % (
+                self.entry_point.exploration_id, self.entry_point.story_id)
+        ):
+            self.entry_point.require_valid_entry_point_exploration(
+                exploration_id=self.entry_point.exploration_id,
+                story_id=self.entry_point.story_id,
+            )
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_fails_if_exploration_id_is_not_a_string(self) -> None:
         self.entry_point.topic_id = 'valid_topic1'
         self.entry_point.story_id = 'valid_story1'
