@@ -26,6 +26,7 @@ from core.domain import classroom_config_services
 from core.domain import classroom_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import question_fetchers
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import story_domain
@@ -37,6 +38,12 @@ from core.domain import topic_fetchers
 from core.domain import translation_fetchers
 
 from typing import Dict, List, Optional, TypedDict, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import question_models
+
+(question_models) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class InitializeAndroidTestDataHandler(
@@ -144,6 +151,8 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
+                        'question',
+                        'question_skill_link',
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
                         constants.ACTIVITY_TYPE_CLASSROOM
                     ]
@@ -230,6 +239,33 @@ class AndroidActivityHandler(base.BaseHandler[
                     'payload': (
                         subtopic_page.to_dict() if subtopic_page is not None
                         else None)
+                })
+        elif activity_type == 'question':
+            for activity_data in activities_data:
+                question = question_fetchers.get_question_by_id(
+                    [activity_data['id']],
+                    strict=False,
+                    version=activity_data.get('version'))
+                activities.append({
+                    'id': activity_data['id'],
+                    'version': activity_data.get('version'),
+                    'payload': (
+                        question.to_dict() if question is not None else None)
+                })
+        elif activity_type == 'question_skill_link':
+            for activity_data in activities_data:
+                question_skill_link_models = (
+                    question_models.QuestionSkillLinkModel
+                    .get_question_skill_links_by_skill_ids(
+                        1000, [activity_data['id']], 0))
+                question_ids = set(
+                    [question_skill_link.question_id
+                    for question_skill_link in question_skill_link_models])
+                activities.append({
+                    'id': activity_data['id'],
+                    'payload': {
+                        'question_ids': question_ids
+                    }
                 })
         elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
             for activity_data in activities_data:

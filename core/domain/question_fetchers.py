@@ -86,6 +86,32 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     return questions, grouped_skill_descriptions
 
 
+def get_question_by_id(
+    question_id: str,
+    strict: bool = True,
+    version: Optional[int] = None
+) -> Optional[question_domain.Question]:
+    """Fetches a specific question by its ID and optionally its content version.
+
+    Args:
+        question_id: str. The ID of the question to fetch.
+        strict: bool. Whether to fail noisily if no question with the given ID
+            exists in the datastore.
+        version: int or None. The optional version of the question to fetch. If
+            none, then the latest is fetched.
+
+    Returns:
+        Question|None. A domain object representing the fetched question with
+        the given ID, or None if the provided ID is invalid.
+    """
+    question_model = (
+        question_models.QuestionModel.get(
+            question_id, strict=strict, version=version))
+    return (
+        get_question_from_model(question_model)
+        if question_model is not None else None)
+
+
 def get_questions_by_ids(
     question_ids: List[str]
 ) -> List[Optional[question_domain.Question]]:
