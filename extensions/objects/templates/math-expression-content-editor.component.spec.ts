@@ -506,7 +506,9 @@ describe('MathExpressionContentEditorComponent', () => {
       },
     };
     component.localValue.label = '\\frac{a}{b}';
+
     component.ngOnChanges(changes);
+
     expect(component.localValue.label).toBe('\\frac{x}{y}');
   });
 });
