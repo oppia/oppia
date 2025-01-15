@@ -97,8 +97,11 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         try:
             for change in exp_snapshot_metadata_model.commit_cmds:
                 if (
-                    change['cmd'] == 'edit_state_property' and
-                    change['property_name'] == 'recorded_voiceovers'
+                    change['cmd'] == 'edit_state_property' and (
+                        change['property_name'] == 'recorded_voiceovers' or
+                        change['property_name'] == (
+                            'content_ids_to_audio_translations')
+                    )
                 ):
                     return True
         except Exception:
@@ -328,6 +331,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             # If no voiceover-related changes were made during the commit,
             # then the rest of the for loop body can be skipped.
             if len(filenames_in_this_version) == 0:
+                logging.info('No files added in this version.')
                 continue
 
             voice_artist_id = (
