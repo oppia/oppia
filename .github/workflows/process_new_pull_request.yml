@@ -4,124 +4,150 @@ on:
   pull_request_target:
     types: [opened]
 
-permissions: read-all
+permissions: {}
 
 jobs:
   assign_reviewers:
     name: Assign Reviewers
     runs-on: ubuntu-22.04
     permissions:
-      pull-requests: write
+      pull-requests: read
+    outputs:
+      is_new_contributor: ${{ steps.check-new-contributor.outputs.result }}
+      has_reviewers: ${{ steps.check-reviewers.outputs.has_reviewers }}
+      has_teams: ${{ steps.check-reviewers.outputs.has_teams }}
+      author: ${{ steps.set-env.outputs.author }}
+      repo: ${{ steps.set-env.outputs.repo }}
+      owner: ${{ steps.set-env.outputs.owner }}
+      pr_number: ${{ steps.set-env.outputs.pr_number }}
     steps:
       - name: Set environment variables
         id: set-env
-        env:
-          AUTHOR: ${{ github.event.pull_request.user.login }}
-          REPO: ${{ github.event.repository.name }}
-          OWNER: ${{ github.event.repository.owner.login }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          echo "AUTHOR=${AUTHOR}" >> $GITHUB_ENV
-          echo "REPO=${REPO}" >> $GITHUB_ENV
-          echo "OWNER=${OWNER}" >> $GITHUB_ENV
-          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
+          echo "author=${{ github.event.pull_request.user.login }}" >> $GITHUB_OUTPUT
+          echo "repo=${{ github.event.repository.name }}" >> $GITHUB_OUTPUT
+          echo "owner=${{ github.event.repository.owner.login }}" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
       - name: Check if submitter is a new contributor
         id: check-new-contributor
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const owner = process.env.OWNER;
-            const repo = process.env.REPO;
-            const author = process.env.AUTHOR;
-            // Fetch merged PRs of the submitter
-            const { data } = await github.rest.search.issuesAndPullRequests({
-              q: `repo:${owner}/${repo} type:pr is:merged author:${author}`,
-            });
-            const submitterIsNewContributor = data.total_count === 0;
-            console.log(
-              `User @${author} is ${
-                submitterIsNewContributor
-                  ? 'a new contributor'
-                  : 'not a new contributor'
-              }.`
-            );
-            core.setOutput('IS_NEW_CONTRIBUTOR', submitterIsNewContributor);
+            const author = '${{ github.event.pull_request.user.login }}';
+            const owner = '${{ github.event.repository.owner.login }}';
+            const repo = '${{ github.event.repository.name }}';
+            
+            try {
+              const { data } = await github.rest.search.issuesAndPullRequests({
+                q: `repo:${owner}/${repo} type:pr is:merged author:${author}`,
+              });
+              return data.total_count === 0;
+            } catch (error) {
+              console.error('Error checking contributor status:', error);
+              return false;
+            }
       - name: Check for reviewers and teams
         id: check-reviewers
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prNumber = process.env.PR_NUMBER;
-            const owner = process.env.OWNER;
-            const repo = process.env.REPO;
-            const requestedReviewers = context.payload.pull_request.requested_reviewers.map(r => r.login);
-            const requestedTeams = context.payload.pull_request.requested_teams.map(t => t.slug);
-            const hasReviewers = requestedReviewers.length > 0;
-            const hasTeams = requestedTeams.length > 0;
-            core.setOutput('HAS_REVIEWERS', hasReviewers);
-            core.setOutput('HAS_TEAMS', hasTeams);
+            const pr = context.payload.pull_request;
+            const hasReviewers = pr.requested_reviewers?.length > 0;
+            const hasTeams = pr.requested_teams?.length > 0;
+            core.setOutput('has_reviewers', hasReviewers);
+            core.setOutput('has_teams', hasTeams);
+  elevated_permission:
+    name: Elevated Permission Workflow
+    needs: assign_reviewers
+    if: always()
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+    steps:
       - name: Assign reviewers as assignees
-        if: steps.check-reviewers.outputs.HAS_REVIEWERS == 'true'
-        uses: actions/github-script@v6
+        if: needs.assign_reviewers.outputs.has_reviewers == 'true'
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prNumber = process.env.PR_NUMBER;
-            const owner = process.env.OWNER;
-            const repo = process.env.REPO;
-            const requestedReviewers = context.payload.pull_request.requested_reviewers.map(r => r.login);
+            const owner = '${{ needs.assign_reviewers.outputs.owner }}';
+            const repo = '${{ needs.assign_reviewers.outputs.repo }}';
+            const pr_number = parseInt('${{ needs.assign_reviewers.outputs.pr_number }}');
+            
             try {
-              await github.rest.issues.addAssignees({
+              const { data: pr } = await github.rest.pulls.get({
                 owner,
                 repo,
-                issue_number: prNumber,
-                assignees: requestedReviewers,
+                pull_number: pr_number
               });
-              console.log(`Assigned reviewers: ${requestedReviewers.join(", ")}`);
+              
+              const reviewers = pr.requested_reviewers.map(r => r.login);
+              
+              if (reviewers.length > 0) {
+                await github.rest.issues.addAssignees({
+                  owner,
+                  repo,
+                  issue_number: pr_number,
+                  assignees: reviewers
+                });
+                console.log(`Assigned reviewers: ${reviewers.join(", ")}`);
+              }
             } catch (error) {
-              console.error(`Failed to assign reviewers: ${error.message}`);
+              console.error('Error assigning reviewers:', error);
+              throw error;
             }
       - name: Notify team if no individual reviewers are found
-        if: steps.check-reviewers.outputs.HAS_REVIEWERS == 'false' && steps.check-reviewers.outputs.HAS_TEAMS == 'false'
-        uses: actions/github-script@v6
+        if: needs.assign_reviewers.outputs.has_reviewers == 'false' && needs.assign_reviewers.outputs.has_teams == 'false'
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prNumber = process.env.PR_NUMBER;
-            const owner = process.env.OWNER;
-            const repo = process.env.REPO;
+            const owner = '${{ needs.assign_reviewers.outputs.owner }}';
+            const repo = '${{ needs.assign_reviewers.outputs.repo }}';
+            const pr_number = parseInt('${{ needs.assign_reviewers.outputs.pr_number }}');
+            
             try {
               await github.rest.issues.createComment({
                 owner,
                 repo,
-                issue_number: prNumber,
-                body: `No individual reviewers or teams were found by GitHub. Please assign an appropriate reviewer. @oppia/dev-workflow-reviewers, could you please review the issue? Thank you!`,
+                issue_number: pr_number,
+                body: '@oppia/dev-workflow-reviewers, could you please review this PR? No individual reviewers or teams were assigned. Thank you!'
               });
               console.log("Notified team about missing reviewers.");
             } catch (error) {
-              console.error(`Failed to notify team: ${error.message}`);
+              console.error('Error creating comment:', error);
+              throw error;
             }
       - name: Add PTAL syntax comment for new contributors
-        if: steps.check-new-contributor.outputs.IS_NEW_CONTRIBUTOR == 'true'
-        uses: actions/github-script@v6
+        if: needs.assign_reviewers.outputs.is_new_contributor == 'true'
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const author = process.env.AUTHOR;
-            const owner = process.env.OWNER;
-            const repo = process.env.REPO;
-            const prNumber = process.env.PR_NUMBER;
+            const owner = '${{ needs.assign_reviewers.outputs.owner }}';
+            const repo = '${{ needs.assign_reviewers.outputs.repo }}';
+            const pr_number = parseInt('${{ needs.assign_reviewers.outputs.pr_number }}');
+            const author = '${{ needs.assign_reviewers.outputs.author }}';
+            
             try {
-              const commentBody = `Hello @${author}! Thank you for making a PR. Please ensure your PR is assigned to the correct reviewers -- check the "Assignees" section in the sidebar on the right. Typically, this should match the "Reviewers" section. If it's not correct, you can leave a comment with the syntax \`@reviewer_username PTAL\` to request that a specific reviewer be assigned.\n\n Thanks!`;
+              const commentBody = `Hello @${author}! Thank you for making a PR. 
+              
+              Please ensure your PR is assigned to the correct reviewers -- check the "Assignees" section in the sidebar on the right. Typically, this should match the "Reviewers" section.
+              
+              If it's not correct, you can leave a comment with the syntax \`@reviewer_username PTAL\` to request that a specific reviewer be assigned.
+              
+              Thanks!`;
+              
               await github.rest.issues.createComment({
                 owner,
                 repo,
-                issue_number: prNumber,
+                issue_number: pr_number,
                 body: commentBody,
               });
               console.log(`Added PTAL syntax comment for new contributor @${author}.`);
             } catch (error) {
-              console.error(`Failed to add comment: ${error.message}`);
+              console.error('Error creating comment:', error);
+              throw error;
             }
