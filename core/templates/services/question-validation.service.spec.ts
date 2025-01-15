@@ -245,7 +245,7 @@ describe('Question Validation Service', () => {
         questionObjectFactory.createFromBackendDict(mockQuestionDict);
 
       expect(qvs.getValidationErrorMessage(question)).toEqual(
-        'Please enter a feedback for the default outcome.'
+        "Please enter feedback for the '[All other answers]' outcome."
       );
     });
 
