@@ -21,6 +21,7 @@ import {
   InsertScriptService,
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
+
 class MockRenderer {
   createElement(tag: string) {
     return document.createElement(tag);

@@ -72,7 +72,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   placeholderText = '\\frac{x}{y}';
   active: boolean = false;
   localValue: {label: string} = {label: ''};
-  loaded = false;
+
   constructor(
     private alertsService: AlertsService,
     private externalRteSaveService: ExternalRteSaveService,
