@@ -1448,7 +1448,7 @@ class RevisionCardEntryPointDict(TypedDict):
 
 
 class RevisionCardEntryPoint(EntryPoint):
-    """Domain object for the Android revision card entry point."""
+    """Domain object for the Android study guide entry point."""
 
     def __init__(self, topic_id: str, subtopic_id: str) -> None:
         """Constructs an RevisionCardEntryPoint domain object.

@@ -2473,7 +2473,7 @@ Angular Migration
 * Fixes Part of #8472: Migrate Exploration data service (#11564)
 
 Translations
-* Add hi-en to SUPPORTED_CONTENT_LANGUAGES and fixes revision card not showing content (#11917)
+* Add hi-en to SUPPORTED_CONTENT_LANGUAGES and fixes study guide not showing content (#11917)
 
 Developer UX
 * Fix #9887: Adds inline comment checker for codeowner (#11835)
