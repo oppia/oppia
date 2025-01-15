@@ -479,13 +479,20 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
 
     this.explorationId = this.explorationDataService.explorationId;
     this.explorationAllSnapshotsUrl =
-      '/createhandler/snapshots/' + this.explorationId;
+      this.urlInterpolationService.interpolateUrl(
+        '/createhandler/snapshots/<exploration_id>',
+        {exploration_id: this.explorationId}
+      );
     this.checkRevertExplorationValidUrl =
       '/createhandler/check_revert_valid/<exploration_id>/<version>';
-    this.revertExplorationUrl = '/createhandler/revert/' + this.explorationId;
-    this.explorationDownloadUrl =
-      '/createhandler/download/' + this.explorationId;
-
+    this.revertExplorationUrl = this.urlInterpolationService.interpolateUrl(
+      '/createhandler/revert/<exploration_id>',
+      {exploration_id: this.explorationId}
+    );
+    this.explorationDownloadUrl = this.urlInterpolationService.interpolateUrl(
+      '/createhandler/download/<exploration_id>',
+      {exploration_id: this.explorationId}
+    );
     /* Letiable definitions:
      *
      * explorationVersionMetadata is an object whose keys are version

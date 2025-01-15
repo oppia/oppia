@@ -212,7 +212,10 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     if (!this.explorationId) {
       return '#';
     } else {
-      let result = '/explore/' + this.explorationId;
+      let result = this.urlInterpolationService.interpolateUrl(
+        '/explore/<exploration_id>',
+        {exploration_id: this.explorationId}
+      );
       let urlParams = this.urlService.getUrlParams();
       let parentExplorationIds = this.parentExplorationIds;
 

@@ -925,13 +925,24 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should have component properties correspond to backend data', () => {
-      expect(component.explorationUrl).toBe('/create/' + explorationId);
-      expect(component.explorationDownloadUrl).toBe(
-        '/createhandler/download/' + explorationId
+      const explorationUrl = urlInterpolationService.interpolateUrl(
+        '/create/<exploration_id>',
+        {exploration_id: explorationId}
       );
-      expect(component.revertExplorationUrl).toBe(
-        '/createhandler/revert/' + explorationId
+      expect(component.explorationUrl).toBe(explorationUrl);
+
+      const downloadUrl = urlInterpolationService.interpolateUrl(
+        '/createhandler/download/<exploration_id>',
+        {exploration_id: explorationId}
       );
+      expect(component.explorationDownloadUrl).toBe(downloadUrl);
+
+      const revertUrl = urlInterpolationService.interpolateUrl(
+        '/createhandler/revert/<exploration_id>',
+        {exploration_id: explorationId}
+      );
+      expect(component.revertExplorationUrl).toBe(revertUrl);
+
       expect(component.areExplorationWarningsVisible).toBeFalse();
     });
 
