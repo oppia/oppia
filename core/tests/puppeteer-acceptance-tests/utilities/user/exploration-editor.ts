@@ -1087,13 +1087,6 @@ export class ExplorationEditor extends BaseUser {
         await this.page.type(floatFormInput, answer);
         break;
       case 'Multiple Choice':
-        await this.page.waitForSelector(responseModalHeaderSelector, {
-          visible: true,
-        });
-        await this.page.waitForSelector(multipleChoiceResponseDropdown, {
-          visible: true,
-        });
-        await this.page.waitForTimeout(5000);
         await this.clickOn(multipleChoiceResponseDropdown);
         await this.page.waitForSelector(multipleChoiceResponseOption, {
           visible: true,
@@ -1157,6 +1150,7 @@ export class ExplorationEditor extends BaseUser {
         });
     } else {
       await this.clickOn(addAnotherResponseButton);
+      await this.waitForNetworkIdle();
     }
   }
 
