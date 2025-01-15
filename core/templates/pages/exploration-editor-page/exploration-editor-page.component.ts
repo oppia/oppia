@@ -186,7 +186,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private versionHistoryService: VersionHistoryService,
     private entityVoiceoversService: EntityVoiceoversService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   setDocumentTitle(): void {
