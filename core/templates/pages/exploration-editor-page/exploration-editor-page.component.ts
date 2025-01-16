@@ -79,6 +79,7 @@ import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFacto
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -185,7 +186,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private versionHistoryService: VersionHistoryService,
     private entityVoiceoversService: EntityVoiceoversService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   setDocumentTitle(): void {
@@ -208,7 +210,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   }
 
   getExplorationUrl(explorationId: string): string {
-    return explorationId ? '/explore/' + explorationId : '';
+    return explorationId
+      ? this.urlInterpolationService.interpolateUrl(
+          '/explore/<exploration_id>',
+          {exploration_id: explorationId}
+        )
+      : '';
   }
 
   // Initializes the exploration page using data from the backend.
@@ -775,12 +782,23 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.loaderService.showLoadingScreen('Loading');
 
     this.explorationId = this.contextService.getExplorationId();
-    this.explorationUrl = '/create/' + this.explorationId;
-    this.explorationDownloadUrl =
-      '/createhandler/download/' + this.explorationId;
+    this.explorationUrl = this.urlInterpolationService.interpolateUrl(
+      '/create/<exploration_id>',
+      {exploration_id: this.explorationId}
+    );
+    this.explorationDownloadUrl = this.urlInterpolationService.interpolateUrl(
+      '/createhandler/download/<exploration_id>',
+      {exploration_id: this.explorationId}
+    );
     this.checkRevertExplorationValidUrl =
-      '/createhandler/check_revert_valid/' + this.explorationId;
-    this.revertExplorationUrl = '/createhandler/revert/' + this.explorationId;
+      this.urlInterpolationService.interpolateUrl(
+        '/createhandler/check_revert_valid/<exploration_id>',
+        {exploration_id: this.explorationId}
+      );
+    this.revertExplorationUrl = this.urlInterpolationService.interpolateUrl(
+      '/createhandler/revert/<exploration_id>',
+      {exploration_id: this.explorationId}
+    );
     this.areExplorationWarningsVisible = false;
 
     // The initExplorationPage function is written separately since it
