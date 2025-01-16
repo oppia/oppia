@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Utils file for dealing with git changes."""
 
 from __future__ import annotations
@@ -27,7 +26,8 @@ from scripts import common
 from typing import Dict, Final, List, Optional, Set, Tuple
 
 GitRef = collections.namedtuple(
-    'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
+    'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1']
+)
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 EMPTY_SHA1: Final[str] = '0000000000000000000000000000000000000000'
@@ -42,8 +42,9 @@ def get_git_remotes() -> List[str]:
     Raises:
         ValueError. Subprocess failed to start.
     """
-    task = subprocess.Popen(
-        ['git', 'remote'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    task = subprocess.Popen(['git', 'remote'],
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
     out, err = task.communicate()
     if not err:
         remotes = out[:-1].decode('utf-8').split('\n')
@@ -64,10 +65,10 @@ def get_remote_url(remote_name: str) -> str:
     Raises:
         ValueError. Subprocess failed to start.
     """
-    task = subprocess.Popen(
-        ['git', 'config', '--get', 'remote.%s.url' % remote_name],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
+    task = subprocess.Popen(['git', 'config', '--get',
+                             'remote.%s.url' % remote_name],
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
     remote_url, err = task.communicate()
     if not err:
         return remote_url.decode('utf-8')
@@ -177,7 +178,8 @@ def get_local_git_repository_remote_name() -> str:
 
 
 def git_diff_name_status(
-    left: Optional[str] = None, right: Optional[str] = None,
+    left: Optional[str] = None,
+    right: Optional[str] = None,
     diff_filter: Optional[str] = None
 ) -> List[FileDiff]:
     """Compare two branches/commits with git.
@@ -196,8 +198,7 @@ def git_diff_name_status(
     """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter == '':
-        raise ValueError(
-            'Error: diff_filter should not be an empty string.')
+        raise ValueError('Error: diff_filter should not be an empty string.')
     if diff_filter:
         git_cmd.append('--diff-filter={}'.format(diff_filter))
     if left == '':
@@ -221,8 +222,7 @@ def git_diff_name_status(
             #
             # We extract the first char (indicating the status), and the string
             # after the last tab character.
-            file_list.append(
-                FileDiff(bytes([line[0]]), line[line.rfind(b'\t') + 1:]))
+            file_list.append(FileDiff(bytes([line[0]]), line[line.rfind(b'\t') + 1:]))
         return file_list
     else:
         raise ValueError(err)
@@ -262,17 +262,17 @@ def get_merge_base(branch: str, other_branch: str) -> str:
     Raises:
         ValueError. An error occurred in the git command.
     """
-    merge_base, err = common.start_subprocess_for_result(
-        ['git', 'merge-base', branch, other_branch])
+    merge_base, err = common.start_subprocess_for_result([
+        'git', 'merge-base', branch, other_branch
+    ])
     if err:
         raise ValueError(err)
 
     return merge_base.decode('utf-8').strip()
 
 
-def compare_to_remote(
-    remote: str, local_branch: str, remote_branch: str
-) -> List[FileDiff]:
+def compare_to_remote(remote: str, local_branch: str,
+                      remote_branch: str) -> List[FileDiff]:
     """Compare local with remote branch with git diff.
 
     Parameter:
@@ -293,14 +293,14 @@ def compare_to_remote(
     # Only compare differences to the merge base of the local and remote
     # branches (what GitHub shows in the files tab of pull requests).
     file_diffs = git_diff_name_status(
-        get_merge_base(remote_branch, local_branch), local_branch)
+        get_merge_base(remote_branch, local_branch), local_branch
+    )
     for file_diff in file_diffs:
-        if not check_file_inside_directory(
-            file_diff.name.decode(), common.CURR_DIR
-        ):
+        if not check_file_inside_directory(file_diff.name.decode(), common.CURR_DIR):
             raise ValueError(
-                'Error: The file %s is not inside the oppia directory.' % (
-                    file_diff.name.decode()))
+                'Error: The file %s is not inside the oppia directory.' %
+                (file_diff.name.decode())
+            )
 
     return file_diffs
 
@@ -313,7 +313,8 @@ def get_parent_branch_name_for_diff() -> str:
     """
     if common.is_current_branch_a_hotfix_branch():
         return 'release-%s' % common.get_current_release_version_number(
-            common.get_current_branch_name())
+            common.get_current_branch_name()
+        )
     return 'develop'
 
 
@@ -340,14 +341,14 @@ def get_refs() -> List[GitRef]:
                 remote_ref, remote_sha = None, None
             else:
                 remote_ref, remote_sha = refs[2], refs[3]
-            ref_list.append(
-                GitRef(local_ref, local_sha, remote_ref, remote_sha))
+            ref_list.append(GitRef(local_ref, local_sha, remote_ref, remote_sha))
     # If git didn't provide refs or the refs are empty, use the current branch
     # to get the refs.
     if not ref_list:
         current_branch = common.get_current_branch_name()
-        encoded_stdout, encoded_stderr = common.start_subprocess_for_result(
-            ['git', 'show-ref', current_branch])
+        encoded_stdout, encoded_stderr = common.start_subprocess_for_result([
+            'git', 'show-ref', current_branch
+        ])
         stderr = encoded_stderr.decode('utf-8')
         if stderr:
             raise ValueError(stderr)
@@ -361,9 +362,8 @@ def get_refs() -> List[GitRef]:
     return ref_list
 
 
-def get_changed_files(
-    ref_list: List[GitRef], remote: str
-) -> Dict[str, Tuple[List[FileDiff], List[bytes]]]:
+def get_changed_files(ref_list: List[GitRef],
+                      remote: str) -> Dict[str, Tuple[List[FileDiff], List[bytes]]]:
     """Collect diff files and ACMRT files for each branch in ref_list.
     ACMRT files are files that are Added, Copied, Modified, Renamed, or
     Type-changed.
@@ -382,32 +382,30 @@ def get_changed_files(
     # TODO(#11620): Change the following to a denylist instead of an allowlist.
     ref_heads_only = [
         ref for ref in ref_list
-        if (ref.local_ref.startswith('refs/heads/') or ref.local_ref == 'HEAD')]
+        if (ref.local_ref.startswith('refs/heads/') or ref.local_ref == 'HEAD')
+    ]
     # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
     remote_branches = [
-        '%s/%s' % (remote, ref.remote_ref.split('/')[-1])
-        for ref in ref_heads_only if ref.remote_ref]
+        '%s/%s' % (remote, ref.remote_ref.split('/')[-1]) for ref in ref_heads_only
+        if ref.remote_ref
+    ]
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
     for branch, _, remote_branch in itertools.zip_longest(
-        branches,
-        hashes,
-        remote_branches
+        branches, hashes, remote_branches
     ):
         remote_to_use = remote
         if not remote_branch:
             upstream_remote_name = get_upstream_git_repository_remote_name()
             remote_branch = (
-                '%s/%s' % (
-                    upstream_remote_name, get_parent_branch_name_for_diff())
+                '%s/%s' % (upstream_remote_name, get_parent_branch_name_for_diff())
             )
             remote_to_use = upstream_remote_name
         # Get the difference to remote/develop.
-        diff_files = compare_to_remote(
-            remote_to_use, branch, remote_branch)
+        diff_files = compare_to_remote(remote_to_use, branch, remote_branch)
         acmrt_files = extract_acmrt_files_from_diff(diff_files)
         collected_files[branch] = (diff_files, acmrt_files)
 
@@ -457,9 +455,7 @@ def get_python_dot_test_files_from_diff(diff_files: List[bytes]) -> Set[str]:
         else:
             test_file_path = decoded_file_path.replace('.py', '_test.py')
         if os.path.exists(test_file_path):
-            python_test_files.add(
-                test_file_path.replace('.py', '').replace('/', '.')
-            )
+            python_test_files.add(test_file_path.replace('.py', '').replace('/', '.'))
 
     return python_test_files
 
@@ -479,15 +475,12 @@ def get_changed_python_test_files() -> Set[str]:
     if not remote:
         sys.exit('Error: No remote repository found.')
     refs = get_refs()
-    collected_files = get_changed_files(
-        refs, remote)
+    collected_files = get_changed_files(refs, remote)
     for _, (_, acmrt_files) in collected_files.items():
         if not acmrt_files:
             continue
 
-        python_test_files.update(
-            get_python_dot_test_files_from_diff(acmrt_files))
+        python_test_files.update(get_python_dot_test_files_from_diff(acmrt_files))
     staged_files = get_staged_acmrt_files()
-    python_test_files.update(
-        get_python_dot_test_files_from_diff(staged_files))
+    python_test_files.update(get_python_dot_test_files_from_diff(staged_files))
     return python_test_files

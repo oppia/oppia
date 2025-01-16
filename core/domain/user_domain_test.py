@@ -175,24 +175,28 @@ class UserSettingsTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_non_str_user_id_raises_exception(self) -> None:
         self.user_settings.user_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected user_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
             self.user_settings.validate()
 
     def test_validate_wrong_format_user_id_raises_exception(self) -> None:
         self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The user ID is in a wrong format.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
             self.user_settings.validate()
 
         self.user_settings.user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The user ID is in a wrong format.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
             self.user_settings.validate()
 
         self.user_settings.user_id = 'a' * 36
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The user ID is in a wrong format.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
             self.user_settings.validate()
 
     def test_validate_invalid_banned_value_type_raises_exception(self) -> None:
@@ -200,16 +204,18 @@ class UserSettingsTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self.user_settings.banned = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected banned to be a bool'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected banned to be a bool'
+        ):
             self.user_settings.validate()
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self.user_settings.banned = '123'  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected banned to be a bool'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected banned to be a bool'
+        ):
             self.user_settings.validate()
 
     def test_validate_invalid_roles_value_type_raises_exception(self) -> None:
@@ -217,38 +223,43 @@ class UserSettingsTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self.user_settings.roles = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected roles to be a list'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to be a list'
+        ):
             self.user_settings.validate()
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self.user_settings.roles = True  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected roles to be a list'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to be a list'
+        ):
             self.user_settings.validate()
 
     def test_validate_banned_user_with_roles_raises_exception(self) -> None:
         self.user_settings.roles = ['FULL_USER']
         self.user_settings.banned = True
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected roles for banned user to be empty'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles for banned user to be empty'
+        ):
             self.user_settings.validate()
 
     def test_validate_roles_with_duplicate_value_raise_exception(self) -> None:
         self.user_settings.roles = ['FULL_USER', 'FULL_USER', 'TOPIC_MANAGER']
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Roles contains duplicate values:'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Roles contains duplicate values:'
+        ):
             self.user_settings.validate()
 
     def test_validate_roles_without_any_default_role_raise_exception(self) -> None:
         self.user_settings.roles = ['TOPIC_MANAGER']
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected roles to contains one default role.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to contains one default role.'
+        ):
             self.user_settings.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -256,8 +267,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_non_str_pin_id(self) -> None:
         self.user_settings.pin = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected PIN to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected PIN to be a string'
+        ):
             self.user_settings.validate()
 
     def test_validate_invalid_length_pin_raises_error(self) -> None:
@@ -295,14 +307,16 @@ class UserSettingsTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_non_str_role_raises_exception(self) -> None:
         self.user_settings.roles = [0]  # type: ignore[list-item]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected roles to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to be a string'
+        ):
             self.user_settings.validate()
 
     def test_validate_invalid_role_name_raises_exception(self) -> None:
         self.user_settings.roles = ['invalid_role']
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Role invalid_role does not exist.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Role invalid_role does not exist.'
+        ):
             self.user_settings.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -310,9 +324,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_non_str_display_alias_raises_error(self) -> None:
         self.user_settings.display_alias = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected display_alias to be a string,'
-                                    ' received %s' % self.user_settings.display_alias):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected display_alias to be a string,'
+            ' received %s' % self.user_settings.display_alias
+        ):
             self.user_settings.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -321,8 +336,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_validate_non_str_creator_dashboard_display_pref_raises_error(self) -> None:
         self.user_settings.creator_dashboard_display_pref = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected dashboard display preference to be a string'):
+            utils.ValidationError,
+            'Expected dashboard display preference to be a string'
+        ):
             self.user_settings.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -330,17 +346,19 @@ class UserSettingsTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validation_none__email_raises_error(self) -> None:
         self.user_settings.email = None  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected email to be a string,'
-                                    ' received %s' % self.user_settings.email):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected email to be a string,'
+            ' received %s' % self.user_settings.email
+        ):
             self.user_settings.validate()
 
     def test_validation_wrong_email_raises_error(self) -> None:
         invalid_emails_list = ['testemail.com', '@testemail.com', 'testemail.com@']
         for email in invalid_emails_list:
             self.user_settings.email = email
-            with self.assertRaisesRegex(utils.ValidationError,
-                                        'Invalid email address: %s' % email):
+            with self.assertRaisesRegex(
+                utils.ValidationError, 'Invalid email address: %s' % email
+            ):
                 self.user_settings.validate()
 
     def test_validate_invalid_creator_dashboard_display_pref_raises_error(self) -> None:
@@ -348,9 +366,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'invalid_creator_dashboard_display_pref'
         )
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'invalid_creator_dashboard_display_pref is not a valid '
-                'value for the dashboard display preferences.'):
+            utils.ValidationError,
+            'invalid_creator_dashboard_display_pref is not a valid '
+            'value for the dashboard display preferences.'
+        ):
             self.user_settings.validate()
 
     def test_validate_empty_display_alias_for_profiles_raises_error(self) -> None:
@@ -377,18 +396,20 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_create_new_user_with_existing_auth_id_raises_error(self) -> None:
         user_id = self.user_settings.user_id
         user_auth_id = auth_services.get_auth_id_from_user_id(user_id)
-        with self.assertRaisesRegex(Exception,
-                                    'User %s already exists for auth_id %s.' %
-                                    (user_id, user_auth_id)):
+        with self.assertRaisesRegex(
+            Exception,
+            'User %s already exists for auth_id %s.' % (user_id, user_auth_id)
+        ):
             # Ruling out the possibility of None for mypy type checking.
             assert user_auth_id is not None
             user_services.create_new_user(user_auth_id, self.OWNER_EMAIL)
 
     def test_cannot_set_existing_username(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Sorry, the username \"%s\" is already taken! Please pick '
-                'a different one.' % self.OWNER_USERNAME):
+            utils.ValidationError,
+            'Sorry, the username \"%s\" is already taken! Please pick '
+            'a different one.' % self.OWNER_USERNAME
+        ):
             user_services.set_username(self.owner_id, self.OWNER_USERNAME)
 
     def test_cannot_add_user_role_with_invalid_role(self) -> None:
@@ -424,9 +445,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             id='unregistered_user_id', email='user@example.com', username=''
         ).put()
 
-        user_ids = user_services.get_human_readable_user_ids(
-            [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id']
-        )
+        user_ids = user_services.get_human_readable_user_ids([
+            self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'
+        ])
         expected_user_ids = [
             'owner', 'admin', '[Awaiting user registration: u..@example.com]'
         ]
@@ -439,9 +460,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user('auth_id', 'user@example.com').user_id
         user_services.set_username(user_id, 'username')
         user_services.mark_user_for_deletion(user_id)
-        human_readable_user_ids = user_services.get_human_readable_user_ids(
-            [user_id], strict=False
-        )
+        human_readable_user_ids = user_services.get_human_readable_user_ids([user_id],
+                                                                            strict=False
+                                                                           )
 
         self.assertEqual(
             human_readable_user_ids, [user_services.LABEL_FOR_USER_BEING_DELETED]
@@ -481,8 +502,9 @@ class UserGroupDomainTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_user_group_name(self) -> None:
         self.user_group.name = 2  # type: ignore[assignment]
-        with self.assertRaisesRegex(Exception,
-                                    'Expected name to be a string, received 2.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected name to be a string, received 2.'
+        ):
             self.user_group.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -491,7 +513,8 @@ class UserGroupDomainTests(test_utils.GenericTestBase):
     def test_validate_member_names_is_list(self) -> None:
         self.user_group.member_usernames = 2  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                Exception, 'Expected \'member_usernames\' to be a list, received 2.'):
+            Exception, 'Expected \'member_usernames\' to be a list, received 2.'
+        ):
             self.user_group.validate()
 
     def test_validate_each_username_is_of_string_type(self) -> None:
@@ -500,15 +523,16 @@ class UserGroupDomainTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         self.user_group.member_usernames = ['user1', 2]  # type: ignore[list-item]
         with self.assertRaisesRegex(
-                Exception, 'Expected each user username to be a string, received 2.'):
+            Exception, 'Expected each user username to be a string, received 2.'
+        ):
             self.user_group.validate()
 
     def test_validate_user_group_name_follows_regex_pattern(self) -> None:
         self.user_group.name = 'user_group_1'
         with self.assertRaisesRegex(
-                Exception,
-                'Invalid user group name user_group_1. User group name can only '
-                'contain alphanumeric characters and spaces.'):
+            Exception, 'Invalid user group name user_group_1. User group name can only '
+            'contain alphanumeric characters and spaces.'
+        ):
             self.user_group.validate()
 
     def test_update_name_successfully(self) -> None:
@@ -567,8 +591,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_non_list_created_exploration_ids(self) -> None:
         self.user_contributions.created_exploration_ids = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(Exception,
-                                    'Expected created_exploration_ids to be a list'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected created_exploration_ids to be a list'
+        ):
             self.user_contributions.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -577,8 +602,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
     def test_validate_created_exploration_ids(self) -> None:
         self.user_contributions.created_exploration_ids = [0]  # type: ignore[list-item]
         with self.assertRaisesRegex(
-                Exception, 'Expected exploration_id in created_exploration_ids '
-                'to be a string'):
+            Exception, 'Expected exploration_id in created_exploration_ids '
+            'to be a string'
+        ):
             self.user_contributions.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -586,8 +612,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_non_list_edited_exploration_ids(self) -> None:
         self.user_contributions.edited_exploration_ids = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(Exception,
-                                    'Expected edited_exploration_ids to be a list'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected edited_exploration_ids to be a list'
+        ):
             self.user_contributions.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -595,9 +622,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_edited_exploration_ids(self) -> None:
         self.user_contributions.edited_exploration_ids = [0]  # type: ignore[list-item]
-        with self.assertRaisesRegex(Exception,
-                                    'Expected exploration_id in edited_exploration_ids '
-                                    'to be a string'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected exploration_id in edited_exploration_ids '
+            'to be a string'
+        ):
             self.user_contributions.validate()
 
     def test_save_user_contributions(self) -> None:
@@ -622,8 +650,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
     def test_cannot_update_user_contributions_with_invalid_user_id(self) -> None:
         with self.assertRaisesRegex(
-                Exception,
-                'User contributions model for user invalid_user_id does not exist'):
+            Exception,
+            'User contributions model for user invalid_user_id does not exist'
+        ):
             user_services.update_user_contributions('invalid_user_id', [], [])
 
     def test_cannot_update_dashboard_stats_log_with_invalid_schema_version(
@@ -636,9 +665,9 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
         self.assertIsNone(user_services.get_user_impact_score(self.owner_id))
         with self.assertRaisesRegex(
-                Exception,
-                'Sorry, we can only process v1-v%d dashboard stats schemas at '
-                'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v1-v%d dashboard stats schemas at '
+            'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION
+        ):
             user_services.update_dashboard_stats_log(self.owner_id)
 
 
@@ -722,10 +751,10 @@ class UserExplorationPrefsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             default_dict, {
-                'mute_feedback_notifications': feconf.
-                DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE,
-                'mute_suggestion_notifications': feconf.
-                DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
+                'mute_feedback_notifications':
+                    feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE,
+                'mute_suggestion_notifications':
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
             }
         )
 
@@ -1245,8 +1274,9 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         user_contribution_rights = self.user_contribution_rights
         user_contribution_rights.can_review_translation_for_language_codes = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected can_review_translation_for_language_codes to be a list'):
+            utils.ValidationError,
+            'Expected can_review_translation_for_language_codes to be a list'
+        ):
             self.user_contribution_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -1257,22 +1287,25 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         user_contribution_rights = self.user_contribution_rights
         user_contribution_rights.can_review_voiceover_for_language_codes = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected can_review_voiceover_for_language_codes to be a list'):
+            utils.ValidationError,
+            'Expected can_review_voiceover_for_language_codes to be a list'
+        ):
             self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_voiceover_raise_error(self) -> None:
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid language_code: invalid_lang_code'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language_code: invalid_lang_code'
+        ):
             self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_translation_raise_error(self) -> None:
         self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid language_code: invalid_lang_code'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language_code: invalid_lang_code'
+        ):
             self.user_contribution_rights.validate()
 
     def test_can_review_voiceover_for_language_codes_with_duplicate_values(
@@ -1285,9 +1318,10 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected can_review_voiceover_for_language_codes list not to have '
-                'duplicate values'):
+            utils.ValidationError,
+            'Expected can_review_voiceover_for_language_codes list not to have '
+            'duplicate values'
+        ):
             self.user_contribution_rights.validate()
 
     def test_can_review_translation_for_language_codes_with_duplicate_values(
@@ -1300,9 +1334,10 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected can_review_translation_for_language_codes list not to '
-                'have duplicate values'):
+            utils.ValidationError,
+            'Expected can_review_translation_for_language_codes list not to '
+            'have duplicate values'
+        ):
             self.user_contribution_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -1311,8 +1346,8 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     def test_incorrect_type_for_can_review_questions_raise_error(self) -> None:
         self.user_contribution_rights.can_review_questions = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected can_review_questions to be a boolean value'):
+            utils.ValidationError, 'Expected can_review_questions to be a boolean value'
+        ):
             self.user_contribution_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -1321,8 +1356,8 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     def test_incorrect_type_for_can_submit_questions_raise_error(self) -> None:
         self.user_contribution_rights.can_submit_questions = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected can_submit_questions to be a boolean value'):
+            utils.ValidationError, 'Expected can_submit_questions to be a boolean value'
+        ):
             self.user_contribution_rights.validate()
 
 
@@ -1338,9 +1373,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
-            'preferred_translation_language_code': (
-                'preferred_translation_language_code'
-            ),
+            'preferred_translation_language_code':
+                ('preferred_translation_language_code'),
             'user_id': None,
         }
         modifiable_user_data = (
@@ -1375,9 +1409,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
-            'preferred_translation_language_code': (
-                'preferred_translation_language_code'
-            ),
+            'preferred_translation_language_code':
+                ('preferred_translation_language_code'),
             'user_id': 'user_id',
         }
         modifiable_user_data = (
@@ -1414,9 +1447,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
-            'preferred_translation_language_code': (
-                'preferred_translation_language_code'
-            ),
+            'preferred_translation_language_code':
+                ('preferred_translation_language_code'),
             'user_id': 'user_id',
         }
         error_msg = 'Invalid modifiable user data: no schema version specified.'
@@ -1431,9 +1463,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
-            'preferred_translation_language_code': (
-                'preferred_translation_language_code'
-            ),
+            'preferred_translation_language_code':
+                ('preferred_translation_language_code'),
             'user_id': 'user_id',
         }
         current_version_plus_one = (
@@ -1454,9 +1485,8 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['preferred_language_codes'],
             'preferred_site_language_code': 'preferred_site_language_code',
             'preferred_audio_language_code': 'preferred_audio_language_code',
-            'preferred_translation_language_code': (
-                'preferred_translation_language_code'
-            ),
+            'preferred_translation_language_code':
+                ('preferred_translation_language_code'),
             'user_id': 'user_id',
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -1533,12 +1563,10 @@ class ExplorationUserDataTests(test_utils.GenericTestBase):
             'draft_change_list_last_updated': None,
             'draft_change_list_exp_version': None,
             'draft_change_list_id': 0,
-            'mute_suggestion_notifications': (
-                feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
-            ),
-            'mute_feedback_notifications': (
-                feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE
-            ),
+            'mute_suggestion_notifications':
+                (feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+            'mute_feedback_notifications':
+                (feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
             'furthest_reached_checkpoint_exp_version': None,
             'furthest_reached_checkpoint_state_name': None,
             'most_recently_reached_checkpoint_state_name': None,
@@ -1625,12 +1653,10 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         expected_learner_group_user_dict = {
             'user_id': 'user1',
             'invited_to_learner_groups_ids': ['group_id_2', 'group_id_3'],
-            'learner_groups_user_details': [
-                {
-                    'group_id': 'group_id_1',
-                    'progress_sharing_is_turned_on': False
-                }
-            ],
+            'learner_groups_user_details': [{
+                'group_id': 'group_id_1',
+                'progress_sharing_is_turned_on': False
+            }],
             'learner_groups_user_details_schema_version': 1
         }
 
@@ -1659,12 +1685,10 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         expected_learner_group_user_dict = {
             'user_id': 'user1',
             'invited_to_learner_groups_ids': ['group_id_2', 'group_id_3'],
-            'learner_groups_user_details': [
-                {
-                    'group_id': 'group_id_1',
-                    'progress_sharing_is_turned_on': False
-                }
-            ],
+            'learner_groups_user_details': [{
+                'group_id': 'group_id_1',
+                'progress_sharing_is_turned_on': False
+            }],
             'learner_groups_user_details_schema_version': 1
         }
 

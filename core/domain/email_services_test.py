@@ -24,7 +24,7 @@ from core.domain import platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
 
-(email_models, ) = models.Registry.import_models([models.Names.EMAIL])
+(email_models,) = models.Registry.import_models([models.Names.EMAIL])
 platform_email_services = models.Registry.import_email_services()
 
 
@@ -46,13 +46,11 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 bcc_admin=False
             )
 
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+        (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+        (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+    ])
     def test_send_mail_data_properly_sent(self) -> None:
         """Verifies that the data sent in send_mail is correct."""
         email_services.send_mail(
@@ -69,13 +67,11 @@ class EmailServicesTest(test_utils.EmailTestBase):
         self.assertEqual(messages[0].body, 'body')
         self.assertEqual(messages[0].html, 'html')
 
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+        (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+        (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+    ])
     def test_bcc_admin_flag(self) -> None:
         """Verifies that the bcc admin flag is working properly in
         send_mail.
@@ -105,13 +101,11 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'body', 'html'
             )
 
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+        (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+        (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+    ])
     def test_send_bulk_mail_data_properly_sent(self) -> None:
         """Verifies that the data sent in send_bulk_mail is correct
            for each user in the recipient list.
@@ -125,13 +119,11 @@ class EmailServicesTest(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].to, recipients)
 
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+        (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+        (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+    ])
     def test_email_not_sent_if_email_addresses_are_malformed(self) -> None:
         """Tests that email is not sent if recipient email address is
         malformed.
@@ -216,13 +208,11 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'html'
             )
 
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+        (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+        (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
+    ])
     def test_unsuccessful_status_codes_raises_exception(self) -> None:
         """Test that unsuccessful status codes returned raises an exception."""
 
@@ -261,9 +251,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 bcc_admin=True
             )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_loggable_email_string_generation(self) -> None:
         """Tests that loggable email string is generated correctly."""
         msg_body = (

@@ -39,9 +39,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
 
-(collection_models, exp_models) = models.Registry.import_models(
-    [models.Names.COLLECTION, models.Names.EXPLORATION]
-)
+(collection_models, exp_models) = models.Registry.import_models([
+    models.Names.COLLECTION, models.Names.EXPLORATION
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -195,7 +195,9 @@ def create_new_exploration_rights(exploration_id: str, committer_id: str) -> Non
     exploration_rights = rights_domain.ActivityRights(
         exploration_id, [committer_id], [], [], []
     )
-    commit_cmds: List[Dict[str, str]] = [{'cmd': rights_domain.CMD_CREATE_NEW}]
+    commit_cmds: List[Dict[str, str]] = [{
+        'cmd': rights_domain.CMD_CREATE_NEW
+    }]
 
     exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
@@ -242,7 +244,7 @@ def get_exploration_rights(
 
 def get_exploration_rights(exploration_id: str,
                            strict: bool = True
-                           ) -> Optional[rights_domain.ActivityRights]:
+                          ) -> Optional[rights_domain.ActivityRights]:
     """Retrieves the rights for this exploration from the datastore.
 
     Args:
@@ -418,7 +420,9 @@ def create_new_collection_rights(collection_id: str, committer_id: str) -> None:
     collection_rights = rights_domain.ActivityRights(
         collection_id, [committer_id], [], [], []
     )
-    commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
+    commit_cmds = [{
+        'cmd': rights_domain.CMD_CREATE_NEW
+    }]
 
     collection_models.CollectionRightsModel(
         id=collection_rights.id,
@@ -463,9 +467,9 @@ def get_collection_rights(
     ...
 
 
-def get_collection_rights(collection_id: str,
-                          strict: bool = True
-                          ) -> Optional[rights_domain.ActivityRights]:
+def get_collection_rights(
+    collection_id: str, strict: bool = True
+) -> Optional[rights_domain.ActivityRights]:
     """Retrieves the rights for this collection from the datastore.
 
     Args:
@@ -603,11 +607,11 @@ def check_can_access_activity(
         return bool(
             role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user.actions or (
                 user.user_id and (
-                    activity_rights.is_viewer(user.user_id)
-                    or activity_rights.is_owner(user.user_id)
-                    or activity_rights.is_editor(user.user_id)
-                    or activity_rights.is_voice_artist(user.user_id)
-                    or activity_rights.viewable_if_private
+                    activity_rights.is_viewer(user.user_id) or
+                    activity_rights.is_owner(user.user_id) or
+                    activity_rights.is_editor(user.user_id) or
+                    activity_rights.is_voice_artist(user.user_id) or
+                    activity_rights.viewable_if_private
                 )
             )
         )
@@ -635,16 +639,24 @@ def check_can_edit_activity(
     if role_services.ACTION_EDIT_OWNED_ACTIVITY not in user.actions:
         return False
 
-    if (user.user_id and (activity_rights.is_owner(user.user_id)
-                          or activity_rights.is_editor(user.user_id))):
+    if (
+        user.user_id and (
+            activity_rights.is_owner(user.user_id) or
+            activity_rights.is_editor(user.user_id)
+        )
+    ):
         return True
 
-    if (activity_rights.community_owned
-            or (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)):
+    if (
+        activity_rights.community_owned or
+        (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)
+    ):
         return True
 
-    if (activity_rights.is_published()
-            and role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
+    if (
+        activity_rights.is_published() and
+        role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions
+    ):
         return True
 
     return False
@@ -671,17 +683,25 @@ def check_can_voiceover_activity(
     if role_services.ACTION_EDIT_OWNED_ACTIVITY not in user.actions:
         return False
 
-    if (user.user_id
-            and (activity_rights.is_owner(user.user_id) or activity_rights.is_editor(
-                user.user_id) or activity_rights.is_voice_artist(user.user_id))):
+    if (
+        user.user_id and (
+            activity_rights.is_owner(user.user_id) or
+            activity_rights.is_editor(user.user_id) or
+            activity_rights.is_voice_artist(user.user_id)
+        )
+    ):
         return True
 
-    if (activity_rights.community_owned
-            or role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions):
+    if (
+        activity_rights.community_owned or
+        role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions
+    ):
         return True
 
-    if (activity_rights.is_published()
-            and role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
+    if (
+        activity_rights.is_published() and
+        role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions
+    ):
         return True
 
     return False
@@ -727,8 +747,8 @@ def check_can_save_activity(
     """
 
     return (
-        check_can_edit_activity(user, activity_rights)
-        or (check_can_voiceover_activity(user, activity_rights))
+        check_can_edit_activity(user, activity_rights) or
+        (check_can_voiceover_activity(user, activity_rights))
     )
 
 
@@ -755,12 +775,16 @@ def check_can_delete_activity(
 
     if role_services.ACTION_DELETE_ANY_ACTIVITY in user.actions:
         return True
-    elif (activity_rights.is_private()
-          and role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions
-          and activity_rights.is_owner(user.user_id)):
+    elif (
+        activity_rights.is_private() and
+        role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions and
+        activity_rights.is_owner(user.user_id)
+    ):
         return True
-    elif (activity_rights.is_published()
-          and (role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in user.actions)):
+    elif (
+        activity_rights.is_published() and
+        (role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in user.actions)
+    ):
         return True
 
     return False
@@ -934,8 +958,10 @@ def _assign_role(
             'No activity_rights exists for the given activity_id: %s' % activity_id
         )
 
-    if (new_role == rights_domain.ROLE_VOICE_ARTIST
-            and activity_type == constants.ACTIVITY_TYPE_EXPLORATION):
+    if (
+        new_role == rights_domain.ROLE_VOICE_ARTIST and
+        activity_type == constants.ACTIVITY_TYPE_EXPLORATION
+    ):
         if activity_rights.is_published():
             user_can_assign_role = check_can_manage_voice_artist_in_activity(
                 committer, activity_rights
@@ -958,8 +984,10 @@ def _assign_role(
     assignee_username = user_services.get_username(assignee_id)
     old_role = rights_domain.ROLE_NONE
 
-    if new_role not in [rights_domain.ROLE_OWNER, rights_domain.ROLE_EDITOR,
-                        rights_domain.ROLE_VOICE_ARTIST, rights_domain.ROLE_VIEWER]:
+    if new_role not in [
+        rights_domain.ROLE_OWNER, rights_domain.ROLE_EDITOR,
+        rights_domain.ROLE_VOICE_ARTIST, rights_domain.ROLE_VIEWER
+    ]:
         raise Exception('Invalid role: %s' % new_role)
 
     # TODO(#12369): Currently, only exploration allows reassigning users to
@@ -986,8 +1014,10 @@ def _assign_role(
 
     elif new_role == rights_domain.ROLE_EDITOR:
 
-        if (activity_rights.is_editor(assignee_id)
-                or activity_rights.is_owner(assignee_id)):
+        if (
+            activity_rights.is_editor(assignee_id) or
+            activity_rights.is_owner(assignee_id)
+        ):
             raise Exception('This user already can edit this %s.' % activity_type)
 
         activity_rights.editor_ids.append(assignee_id)
@@ -1002,9 +1032,11 @@ def _assign_role(
 
     elif new_role == rights_domain.ROLE_VOICE_ARTIST:
 
-        if (activity_rights.is_editor(assignee_id)
-                or activity_rights.is_voice_artist(assignee_id)
-                or activity_rights.is_owner(assignee_id)):
+        if (
+            activity_rights.is_editor(assignee_id) or
+            activity_rights.is_voice_artist(assignee_id) or
+            activity_rights.is_owner(assignee_id)
+        ):
             raise Exception('This user already can voiceover this %s.' % activity_type)
 
         activity_rights.voice_artist_ids.append(assignee_id)
@@ -1015,9 +1047,11 @@ def _assign_role(
 
     elif new_role == rights_domain.ROLE_VIEWER:
 
-        if (activity_rights.is_owner(assignee_id)
-                or activity_rights.is_editor(assignee_id)
-                or activity_rights.is_viewer(assignee_id)):
+        if (
+            activity_rights.is_owner(assignee_id) or
+            activity_rights.is_editor(assignee_id) or
+            activity_rights.is_viewer(assignee_id)
+        ):
             raise Exception('This user already can view this %s.' % activity_type)
 
         if activity_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
@@ -1028,14 +1062,12 @@ def _assign_role(
     commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role
     )
-    commit_cmds = [
-        {
-            'cmd': rights_domain.CMD_CHANGE_ROLE,
-            'assignee_id': assignee_id,
-            'old_role': old_role,
-            'new_role': new_role
-        }
-    ]
+    commit_cmds = [{
+        'cmd': rights_domain.CMD_CHANGE_ROLE,
+        'assignee_id': assignee_id,
+        'old_role': old_role,
+        'new_role': new_role
+    }]
 
     _save_activity_rights(
         committer_id, activity_rights, activity_type, commit_message, commit_cmds
@@ -1075,8 +1107,10 @@ def _deassign_role(
             'No activity_rights exists for the given activity_id: %s' % activity_id
         )
 
-    if (activity_rights.is_voice_artist(removed_user_id)
-            and activity_type == constants.ACTIVITY_TYPE_EXPLORATION):
+    if (
+        activity_rights.is_voice_artist(removed_user_id) and
+        activity_type == constants.ACTIVITY_TYPE_EXPLORATION
+    ):
         user_can_deassign_role = check_can_manage_voice_artist_in_activity(
             committer, activity_rights
         )
@@ -1117,13 +1151,11 @@ def _deassign_role(
     commit_message = 'Remove %s from role %s for %s' % (
         assignee_username, old_role, activity_type
     )
-    commit_cmds = [
-        {
-            'cmd': rights_domain.CMD_REMOVE_ROLE,
-            'removed_user_id': removed_user_id,
-            'old_role': old_role,
-        }
-    ]
+    commit_cmds = [{
+        'cmd': rights_domain.CMD_REMOVE_ROLE,
+        'removed_user_id': removed_user_id,
+        'old_role': old_role,
+    }]
 
     _save_activity_rights(
         committer_id, activity_rights, activity_type, commit_message, commit_cmds
@@ -1203,13 +1235,11 @@ def _change_activity_status(
         cmd_type = rights_domain.CMD_CHANGE_EXPLORATION_STATUS
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         cmd_type = rights_domain.CMD_CHANGE_COLLECTION_STATUS
-    commit_cmds = [
-        {
-            'cmd': cmd_type,
-            'old_status': old_status,
-            'new_status': new_status
-        }
-    ]
+    commit_cmds = [{
+        'cmd': cmd_type,
+        'old_status': old_status,
+        'new_status': new_status
+    }]
 
     if new_status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         activity_rights.viewer_ids = []
@@ -1329,8 +1359,10 @@ def assign_role_for_exploration(
         constants.ACTIVITY_TYPE_EXPLORATION,
         allow_assigning_any_role=True
     )
-    if new_role in [rights_domain.ROLE_OWNER, rights_domain.ROLE_EDITOR,
-                    rights_domain.ROLE_VOICE_ARTIST]:
+    if new_role in [
+        rights_domain.ROLE_OWNER, rights_domain.ROLE_EDITOR,
+        rights_domain.ROLE_VOICE_ARTIST
+    ]:
         subscription_services.subscribe_to_exploration(assignee_id, exploration_id)
 
 
@@ -1419,13 +1451,11 @@ def set_private_viewability_of_exploration(
         )
 
     exploration_rights.viewable_if_private = viewable_if_private
-    commit_cmds: List[Dict[str, Union[str, bool]]] = [
-        {
-            'cmd': rights_domain.CMD_CHANGE_PRIVATE_VIEWABILITY,
-            'old_viewable_if_private': old_viewable_if_private,
-            'new_viewable_if_private': viewable_if_private,
-        }
-    ]
+    commit_cmds: List[Dict[str, Union[str, bool]]] = [{
+        'cmd': rights_domain.CMD_CHANGE_PRIVATE_VIEWABILITY,
+        'old_viewable_if_private': old_viewable_if_private,
+        'new_viewable_if_private': viewable_if_private,
+    }]
     commit_message = (
         'Made exploration viewable to anyone with the link.' if viewable_if_private else
         'Made exploration viewable only to invited playtesters.'

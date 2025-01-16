@@ -48,7 +48,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'new_value': 'new_value',
             'old_value': 'old_value',
         }
-        observed_object = question_domain.QuestionChange(change_dict=change_dict, )
+        observed_object = question_domain.QuestionChange(change_dict=change_dict,)
 
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
@@ -56,65 +56,72 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
             question_domain.QuestionChange({})
 
     def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command wrong is not allowed'):
-            question_domain.QuestionChange({'cmd': 'wrong'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command wrong is not allowed'
+        ):
+            question_domain.QuestionChange({
+                'cmd': 'wrong'
+            })
 
     def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with missing attributes in cmd.
         """
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The following required attributes are missing: new_value'):
-            question_domain.QuestionChange(
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'question_state_data',
-                    'old_value': 'old_value'
-                }
-            )
+            utils.ValidationError,
+            'The following required attributes are missing: new_value'
+        ):
+            question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'question_state_data',
+                'old_value': 'old_value'
+            })
 
     def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with extra attributes in cmd.
         """
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The following extra attributes are present: invalid'):
-            question_domain.QuestionChange({'cmd': 'create_new', 'invalid': 'invalid'})
+            utils.ValidationError, 'The following extra attributes are present: invalid'
+        ):
+            question_domain.QuestionChange({
+                'cmd': 'create_new',
+                'invalid': 'invalid'
+            })
 
     def test_update_question_property_with_wrong_property_name(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Value for property_name in cmd update_question_property: '
-                'wrong is not allowed'):
-            question_domain.QuestionChange(
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'wrong',
-                    'new_value': 'new_value',
-                    'old_value': 'old_value'
-                }
-            )
+            utils.ValidationError,
+            'Value for property_name in cmd update_question_property: '
+            'wrong is not allowed'
+        ):
+            question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'wrong',
+                'new_value': 'new_value',
+                'old_value': 'old_value'
+            })
 
     def test_create_new(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is create_new.
         """
-        change_dict = {'cmd': 'create_new'}
-        observed_object = question_domain.QuestionChange(change_dict=change_dict, )
+        change_dict = {
+            'cmd': 'create_new'
+        }
+        observed_object = question_domain.QuestionChange(change_dict=change_dict,)
 
         self.assertEqual('create_new', observed_object.cmd)
 
@@ -145,7 +152,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'question_dict': test_question_dict,
             'skill_id': '10',
         }
-        observed_object = question_domain.QuestionChange(change_dict=change_dict, )
+        observed_object = question_domain.QuestionChange(change_dict=change_dict,)
 
         self.assertEqual('create_new_fully_specified_question', observed_object.cmd)
         self.assertEqual('10', observed_object.skill_id)
@@ -160,7 +167,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'from_version': 0,
             'to_version': 10,
         }
-        observed_object = question_domain.QuestionChange(change_dict=change_dict, )
+        observed_object = question_domain.QuestionChange(change_dict=change_dict,)
 
         self.assertEqual('migrate_state_schema_to_latest_version', observed_object.cmd)
         self.assertEqual(0, observed_object.from_version)
@@ -195,16 +202,18 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange
         object when change_dict is without cmd key.
         """
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
             question_domain.QuestionSuggestionChange({})
 
     def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with wrong cmd value.
         """
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command wrong is not allowed'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command wrong is not allowed'
+        ):
             question_domain.QuestionSuggestionChange({
                 'cmd': 'wrong',
             })
@@ -214,32 +223,29 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         when change_dict is with missing attributes in cmd.
         """
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The following required attributes are missing: skill_difficulty,'
-                ' skill_id'):
-            question_domain.QuestionSuggestionChange(
-                {
-                    'cmd': 'create_new_fully_specified_question',
-                    'question_dict': 'question_dict',
-                }
-            )
+            utils.ValidationError,
+            'The following required attributes are missing: skill_difficulty,'
+            ' skill_id'
+        ):
+            question_domain.QuestionSuggestionChange({
+                'cmd': 'create_new_fully_specified_question',
+                'question_dict': 'question_dict',
+            })
 
     def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with extra attributes in cmd.
         """
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The following extra attributes are present: invalid'):
-            question_domain.QuestionSuggestionChange(
-                {
-                    'cmd': 'create_new_fully_specified_question',
-                    'question_dict': 'question_dict',
-                    'skill_id': 'skill_1',
-                    'skill_difficulty': '0.3',
-                    'invalid': 'invalid'
-                }
-            )
+            utils.ValidationError, 'The following extra attributes are present: invalid'
+        ):
+            question_domain.QuestionSuggestionChange({
+                'cmd': 'create_new_fully_specified_question',
+                'question_dict': 'question_dict',
+                'skill_id': 'skill_1',
+                'skill_difficulty': '0.3',
+                'invalid': 'invalid'
+            })
 
     def test_create_new_fully_specified_question(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
@@ -283,10 +289,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             ).to_dict()
         )
         translation_dict = {
-            'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.', translation_domain.TranslatableContentFormat.HTML,
-                True
-            )
+            'content_id_3':
+                translation_domain.TranslatedContent(
+                    'My name is Nikhil.',
+                    translation_domain.TranslatableContentFormat.HTML, True
+                )
         }
         self.dummy_entity_translations = translation_domain.EntityTranslation(
             'question_id', feconf.TranslatableEntityType.QUESTION, 1, 'hi',
@@ -341,10 +348,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'invalid_tagged_skill_misconception_id'
         )
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the format of tagged skill misconception id '
-                'to be <skill_id>-<misconception_id>, received '
-                'invalid_tagged_skill_misconception_id'):
+            utils.ValidationError,
+            'Expected the format of tagged skill misconception id '
+            'to be <skill_id>-<misconception_id>, received '
+            'invalid_tagged_skill_misconception_id'
+        ):
             self.question.validate()
 
         # Here we use MyPy ignore because we want to add a test which would
@@ -353,8 +361,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         state.interaction.answer_groups[
             0].tagged_skill_misconception_id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected tagged skill misconception id to be a str, received 1'):
+            utils.ValidationError,
+            'Expected tagged skill misconception id to be a str, received 1'
+        ):
             self.question.validate()
 
     def test_strict_validation(self) -> None:
@@ -416,32 +425,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'normalizedStrSet': ['Test']
         }
         state.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': 'abc',
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': 'abc',
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': rule_spec_input_test_dict
-                            },
-                            'rule_type': 'Contains'
-                        }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': None
-                }
-            )
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': rule_spec_input_test_dict
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            })
         ]
 
         self._assert_question_domain_validation_error(
@@ -449,32 +454,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
         state.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': 'pqr',
-                        'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': 'pqr',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': rule_spec_input_test_dict
-                            },
-                            'rule_type': 'Contains'
-                        }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': None
-                }
-            )
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': rule_spec_input_test_dict
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            })
         ]
 
         self._assert_question_domain_validation_error(
@@ -483,32 +484,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
         state.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': 'not None',
-                        'missing_prerequisite_skill_id': None
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': rule_spec_input_test_dict
-                            },
-                            'rule_type': 'Contains'
-                        }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': None
-                }
-            )
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': 'not None',
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': rule_spec_input_test_dict
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            })
         ]
 
         self._assert_question_domain_validation_error(
@@ -711,16 +708,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify update_inapplicable_skill_misconception_ids method
         of the Question domain object.
         """
-        self.assertEqual(
-            ['skillId12345-123'], self.question.inapplicable_skill_misconception_ids
-        )
-        self.question.update_inapplicable_skill_misconception_ids(
-            ['skillid-misconceptionid']
-        )
-        self.assertEqual(
-            ['skillid-misconceptionid'],
-            self.question.inapplicable_skill_misconception_ids
-        )
+        self.assertEqual(['skillId12345-123'],
+                         self.question.inapplicable_skill_misconception_ids)
+        self.question.update_inapplicable_skill_misconception_ids([
+            'skillid-misconceptionid'
+        ])
+        self.assertEqual(['skillid-misconceptionid'],
+                         self.question.inapplicable_skill_misconception_ids)
 
     def test_update_question_state_data(self) -> None:
         """Test to verify update_question_state_data method of the Question
@@ -893,10 +887,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 32)
         self.assertEqual(
-            self.question_state_dict['interaction']['customization_args'],
-            {'buttonText': {
-                'value': 'Add item'
-            }}
+            self.question_state_dict['interaction']['customization_args'], {
+                'buttonText': {
+                    'value': 'Add item'
+                }
+            }
         )
 
     def test_question_state_dict_conversion_from_v32_to_v33(self) -> None:
@@ -918,10 +913,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 33)
         self.assertEqual(
-            self.question_state_dict['interaction']['customization_args'],
-            {'showChoicesInShuffledOrder': {
-                'value': True
-            }}
+            self.question_state_dict['interaction']['customization_args'], {
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            }
         )
 
     def test_question_state_dict_conversion_from_v33_to_v34(self) -> None:
@@ -1071,8 +1067,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 35)
         self.assertEqual(test_value['state']['interaction']['id'], 'MathEquationInput')
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
-            {'temp_id_3': {}}
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], {
+                'temp_id_3': {}
+            }
         )
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0]['rule_specs'][0]
@@ -1258,7 +1255,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         # Testing with interaction id 'PencilCodeEditor'.
         test_value['state']['interaction']['id'] = 'PencilCodeEditor'
-        test_value['state']['interaction']['customization_args'] = {'initial_code': {}}
+        test_value['state']['interaction']['customization_args'] = {
+            'initial_code': {}
+        }
 
         # Here we use MyPy ignore because we are defining WrittenTranslationDict
         # and WrittenTranslationDict do not accept 'html' key, because the
@@ -1287,8 +1286,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 36)
         self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {'initialCode': {}}
+            test_value['state']['interaction']['customization_args'], {
+                'initialCode': {}
+            }
         )
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
@@ -1340,9 +1340,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
         test_value['state_schema_version'] = 35
 
-        with self.swap_to_always_return(customization_args_util,
-                                        'validate_customization_args_and_values',
-                                        value=True):
+        with self.swap_to_always_return(
+            customization_args_util,
+            'validate_customization_args_and_values',
+            value=True
+        ):
             question_domain.Question.update_state_from_model(
                 test_value, test_value['state_schema_version']
             )
@@ -1379,9 +1381,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
         test_value['state_schema_version'] = 35
 
-        with self.swap_to_always_return(customization_args_util,
-                                        'validate_customization_args_and_values',
-                                        value=True):
+        with self.swap_to_always_return(
+            customization_args_util,
+            'validate_customization_args_and_values',
+            value=True
+        ):
             question_domain.Question.update_state_from_model(
                 test_value, test_value['state_schema_version']
             )
@@ -1390,30 +1394,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(
             test_value['state']['interaction']['customization_args'], {
                 'choices': {
-                    'value': [
-                        {
-                            'content_id': 'ca_choices_3',
-                            'html': 'v'
-                        }, {
-                            'content_id': 'ca_choices_4',
-                            'html': 'a'
-                        }, {
-                            'content_id': 'ca_choices_5',
-                            'html': 'l'
-                        }, {
-                            'content_id': 'ca_choices_6',
-                            'html': 'u'
-                        }, {
-                            'content_id': 'ca_choices_7',
-                            'html': 'e'
-                        }, {
-                            'content_id': 'ca_choices_8',
-                            'html': '_'
-                        }, {
-                            'content_id': 'ca_choices_9',
-                            'html': '1'
-                        }
-                    ]
+                    'value': [{
+                        'content_id': 'ca_choices_3',
+                        'html': 'v'
+                    }, {
+                        'content_id': 'ca_choices_4',
+                        'html': 'a'
+                    }, {
+                        'content_id': 'ca_choices_5',
+                        'html': 'l'
+                    }, {
+                        'content_id': 'ca_choices_6',
+                        'html': 'u'
+                    }, {
+                        'content_id': 'ca_choices_7',
+                        'html': 'e'
+                    }, {
+                        'content_id': 'ca_choices_8',
+                        'html': '_'
+                    }, {
+                        'content_id': 'ca_choices_9',
+                        'html': '1'
+                    }]
                 },
                 'showChoicesInShuffledOrder': {
                     'value': True
@@ -1487,9 +1489,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state']['interaction']['customization_args'], {})
 
-        with self.swap_to_always_return(customization_args_util,
-                                        'validate_customization_args_and_values',
-                                        value=True):
+        with self.swap_to_always_return(
+            customization_args_util,
+            'validate_customization_args_and_values',
+            value=True
+        ):
             question_domain.Question.update_state_from_model(
                 test_value, test_value['state_schema_version']
             )
@@ -1512,8 +1516,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
-            {'ca_choices_3': {}}
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], {
+                'ca_choices_3': {}
+            }
         )
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
@@ -1540,32 +1545,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversion_from_v36_to_v37(self) -> None:
 
         self.question_state_dict['interaction']['id'] = 'TextInput'
-        self.question_state_dict['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [
-                    {
-                        'rule_type': 'CaseSensitiveEquals',
-                        'inputs': {
-                            'x': ''
-                        }
-                    }
-                ],
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        self.question_state_dict['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'rule_type': 'CaseSensitiveEquals',
+                'inputs': {
+                    'x': ''
+                }
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1585,30 +1586,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversion_from_v37_to_v38(self) -> None:
 
         self.question_state_dict['interaction']['id'] = 'MathEquationInput'
-        self.question_state_dict['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [{
-                    'inputs': {
-                        'x': 'variable=pi'
-                    },
-                    'rule_type': ''
-                }],
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        self.question_state_dict['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'variable=pi'
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'rule_type': ''
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
         self.question_state_dict['interaction']['customization_args'] = {}
 
         test_value: question_domain.VersionedQuestionStateDict = {
@@ -1622,10 +1621,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 38)
         self.assertEqual(
-            self.question_state_dict['interaction']['customization_args'],
-            {'customOskLetters': {
-                'value': ['a', 'b', 'e', 'i', 'l', 'r', 'v', 'π']
-            }}
+            self.question_state_dict['interaction']['customization_args'], {
+                'customOskLetters': {
+                    'value': ['a', 'b', 'e', 'i', 'l', 'r', 'v', 'π']
+                }
+            }
         )
 
     def test_question_state_dict_conversion_from_v38_to_v39(self) -> None:
@@ -1635,11 +1635,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {}
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        self.question_state_dict[
-            'written_translations'
-        ] = {  # type: ignore[misc]
-            'translations_mapping': {}
-        }
+        self.question_state_dict['written_translations'
+                                ] = {  # type: ignore[misc]
+                                    'translations_mapping': {}
+                                }
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1662,46 +1661,45 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
-            {'ca_placeholder_0': {}}
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], {
+                'ca_placeholder_0': {}
+            }
         )
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         self.assertEqual(
             test_value['state']['written_translations']
             ['translations_mapping'],  # type: ignore[misc]
-            {'ca_placeholder_0': {}}
+            {
+                'ca_placeholder_0': {}
+            }
         )
 
     def test_question_state_dict_conversion_from_v39_to_v40(self) -> None:
 
         self.question_state_dict['interaction']['id'] = 'TextInput'
-        self.question_state_dict['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [
-                    {
-                        'inputs': {
-                            'x': 'variable=pi'
-                        },
-                        'rule_type': 'standard'
-                    }
-                ],
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        self.question_state_dict['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'variable=pi'
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'rule_type': 'standard'
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1725,36 +1723,33 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversion_from_v40_to_v41(self) -> None:
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        self.question_state_dict[
-            'written_translations'
-        ] = {  # type: ignore[misc]
-            'translations_mapping': {}
-        }
+        self.question_state_dict['written_translations'
+                                ] = {  # type: ignore[misc]
+                                    'translations_mapping': {}
+                                }
         self.question_state_dict['interaction']['id'] = 'TextInput'
-        self.question_state_dict['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [{
-                    'rule_type': 'standard',
-                    'inputs': {
-                        'x': 'text'
-                    },
-                }],
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        self.question_state_dict['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'rule_type': 'standard',
+                'inputs': {
+                    'x': 'text'
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
         self.question_state_dict['next_content_id_index'] = 0  # type: ignore[misc]
@@ -1783,36 +1778,35 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
-            {'rule_input_0': {}}
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], {
+                'rule_input_0': {}
+            }
         )
 
         # Testing with interaction id 'SetInput'.
         test_value['state']['interaction']['id'] = 'SetInput'
-        test_value['state']['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [{
-                    'rule_type': 'standard',
-                    'inputs': {
-                        'x': 'text'
-                    }
-                }],
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        test_value['state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'rule_type': 'standard',
+                'inputs': {
+                    'x': 'text'
+                }
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
         test_value['state']['next_content_id_index'] = 0  # type: ignore[misc]
@@ -1837,8 +1831,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
         self.assertEqual(
-            test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
-            {'rule_input_0': {}}
+            test_value['state']['recorded_voiceovers']['voiceovers_mapping'], {
+                'rule_input_0': {}
+            }
         )
 
     def test_question_state_dict_conversion_from_v41_to_v42(self) -> None:
@@ -1851,18 +1846,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'answer_is_exclusive': False
         }
 
-        ca_choices_dicts: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'html': 'correct_value',
-                'content_id': 'content_id_1'
-            }, {
-                'html': 'value_2',
-                'content_id': 'content_id_2'
-            }, {
-                'html': 'value_3',
-                'content_id': 'content_id_3'
-            }
-        ]
+        ca_choices_dicts: List[state_domain.SubtitledHtmlDict] = [{
+            'html': 'correct_value',
+            'content_id': 'content_id_1'
+        }, {
+            'html': 'value_2',
+            'content_id': 'content_id_2'
+        }, {
+            'html': 'value_3',
+            'content_id': 'content_id_3'
+        }]
 
         self.question_state_dict['interaction']['id'] = 'ItemSelectionInput'
         self.question_state_dict['interaction']['solution'] = test_solution_dict
@@ -1871,32 +1864,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'value': ca_choices_dicts
             }
         }
-        self.question_state_dict['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [
-                    {
-                        'inputs': {
-                            'x': ['correct_value'],
-                        },
-                        'rule_type': 'IsEqualToOrdering'
-                    }
-                ],
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        self.question_state_dict['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['correct_value'],
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1931,32 +1920,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'value': ca_choices_dicts
             }
         }
-        test_value['state']['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [
-                    {
-                        'inputs': {
-                            'x': ['invalid_value'],
-                        },
-                        'rule_type': 'IsEqualToOrdering'
-                    }
-                ],
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        test_value['state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['invalid_value'],
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
         test_value['state_schema_version'] = 41
 
         question_domain.Question.update_state_from_model(
@@ -1980,60 +1965,54 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['solution'] = (
             drag_and_drop_test_solution_dict
         )
-        ca_choices_dicts = [
-            {
-                'html': 'correct_value',
-                'content_id': 'content_id_1'
-            }, {
-                'html': 'value_2',
-                'content_id': 'content_id_2'
-            }, {
-                'html': 'value_3',
-                'content_id': 'content_id_3'
-            }
-        ]
+        ca_choices_dicts = [{
+            'html': 'correct_value',
+            'content_id': 'content_id_1'
+        }, {
+            'html': 'value_2',
+            'content_id': 'content_id_2'
+        }, {
+            'html': 'value_3',
+            'content_id': 'content_id_3'
+        }]
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
                 'value': ca_choices_dicts
             }
         }
-        test_value['state']['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [
-                    {
-                        'inputs': {
-                            'x': [['value_2']],
-                        },
-                        'rule_type': 'IsEqualToOrdering'
-                    }, {
-                        'inputs': {
-                            'x': 'correct_value',
-                        },
-                        'rule_type': 'HasElementXAtPositionY'
-                    }, {
-                        'inputs': {
-                            'x': 'correct_value',
-                            'y': 'value_3'
-                        },
-                        'rule_type': 'HasElementXBeforeElementY'
-                    }
-                ],
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        test_value['state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': [['value_2']],
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'inputs': {
+                    'x': 'correct_value',
+                },
+                'rule_type': 'HasElementXAtPositionY'
+            }, {
+                'inputs': {
+                    'x': 'correct_value',
+                    'y': 'value_3'
+                },
+                'rule_type': 'HasElementXBeforeElementY'
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
         test_value['state_schema_version'] = 41
 
         question_domain.Question.update_state_from_model(
@@ -2043,25 +2022,23 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 42)
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0], {
-                'rule_specs': [
-                    {
-                        'inputs': {
-                            'x': [['content_id_2']]
-                        },
-                        'rule_type': 'IsEqualToOrdering'
-                    }, {
-                        'inputs': {
-                            'x': 'content_id_1'
-                        },
-                        'rule_type': 'HasElementXAtPositionY'
-                    }, {
-                        'inputs': {
-                            'x': 'content_id_1',
-                            'y': 'content_id_3'
-                        },
-                        'rule_type': 'HasElementXBeforeElementY'
-                    }
-                ],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': [['content_id_2']]
+                    },
+                    'rule_type': 'IsEqualToOrdering'
+                }, {
+                    'inputs': {
+                        'x': 'content_id_1'
+                    },
+                    'rule_type': 'HasElementXAtPositionY'
+                }, {
+                    'inputs': {
+                        'x': 'content_id_1',
+                        'y': 'content_id_3'
+                    },
+                    'rule_type': 'HasElementXBeforeElementY'
+                }],
                 'outcome': {
                     'dest': 'abc',
                     'dest_if_really_stuck': None,
@@ -2100,10 +2077,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 43)
         self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {'useFractionForDivision': {
-                'value': True
-            }}
+            test_value['state']['interaction']['customization_args'], {
+                'useFractionForDivision': {
+                    'value': True
+                }
+            }
         )
 
     def test_question_state_dict_conversion_from_v43_to_v44(self) -> None:
@@ -2213,10 +2191,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 49)
         self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {'requireNonnegativeInput': {
-                'value': False
-            }}
+            test_value['state']['interaction']['customization_args'], {
+                'requireNonnegativeInput': {
+                    'value': False
+                }
+            }
         )
 
     def test_question_state_dict_conversion_from_v49_to_v50(self) -> None:
@@ -2227,38 +2206,34 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         }
         inputs_variable_test_dict: List[str] = []
-        self.question_state_dict['interaction']['answer_groups'] = [
-            {
-                'outcome': {
-                    'dest': 'abc',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        self.question_state_dict['interaction']['answer_groups'] = [{
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
                 },
-                'rule_specs': [
-                    {
-                        'inputs': {
-                            'x': 'a - b'
-                        },
-                        'rule_type': 'ContainsSomeOf'
-                    }, {
-                        'inputs': {
-                            'x': 'a - b',
-                            'y': inputs_variable_test_dict
-                        },
-                        'rule_type': 'MatchesExactlyWith'
-                    }
-                ],
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': inputs_variable_test_dict
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -2269,14 +2244,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(test_value['state_schema_version'], 50)
         rule_specs = test_value['state']['interaction']['answer_groups'][0]['rule_specs'
-                                                                            ]
+                                                                           ]
         self.assertEqual(len(rule_specs), 1)
         self.assertEqual(rule_specs[0]['rule_type'], 'MatchesExactlyWith')
         self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {'allowedVariables': {
-                'value': ['a', 'b', 'c']
-            }}
+            test_value['state']['interaction']['customization_args'], {
+                'allowedVariables': {
+                    'value': ['a', 'b', 'c']
+                }
+            }
         )
 
     def test_get_all_translatable_content_for_question(self) -> None:
@@ -2285,7 +2261,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             translatable_content.content_value
             for translatable_content in self.question.
             get_all_contents_which_need_translations(self.dummy_entity_translations
-                                                     ).values()
+                                                    ).values()
         ]
 
         self.assertItemsEqual(
@@ -2414,8 +2390,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validation_with_invalid_id(self) -> None:
         self.observed_object.id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected id to be a string, received 1'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected id to be a string, received 1'
+        ):
             self.observed_object.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2424,8 +2401,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     def test_validation_with_invalid_interaction_id(self) -> None:
         self.observed_object.interaction_id = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected interaction id to be a string, received 1'):
+            utils.ValidationError, 'Expected interaction id to be a string, received 1'
+        ):
             self.observed_object.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2434,8 +2411,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     def test_validation_with_invalid_question_content(self) -> None:
         self.observed_object.question_content = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected question content to be a string, received 1'):
+            utils.ValidationError,
+            'Expected question content to be a string, received 1'
+        ):
             self.observed_object.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2443,8 +2421,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validation_with_invalid_created_on(self) -> None:
         self.observed_object.created_on = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected created on to be a datetime, received 1'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected created on to be a datetime, received 1'
+        ):
             self.observed_object.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2453,8 +2432,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     def test_validation_with_invalid_last_updated(self) -> None:
         self.observed_object.last_updated = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected last updated to be a datetime, received 1'):
+            utils.ValidationError, 'Expected last updated to be a datetime, received 1'
+        ):
             self.observed_object.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2465,9 +2444,13 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         misconception_ids value is an invalid list.
         """
         self.observed_object.misconception_ids = ['Test', 1]  # type: ignore[list-item]
-        with self.assertRaisesRegex(utils.ValidationError, re.escape(
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            re.escape(
                 'Expected misconception ids to be a list of strings, '
-                'received [\'Test\', 1]')):
+                'received [\'Test\', 1]'
+            )
+        ):
             self.observed_object.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2479,9 +2462,10 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         """
         self.observed_object.misconception_ids = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected misconception ids to be a list of strings, '
-                'received 123'):
+            utils.ValidationError,
+            'Expected misconception ids to be a list of strings, '
+            'received 123'
+        ):
             self.observed_object.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2492,13 +2476,15 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         version value is an invalid.
         """
         self.observed_object.version = -2
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected version to be non-negative, received -2'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected version to be non-negative, received -2'
+        ):
             self.observed_object.validate()
 
         self.observed_object.version = 'invalid'  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected version to be int, received invalid'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected version to be int, received invalid'
+        ):
             self.observed_object.validate()
 
 

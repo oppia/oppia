@@ -163,10 +163,10 @@ class ExplorationOpportunitySummary:
             exploration_opportunity_summary_dict['chapter_title'],
             exploration_opportunity_summary_dict['content_count'],
             exploration_opportunity_summary_dict['incomplete_translation_language_codes'
-                                                 ],
+                                                ],
             exploration_opportunity_summary_dict['translation_counts'],
             exploration_opportunity_summary_dict['language_codes_needing_voice_artists'
-                                                 ],
+                                                ],
             exploration_opportunity_summary_dict[
                 'language_codes_with_assigned_voice_artists'],
             exploration_opportunity_summary_dict['translation_in_review_counts']
@@ -212,8 +212,8 @@ class ExplorationOpportunitySummary:
             language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
         ]
 
-        if not set(self.language_codes_with_assigned_voice_artists).isdisjoint(
-                self.language_codes_needing_voice_artists):
+        if not set(self.language_codes_with_assigned_voice_artists
+                  ).isdisjoint(self.language_codes_needing_voice_artists):
             raise utils.ValidationError(
                 'Expected voice_artist "needed" and "assigned" list of '
                 'languages to be disjoint, received: %s, %s' % (

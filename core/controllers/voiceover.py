@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the voiceover admin page."""
 
 from __future__ import annotations
@@ -24,27 +23,27 @@ from core.domain import voiceover_services
 from typing import Dict, TypedDict
 
 
-class VoiceoverAdminDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class VoiceoverAdminDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Fetches relevant data for the voiceover admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves relevant data for the voiceover admin page."""
 
-        language_accent_master_list: Dict[str, Dict[str, str]] = (
-            voiceover_services.get_language_accent_master_list())
+        language_accent_master_list: Dict[str, Dict[
+            str, str]] = (voiceover_services.get_language_accent_master_list())
 
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
-            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+            voiceover_services.get_all_language_accent_codes_for_voiceovers()
+        )
         self.values.update({
-            'language_accent_master_list':
-                language_accent_master_list,
+            'language_accent_master_list': language_accent_master_list,
             'language_codes_mapping': language_codes_mapping
         })
         self.render_json(self.values)
@@ -59,10 +58,7 @@ class PutLanguageCodesHandlerNormalizedPayloadDict(TypedDict):
 
 
 class VoiceoverLanguageCodesMappingHandler(
-    base.BaseHandler[
-        PutLanguageCodesHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[PutLanguageCodesHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Updates the language codes mapping field in the backend."""
 
@@ -104,11 +100,9 @@ class VoiceoverLanguageCodesMappingHandler(
         voiceovers.
         """
         assert self.normalized_payload is not None
-        language_codes_mapping = (
-            self.normalized_payload['language_codes_mapping'])
+        language_codes_mapping = (self.normalized_payload['language_codes_mapping'])
 
-        voiceover_services.save_language_accent_support(
-            language_codes_mapping)
+        voiceover_services.save_language_accent_support(language_codes_mapping)
         self.render_json(self.values)
 
 
@@ -123,10 +117,7 @@ class PutVoiceArtistMetadataHandlerNormalizedPayloadDict(TypedDict):
 
 
 class VoiceArtistMetadataHandler(
-    base.BaseHandler[
-        PutVoiceArtistMetadataHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[PutVoiceArtistMetadataHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler class to manage voice artist data for the voiceover admin page.
     """
@@ -158,15 +149,15 @@ class VoiceArtistMetadataHandler(
     def get(self) -> None:
         """Retrieves voice artist data for the voiceover admin page."""
         voice_artist_id_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping())
+            voiceover_services.get_all_voice_artist_language_accent_mapping()
+        )
         voice_artist_id_to_voice_artist_name = (
-            voiceover_services.get_voice_artist_ids_to_voice_artist_names())
+            voiceover_services.get_voice_artist_ids_to_voice_artist_names()
+        )
 
         self.values.update({
-            'voice_artist_id_to_language_mapping':
-                voice_artist_id_to_language_mapping,
-            'voice_artist_id_to_voice_artist_name':
-                voice_artist_id_to_voice_artist_name
+            'voice_artist_id_to_language_mapping': voice_artist_id_to_language_mapping,
+            'voice_artist_id_to_voice_artist_name': voice_artist_id_to_voice_artist_name
         })
         self.render_json(self.values)
 
@@ -179,7 +170,8 @@ class VoiceArtistMetadataHandler(
         language_accent_code = self.normalized_payload['language_accent_code']
 
         voiceover_services.update_voice_artist_language_mapping(
-            voice_artist_id, language_code, language_accent_code)
+            voice_artist_id, language_code, language_accent_code
+        )
         self.render_json(self.values)
 
 
@@ -203,14 +195,15 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_voiceover_admin_page
     def get(self, voice_artist_id: str, language_code: str) -> None:
         exploration_id_to_filenames = (
             voiceover_services.get_voiceover_filenames(
-                voice_artist_id=voice_artist_id,
-                language_code=language_code
+                voice_artist_id=voice_artist_id, language_code=language_code
             )
         )
 
@@ -220,9 +213,7 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
         self.render_json(self.values)
 
 
-class EntityVoiceoversBulkHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class EntityVoiceoversBulkHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler class to get entity voiceovers data for a given language code
     of an exploration.
     """
@@ -250,7 +241,9 @@ class EntityVoiceoversBulkHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(
@@ -262,7 +255,8 @@ class EntityVoiceoversBulkHandler(
     ) -> None:
         entity_voiceovers_objects = (
             voiceover_services.fetch_entity_voiceovers_by_language_code(
-                entity_id, entity_type, entity_version, language_code)
+                entity_id, entity_type, entity_version, language_code
+            )
         )
         entity_voiceovers_dicts = []
 

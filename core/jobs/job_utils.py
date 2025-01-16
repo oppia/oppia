@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Helper functions for beam validators and one-off jobs."""
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from google.cloud.ndb import query as ndb_query
 from typing import Any, List, Optional, Tuple, Type, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -66,7 +65,9 @@ def clone_model(
     cls = model.__class__
     # Pylint doesn't like that we call __get__() directly, but we have to in
     # order to specify its arguments model and cls.
-    props = {k: v.__get__(model, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access,unnecessary-dunder-call
+    props = {
+        k: v.__get__(model, cls) for k, v in cls._properties.items()
+    }  # pylint: disable=protected-access,unnecessary-dunder-call
     props.update(new_values)
     with datastore_services.get_ndb_context():
         return cls(id=model_id, **props)
@@ -121,9 +122,9 @@ def get_model_kind(
     Raises:
         TypeError. When the argument is not a model.
     """
-    if isinstance(model, datastore_services.Model) or (
-            isinstance(model, type) and
-            issubclass(model, datastore_services.Model)):
+    if isinstance(
+        model, datastore_services.Model
+    ) or (isinstance(model, type) and issubclass(model, datastore_services.Model)):
         return model._get_kind()  # pylint: disable=protected-access
     else:
         raise TypeError('%r is not a model type or instance' % model)
@@ -151,9 +152,7 @@ def get_model_id(model: datastore_services.Model) -> Optional[str]:
 
 # Here we use type Any because this method can return a property from a
 # model and that property can be of any type.
-def get_model_property(
-    model: datastore_services.Model, property_name: str
-) -> Any:
+def get_model_property(model: datastore_services.Model, property_name: str) -> Any:
     """Returns the given property from a model.
 
     Args:
@@ -239,8 +238,8 @@ def get_beam_key_from_ndb_key(
         beam_datastore_types.Key. The Apache Beam key.
     """
     return beam_datastore_types.Key(
-        ndb_key.flat(), project=ndb_key.project(),
-        namespace=ndb_key.namespace())
+        ndb_key.flat(), project=ndb_key.project(), namespace=ndb_key.namespace()
+    )
 
 
 def get_beam_query_from_ndb_query(
@@ -265,12 +264,8 @@ def get_beam_query_from_ndb_query(
     """
     kind = query.kind
     namespace = namespace or query.namespace
-    filters = (
-        _get_beam_filters_from_ndb_node(query.filters) if query.filters else ()
-    )
-    order = (
-        _get_beam_order_from_ndb_order(query.order_by) if query.order_by else ()
-    )
+    filters = (_get_beam_filters_from_ndb_node(query.filters) if query.filters else ())
+    order = (_get_beam_order_from_ndb_order(query.order_by) if query.order_by else ())
 
     if not kind and not order:
         # NOTE: When kind is omitted, Apache Beam requires the query to order
@@ -278,8 +273,12 @@ def get_beam_query_from_ndb_query(
         order = ('__key__',)
 
     return beam_datastore_types.Query(
-        kind=kind, namespace=namespace, project=feconf.OPPIA_PROJECT_ID,
-        filters=filters, order=order)
+        kind=kind,
+        namespace=namespace,
+        project=feconf.OPPIA_PROJECT_ID,
+        filters=filters,
+        order=order
+    )
 
 
 # Here we use type Any because this method can return a list of tuples
@@ -309,12 +308,13 @@ def _get_beam_filters_from_ndb_node(
         for n in node:
             beam_filters.extend(_get_beam_filters_from_ndb_node(n))
     elif isinstance(node, ndb_query.FilterNode):
-        beam_filters.append((node._name, node._opsymbol, node._value)) # pylint: disable=protected-access
+        beam_filters.append((node._name, node._opsymbol, node._value))  # pylint: disable=protected-access
     else:
         raise TypeError(
             '`!=`, `IN`, and `OR` are forbidden filters. To emulate their '
             'behavior, use multiple AND queries and flatten them into a single '
-            'PCollection.')
+            'PCollection.'
+        )
 
     return tuple(beam_filters)
 

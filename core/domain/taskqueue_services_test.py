@@ -59,7 +59,9 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             )
 
     def test_exception_raised_when_email_task_params_is_not_serializable(self) -> None:
-        params: Dict[str, Set[str]] = {'param1': set()}
+        params: Dict[str, Set[str]] = {
+            'param1': set()
+        }
         serialization_exception = self.assertRaisesRegex(
             ValueError,
             'The params added to the email task call cannot be json serialized'
@@ -72,7 +74,10 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
     def test_defer_makes_the_correct_request(self) -> None:
         correct_fn_identifier = '/task/deferredtaskshandler'
         correct_args = (1, 2, 3)
-        correct_kwargs = {'a': 'b', 'c': 'd'}
+        correct_kwargs = {
+            'a': 'b',
+            'c': 'd'
+        }
 
         expected_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
         expected_url = feconf.TASK_URL_DEFERRED
@@ -86,13 +91,11 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             platform_taskqueue_services,
             'create_http_task',
             lambda queue_name, url, payload=None, scheduled_for=None: None,
-            expected_kwargs=[
-                {
-                    'queue_name': expected_queue_name,
-                    'url': expected_url,
-                    'payload': expected_payload
-                }
-            ]
+            expected_kwargs=[{
+                'queue_name': expected_queue_name,
+                'url': expected_url,
+                'payload': expected_payload
+            }]
         )
 
         with create_http_task_swap:
@@ -102,7 +105,9 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             )
 
     def test_enqueue_task_makes_the_correct_request(self) -> None:
-        correct_payload = {'user_id': '1'}
+        correct_payload = {
+            'user_id': '1'
+        }
         correct_url = feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS
         correct_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
 

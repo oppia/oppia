@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.batch_jobs.exp_search_indexing_jobs."""
 
 from __future__ import annotations
@@ -41,9 +40,8 @@ StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        exp_search_indexing_jobs.IndexExplorationsInSearchJob
-    ] = exp_search_indexing_jobs.IndexExplorationsInSearchJob
+    JOB_CLASS: Type[exp_search_indexing_jobs.IndexExplorationsInSearchJob
+                   ] = exp_search_indexing_jobs.IndexExplorationsInSearchJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -67,17 +65,15 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
-            expected_args=[
-                ([{
-                    'id': 'abcd',
-                    'language_code': 'lang',
-                    'title': 'title',
-                    'category': 'category',
-                    'tags': [],
-                    'objective': 'objective',
-                    'rank': 20,
-                }], search_services.SEARCH_INDEX_EXPLORATIONS)
-            ]
+            expected_args=[([{
+                'id': 'abcd',
+                'language_code': 'lang',
+                'title': 'title',
+                'category': 'category',
+                'tags': [],
+                'objective': 'objective',
+                'rank': 20,
+            }], search_services.SEARCH_INDEX_EXPLORATIONS)]
         )
 
         with add_docs_to_index_swap:
@@ -105,25 +101,20 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
-            expected_args=[
-                (
-                    [{
-                        'id': 'abcd%s' % i,
-                        'language_code': 'lang',
-                        'title': 'title',
-                        'category': 'category',
-                        'tags': [],
-                        'objective': 'objective',
-                        'rank': 20,
-                    }],
-                    search_services.SEARCH_INDEX_EXPLORATIONS
-                ) for i in range(5)
-            ]
+            expected_args=[([{
+                'id': 'abcd%s' % i,
+                'language_code': 'lang',
+                'title': 'title',
+                'category': 'category',
+                'tags': [],
+                'objective': 'objective',
+                'rank': 20,
+            }], search_services.SEARCH_INDEX_EXPLORATIONS) for i in range(5)]
         )
 
         max_batch_size_swap = self.swap(
-            exp_search_indexing_jobs.IndexExplorationsInSearchJob,
-            'MAX_BATCH_SIZE', 1)
+            exp_search_indexing_jobs.IndexExplorationsInSearchJob, 'MAX_BATCH_SIZE', 1
+        )
 
         with add_docs_to_index_swap, max_batch_size_swap:
             self.assert_job_output_is([
@@ -146,8 +137,8 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         exp_summary.put()
 
         def add_docs_to_index_mock(
-                unused_documents: Dict[str, Union[int, str, List[str]]],
-                unused_index_name: str
+            unused_documents: Dict[str, Union[int, str, List[str]]],
+            unused_index_name: str
         ) -> None:
             raise platform_search_services.SearchException('search exception')
 
@@ -155,27 +146,20 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             add_docs_to_index_mock,
-            expected_args=[
-                (
-                    [{
-                        'id': 'abcd',
-                        'language_code': 'lang',
-                        'title': 'title',
-                        'category': 'category',
-                        'tags': [],
-                        'objective': 'objective',
-                        'rank': 20,
-                    }],
-                    search_services.SEARCH_INDEX_EXPLORATIONS
-                )
-            ]
+            expected_args=[([{
+                'id': 'abcd',
+                'language_code': 'lang',
+                'title': 'title',
+                'category': 'category',
+                'tags': [],
+                'objective': 'objective',
+                'rank': 20,
+            }], search_services.SEARCH_INDEX_EXPLORATIONS)]
         )
 
         with add_docs_to_index_swap:
             self.assert_job_output_is([
-                job_run_result.JobRunResult.as_stderr(
-                    'ERROR: "search exception": 1'
-                )
+                job_run_result.JobRunResult.as_stderr('ERROR: "search exception": 1')
             ])
 
     def test_skips_deleted_model(self) -> None:

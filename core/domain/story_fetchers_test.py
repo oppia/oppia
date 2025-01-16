@@ -31,7 +31,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import story_models
 
-(story_models, ) = models.Registry.import_models([models.Names.STORY])
+(story_models,) = models.Registry.import_models([models.Names.STORY])
 
 
 class StoryFetchersUnitTests(test_utils.GenericTestBase):
@@ -62,22 +62,18 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
         topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, self.story_id)
         changelist = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': self.NODE_ID_1,
-                    'title': 'Title 1'
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                    'node_id': self.NODE_ID_1,
-                    'old_value': None,
-                    'new_value': self.EXP_ID_1
-                }
-            )
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': self.EXP_ID_1
+            })
         ]
         story_services.update_story(
             self.USER_ID, self.story_id, changelist, 'Added node.'
@@ -92,9 +88,8 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.user_id_admin = (self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.set_topic_managers(
-            [user_services.get_username(self.user_id_a)], self.TOPIC_ID
-        )
+        self.set_topic_managers([user_services.get_username(self.user_id_a)],
+                                self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(self.user_id_admin)
@@ -118,9 +113,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.thumbnail_filename, None)
 
     def test_get_story_summaries_by_id(self) -> None:
-        story_summaries = story_fetchers.get_story_summaries_by_ids(
-            [self.story_id, 'someID']
-        )
+        story_summaries = story_fetchers.get_story_summaries_by_ids([
+            self.story_id, 'someID'
+        ])
 
         self.assertEqual(len(story_summaries), 1)
         self.assertEqual(story_summaries[0].id, self.story_id)
@@ -156,14 +151,15 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
             versioned_story_contents, story_id)
         versioned_story_contents['schema_version'
-                                 ] = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 1
+                                ] = feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION - 1
         story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
                 versioned_story_contents, story_id
         )
         versioned_story_contents['schema_version'] = 6
         with self.assertRaisesRegex(
-                Exception, 'Sorry, we can only process v1-v%d story schemas at '
-                'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v1-v%d story schemas at '
+            'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+        ):
             story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
                 versioned_story_contents, story_id
             )
@@ -192,15 +188,16 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_raises_error_if_stories_fetched_with_invalid_id_and_strict(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'No story model exists for the story_id: invalid_id'):
+            Exception, 'No story model exists for the story_id: invalid_id'
+        ):
             story_fetchers.get_stories_by_ids(['invalid_id'], strict=True)
 
     def test_get_stories_by_ids_for_non_existing_story_returns_none(self) -> None:
         non_exiting_story_id = 'invalid_id'
         expected_story = self.story.to_dict()
-        stories = story_fetchers.get_stories_by_ids(
-            [self.story_id, non_exiting_story_id]
-        )
+        stories = story_fetchers.get_stories_by_ids([
+            self.story_id, non_exiting_story_id
+        ])
         # Ruling out the possibility of None for mypy type checking.
         assert stories[0] is not None
         self.assertEqual(len(stories), 2)
@@ -209,13 +206,13 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_multi_users_progress_in_stories(self) -> None:
         all_users_stories_progress = (
-            story_fetchers.get_multi_users_progress_in_stories(
-                [self.USER_ID], [self.story_id, 'invalid_story_id']
-            )
+            story_fetchers.get_multi_users_progress_in_stories([self.USER_ID], [
+                self.story_id, 'invalid_story_id'
+            ])
         )
-        all_stories = story_fetchers.get_stories_by_ids(
-            [self.story_id, 'invalid_story_id']
-        )
+        all_stories = story_fetchers.get_stories_by_ids([
+            self.story_id, 'invalid_story_id'
+        ])
 
         # Should return None for invalid story ID.
         self.assertIsNone(all_stories[1])
@@ -237,9 +234,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
 
         all_users_stories_progress = (
-            story_fetchers.get_multi_users_progress_in_stories(
-                [self.USER_ID], [self.story_id, 'invalid_story_id']
-            )
+            story_fetchers.get_multi_users_progress_in_stories([self.USER_ID], [
+                self.story_id, 'invalid_story_id'
+            ])
         )
         user_stories_progress = all_users_stories_progress[self.USER_ID]
 
@@ -297,8 +294,8 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.story_id, self.NODE_ID_2
         )
         for ind, completed_node in enumerate(
-                story_fetchers.get_completed_nodes_in_story(self.USER_ID,
-                                                            self.story_id)):
+            story_fetchers.get_completed_nodes_in_story(self.USER_ID, self.story_id)
+        ):
             self.assertEqual(
                 completed_node.to_dict(), story.story_contents.nodes[ind].to_dict()
             )
@@ -312,13 +309,15 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
         # Tests error should be raised if story or node doesn't exist.
         with self.assertRaisesRegex(
-                Exception, 'The node with id node_5 is not part of this story.'):
+            Exception, 'The node with id node_5 is not part of this story.'
+        ):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 self.story_id, 'node_5'
             )
 
-        with self.assertRaisesRegex(Exception,
-                                    'Story with id story_id_2 does not exist.'):
+        with self.assertRaisesRegex(
+            Exception, 'Story with id story_id_2 does not exist.'
+        ):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 'story_id_2', self.NODE_ID_1
             )
@@ -343,15 +342,13 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
         learner_id = 'learner1'
         change_list = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                    'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
-                    'old_value': None,
-                    'new_value': exp_id_1
-                }
-            )
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
+                'old_value': None,
+                'new_value': exp_id_1
+            })
         ]
         story_services.update_story(
             self.USER_ID, self.story_id, change_list, 'Added node.'

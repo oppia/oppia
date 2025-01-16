@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for scripts/get_github_workflow_status.py."""
 
 from __future__ import annotations
@@ -25,11 +24,13 @@ from . import check_github_workflow_status
 
 
 class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
+
     def setUp(self) -> None:
         super().setUp()
         self.temp_dir = tempfile.TemporaryDirectory()
         self.github_output_file_path = os.path.join(
-            self.temp_dir.name, 'github_output.json')
+            self.temp_dir.name, 'github_output.json'
+        )
         os.environ['GITHUB_OUTPUT'] = self.github_output_file_path
 
     def tearDown(self) -> None:
@@ -44,35 +45,48 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
 
     def test_get_github_workflow_status_with_job_failure(self) -> None:
         jobs = {
-            'job1': {'result': 'success'},
-            'job2': {'result': 'failure'},
-            'job3': {'result': 'success'},
+            'job1': {
+                'result': 'success'
+            },
+            'job2': {
+                'result': 'failure'
+            },
+            'job3': {
+                'result': 'success'
+            },
         }
 
         check_github_workflow_status.main(['--jobs', json.dumps(jobs)])
-        self.assertEqual(
-            self.get_workflow_status_from_github_output(), 'failure')
+        self.assertEqual(self.get_workflow_status_from_github_output(), 'failure')
 
     def test_get_github_workflow_status_with_all_jobs_success(self) -> None:
         jobs = {
-            'job1': {'result': 'success'},
-            'job2': {'result': 'success'},
-            'job3': {'result': 'success'},
+            'job1': {
+                'result': 'success'
+            },
+            'job2': {
+                'result': 'success'
+            },
+            'job3': {
+                'result': 'success'
+            },
         }
 
         check_github_workflow_status.main(['--jobs', json.dumps(jobs)])
-        self.assertEqual(
-            self.get_workflow_status_from_github_output(), 'success')
+        self.assertEqual(self.get_workflow_status_from_github_output(), 'success')
 
-    def test_get_github_workflow_status_with_jobs_success_or_skipped(
-        self
-    ) -> None:
+    def test_get_github_workflow_status_with_jobs_success_or_skipped(self) -> None:
         jobs = {
-            'job1': {'result': 'skipped'},
-            'job2': {'result': 'success'},
-            'job3': {'result': 'success'},
+            'job1': {
+                'result': 'skipped'
+            },
+            'job2': {
+                'result': 'success'
+            },
+            'job3': {
+                'result': 'success'
+            },
         }
 
         check_github_workflow_status.main(['--jobs', json.dumps(jobs)])
-        self.assertEqual(
-            self.get_workflow_status_from_github_output(), 'success')
+        self.assertEqual(self.get_workflow_status_from_github_output(), 'success')

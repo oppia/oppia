@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the diagnostic test player page."""
 
 from __future__ import annotations
@@ -53,10 +52,8 @@ class DiagnosticTestQuestionsHandlerNormalizedRequestDict(TypedDict):
 
 
 class DiagnosticTestQuestionsHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        DiagnosticTestQuestionsHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str],
+                     DiagnosticTestQuestionsHandlerNormalizedRequestDict]
 ):
     """Handler class to fetch the questions from the diagnostic test skills of
     the given topic ID.
@@ -67,7 +64,8 @@ class DiagnosticTestQuestionsHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.ENTITY_ID_REGEX
@@ -98,8 +96,7 @@ class DiagnosticTestQuestionsHandler(
         # particular TypedDict that was defined according to the schemas.
         # So that the type of fetched values is not considered as Any type.
         request_data = cast(
-            DiagnosticTestQuestionsHandlerNormalizedRequestDict,
-            self.normalized_request
+            DiagnosticTestQuestionsHandlerNormalizedRequestDict, self.normalized_request
         )
 
         # The list of question IDs that were already presented in the
@@ -110,7 +107,8 @@ class DiagnosticTestQuestionsHandler(
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.NotFoundException(
-                'No corresponding topic exists for the given topic ID.')
+                'No corresponding topic exists for the given topic ID.'
+            )
 
         diagnostic_test_skill_ids = topic.skill_ids_for_diagnostic_test
 
@@ -118,13 +116,11 @@ class DiagnosticTestQuestionsHandler(
         # Among the two questions, one question should be considered as the
         # main and the other should be considered as the backup.
         skill_id_to_questions_map: Dict[
-            str, List[question_domain.Question]] = (
-                collections.defaultdict(list))
+            str, List[question_domain.Question]] = (collections.defaultdict(list))
 
         for skill_id in diagnostic_test_skill_ids:
             questions = question_services.get_questions_by_skill_ids(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
-                [skill_id],
+                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME, [skill_id],
                 require_medium_difficulty=True
             )
 
@@ -146,9 +142,8 @@ class DiagnosticTestQuestionsHandler(
         # and if they attempted incorrectly then the backup question will be
         # asked otherwise not. The main question and the backup question are of
         # the same difficulty.
-        skill_id_to_questions_dict: Dict[
-            str, Dict[str, question_domain.QuestionDict]] = (
-                collections.defaultdict(dict))
+        skill_id_to_questions_dict: Dict[str, Dict[
+            str, question_domain.QuestionDict]] = (collections.defaultdict(dict))
 
         for skill_id, linked_questions in skill_id_to_questions_map.items():
             if len(linked_questions) < 2:
@@ -158,12 +153,12 @@ class DiagnosticTestQuestionsHandler(
             # question is considered the main question and the second one is
             # considered the backup question.
             skill_id_to_questions_dict[skill_id][
-                feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN] = (
-                    linked_questions[0].to_dict())
+                feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN
+            ] = (linked_questions[0].to_dict())
             skill_id_to_questions_dict[skill_id][
-                feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP] = (
-                    linked_questions[1].to_dict())
+                feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP
+            ] = (linked_questions[1].to_dict())
 
-        self.render_json(
-            {'skill_id_to_questions_dict': skill_id_to_questions_dict}
-        )
+        self.render_json({
+            'skill_id_to_questions_dict': skill_id_to_questions_dict
+        })

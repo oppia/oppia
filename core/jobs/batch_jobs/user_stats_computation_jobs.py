@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Jobs that are run by CRON scheduler."""
 
 from __future__ import annotations
@@ -32,7 +31,7 @@ import apache_beam as beam
 from typing import Iterable
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import user_models
 
@@ -48,72 +47,64 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         user_settings_models = (
-            self.pipeline
-            | 'Get all UserSettingsModels' >> (
-                ndb_io.GetModels(user_models.UserSettingsModel.get_all()))
+            self.pipeline | 'Get all UserSettingsModels' >>
+            (ndb_io.GetModels(user_models.UserSettingsModel.get_all()))
         )
 
         old_user_stats_models = (
-            self.pipeline
-            | 'Get all UserStatsModels' >> (
-                ndb_io.GetModels(user_models.UserStatsModel.get_all()))
+            self.pipeline | 'Get all UserStatsModels' >>
+            (ndb_io.GetModels(user_models.UserStatsModel.get_all()))
         )
 
         # Creates UserStatsModels if it does not exists.
         new_user_stats_models = (
-            (user_settings_models, old_user_stats_models)
-            | 'Merge models' >> beam.Flatten()
+            (user_settings_models, old_user_stats_models) |
+            'Merge models' >> beam.Flatten()
             # Returns a PCollection of
             # (model.id, (user_settings_models, user_stats_models)) or
             # (model.id, (user_settings_models,)).
             | 'Group models with same ID' >> beam.GroupBy(lambda m: m.id)
             # Discards model.id from the PCollection.
-            | 'Get rid of key' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Get rid of key' >> beam.Values()  # pylint: disable=no-value-for-parameter
             # Only keep groupings that indicate that
             # the UserStatsModel is missing.
             | 'Filter pairs of models' >> beam.Filter(
                 lambda models: (
                     len(list(models)) == 1 and
                     isinstance(list(models)[0], user_models.UserSettingsModel)
-                ))
+                )
+            )
             # Choosing the first element.
-            | 'Transform tuples into models' >> beam.Map(
-                lambda models: list(models)[0])
+            |
+            'Transform tuples into models' >> beam.Map(lambda models: list(models)[0])
             # Creates the missing UserStatsModels.
-            | 'Create new user stat models' >> beam.ParDo(
-                CreateUserStatsModel())
+            | 'Create new user stat models' >> beam.ParDo(CreateUserStatsModel())
         )
 
-        unused_put_result = (
-            (new_user_stats_models, old_user_stats_models)
-            | 'Merge new and old models together' >> beam.Flatten()
-            | 'Update the dashboard stats' >> beam.ParDo(
-                UpdateWeeklyCreatorStats())
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
+        unused_put_result = ((new_user_stats_models, old_user_stats_models) |
+                             'Merge new and old models together' >> beam.Flatten() |
+                             'Update the dashboard stats' >>
+                             beam.ParDo(UpdateWeeklyCreatorStats()) |
+                             'Put models into the datastore' >> ndb_io.PutModels())
 
         new_user_stats_job_result = (
-            new_user_stats_models
-            | 'Create new job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult('NEW MODELS'))
+            new_user_stats_models | 'Create new job run result' >>
+            (job_result_transforms.CountObjectsToJobRunResult('NEW MODELS'))
         )
         old_user_stats_job_result = (
-            old_user_stats_models
-            | 'Create old job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult('OLD MODELS'))
+            old_user_stats_models | 'Create old job run result' >>
+            (job_result_transforms.CountObjectsToJobRunResult('OLD MODELS'))
         )
 
-        return (
-            (new_user_stats_job_result, old_user_stats_job_result)
-            | 'Merge new and old results together' >> beam.Flatten()
-        )
+        return ((new_user_stats_job_result, old_user_stats_job_result) |
+                'Merge new and old results together' >> beam.Flatten())
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
+class CreateUserStatsModel(beam.DoFn):  # type: ignore[misc]
     """DoFn to create empty user stats model."""
 
     def process(
@@ -129,8 +120,7 @@ class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
             UserStatsModel. The created user stats model.
         """
         with datastore_services.get_ndb_context():
-            user_stats_model = (
-                user_models.UserStatsModel(id=user_settings_model.id))
+            user_stats_model = (user_models.UserStatsModel(id=user_settings_model.id))
         user_stats_model.update_timestamps()
         yield user_stats_model
 
@@ -139,7 +129,7 @@ class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
+class UpdateWeeklyCreatorStats(beam.DoFn):  # type: ignore[misc]
     """DoFn to update weekly dashboard stats in the user stats model."""
 
     def process(

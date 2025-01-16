@@ -106,7 +106,7 @@ class CommonTests(test_utils.GenericTestBase):
             servers, 'managed_ng_build', mock_context_manager, expected_args=[]
         )
         swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1, )]
+            sys, 'exit', lambda _: None, expected_args=[(1,)]
         )
         with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
             common.run_ng_compilation()
@@ -145,13 +145,11 @@ class CommonTests(test_utils.GenericTestBase):
             os.path,
             'isdir',
             lambda _: False,
-            expected_args=[
-                ('dist/oppia-angular', ), ('dist/oppia-angular', ),
-                ('dist/oppia-angular', )
-            ]
+            expected_args=[('dist/oppia-angular',), ('dist/oppia-angular',),
+                           ('dist/oppia-angular',)]
         )
         swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1, ), (1, ), (1, )]
+            sys, 'exit', lambda _: None, expected_args=[(1,), (1,), (1,)]
         )
         with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
             common.run_ng_compilation()
@@ -207,24 +205,32 @@ class CommonTests(test_utils.GenericTestBase):
         )
 
     def test_ensure_directory_exists_with_existing_dir(self) -> None:
-        check_function_calls = {'makedirs_gets_called': False}
+        check_function_calls = {
+            'makedirs_gets_called': False
+        }
 
         def mock_makedirs(unused_dirpath: str) -> None:
             check_function_calls['makedirs_gets_called'] = True
 
         with self.swap(os, 'makedirs', mock_makedirs):
             common.ensure_directory_exists('assets')
-        self.assertEqual(check_function_calls, {'makedirs_gets_called': False})
+        self.assertEqual(check_function_calls, {
+            'makedirs_gets_called': False
+        })
 
     def test_ensure_directory_exists_with_non_existing_dir(self) -> None:
-        check_function_calls = {'makedirs_gets_called': False}
+        check_function_calls = {
+            'makedirs_gets_called': False
+        }
 
         def mock_makedirs(unused_dirpath: str) -> None:
             check_function_calls['makedirs_gets_called'] = True
 
         with self.swap(os, 'makedirs', mock_makedirs):
             common.ensure_directory_exists('test-dir')
-        self.assertEqual(check_function_calls, {'makedirs_gets_called': True})
+        self.assertEqual(check_function_calls, {
+            'makedirs_gets_called': True
+        })
 
     def test_require_cwd_to_be_oppia_with_correct_cwd_and_unallowed_deploy_dir(
         self
@@ -245,7 +251,8 @@ class CommonTests(test_utils.GenericTestBase):
 
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         with getcwd_swap, self.assertRaisesRegex(
-                Exception, 'Please run this script from the oppia/ directory.'):
+            Exception, 'Please run this script from the oppia/ directory.'
+        ):
             common.require_cwd_to_be_oppia()
 
     def test_require_cwd_to_be_oppia_with_wrong_cwd_and_allowed_deploy_dir(
@@ -423,8 +430,9 @@ class CommonTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
-                Exception,
-                'ERROR: There is no existing remote alias for the url3, url4 repo.'):
+            Exception,
+            'ERROR: There is no existing remote alias for the url3, url4 repo.'
+        ):
             common.get_remote_alias(['url3', 'url4'])
 
     def test_verify_local_repo_is_clean_with_clean_repo(self) -> None:
@@ -442,7 +450,8 @@ class CommonTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
-                Exception, 'ERROR: This script should be run from a clean branch.'):
+            Exception, 'ERROR: This script should be run from a clean branch.'
+        ):
             common.verify_local_repo_is_clean()
 
     def test_get_current_branch_name(self) -> None:
@@ -600,8 +609,8 @@ class CommonTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
-                Exception,
-                'ERROR: This script can only be run from the "test" branch.'):
+            Exception, 'ERROR: This script can only be run from the "test" branch.'
+        ):
             common.verify_current_branch_name('test')
 
     def test_is_port_in_use(self) -> None:
@@ -618,7 +627,7 @@ class CommonTests(test_utils.GenericTestBase):
             return True
 
         sleep_swap = self.swap_with_checks(
-            time, 'sleep', mock_sleep, expected_args=[(1, )] * 60
+            time, 'sleep', mock_sleep, expected_args=[(1,)] * 60
         )
         is_port_in_use_swap = self.swap(common, 'is_port_in_use', mock_is_port_in_use)
 
@@ -653,10 +662,10 @@ class CommonTests(test_utils.GenericTestBase):
             pass
 
         sleep_swap = self.swap_with_checks(
-            time, 'sleep', mock_sleep, expected_args=[(1, )] * 60 * 5
+            time, 'sleep', mock_sleep, expected_args=[(1,)] * 60 * 5
         )
         is_port_in_use_swap = self.swap(common, 'is_port_in_use', mock_is_port_in_use)
-        exit_swap = self.swap_with_checks(sys, 'exit', mock_exit, expected_args=[(1, )])
+        exit_swap = self.swap_with_checks(sys, 'exit', mock_exit, expected_args=[(1,)])
 
         with sleep_swap, is_port_in_use_swap, exit_swap:
             common.wait_for_port_to_be_in_use(9999)
@@ -739,9 +748,9 @@ class CommonTests(test_utils.GenericTestBase):
 
         target_stdout = io.StringIO()
         with _redirect_stdout(target_stdout):
-            common.print_each_string_after_two_new_lines(
-                ['These', 'are', 'sample', 'strings.']
-            )
+            common.print_each_string_after_two_new_lines([
+                'These', 'are', 'sample', 'strings.'
+            ])
 
         self.assertEqual(
             target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n'
@@ -820,10 +829,10 @@ class CommonTests(test_utils.GenericTestBase):
 
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegex(
-                Exception,
-                'No personal access token provided, please set up a personal '
-                'access token at https://github.com/settings/tokens and re-run '
-                'the script'):
+            Exception, 'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script'
+        ):
             common.get_personal_access_token()
 
     def test_inplace_replace_file(self) -> None:
@@ -873,7 +882,8 @@ class CommonTests(test_utils.GenericTestBase):
             origin_content = f.readlines()
 
         with self.assertRaisesRegex(
-                ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'):
+            ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
+        ):
             common.inplace_replace_file(
                 origin_filepath,
                 '"DEV_MODEa": .*',
@@ -908,7 +918,8 @@ class CommonTests(test_utils.GenericTestBase):
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
         with self.assertRaisesRegex(
-                ValueError, re.escape('Exception raised from compile()')), compile_swap:
+            ValueError, re.escape('Exception raised from compile()')
+        ), compile_swap:
             common.inplace_replace_file(
                 origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,'
             )
@@ -939,8 +950,8 @@ class CommonTests(test_utils.GenericTestBase):
 
         chdir_swap = self.swap_with_checks(
             os, 'chdir', mock_chdir, expected_args=[
-                ('/new/path', ),
-                ('/old/path', ),
+                ('/new/path',),
+                ('/old/path',),
             ]
         )
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
@@ -980,9 +991,8 @@ class CommonTests(test_utils.GenericTestBase):
             os,
             'write',
             write_raise_oserror,
-            expected_args=(
-                (sys.stdout.fileno(), b'test'), (sys.stdout.fileno(), b'test')
-            )
+            expected_args=((sys.stdout.fileno(), b'test'),
+                           (sys.stdout.fileno(), b'test'))
         )
         with write_swap:
             # This test makes sure that when write fails (with errno.EAGAIN)
@@ -1024,9 +1034,10 @@ class CommonTests(test_utils.GenericTestBase):
                 important attributes or behaviors.
         """
         default_context = ssl.create_default_context()
-        for attribute in ('verify_flags', 'verify_mode', 'protocol',
-                          'hostname_checks_common_name', 'options', 'minimum_version',
-                          'maximum_version', 'check_hostname'):
+        for attribute in (
+            'verify_flags', 'verify_mode', 'protocol', 'hostname_checks_common_name',
+            'options', 'minimum_version', 'maximum_version', 'check_hostname'
+        ):
             self.assertEqual(
                 getattr(context, attribute), getattr(default_context, attribute)
             )
@@ -1066,8 +1077,9 @@ class CommonTests(test_utils.GenericTestBase):
         isfile_swap = self.swap(os.path, 'isfile', lambda _: False)
         print_swap = self.swap(builtins, 'print', mock_print)
 
-        with print_swap, isfile_swap, self.assertRaisesRegex(Exception,
-                                                             'Chrome not found.'):
+        with print_swap, isfile_swap, self.assertRaisesRegex(
+            Exception, 'Chrome not found.'
+        ):
             common.setup_chrome_bin_env_variable()
         self.assertIn('Chrome is not found, stopping...', print_arr)
 
@@ -1289,9 +1301,9 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertTrue(common.is_oppia_server_already_running())
 
     def test_start_subprocess_for_result(self) -> None:
-        process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        process = subprocess.Popen(['echo', 'test'],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
         def mock_popen( # pylint: disable=unused-argument
             cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:
@@ -1334,9 +1346,9 @@ class UrlRetrieveTests(CommonTests):
 
         self.curl_is_called = False
 
-        successful_mock_curl_process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        successful_mock_curl_process = subprocess.Popen(['echo', 'test'],
+                                                        stdout=subprocess.PIPE,
+                                                        stderr=subprocess.PIPE)
         def mock_successful_curl_popen(  # pylint: disable=unused-argument
             cmd_tokens: List[str], stdout: int, stderr: int, encoding: str
         ) -> subprocess.Popen[bytes]:
@@ -1462,8 +1474,9 @@ class UrlRetrieveTests(CommonTests):
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
 
         with open_swap, urlopen_swap, self.swap_curl_failure:
-            with self.assertRaisesRegex(Exception,
-                                        'The URL http://example.com should use HTTPS.'):
+            with self.assertRaisesRegex(
+                Exception, 'The URL http://example.com should use HTTPS.'
+            ):
                 common.url_retrieve('http://example.com', 'test_path')
 
     def test_url_retrieve_with_successful_http_works(self) -> None:

@@ -13,13 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for ItemSelectionInput.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.ItemSelectionInput import ItemSelectionInput # pylint: disable=unused-import, line-too-long # isort: skip
+from extensions.interactions.ItemSelectionInput import ItemSelectionInput  # pylint: disable=unused-import, line-too-long # isort: skip
 
 
 class ItemSelectionInputTests(test_utils.GenericTestBase):

@@ -59,7 +59,9 @@ def create_evaluation_context_for_client(
         EvaluationContext. The context for evaluation.
     """
     return platform_parameter_domain.EvaluationContext.from_dict(
-        client_context_dict, {'server_mode': get_server_mode()}
+        client_context_dict, {
+            'server_mode': get_server_mode()
+        }
     )
 
 
@@ -126,12 +128,12 @@ def _create_evaluation_context_for_server(
         else:
             current_app_version = current_app_version.replace('-', '.')
 
-    return platform_parameter_domain.EvaluationContext.from_dict(
-        {
-            'platform_type': 'Web',
-            'app_version': current_app_version,
-        }, {'server_mode': get_server_mode()}
-    )
+    return platform_parameter_domain.EvaluationContext.from_dict({
+        'platform_type': 'Web',
+        'app_version': current_app_version,
+    }, {
+        'server_mode': get_server_mode()
+    })
 
 
 def get_platform_parameter_value(
@@ -179,7 +181,9 @@ def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
     parameter = registry.Registry.get_platform_parameter(param_name)
     if DATA_TYPE_TO_SCHEMA_TYPE.get(parameter.data_type) is not None:
         schema_type = copy.deepcopy(DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type])
-        return {'type': schema_type}
+        return {
+            'type': schema_type
+        }
     else:
         raise Exception(
             'The %s platform parameter has a data type of %s which is not '

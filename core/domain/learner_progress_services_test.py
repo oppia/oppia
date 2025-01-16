@@ -45,7 +45,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models, ) = models.Registry.import_models([models.Names.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class IncompleteExplorationDetailsDict(TypedDict):
@@ -205,14 +205,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         subtopic_page_services.save_subtopic_page(
             self.owner_id, subtopic_page, 'Added subtopic', [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Sample',
-                        'url_fragment': 'dummy-fragment'
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample',
+                    'url_fragment': 'dummy-fragment'
+                })
             ]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -222,22 +220,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
 
         changelist = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': 'node_1',
-                    'title': 'Title 1'
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                    'old_value': None,
-                    'new_value': self.EXP_ID_4,
-                    'node_id': 'node_1'
-                }
-            )
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_4,
+                'node_id': 'node_1'
+            })
         ]
         story_services.update_story(
             self.owner_id, self.STORY_ID_0, changelist, 'Added node.'
@@ -264,14 +258,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         subtopic_page_services.save_subtopic_page(
             self.owner_id, subtopic_page, 'Added subtopic', [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Sample',
-                        'url_fragment': 'fragment'
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample',
+                    'url_fragment': 'fragment'
+                })
             ]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -281,22 +273,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
 
         changelist = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': 'node_1',
-                    'title': 'Title 1'
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                    'old_value': None,
-                    'new_value': self.EXP_ID_5,
-                    'node_id': 'node_1'
-                }
-            )
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_5,
+                'node_id': 'node_1'
+            })
         ]
 
         story_services.update_story(
@@ -324,14 +312,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         subtopic_page_services.save_subtopic_page(
             self.owner_id, subtopic_page, 'Added subtopic', [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Sample',
-                        'url_fragment': 'sample-fragment'
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample',
+                    'url_fragment': 'sample-fragment'
+                })
             ]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -361,14 +347,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         subtopic_page_services.save_subtopic_page(
             self.owner_id, subtopic_page, 'Added subtopic', [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Sample',
-                        'url_fragment': 'sample-fragment'
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample',
+                    'url_fragment': 'sample-fragment'
+                })
             ]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -2243,7 +2227,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     def test_get_all_activity_progress(self) -> None:
         # Add topics to config_domain.
         self.save_new_valid_classroom(
-            topic_id_to_prerequisite_topic_ids={self.TOPIC_ID_3: []}
+            topic_id_to_prerequisite_topic_ids={
+                self.TOPIC_ID_3: []
+            }
         )
 
         # Add activities to the completed section.
@@ -2360,12 +2346,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)
         # Add an exploration to a collection that has already been completed.
         collection_services.update_collection(
-            self.owner_id, self.COL_ID_0, [
-                {
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': self.EXP_ID_2
-                }
-            ], 'Add new exploration'
+            self.owner_id, self.COL_ID_0, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID_2
+            }], 'Add new exploration'
         )
 
         # Delete a topic in the learn section of the learner goals.
@@ -2373,22 +2357,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Add a node to a story that has already been completed.
         changelist = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': 'node_2',
-                    'title': 'Title 2'
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                    'old_value': None,
-                    'new_value': self.EXP_ID_6,
-                    'node_id': 'node_2'
-                }
-            )
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_2',
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_6,
+                'node_id': 'node_2'
+            })
         ]
 
         # Update the story.

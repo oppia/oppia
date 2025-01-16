@@ -46,10 +46,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         translation_dict = {
-            'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.', translation_domain.TranslatableContentFormat.HTML,
-                True
-            )
+            'content_id_3':
+                translation_domain.TranslatedContent(
+                    'My name is Nikhil.',
+                    translation_domain.TranslatableContentFormat.HTML, True
+                )
         }
         self.dummy_entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
@@ -67,21 +68,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content_0',
             'html': '<p>state content html</p>'
         }
-        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'content_id': 'ca_choices_0',
-                'html': '<p>state customization arg html 1</p>'
-            }, {
-                'content_id': 'ca_choices_1',
-                'html': '<p>state customization arg html 2</p>'
-            }, {
-                'content_id': 'ca_choices_2',
-                'html': '<p>state customization arg html 3</p>'
-            }, {
-                'content_id': 'ca_choices_3',
-                'html': '<p>state customization arg html 4</p>'
-            }
-        ]
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [{
+            'content_id': 'ca_choices_0',
+            'html': '<p>state customization arg html 1</p>'
+        }, {
+            'content_id': 'ca_choices_1',
+            'html': '<p>state customization arg html 2</p>'
+        }, {
+            'content_id': 'ca_choices_2',
+            'html': '<p>state customization arg html 3</p>'
+        }, {
+            'content_id': 'ca_choices_3',
+            'html': '<p>state customization arg html 4</p>'
+        }]
         state_customization_args_dict: (state_domain.CustomizationArgsDictType) = {
             'choices': {
                 'value': choices_subtitled_dicts
@@ -97,34 +96,31 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False, [], None, None
             ), [
                 state_domain.RuleSpec(
-                    'IsEqualToOrdering',
-                    {'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]}
+                    'IsEqualToOrdering', {
+                        'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
+                    }
                 ),
                 state_domain.RuleSpec(
                     'HasElementXAtPositionY', {
                         'x': '<p>HasElementXAtPositionY rule_spec '
-                        'html</p>',
+                             'html</p>',
                         'y': 2
                     }
                 ),
                 state_domain.RuleSpec(
                     'HasElementXBeforeElementY', {
                         'x': '<p>x input for HasElementXAtPositionY '
-                        'rule_spec </p>',
+                             'rule_spec </p>',
                         'y': '<p>y input for HasElementXAtPositionY '
-                        'rule_spec </p>'
+                             'rule_spec </p>'
                     }
                 ),
                 state_domain.RuleSpec(
                     'IsEqualToOrderingWithOneItemAtIncorrectPosition', {
-                        'x': [
-                            [
-                                (
-                                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPos'
-                                    'ition rule_spec htmls</p>'
-                                )
-                            ]
-                        ]
+                        'x': [[(
+                            '<p>IsEqualToOrderingWithOneItemAtIncorrectPos'
+                            'ition rule_spec htmls</p>'
+                        )]]
                     }
                 )
             ], [], None
@@ -152,12 +148,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_solution_dict = {
             'answer_is_exclusive': True,
-            'correct_answer': [
-                ['<p>state customization arg html 1</p>'],
-                ['<p>state customization arg html 2</p>'],
-                ['<p>state customization arg html 3</p>'],
-                ['<p>state customization arg html 4</p>']
-            ],
+            'correct_answer': [['<p>state customization arg html 1</p>'],
+                               ['<p>state customization arg html 2</p>'],
+                               ['<p>state customization arg html 3</p>'],
+                               ['<p>state customization arg html 4</p>']],
             'explanation': {
                 'content_id': 'solution_3',
                 'html': '<p>This is solution for state1</p>'
@@ -392,20 +386,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False, [], None, None
             ), [
                 state_domain.RuleSpec(
-                    'Equals', {'x': ['<p>Equals rule_spec html</p>']}
+                    'Equals', {
+                        'x': ['<p>Equals rule_spec html</p>']
+                    }
                 ),
                 state_domain.RuleSpec(
-                    'ContainsAtLeastOneOf',
-                    {'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']}
+                    'ContainsAtLeastOneOf', {
+                        'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
+                    }
                 ),
                 state_domain.RuleSpec(
-                    'IsProperSubsetOf',
-                    {'x': ['<p>IsProperSubsetOf rule_spec html</p>']}
+                    'IsProperSubsetOf', {
+                        'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                    }
                 ),
                 state_domain.RuleSpec(
-                    'DoesNotContainAtLeastOneOf',
-                    {'x': ['<p>DoesNotContainAtLeastOneOf rule_'
-                           'spec html</p>']}
+                    'DoesNotContainAtLeastOneOf', {
+                        'x': ['<p>DoesNotContainAtLeastOneOf rule_'
+                              'spec html</p>']
+                    }
                 )
             ], [], None
         )
@@ -515,20 +514,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False, [], None, None
             ), [
                 state_domain.RuleSpec(
-                    'Equals', {'x': ['<p>Equals rule_spec html</p>']}
+                    'Equals', {
+                        'x': ['<p>Equals rule_spec html</p>']
+                    }
                 ),
                 state_domain.RuleSpec(
-                    'ContainsAtLeastOneOf',
-                    {'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']}
+                    'ContainsAtLeastOneOf', {
+                        'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
+                    }
                 ),
                 state_domain.RuleSpec(
-                    'IsProperSubsetOf',
-                    {'x': ['<p>IsProperSubsetOf rule_spec html</p>']}
+                    'IsProperSubsetOf', {
+                        'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                    }
                 ),
                 state_domain.RuleSpec(
-                    'DoesNotContainAtLeastOneOf',
-                    {'x': ['<p>DoesNotContainAtLeastOneOf rule_'
-                           'spec html</p>']}
+                    'DoesNotContainAtLeastOneOf', {
+                        'x': ['<p>DoesNotContainAtLeastOneOf rule_'
+                              'spec html</p>']
+                    }
                 )
             ], [], None
         )
@@ -549,10 +553,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                       classmethod(mock_get_html_field_types_to_rule_specs)):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegex(
-                    Exception, 'The rule spec does not belong to a valid format.'):
+                Exception, 'The rule spec does not belong to a valid format.'
+            ):
                 state_domain.State.convert_html_fields_in_state(
                     state.to_dict(), lambda x: x
                 )
@@ -574,15 +581,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'value': 1
                 },
                 'choices': {
-                    'value': [
-                        {
-                            'content_id': None,
-                            'html': '<p>init_state customization arg html 1</p>'
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': '<p>init_state customization arg html 2</p>'
-                        }
-                    ]
+                    'value': [{
+                        'content_id': None,
+                        'html': '<p>init_state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>init_state customization arg html 2</p>'
+                    }]
                 }
             }
 
@@ -591,8 +596,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         state.update_interaction_id('ItemSelectionInput')
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected content id to be a string, received None'):
+            utils.ValidationError, 'Expected content id to be a string, received None'
+        ):
             state.update_interaction_customization_args(
                 state_customization_args_dict
             )  # type: ignore[arg-type]
@@ -612,26 +617,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 False, [], None, None
             ), [
                 state_domain.RuleSpec(
-                    'Equals', {'x': ['<p>init_state customization arg html 1</p>']}
+                    'Equals', {
+                        'x': ['<p>init_state customization arg html 1</p>']
+                    }
                 )
             ], [], None
         )
 
-        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'content_id': 'ca_choices_0',
-                'html': '<p>init_state customization arg html 1</p>'
-            }, {
-                'content_id': 'ca_choices_1',
-                'html': '<p>init_state customization arg html 2</p>'
-            }, {
-                'content_id': 'ca_choices_2',
-                'html': '<p>init_state customization arg html 3</p>'
-            }, {
-                'content_id': 'ca_choices_3',
-                'html': '<p>init_state customization arg html 4</p>'
-            }
-        ]
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [{
+            'content_id': 'ca_choices_0',
+            'html': '<p>init_state customization arg html 1</p>'
+        }, {
+            'content_id': 'ca_choices_1',
+            'html': '<p>init_state customization arg html 2</p>'
+        }, {
+            'content_id': 'ca_choices_2',
+            'html': '<p>init_state customization arg html 3</p>'
+        }, {
+            'content_id': 'ca_choices_3',
+            'html': '<p>init_state customization arg html 4</p>'
+        }]
 
         state_customization_args_dict: Dict[str, Dict[str, Union[
             List[state_domain.SubtitledHtmlDict], int]]] = {
@@ -664,12 +669,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                       classmethod(mock_get_html_field_types_to_rule_specs)):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegex(
-                    Exception,
-                    'Rule spec should have at least one valid input variable with '
-                    'Html in it.'):
+                Exception,
+                'Rule spec should have at least one valid input variable with '
+                'Html in it.'
+            ):
                 state_domain.State.convert_html_fields_in_state(
                     state.to_dict(), lambda x: x
                 )
@@ -686,21 +694,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'content_id': 'ca_choices_0',
-                'html': '<p>state customization arg html 1</p>'
-            }, {
-                'content_id': 'ca_choices_1',
-                'html': '<p>state customization arg html 2</p>'
-            }, {
-                'content_id': 'ca_choices_2',
-                'html': '<p>state customization arg html 3</p>'
-            }, {
-                'content_id': 'ca_choices_3',
-                'html': '<p>state customization arg html 4</p>'
-            }
-        ]
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [{
+            'content_id': 'ca_choices_0',
+            'html': '<p>state customization arg html 1</p>'
+        }, {
+            'content_id': 'ca_choices_1',
+            'html': '<p>state customization arg html 2</p>'
+        }, {
+            'content_id': 'ca_choices_2',
+            'html': '<p>state customization arg html 3</p>'
+        }, {
+            'content_id': 'ca_choices_3',
+            'html': '<p>state customization arg html 4</p>'
+        }]
         state_customization_args_dict: Dict[str, Dict[str, Union[
             List[state_domain.SubtitledHtmlDict], bool]]] = {
                 'choices': {
@@ -721,12 +727,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
-            'correct_answer': [
-                ['<p>state customization arg html 1</p>'],
-                ['<p>state customization arg html 2</p>'],
-                ['<p>state customization arg html 3</p>'],
-                ['<p>state customization arg html 4</p>']
-            ],
+            'correct_answer': [['<p>state customization arg html 1</p>'],
+                               ['<p>state customization arg html 2</p>'],
+                               ['<p>state customization arg html 3</p>'],
+                               ['<p>state customization arg html 4</p>']],
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>This is solution for state1</p>'
@@ -761,10 +765,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                       classmethod(mock_get_html_field_types_to_rule_specs)):
-            with self.assertRaisesRegex(Exception, 'The solution does not have a valid '
-                                        'correct_answer type.'):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
+            with self.assertRaisesRegex(
+                Exception, 'The solution does not have a valid '
+                'correct_answer type.'
+            ):
                 state_domain.State.convert_html_fields_in_state(
                     state.to_dict(), lambda x: x
                 )
@@ -848,15 +856,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state = exploration.states['text']
 
-        expected_training_data = [
-            {
-                'answer_group_index': 1,
-                'answers': [
-                    'cheerful', 'merry', 'ecstatic', 'glad', 'overjoyed', 'pleased',
-                    'thrilled', 'smile'
-                ]
-            }
-        ]
+        expected_training_data = [{
+            'answer_group_index':
+                1,
+            'answers': [
+                'cheerful', 'merry', 'ecstatic', 'glad', 'overjoyed', 'pleased',
+                'thrilled', 'smile'
+            ]
+        }]
 
         observed_training_data = state.get_training_data()
 
@@ -890,7 +897,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
-                'content_id': 'solution',
+                'content_id':
+                    'solution',
                 'html': (
                     '<oppia-noninteractive-collapsible content-with-value='
                     '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
@@ -987,46 +995,43 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         init_state.update_content(
-            state_domain.SubtitledHtml.from_dict(
-                {
-                    'content_id': 'content_0',
-                    'html': (
-                        '<oppia-noninteractive-tabs tab_contents-with-value'
-                        '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
-                        '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
-                        'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
-                        'quot;:&amp;quot;hello&amp;quot;}]\">'
-                        '</oppia-noninteractive-tabs>'
-                    )
-                }
-            )
+            state_domain.SubtitledHtml.from_dict({
+                'content_id':
+                    'content_0',
+                'html': (
+                    '<oppia-noninteractive-tabs tab_contents-with-value'
+                    '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
+                    '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
+                    'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
+                    'quot;:&amp;quot;hello&amp;quot;}]\">'
+                    '</oppia-noninteractive-tabs>'
+                )
+            })
         )
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
-            state_domain.SubtitledHtml.from_dict(
-                {
-                    'content_id': 'content_0',
-                    'html': (
-                        '<p><oppia-noninteractive-link text-with-value="'
-                        '&amp;quot;What is a link?&amp;quot;" url-with-'
-                        'value="&amp;quot;htt://link.com&amp'
-                        ';quot;"></oppia-noninteractive-link></p>'
-                    )
-                }
-            )
+            state_domain.SubtitledHtml.from_dict({
+                'content_id':
+                    'content_0',
+                'html': (
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            })
         )
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
-            state_domain.SubtitledHtml.from_dict(
-                {
-                    'content_id': 'content_0',
-                    'html': (
-                        '<p><oppia-noninteractive-skillreview text-with-value="'
-                        '&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;'
-                        '&amp;quot;"></oppia-noninteractive-skillreview></p>'
-                    )
-                }
-            )
+            state_domain.SubtitledHtml.from_dict({
+                'content_id':
+                    'content_0',
+                'html': (
+                    '<p><oppia-noninteractive-skillreview text-with-value="'
+                    '&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;'
+                    '&amp;quot;"></oppia-noninteractive-skillreview></p>'
+                )
+            })
         )
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
@@ -1159,7 +1164,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.rename_state('State 2', 'END')
 
         default_outcome = exploration.states['Renamed state'
-                                             ].interaction.default_outcome
+                                            ].interaction.default_outcome
         assert default_outcome is not None
         # Ensure the other states are connected to END.
         default_outcome.dest = 'State 2'
@@ -1184,7 +1189,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # The exploration should NOT be terminable even though it has a state
         # called 'END' and everything else is connected to it.
         with self.assertRaisesRegex(
-                Exception, 'This state does not have any interaction specified.'):
+            Exception, 'This state does not have any interaction specified.'
+        ):
             exploration.validate(strict=True)
 
         # Renaming the node to something other than 'END' and giving it an
@@ -1223,8 +1229,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(
-                Exception,
-            ('Expected solicit_answer_details to be a boolean, received')):
+            Exception, ('Expected solicit_answer_details to be a boolean, received')
+        ):
             init_state.update_solicit_answer_details('abc')  # type: ignore[arg-type]
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
@@ -1265,7 +1271,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
         with self.assertRaisesRegex(
-                Exception, ('Expected card_is_checkpoint to be a boolean, received')):
+            Exception, ('Expected card_is_checkpoint to be a boolean, received')
+        ):
             init_state.update_card_is_checkpoint('abc')  # type: ignore[arg-type]
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
@@ -1298,36 +1305,34 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': [[html_with_old_math_schema]]
-                    },
-                    'rule_type': 'IsEqualToOrdering'
-                }, {
-                    'rule_type': 'HasElementXAtPositionY',
-                    'inputs': {
-                        'x': html_with_old_math_schema,
-                        'y': 2
-                    }
-                }, {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': [[html_with_old_math_schema]]
-                    }
-                }, {
-                    'rule_type': 'HasElementXBeforeElementY',
-                    'inputs': {
-                        'x': html_with_old_math_schema,
-                        'y': html_with_old_math_schema
-                    }
-                }, {
-                    'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                    'inputs': {
-                        'x': [[html_with_old_math_schema]]
-                    }
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': html_with_old_math_schema,
+                    'y': 2
                 }
-            ],
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': html_with_old_math_schema,
+                    'y': html_with_old_math_schema
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                }
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1344,54 +1349,50 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': [[html_with_new_math_schema]]
-                    },
-                    'rule_type': 'IsEqualToOrdering'
-                }, {
-                    'rule_type': 'HasElementXAtPositionY',
-                    'inputs': {
-                        'x': html_with_new_math_schema,
-                        'y': 2
-                    }
-                }, {
-                    'rule_type': 'IsEqualToOrdering',
-                    'inputs': {
-                        'x': [[html_with_new_math_schema]]
-                    }
-                }, {
-                    'rule_type': 'HasElementXBeforeElementY',
-                    'inputs': {
-                        'x': html_with_new_math_schema,
-                        'y': html_with_new_math_schema
-                    }
-                }, {
-                    'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                    'inputs': {
-                        'x': [[html_with_new_math_schema]]
-                    }
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': html_with_new_math_schema,
+                    'y': 2
                 }
-            ],
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': html_with_new_math_schema,
+                    'y': html_with_new_math_schema
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                }
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'content_id': 'ca_choices_0',
-                'html': html_with_old_math_schema
-            }, {
-                'content_id': 'ca_choices_1',
-                'html': '<p>2</p>'
-            }, {
-                'content_id': 'ca_choices_2',
-                'html': '<p>3</p>'
-            }, {
-                'content_id': 'ca_choices_3',
-                'html': '<p>4</p>'
-            }
-        ]
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [{
+            'content_id': 'ca_choices_0',
+            'html': html_with_old_math_schema
+        }, {
+            'content_id': 'ca_choices_1',
+            'html': '<p>2</p>'
+        }, {
+            'content_id': 'ca_choices_2',
+            'html': '<p>3</p>'
+        }, {
+            'content_id': 'ca_choices_3',
+            'html': '<p>4</p>'
+        }]
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content_0',
@@ -1408,7 +1409,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id':
+                            'default_outcome',
                         'html': (
                             '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
@@ -1433,25 +1435,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'DragAndDropSortInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
-                        }
-                    }, {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
-                        }
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': html_with_old_math_schema
                     }
-                ],
+                }, {
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': html_with_old_math_schema
+                    }
+                }],
                 'solution': {
                     'answer_is_exclusive': True,
-                    'correct_answer': [
-                        [html_with_old_math_schema], ['<p>2</p>'], ['<p>3</p>'],
-                        ['<p>4</p>']
-                    ],
+                    'correct_answer': [[html_with_old_math_schema], ['<p>2</p>'],
+                                       ['<p>3</p>'], ['<p>4</p>']],
                     'explanation': {
                         'content_id': 'solution',
                         'html': '<p>This is solution for state1</p>'
@@ -1479,7 +1477,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id':
+                            'default_outcome',
                         'html': (
                             '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
@@ -1496,21 +1495,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_0',
-                                'html': html_with_new_math_schema
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>2</p>'
-                            }, {
-                                'content_id': 'ca_choices_2',
-                                'html': '<p>3</p>'
-                            }, {
-                                'content_id': 'ca_choices_3',
-                                'html': '<p>4</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_with_new_math_schema
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>4</p>'
+                        }]
                     },
                     'allowMultipleItemsInSamePosition': {
                         'value': True
@@ -1518,25 +1515,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'DragAndDropSortInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
-                        }
-                    }, {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
-                        }
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': html_with_new_math_schema
                     }
-                ],
+                }, {
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': html_with_new_math_schema
+                    }
+                }],
                 'solution': {
                     'answer_is_exclusive': True,
-                    'correct_answer': [
-                        [html_with_new_math_schema], ['<p>2</p>'], ['<p>3</p>'],
-                        ['<p>4</p>']
-                    ],
+                    'correct_answer': [[html_with_new_math_schema], ['<p>2</p>'],
+                                       ['<p>3</p>'], ['<p>4</p>']],
                     'explanation': {
                         'content_id': 'solution',
                         'html': '<p>This is solution for state1</p>'
@@ -1570,105 +1563,95 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>'
         )
-        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [
-            {
-                'rule_specs': [
-                    {
-                        'rule_type': 'Equals',
-                        'inputs': {
-                            'x': [html_with_old_math_schema]
-                        }
-                    }, {
-                        'rule_type': 'ContainsAtLeastOneOf',
-                        'inputs': {
-                            'x': [html_with_old_math_schema]
-                        }
-                    }, {
-                        'rule_type': 'IsProperSubsetOf',
-                        'inputs': {
-                            'x': [html_with_old_math_schema]
-                        }
-                    }, {
-                        'rule_type': 'DoesNotContainAtLeastOneOf',
-                        'inputs': {
-                            'x': [html_with_old_math_schema]
-                        }
-                    }
-                ],
-                'outcome': {
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback',
-                        'html': html_with_old_math_schema
-                    },
-                    'param_changes': [],
-                    'labelled_as_correct': False,
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'IsProperSubsetOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'DoesNotContainAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': html_with_old_math_schema
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
 
-        answer_group_with_new_math_schema = [
-            {
-                'rule_specs': [
-                    {
-                        'rule_type': 'Equals',
-                        'inputs': {
-                            'x': [html_with_new_math_schema]
-                        }
-                    }, {
-                        'rule_type': 'ContainsAtLeastOneOf',
-                        'inputs': {
-                            'x': [html_with_new_math_schema]
-                        }
-                    }, {
-                        'rule_type': 'IsProperSubsetOf',
-                        'inputs': {
-                            'x': [html_with_new_math_schema]
-                        }
-                    }, {
-                        'rule_type': 'DoesNotContainAtLeastOneOf',
-                        'inputs': {
-                            'x': [html_with_new_math_schema]
-                        }
-                    }
-                ],
-                'outcome': {
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback',
-                        'html': html_with_new_math_schema
-                    },
-                    'param_changes': [],
-                    'labelled_as_correct': False,
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        answer_group_with_new_math_schema = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [html_with_new_math_schema]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_new_math_schema]
+                }
+            }, {
+                'rule_type': 'IsProperSubsetOf',
+                'inputs': {
+                    'x': [html_with_new_math_schema]
+                }
+            }, {
+                'rule_type': 'DoesNotContainAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_new_math_schema]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': html_with_new_math_schema
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
 
-        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'content_id': 'ca_choices_0',
-                'html': '<p>init_state customization arg html 1</p>'
-            }, {
-                'content_id': 'ca_choices_1',
-                'html': html_with_old_math_schema
-            }, {
-                'content_id': 'ca_choices_2',
-                'html': '<p>init_state customization arg html 3</p>'
-            }, {
-                'content_id': 'ca_choices_3',
-                'html': '<p>init_state customization arg html 4</p>'
-            }
-        ]
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [{
+            'content_id': 'ca_choices_0',
+            'html': '<p>init_state customization arg html 1</p>'
+        }, {
+            'content_id': 'ca_choices_1',
+            'html': html_with_old_math_schema
+        }, {
+            'content_id': 'ca_choices_2',
+            'html': '<p>init_state customization arg html 3</p>'
+        }, {
+            'content_id': 'ca_choices_3',
+            'html': '<p>init_state customization arg html 4</p>'
+        }]
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content_0',
@@ -1698,7 +1681,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id':
+                            'default_outcome',
                         'html': (
                             '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
@@ -1762,7 +1746,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id':
+                            'default_outcome',
                         'html': (
                             '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
@@ -1785,21 +1770,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>init_state customization arg html 1</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': html_with_new_math_schema
-                            }, {
-                                'content_id': 'ca_choices_2',
-                                'html': '<p>init_state customization arg html 3</p>'
-                            }, {
-                                'content_id': 'ca_choices_3',
-                                'html': '<p>init_state customization arg html 4</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>init_state customization arg html 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': html_with_new_math_schema
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>init_state customization arg html 3</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>init_state customization arg html 4</p>'
+                        }]
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -1928,20 +1911,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 'confirmed_unclassified_answers': [],
-                'id': 'TextInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
-                        }
-                    }, {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
-                        }
+                'id':
+                    'TextInput',
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': html_with_old_math_schema
                     }
-                ]
+                }, {
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': html_with_old_math_schema
+                    }
+                }]
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
@@ -1996,20 +1978,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 'confirmed_unclassified_answers': [],
-                'id': 'TextInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
-                        }
-                    }, {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
-                        }
+                'id':
+                    'TextInput',
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': html_with_new_math_schema
                     }
-                ]
+                }, {
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': html_with_new_math_schema
+                    }
+                }]
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
@@ -2032,37 +2013,33 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
         )
-        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [
-            {
-                'rule_specs': [
-                    {
-                        'rule_type': 'Equals',
-                        'inputs': {
-                            'x': [html_with_old_math_schema]
-                        }
-                    }, {
-                        'rule_type': 'ContainsAtLeastOneOf',
-                        'inputs': {
-                            'x': [html_with_old_math_schema]
-                        }
-                    }
-                ],
-                'outcome': {
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback',
-                        'html': html_with_old_math_schema
-                    },
-                    'param_changes': [],
-                    'labelled_as_correct': False,
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': html_with_old_math_schema
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
 
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
@@ -2081,7 +2058,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id':
+                            'default_outcome',
                         'html': (
                             '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
@@ -2135,10 +2113,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                       classmethod(mock_get_html_field_types_to_rule_specs)):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegex(
-                    Exception, 'The rule spec does not belong to a valid format.'):
+                Exception, 'The rule spec does not belong to a valid format.'
+            ):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.add_math_content_to_math_rte_components,
@@ -2153,37 +2134,33 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
         )
-        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [
-            {
-                'rule_specs': [
-                    {
-                        'rule_type': 'Equals',
-                        'inputs': {
-                            'x': [html_with_old_math_schema]
-                        }
-                    }, {
-                        'rule_type': 'ContainsAtLeastOneOf',
-                        'inputs': {
-                            'x': [html_with_old_math_schema]
-                        }
-                    }
-                ],
-                'outcome': {
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback',
-                        'html': html_with_old_math_schema
-                    },
-                    'param_changes': [],
-                    'labelled_as_correct': False,
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        answer_group_with_old_math_schema: List[state_domain.AnswerGroupDict] = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': [html_with_old_math_schema]
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': html_with_old_math_schema
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
 
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
@@ -2202,7 +2179,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id':
+                            'default_outcome',
                         'html': (
                             '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
@@ -2256,12 +2234,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                       classmethod(mock_get_html_field_types_to_rule_specs)):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegex(
-                    Exception,
-                    'Rule spec should have at least one valid input variable with '
-                    'Html in it.'):
+                Exception,
+                'Rule spec should have at least one valid input variable with '
+                'Html in it.'
+            ):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.add_math_content_to_math_rte_components
@@ -2297,7 +2278,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
-                'solution': old_solution_dict,
+                'solution':
+                    old_solution_dict,
                 'answer_groups': [],
                 'default_outcome': {
                     'param_changes': [],
@@ -2320,20 +2302,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 'confirmed_unclassified_answers': [],
-                'id': 'TextInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
-                        }
-                    }, {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
-                        }
+                'id':
+                    'TextInput',
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': html_with_old_math_schema
                     }
-                ]
+                }, {
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': html_with_old_math_schema
+                    }
+                }]
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
@@ -2354,10 +2335,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                       classmethod(mock_get_html_field_types_to_rule_specs)):
-            with self.assertRaisesRegex(Exception, 'The solution does not have a valid '
-                                        'correct_answer type.'):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
+            with self.assertRaisesRegex(
+                Exception, 'The solution does not have a valid '
+                'correct_answer type.'
+            ):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.add_math_content_to_math_rte_components
@@ -2390,7 +2375,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
-                'solution': None,
+                'solution':
+                    None,
                 'answer_groups': [],
                 'default_outcome': {
                     'param_changes': [],
@@ -2406,20 +2392,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {},
                 'confirmed_unclassified_answers': [],
-                'id': None,
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
-                        }
-                    }, {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
-                        }
+                'id':
+                    None,
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': html_with_old_math_schema
                     }
-                ]
+                }, {
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': html_with_old_math_schema
+                    }
+                }]
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
@@ -2438,7 +2423,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
-                'solution': None,
+                'solution':
+                    None,
                 'answer_groups': [],
                 'default_outcome': {
                     'param_changes': [],
@@ -2454,20 +2440,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {},
                 'confirmed_unclassified_answers': [],
-                'id': None,
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
-                        }
-                    }, {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
-                        }
+                'id':
+                    None,
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': html_with_new_math_schema
                     }
-                ]
+                }, {
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': html_with_new_math_schema
+                    }
+                }]
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {}
@@ -2515,9 +2500,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test validation of subtitled HTML with invalid content."""
         subtitled_html = state_domain.SubtitledHtml('content_id', '<p>some html</p>')
         subtitled_html.validate()
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected content id to be a string, '
-                                    'received 20'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected content id to be a string, '
+            'received 20'
+        ):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
@@ -2536,9 +2522,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id', 'some html string'
         )
         subtitled_unicode.validate()
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected content id to be a string, '
-                                    'received 20'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected content id to be a string, '
+            'received 20'
+        ):
             with self.swap(subtitled_unicode, 'content_id', 20):
                 subtitled_unicode.validate()
 
@@ -2547,8 +2534,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         audio_voiceover = state_domain.Voiceover('a.mp3', 20, True, 24.5)
         audio_voiceover.validate()
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected audio filename to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected audio filename to be a string'
+        ):
             with self.swap(audio_voiceover, 'filename', 20):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(utils.ValidationError, 'Invalid audio filename'):
@@ -2561,29 +2549,34 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_voiceover, 'filename', 'a.invalidext'):
                 audio_voiceover.validate()
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected file size to be an int'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected file size to be an int'
+        ):
             with self.swap(audio_voiceover, 'file_size_bytes', 'abc'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(utils.ValidationError, 'Invalid file size'):
             with self.swap(audio_voiceover, 'file_size_bytes', -3):
                 audio_voiceover.validate()
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected needs_update to be a bool'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected needs_update to be a bool'
+        ):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected duration_secs to be a float'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected duration_secs to be a float'
+        ):
             with self.swap(audio_voiceover, 'duration_secs', 'test'):
                 audio_voiceover.validate()
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected duration_secs to be a float'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected duration_secs to be a float'
+        ):
             with self.swap(audio_voiceover, 'duration_secs', '10'):
                 audio_voiceover.validate()
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected duration_secs to be positive number, '
-                                    'or zero if not yet specified'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected duration_secs to be positive number, '
+            'or zero if not yet specified'
+        ):
             with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
 
@@ -2655,27 +2648,24 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(
             init_state, 'MultipleChoiceInput', content_id_generator
         )
-        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'content_id': 'non-unique-content-id',
-                'html': '1'
-            }, {
-                'content_id': 'non-unique-content-id',
-                'html': '2'
-            }
-        ]
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [{
+            'content_id': 'non-unique-content-id',
+            'html': '1'
+        }, {
+            'content_id': 'non-unique-content-id',
+            'html': '2'
+        }]
         with self.assertRaisesRegex(
-                Exception, 'All customization argument content_ids should be unique.'):
-            init_state.update_interaction_customization_args(
-                {
-                    'choices': {
-                        'value': choices_subtitled_dicts
-                    },
-                    'showChoicesInShuffledOrder': {
-                        'value': True
-                    }
+            Exception, 'All customization argument content_ids should be unique.'
+        ):
+            init_state.update_interaction_customization_args({
+                'choices': {
+                    'value': choices_subtitled_dicts
+                },
+                'showChoicesInShuffledOrder': {
+                    'value': True
                 }
-            )
+            })
 
     def test_solution_validation(self) -> None:
         """Test validation of state solution."""
@@ -2710,7 +2700,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         assert init_state.interaction.id is not None
         # Object type of answer must match that of correct_answer.
         with self.assertRaisesRegex(
-                AssertionError, re.escape('Expected unicode string, received [0, 0]')):
+            AssertionError, re.escape('Expected unicode string, received [0, 0]')
+        ):
             init_state.interaction.solution = (
                 state_domain.Solution.from_dict(
                     init_state.interaction.id, solution_dict
@@ -2738,18 +2729,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected solicit_answer_details to be '
-                                    'a boolean, received'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected solicit_answer_details to be '
+            'a boolean, received'
+        ):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.solicit_answer_details, False)
         self.set_interaction_for_state(init_state, 'Continue', content_id_generator)
         self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The Continue interaction does not '
-                                    'support soliciting answer details from learners.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The Continue interaction does not '
+            'support soliciting answer details from learners.'
+        ):
             with self.swap(init_state, 'solicit_answer_details', True):
                 exploration.validate()
         self.set_interaction_for_state(init_state, 'TextInput', content_id_generator)
@@ -2768,9 +2761,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.linked_skill_id, None)
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected linked_skill_id to be '
-                                    'a str, received 12.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected linked_skill_id to be '
+            'a str, received 12.'
+        ):
             with self.swap(init_state, 'linked_skill_id', 12):
                 exploration.validate()
         self.assertEqual(init_state.linked_skill_id, None)
@@ -2781,8 +2775,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.inapplicable_skill_misconception_ids, [])
         with self.assertRaisesRegex(
-                utils.ValidationError, 'Expected '
-                'inapplicable_skill_misconception_ids to be a list, received 12.'):
+            utils.ValidationError, 'Expected '
+            'inapplicable_skill_misconception_ids to be a list, received 12.'
+        ):
             with self.swap(init_state, 'inapplicable_skill_misconception_ids', 12):
                 exploration.validate()
         self.assertEqual(init_state.inapplicable_skill_misconception_ids, [])
@@ -2792,9 +2787,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected card_is_checkpoint to be '
-                                    'a boolean, received'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected card_is_checkpoint to be '
+            'a boolean, received'
+        ):
             with self.swap(init_state, 'card_is_checkpoint', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.card_is_checkpoint, True)
@@ -2839,7 +2835,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
         exploration.init_state.update_interaction_solution(solution)
         with self.assertRaisesRegex(
-                Exception, 'Expected answer_is_exclusive to be bool, received 1'):
+            Exception, 'Expected answer_is_exclusive to be bool, received 1'
+        ):
             exploration.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2850,7 +2847,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.param_changes = 0  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
-                Exception, 'Expected state param_changes to be a list, received 0'):
+            Exception, 'Expected state param_changes to be a list, received 0'
+        ):
             exploration.init_state.validate({}, True)
 
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self) -> None:
@@ -2915,8 +2913,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_recorded_voiceovers(recorded_voiceovers)
 
         with self.assertRaisesRegex(
-                Exception,
-                'The content_id hint_1 does not exist in recorded_voiceovers'):
+            Exception, 'The content_id hint_1 does not exist in recorded_voiceovers'
+        ):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
     def test_cannot_update_hints_with_new_content_id_in_recorded_voiceovers(
@@ -2968,8 +2966,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_recorded_voiceovers(recorded_voiceovers)
 
         with self.assertRaisesRegex(
-                Exception,
-                'The content_id hint_2 already exists in recorded_voiceovers'):
+            Exception, 'The content_id hint_2 already exists in recorded_voiceovers'
+        ):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
     def test_cannot_update_interaction_solution_with_non_dict_solution(self) -> None:
@@ -3006,9 +3004,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(Exception,
-                                    'Expected solution to be a Solution object,'
-                                    'received test string'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected solution to be a Solution object,'
+            'received test string'
+        ):
             exploration.init_state.update_interaction_solution(
                 'test string'
             )  # type: ignore[arg-type]
@@ -3035,9 +3034,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegex(Exception, 'Expected hints_list to be a list'):
-            exploration.init_state.update_interaction_hints(
-                {}
-            )  # type: ignore[arg-type]
+            exploration.init_state.update_interaction_hints({}
+                                                           )  # type: ignore[arg-type]
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
@@ -3048,7 +3046,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegex(
-                Exception, 'Expected confirmed_unclassified_answers to be a list'):
+            Exception, 'Expected confirmed_unclassified_answers to be a list'
+        ):
             (
                 exploration.init_state.
                 update_interaction_confirmed_unclassified_answers({})
@@ -3061,7 +3060,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 exploration.init_state_name, None,
                 state_domain.SubtitledHtml('feedback_1', '<p>Feedback</p>'), False, [],
                 None, None
-            ), [state_domain.RuleSpec('Contains', {'x': 'Test'})], [], None
+            ), [state_domain.RuleSpec('Contains', {
+                'x': 'Test'
+            })], [], None
         )
 
         self.assertEqual(
@@ -3069,9 +3070,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
 
         (
-            exploration.init_state.update_interaction_confirmed_unclassified_answers(
-                [state_answer_group]
-            )
+            exploration.init_state.update_interaction_confirmed_unclassified_answers([
+                state_answer_group
+            ])
         )
 
         self.assertEqual(
@@ -3085,8 +3086,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_non_list_interaction_answer_groups(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected interaction_answer_groups to be a list'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected interaction_answer_groups to be a list'
+        ):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups'
             )  # type: ignore[arg-type]
@@ -3106,10 +3108,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group.rule_specs[0].inputs = []  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
-                Exception, re.escape('Expected rule_inputs to be a dict, received []')):
-            exploration.init_state.update_interaction_answer_groups(
-                [state_answer_group]
-            )
+            Exception, re.escape('Expected rule_inputs to be a dict, received []')
+        ):
+            exploration.init_state.update_interaction_answer_groups([
+                state_answer_group
+            ])
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
@@ -3125,11 +3128,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
         state_answer_group.rule_specs = {}  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected answer group rule specs to be a list'):
-            exploration.init_state.update_interaction_answer_groups(
-                [state_answer_group]
-            )
+        with self.assertRaisesRegex(
+            Exception, 'Expected answer group rule specs to be a list'
+        ):
+            exploration.init_state.update_interaction_answer_groups([
+                state_answer_group
+            ])
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
@@ -3150,12 +3154,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ), [state_domain.RuleSpec('Contains', test_inputs)], [], None
         )
 
-        with self.assertRaisesRegex(Exception, re.escape(
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
                 'Value has the wrong type. It should be a TranslatableSetOf'
-                'NormalizedString. The value is')):
-            exploration.init_state.update_interaction_answer_groups(
-                [state_answer_group]
+                'NormalizedString. The value is'
             )
+        ):
+            exploration.init_state.update_interaction_answer_groups([
+                state_answer_group
+            ])
 
     def test_validate_rule_spec(self) -> None:
         observed_log_messages: List[str] = []
@@ -3226,18 +3234,19 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
             return html
 
         schema = {
-            'type': 'dict',
-            'properties': [
-                {
-                    'name': 'content',
-                    'schema': {
-                        'type': 'custom',
-                        'obj_type': 'SubtitledHtml',
-                    }
+            'type':
+                'dict',
+            'properties': [{
+                'name': 'content',
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledHtml',
                 }
-            ]
+            }]
         }
-        value = {'content': state_domain.SubtitledHtml('id', '<p>testing</p>')}
+        value = {
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+        }
 
         state_domain.InteractionCustomizationArg.traverse_by_schema_and_convert(
             schema, value, extract_html
@@ -3249,18 +3258,19 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
         html = []
 
         schema = {
-            'type': 'dict',
-            'properties': [
-                {
-                    'name': 'content',
-                    'schema': {
-                        'type': 'custom',
-                        'obj_type': 'SubtitledHtml',
-                    }
+            'type':
+                'dict',
+            'properties': [{
+                'name': 'content',
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledHtml',
                 }
-            ]
+            }]
         }
-        value = {'content': state_domain.SubtitledHtml('id', '<p>testing</p>')}
+        value = {
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+        }
 
         html = (
             state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
@@ -3342,9 +3352,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     def test_get_content_ids_for_voiceovers_return_correct_list_of_content_id(
         self
     ) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {}}
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
+            'voiceovers_mapping': {}
+        })
         self.assertEqual(recorded_voiceovers.get_content_ids_for_voiceovers(), [])
 
         recorded_voiceovers.add_content_id_for_voiceover('feedback_1')
@@ -3355,9 +3365,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_add_content_id_for_voiceovers_adds_content_id(self) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {}}
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
+            'voiceovers_mapping': {}
+        })
 
         self.assertEqual(len(recorded_voiceovers.get_content_ids_for_voiceovers()), 0)
 
@@ -3375,12 +3385,13 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     def test_add_content_id_for_voiceover_with_invalid_content_id_raise_error(
         self
     ) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {}}
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
+            'voiceovers_mapping': {}
+        })
         invalid_content_id = 123
-        with self.assertRaisesRegex(Exception,
-                                    'Expected content_id to be a string, received 123'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected content_id to be a string, received 123'
+        ):
             recorded_voiceovers.add_content_id_for_voiceover(
                 invalid_content_id
             )  # type: ignore[arg-type]
@@ -3405,8 +3416,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers_dict
         )
         existing_content_id = 'feedback_1'
-        with self.assertRaisesRegex(Exception,
-                                    'The content_id feedback_1 already exist.'):
+        with self.assertRaisesRegex(
+            Exception, 'The content_id feedback_1 already exist.'
+        ):
             recorded_voiceovers.add_content_id_for_voiceover(existing_content_id)
 
     def test_delete_content_id_for_voiceovers_deletes_content_id(self) -> None:
@@ -3444,8 +3456,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers_dict
         )
         nonexisting_content_id_to_delete = 'feedback_1'
-        with self.assertRaisesRegex(Exception,
-                                    'The content_id feedback_1 does not exist.'):
+        with self.assertRaisesRegex(
+            Exception, 'The content_id feedback_1 does not exist.'
+        ):
             recorded_voiceovers.delete_content_id_for_voiceover(
                 nonexisting_content_id_to_delete
             )
@@ -3456,9 +3469,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_content_id_for_voiceover_with_invalid_content_id_raise_error(  # pylint: disable=line-too-long
         self
     ) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
-            {'voiceovers_mapping': {}}
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
+            'voiceovers_mapping': {}
+        })
         invalid_content_id_to_delete = 123
         with self.assertRaisesRegex(Exception, 'Expected content_id to be a string, '):
             recorded_voiceovers.delete_content_id_for_voiceover(
@@ -3489,15 +3502,13 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
     def test_validate_non_dict_language_code_to_voiceover(self) -> None:
-        recorded_voiceovers = state_domain.RecordedVoiceovers(
-            {
-                'en': []  # type: ignore[dict-item]
-            }
-        )
+        recorded_voiceovers = state_domain.RecordedVoiceovers({
+            'en': []  # type: ignore[dict-item]
+        })
 
         with self.assertRaisesRegex(
-                Exception,
-                re.escape('Expected content_id value to be a dict, received []')):
+            Exception, re.escape('Expected content_id value to be a dict, received []')
+        ):
             recorded_voiceovers.validate(None)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3521,8 +3532,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers_dict
         )
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected language_code to be a string, '):
+        with self.assertRaisesRegex(
+            Exception, 'Expected language_code to be a string, '
+        ):
             recorded_voiceovers.validate(['content'])
 
     def test_validation_with_unknown_language_code_raise_error(self) -> None:
@@ -3564,9 +3576,13 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers_dict
         )
 
-        with self.assertRaisesRegex(Exception, re.escape(
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
                 'Expected state recorded_voiceovers to match the listed '
-                'content ids [\'invalid_content\']')):
+                'content ids [\'invalid_content\']'
+            )
+        ):
             recorded_voiceovers.validate(['invalid_content'])
 
 
@@ -3582,8 +3598,9 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def test_validate_non_str_filename(self) -> None:
         self.voiceover.validate()
         self.voiceover.filename = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(Exception,
-                                    'Expected audio filename to be a string'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected audio filename to be a string'
+        ):
             self.voiceover.validate()
 
     def test_validate_filename(self) -> None:
@@ -3595,9 +3612,13 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def test_validate_audio_extension(self) -> None:
         self.voiceover.validate()
         self.voiceover.filename = 'filename.png'
-        with self.assertRaisesRegex(Exception, re.escape(
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
                 'Invalid audio filename: it should have one of the following '
-                'extensions: %s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))):
+                'extensions: %s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+            )
+        ):
             self.voiceover.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3648,9 +3669,10 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def test_validate_negative_duration_seconds(self) -> None:
         self.voiceover.validate()
         self.voiceover.duration_secs = -1.45
-        with self.assertRaisesRegex(Exception,
-                                    'Expected duration_secs to be positive number, '
-                                    'or zero if not yet specified'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected duration_secs to be positive number, '
+            'or zero if not yet specified'
+        ):
             self.voiceover.validate()
 
 

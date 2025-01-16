@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Beam DoFns and PTransforms to provide validation of skill models."""
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from core.platform import models
 from typing import Optional, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
 
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
@@ -35,14 +34,14 @@ if MYPY: # pragma: no cover
 
 @validation_decorators.AuditsExisting(skill_models.SkillSnapshotMetadataModel)
 class ValidateSkillSnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        skill_models.SkillSnapshotMetadataModel
-    ]
+    base_validation.BaseValidateCommitCmdsSchema[skill_models.SkillSnapshotMetadataModel
+                                                ]
 ):
     """Overrides _get_change_domain_class for SkillSnapshotMetadataModel."""
 
     def _get_change_domain_class(
-        self, unused_input_model: skill_models.SkillSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        unused_input_model: skill_models.SkillSnapshotMetadataModel  # pylint: disable=unused-argument
     ) -> Type[skill_domain.SkillChange]:
         """Returns a change domain class.
 
@@ -58,9 +57,7 @@ class ValidateSkillSnapshotMetadataModel(
 
 @validation_decorators.AuditsExisting(skill_models.SkillCommitLogEntryModel)
 class ValidateSkillCommitLogEntryModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        skill_models.SkillCommitLogEntryModel
-    ]
+    base_validation.BaseValidateCommitCmdsSchema[skill_models.SkillCommitLogEntryModel]
 ):
     """Overrides _get_change_domain_class for SkillCommitLogEntryModel."""
 

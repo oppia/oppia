@@ -30,7 +30,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import question_models
 
-(question_models, ) = models.Registry.import_models([models.Names.QUESTION])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class QuestionFetchersUnitTests(test_utils.GenericTestBase):
@@ -118,9 +118,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             self._create_valid_question_data('DEF', content_id_generator), ['skill_1'],
             content_id_generator.next_content_id_index
         )
-        questions = question_fetchers.get_questions_by_ids(
-            [self.question_id, 'invalid_question_id', question_id_2]
-        )
+        questions = question_fetchers.get_questions_by_ids([
+            self.question_id, 'invalid_question_id', question_id_2
+        ])
         self.assertEqual(len(questions), 3)
         # Ruling out the possibility of None for mypy type checking.
         assert questions[0] is not None
@@ -133,12 +133,12 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
     def test_cannot_get_question_from_model_with_invalid_schema_version(self) -> None:
         # Delete all question models.
         all_question_models = question_models.QuestionModel.get_all()
-        question_models.QuestionModel.delete_multi(
-            [question_model.id for question_model in all_question_models],
-            feconf.SYSTEM_COMMITTER_ID,
-            '',
-            force_deletion=True
-        )
+        question_models.QuestionModel.delete_multi([
+            question_model.id for question_model in all_question_models
+        ],
+                                                   feconf.SYSTEM_COMMITTER_ID,
+                                                   '',
+                                                   force_deletion=True)
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
@@ -157,8 +157,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         )
 
         question_model.commit(
-            self.editor_id, 'question model created',
-            [{
+            self.editor_id, 'question model created', [{
                 'cmd': question_domain.CMD_CREATE_NEW
             }]
         )
@@ -170,20 +169,20 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         assert fetched_question_models is not None
 
         with self.assertRaisesRegex(
-                Exception,
-                'Sorry, we can only process v25-v%d state schemas at present.' %
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v25-v%d state schemas at present.' %
+            feconf.CURRENT_STATE_SCHEMA_VERSION
+        ):
             question_fetchers.get_question_from_model(fetched_question_models)
 
     def test_get_question_from_model_with_current_valid_schema_version(self) -> None:
         # Delete all question models.
         all_question_models = question_models.QuestionModel.get_all()
-        question_models.QuestionModel.delete_multi(
-            [question_model.id for question_model in all_question_models],
-            feconf.SYSTEM_COMMITTER_ID,
-            '',
-            force_deletion=True
-        )
+        question_models.QuestionModel.delete_multi([
+            question_model.id for question_model in all_question_models
+        ],
+                                                   feconf.SYSTEM_COMMITTER_ID,
+                                                   '',
+                                                   force_deletion=True)
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
@@ -202,8 +201,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         )
 
         question_model.commit(
-            self.editor_id, 'question model created',
-            [{
+            self.editor_id, 'question model created', [{
                 'cmd': question_domain.CMD_CREATE_NEW
             }]
         )

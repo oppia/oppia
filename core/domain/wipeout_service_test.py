@@ -75,16 +75,14 @@ if MYPY:  # pragma: no cover
     config_models, email_models, exp_models, feedback_models, improvements_models,
     learner_group_models, question_models, skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
-) = models.Registry.import_models(
-    [
-        models.Names.APP_FEEDBACK_REPORT, models.Names.AUTH, models.Names.BLOG,
-        models.Names.COLLECTION, models.Names.CONFIG, models.Names.EMAIL,
-        models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.IMPROVEMENTS,
-        models.Names.LEARNER_GROUP, models.Names.QUESTION, models.Names.SKILL,
-        models.Names.STORY, models.Names.SUBTOPIC, models.Names.SUGGESTION,
-        models.Names.TOPIC, models.Names.USER
-    ]
-)
+) = models.Registry.import_models([
+    models.Names.APP_FEEDBACK_REPORT, models.Names.AUTH, models.Names.BLOG,
+    models.Names.COLLECTION, models.Names.CONFIG, models.Names.EMAIL,
+    models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.IMPROVEMENTS,
+    models.Names.LEARNER_GROUP, models.Names.QUESTION, models.Names.SKILL,
+    models.Names.STORY, models.Names.SUBTOPIC, models.Names.SUGGESTION,
+    models.Names.TOPIC, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -105,13 +103,11 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
 
     def test_gets_pending_deletion_request(self) -> None:
-        wipeout_service.save_pending_deletion_requests(
-            [
-                wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_1_id, self.USER_1_USERNAME, self.USER_1_EMAIL
-                )
-            ]
-        )
+        wipeout_service.save_pending_deletion_requests([
+            wipeout_domain.PendingDeletionRequest.create_default(
+                self.user_1_id, self.USER_1_USERNAME, self.USER_1_EMAIL
+            )
+        ])
 
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id)
@@ -129,16 +125,14 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         )
         self.assertEqual(number_of_pending_deletion_requests, 0)
 
-        wipeout_service.save_pending_deletion_requests(
-            [
-                wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_1_id, self.USER_1_USERNAME, self.USER_1_EMAIL
-                ),
-                wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_2_id, self.USER_2_USERNAME, self.USER_2_EMAIL
-                )
-            ]
-        )
+        wipeout_service.save_pending_deletion_requests([
+            wipeout_domain.PendingDeletionRequest.create_default(
+                self.user_1_id, self.USER_1_USERNAME, self.USER_1_EMAIL
+            ),
+            wipeout_domain.PendingDeletionRequest.create_default(
+                self.user_2_id, self.USER_2_USERNAME, self.USER_2_EMAIL
+            )
+        ])
         number_of_pending_deletion_requests = (
             wipeout_service.get_number_of_pending_deletion_requests()
         )
@@ -195,10 +189,11 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.assertEqual(pending_deletion_request_model_new.email, self.USER_1_EMAIL)
         self.assertEqual(pending_deletion_request_model_new.deletion_complete, True)
         self.assertEqual(
-            pending_deletion_request_model_new.pseudonymizable_entity_mappings,
-            {'story': {
-                'story_id': 'user_id'
-            }}
+            pending_deletion_request_model_new.pseudonymizable_entity_mappings, {
+                'story': {
+                    'story_id': 'user_id'
+                }
+            }
         )
         self.assertEqual(
             pending_deletion_request_model_old.created_on,
@@ -607,10 +602,12 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.user_1_id)
         user_settings.created_on = None
 
-        with self.swap_to_always_return(user_services, 'get_user_settings',
-                                        user_settings):
+        with self.swap_to_always_return(
+            user_services, 'get_user_settings', user_settings
+        ):
             with self.assertRaisesRegex(
-                    Exception, 'No data available for when the user was created on.'):
+                Exception, 'No data available for when the user was created on.'
+            ):
                 wipeout_service.pre_delete_user(self.user_1_id)
 
 
@@ -683,9 +680,9 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id)
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_run_user_deletion_completion_with_user_properly_deleted(self) -> None:
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
@@ -693,12 +690,10 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             email_manager,
             'send_account_deleted_email',
             lambda x, y: None,
-            expected_args=[
-                (
-                    self.pending_deletion_request.user_id,
-                    self.pending_deletion_request.email
-                )
-            ]
+            expected_args=[(
+                self.pending_deletion_request.user_id,
+                self.pending_deletion_request.email
+            )]
         )
 
         with send_email_swap:
@@ -721,9 +716,9 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             auth_services.verify_external_auth_associations_are_deleted(self.user_1_id)
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_run_user_deletion_completion_user_wrongly_deleted_emails_enabled(
         self
     ) -> None:
@@ -950,7 +945,8 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(test_utils.GenericTestBas
         self
     ) -> None:
         with self.assertRaisesRegex(
-                Exception, 'Field name can only be None when commit log model class'):
+            Exception, 'Field name can only be None when commit log model class'
+        ):
             wipeout_service._collect_and_save_entity_ids_from_snapshots_and_commits(   # pylint: disable=line-too-long, protected-access
                 wipeout_service.get_pending_deletion_request(self.user_1_id),
                 models.Names.QUESTION,
@@ -1026,8 +1022,9 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(test_utils.GenericTestBas
         self.assertNotEqual(report_model_1.scrubbed_by, report_model_2.scrubbed_by)
 
 
-class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(test_utils.GenericTestBase
-                                                             ):
+class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
+    test_utils.GenericTestBase
+):
     """Tests that the wipeout services properly verifies the deleted status of
     AppFeedbackReportModels with previous references to a deleted user.
     """
@@ -1199,7 +1196,9 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False
         )
-        param_model.commit(self.user_1_id, 'commit message', [{'cmd': 'command'}])
+        param_model.commit(self.user_1_id, 'commit message', [{
+            'cmd': 'command'
+        }])
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
@@ -1279,7 +1278,9 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False
         )
-        param_model.commit(self.user_1_id, 'commit message', [{'cmd': 'command'}])
+        param_model.commit(self.user_1_id, 'commit message', [{
+            'cmd': 'command'
+        }])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
@@ -1320,7 +1321,9 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False
         )
-        param_model.commit(self.user_2_id, 'commit message', [{'cmd': 'command'}])
+        param_model.commit(self.user_2_id, 'commit message', [{
+            'cmd': 'command'
+        }])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
@@ -1370,7 +1373,9 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
 
     def test_one_config_property_with_multiple_users_is_pseudonymized(self) -> None:
         param_model = config_models.PlatformParameterModel.get_by_id(self.CONFIG_1_ID)
-        param_model.commit(self.user_2_id, 'commit message', [{'cmd': 'command'}])
+        param_model.commit(self.user_2_id, 'commit message', [{
+            'cmd': 'command'
+        }])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
@@ -1440,8 +1445,12 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
             rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False
         )
-        param_model.commit(self.user_1_id, 'commit message', [{'cmd': 'command'}])
-        param_model.commit(self.user_1_id, 'commit message', [{'cmd': 'command_2'}])
+        param_model.commit(self.user_1_id, 'commit message', [{
+            'cmd': 'command'
+        }])
+        param_model.commit(self.user_1_id, 'commit message', [{
+            'cmd': 'command_2'
+        }])
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -1466,7 +1475,9 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
             rule_schema_version=(feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             default_value=False
         )
-        param_model.commit(self.user_1_id, 'commit message', [{'cmd': 'command'}])
+        param_model.commit(self.user_1_id, 'commit message', [{
+            'cmd': 'command'
+        }])
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
@@ -1722,7 +1733,9 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertNotIn(self.user_1_id, old_summary_model.contributors_summary)
 
         old_summary_model.contributor_ids = [self.user_1_id]
-        old_summary_model.contributors_summary = {self.user_1_id: 2}
+        old_summary_model.contributors_summary = {
+            self.user_1_id: 2
+        }
         old_summary_model.update_timestamps()
         old_summary_model.put()
 
@@ -2138,7 +2151,9 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertNotIn(self.user_1_id, old_summary_model.contributors_summary)
 
         old_summary_model.contributor_ids = [self.user_1_id]
-        old_summary_model.contributors_summary = {self.user_1_id: 2}
+        old_summary_model.contributors_summary = {
+            self.user_1_id: 2
+        }
         old_summary_model.update_timestamps()
         old_summary_model.put()
 
@@ -2448,9 +2463,9 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         )
 
         pseudonymized_feedback_thread_models = (
-            feedback_models.GeneralFeedbackThreadModel.get_multi(
-                [model.id for model in feedback_thread_models]
-            )
+            feedback_models.GeneralFeedbackThreadModel.get_multi([
+                model.id for model in feedback_thread_models
+            ])
         )
         for feedback_thread_model in pseudonymized_feedback_thread_models:
             # Ruling out the possibility of None for mypy type checking.
@@ -2461,9 +2476,9 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             )
 
         pseudonymized_feedback_message_models = (
-            feedback_models.GeneralFeedbackMessageModel.get_multi(
-                [model.id for model in feedback_message_models]
-            )
+            feedback_models.GeneralFeedbackMessageModel.get_multi([
+                model.id for model in feedback_message_models
+            ])
         )
         for feedback_message_model in pseudonymized_feedback_message_models:
             # Ruling out the possibility of None for mypy type checking.
@@ -3025,16 +3040,12 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
     def test_one_question_with_multiple_users_is_pseudonymized(self) -> None:
         question_services.update_question(
             self.user_2_id, self.QUESTION_1_ID, [
-                question_domain.QuestionChange(
-                    {
-                        'cmd': question_domain.CMD_UPDATE_QUESTION_PROPERTY,
-                        'property_name': (
-                            question_domain.QUESTION_PROPERTY_LANGUAGE_CODE
-                        ),
-                        'new_value': 'cs',
-                        'old_value': 'en'
-                    }
-                )
+                question_domain.QuestionChange({
+                    'cmd': question_domain.CMD_UPDATE_QUESTION_PROPERTY,
+                    'property_name': (question_domain.QUESTION_PROPERTY_LANGUAGE_CODE),
+                    'new_value': 'cs',
+                    'old_value': 'en'
+                })
             ], 'Change language.'
         )
 
@@ -3156,16 +3167,12 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
 
         question_services.update_question(
             self.user_2_id, self.QUESTION_2_ID, [
-                question_domain.QuestionChange(
-                    {
-                        'cmd': question_domain.CMD_UPDATE_QUESTION_PROPERTY,
-                        'property_name': (
-                            question_domain.QUESTION_PROPERTY_LANGUAGE_CODE
-                        ),
-                        'new_value': 'cs',
-                        'old_value': 'en'
-                    }
-                )
+                question_domain.QuestionChange({
+                    'cmd': question_domain.CMD_UPDATE_QUESTION_PROPERTY,
+                    'property_name': (question_domain.QUESTION_PROPERTY_LANGUAGE_CODE),
+                    'new_value': 'cs',
+                    'old_value': 'en'
+                })
             ], 'Change language.'
         )
 
@@ -3373,14 +3380,12 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
     def test_one_skill_with_multiple_users_is_pseudonymized(self) -> None:
         skill_services.update_skill(
             self.user_2_id, self.SKILL_1_ID, [
-                skill_domain.SkillChange(
-                    {
-                        'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                        'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
-                        'new_value': 'cs',
-                        'old_value': 'en'
-                    }
-                )
+                skill_domain.SkillChange({
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
+                    'new_value': 'cs',
+                    'old_value': 'en'
+                })
             ], 'Change language.'
         )
 
@@ -3470,14 +3475,12 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
 
         skill_services.update_skill(
             self.user_2_id, self.SKILL_2_ID, [
-                skill_domain.SkillChange(
-                    {
-                        'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                        'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
-                        'new_value': 'cs',
-                        'old_value': 'en'
-                    }
-                )
+                skill_domain.SkillChange({
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
+                    'new_value': 'cs',
+                    'old_value': 'en'
+                })
             ], 'Change language.'
         )
 
@@ -3713,24 +3716,18 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
     def test_one_story_with_multiple_users_is_pseudonymized(self) -> None:
         story_services.update_story(
             self.user_2_id, self.STORY_1_ID, [
-                story_domain.StoryChange(
-                    {
-                        'cmd': story_domain.CMD_ADD_STORY_NODE,
-                        'node_id': 'node_1',
-                        'title': 'Title 2'
-                    }
-                ),
-                story_domain.StoryChange(
-                    {
-                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                        'property_name': (
-                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
-                        ),
-                        'node_id': 'node_1',
-                        'old_value': None,
-                        'new_value': 'exp_1'
-                    }
-                )
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Title 2'
+                }),
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': 'exp_1'
+                })
             ], 'Add node.'
         )
 
@@ -3835,24 +3832,18 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
 
         story_services.update_story(
             self.user_2_id, self.STORY_2_ID, [
-                story_domain.StoryChange(
-                    {
-                        'cmd': story_domain.CMD_ADD_STORY_NODE,
-                        'node_id': 'node_1',
-                        'title': 'Title 2'
-                    }
-                ),
-                story_domain.StoryChange(
-                    {
-                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                        'property_name': (
-                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
-                        ),
-                        'node_id': 'node_1',
-                        'old_value': None,
-                        'new_value': 'exp_1'
-                    }
-                )
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Title 2'
+                }),
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': 'exp_1'
+                })
             ], 'Add node.'
         )
 
@@ -4143,18 +4134,15 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     def test_one_subtopic_with_multiple_users_is_pseudonymized(self) -> None:
         subtopic_page_services.save_subtopic_page(
             self.user_2_id, self.subtopic_page, 'Change subtopic', [
-                subtopic_page_domain.SubtopicPageChange(
-                    {
-                        'cmd': (subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY),
-                        'property_name': (
-                            subtopic_page_domain.
-                            SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
-                        ),
-                        'new_value': 'new value',
-                        'old_value': 'old value',
-                        'subtopic_id': self.SUBTOP_1_ID
-                    }
-                )
+                subtopic_page_domain.SubtopicPageChange({
+                    'cmd': (subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY),
+                    'property_name': (
+                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+                    ),
+                    'new_value': 'new value',
+                    'old_value': 'old value',
+                    'subtopic_id': self.SUBTOP_1_ID
+                })
             ]
         )
 
@@ -4931,9 +4919,8 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             story_ids=[],
             partially_learnt_topic_ids=[]
         ).put()
-        user_models.LearnerGoalsModel(
-            id=self.profile_user_id, topic_ids_to_learn=[]
-        ).put()
+        user_models.LearnerGoalsModel(id=self.profile_user_id,
+                                      topic_ids_to_learn=[]).put()
         user_models.LearnerPlaylistModel(
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]
         ).put()
@@ -5328,9 +5315,8 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             story_ids=[],
             partially_learnt_topic_ids=[]
         ).put()
-        user_models.LearnerGoalsModel(
-            id=self.profile_user_id, topic_ids_to_learn=[]
-        ).put()
+        user_models.LearnerGoalsModel(id=self.profile_user_id,
+                                      topic_ids_to_learn=[]).put()
         user_models.LearnerPlaylistModel(
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]
         ).put()
@@ -5592,9 +5578,9 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         )
 
         pseudonymized_blog_post_models = (
-            blog_models.BlogPostModel.get_multi(
-                [model.id for model in blog_post_models_list]
-            )
+            blog_models.BlogPostModel.get_multi([
+                model.id for model in blog_post_models_list
+            ])
         )
         for blog_post_model in pseudonymized_blog_post_models:
             # Ruling out the possibility of None for mypy type checking.
@@ -5605,9 +5591,9 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             )
 
         pseudonymized_blog_post_summary_models = (
-            blog_models.BlogPostSummaryModel.get_multi(
-                [model.id for model in blog_post_summary_models_list]
-            )
+            blog_models.BlogPostSummaryModel.get_multi([
+                model.id for model in blog_post_summary_models_list
+            ])
         )
         for blog_post_summary_model in pseudonymized_blog_post_summary_models:
             # Ruling out the possibility of None for mypy type checking.
@@ -5631,9 +5617,9 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         # Verify that user id is removed from the list of editor ids in all
         # BlogPostRights models.
         blog_post_rights_models = (
-            blog_models.BlogPostRightsModel.get_multi(
-                [model.id for model in blog_post_rights_models_list]
-            )
+            blog_models.BlogPostRightsModel.get_multi([
+                model.id for model in blog_post_rights_models_list
+            ])
         )
         for blog_post_rights_model in blog_post_rights_models:
             # Ruling out the possibility of None for mypy type checking.
@@ -5858,9 +5844,9 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_repeated_deletion_is_successful_when_emails_enabled(self) -> None:
         with self.send_mail_to_admin_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
@@ -5884,9 +5870,9 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_no_email_is_sent_when_there_are_no_users_pending_deletion(self) -> None:
         pending_deletion_request_models: Sequence[
             user_models.PendingDeletionRequestModel
@@ -5898,9 +5884,9 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_regular_deletion_is_successful(self) -> None:
         with self.send_mail_to_admin_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
@@ -5972,9 +5958,9 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_verification_when_user_is_not_deleted_emails_enabled(self) -> None:
         with self.send_mail_to_admin_swap:
             wipeout_service.check_completion_of_user_deletion()
@@ -5993,12 +5979,10 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.check_completion_of_user_deletion()
         self.assertEqual(len(self.email_bodies), 0)
 
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName')
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+        (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName')
+    ])
     def test_verification_when_user_is_deleted_is_successful(self) -> None:
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id)
@@ -6014,9 +5998,9 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
         self.assertIsNone(user_models.UserSettingsModel.get_by_id(self.user_1_id))
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_verification_when_user_is_wrongly_deleted_fails(self) -> None:
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id)

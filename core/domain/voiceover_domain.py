@@ -85,14 +85,15 @@ class EntityVoiceovers:
             feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]] = {}
 
         for content_id, voiceover_type_to_voiceover in (
-                self.voiceovers_mapping.items()):
+            self.voiceovers_mapping.items()
+        ):
             content_id_to_voiceovers_dict[content_id] = {}
             for voiceover_type in feconf.VoiceoverType:
                 voiceover = voiceover_type_to_voiceover[voiceover_type]
                 voiceover_dict = (None if voiceover is None else voiceover.to_dict())
 
                 content_id_to_voiceovers_dict[content_id][voiceover_type.value
-                                                          ] = voiceover_dict
+                                                         ] = voiceover_dict
         return {
             'entity_id': self.entity_id,
             'entity_type': self.entity_type,
@@ -118,7 +119,8 @@ class EntityVoiceovers:
         content_id_to_voiceovers: Dict[str, Dict[feconf.VoiceoverType,
                                                  Optional[state_domain.Voiceover]]] = {}
         for content_id, voiceover_type_to_voiceover_dict in (
-                entity_voiceovers_dict['voiceovers_mapping'].items()):
+            entity_voiceovers_dict['voiceovers_mapping'].items()
+        ):
             content_id_to_voiceovers[content_id] = {}
             for voiceover_type in feconf.VoiceoverType:
                 voiceover_dict = voiceover_type_to_voiceover_dict[voiceover_type.value]
@@ -154,14 +156,16 @@ class EntityVoiceovers:
                 'language_accent_code must be a string, received %s' %
                 self.language_accent_code
             )
-        if not bool(re.match(feconf.LANGUAGE_ACCENT_CODE_REGEX,
-                             self.language_accent_code)):
+        if not bool(
+            re.match(feconf.LANGUAGE_ACCENT_CODE_REGEX, self.language_accent_code)
+        ):
             raise utils.ValidationError(
                 'language_accent_code must be formatted as '
                 '{{language}}-{{accent}}, received %s' % self.language_accent_code
             )
         for content_id, voiceover_type_to_voiceover in (
-                self.voiceovers_mapping.items()):
+            self.voiceovers_mapping.items()
+        ):
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
                     'content_id must be a string, received %s' % content_id
@@ -235,8 +239,8 @@ class EntityVoiceovers:
             automatic voiceovers are empty or not.
         """
         return (
-            self.voiceovers_mapping[content_id][feconf.VoiceoverType.MANUAL] is None
-            and self.voiceovers_mapping[content_id][feconf.VoiceoverType.AUTO] is None
+            self.voiceovers_mapping[content_id][feconf.VoiceoverType.MANUAL] is None and
+            self.voiceovers_mapping[content_id][feconf.VoiceoverType.AUTO] is None
         )
 
     @classmethod

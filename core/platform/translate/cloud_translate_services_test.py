@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for cloud_translate_services."""
 
 from __future__ import annotations
@@ -25,44 +24,42 @@ from core.tests import test_utils
 class CloudTranslateServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_translate_services."""
 
-    def test_translate_text_with_invalid_source_language_raises_error(
-            self
-    ) -> None:
+    def test_translate_text_with_invalid_source_language_raises_error(self) -> None:
         with self.assertRaisesRegex(
             # Hindi (hi) is not a allowlisted language code.
-            ValueError, 'Invalid source language code: hi'):
-            cloud_translate_services.translate_text(
-                'hello world', 'hi', 'es')
+            ValueError,
+            'Invalid source language code: hi'
+        ):
+            cloud_translate_services.translate_text('hello world', 'hi', 'es')
 
-    def test_translate_text_with_invalid_target_language_raises_error(
-            self
-    ) -> None:
+    def test_translate_text_with_invalid_target_language_raises_error(self) -> None:
         with self.assertRaisesRegex(
             # Hindi (hi) is not a allowlisted language code.
-            ValueError, 'Invalid target language code: hi'):
-            cloud_translate_services.translate_text(
-                'hello world', 'en', 'hi')
+            ValueError,
+            'Invalid target language code: hi'
+        ):
+            cloud_translate_services.translate_text('hello world', 'en', 'hi')
 
     def test_translate_text_with_same_source_target_language_doesnt_call_api(
-            self
+        self
     ) -> None:
         with self.swap_to_always_raise(
-            cloud_translate_services.CLIENT,
-            'translate',
-            error=AssertionError
+            cloud_translate_services.CLIENT, 'translate', error=AssertionError
         ):
             translated_text = cloud_translate_services.translate_text(
-                'hello world', 'en', 'en')
+                'hello world', 'en', 'en'
+            )
             self.assertEqual(translated_text, 'hello world')
 
-    def test_translate_text_with_valid_input_calls_translate_api(
-            self
-    ) -> None:
+    def test_translate_text_with_valid_input_calls_translate_api(self) -> None:
         with self.swap_to_always_return(
             cloud_translate_services.CLIENT,
             'translate',
-            value={'translatedText': 'hola mundo'}
+            value={
+                'translatedText': 'hola mundo'
+            }
         ):
             translated_text = cloud_translate_services.translate_text(
-                'hello world', 'en', 'es')
+                'hello world', 'en', 'es'
+            )
             self.assertEqual(translated_text, 'hola mundo')

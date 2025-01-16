@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Loads constants for backend use."""
 
 from __future__ import annotations
@@ -44,8 +43,7 @@ def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
     json_end = text_without_comments.rindex('}') + 1
     # Here we use type Any because 'json_dict' is a generic JSON object and
     # generic JSON objects are of type Dict[str, Any].
-    json_dict: Dict[str, Any] = (
-        json.loads(text_without_comments[json_start:json_end]))
+    json_dict: Dict[str, Any] = (json.loads(text_without_comments[json_start:json_end]))
     return json_dict
 
 
@@ -68,17 +66,20 @@ def remove_comments(text: str) -> str:
 @overload
 def get_package_file_contents(
     package: str, filepath: str, *, binary_mode: Literal[True]
-) -> bytes: ...
+) -> bytes:
+    ...
 
 
 @overload
-def get_package_file_contents(package: str, filepath: str) -> str: ...
+def get_package_file_contents(package: str, filepath: str) -> str:
+    ...
 
 
 @overload
 def get_package_file_contents(
     package: str, filepath: str, *, binary_mode: Literal[False]
-) -> str: ...
+) -> str:
+    ...
 
 
 def get_package_file_contents(
@@ -110,9 +111,7 @@ def get_package_file_contents(
             ) as binary_file:
                 read_binary_mode_data: bytes = binary_file.read()
                 return read_binary_mode_data
-        with open(
-            os.path.join(package, filepath), 'r', encoding='utf-8'
-        ) as file:
+        with open(os.path.join(package, filepath), 'r', encoding='utf-8') as file:
             return file.read()
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)

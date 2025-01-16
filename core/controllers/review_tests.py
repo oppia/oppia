@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the review tests page."""
 
 from __future__ import annotations
@@ -26,9 +25,7 @@ from core.domain import story_fetchers
 from typing import Dict
 
 
-class ReviewTestsPageDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class ReviewTestsPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Fetches relevant data for the review tests page. This handler should
     be called only if the user has completed at least one exploration in
     the story.
@@ -40,7 +37,9 @@ class ReviewTestsPageDataHandler(
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id: str) -> None:
@@ -55,9 +54,8 @@ class ReviewTestsPageDataHandler(
 
         try:
             skills = skill_fetchers.get_multi_skills(
-                story.get_acquired_skill_ids_for_node_ids(
-                    latest_completed_node_ids
-                ))
+                story.get_acquired_skill_ids_for_node_ids(latest_completed_node_ids)
+            )
         except Exception as e:
             raise self.NotFoundException(e)
         skill_descriptions = {}

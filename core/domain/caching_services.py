@@ -125,9 +125,8 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
     CACHE_NAMESPACE_SKILL: skill_domain.Skill.deserialize,
     CACHE_NAMESPACE_STORY: story_domain.Story.deserialize,
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
-    CACHE_NAMESPACE_PLATFORM_PARAMETER: (
-        platform_parameter_domain.PlatformParameter.deserialize
-    ),
+    CACHE_NAMESPACE_PLATFORM_PARAMETER:
+        (platform_parameter_domain.PlatformParameter.deserialize),
     CACHE_NAMESPACE_DEFAULT: json.loads
 }
 

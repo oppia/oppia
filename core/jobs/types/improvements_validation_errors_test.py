@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for improvements model validator errors."""
 
 from __future__ import annotations
@@ -23,15 +22,13 @@ from core.jobs.types import improvements_validation_errors
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
-(improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS])
+(improvements_models,) = models.Registry.import_models([models.Names.IMPROVEMENTS])
 
 
-class InvalidCompositeEntityErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+class InvalidCompositeEntityErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self) -> None:
         model = improvements_models.ExplorationStatsTaskEntryModel(
@@ -47,11 +44,10 @@ class InvalidCompositeEntityErrorTests(
             created_on=self.NOW,
             last_updated=self.NOW,
         )
-        error = improvements_validation_errors.InvalidCompositeEntityError(
-            model)
+        error = improvements_validation_errors.InvalidCompositeEntityError(model)
 
         self.assertEqual(
-            error.stderr,
-            'InvalidCompositeEntityError in '
+            error.stderr, 'InvalidCompositeEntityError in '
             'ExplorationStatsTaskEntryModel(id="23"): model '
-            'has invalid composite entity %s' % model.composite_entity_id)
+            'has invalid composite entity %s' % model.composite_entity_id
+        )

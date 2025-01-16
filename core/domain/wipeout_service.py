@@ -66,25 +66,23 @@ if MYPY:  # pragma: no cover
     config_models, exp_models, feedback_models, improvements_models, question_models,
     skill_models, story_models, subtopic_models, suggestion_models, topic_models,
     user_models
-) = models.Registry.import_models(
-    [
-        models.Names.APP_FEEDBACK_REPORT,
-        models.Names.BASE_MODEL,
-        models.Names.BLOG,
-        models.Names.COLLECTION,
-        models.Names.CONFIG,
-        models.Names.EXPLORATION,
-        models.Names.FEEDBACK,
-        models.Names.IMPROVEMENTS,
-        models.Names.QUESTION,
-        models.Names.SKILL,
-        models.Names.STORY,
-        models.Names.SUBTOPIC,
-        models.Names.SUGGESTION,
-        models.Names.TOPIC,
-        models.Names.USER,
-    ]
-)
+) = models.Registry.import_models([
+    models.Names.APP_FEEDBACK_REPORT,
+    models.Names.BASE_MODEL,
+    models.Names.BLOG,
+    models.Names.COLLECTION,
+    models.Names.CONFIG,
+    models.Names.EXPLORATION,
+    models.Names.FEEDBACK,
+    models.Names.IMPROVEMENTS,
+    models.Names.QUESTION,
+    models.Names.SKILL,
+    models.Names.STORY,
+    models.Names.SUBTOPIC,
+    models.Names.SUGGESTION,
+    models.Names.TOPIC,
+    models.Names.USER,
+])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -141,19 +139,21 @@ def save_pending_deletion_requests(
         )
     )
     final_pending_deletion_request_models = []
-    for deletion_request_model, deletion_request in zip(pending_deletion_request_models,
-                                                        pending_deletion_requests):
+    for deletion_request_model, deletion_request in zip(
+        pending_deletion_request_models, pending_deletion_requests
+    ):
         deletion_request.validate()
         deletion_request_dict = {
-            'username': deletion_request.username,
-            'email': deletion_request.email,
-            'normalized_long_term_username': (
-                deletion_request.normalized_long_term_username
-            ),
-            'deletion_complete': deletion_request.deletion_complete,
-            'pseudonymizable_entity_mappings': (
-                deletion_request.pseudonymizable_entity_mappings
-            )
+            'username':
+                deletion_request.username,
+            'email':
+                deletion_request.email,
+            'normalized_long_term_username':
+                (deletion_request.normalized_long_term_username),
+            'deletion_complete':
+                deletion_request.deletion_complete,
+            'pseudonymizable_entity_mappings':
+                (deletion_request.pseudonymizable_entity_mappings)
         }
         if deletion_request_model is not None:
             deletion_request_model.populate(**deletion_request_dict)
@@ -388,8 +388,9 @@ def _delete_models_with_delete_at_end_policy(user_id: str) -> None:
     Args:
         user_id: str. The unique ID of the user that is being deleted.
     """
-    for model_class in models.Registry.get_storage_model_classes([models.Names.AUTH,
-                                                                  models.Names.USER]):
+    for model_class in models.Registry.get_storage_model_classes([
+        models.Names.AUTH, models.Names.USER
+    ]):
         policy = model_class.get_deletion_policy()
         if policy == base_models.DELETION_POLICY.DELETE_AT_END:
             model_class.apply_deletion_policy(user_id)
@@ -615,8 +616,10 @@ def verify_user_deleted(
 
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():
-        if (model_class.get_deletion_policy() not in policies_not_to_verify
-                and model_class.has_reference_to_user_id(user_id)):
+        if (
+            model_class.get_deletion_policy() not in policies_not_to_verify and
+            model_class.has_reference_to_user_id(user_id)
+        ):
             logging.error(
                 '%s %s is not deleted for user with ID %s' %
                 (WIPEOUT_LOGS_PREFIX, model_class.__name__, user_id)
@@ -658,8 +661,8 @@ def remove_user_from_activities_with_associated_rights_models(user_id: str) -> N
 
     explorations_to_remove_user_from_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries
-        if not exp_summary.is_solely_owned_by_user(user_id)
-        and exp_summary.does_user_have_any_role(user_id)
+        if not exp_summary.is_solely_owned_by_user(user_id) and
+        exp_summary.does_user_have_any_role(user_id)
     ]
     for exp_id in explorations_to_remove_user_from_ids:
         rights_manager.deassign_role_for_exploration(
@@ -674,8 +677,8 @@ def remove_user_from_activities_with_associated_rights_models(user_id: str) -> N
     )
     explorations_to_be_deleted_ids = [
         exploration_rights.id for exploration_rights in explorations_rights
-        if exploration_rights.is_private()
-        and exploration_rights.is_solely_owned_by_user(user_id)
+        if exploration_rights.is_private() and
+        exploration_rights.is_solely_owned_by_user(user_id)
     ]
     exp_services.delete_explorations(
         user_id, explorations_to_be_deleted_ids, force_deletion=True
@@ -707,8 +710,8 @@ def remove_user_from_activities_with_associated_rights_models(user_id: str) -> N
 
     collections_to_remove_user_from_ids = [
         col_summary.id for col_summary in subscribed_collection_summaries
-        if not col_summary.is_solely_owned_by_user(user_id)
-        and col_summary.does_user_have_any_role(user_id)
+        if not col_summary.is_solely_owned_by_user(user_id) and
+        col_summary.does_user_have_any_role(user_id)
     ]
     for col_id in collections_to_remove_user_from_ids:
         rights_manager.deassign_role_for_collection(
@@ -723,8 +726,8 @@ def remove_user_from_activities_with_associated_rights_models(user_id: str) -> N
     )
     collections_to_be_deleted_ids = [
         collection_rights.id for collection_rights in collection_rights
-        if collection_rights.is_private()
-        and collection_rights.is_solely_owned_by_user(user_id)
+        if collection_rights.is_private() and
+        collection_rights.is_solely_owned_by_user(user_id)
     ]
     collection_services.delete_collections(
         user_id, collections_to_be_deleted_ids, force_deletion=True
@@ -773,13 +776,14 @@ def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
             config, collection, skill, or suggestion) that were modified
             in some way by the user who is currently being deleted.
     """
-    if (entity_category.value
-            not in pending_deletion_request.pseudonymizable_entity_mappings):
+    if (
+        entity_category.value
+        not in pending_deletion_request.pseudonymizable_entity_mappings
+    ):
         pseudonymized_id = user_models.PseudonymizedUserModel.get_new_id('')
         pending_deletion_request.pseudonymizable_entity_mappings[
             entity_category.value] = {
-                entity_id: pseudonymized_id
-                for entity_id in entity_ids
+                entity_id: pseudonymized_id for entity_id in entity_ids
             }
         save_pending_deletion_requests([pending_deletion_request])
 
@@ -800,8 +804,10 @@ def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
     """
     # The pseudonymizable_entity_mappings field might have only been partially
     # generated, so we fill in the missing part for this entity category.
-    if (entity_category.value
-            not in pending_deletion_request.pseudonymizable_entity_mappings):
+    if (
+        entity_category.value
+        not in pending_deletion_request.pseudonymizable_entity_mappings
+    ):
         pending_deletion_request.pseudonymizable_entity_mappings[
             entity_category.value
         ] = (_generate_entity_to_pseudonymized_ids_mapping(entity_ids))
@@ -877,7 +883,7 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
     if commit_log_model_class is not None:
         commit_log_models = list(
             commit_log_model_class.query(commit_log_model_class.user_id == user_id
-                                         ).fetch()
+                                        ).fetch()
         )
         if commit_log_model_field_name is None:
             raise Exception(
@@ -917,7 +923,7 @@ def _pseudonymize_config_models(
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to pseudonymize the models.
     """
-    snapshot_model_classes = (config_models.PlatformParameterSnapshotMetadataModel, )
+    snapshot_model_classes = (config_models.PlatformParameterSnapshotMetadataModel,)
 
     snapshot_metadata_models, _ = (
         _collect_and_save_entity_ids_from_snapshots_and_commits(
@@ -960,8 +966,9 @@ def _pseudonymize_config_models(
             model for model in snapshot_metadata_models
             if model.get_unversioned_instance_id() == config_id
         ]
-        for i in range(0, len(config_related_models),
-                       feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+        for i in range(
+            0, len(config_related_models), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+        ):
             _pseudonymize_models_transactional(
                 config_related_models[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
@@ -1043,7 +1050,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[activity_category.value
-                                                                 ]
+                                                                ]
     )
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_models: List[base_models.BaseModel] = [
@@ -1053,8 +1060,9 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         for model in commit_log_models:
             if getattr(model, commit_log_model_field_name) == activity_id:
                 activity_related_models.append(model)
-        for i in range(0, len(activity_related_models),
-                       feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+        for i in range(
+            0, len(activity_related_models), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+        ):
             _pseudonymize_models_transactional(
                 activity_related_models[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
@@ -1068,7 +1076,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
     rights_snapshot_metadata_model_class: Type[base_models.BaseSnapshotMetadataModel],
     rights_snapshot_content_model_class: Type[base_models.BaseSnapshotContentModel],
     commit_log_model_class: Type[base_models.BaseCommitLogEntryModel
-                                 ], commit_log_model_field_name: str,
+                                ], commit_log_model_field_name: str,
     allowed_commands: List[feconf.ValidCmdDict], rights_user_id_fields: List[str]
 ) -> None:
     """Pseudonymize the activity models with associated rights models for the
@@ -1206,8 +1214,9 @@ def _pseudonymize_activity_models_with_associated_rights_models(
             commit_log_model.user_id = pseudonymized_id
             commit_log_model.update_timestamps()
         all_models: List[base_models.BaseModel] = []
-        for snapshot_metadata_model in (snapshot_metadata_models +
-                                        rights_snapshot_metadata_models):
+        for snapshot_metadata_model in (
+            snapshot_metadata_models + rights_snapshot_metadata_models
+        ):
             all_models.append(snapshot_metadata_model)
         for snapshot_content_model in rights_snapshot_content_models:
             all_models.append(snapshot_content_model)
@@ -1217,7 +1226,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[activity_category.value
-                                                                 ]
+                                                                ]
     )
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_snapshot_metadata_models = [
@@ -1248,8 +1257,9 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         for metadata_model in activity_related_snapshot_metadata_models:
             activity_related_models.append(metadata_model)
 
-        for i in range(0, len(activity_related_models),
-                       feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+        for i in range(
+            0, len(activity_related_models), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+        ):
             _pseudonymize_models_transactional(
                 activity_related_models[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
@@ -1271,9 +1281,9 @@ def _remove_user_id_from_contributors_in_summary_models(
     """
     related_summary_models: Sequence[Union[collection_models.CollectionSummaryModel,
                                            exp_models.ExpSummaryModel]
-                                     ] = summary_model_class.query(
-                                         summary_model_class.contributor_ids == user_id
-                                     ).fetch()
+                                    ] = summary_model_class.query(
+                                        summary_model_class.contributor_ids == user_id
+                                    ).fetch()
 
     @transaction_services.run_in_transaction_wrapper
     def _remove_user_id_from_models_transactional(
@@ -1300,8 +1310,9 @@ def _remove_user_id_from_contributors_in_summary_models(
         summary_model_class.update_timestamps_multi(summary_models)
         datastore_services.put_multi(summary_models)
 
-    for i in range(0, len(related_summary_models),
-                   feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+    for i in range(
+        0, len(related_summary_models), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+    ):
         _remove_user_id_from_models_transactional(
             related_summary_models[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
@@ -1365,8 +1376,9 @@ def _pseudonymize_one_model_class(
         model_class.update_timestamps_multi(models_to_pseudonymize)
         model_class.put_multi(models_to_pseudonymize)
 
-    for i in range(0, len(models_to_pseudonymize),
-                   feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+    for i in range(
+        0, len(models_to_pseudonymize), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+    ):
         _pseudonymize_models_transactional(
             models_to_pseudonymize[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
@@ -1402,10 +1414,10 @@ def _pseudonymize_feedback_models(
 
     feedback_message_model_class = feedback_models.GeneralFeedbackMessageModel
     feedback_message_models: Sequence[feedback_models.GeneralFeedbackMessageModel
-                                      ] = feedback_message_model_class.query(
-                                          feedback_message_model_class.author_id ==
-                                          user_id
-                                      ).fetch()
+                                     ] = feedback_message_model_class.query(
+                                         feedback_message_model_class.author_id ==
+                                         user_id
+                                     ).fetch()
     feedback_ids |= set(model.thread_id for model in feedback_message_models)
 
     suggestion_model_class = suggestion_models.GeneralSuggestionModel
@@ -1491,8 +1503,9 @@ def _pseudonymize_feedback_models(
         for suggestion_model in general_suggestion_models:
             if suggestion_model.id == feedback_id:
                 feedback_related_models.append(suggestion_model)
-        for i in range(0, len(feedback_related_models),
-                       feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+        for i in range(
+            0, len(feedback_related_models), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+        ):
             _pseudonymize_models_transactional(
                 feedback_related_models[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
@@ -1519,9 +1532,9 @@ def _pseudonymize_blog_post_models(
     # with that pseudonymous user ID in all the models.
     blog_post_model_class = blog_models.BlogPostModel
     blog_post_models_list: Sequence[blog_models.BlogPostModel
-                                    ] = blog_post_model_class.query(
-                                        blog_post_model_class.author_id == user_id
-                                    ).fetch()
+                                   ] = blog_post_model_class.query(
+                                       blog_post_model_class.author_id == user_id
+                                   ).fetch()
     blog_related_model_ids = {model.id for model in blog_post_models_list}
 
     blog_post_summary_model_class = blog_models.BlogPostSummaryModel
@@ -1562,10 +1575,10 @@ def _pseudonymize_blog_post_models(
         blog_post_models_list: List[Union[blog_models.BlogPostModel,
                                           blog_models.BlogPostSummaryModel,
                                           blog_models.BlogAuthorDetailsModel]
-                                    ] = [
-                                        model for model in blog_posts_related_models
-                                        if isinstance(model, blog_post_model_class)
-                                    ]
+                                   ] = [
+                                       model for model in blog_posts_related_models
+                                       if isinstance(model, blog_post_model_class)
+                                   ]
         for blog_post_model in blog_post_models_list:
             if blog_post_model.author_id == user_id:
                 blog_post_model.author_id = pseudonymized_id
@@ -1584,7 +1597,7 @@ def _pseudonymize_blog_post_models(
         all_models: List[Union[blog_models.BlogPostModel,
                                blog_models.BlogPostSummaryModel,
                                blog_models.BlogAuthorDetailsModel]
-                         ] = blog_post_models_list + blog_post_summary_models_list
+                        ] = blog_post_models_list + blog_post_summary_models_list
 
         for model in blog_posts_related_models:
             if isinstance(model, blog_author_details_model_class):
@@ -1598,7 +1611,7 @@ def _pseudonymize_blog_post_models(
 
     blog_post_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[models.Names.BLOG.value
-                                                                 ]
+                                                                ]
     )
     for blog_related_ids, pseudonymized_id in blog_post_ids_to_pids.items():
         blog_posts_related_models = [
@@ -1611,9 +1624,9 @@ def _pseudonymize_blog_post_models(
             blog_posts_related_models, feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
         )
         for transaction_slice in transaction_slices:
-            _pseudonymize_models_transactional(
-                [m for m in transaction_slice if m is not None], pseudonymized_id
-            )
+            _pseudonymize_models_transactional([
+                m for m in transaction_slice if m is not None
+            ], pseudonymized_id)
 
 
 def _pseudonymize_version_history_models(
@@ -1678,8 +1691,9 @@ def _pseudonymize_version_history_models(
             models.Names.EXPLORATION.value]
     )
 
-    for i in range(0, len(version_history_models),
-                   feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+    for i in range(
+        0, len(version_history_models), feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+    ):
         _pseudonymize_models_transactional(
             version_history_models[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
             exp_ids_to_pids

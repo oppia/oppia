@@ -26,7 +26,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models, ) = (models.Registry.import_models([models.Names.SUGGESTION]))
+(suggestion_models,) = (models.Registry.import_models([models.Names.SUGGESTION]))
 
 
 def get_translation_submitter_total_stats_from_model(
@@ -400,7 +400,8 @@ def get_all_translation_coordinator_stats(
     translation_coordinator_models: Sequence[
         suggestion_models.TranslationCoordinatorsModel] = []
     if sort == (
-            suggestion_models.SortChoices.SORT_KEY_INCREASING_COORDINATOR_COUNTS.value):
+        suggestion_models.SortChoices.SORT_KEY_INCREASING_COORDINATOR_COUNTS.value
+    ):
         translation_coordinator_models = (
             model_class.query().order(model_class.coordinators_count).fetch()
         )

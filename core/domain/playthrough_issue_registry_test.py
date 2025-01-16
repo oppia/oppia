@@ -32,11 +32,11 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.issues_dict = {
-            'EarlyQuit': EarlyQuit.EarlyQuit,
+            'EarlyQuit':
+                EarlyQuit.EarlyQuit,
             'CyclicStateTransitions': (CyclicStateTransitions.CyclicStateTransitions),
-            'MultipleIncorrectSubmissions': (
-                MultipleIncorrectSubmissions.MultipleIncorrectSubmissions
-            )
+            'MultipleIncorrectSubmissions':
+                (MultipleIncorrectSubmissions.MultipleIncorrectSubmissions)
         }
         self.invalid_issue_type = 'InvalidIssueType'
 

@@ -37,9 +37,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
     from mypy_imports import transaction_services
 
-(question_models, skill_models) = models.Registry.import_models(
-    [models.Names.QUESTION, models.Names.SKILL]
-)
+(question_models, skill_models) = models.Registry.import_models([
+    models.Names.QUESTION, models.Names.SKILL
+])
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -636,16 +636,20 @@ def apply_change_list(
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
-                if (change.property_name ==
-                        question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
+                if (
+                    change.property_name ==
+                    question_domain.QUESTION_PROPERTY_LANGUAGE_CODE
+                ):
                     # Here we use cast because this 'if' condition forces
                     # change to have type UpdateQuestionPropertyLanguageCodeCmd.
                     update_language_code_cmd = cast(
                         question_domain.UpdateQuestionPropertyLanguageCodeCmd, change
                     )
                     question.update_language_code(update_language_code_cmd.new_value)
-                elif (change.property_name ==
-                      question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
+                elif (
+                    change.property_name ==
+                    question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateQuestionPropertyQuestionStateDataCmd.
@@ -657,8 +661,10 @@ def apply_change_list(
                         update_question_state_data_cmd.new_value
                     )
                     question.update_question_state_data(state_domain_object)
-                elif (change.property_name ==
-                      question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
+                elif (
+                    change.property_name ==
+                    question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateQuestionPropertyLinkedSkillIdsCmd.
@@ -668,8 +674,10 @@ def apply_change_list(
                     question.update_linked_skill_ids(
                         update_linked_skill_ids_cmd.new_value
                     )
-                elif (change.property_name ==
-                      question_property_inapplicable_skill_misconception_ids):
+                elif (
+                    change.property_name ==
+                    question_property_inapplicable_skill_misconception_ids
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateQuestionPropertySkillMisconceptionIdsCmd.
@@ -680,8 +688,10 @@ def apply_change_list(
                     question.update_inapplicable_skill_misconception_ids(
                         update_skill_misconception_ids_cmd.new_value
                     )
-                elif (change.property_name ==
-                      question_domain.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                elif (
+                    change.property_name ==
+                    question_domain.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX
+                ):
                     # Here we use cast because this 'if' condition forces
                     # change to have type
                     # UpdateQuestionPropertyNextContentIdIndexCmd.
@@ -930,8 +940,8 @@ def untag_deleted_misconceptions(
         )
         deleted_inapplicable_skill_misconception_ids = (
             list(
-                set(deleted_skill_misconception_ids)
-                & set(inapplicable_skill_misconception_ids)
+                set(deleted_skill_misconception_ids) &
+                set(inapplicable_skill_misconception_ids)
             )
         )
         if deleted_inapplicable_skill_misconception_ids:
@@ -942,14 +952,12 @@ def untag_deleted_misconceptions(
                 )
             )
             change_list.append(
-                question_domain.QuestionChange(
-                    {
-                        'cmd': 'update_question_property',
-                        'property_name': 'inapplicable_skill_misconception_ids',
-                        'new_value': new_inapplicable_skill_misconception_ids,
-                        'old_value': question.inapplicable_skill_misconception_ids
-                    }
-                )
+                question_domain.QuestionChange({
+                    'cmd': 'update_question_property',
+                    'property_name': 'inapplicable_skill_misconception_ids',
+                    'new_value': new_inapplicable_skill_misconception_ids,
+                    'old_value': question.inapplicable_skill_misconception_ids
+                })
             )
         old_question_state_data_dict = question.question_state_data.to_dict()
         answer_groups = (list(question.question_state_data.interaction.answer_groups))
@@ -961,14 +969,12 @@ def untag_deleted_misconceptions(
                 answer_group.tagged_skill_misconception_id = None
         question.question_state_data.interaction.answer_groups = answer_groups
         change_list.append(
-            question_domain.QuestionChange(
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'question_state_data',
-                    'new_value': question.question_state_data.to_dict(),
-                    'old_value': old_question_state_data_dict
-                }
-            )
+            question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'question_state_data',
+                'new_value': question.question_state_data.to_dict(),
+                'old_value': old_question_state_data_dict
+            })
         )
         update_question(
             committer_id, question.id, change_list,

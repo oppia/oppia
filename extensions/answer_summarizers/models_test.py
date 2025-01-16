@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Test calculations to get interaction answer views."""
 
 from __future__ import annotations
@@ -42,7 +41,9 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Subclasses of BaseCalculation should implement the '
                 'calculate_from_state_answers_dict(state_answers_dict) '
-                'method.')):
+                'method.'
+            )
+        ):
             answer_models.BaseCalculation().calculate_from_state_answers_dict({
                 'exploration_id': 'exp_id',
                 'exploration_version': 1,
@@ -121,23 +122,18 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
 
     def _get_calculation_instance(self) -> answer_models.BaseCalculation:
         """Requires the existance of the class constant: CALCULATION_ID."""
-        return calculation_registry.Registry.get_calculation_by_id(
-            self.CALCULATION_ID)
+        return calculation_registry.Registry.get_calculation_by_id(self.CALCULATION_ID)
 
     def _perform_calculation(
         self, state_answers_dict: stats_domain.StateAnswersDict
-    ) -> Union[
-        stats_domain.AnswerFrequencyList,
-        stats_domain.CategorizedAnswerFrequencyLists
-    ]:
+    ) -> Union[stats_domain.AnswerFrequencyList,
+               stats_domain.CategorizedAnswerFrequencyLists]:
         """Performs calculation on state_answers_dict and returns its output."""
         calculation_instance = self._get_calculation_instance()
         state_answers_calc_output = (
-            calculation_instance.calculate_from_state_answers_dict(
-                state_answers_dict))
-        self.assertEqual(
-            state_answers_calc_output.calculation_id,
-            self.CALCULATION_ID)
+            calculation_instance.calculate_from_state_answers_dict(state_answers_dict)
+        )
+        self.assertEqual(state_answers_calc_output.calculation_id, self.CALCULATION_ID)
         return state_answers_calc_output.calculation_output
 
 
@@ -148,28 +144,63 @@ class AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
     def test_top_answers_without_ties(self) -> None:
         # Create 12 answers with different frequencies.
-        answers = (
-            ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 +
-            ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L'])
+        answers = (['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 + ['E'] * 8 +
+                   ['F'] * 7 + ['G'] * 6 + ['H'] * 5 + ['I'] * 4 + ['J'] * 3 +
+                   ['K'] * 2 + ['L'])
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         # All 12 should be sorted.
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 12},
-            {'answer': 'B', 'frequency': 11},
-            {'answer': 'C', 'frequency': 10},
-            {'answer': 'D', 'frequency': 9},
-            {'answer': 'E', 'frequency': 8},
-            {'answer': 'F', 'frequency': 7},
-            {'answer': 'G', 'frequency': 6},
-            {'answer': 'H', 'frequency': 5},
-            {'answer': 'I', 'frequency': 4},
-            {'answer': 'J', 'frequency': 3},
-            {'answer': 'K', 'frequency': 2},
-            {'answer': 'L', 'frequency': 1},
+            {
+                'answer': 'A',
+                'frequency': 12
+            },
+            {
+                'answer': 'B',
+                'frequency': 11
+            },
+            {
+                'answer': 'C',
+                'frequency': 10
+            },
+            {
+                'answer': 'D',
+                'frequency': 9
+            },
+            {
+                'answer': 'E',
+                'frequency': 8
+            },
+            {
+                'answer': 'F',
+                'frequency': 7
+            },
+            {
+                'answer': 'G',
+                'frequency': 6
+            },
+            {
+                'answer': 'H',
+                'frequency': 5
+            },
+            {
+                'answer': 'I',
+                'frequency': 4
+            },
+            {
+                'answer': 'J',
+                'frequency': 3
+            },
+            {
+                'answer': 'K',
+                'frequency': 2
+            },
+            {
+                'answer': 'L',
+                'frequency': 1
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
@@ -182,18 +213,54 @@ class AnswerFrequenciesUnitTests(CalculationUnitTestBase):
         actual_calc_output = self._perform_calculation(state_answers_dict)
         # All 12 should appear in-order.
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 1},
-            {'answer': 'B', 'frequency': 1},
-            {'answer': 'C', 'frequency': 1},
-            {'answer': 'D', 'frequency': 1},
-            {'answer': 'E', 'frequency': 1},
-            {'answer': 'F', 'frequency': 1},
-            {'answer': 'G', 'frequency': 1},
-            {'answer': 'H', 'frequency': 1},
-            {'answer': 'I', 'frequency': 1},
-            {'answer': 'J', 'frequency': 1},
-            {'answer': 'K', 'frequency': 1},
-            {'answer': 'L', 'frequency': 1},
+            {
+                'answer': 'A',
+                'frequency': 1
+            },
+            {
+                'answer': 'B',
+                'frequency': 1
+            },
+            {
+                'answer': 'C',
+                'frequency': 1
+            },
+            {
+                'answer': 'D',
+                'frequency': 1
+            },
+            {
+                'answer': 'E',
+                'frequency': 1
+            },
+            {
+                'answer': 'F',
+                'frequency': 1
+            },
+            {
+                'answer': 'G',
+                'frequency': 1
+            },
+            {
+                'answer': 'H',
+                'frequency': 1
+            },
+            {
+                'answer': 'I',
+                'frequency': 1
+            },
+            {
+                'answer': 'J',
+                'frequency': 1
+            },
+            {
+                'answer': 'K',
+                'frequency': 1
+            },
+            {
+                'answer': 'L',
+                'frequency': 1
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
@@ -223,21 +290,35 @@ class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
     def test_top5_without_ties(self) -> None:
         """Simplest case: ordering is obvious."""
         # Create 12 answers with different frequencies.
-        answers = (
-            ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 +
-            ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L'])
+        answers = (['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 + ['E'] * 8 +
+                   ['F'] * 7 + ['G'] * 6 + ['H'] * 5 + ['I'] * 4 + ['J'] * 3 +
+                   ['K'] * 2 + ['L'])
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         # Only top 5 are kept.
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 12},
-            {'answer': 'B', 'frequency': 11},
-            {'answer': 'C', 'frequency': 10},
-            {'answer': 'D', 'frequency': 9},
-            {'answer': 'E', 'frequency': 8},
+            {
+                'answer': 'A',
+                'frequency': 12
+            },
+            {
+                'answer': 'B',
+                'frequency': 11
+            },
+            {
+                'answer': 'C',
+                'frequency': 10
+            },
+            {
+                'answer': 'D',
+                'frequency': 9
+            },
+            {
+                'answer': 'E',
+                'frequency': 8
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
@@ -251,17 +332,30 @@ class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
         actual_calc_output = self._perform_calculation(state_answers_dict)
         # Only first 5 are kept.
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 1},
-            {'answer': 'B', 'frequency': 1},
-            {'answer': 'C', 'frequency': 1},
-            {'answer': 'D', 'frequency': 1},
-            {'answer': 'E', 'frequency': 1},
+            {
+                'answer': 'A',
+                'frequency': 1
+            },
+            {
+                'answer': 'B',
+                'frequency': 1
+            },
+            {
+                'answer': 'C',
+                'frequency': 1
+            },
+            {
+                'answer': 'D',
+                'frequency': 1
+            },
+            {
+                'answer': 'E',
+                'frequency': 1
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
-    def test_top_5_answers_are_not_calculated_for_linear_interactions(
-        self
-    ) -> None:
+    def test_top_5_answers_are_not_calculated_for_linear_interactions(self) -> None:
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
@@ -284,26 +378,55 @@ class Top10AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
     def test_top10_answers_without_ties(self) -> None:
         # Create 12 answers with different frequencies.
-        answers = (
-            ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 +
-            ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L'])
+        answers = (['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 + ['E'] * 8 +
+                   ['F'] * 7 + ['G'] * 6 + ['H'] * 5 + ['I'] * 4 + ['J'] * 3 +
+                   ['K'] * 2 + ['L'])
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         # Only top 10 are kept.
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 12},
-            {'answer': 'B', 'frequency': 11},
-            {'answer': 'C', 'frequency': 10},
-            {'answer': 'D', 'frequency': 9},
-            {'answer': 'E', 'frequency': 8},
-            {'answer': 'F', 'frequency': 7},
-            {'answer': 'G', 'frequency': 6},
-            {'answer': 'H', 'frequency': 5},
-            {'answer': 'I', 'frequency': 4},
-            {'answer': 'J', 'frequency': 3},
+            {
+                'answer': 'A',
+                'frequency': 12
+            },
+            {
+                'answer': 'B',
+                'frequency': 11
+            },
+            {
+                'answer': 'C',
+                'frequency': 10
+            },
+            {
+                'answer': 'D',
+                'frequency': 9
+            },
+            {
+                'answer': 'E',
+                'frequency': 8
+            },
+            {
+                'answer': 'F',
+                'frequency': 7
+            },
+            {
+                'answer': 'G',
+                'frequency': 6
+            },
+            {
+                'answer': 'H',
+                'frequency': 5
+            },
+            {
+                'answer': 'I',
+                'frequency': 4
+            },
+            {
+                'answer': 'J',
+                'frequency': 3
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
@@ -317,22 +440,50 @@ class Top10AnswerFrequenciesUnitTests(CalculationUnitTestBase):
         actual_calc_output = self._perform_calculation(state_answers_dict)
         # Only first 10 are kept.
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 1},
-            {'answer': 'B', 'frequency': 1},
-            {'answer': 'C', 'frequency': 1},
-            {'answer': 'D', 'frequency': 1},
-            {'answer': 'E', 'frequency': 1},
-            {'answer': 'F', 'frequency': 1},
-            {'answer': 'G', 'frequency': 1},
-            {'answer': 'H', 'frequency': 1},
-            {'answer': 'I', 'frequency': 1},
-            {'answer': 'J', 'frequency': 1},
+            {
+                'answer': 'A',
+                'frequency': 1
+            },
+            {
+                'answer': 'B',
+                'frequency': 1
+            },
+            {
+                'answer': 'C',
+                'frequency': 1
+            },
+            {
+                'answer': 'D',
+                'frequency': 1
+            },
+            {
+                'answer': 'E',
+                'frequency': 1
+            },
+            {
+                'answer': 'F',
+                'frequency': 1
+            },
+            {
+                'answer': 'G',
+                'frequency': 1
+            },
+            {
+                'answer': 'H',
+                'frequency': 1
+            },
+            {
+                'answer': 'I',
+                'frequency': 1
+            },
+            {
+                'answer': 'J',
+                'frequency': 1
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
-    def test_top_10_answers_are_not_calculated_for_linear_interactions(
-        self
-    ) -> None:
+    def test_top_10_answers_are_not_calculated_for_linear_interactions(self) -> None:
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
@@ -364,18 +515,29 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 3},
-            {'answer': 'B', 'frequency': 2},
-            {'answer': 'C', 'frequency': 1},
-            {'answer': 'D', 'frequency': 1},
+            {
+                'answer': 'A',
+                'frequency': 3
+            },
+            {
+                'answer': 'B',
+                'frequency': 2
+            },
+            {
+                'answer': 'C',
+                'frequency': 1
+            },
+            {
+                'answer': 'D',
+                'frequency': 1
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_many_shared_answers(self) -> None:
-        answers = (
-            ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 +
-            ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L'])
+        answers = (['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 + ['E'] * 8 +
+                   ['F'] * 7 + ['G'] * 6 + ['H'] * 5 + ['I'] * 4 + ['J'] * 3 +
+                   ['K'] * 2 + ['L'])
         split_len = len(answers) // 4
         answer_dicts_list = [
             self._create_answer_dict(answers[:split_len * 1]),
@@ -388,22 +550,50 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
         actual_calc_output = self._perform_calculation(state_answers_dict)
         # Only top 10 are kept.
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 12},
-            {'answer': 'B', 'frequency': 11},
-            {'answer': 'C', 'frequency': 10},
-            {'answer': 'D', 'frequency': 9},
-            {'answer': 'E', 'frequency': 8},
-            {'answer': 'F', 'frequency': 7},
-            {'answer': 'G', 'frequency': 6},
-            {'answer': 'H', 'frequency': 5},
-            {'answer': 'I', 'frequency': 4},
-            {'answer': 'J', 'frequency': 3},
+            {
+                'answer': 'A',
+                'frequency': 12
+            },
+            {
+                'answer': 'B',
+                'frequency': 11
+            },
+            {
+                'answer': 'C',
+                'frequency': 10
+            },
+            {
+                'answer': 'D',
+                'frequency': 9
+            },
+            {
+                'answer': 'E',
+                'frequency': 8
+            },
+            {
+                'answer': 'F',
+                'frequency': 7
+            },
+            {
+                'answer': 'G',
+                'frequency': 6
+            },
+            {
+                'answer': 'H',
+                'frequency': 5
+            },
+            {
+                'answer': 'I',
+                'frequency': 4
+            },
+            {
+                'answer': 'J',
+                'frequency': 3
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
-    def test_common_answers_are_not_calculated_for_linear_interactions(
-        self
-    ) -> None:
+    def test_common_answers_are_not_calculated_for_linear_interactions(self) -> None:
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
@@ -418,16 +608,13 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
         ):
             self._perform_calculation(state_answers_dict)
 
-    def test_raises_error_if_non_iterable_answer_provided(
-        self
-    ) -> None:
+    def test_raises_error_if_non_iterable_answer_provided(self) -> None:
         # Here 123 is not an iterable answer.
         answer_dicts_list = [self._create_answer_dict(123)]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         with self.assertRaisesRegex(
-            Exception,
-            'To calculate commonly submitted answers\' frequencies, answers '
+            Exception, 'To calculate commonly submitted answers\' frequencies, answers '
             'must be provided in an iterable form, like: SetOfUnicodeString.'
         ):
             self._perform_calculation(state_answers_dict)
@@ -445,13 +632,17 @@ class TopAnswersByCategorizationUnitTests(CalculationUnitTestBase):
     def test_only_one_category(self) -> None:
         answer_dicts_list = [
             self._create_answer_dict(
-                'Hard A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Hard A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
         ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = {
-            'explicit': [{'answer': 'Hard A', 'frequency': 1}],
+            'explicit': [{
+                'answer': 'Hard A',
+                'frequency': 1
+            }],
         }
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
@@ -459,75 +650,107 @@ class TopAnswersByCategorizationUnitTests(CalculationUnitTestBase):
         answer_dicts_list = [
             # EXPLICIT.
             self._create_answer_dict(
-                'Explicit A',
-                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Explicit B',
-                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit B', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Explicit A',
-                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
             # TRAINING DATA.
             self._create_answer_dict(
                 'Trained data A',
-                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Trained data B',
-                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Trained data B',
-                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION
+            ),
             # STATS CLASSIFIER.
             self._create_answer_dict(
-                'Stats B',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats B', classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Stats C',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats C', classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Stats C',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats C', classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Trained data B',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
             # DEFAULT OUTCOMES.
             self._create_answer_dict(
                 'Default C',
-                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Default C',
-                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Default B',
-                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+            ),
         ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = {
             'explicit': [
-                {'answer': 'Explicit A', 'frequency': 2},
-                {'answer': 'Explicit B', 'frequency': 1},
+                {
+                    'answer': 'Explicit A',
+                    'frequency': 2
+                },
+                {
+                    'answer': 'Explicit B',
+                    'frequency': 1
+                },
             ],
             'training_data_match': [
-                {'answer': 'Trained data B', 'frequency': 2},
-                {'answer': 'Trained data A', 'frequency': 1},
+                {
+                    'answer': 'Trained data B',
+                    'frequency': 2
+                },
+                {
+                    'answer': 'Trained data A',
+                    'frequency': 1
+                },
             ],
             'statistical_classifier': [
-                {'answer': 'Stats C', 'frequency': 2},
-                {'answer': 'Stats B', 'frequency': 1},
-                {'answer': 'Trained data B', 'frequency': 1},
+                {
+                    'answer': 'Stats C',
+                    'frequency': 2
+                },
+                {
+                    'answer': 'Stats B',
+                    'frequency': 1
+                },
+                {
+                    'answer': 'Trained data B',
+                    'frequency': 1
+                },
             ],
             'default_outcome': [
-                {'answer': 'Default C', 'frequency': 2},
-                {'answer': 'Default B', 'frequency': 1},
+                {
+                    'answer': 'Default C',
+                    'frequency': 2
+                },
+                {
+                    'answer': 'Default B',
+                    'frequency': 1
+                },
             ],
         }
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
-    def test_top_answers_are_not_calculated_for_linear_interactions(
-        self
-    ) -> None:
+    def test_top_answers_are_not_calculated_for_linear_interactions(self) -> None:
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
@@ -556,69 +779,90 @@ class TopNUnresolvedAnswersByFrequencyUnitTests(CalculationUnitTestBase):
         answer_dicts_list = [
             # EXPLICIT.
             self._create_answer_dict(
-                'Explicit A',
-                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Explicit B',
-                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit B', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Explicit A',
-                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
             # TRAINING DATA.
             self._create_answer_dict(
                 'Trained data A',
-                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Trained data B',
-                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Trained data B',
-                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION
+            ),
             # STATS CLASSIFIER.
             self._create_answer_dict(
-                'Stats B',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats B', classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Stats C',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats C', classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Stats C',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats C', classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
             self._create_answer_dict(
-                'Explicit B',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                'Explicit B', classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
             # EXPLICIT.
             self._create_answer_dict(
-                'Trained data B',
-                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Trained data B', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
             # DEFAULT OUTCOMES.
             self._create_answer_dict(
                 'Default C',
-                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Default C',
-                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+            ),
             self._create_answer_dict(
                 'Default B',
-                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+            ),
             # EXPLICIT.
             self._create_answer_dict(
-                'Default B',
-                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+                'Default B', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
             # STATS CLASSIFIER.
             self._create_answer_dict(
-                'Default B',
-                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+                'Default B', classify_category=exp_domain.STATISTICAL_CLASSIFICATION
+            ),
         ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = [
-            {'answer': 'Default B', 'frequency': 3},
-            {'answer': 'Explicit B', 'frequency': 2},
-            {'answer': 'Stats C', 'frequency': 2},
-            {'answer': 'Default C', 'frequency': 2},
-            {'answer': 'Stats B', 'frequency': 1},
+            {
+                'answer': 'Default B',
+                'frequency': 3
+            },
+            {
+                'answer': 'Explicit B',
+                'frequency': 2
+            },
+            {
+                'answer': 'Stats C',
+                'frequency': 2
+            },
+            {
+                'answer': 'Default C',
+                'frequency': 2
+            },
+            {
+                'answer': 'Stats B',
+                'frequency': 1
+            },
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 

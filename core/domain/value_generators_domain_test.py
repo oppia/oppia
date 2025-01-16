@@ -51,8 +51,9 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
     def test_generate_value_of_base_value_generator_raises_error(self) -> None:
         base_generator = value_generators_domain.BaseValueGenerator()
         with self.assertRaisesRegex(
-                NotImplementedError,
-                re.escape('generate_value() method has not yet been implemented')):
+            NotImplementedError,
+            re.escape('generate_value() method has not yet been implemented')
+        ):
             base_generator.generate_value()
 
     def test_registry_template_random_selector_contents(self) -> None:
@@ -99,7 +100,9 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         module = importlib.import_module(
             'extensions.value_generators.models.generators'
         )
-        expected_generators = {'RandomSelector': type(generators.RandomSelector())}
+        expected_generators = {
+            'RandomSelector': type(generators.RandomSelector())
+        }
         with self.swap(module, 'Copier', MockCopier):
             value_generators = (
                 value_generators_domain.Registry.get_all_generator_classes()
@@ -117,8 +120,9 @@ class ValueGeneratorNameTests(test_utils.GenericTestBase):
 
         for file_name in all_python_files:
             python_module = importlib.import_module(file_name)
-            for name, clazz in inspect.getmembers(python_module,
-                                                  predicate=inspect.isclass):
+            for name, clazz in inspect.getmembers(
+                python_module, predicate=inspect.isclass
+            ):
                 all_base_classes = [
                     base_class.__name__ for base_class in (inspect.getmro(clazz))
                 ]

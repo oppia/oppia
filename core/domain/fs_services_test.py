@@ -42,8 +42,9 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), b'file_contents')
 
     def test_validate_entity_parameters(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid entity_id received: 1'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid entity_id received: 1'
+        ):
             # Here we use MyPy ignore because the argument `entity_id` of
             # GcsFileSystem() can only accept string values, but here for
             # testing purpose we are providing integer value. Thus to avoid
@@ -56,9 +57,10 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(utils.ValidationError, 'Entity id cannot be empty'):
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, '')
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid entity_name received: '
-                                    'invalid_name.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid entity_name received: '
+            'invalid_name.'
+        ):
             fs_services.GcsFileSystem('invalid_name', 'exp_id')
 
     def test_delete(self) -> None:
@@ -92,8 +94,10 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(IOError, 'Invalid filepath'):
             self.fs.listdir('/abc')
 
-        with self.assertRaisesRegex(IOError, ('The dir_name should not start with /'
-                                              ' or end with / : abc/')):
+        with self.assertRaisesRegex(
+            IOError, ('The dir_name should not start with /'
+                      ' or end with / : abc/')
+        ):
             self.fs.listdir('abc/')
 
         self.assertEqual(self.fs.listdir('fake_dir'), [])
@@ -156,8 +160,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
     def test_save_original_and_compressed_versions_of_image(self) -> None:
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             original_image_content = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID
@@ -174,8 +179,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
     def test_skip_upload_if_image_already_exists(self) -> None:
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             original_image_content = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID
@@ -214,8 +220,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertEqual(saved_image_content, new_saved_image_content)
 
     def test_validate_and_save_image(self) -> None:
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             original_image_content = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID
@@ -232,8 +239,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
     def test_compress_image_on_prod_mode_with_small_image_size(self) -> None:
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             original_image_content = f.read()
 
         with self.swap(constants, 'DEV_MODE', False):
@@ -271,8 +279,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             )
 
     def test_save_original_and_compressed_versions_of_svg_image(self) -> None:
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
+        ) as f:
             image_content = f.read()
 
         with self.swap(constants, 'DEV_MODE', False):
@@ -304,8 +313,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.assertEqual(micro_image_content, image_content)
 
     def test_copy_images(self) -> None:
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             original_image_content = f.read()
         fs_services.save_original_and_compressed_versions_of_image(
             self.FILENAME, 'exploration', self.EXPLORATION_ID, original_image_content,

@@ -82,12 +82,10 @@ def index_exploration_summaries(
         exp_summaries: list(ExplorationSummary). List of Exp Summary domain
             objects to be indexed.
     """
-    platform_search_services.add_documents_to_index(
-        [
-            _exp_summary_to_search_dict(exp_summary)
-            for exp_summary in exp_summaries if _should_index_exploration(exp_summary)
-        ], SEARCH_INDEX_EXPLORATIONS
-    )
+    platform_search_services.add_documents_to_index([
+        _exp_summary_to_search_dict(exp_summary)
+        for exp_summary in exp_summaries if _should_index_exploration(exp_summary)
+    ], SEARCH_INDEX_EXPLORATIONS)
 
 
 def _exp_summary_to_search_dict(
@@ -127,8 +125,8 @@ def _should_index_exploration(exp_summary: exp_domain.ExplorationSummary) -> boo
         search queries.
     """
     return (
-        not exp_summary.deleted
-        and exp_summary.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+        not exp_summary.deleted and
+        exp_summary.status != rights_domain.ACTIVITY_STATUS_PRIVATE
     )
 
 
@@ -145,7 +143,13 @@ def get_search_rank_from_exp_summary(exp_summary: exp_domain.ExplorationSummary)
     Returns:
         int. Document's rank in search.
     """
-    rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
+    rating_weightings = {
+        '1': -5,
+        '2': -2,
+        '3': 2,
+        '4': 5,
+        '5': 10
+    }
 
     rank = _DEFAULT_RANK
     if exp_summary.ratings:
@@ -167,13 +171,11 @@ def index_collection_summaries(
         collection_summaries: list(CollectionSummary). List of collection
             summary domain objects to be indexed.
     """
-    platform_search_services.add_documents_to_index(
-        [
-            _collection_summary_to_search_dict(collection_summary)
-            for collection_summary in collection_summaries
-            if _should_index_collection(collection_summary)
-        ], SEARCH_INDEX_COLLECTIONS
-    )
+    platform_search_services.add_documents_to_index([
+        _collection_summary_to_search_dict(collection_summary)
+        for collection_summary in collection_summaries
+        if _should_index_collection(collection_summary)
+    ], SEARCH_INDEX_COLLECTIONS)
 
 
 def _collection_summary_to_search_dict(
@@ -363,9 +365,9 @@ def index_blog_post_summaries(
         _blog_post_summary_to_search_dict(blog_post_summary)
         for blog_post_summary in blog_post_summaries
     ]
-    platform_search_services.add_documents_to_index(
-        [doc for doc in docs_to_index if doc], SEARCH_INDEX_BLOG_POSTS
-    )
+    platform_search_services.add_documents_to_index([
+        doc for doc in docs_to_index if doc
+    ], SEARCH_INDEX_BLOG_POSTS)
 
 
 def _blog_post_summary_to_search_dict(
@@ -383,12 +385,14 @@ def _blog_post_summary_to_search_dict(
     """
     if (not blog_post_summary.deleted and blog_post_summary.published_on is not None):
         doc: BlogPostSummaryDomainSearchDict = {
-            'id': blog_post_summary.id,
-            'title': blog_post_summary.title,
-            'tags': blog_post_summary.tags,
-            'rank': math.floor(
-                utils.get_time_in_millisecs(blog_post_summary.published_on)
-            )
+            'id':
+                blog_post_summary.id,
+            'title':
+                blog_post_summary.title,
+            'tags':
+                blog_post_summary.tags,
+            'rank':
+                math.floor(utils.get_time_in_millisecs(blog_post_summary.published_on))
         }
         return doc
     return None
@@ -438,9 +442,8 @@ def delete_blog_post_summary_from_search_index(blog_post_id: str) -> None:
     """
     # The argument type of delete_documents_from_index() is List[str],
     # therefore, we provide [blog_post_id] as argument.
-    platform_search_services.delete_documents_from_index(
-        [blog_post_id], SEARCH_INDEX_BLOG_POSTS
-    )
+    platform_search_services.delete_documents_from_index([blog_post_id],
+                                                         SEARCH_INDEX_BLOG_POSTS)
 
 
 def clear_blog_post_summaries_search_index() -> None:

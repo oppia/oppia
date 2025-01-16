@@ -34,7 +34,7 @@ if MYPY:  # pragma: no cover
 
 translate_services = models.Registry.import_translate_services()
 
-(translation_models, ) = models.Registry.import_models([models.Names.TRANSLATION])
+(translation_models,) = models.Registry.import_models([models.Names.TRANSLATION])
 
 
 def get_and_cache_machine_translation(
@@ -168,8 +168,7 @@ def compute_translation_related_change(
         contents as value and the languages as key.
     """
     language_code_to_entity_translation = {
-        entity_translation.language_code: entity_translation
-        for entity_translation in (
+        entity_translation.language_code: entity_translation for entity_translation in (
             translation_fetchers.get_all_entity_translations_for_entity(
                 feconf.TranslatableEntityType.EXPLORATION, updated_exploration.id,
                 updated_exploration.version - 1
@@ -229,8 +228,7 @@ def compute_translation_related_changes_upon_revert(
         contents as value and the languages as key.
     """
     language_code_to_entity_translation = {
-        entity_translation.language_code: entity_translation
-        for entity_translation in (
+        entity_translation.language_code: entity_translation for entity_translation in (
             translation_fetchers.get_all_entity_translations_for_entity(
                 feconf.TranslatableEntityType.EXPLORATION, reverted_exploration.id,
                 revert_to_version
@@ -270,7 +268,8 @@ def get_languages_with_complete_translation(
     content_count = exploration.get_content_count()
     language_code_list = []
     for language_code, count in get_translation_counts(
-            feconf.TranslatableEntityType.EXPLORATION, exploration).items():
+        feconf.TranslatableEntityType.EXPLORATION, exploration
+    ).items():
         if count == content_count:
             language_code_list.append(language_code)
 
@@ -318,8 +317,8 @@ def get_translation_counts(
         )
     )
     return {
-        entity_translation.language_code: entity.
-        get_translation_count(entity_translation)
+        entity_translation.language_code:
+            entity.get_translation_count(entity_translation)
         for entity_translation in entity_translations
     }
 

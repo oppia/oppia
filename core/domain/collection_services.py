@@ -56,9 +56,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import user_models
 
-(collection_models, user_models) = models.Registry.import_models(
-    [models.Names.COLLECTION, models.Names.USER]
-)
+(collection_models, user_models) = models.Registry.import_models([
+    models.Names.COLLECTION, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -270,8 +270,9 @@ def get_collection_by_id(
         if collection_model:
             collection = get_collection_from_model(collection_model)
             caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_COLLECTION, sub_namespace,
-                {collection_id: collection}
+                caching_services.CACHE_NAMESPACE_COLLECTION, sub_namespace, {
+                    collection_id: collection
+                }
             )
             return collection
         else:
@@ -356,7 +357,9 @@ def get_multiple_collections_by_id(
             '\n'.join(not_found)
         )
 
-    cache_update = {cid: val for cid, val in db_results_dict.items() if val is not None}
+    cache_update = {
+        cid: val for cid, val in db_results_dict.items() if val is not None
+    }
 
     if cache_update:
         caching_services.set_multi(
@@ -382,12 +385,10 @@ def get_collection_and_collection_rights_by_id(
         collection rights domain object, respectively.
     """
     collection_and_rights = (
-        datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [
-                ('CollectionModel', [collection_id]),
-                ('CollectionRightsModel', [collection_id])
-            ]
-        )
+        datastore_services.fetch_multiple_entities_by_ids_and_models([
+            ('CollectionModel', [collection_id]),
+            ('CollectionRightsModel', [collection_id])
+        ])
     )
 
     collection = None
@@ -726,13 +727,14 @@ def get_collection_ids_matching_query(
         # through query and there cannot be a collection id for which there is
         # no collection.
         for ind, _ in enumerate(
-                collection_models.CollectionSummaryModel.get_multi(collection_ids)):
+            collection_models.CollectionSummaryModel.get_multi(collection_ids)
+        ):
             returned_collection_ids.append(collection_ids[ind])
 
         # The number of collections in a page is always less than or equal to
         # feconf.SEARCH_RESULTS_PAGE_SIZE.
-        if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
-                search_offset is None):
+        if len(returned_collection_ids
+              ) == feconf.SEARCH_RESULTS_PAGE_SIZE or (search_offset is None):
             break
 
     return (returned_collection_ids, search_offset)
@@ -790,8 +792,9 @@ def apply_change_list(
                     swap_collection_nodes_cmd.second_index
                 )
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if (change.property_name == collection_domain.COLLECTION_PROPERTY_TITLE
-                    ):
+                if (
+                    change.property_name == collection_domain.COLLECTION_PROPERTY_TITLE
+                ):
                     # Here we use cast because this 'if' condition forces
                     # change to have type EditCollectionPropertyTitleCmd.
                     edit_collection_property_title_cmd = cast(
@@ -800,8 +803,10 @@ def apply_change_list(
                     collection.update_title(
                         edit_collection_property_title_cmd.new_value
                     )
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
+                elif (
+                    change.property_name ==
+                    collection_domain.COLLECTION_PROPERTY_CATEGORY
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyCategoryCmd.
                     edit_collection_property_category_cmd = cast(
@@ -810,8 +815,10 @@ def apply_change_list(
                     collection.update_category(
                         edit_collection_property_category_cmd.new_value
                     )
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
+                elif (
+                    change.property_name ==
+                    collection_domain.COLLECTION_PROPERTY_OBJECTIVE
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyObjectiveCmd.
                     edit_collection_property_objective_cmd = cast(
@@ -820,8 +827,10 @@ def apply_change_list(
                     collection.update_objective(
                         edit_collection_property_objective_cmd.new_value
                     )
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                elif (
+                    change.property_name ==
+                    collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyLanguageCodeCmd.
                     edit_collection_property_language_code_cmd = cast(
@@ -830,8 +839,9 @@ def apply_change_list(
                     collection.update_language_code(
                         edit_collection_property_language_code_cmd.new_value
                     )
-                elif (change.property_name == collection_domain.COLLECTION_PROPERTY_TAGS
-                      ):
+                elif (
+                    change.property_name == collection_domain.COLLECTION_PROPERTY_TAGS
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyTagsCmd.
                     edit_collection_property_tags_cmd = cast(
@@ -913,8 +923,7 @@ def _save_collection(
     exp_ids = collection.exploration_ids
     exp_summaries = (exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
     exp_summaries_dict = {
-        exp_id: exp_summaries[ind]
-        for (ind, exp_id) in enumerate(exp_ids)
+        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
     }
     for collection_node in collection.nodes:
         if not exp_summaries_dict[collection_node.exploration_id]:
@@ -1018,13 +1027,11 @@ def save_new_collection(
     """
     commit_message = ('New collection created with title \'%s\'.' % collection.title)
     _create_collection(
-        committer_id, collection, commit_message, [
-            {
-                'cmd': CMD_CREATE_NEW,
-                'title': collection.title,
-                'category': collection.category,
-            }
-        ]
+        committer_id, collection, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': collection.title,
+            'category': collection.category,
+        }]
     )
 
 
@@ -1187,8 +1194,10 @@ def update_collection(
     _save_collection(committer_id, collection, commit_message, change_list)
     regenerate_collection_summary_with_new_contributor(collection.id, committer_id)
 
-    if (not rights_manager.is_collection_private(collection.id)
-            and committer_id != feconf.MIGRATION_BOT_USER_ID):
+    if (
+        not rights_manager.is_collection_private(collection.id) and
+        committer_id != feconf.MIGRATION_BOT_USER_ID
+    ):
         user_settings = user_services.get_user_settings(committer_id)
         if user_settings is not None:
             user_settings.update_first_contribution_msec(
@@ -1340,9 +1349,8 @@ def save_collection_summary(
         'contributors_summary': collection_summary.contributors_summary,
         'version': collection_summary.version,
         'node_count': collection_summary.node_count,
-        'collection_model_last_updated': (
-            collection_summary.collection_model_last_updated
-        ),
+        'collection_model_last_updated':
+            (collection_summary.collection_model_last_updated),
         'collection_model_created_on': (collection_summary.collection_model_created_on)
     }
 
@@ -1395,13 +1403,11 @@ def save_new_collection_from_yaml(
     )
 
     _create_collection(
-        committer_id, collection, commit_message, [
-            {
-                'cmd': CMD_CREATE_NEW,
-                'title': collection.title,
-                'category': collection.category,
-            }
-        ]
+        committer_id, collection, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': collection.title,
+            'category': collection.category,
+        }]
     )
 
     return collection
@@ -1475,9 +1481,7 @@ def index_collections_given_ids(collection_ids: List[str]) -> None:
             to be indexed.
     """
     collection_summaries = get_collection_summaries_matching_ids(collection_ids)
-    search_services.index_collection_summaries(
-        [
-            collection_summary for collection_summary in collection_summaries
-            if collection_summary is not None
-        ]
-    )
+    search_services.index_collection_summaries([
+        collection_summary for collection_summary in collection_summaries
+        if collection_summary is not None
+    ])

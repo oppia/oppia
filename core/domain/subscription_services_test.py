@@ -36,7 +36,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models, ) = models.Registry.import_models([models.Names.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 COLLECTION_ID: Final = 'col_id'
 COLLECTION_ID_2: Final = 'col_id_2'
@@ -406,12 +406,10 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # the collection author should not be subscribed to the exploration nor
         # should the exploration author be subscribed to the collection.
         collection_services.update_collection(
-            self.owner_id, COLLECTION_ID, [
-                {
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': EXP_ID
-                }
-            ], 'Add new exploration to collection.'
+            self.owner_id, COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': EXP_ID
+            }], 'Add new exploration to collection.'
         )
 
         # Ensure subscriptions are as expected.
@@ -482,7 +480,8 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
 
     def test_exception_is_raised_when_user_self_subscribes(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'User %s is not allowed to self subscribe.' % USER_ID):
+            Exception, 'User %s is not allowed to self subscribe.' % USER_ID
+        ):
             subscription_services.subscribe_to_creator(USER_ID, USER_ID)
 
     def test_subscribe_to_creator(self) -> None:

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.batch_jobs.suggestion_stats_computation_jobs."""
 
 from __future__ import annotations
@@ -52,20 +51,11 @@ StatsType = List[Tuple[str, Dict[str, Union[bool, int, str]]]]
 
 class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        suggestion_stats_computation_jobs
-        .GenerateContributionStatsJob
-    ] = (
-        suggestion_stats_computation_jobs
-        .GenerateContributionStatsJob
-    )
+    JOB_CLASS: Type[suggestion_stats_computation_jobs.GenerateContributionStatsJob
+                   ] = (suggestion_stats_computation_jobs.GenerateContributionStatsJob)
 
-    VALID_USER_ID_1: Final = 'uid_%s' % (
-        'a' * feconf.USER_ID_RANDOM_PART_LENGTH
-    )
-    VALID_USER_ID_2: Final = 'uid_%s' % (
-        'b' * feconf.USER_ID_RANDOM_PART_LENGTH
-    )
+    VALID_USER_ID_1: Final = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    VALID_USER_ID_2: Final = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
     TOPIC_1_ID: Final = 'topic_1_id'
@@ -121,29 +111,27 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1
+        )
         self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_stats_model.submitted_translations_count, 1)
-        self.assertEqual(
-            translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(translation_stats_model.submitted_translation_word_count, 3)
         self.assertEqual(translation_stats_model.accepted_translations_count, 0)
         self.assertEqual(
-            translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
+            translation_stats_model.accepted_translations_without_reviewer_edits_count,
             0
         )
-        self.assertEqual(
-            translation_stats_model.accepted_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.accepted_translation_word_count, 0)
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [suggestion_model.created_on.date()]
@@ -195,9 +183,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             )
         ])
 
-    def test_creates_stats_model_from_one_suggestion_in_legacy_format(
-        self
-    ) -> None:
+    def test_creates_stats_model_from_one_suggestion_in_legacy_format(self) -> None:
         suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -241,37 +227,33 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1
+        )
         self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_stats_model.submitted_translations_count, 1)
-        self.assertEqual(
-            translation_stats_model.submitted_translation_word_count, 2)
+        self.assertEqual(translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(translation_stats_model.submitted_translation_word_count, 2)
         self.assertEqual(translation_stats_model.accepted_translations_count, 0)
         self.assertEqual(
-            translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
+            translation_stats_model.accepted_translations_without_reviewer_edits_count,
             0
         )
-        self.assertEqual(
-            translation_stats_model.accepted_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.accepted_translation_word_count, 0)
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [suggestion_model.created_on.date()]
         )
 
-    def test_creates_stats_model_from_one_suggestion_in_set_format(
-        self
-    ) -> None:
+    def test_creates_stats_model_from_one_suggestion_in_set_format(self) -> None:
         suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -316,29 +298,27 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1
+        )
         self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_stats_model.submitted_translations_count, 1)
-        self.assertEqual(
-            translation_stats_model.submitted_translation_word_count, 6)
+        self.assertEqual(translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(translation_stats_model.submitted_translation_word_count, 6)
         self.assertEqual(translation_stats_model.accepted_translations_count, 0)
         self.assertEqual(
-            translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
+            translation_stats_model.accepted_translations_without_reviewer_edits_count,
             0
         )
-        self.assertEqual(
-            translation_stats_model.accepted_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.accepted_translation_word_count, 0)
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [suggestion_model.created_on.date()]
@@ -391,29 +371,27 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1
+        )
         self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_stats_model.submitted_translations_count, 1)
-        self.assertEqual(
-            translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(translation_stats_model.submitted_translation_word_count, 3)
         self.assertEqual(translation_stats_model.accepted_translations_count, 0)
         self.assertEqual(
-            translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
+            translation_stats_model.accepted_translations_without_reviewer_edits_count,
             0
         )
-        self.assertEqual(
-            translation_stats_model.accepted_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.accepted_translation_word_count, 0)
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [suggestion_model.created_on.date()]
@@ -471,10 +449,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', self.TOPIC_1_ID))
+                self.LANG_1, 'reviewer1', self.TOPIC_1_ID
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
@@ -482,47 +464,39 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1
+        )
         self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_stats_model.submitted_translations_count, 1)
-        self.assertEqual(
-            translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(translation_stats_model.submitted_translation_word_count, 3)
         self.assertEqual(translation_stats_model.accepted_translations_count, 1)
         self.assertEqual(
-            translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
+            translation_stats_model.accepted_translations_without_reviewer_edits_count,
             1
         )
-        self.assertEqual(
-            translation_stats_model.accepted_translation_word_count, 3)
+        self.assertEqual(translation_stats_model.accepted_translation_word_count, 3)
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [suggestion_model.created_on.date()]
         )
 
+        self.assertEqual(translation_review_stats_model.language_code, self.LANG_1)
+        self.assertEqual(translation_review_stats_model.reviewer_user_id, 'reviewer1')
+        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(translation_review_stats_model.reviewed_translations_count, 1)
         self.assertEqual(
-            translation_review_stats_model.language_code, self.LANG_1)
+            translation_review_stats_model.reviewed_translation_word_count, 3
+        )
+        self.assertEqual(translation_review_stats_model.accepted_translations_count, 1)
         self.assertEqual(
-            translation_review_stats_model.reviewer_user_id, 'reviewer1')
-        self.assertEqual(
-            translation_review_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_review_stats_model.reviewed_translations_count, 1)
-        self.assertEqual(
-            translation_review_stats_model.reviewed_translation_word_count, 3)
-        self.assertEqual(
-            translation_review_stats_model.accepted_translations_count, 1)
-        self.assertEqual(
-            translation_review_stats_model
-            .accepted_translations_with_reviewer_edits_count,
-            0
+            translation_review_stats_model.
+            accepted_translations_with_reviewer_edits_count, 0
         )
         self.assertEqual(
-            translation_review_stats_model.accepted_translation_word_count, 3)
+            translation_review_stats_model.accepted_translation_word_count, 3
+        )
         self.assertEqual(
             translation_review_stats_model.first_contribution_date,
             datetime.datetime.utcnow().date()
@@ -532,9 +506,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             datetime.datetime.utcnow().date()
         )
 
-    def test_escapes_stats_without_opportunity(
-        self
-    ) -> None:
+    def test_escapes_stats_without_opportunity(self) -> None:
         suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -563,10 +535,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, ''
+            )
+        )
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', ''))
+                self.LANG_1, 'reviewer1', ''
+            )
+        )
 
         assert translation_stats_model is None
         assert translation_review_stats_model is None
@@ -647,10 +623,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, feconf.SUGGESTION_BOT_USER_ID, self.TOPIC_1_ID))
+                self.LANG_1, feconf.SUGGESTION_BOT_USER_ID, self.TOPIC_1_ID
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
@@ -658,48 +638,42 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1
+        )
         self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_stats_model.submitted_translations_count, 2)
-        self.assertEqual(
-            translation_stats_model.submitted_translation_word_count, 6)
+        self.assertEqual(translation_stats_model.submitted_translations_count, 2)
+        self.assertEqual(translation_stats_model.submitted_translation_word_count, 6)
         self.assertEqual(translation_stats_model.accepted_translations_count, 2)
         self.assertEqual(
-            translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
+            translation_stats_model.accepted_translations_without_reviewer_edits_count,
             2
         )
-        self.assertEqual(
-            translation_stats_model.accepted_translation_word_count, 6)
+        self.assertEqual(translation_stats_model.accepted_translation_word_count, 6)
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [first_suggestion_model.created_on.date()]
         )
 
-        self.assertEqual(
-            translation_review_stats_model.language_code, self.LANG_1)
+        self.assertEqual(translation_review_stats_model.language_code, self.LANG_1)
         self.assertEqual(
             translation_review_stats_model.reviewer_user_id,
-            feconf.SUGGESTION_BOT_USER_ID)
+            feconf.SUGGESTION_BOT_USER_ID
+        )
+        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(translation_review_stats_model.reviewed_translations_count, 2)
         self.assertEqual(
-            translation_review_stats_model.topic_id, self.TOPIC_1_ID)
+            translation_review_stats_model.reviewed_translation_word_count, 6
+        )
+        self.assertEqual(translation_review_stats_model.accepted_translations_count, 2)
         self.assertEqual(
-            translation_review_stats_model.reviewed_translations_count, 2)
-        self.assertEqual(
-            translation_review_stats_model.reviewed_translation_word_count, 6)
-        self.assertEqual(
-            translation_review_stats_model.accepted_translations_count, 2)
-        self.assertEqual(
-            translation_review_stats_model
-            .accepted_translations_with_reviewer_edits_count,
-            0
+            translation_review_stats_model.
+            accepted_translations_with_reviewer_edits_count, 0
         )
         self.assertEqual(
-            translation_review_stats_model.accepted_translation_word_count, 6)
+            translation_review_stats_model.accepted_translation_word_count, 6
+        )
         self.assertEqual(
             translation_review_stats_model.first_contribution_date,
             datetime.datetime.utcnow().date()
@@ -709,9 +683,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             datetime.datetime.utcnow().date()
         )
 
-    def test_creates_multiple_stats_models_from_multiple_users(
-        self
-    ) -> None:
+    def test_creates_multiple_stats_models_from_multiple_users(self) -> None:
         # Define a fixed datetime.
         mocked_now = datetime.datetime(2024, 10, 28)
 
@@ -789,110 +761,101 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         first_translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
         second_translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_2, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_2, self.TOPIC_1_ID
+            )
+        )
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', self.TOPIC_1_ID))
+                self.LANG_1, 'reviewer1', self.TOPIC_1_ID
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert first_translation_stats_model is not None
         assert second_translation_stats_model is not None
         assert translation_review_stats_model is not None
 
+        self.assertEqual(first_translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            first_translation_stats_model.language_code, self.LANG_1)
+            first_translation_stats_model.contributor_user_id, self.VALID_USER_ID_1
+        )
+        self.assertEqual(first_translation_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(first_translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
-            first_translation_stats_model.contributor_user_id,
-            self.VALID_USER_ID_1
+            first_translation_stats_model.submitted_translation_word_count, 3
+        )
+        self.assertEqual(first_translation_stats_model.accepted_translations_count, 1)
+        self.assertEqual(
+            first_translation_stats_model.
+            accepted_translations_without_reviewer_edits_count, 1
         )
         self.assertEqual(
-            first_translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            first_translation_stats_model.submitted_translations_count, 1)
-        self.assertEqual(
-            first_translation_stats_model.submitted_translation_word_count, 3)
-        self.assertEqual(
-            first_translation_stats_model.accepted_translations_count, 1)
-        self.assertEqual(
-            first_translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
-            1
+            first_translation_stats_model.accepted_translation_word_count, 3
         )
+        self.assertEqual(first_translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
-            first_translation_stats_model.accepted_translation_word_count, 3)
-        self.assertEqual(
-            first_translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            first_translation_stats_model.rejected_translation_word_count, 0)
+            first_translation_stats_model.rejected_translation_word_count, 0
+        )
         self.assertItemsEqual(
             first_translation_stats_model.contribution_dates,
             [first_suggestion_model.created_on.date()]
         )
 
+        self.assertEqual(second_translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            second_translation_stats_model.language_code, self.LANG_1)
+            second_translation_stats_model.contributor_user_id, self.VALID_USER_ID_2
+        )
+        self.assertEqual(second_translation_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(second_translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
-            second_translation_stats_model.contributor_user_id,
-            self.VALID_USER_ID_2
+            second_translation_stats_model.submitted_translation_word_count, 3
+        )
+        self.assertEqual(second_translation_stats_model.accepted_translations_count, 1)
+        self.assertEqual(
+            second_translation_stats_model.
+            accepted_translations_without_reviewer_edits_count, 1
         )
         self.assertEqual(
-            second_translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            second_translation_stats_model.submitted_translations_count, 1)
-        self.assertEqual(
-            second_translation_stats_model.submitted_translation_word_count, 3)
-        self.assertEqual(
-            second_translation_stats_model.accepted_translations_count, 1)
-        self.assertEqual(
-            second_translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
-            1
+            second_translation_stats_model.accepted_translation_word_count, 3
         )
+        self.assertEqual(second_translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
-            second_translation_stats_model.accepted_translation_word_count, 3)
-        self.assertEqual(
-            second_translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            second_translation_stats_model.rejected_translation_word_count, 0)
+            second_translation_stats_model.rejected_translation_word_count, 0
+        )
         self.assertItemsEqual(
             second_translation_stats_model.contribution_dates,
             [second_suggestion_model.created_on.date()]
         )
 
+        self.assertEqual(translation_review_stats_model.language_code, self.LANG_1)
+        self.assertEqual(translation_review_stats_model.reviewer_user_id, 'reviewer1')
+        self.assertEqual(translation_review_stats_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(translation_review_stats_model.reviewed_translations_count, 2)
         self.assertEqual(
-            translation_review_stats_model.language_code, self.LANG_1)
+            translation_review_stats_model.reviewed_translation_word_count, 6
+        )
+        self.assertEqual(translation_review_stats_model.accepted_translations_count, 2)
         self.assertEqual(
-            translation_review_stats_model.reviewer_user_id, 'reviewer1')
-        self.assertEqual(
-            translation_review_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_review_stats_model.reviewed_translations_count, 2)
-        self.assertEqual(
-            translation_review_stats_model.reviewed_translation_word_count, 6)
-        self.assertEqual(
-            translation_review_stats_model.accepted_translations_count, 2)
-        self.assertEqual(
-            translation_review_stats_model
-            .accepted_translations_with_reviewer_edits_count,
-            0
+            translation_review_stats_model.
+            accepted_translations_with_reviewer_edits_count, 0
         )
         self.assertEqual(
-            translation_review_stats_model.accepted_translation_word_count, 6)
-        self.assertEqual(
-            translation_review_stats_model.first_contribution_date,
-            mocked_now.date()
+            translation_review_stats_model.accepted_translation_word_count, 6
         )
         self.assertEqual(
-            translation_review_stats_model.last_contribution_date,
-            mocked_now.date()
+            translation_review_stats_model.first_contribution_date, mocked_now.date()
+        )
+        self.assertEqual(
+            translation_review_stats_model.last_contribution_date, mocked_now.date()
         )
 
     def _create_valid_question_data(
-        self,
-        default_dest_state_name: str,
+        self, default_dest_state_name: str,
         content_id_generator: translation_domain.ContentIdGenerator
     ) -> state_domain.State:
         """Creates a valid question_data dict.
@@ -907,46 +870,57 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name,
+            content_id_generator.generate(translation_domain.ContentType.CONTENT),
             content_id_generator.generate(
-                translation_domain.ContentType.CONTENT),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME),
-            is_initial_state=True)
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
+            is_initial_state=True
+        )
         state.update_interaction_id('TextInput')
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.SOLUTION),
-                'html': '<p>This is a solution.</p>',
+                'content_id':
+                    content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION
+                    ),
+                'html':
+                    '<p>This is a solution.</p>',
             },
         }
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    content_id_generator.generate(
-                        translation_domain.ContentType.HINT),
-                    '<p>This is a hint.</p>')),
+                    content_id_generator.generate(translation_domain.ContentType.HINT),
+                    '<p>This is a hint.</p>'
+                )
+            ),
         ]
         # Ruling out the possibility of None for mypy type checking, because
         # we above we are already updating the value of interaction_id.
         assert state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, solution_dict)
+        solution = state_domain.Solution.from_dict(state.interaction.id, solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': content_id_generator.generate(
-                        translation_domain.ContentType.CUSTOMIZATION_ARG,
-                        extra_prefix='placeholder'),
-                    'unicode_str': 'Enter text here',
+                    'content_id':
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG,
+                            extra_prefix='placeholder'
+                        ),
+                    'unicode_str':
+                        'Enter text here',
                 },
             },
-            'rows': {'value': 1},
-            'catchMisspellings': {'value': False}
+            'rows': {
+                'value': 1
+            },
+            'catchMisspellings': {
+                'value': False
+            }
         })
         # Here, state is a State domain object and it is created using
         # 'create_default_state' method. So, 'state' is a default_state
@@ -965,29 +939,20 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             str. A topic ID.
         """
         skill_id = skill_services.get_new_skill_id()
-        skill = (
-            skill_domain.Skill.create_default_skill(
-                skill_id, 'description', []))
+        skill = (skill_domain.Skill.create_default_skill(skill_id, 'description', []))
         skill.rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
         ]
         skill_services.save_new_skill('owner_id', skill)
 
         topic_id = topic_fetchers.get_new_topic_id()
         canonical_story_references = [
-            topic_domain.StoryReference.create_default_story_reference(
-                'story_id1'
-            )
+            topic_domain.StoryReference.create_default_story_reference('story_id1')
         ]
         additional_story_references = [
-            topic_domain.StoryReference.create_default_story_reference(
-                'story_id2'
-            )
+            topic_domain.StoryReference.create_default_story_reference('story_id2')
         ]
         uncategorized_skill_ids = [skill_id]
         subtopic = topic_domain.Subtopic.from_dict({
@@ -1003,14 +968,13 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         skill_ids_for_diagnostic_test = [skill_id]
 
         topic = topic_domain.Topic(
-            topic_id, 'Topic1', 'topic-three', 'topic-three', None,
-            None, None, 'description',
-            canonical_story_references, additional_story_references,
-            uncategorized_skill_ids, subtopics,
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 2,
-            'en', 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            'topic meta tag content', False,
-            'topic page title', skill_ids_for_diagnostic_test)
+            topic_id, 'Topic1', 'topic-three', 'topic-three', None, None, None,
+            'description', canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, subtopics, feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            2, 'en', 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            'topic meta tag content', False, 'topic page title',
+            skill_ids_for_diagnostic_test
+        )
         topic_services.save_new_topic('topic_admin', topic)
 
         subtopic = topic_domain.Subtopic.from_dict({
@@ -1024,43 +988,39 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         })
 
         content_id_generator = translation_domain.ContentIdGenerator()
-        state = self._create_valid_question_data(
-            'default_state', content_id_generator)
-        suggestion_change: Dict[
-            str, Union[str, float, question_domain.QuestionDict]
-        ] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'id': 'test_id',
-                'version': 12,
-                'question_state_data': state.to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': [skill_id],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'next_content_id_index': (
-                    content_id_generator.next_content_id_index)
-            },
-            'skill_id': skill_id,
-            'skill_difficulty': 0.3
-        }
+        state = self._create_valid_question_data('default_state', content_id_generator)
+        suggestion_change: Dict[str, Union[
+            str, float, question_domain.QuestionDict]] = {
+                'cmd': (question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                'question_dict': {
+                    'id':
+                        'test_id',
+                    'version':
+                        12,
+                    'question_state_data':
+                        state.to_dict(),
+                    'language_code':
+                        'en',
+                    'question_state_data_schema_version':
+                        (feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': [skill_id],
+                    'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                    'next_content_id_index':
+                        (content_id_generator.next_content_id_index)
+                },
+                'skill_id': skill_id,
+                'skill_difficulty': 0.3
+            }
         suggestion_1_id = 'skill1.thread1'
         suggestion_models.GeneralSuggestionModel.create(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL,
-            skill_id, 1,
-            suggestion_models.STATUS_ACCEPTED, 'author_1',
-            None, suggestion_change, 'category1',
-            suggestion_1_id, 'en')
+            feconf.SUGGESTION_TYPE_ADD_QUESTION, feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            suggestion_models.STATUS_ACCEPTED, 'author_1', None, suggestion_change,
+            'category1', suggestion_1_id, 'en'
+        )
 
         return topic_id
 
-    def test_creates_question_stats_models_from_one_accepted_suggestion(
-        self
-    ) -> None:
+    def test_creates_question_stats_models_from_one_accepted_suggestion(self) -> None:
         topic_id = self._create_question()
 
         self.assert_job_output_is([
@@ -1075,18 +1035,17 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         ])
 
         question_stats_models = (
-            suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(
-                'author_1'))
+            suggestion_models.QuestionContributionStatsModel.
+            get_all_by_user_id('author_1')
+        )
         question_review_stats_models = (
             suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
-                feconf.SUGGESTION_BOT_USER_ID))
+                feconf.SUGGESTION_BOT_USER_ID
+            )
+        )
 
-        self.assertEqual(
-            len(question_stats_models), 1
-        )
-        self.assertEqual(
-            len(question_review_stats_models), 1
-        )
+        self.assertEqual(len(question_stats_models), 1)
+        self.assertEqual(len(question_review_stats_models), 1)
 
         question_stats_model = question_stats_models[0]
         question_review_stats_model = question_review_stats_models[0]
@@ -1095,16 +1054,12 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         assert question_stats_model is not None
         assert question_review_stats_model is not None
 
-        self.assertEqual(
-            question_stats_model.contributor_user_id, 'author_1')
+        self.assertEqual(question_stats_model.contributor_user_id, 'author_1')
         self.assertEqual(question_stats_model.topic_id, topic_id)
-        self.assertEqual(
-            question_stats_model.submitted_questions_count, 1)
+        self.assertEqual(question_stats_model.submitted_questions_count, 1)
         self.assertEqual(question_stats_model.accepted_questions_count, 1)
         self.assertEqual(
-            question_stats_model
-            .accepted_questions_without_reviewer_edits_count,
-            1
+            question_stats_model.accepted_questions_without_reviewer_edits_count, 1
         )
         self.assertEqual(
             question_stats_model.first_contribution_date,
@@ -1116,18 +1071,13 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
 
         self.assertEqual(
-            question_review_stats_model.reviewer_user_id,
-            feconf.SUGGESTION_BOT_USER_ID
+            question_review_stats_model.reviewer_user_id, feconf.SUGGESTION_BOT_USER_ID
         )
         self.assertEqual(question_review_stats_model.topic_id, topic_id)
+        self.assertEqual(question_review_stats_model.reviewed_questions_count, 1)
+        self.assertEqual(question_review_stats_model.accepted_questions_count, 1)
         self.assertEqual(
-            question_review_stats_model.reviewed_questions_count, 1)
-        self.assertEqual(
-            question_review_stats_model.accepted_questions_count, 1)
-        self.assertEqual(
-            question_review_stats_model
-            .accepted_questions_with_reviewer_edits_count,
-            0
+            question_review_stats_model.accepted_questions_with_reviewer_edits_count, 0
         )
         self.assertEqual(
             question_review_stats_model.first_contribution_date,
@@ -1218,7 +1168,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         suggestion_3_model.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([
-            suggestion_1_model, suggestion_2_model, suggestion_3_model])
+            suggestion_1_model, suggestion_2_model, suggestion_3_model
+        ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -1229,34 +1180,31 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
         self.assertEqual(translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1
+        )
         self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
-        self.assertEqual(
-            translation_stats_model.submitted_translations_count, 3)
-        self.assertEqual(
-            translation_stats_model.submitted_translation_word_count, 13)
+        self.assertEqual(translation_stats_model.submitted_translations_count, 3)
+        self.assertEqual(translation_stats_model.submitted_translation_word_count, 13)
         self.assertEqual(translation_stats_model.accepted_translations_count, 0)
         self.assertEqual(
-            translation_stats_model
-            .accepted_translations_without_reviewer_edits_count,
+            translation_stats_model.accepted_translations_without_reviewer_edits_count,
             0
         )
-        self.assertEqual(
-            translation_stats_model.accepted_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.accepted_translation_word_count, 0)
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
-        self.assertEqual(
-            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertEqual(translation_stats_model.rejected_translation_word_count, 0)
         # We are checking whether contribution_dates are added in ascending
         # order.
         self.assertListEqual(
-            translation_stats_model.contribution_dates,
-            [
+            translation_stats_model.contribution_dates, [
                 suggestion_2_model.created_on.date(),
                 suggestion_3_model.created_on.date(),
                 suggestion_1_model.created_on.date()
@@ -1267,19 +1215,11 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
-        suggestion_stats_computation_jobs
-        .AuditGenerateContributionStatsJob
-    ] = (
-        suggestion_stats_computation_jobs
-        .AuditGenerateContributionStatsJob
-    )
+        suggestion_stats_computation_jobs.AuditGenerateContributionStatsJob
+    ] = (suggestion_stats_computation_jobs.AuditGenerateContributionStatsJob)
 
-    VALID_USER_ID_1: Final = 'uid_%s' % (
-        'a' * feconf.USER_ID_RANDOM_PART_LENGTH
-    )
-    VALID_USER_ID_2: Final = 'uid_%s' % (
-        'b' * feconf.USER_ID_RANDOM_PART_LENGTH
-    )
+    VALID_USER_ID_1: Final = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    VALID_USER_ID_2: Final = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
     TOPIC_1_ID: Final = 'topic_1_id'
@@ -1335,7 +1275,9 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         self.assertIsNone(translation_stats_model)
 
@@ -1385,9 +1327,7 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             )
         ])
 
-    def test_creates_stats_model_from_one_suggestion_in_legacy_format(
-        self
-    ) -> None:
+    def test_creates_stats_model_from_one_suggestion_in_legacy_format(self) -> None:
         suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -1431,13 +1371,13 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         self.assertIsNone(translation_stats_model)
 
-    def test_creates_stats_model_from_one_suggestion_in_set_format(
-        self
-    ) -> None:
+    def test_creates_stats_model_from_one_suggestion_in_set_format(self) -> None:
         suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -1482,7 +1422,9 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         self.assertIsNone(translation_stats_model)
 
@@ -1533,7 +1475,9 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         self.assertIsNone(translation_stats_model)
 
@@ -1589,17 +1533,19 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', self.TOPIC_1_ID))
+                self.LANG_1, 'reviewer1', self.TOPIC_1_ID
+            )
+        )
 
         self.assertIsNone(translation_stats_model)
         self.assertIsNone(translation_review_stats_model)
 
-    def test_escapes_stats_without_opportunity(
-        self
-    ) -> None:
+    def test_escapes_stats_without_opportunity(self) -> None:
         suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -1628,10 +1574,14 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, ''))
+                self.LANG_1, self.VALID_USER_ID_1, ''
+            )
+        )
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', ''))
+                self.LANG_1, 'reviewer1', ''
+            )
+        )
 
         assert translation_stats_model is None
         assert translation_review_stats_model is None
@@ -1712,17 +1662,19 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, feconf.SUGGESTION_BOT_USER_ID, self.TOPIC_1_ID))
+                self.LANG_1, feconf.SUGGESTION_BOT_USER_ID, self.TOPIC_1_ID
+            )
+        )
 
         self.assertIsNone(translation_stats_model)
         self.assertIsNone(translation_review_stats_model)
 
-    def test_creates_multiple_stats_models_from_multiple_users(
-        self
-    ) -> None:
+    def test_creates_multiple_stats_models_from_multiple_users(self) -> None:
         opportunity_model = self.create_model(
             opportunity_models.ExplorationOpportunitySummaryModel,
             id=self.EXP_1_ID,
@@ -1796,21 +1748,26 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         first_translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
         second_translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_2, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_2, self.TOPIC_1_ID
+            )
+        )
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', self.TOPIC_1_ID))
+                self.LANG_1, 'reviewer1', self.TOPIC_1_ID
+            )
+        )
 
         self.assertIsNone(first_translation_stats_model)
         self.assertIsNone(second_translation_stats_model)
         self.assertIsNone(translation_review_stats_model)
 
     def _create_valid_question_data(
-        self,
-        default_dest_state_name: str,
+        self, default_dest_state_name: str,
         content_id_generator: translation_domain.ContentIdGenerator
     ) -> state_domain.State:
         """Creates a valid question_data dict.
@@ -1825,46 +1782,57 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name,
+            content_id_generator.generate(translation_domain.ContentType.CONTENT),
             content_id_generator.generate(
-                translation_domain.ContentType.CONTENT),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME),
-            is_initial_state=True)
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
+            is_initial_state=True
+        )
         state.update_interaction_id('TextInput')
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.SOLUTION),
-                'html': '<p>This is a solution.</p>',
+                'content_id':
+                    content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION
+                    ),
+                'html':
+                    '<p>This is a solution.</p>',
             },
         }
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    content_id_generator.generate(
-                        translation_domain.ContentType.HINT),
-                    '<p>This is a hint.</p>')),
+                    content_id_generator.generate(translation_domain.ContentType.HINT),
+                    '<p>This is a hint.</p>'
+                )
+            ),
         ]
         # Ruling out the possibility of None for mypy type checking, because
         # we above we are already updating the value of interaction_id.
         assert state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, solution_dict)
+        solution = state_domain.Solution.from_dict(state.interaction.id, solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': content_id_generator.generate(
-                        translation_domain.ContentType.CUSTOMIZATION_ARG,
-                        extra_prefix='placeholder'),
-                    'unicode_str': 'Enter text here',
+                    'content_id':
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG,
+                            extra_prefix='placeholder'
+                        ),
+                    'unicode_str':
+                        'Enter text here',
                 },
             },
-            'rows': {'value': 1},
-            'catchMisspellings': {'value': False}
+            'rows': {
+                'value': 1
+            },
+            'catchMisspellings': {
+                'value': False
+            }
         })
         # Here, state is a State domain object and it is created using
         # 'create_default_state' method. So, 'state' is a default_state
@@ -1883,29 +1851,20 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             str. A topic ID.
         """
         skill_id = skill_services.get_new_skill_id()
-        skill = (
-            skill_domain.Skill.create_default_skill(
-                skill_id, 'description', []))
+        skill = (skill_domain.Skill.create_default_skill(skill_id, 'description', []))
         skill.rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
         ]
         skill_services.save_new_skill('owner_id', skill)
 
         topic_id = topic_fetchers.get_new_topic_id()
         canonical_story_references = [
-            topic_domain.StoryReference.create_default_story_reference(
-                'story_id1'
-            )
+            topic_domain.StoryReference.create_default_story_reference('story_id1')
         ]
         additional_story_references = [
-            topic_domain.StoryReference.create_default_story_reference(
-                'story_id2'
-            )
+            topic_domain.StoryReference.create_default_story_reference('story_id2')
         ]
         uncategorized_skill_ids = [skill_id]
         subtopic = topic_domain.Subtopic.from_dict({
@@ -1921,14 +1880,13 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         skill_ids_for_diagnostic_test = [skill_id]
 
         topic = topic_domain.Topic(
-            topic_id, 'Topic1', 'topic-three', 'topic-three', None,
-            None, None, 'description',
-            canonical_story_references, additional_story_references,
-            uncategorized_skill_ids, subtopics,
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 2,
-            'en', 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            'topic meta tag content', False,
-            'topic page title', skill_ids_for_diagnostic_test)
+            topic_id, 'Topic1', 'topic-three', 'topic-three', None, None, None,
+            'description', canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, subtopics, feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            2, 'en', 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            'topic meta tag content', False, 'topic page title',
+            skill_ids_for_diagnostic_test
+        )
         topic_services.save_new_topic('topic_admin', topic)
 
         subtopic = topic_domain.Subtopic.from_dict({
@@ -1942,43 +1900,39 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         })
 
         content_id_generator = translation_domain.ContentIdGenerator()
-        state = self._create_valid_question_data(
-            'default_state', content_id_generator)
-        suggestion_change: Dict[
-            str, Union[str, float, question_domain.QuestionDict]
-        ] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'id': 'test_id',
-                'version': 12,
-                'question_state_data': state.to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': [skill_id],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                'next_content_id_index': (
-                    content_id_generator.next_content_id_index)
-            },
-            'skill_id': skill_id,
-            'skill_difficulty': 0.3
-        }
+        state = self._create_valid_question_data('default_state', content_id_generator)
+        suggestion_change: Dict[str, Union[
+            str, float, question_domain.QuestionDict]] = {
+                'cmd': (question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                'question_dict': {
+                    'id':
+                        'test_id',
+                    'version':
+                        12,
+                    'question_state_data':
+                        state.to_dict(),
+                    'language_code':
+                        'en',
+                    'question_state_data_schema_version':
+                        (feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': [skill_id],
+                    'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                    'next_content_id_index':
+                        (content_id_generator.next_content_id_index)
+                },
+                'skill_id': skill_id,
+                'skill_difficulty': 0.3
+            }
         suggestion_1_id = 'skill1.thread1'
         suggestion_models.GeneralSuggestionModel.create(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL,
-            skill_id, 1,
-            suggestion_models.STATUS_ACCEPTED, 'author_1',
-            None, suggestion_change, 'category1',
-            suggestion_1_id, 'en')
+            feconf.SUGGESTION_TYPE_ADD_QUESTION, feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            suggestion_models.STATUS_ACCEPTED, 'author_1', None, suggestion_change,
+            'category1', suggestion_1_id, 'en'
+        )
 
         return topic_id
 
-    def test_creates_question_stats_models_from_one_accepted_suggestion(
-        self
-    ) -> None:
+    def test_creates_question_stats_models_from_one_accepted_suggestion(self) -> None:
         self._create_question()
 
         self.assert_job_output_is([
@@ -1993,18 +1947,17 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         ])
 
         question_stats_models = (
-            suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(
-                'author_1'))
+            suggestion_models.QuestionContributionStatsModel.
+            get_all_by_user_id('author_1')
+        )
         question_review_stats_models = (
             suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
-                feconf.SUGGESTION_BOT_USER_ID))
+                feconf.SUGGESTION_BOT_USER_ID
+            )
+        )
 
-        self.assertEqual(
-            len(question_stats_models), 0
-        )
-        self.assertEqual(
-            len(question_review_stats_models), 0
-        )
+        self.assertEqual(len(question_stats_models), 0)
+        self.assertEqual(len(question_review_stats_models), 0)
 
     def test_creates_stats_model_from_multiple_suggestions(self) -> None:
         opportunity_model = self.create_model(
@@ -2063,7 +2016,8 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         suggestion_2_model.update_timestamps(update_last_updated_time=False)
         suggestion_models.GeneralSuggestionModel.put_multi([
-            suggestion_1_model, suggestion_2_model])
+            suggestion_1_model, suggestion_2_model
+        ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -2074,6 +2028,8 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         translation_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
-                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID))
+                self.LANG_1, self.VALID_USER_ID_1, self.TOPIC_1_ID
+            )
+        )
 
         self.assertIsNone(translation_stats_model)

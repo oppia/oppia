@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
@@ -50,7 +49,9 @@ class TopicsAndSkillsDashboardPageDataHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self) -> None:
@@ -61,31 +62,28 @@ class TopicsAndSkillsDashboardPageDataHandler(
         # 'FrontendTopicSummaryDict', and this is done because below we
         # are adding new keys that are not defined on the 'TopicSummaryDict'.
         topic_summary_dicts: List[topic_domain.FrontendTopicSummaryDict] = [
-            summary.to_dict() for summary in topic_summaries]  # type: ignore[misc]
+            summary.to_dict() for summary in topic_summaries
+        ]  # type: ignore[misc]
 
         skill_summaries = skill_services.get_all_skill_summaries()
-        skill_summary_dicts = [
-            summary.to_dict() for summary in skill_summaries]
+        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
 
         skill_ids_assigned_to_some_topic = (
-            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
-        merged_skill_ids = (
-            skill_services.get_merged_skill_ids())
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic()
+        )
+        merged_skill_ids = (skill_services.get_merged_skill_ids())
         topic_rights_dict = topic_fetchers.get_all_topic_rights()
         for topic_summary in topic_summary_dicts:
             if topic_rights_dict[topic_summary['id']]:
                 topic_rights = topic_rights_dict[topic_summary['id']]
                 if topic_rights:
-                    topic_summary['is_published'] = (
-                        topic_rights.topic_is_published)
+                    topic_summary['is_published'] = (topic_rights.topic_is_published)
                     topic_summary['can_edit_topic'] = (
-                        topic_services.check_can_edit_topic(
-                            self.user, topic_rights)
+                        topic_services.check_can_edit_topic(self.user, topic_rights)
                     )
 
         classrooms = classroom_config_services.get_all_classrooms()
-        all_classroom_names = [
-            classroom.name for classroom in classrooms]
+        all_classroom_names = [classroom.name for classroom in classrooms]
 
         topic_classroom_dict = {}
         for classroom in classrooms:
@@ -94,58 +92,55 @@ class TopicsAndSkillsDashboardPageDataHandler(
 
         for topic_summary_dict in topic_summary_dicts:
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
-                topic_summary_dict['id'], None)
+                topic_summary_dict['id'], None
+            )
 
         chapter_counts_by_topic_id = (
-            topic_services.get_chapter_counts_in_topic_summaries(
-                topic_summary_dicts))
+            topic_services.get_chapter_counts_in_topic_summaries(topic_summary_dicts)
+        )
 
         for topic_summary_dict in topic_summary_dicts:
-            topic_chapter_count = chapter_counts_by_topic_id[
-                topic_summary_dict['id']]
+            topic_chapter_count = chapter_counts_by_topic_id[topic_summary_dict['id']]
             topic_summary_dict.update({
-                'total_upcoming_chapters_count': (
-                    topic_chapter_count.total_upcoming_chapters_count),
-                'total_overdue_chapters_count': (
-                    topic_chapter_count.total_overdue_chapters_count),
-                'total_chapter_counts_for_each_story': (
-                    topic_chapter_count.total_chapter_counts_for_each_story),
-                'published_chapter_counts_for_each_story': (
-                    topic_chapter_count.published_chapter_counts_for_each_story)
+                'total_upcoming_chapters_count':
+                    (topic_chapter_count.total_upcoming_chapters_count),
+                'total_overdue_chapters_count':
+                    (topic_chapter_count.total_overdue_chapters_count),
+                'total_chapter_counts_for_each_story':
+                    (topic_chapter_count.total_chapter_counts_for_each_story),
+                'published_chapter_counts_for_each_story':
+                    (topic_chapter_count.published_chapter_counts_for_each_story)
             })
 
         mergeable_skill_summary_dicts = []
 
         untriaged_skill_summaries = (
             skill_services.get_untriaged_skill_summaries(
-                skill_summaries, skill_ids_assigned_to_some_topic,
-                merged_skill_ids))
+                skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids
+            )
+        )
 
         categorized_skills = (
-            skill_services.get_categorized_skill_ids_and_descriptions())
+            skill_services.get_categorized_skill_ids_and_descriptions()
+        )
 
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
-            if (skill_id in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in merged_skill_ids):
+            if (skill_id in skill_ids_assigned_to_some_topic
+               ) and (skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
 
-        can_delete_topic = (
-            role_services.ACTION_DELETE_TOPIC in self.user.actions)
+        can_delete_topic = (role_services.ACTION_DELETE_TOPIC in self.user.actions)
 
-        can_create_topic = (
-            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
+        can_create_topic = (role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
-        can_delete_skill = (
-            role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
+        can_delete_skill = (role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
 
-        can_create_skill = (
-            role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
+        can_create_skill = (role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
             'untriaged_skill_summary_dicts': [
-                skill_summary.to_dict()
-                for skill_summary in untriaged_skill_summaries
+                skill_summary.to_dict() for skill_summary in untriaged_skill_summaries
             ],
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
@@ -168,26 +163,32 @@ class CategorizedAndUntriagedSkillsDataHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_ids_assigned_to_some_topic = (
-            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic()
+        )
         merged_skill_ids = skill_services.get_merged_skill_ids()
 
         untriaged_skill_summaries = (
             skill_services.get_untriaged_skill_summaries(
-                skill_summaries, skill_ids_assigned_to_some_topic,
-                merged_skill_ids))
+                skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids
+            )
+        )
         untriaged_short_skill_summaries = [
             skill_domain.ShortSkillSummary.from_skill_summary(skill_summary)
-            for skill_summary in untriaged_skill_summaries]
+            for skill_summary in untriaged_skill_summaries
+        ]
 
         categorized_skills = (
-            skill_services.get_categorized_skill_ids_and_descriptions())
+            skill_services.get_categorized_skill_ids_and_descriptions()
+        )
 
         self.values.update({
             'untriaged_skill_summary_dicts': [
@@ -199,16 +200,15 @@ class CategorizedAndUntriagedSkillsDataHandler(
         self.render_json(self.values)
 
 
-class TopicAssignmentsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class TopicAssignmentsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides information about which topics contain the given skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.ENTITY_ID_REGEX
@@ -216,7 +216,9 @@ class TopicAssignmentsHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id: str) -> None:
@@ -225,11 +227,10 @@ class TopicAssignmentsHandler(
         Args:
             skill_id: str. The skill ID.
         """
-        topic_assignments = skill_services.get_all_topic_assignments_for_skill(
-            skill_id)
+        topic_assignments = skill_services.get_all_topic_assignments_for_skill(skill_id)
         topic_assignment_dicts = [
-            topic_assignment.to_dict()
-            for topic_assignment in topic_assignments]
+            topic_assignment.to_dict() for topic_assignment in topic_assignments
+        ]
 
         self.render_json({
             'topic_assignment_dicts': topic_assignment_dicts
@@ -250,10 +251,8 @@ class SkillsDashboardPageDataHandlerNormalizedPayloadDict(TypedDict):
 
 
 class SkillsDashboardPageDataHandler(
-    base.BaseHandler[
-        SkillsDashboardPageDataHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[SkillsDashboardPageDataHandlerNormalizedPayloadDict, Dict[str,
+                                                                               str]]
 ):
     """Provides data for the user's skills dashboard page."""
 
@@ -317,8 +316,10 @@ class SkillsDashboardPageDataHandler(
 
         skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                num_skills_to_fetch, status, classroom_name,
-                keywords, sort_by, urlsafe_start_cursor))
+                num_skills_to_fetch, status, classroom_name, keywords, sort_by,
+                urlsafe_start_cursor
+            )
+        )
 
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
 
@@ -351,10 +352,8 @@ class NewTopicHandlerNormalizedRequestDict(TypedDict):
 
 
 class NewTopicHandler(
-    base.BaseHandler[
-        NewTopicHandlerNormalizedPayloadDict,
-        NewTopicHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[NewTopicHandlerNormalizedPayloadDict,
+                     NewTopicHandlerNormalizedRequestDict]
 ):
     """Creates a new topic."""
 
@@ -364,11 +363,13 @@ class NewTopicHandler(
         'POST': {
             'name': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': android_validation_constants
-                            .MAX_CHARS_IN_TOPIC_NAME
+                        'id':
+                            'has_length_at_most',
+                        'max_value':
+                            android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
                     }, {
                         'id': 'is_nonempty',
                     }]
@@ -377,17 +378,20 @@ class NewTopicHandler(
             'url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
             'description': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': android_validation_constants
-                            .MAX_CHARS_IN_TOPIC_DESCRIPTION
+                        'id':
+                            'has_length_at_most',
+                        'max_value':
+                            android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION
                     }]
                 }
             },
             'filename': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
                         'regex_pattern': r'[-\w]+[.]\w+'
@@ -407,17 +411,18 @@ class NewTopicHandler(
             },
             'page_title_fragment': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': (
-                            constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
-                        )
+                        'id':
+                            'has_length_at_most',
+                        'max_value':
+                            (constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
                     }, {
-                        'id': 'has_length_at_least',
-                        'min_value': (
-                            constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
-                        )
+                        'id':
+                            'has_length_at_least',
+                        'min_value':
+                            (constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
                     }]
                 }
             }
@@ -445,36 +450,42 @@ class NewTopicHandler(
 
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, url_fragment, description, page_title_frag)
+            new_topic_id, name, url_fragment, description, page_title_frag
+        )
         topic_services.save_new_topic(self.user_id, topic)
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
-                raw_image, thumbnail_filename)
+                raw_image, thumbnail_filename
+            )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
         entity_id = new_topic_id
         filename_prefix = 'thumbnail'
 
-        image_is_compressible = (
-            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+        image_is_compressible = (file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
             thumbnail_filename, feconf.ENTITY_TYPE_TOPIC, entity_id, raw_image,
-            filename_prefix, image_is_compressible)
+            filename_prefix, image_is_compressible
+        )
 
         topic_services.update_topic_and_subtopic_pages(
-            self.user_id, new_topic_id, [topic_domain.TopicChange({
-                'cmd': 'update_topic_property',
-                'property_name': 'thumbnail_filename',
-                'old_value': None,
-                'new_value': thumbnail_filename
-            }), topic_domain.TopicChange({
-                'cmd': 'update_topic_property',
-                'property_name': 'thumbnail_bg_color',
-                'old_value': None,
-                'new_value': thumbnail_bg_color
-            }), ], 'Add topic thumbnail.')
+            self.user_id, new_topic_id, [
+                topic_domain.TopicChange({
+                    'cmd': 'update_topic_property',
+                    'property_name': 'thumbnail_filename',
+                    'old_value': None,
+                    'new_value': thumbnail_filename
+                }),
+                topic_domain.TopicChange({
+                    'cmd': 'update_topic_property',
+                    'property_name': 'thumbnail_bg_color',
+                    'old_value': None,
+                    'new_value': thumbnail_bg_color
+                }),
+            ], 'Add topic thumbnail.'
+        )
 
         self.render_json({
             'topicId': new_topic_id
@@ -494,10 +505,7 @@ class NewSkillHandlerNormalizedPayloadDict(TypedDict):
 
 
 class NewSkillHandler(
-    base.BaseHandler[
-        NewSkillHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[NewSkillHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Creates a new skill."""
 
@@ -507,11 +515,13 @@ class NewSkillHandler(
         'POST': {
             'description': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': android_validation_constants
-                            .MAX_CHARS_IN_SKILL_DESCRIPTION
+                        'id':
+                            'has_length_at_most',
+                        'max_value':
+                            android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION
                     }]
                 }
             },
@@ -519,7 +529,8 @@ class NewSkillHandler(
                 'schema': {
                     'type': 'list',
                     'items': {
-                        'type': 'basestring',
+                        'type':
+                            'basestring',
                         'validators': [{
                             'id': 'is_regex_matched',
                             'regex_pattern': constants.ENTITY_ID_REGEX
@@ -544,11 +555,10 @@ class NewSkillHandler(
             },
             'files': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.
-                            validate_suggestion_images
-                    )
+                    'type':
+                        'object_dict',
+                    'validation_method':
+                        (domain_objects_validator.validate_suggestion_images)
                 }
             }
         }
@@ -577,14 +587,17 @@ class NewSkillHandler(
                 if topic is None:
                     raise self.InvalidInputException
                 topic_services.add_uncategorized_skill(
-                    self.user_id, topic.id, new_skill_id)
+                    self.user_id, topic.id, new_skill_id
+                )
 
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(
-                'Skill description should not be a duplicate.')
+                'Skill description should not be a duplicate.'
+            )
 
         skill = skill_domain.Skill.create_default_skill(
-            new_skill_id, description, rubrics)
+            new_skill_id, description, rubrics
+        )
 
         skill.update_explanation(explanation_dict)
 
@@ -595,17 +608,19 @@ class NewSkillHandler(
         for filename in image_filenames:
             base64_image = files[filename]
             bytes_image = (
-                base64_image if isinstance(base64_image, bytes)
-                else base64.decodebytes(base64_image.encode('utf-8'))
+                base64_image if isinstance(base64_image, bytes) else
+                base64.decodebytes(base64_image.encode('utf-8'))
             )
             file_format = (
                 image_validation_services.validate_image_and_filename(
-                    bytes_image, filename))
-            image_is_compressible = (
-                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+                    bytes_image, filename
+                )
+            )
+            image_is_compressible = (file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_SKILL, skill.id, bytes_image,
-                'image', image_is_compressible)
+                filename, feconf.ENTITY_TYPE_SKILL, skill.id, bytes_image, 'image',
+                image_is_compressible
+            )
 
         self.render_json({
             'skillId': new_skill_id
@@ -622,10 +637,7 @@ class MergeSkillHandlerNormalizedPayloadDict(TypedDict):
 
 
 class MergeSkillHandler(
-    base.BaseHandler[
-        MergeSkillHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[MergeSkillHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handles merging of the skills."""
 
@@ -635,7 +647,8 @@ class MergeSkillHandler(
         'POST': {
             'old_skill_id': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
                         'regex_pattern': constants.ENTITY_ID_REGEX
@@ -644,7 +657,8 @@ class MergeSkillHandler(
             },
             'new_skill_id': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
                         'regex_pattern': constants.ENTITY_ID_REGEX
@@ -665,30 +679,30 @@ class MergeSkillHandler(
         old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=True)
 
         skill_services.replace_skill_id_in_all_topics(
-            self.user_id, old_skill_id, new_skill_id)
+            self.user_id, old_skill_id, new_skill_id
+        )
         question_services.replace_skill_id_for_all_questions(
-            old_skill_id, old_skill.description, new_skill_id)
+            old_skill_id, old_skill.description, new_skill_id
+        )
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': (
-                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'property_name': (skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
                 'old_value': old_skill.superseding_skill_id,
                 'new_value': new_skill_id
             })
         ]
         skill_services.update_skill(
             self.user_id, old_skill_id, changelist,
-            'Marking the skill as having being merged successfully.')
+            'Marking the skill as having being merged successfully.'
+        )
         skill_services.delete_skill(self.user_id, old_skill_id)
         self.render_json({
             'merged_into_skill': new_skill_id
         })
 
 
-def normalize_comma_separated_topic_ids(
-    comma_separated_topic_ids: str
-) -> List[str]:
+def normalize_comma_separated_topic_ids(comma_separated_topic_ids: str) -> List[str]:
     """Normalizes a string of comma-separated topic IDs into a list of
     topic IDs.
 
@@ -712,10 +726,8 @@ class TopicIdToDiagnosticTestSkillIdsHandlerNormalizedRequestDict(TypedDict):
 
 
 class TopicIdToDiagnosticTestSkillIdsHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        TopicIdToDiagnosticTestSkillIdsHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str],
+                     TopicIdToDiagnosticTestSkillIdsHandlerNormalizedRequestDict]
 ):
     """Handler class to get topic ID to diagnostic test skill IDs dict."""
 
@@ -736,11 +748,9 @@ class TopicIdToDiagnosticTestSkillIdsHandler(
     def get(self) -> None:
         """Retrieves diagnostic test skill IDs."""
         assert self.normalized_request is not None
-        topic_ids = self.normalized_request[
-            'comma_separated_topic_ids']
+        topic_ids = self.normalized_request['comma_separated_topic_ids']
         self.values.update({
-            'topic_id_to_diagnostic_test_skill_ids': (
-                topic_services.get_topic_id_to_diagnostic_test_skill_ids(
-                    topic_ids))
+            'topic_id_to_diagnostic_test_skill_ids':
+                (topic_services.get_topic_id_to_diagnostic_test_skill_ids(topic_ids))
         })
         self.render_json(self.values)

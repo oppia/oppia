@@ -53,12 +53,10 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
 (feedback_models, opportunity_models, story_models,
- suggestion_models) = models.Registry.import_models(
-     [
-         models.Names.FEEDBACK, models.Names.OPPORTUNITY, models.Names.STORY,
-         models.Names.SUGGESTION
-     ]
- )
+ suggestion_models) = models.Registry.import_models([
+     models.Names.FEEDBACK, models.Names.OPPORTUNITY, models.Names.STORY,
+     models.Names.SUGGESTION
+ ])
 
 
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
@@ -131,14 +129,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         )
         subtopic_page_services.save_subtopic_page(
             self.owner_id, subtopic_page, 'Added subtopic', [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Sample',
-                        'url_fragment': 'dummy-fragment'
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample',
+                    'url_fragment': 'dummy-fragment'
+                })
             ]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -162,9 +158,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         """Creates a translation suggestion for exploration 0 and performs basic
         assertions.
         """
-        with self.swap(feedback_models.GeneralFeedbackThreadModel,
-                       'generate_new_thread_id',
-                       self.mock_generate_new_thread_id_for_suggestion):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel, 'generate_new_thread_id',
+            self.mock_generate_new_thread_id_for_suggestion
+        ):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION, self.suggestion_target_id,
@@ -181,22 +178,18 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         """Adds exploration 0 as a node to the test story."""
         story_services.update_story(
             self.owner_id, self.STORY_ID, [
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'add_story_node',
-                        'node_id': 'node_1',
-                        'title': 'Node1',
-                    }
-                ),
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'update_story_node_property',
-                        'property_name': 'exploration_id',
-                        'node_id': 'node_1',
-                        'old_value': None,
-                        'new_value': '0'
-                    }
-                )
+                story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'Node1',
+                }),
+                story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': '0'
+                })
             ], 'Changes.'
         )
 
@@ -230,7 +223,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity.translation_in_review_counts, {'hi': 1})
+        self.assertEqual(opportunity.translation_in_review_counts, {
+            'hi': 1
+        })
 
     def test_get_translation_opportunities_with_no_translations_in_review(self) -> None:
         translation_opportunities, _, _ = (
@@ -259,12 +254,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'delete_story_node',
-                        'node_id': 'node_1',
-                    }
-                )
+                story_domain.StoryChange({
+                    'cmd': 'delete_story_node',
+                    'node_id': 'node_1',
+                })
             ], 'Deleted one node.'
         )
 
@@ -317,14 +310,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         topic_services.update_topic_and_subtopic_pages(
             self.owner_id, self.TOPIC_ID, [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': 'update_topic_property',
-                        'property_name': 'name',
-                        'old_value': 'topic',
-                        'new_value': 'A new topic'
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': 'update_topic_property',
+                    'property_name': 'name',
+                    'old_value': 'topic',
+                    'new_value': 'A new topic'
+                })
             ], 'Change topic title.'
         )
 
@@ -352,14 +343,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'update_story_property',
-                        'property_name': 'title',
-                        'old_value': 'A story',
-                        'new_value': 'A new story'
-                    }
-                )
+                story_domain.StoryChange({
+                    'cmd': 'update_story_property',
+                    'property_name': 'title',
+                    'old_value': 'A story',
+                    'new_value': 'A new story'
+                })
             ], 'Change story title.'
         )
 
@@ -384,15 +373,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'update_story_node_property',
-                        'property_name': 'title',
-                        'node_id': 'node_1',
-                        'old_value': 'Node1',
-                        'new_value': 'A new Node1'
-                    }
-                )
+                story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'title',
+                    'node_id': 'node_1',
+                    'old_value': 'Node1',
+                    'new_value': 'A new Node1'
+                })
             ], 'Change node title.'
         )
 
@@ -418,9 +405,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             exp.next_content_id_index
         )
         answer_group_dict_inputs_value: Dict[str, Union[str, List[str]]] = {
-            'contentId': content_id_generator.generate(
-                translation_domain.ContentType.RULE, extra_prefix='input'
-            ),
+            'contentId':
+                content_id_generator.generate(
+                    translation_domain.ContentType.RULE, extra_prefix='input'
+                ),
             'normalizedStrSet': ['Test']
         }
 
@@ -429,122 +417,108 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
                 'feedback': {
-                    'content_id': content_id_generator.generate(
-                        translation_domain.ContentType.FEEDBACK
-                    ),
-                    'html': '<p>Feedback</p>'
+                    'content_id':
+                        content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK
+                        ),
+                    'html':
+                        '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': answer_group_dict_inputs_value
-                    },
-                    'rule_type': 'Contains'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': answer_group_dict_inputs_value
+                },
+                'rule_type': 'Contains'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
 
         hints_list = []
-        hints_list.append(
-            {
-                'hint_content': {
-                    'content_id': content_id_generator.generate(
-                        translation_domain.ContentType.HINT
-                    ),
-                    'html': '<p>hint one</p>'
-                },
-            }
-        )
+        hints_list.append({
+            'hint_content': {
+                'content_id':
+                    content_id_generator.generate(translation_domain.ContentType.HINT),
+                'html':
+                    '<p>hint one</p>'
+            },
+        })
 
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.SOLUTION
-                ),
-                'html': '<p>hello_world is a string</p>'
+                'content_id':
+                    content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION
+                    ),
+                'html':
+                    '<p>hello_world is a string</p>'
             },
         }
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'state_name': 'Introduction',
-                        'new_value': 'TextInput'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.
-                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'state_name': 'Introduction',
-                        'new_value': {
-                            'placeholder': {
-                                'value': {
-                                    'content_id': content_id_generator.generate(
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'Introduction',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id':
+                                    content_id_generator.generate(
                                         translation_domain.ContentType.
                                         CUSTOMIZATION_ARG,
                                         extra_prefix='placeholder'
                                     ),
-                                    'unicode_str': ''
-                                }
-                            },
-                            'rows': {
-                                'value': 1
-                            },
-                            'catchMisspellings': {
-                                'value': False
+                                'unicode_str':
+                                    ''
                             }
+                        },
+                        'rows': {
+                            'value': 1
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                        ),
-                        'state_name': 'Introduction',
-                        'new_value': [answer_group_dict]
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_HINTS),
-                        'state_name': 'Introduction',
-                        'new_value': hints_list
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION
-                        ),
-                        'state_name': 'Introduction',
-                        'new_value': solution_dict
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index,
-                        'old_value': 0
-                    }
-                )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        (exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'state_name': 'Introduction',
+                    'new_value': [answer_group_dict]
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_HINTS),
+                    'state_name': 'Introduction',
+                    'new_value': hints_list
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
+                    'state_name': 'Introduction',
+                    'new_value': solution_dict
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                    'old_value': 0
+                })
             ], 'Add state name'
         )
         translation_opportunities, _, _ = (
@@ -558,22 +532,18 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         story_services.update_story(
             self.owner_id, self.STORY_ID, [
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'add_story_node',
-                        'node_id': 'node_1',
-                        'title': 'Node1',
-                    }
-                ),
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'update_story_node_property',
-                        'property_name': 'exploration_id',
-                        'node_id': 'node_1',
-                        'old_value': None,
-                        'new_value': '0'
-                    }
-                )
+                story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'Node1',
+                }),
+                story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': '0'
+                })
             ], 'Changes.'
         )
         translation_opportunities, _, _ = (
@@ -582,17 +552,15 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'Introduction',
-                    'property_name': 'content',
-                    'new_value': {
-                        'html': '<p><strong>Test content</strong></p>',
-                        'content_id': 'content_0',
-                    }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content_0',
                 }
-            )
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, '0', change_list, 'commit message'
@@ -613,12 +581,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         # The translation opportunity should be returned after marking a
         # translation as stale.
         translation_needs_update_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
-                    'content_id': 'content_0'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+                'content_id': 'content_0'
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, '0', translation_needs_update_change_list, 'commit message'
@@ -667,9 +633,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         opportunity_services.create_skill_opportunity(self.SKILL_ID, 'description')
         with self.assertRaisesRegex(
-                Exception,
-                'SkillOpportunity corresponding to skill ID %s already exists.' %
-                self.SKILL_ID):
+            Exception, 'SkillOpportunity corresponding to skill ID %s already exists.' %
+            self.SKILL_ID
+        ):
             opportunity_services.create_skill_opportunity(self.SKILL_ID, 'description')
 
     def test_update_skill_description_updates_skill_opportunity(self) -> None:
@@ -677,14 +643,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, self.USER_ID, description='skill_description'
         )
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': (skill_domain.SKILL_PROPERTY_DESCRIPTION),
-                    'old_value': 'skill_description',
-                    'new_value': 'new_description'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (skill_domain.SKILL_PROPERTY_DESCRIPTION),
+                'old_value': 'skill_description',
+                'new_value': 'new_description'
+            })
         ]
 
         skill_services.update_skill(
@@ -913,22 +877,18 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'add_story_node',
-                        'node_id': 'node_1',
-                        'title': 'Node1',
-                    }
-                ),
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'update_story_node_property',
-                        'property_name': 'exploration_id',
-                        'node_id': 'node_1',
-                        'old_value': None,
-                        'new_value': '0'
-                    }
-                )
+                story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'Node1',
+                }),
+                story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': '0'
+                })
             ], 'Changes.'
         )
 
@@ -972,9 +932,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_exploration_opportunity_summaries_by_ids_for_invalid_id(self) -> None:
         opportunities = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['badID']
-            )
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(['badID'])
         )
 
         self.assertEqual(len(opportunities), 1)
@@ -1002,24 +960,19 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             'new_lang' in opportunity.incomplete_translation_language_codes
         )
 
-        mock_supported_languages = constants.SUPPORTED_AUDIO_LANGUAGES + [
-            {
-                'id': 'new_lang',
-                'description': 'New language',
-                'relatedLanguages': ['new_lang']
-            }
-        ]
+        mock_supported_languages = constants.SUPPORTED_AUDIO_LANGUAGES + [{
+            'id': 'new_lang',
+            'description': 'New language',
+            'relatedLanguages': ['new_lang']
+        }]
 
         self.assertEqual(len(observed_log_messages), 0)
 
-        with self.swap(logging, 'info',
-                       _mock_logging_function), self.swap(constants,
-                                                          'SUPPORTED_AUDIO_LANGUAGES',
-                                                          mock_supported_languages):
+        with self.swap(logging, 'info', _mock_logging_function), self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES', mock_supported_languages
+        ):
             opportunities = (
-                opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                    ['0']
-                )
+                opportunity_services.get_exploration_opportunity_summaries_by_ids(['0'])
             )
             self.assertEqual(len(opportunities), 1)
 
@@ -1109,9 +1062,10 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             language_codes_with_assigned_voice_artists=[]
         )
         # Mock the get method of ExplorationOpportunitySummaryModel.
-        with self.swap(opportunity_models.ExplorationOpportunitySummaryModel, 'get',
-                       lambda _id: mock_opportunity_summary
-                       if _id == lesson_id else None):
+        with self.swap(
+            opportunity_models.ExplorationOpportunitySummaryModel, 'get',
+            lambda _id: mock_opportunity_summary if _id == lesson_id else None
+        ):
             # Test pinning an opportunity.
             opportunity_services.update_pinned_opportunity_model(
                 user_id, language_code, topic_id, lesson_id
@@ -1186,13 +1140,13 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(test_utils.GenericTestBase
         )
 
         opportunity = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['exp_1']
-            )
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(['exp_1'])
         )
         assert opportunity['exp_1'] is not None
 
-        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 1})
+        self.assertEqual(opportunity['exp_1'].translation_counts, {
+            'hi': 1
+        })
 
     def test_fully_translated_content_in_language_updated_in_opportunity(self) -> None:
         (
@@ -1201,13 +1155,13 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(test_utils.GenericTestBase
         )
 
         opportunity = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['exp_1']
-            )
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(['exp_1'])
         )
         assert opportunity['exp_1'] is not None
 
-        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 1})
+        self.assertEqual(opportunity['exp_1'].translation_counts, {
+            'hi': 1
+        })
         self.assertTrue(
             'hi' in opportunity['exp_1'].incomplete_translation_language_codes
         )
@@ -1218,13 +1172,13 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(test_utils.GenericTestBase
         )
 
         opportunity = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['exp_1']
-            )
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(['exp_1'])
         )
         assert opportunity['exp_1'] is not None
 
-        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 2})
+        self.assertEqual(opportunity['exp_1'].translation_counts, {
+            'hi': 2
+        })
         self.assertFalse(
             'hi' in opportunity['exp_1'].incomplete_translation_language_codes
         )
@@ -1236,7 +1190,9 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(test_utils.GenericTestBase
         self.save_new_default_exploration('exp_1', owner_id)
         opportunity = (
             opportunity_services.compute_opportunity_models_with_updated_exploration(
-                'exp_1', 2, {'hi': 2}
+                'exp_1', 2, {
+                    'hi': 2
+                }
             )
         )[0]
 

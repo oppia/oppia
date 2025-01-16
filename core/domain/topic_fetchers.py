@@ -34,7 +34,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models, ) = models.Registry.import_models([models.Names.TOPIC])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 def _migrate_subtopics_to_latest_schema(
@@ -92,15 +92,18 @@ def _migrate_story_references_to_latest_schema(
             is supported at present.
     """
     story_reference_schema_version = (versioned_story_references['schema_version'])
-    if not (1 <= story_reference_schema_version <=
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+    if not (
+        1 <= story_reference_schema_version <=
+        feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+    ):
         raise Exception(
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
         )
 
-    while (story_reference_schema_version
-           < feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+    while (
+        story_reference_schema_version < feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+    ):
         topic_domain.Topic.update_story_references_from_model(
             versioned_story_references, story_reference_schema_version
         )
@@ -137,8 +140,10 @@ def get_topic_from_model(topic_model: topic_models.TopicModel) -> topic_domain.T
     }
     if (topic_model.subtopic_schema_version != feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         _migrate_subtopics_to_latest_schema(versioned_subtopics, topic_model.id)
-    if (topic_model.story_reference_schema_version
-            != feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+    if (
+        topic_model.story_reference_schema_version
+        != feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+    ):
         _migrate_story_references_to_latest_schema(versioned_canonical_story_references)
         _migrate_story_references_to_latest_schema(
             versioned_additional_story_references
@@ -227,8 +232,9 @@ def get_topic_by_id(topic_id: str,
         if topic_model:
             topic = get_topic_from_model(topic_model)
             caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_TOPIC, sub_namespace,
-                {topic_id: topic}
+                caching_services.CACHE_NAMESPACE_TOPIC, sub_namespace, {
+                    topic_id: topic
+                }
             )
             return topic
         else:
@@ -269,7 +275,7 @@ def get_topics_by_ids(topic_ids: List[str],
         Exception. No topic model exists for the given topic_id.
     """
     all_topic_models: List[Optional[topic_models.TopicModel]
-                           ] = (topic_models.TopicModel.get_multi(topic_ids))
+                          ] = (topic_models.TopicModel.get_multi(topic_ids))
     topics: List[Optional[topic_domain.Topic]] = []
     for index, topic_model in enumerate(all_topic_models):
         if topic_model is None:
@@ -314,7 +320,7 @@ def get_topic_by_name(topic_name: str,
         Exception. No Topic exists for the given topic name.
     """
     topic_model: Optional[topic_models.TopicModel
-                          ] = (topic_models.TopicModel.get_by_name(topic_name))
+                         ] = (topic_models.TopicModel.get_by_name(topic_name))
     if topic_model is None:
         if strict:
             raise Exception('No Topic exists for the given topic name: %s' % topic_name)
@@ -350,7 +356,7 @@ def get_all_topics() -> List[topic_domain.Topic]:
     """
     backend_topic_models = topic_models.TopicModel.get_all()
     topics: List[topic_domain.Topic
-                 ] = [get_topic_from_model(topic) for topic in backend_topic_models]
+                ] = [get_topic_from_model(topic) for topic in backend_topic_models]
     return topics
 
 
@@ -391,7 +397,7 @@ def get_topic_rights(topic_id: str,
     """
 
     model: Optional[topic_models.TopicRightsModel
-                    ] = (topic_models.TopicRightsModel.get(topic_id, strict=strict))
+                   ] = (topic_models.TopicRightsModel.get(topic_id, strict=strict))
 
     if model is None:
         return None
@@ -482,7 +488,7 @@ def get_all_skill_ids_assigned_to_some_topic() -> Set[str]:
     skill_ids: Set[str] = set()
     all_topic_models = topic_models.TopicModel.get_all()
     all_topics: List[topic_domain.Topic
-                     ] = [get_topic_from_model(topic) for topic in all_topic_models]
+                    ] = [get_topic_from_model(topic) for topic in all_topic_models]
     for topic in all_topics:
         skill_ids.update(topic.get_all_skill_ids())
     return skill_ids
@@ -611,7 +617,7 @@ def get_multi_topic_rights(
         Exception. No topic_rights exists for the given topic_id.
     """
     topic_rights_models: List[Optional[topic_models.TopicRightsModel]
-                              ] = (topic_models.TopicRightsModel.get_multi(topic_ids))
+                             ] = (topic_models.TopicRightsModel.get_multi(topic_ids))
     topic_rights: List[Optional[topic_domain.TopicRights]] = []
     for index, rights in enumerate(topic_rights_models):
         if rights is None:

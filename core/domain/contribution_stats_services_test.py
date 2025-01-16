@@ -27,7 +27,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models, ) = models.Registry.import_models([models.Names.SUGGESTION])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):

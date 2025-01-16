@@ -120,9 +120,8 @@ class Classroom:
             'course_details': self.course_details,
             'teaser_text': self.teaser_text,
             'topic_list_intro': self.topic_list_intro,
-            'topic_id_to_prerequisite_topic_ids': (
-                self.topic_id_to_prerequisite_topic_ids
-            ),
+            'topic_id_to_prerequisite_topic_ids':
+                (self.topic_id_to_prerequisite_topic_ids),
             'is_published': self.is_published,
             'thumbnail_data': self.thumbnail_data.to_dict(),
             'banner_data': self.banner_data.to_dict(),

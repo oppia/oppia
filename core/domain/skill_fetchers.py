@@ -30,7 +30,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
 
-(skill_models, ) = models.Registry.import_models([models.Names.SKILL])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 
 def get_multi_skills(skill_ids: List[str],
@@ -59,7 +59,7 @@ def get_multi_skills(skill_ids: List[str],
 
 
 @overload
-def get_skill_by_id(skill_id: str, ) -> skill_domain.Skill:
+def get_skill_by_id(skill_id: str,) -> skill_domain.Skill:
     ...
 
 
@@ -120,8 +120,9 @@ def get_skill_by_id(skill_id: str,
         if skill_model:
             skill = get_skill_from_model(skill_model)
             caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_SKILL, sub_namespace,
-                {skill_id: skill}
+                caching_services.CACHE_NAMESPACE_SKILL, sub_namespace, {
+                    skill_id: skill
+                }
             )
             return skill
         else:
@@ -156,12 +157,16 @@ def get_skill_from_model(skill_model: skill_models.SkillModel) -> skill_domain.S
     }
 
     # Migrate the skill if it is not using the latest schema version.
-    if (skill_model.skill_contents_schema_version
-            != feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+    if (
+        skill_model.skill_contents_schema_version
+        != feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+    ):
         _migrate_skill_contents_to_latest_schema(versioned_skill_contents)
 
-    if (skill_model.misconceptions_schema_version
-            != feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+    if (
+        skill_model.misconceptions_schema_version
+        != feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+    ):
         _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
 
     if (skill_model.rubric_schema_version != feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
@@ -220,15 +225,18 @@ def _migrate_skill_contents_to_latest_schema(
             is supported at present.
     """
     skill_contents_schema_version = versioned_skill_contents['schema_version']
-    if not (1 <= skill_contents_schema_version <=
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+    if not (
+        1 <= skill_contents_schema_version <=
+        feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+    ):
         raise Exception(
             'Sorry, we can only process v1-v%d skill schemas at '
             'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
         )
 
-    while (skill_contents_schema_version
-           < feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+    while (
+        skill_contents_schema_version < feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+    ):
         skill_domain.Skill.update_skill_contents_from_model(
             versioned_skill_contents, skill_contents_schema_version
         )
@@ -256,8 +264,10 @@ def _migrate_misconceptions_to_latest_schema(
             is supported at present.
     """
     misconception_schema_version = versioned_misconceptions['schema_version']
-    if not (1 <= misconception_schema_version <=
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+    if not (
+        1 <= misconception_schema_version <=
+        feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+    ):
         raise Exception(
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION

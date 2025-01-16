@@ -32,7 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
 
-(skill_models, ) = models.Registry.import_models([models.Names.SKILL])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 
 class SkillFetchersUnitTests(test_utils.GenericTestBase):
@@ -49,20 +49,20 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
                     '1': {},
                     '2': {},
                     '3': {}
-                }}
-            ),
-            translation_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {
+                }
+            }),
+            translation_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
                     '1': {},
                     '2': {},
                     '3': {}
-                }}
-            )
+                }
+            })
         )
         misconceptions = [
             skill_domain.Misconception(
@@ -97,20 +97,20 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             )
         )
         self.save_new_skill(
@@ -120,20 +120,20 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             )
         )
 
@@ -163,7 +163,9 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_skill_from_model_with_invalid_skill_contents_schema_version(
         self
     ) -> None:
-        commit_cmd = skill_domain.SkillChange({'cmd': skill_domain.CMD_CREATE_NEW})
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
@@ -180,14 +182,17 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
         with self.assertRaisesRegex(
-                Exception, 'Sorry, we can only process v1-v%d skill schemas at '
-                'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v1-v%d skill schemas at '
+            'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+        ):
             skill_fetchers.get_skill_from_model(model)
 
     def test_get_skill_from_model_with_invalid_misconceptions_schema_version(
         self
     ) -> None:
-        commit_cmd = skill_domain.SkillChange({'cmd': skill_domain.CMD_CREATE_NEW})
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
@@ -205,32 +210,35 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             all_questions_merged=False,
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             ).to_dict()
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
         with self.assertRaisesRegex(
-                Exception, 'Sorry, we can only process v1-v%d misconception schemas at '
-                'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v1-v%d misconception schemas at '
+            'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+        ):
             skill_fetchers.get_skill_from_model(model)
 
     def test_get_skill_from_model_with_invalid_rubric_schema_version(self) -> None:
-        commit_cmd = skill_domain.SkillChange({'cmd': skill_domain.CMD_CREATE_NEW})
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
@@ -248,28 +256,29 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             all_questions_merged=False,
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             ).to_dict()
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
         with self.assertRaisesRegex(
-                Exception, 'Sorry, we can only process v1-v%d rubric schemas at '
-                'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v1-v%d rubric schemas at '
+            'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+        ):
             skill_fetchers.get_skill_from_model(model)
 
     def test_get_skill_from_model_with_description(self) -> None:
@@ -283,14 +292,12 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_skill_by_id_with_different_versions(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
-                    'old_value': 'en',
-                    'new_value': 'bn'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
+                'old_value': 'en',
+                'new_value': 'bn'
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.skill_id, changelist, 'update language code'
@@ -305,7 +312,9 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.language_code, 'bn')
 
     def test_get_skill_from_model_with_latest_schemas_version(self) -> None:
-        commit_cmd = skill_domain.SkillChange({'cmd': skill_domain.CMD_CREATE_NEW})
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
@@ -323,20 +332,20 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             all_questions_merged=False,
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             ).to_dict()
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]

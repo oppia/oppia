@@ -30,7 +30,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models, ) = models.Registry.import_models([models.Names.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
@@ -127,9 +127,9 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.learner_group.subtopic_page_ids, ['subtopic_id_1'])
         self.assertEqual(self.learner_group.story_ids, ['story_id_1'])
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED]
-    )
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED
+    ])
     def test_is_learner_group_feature_enabled(self) -> None:
         self.assertTrue(
             learner_group_services.is_learner_group_feature_enabled(self.admin_id)
@@ -305,17 +305,16 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(learner_grp.invited_learner_user_ids, [])
         self.assertEqual(learner_grp.learner_user_ids, [self.LEARNER_ID])
         self.assertEqual(
-            learner_grps_user_model.learner_groups_user_details, [
-                {
-                    'group_id': self.LEARNER_GROUP_ID,
-                    'progress_sharing_is_turned_on': True
-                }
-            ]
+            learner_grps_user_model.learner_groups_user_details, [{
+                'group_id': self.LEARNER_GROUP_ID,
+                'progress_sharing_is_turned_on': True
+            }]
         )
 
         # Test for univited learner.
         with self.assertRaisesRegex(
-                Exception, 'Learner was not invited to join the learner group.'):
+            Exception, 'Learner was not invited to join the learner group.'
+        ):
             learner_group_services.add_learner_to_learner_group(
                 self.LEARNER_GROUP_ID, 'uninvited_learner_id', False
             )
@@ -540,9 +539,9 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            learner_group_fetchers.can_multi_learners_share_progress(
-                [self.LEARNER_ID], self.LEARNER_GROUP_ID
-            ), [True]
+            learner_group_fetchers.can_multi_learners_share_progress([
+                self.LEARNER_ID
+            ], self.LEARNER_GROUP_ID), [True]
         )
 
         learner_group_services.update_progress_sharing_permission(
@@ -550,7 +549,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            learner_group_fetchers.can_multi_learners_share_progress(
-                [self.LEARNER_ID], self.LEARNER_GROUP_ID
-            ), [False]
+            learner_group_fetchers.can_multi_learners_share_progress([
+                self.LEARNER_ID
+            ], self.LEARNER_GROUP_ID), [False]
         )

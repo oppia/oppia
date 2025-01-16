@@ -1,11 +1,12 @@
 from typing import Dict, List, Optional, Union
 from google import auth
 
+
 class Client(object):
-    def __init__(
-            self,
-            credentials: auth.credentials.Credentials = ...
-    ) -> None: ...
+
+    def __init__(self, credentials: auth.credentials.Credentials = ...) -> None:
+        ...
+
     def translate(
         self,
         values: Union[str, List[str]],
@@ -14,4 +15,5 @@ class Client(object):
         source_language: Optional[str] = ...,
         customization_ids: Optional[Union[str, List[str]]] = ...,
         model: Optional[str] = ...,
-    ) -> Union[Dict[str, str], List[Dict[str, str]]]: ...
+    ) -> Union[Dict[str, str], List[Dict[str, str]]]:
+        ...

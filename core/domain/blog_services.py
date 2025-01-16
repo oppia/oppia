@@ -41,7 +41,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models, ) = models.Registry.import_models([models.Names.BLOG])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 # The maximum number of iterations allowed for populating the results of a
 # search query.
@@ -181,7 +181,7 @@ def get_blog_post_summary_by_id(
 
 def get_blog_post_summary_by_id(blog_post_id: str,
                                 strict: bool = True
-                                ) -> Optional[blog_domain.BlogPostSummary]:
+                               ) -> Optional[blog_domain.BlogPostSummary]:
     """Returns a domain object representing a blog post summary.
 
     Args:
@@ -405,7 +405,7 @@ def get_published_blog_post_summaries_by_user_id(
         ).filter(
             blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
         ).order(-blog_models.BlogPostSummaryModel.published_on
-                ).fetch(max_limit, offset=offset)
+               ).fetch(max_limit, offset=offset)
     )
     if len(blog_post_summary_models) == 0:
         return []
@@ -766,7 +766,7 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
 
 def get_published_blog_post_summaries(offset: int = 0,
                                       size: Optional[int] = None
-                                      ) -> List[blog_domain.BlogPostSummary]:
+                                     ) -> List[blog_domain.BlogPostSummary]:
     """Returns published BlogPostSummaries list.
 
     Args:
@@ -791,7 +791,7 @@ def get_published_blog_post_summaries(offset: int = 0,
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
         ).order(-blog_models.BlogPostSummaryModel.published_on
-                ).fetch(max_limit, offset=offset)
+               ).fetch(max_limit, offset=offset)
     )
     if len(blog_post_summary_models) == 0:
         return []
@@ -866,12 +866,10 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
     """
     blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
     if len(blog_post_summaries) > 0:
-        search_services.index_blog_post_summaries(
-            [
-                blog_post_summary for blog_post_summary in blog_post_summaries
-                if blog_post_summary is not None
-            ]
-        )
+        search_services.index_blog_post_summaries([
+            blog_post_summary for blog_post_summary in blog_post_summaries
+            if blog_post_summary is not None
+        ])
 
 
 def get_blog_post_ids_matching_query(
@@ -925,15 +923,17 @@ def get_blog_post_ids_matching_query(
 
         invalid_blog_post_ids = []
         for ind, model in enumerate(
-                blog_models.BlogPostSummaryModel.get_multi(blog_post_ids)):
+            blog_models.BlogPostSummaryModel.get_multi(blog_post_ids)
+        ):
             if model is not None:
                 valid_blog_post_ids.append(blog_post_ids[ind])
             else:
                 invalid_blog_post_ids.append(blog_post_ids[ind])
 
-        if ((len(valid_blog_post_ids)
-             == feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE)
-                or search_offset is None):
+        if ((
+            len(valid_blog_post_ids)
+            == feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+        ) or search_offset is None):
             break
 
         if len(invalid_blog_post_ids) > 0:
@@ -942,9 +942,10 @@ def get_blog_post_ids_matching_query(
                 ', '.join(invalid_blog_post_ids)
             )
 
-    if ((len(valid_blog_post_ids)
-         < feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE)
-            and search_offset is not None):
+    if ((
+        len(valid_blog_post_ids)
+        < feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+    ) and search_offset is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS)

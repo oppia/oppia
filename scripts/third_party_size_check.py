@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Script that runs a size check in third-party folder and errors if
 size limit is exceeded. The aim of this is to prevent us accidentally
 breaching the 10k file limit on App Engine.
@@ -79,14 +78,12 @@ def _check_size_in_dir(dir_path: str, skip_files_list: List[str]) -> int:
             continue
         if os.path.isfile(file_path):
             matches_skip_files = any(
-                fnmatch.fnmatch(file_path, pattern)
-                for pattern in skip_files_list
+                fnmatch.fnmatch(file_path, pattern) for pattern in skip_files_list
             )
             if not matches_skip_files:
                 number_of_files_in_dir += 1
         elif os.path.isdir(file_path):
-            number_of_files_in_dir += _check_size_in_dir(
-                file_path, skip_files_list)
+            number_of_files_in_dir += _check_size_in_dir(file_path, skip_files_list)
     return number_of_files_in_dir
 
 
@@ -94,16 +91,20 @@ def check_third_party_size() -> None:
     """Checks if the third-party size limit has been exceeded."""
     skip_files_list = get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
-        THIRD_PARTY_PATH, skip_files_list)
+        THIRD_PARTY_PATH, skip_files_list
+    )
     print('')
     print('------------------------------------------------------')
-    print('    Number of files in third-party folder: %d' % (
-        number_of_files_in_third_party))
+    print(
+        '    Number of files in third-party folder: %d' %
+        (number_of_files_in_third_party)
+    )
     print('')
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
         print(
             '    ERROR: The third-party folder size exceeded the %d files'
-            ' limit.' % THIRD_PARTY_SIZE_LIMIT)
+            ' limit.' % THIRD_PARTY_SIZE_LIMIT
+        )
         print('------------------------------------------------------')
         print('')
         sys.exit(1)
@@ -115,7 +116,7 @@ def check_third_party_size() -> None:
         print('')
 
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     print('Running third-party size check')
     check_third_party_size()
     print('Third-party folder size check passed.')

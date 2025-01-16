@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides file storage functionality from Google Cloud Storage."""
 
 from __future__ import annotations
@@ -79,10 +78,8 @@ def get(bucket_name: str, filepath: str) -> bytes:
 
 
 def commit(
-        bucket_name: str,
-        filepath: str,
-        raw_bytes: Union[bytes, str],
-        mimetype: Optional[str]
+    bucket_name: str, filepath: str, raw_bytes: Union[bytes, str],
+    mimetype: Optional[str]
 ) -> None:
     """Commits raw_bytes to the relevant file in the entity's assets folder.
 
@@ -111,9 +108,7 @@ def delete(bucket_name: str, filepath: str) -> None:
     blob.delete()
 
 
-def copy(
-        bucket_name: str, source_assets_path: str, dest_assets_path: str
-) -> None:
+def copy(bucket_name: str, source_assets_path: str, dest_assets_path: str) -> None:
     """Copies images from source_path.
 
     Args:
@@ -148,5 +143,4 @@ def listdir(bucket_name: str, dir_name: str) -> List[storage.blob.Blob]:
     Returns:
         list(Blob). A list of blobs.
     """
-    return list(
-        _get_client().list_blobs(_get_bucket(bucket_name), prefix=dir_name))
+    return list(_get_client().list_blobs(_get_bucket(bucket_name), prefix=dir_name))

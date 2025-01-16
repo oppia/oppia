@@ -36,7 +36,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models, ) = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class ExplorationRetrievalTests(test_utils.GenericTestBase):
@@ -64,9 +64,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         )
 
     def test_get_exploration_summaries_matching_ids(self) -> None:
-        summaries = exp_fetchers.get_exploration_summaries_matching_ids(
-            [self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID, 'nonexistent']
-        )
+        summaries = exp_fetchers.get_exploration_summaries_matching_ids([
+            self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID, 'nonexistent'
+        ])
         # Here, we are Ruling out the possibility of None for individual
         # elements of the list. Because `summaries` is of List[Optional[...]]
         # type.
@@ -135,13 +135,15 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(self.exploration_1.title, retrieved_exploration.title)
 
         with self.assertRaisesRegex(
-                Exception, 'Entity for class ExplorationModel with id fake_exploration'
-                ' not found'):
+            Exception, 'Entity for class ExplorationModel with id fake_exploration'
+            ' not found'
+        ):
             exp_fetchers.get_exploration_by_id('fake_exploration')
 
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self) -> None:
-        with self.assertRaisesRegex(ValueError,
-                                    'The given entity_id fake_exp_id is invalid'):
+        with self.assertRaisesRegex(
+            ValueError, 'The given entity_id fake_exp_id is invalid'
+        ):
             (
                 exp_fetchers.
                 get_multiple_versioned_exp_interaction_ids_mapping_by_version(
@@ -167,29 +169,27 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def test_retrieval_of_multiple_exploration_versions(self) -> None:
         # Update exploration to version 2.
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        self.content_id_generator_1.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        self.content_id_generator_1.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': self.content_id_generator_1.next_content_id_index
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': self.content_id_generator_1.next_content_id_index
+            })
         ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, ''
@@ -197,29 +197,27 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         # Update exploration to version 3.
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state 2',
-                    'content_id_for_state_content': (
-                        self.content_id_generator_1.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        self.content_id_generator_1.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state 2',
+                'content_id_for_state_content': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': self.content_id_generator_1.next_content_id_index
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': self.content_id_generator_1.next_content_id_index
+            })
         ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, ''
@@ -242,29 +240,27 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def test_version_number_errors_for_get_multiple_exploration_versions(self) -> None:
         # Update exploration to version 2.
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        self.content_id_generator_1.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        self.content_id_generator_1.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': self.content_id_generator_1.next_content_id_index
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': self.content_id_generator_1.next_content_id_index
+            })
         ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, ''
@@ -272,38 +268,36 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         # Update exploration to version 3.
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state 2',
-                    'content_id_for_state_content': (
-                        self.content_id_generator_1.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        self.content_id_generator_1.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state 2',
+                'content_id_for_state_content': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': self.content_id_generator_1.next_content_id_index
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    self.content_id_generator_1.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': self.content_id_generator_1.next_content_id_index
+            })
         ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, ''
         )
 
         with self.assertRaisesRegex(
-                ValueError,
-                'Requested version number 4 cannot be higher than the current '
-                'version number 3.'):
+            ValueError, 'Requested version number 4 cannot be higher than the current '
+            'version number 3.'
+        ):
             (
                 exp_fetchers.
                 get_multiple_versioned_exp_interaction_ids_mapping_by_version(
@@ -314,8 +308,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(ValueError,
-                                    'At least one version number is invalid'):
+        with self.assertRaisesRegex(
+            ValueError, 'At least one version number is invalid'
+        ):
             (
                 exp_fetchers.
                 get_multiple_versioned_exp_interaction_ids_mapping_by_version(
@@ -357,8 +352,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertNotIn('doesnt_exist', result)
 
         with self.assertRaisesRegex(
-                Exception, 'Couldn\'t find explorations with the following ids:\n'
-                'doesnt_exist'):
+            Exception, 'Couldn\'t find explorations with the following ids:\n'
+            'doesnt_exist'
+        ):
             exp_fetchers.get_multiple_explorations_by_id(exp_ids + ['doesnt_exist'])
 
     def test_exploration_user_data_is_none_before_starting_exploration(self) -> None:
@@ -386,12 +382,10 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'draft_change_list_last_updated': None,
             'draft_change_list_exp_version': None,
             'draft_change_list_id': 0,
-            'mute_suggestion_notifications': (
-                feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
-            ),
-            'mute_feedback_notifications': (
-                feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE
-            ),
+            'mute_suggestion_notifications':
+                (feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+            'mute_feedback_notifications':
+                (feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
             'furthest_reached_checkpoint_exp_version': 1,
             'furthest_reached_checkpoint_state_name': 'Introduction',
             'most_recently_reached_checkpoint_exp_version': 1,
@@ -409,32 +403,28 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'New state',
-                        'content_id_for_state_content': (
-                            self.content_id_generator_1.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            self.content_id_generator_1.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'New state',
+                    'content_id_for_state_content': (
+                        self.content_id_generator_1.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': (
-                            self.content_id_generator_1.next_content_id_index
-                        ),
-                        'old_value': 0
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        self.content_id_generator_1.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': (self.content_id_generator_1.next_content_id_index),
+                    'old_value': 0
+                })
             ], 'A commit message.'
         )
         version_history = exp_fetchers.get_exploration_version_history(self.EXP_1_ID, 2)
@@ -629,34 +619,30 @@ title: Old Title
                 'html': ''
             },
             'interaction': {
-                'answer_groups': [
-                    {
-                        'outcome': {
-                            'dest': 'End',
-                            'feedback': {
-                                'content_id': 'feedback_1',
-                                'html': '<p>Correct!</p>',
-                            },
-                            'labelled_as_correct': False,
-                            'missing_prerequisite_skill_id': None,
-                            'param_changes': [],
-                            'refresher_exploration_id': None,
+                'answer_groups': [{
+                    'outcome': {
+                        'dest': 'End',
+                        'feedback': {
+                            'content_id': 'feedback_1',
+                            'html': '<p>Correct!</p>',
                         },
-                        'rule_specs': [
-                            {
-                                'inputs': {
-                                    'x': {
-                                        'contentId': 'rule_input_3',
-                                        'normalizedStrSet': ['InputString'],
-                                    }
-                                },
-                                'rule_type': 'Equals',
+                        'labelled_as_correct': False,
+                        'missing_prerequisite_skill_id': None,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                    },
+                    'rule_specs': [{
+                        'inputs': {
+                            'x': {
+                                'contentId': 'rule_input_3',
+                                'normalizedStrSet': ['InputString'],
                             }
-                        ],
-                        'tagged_skill_misconception_id': None,
-                        'training_data': [],
-                    }
-                ],
+                        },
+                        'rule_type': 'Equals',
+                    }],
+                    'tagged_skill_misconception_id': None,
+                    'training_data': [],
+                }],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'placeholder': {
@@ -960,13 +946,11 @@ title: Old Title
 
         # Version 4 is an upgrade based on the migration job.
         commit_cmds = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                    'from_version': str(exploration_model.states_schema_version),
-                    'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': str(exploration_model.states_schema_version),
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+            })
         ]
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USERNAME, exploration_model.id, commit_cmds,
@@ -1025,17 +1009,18 @@ title: Old Title
             'version_number': 5,
         }
         commit_dict_4 = {
-            'committer_id': feconf.MIGRATION_BOT_USERNAME,
-            'commit_message': 'Update exploration states from schema version 41 to %d.'
-            % feconf.CURRENT_STATE_SCHEMA_VERSION,
-            'commit_cmds': [
-                {
-                    'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                    'from_version': '41',
-                    'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
-                }
-            ],
-            'version_number': 4,
+            'committer_id':
+                feconf.MIGRATION_BOT_USERNAME,
+            'commit_message':
+                'Update exploration states from schema version 41 to %d.' %
+                feconf.CURRENT_STATE_SCHEMA_VERSION,
+            'commit_cmds': [{
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '41',
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+            }],
+            'version_number':
+                4,
         }
 
         # Ensure there have been 5 commits.

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.job_test_utils."""
 
 from __future__ import annotations
@@ -49,9 +48,7 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
         with self.assertRaisesRegex(AssertionError, 'failed'):
             self.assert_pcoll_equal(output, [123])
 
-    def test_assert_pcoll_empty_raises_runtime_error_when_called_twice(
-        self
-    ) -> None:
+    def test_assert_pcoll_empty_raises_runtime_error_when_called_twice(self) -> None:
         # NOTE: Arbitrary operations that produce a non-empty PCollection.
         output = self.pipeline | beam.Create([]) | beam.Map(lambda x: x)
 
@@ -62,9 +59,7 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
         ):
             self.assert_pcoll_empty(output)
 
-    def test_assert_pcoll_equal_raises_runtime_error_when_called_twice(
-        self
-    ) -> None:
+    def test_assert_pcoll_equal_raises_runtime_error_when_called_twice(self) -> None:
         # NOTE: Arbitrary operations that produce a non-empty PCollection.
         output = self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
 
@@ -98,11 +93,10 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # MyPy does not support for extra attributes on functions of
         # Callable types. So, once this 'assert_called' method is
         # replaced with some more standard method, we can remove this todo.
-        self.job.run.assert_called() # type: ignore[attr-defined]
+        self.job.run.assert_called()  # type: ignore[attr-defined]
 
     def test_put_multi(self) -> None:
-        model_list = [
-            self.create_model(base_models.BaseModel) for _ in range(3)]
+        model_list = [self.create_model(base_models.BaseModel) for _ in range(3)]
         self.put_multi(model_list)
 
         model_ids = [model.id for model in model_list]
@@ -137,9 +131,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
 
 class DecorateBeamErrorsTests(test_utils.TestBase):
 
-    def assert_error_is_decorated(
-        self, actual_msg: str, decorated_msg: str
-    ) -> None:
+    def assert_error_is_decorated(self, actual_msg: str, decorated_msg: str) -> None:
         """Asserts that decorate_beam_errors() raises with the right message.
 
         Args:
@@ -156,7 +148,8 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
     def test_decorates_message_with_both_unexpected_and_missing(self) -> None:
         actual_msg = (
             'Error, unexpected elements ["abc", "def"], '
-            'missing elements ["123", "456"] [while running FooJob]')
+            'missing elements ["123", "456"] [while running FooJob]'
+        )
         decorated_msg = (
             'failed while running FooJob\n'
             '\n'
@@ -173,7 +166,8 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
 
     def test_decorates_message_with_only_unexpected(self) -> None:
         actual_msg = (
-            'Error, unexpected elements ["abc", "def"] [while running FooJob]')
+            'Error, unexpected elements ["abc", "def"] [while running FooJob]'
+        )
         decorated_msg = (
             'failed while running FooJob\n'
             '\n'
@@ -185,8 +179,7 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
         self.assert_error_is_decorated(actual_msg, decorated_msg)
 
     def test_decorates_message_with_only_missing(self) -> None:
-        actual_msg = (
-            'Error, missing elements ["abc", "def"] [while running FooJob]')
+        actual_msg = ('Error, missing elements ["abc", "def"] [while running FooJob]')
         decorated_msg = (
             'failed while running FooJob\n'
             '\n'
@@ -198,8 +191,7 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
         self.assert_error_is_decorated(actual_msg, decorated_msg)
 
     def test_decorates_message_with_comparison_to_empty_list(self) -> None:
-        actual_msg = (
-            'Error [] == ["abc", "def"] [while running FooJob]')
+        actual_msg = ('Error [] == ["abc", "def"] [while running FooJob]')
         decorated_msg = (
             'failed while running FooJob\n'
             '\n'
@@ -215,11 +207,8 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
 
         self.assert_error_is_decorated(actual_msg, actual_msg)
 
-    def test_does_not_decorate_message_with_invalid_unexpected_value(
-        self
-    ) -> None:
-        actual_msg = (
-            'Error, unexpected elements [abc, def] [while running FooJob]')
+    def test_does_not_decorate_message_with_invalid_unexpected_value(self) -> None:
+        actual_msg = ('Error, unexpected elements [abc, def] [while running FooJob]')
 
         self.assert_error_is_decorated(actual_msg, actual_msg)
 

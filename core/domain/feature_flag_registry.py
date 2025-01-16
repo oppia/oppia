@@ -27,7 +27,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import config_models
 
-(config_models, ) = models.Registry.import_models([models.Names.CONFIG])
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 FeatureNames = feature_flag_list.FeatureNames
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (

@@ -60,9 +60,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
-            'page_contents_schema_version': (
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
-            ),
+            'page_contents_schema_version':
+                (feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -95,9 +94,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
-            'page_contents_schema_version': (
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
-            ),
+            'page_contents_schema_version':
+                (feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -161,9 +159,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
-            'page_contents_schema_version': (
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
-            ),
+            'page_contents_schema_version':
+                (feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -192,19 +189,16 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
-            'page_contents_schema_version': (
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
-            ),
+            'page_contents_schema_version':
+                (feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
         self.subtopic_page.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict(
-                {
-                    'html': '<p>hello world</p>',
-                    'content_id': 'content'
-                }
-            )
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>hello world</p>',
+                'content_id': 'content'
+            })
         )
         self.assertEqual(self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
@@ -235,9 +229,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'written_translations': written_translations_dict
             },
-            'page_contents_schema_version': (
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
-            ),
+            'page_contents_schema_version':
+                (feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -248,13 +241,11 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_create_subtopic_page_change(self) -> None:
-        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
-            {
-                'cmd': subtopic_page_domain.CMD_CREATE_NEW,
-                'topic_id': self.topic_id,
-                'subtopic_id': 'subtopic_id'
-            }
-        )
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+            'topic_id': self.topic_id,
+            'subtopic_id': 'subtopic_id'
+        })
 
         self.assertEqual(
             subtopic_page_change_object.to_dict(), {
@@ -278,14 +269,16 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     def test_validate_page_contents_schema_version_type(self) -> None:
         self.subtopic_page.page_contents_schema_version = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                Exception, 'Expected page contents schema version to be an integer'):
+            Exception, 'Expected page contents schema version to be an integer'
+        ):
             self.subtopic_page.validate()
 
     def test_validate_page_contents_schema_version(self) -> None:
         self.subtopic_page.page_contents_schema_version = 0
         with self.assertRaisesRegex(
-                Exception, 'Expected page contents schema version to be %s' %
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+            Exception, 'Expected page contents schema version to be %s' %
+            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+        ):
             self.subtopic_page.validate()
 
 
@@ -363,68 +356,71 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
 class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
     def test_subtopic_page_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
-            subtopic_page_domain.SubtopicPageChange({'invalid': 'data'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
+            subtopic_page_domain.SubtopicPageChange({
+                'invalid': 'data'
+            })
 
     def test_subtopic_page_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command invalid is not allowed'):
-            subtopic_page_domain.SubtopicPageChange({'cmd': 'invalid'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command invalid is not allowed'
+        ):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'invalid'
+            })
 
     def test_subtopic_page_change_object_with_missing_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('The following required attributes are missing: '
-                                     'new_value, old_value')):
-            subtopic_page_domain.SubtopicPageChange(
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'property_name': '<p>page_contents_html</p>',
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('The following required attributes are missing: '
+             'new_value, old_value')
+        ):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'update_subtopic_page_property',
+                'property_name': '<p>page_contents_html</p>',
+            })
 
     def test_subtopic_page_change_object_with_extra_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('The following extra attributes are present: invalid')):
-            subtopic_page_domain.SubtopicPageChange(
-                {
-                    'cmd': 'create_new',
-                    'topic_id': 'topic_id',
-                    'subtopic_id': 'subtopic_id',
-                    'invalid': 'invalid'
-                }
-            )
+            utils.ValidationError,
+            ('The following extra attributes are present: invalid')
+        ):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'create_new',
+                'topic_id': 'topic_id',
+                'subtopic_id': 'subtopic_id',
+                'invalid': 'invalid'
+            })
 
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
         self
     ) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for property_name in cmd update_subtopic_page_property: '
-             'invalid is not allowed')):
-            subtopic_page_domain.SubtopicPageChange(
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'subtopic_id': 'subtopic_id',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
+            utils.ValidationError, (
+                'Value for property_name in cmd update_subtopic_page_property: '
+                'invalid is not allowed'
             )
+        ):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'update_subtopic_page_property',
+                'subtopic_id': 'subtopic_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
     def test_subtopic_page_change_object_with_update_subtopic_page_property(
         self
     ) -> None:
-        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
-            {
-                'cmd': 'update_subtopic_page_property',
-                'subtopic_id': 'subtopic_id',
-                'property_name': 'page_contents_html',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
+            'cmd': 'update_subtopic_page_property',
+            'subtopic_id': 'subtopic_id',
+            'property_name': 'page_contents_html',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(
             subtopic_page_change_object.cmd, 'update_subtopic_page_property'
@@ -438,13 +434,11 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
     def test_subtopic_page_change_object_with_create_new(self) -> None:
         subtopic_page_change_object = (
-            subtopic_page_domain.SubtopicPageChange(
-                {
-                    'cmd': 'create_new',
-                    'topic_id': 'topic_id',
-                    'subtopic_id': 'subtopic_id'
-                }
-            )
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'create_new',
+                'topic_id': 'topic_id',
+                'subtopic_id': 'subtopic_id'
+            })
         )
 
         self.assertEqual(subtopic_page_change_object.cmd, 'create_new')

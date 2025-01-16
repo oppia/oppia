@@ -32,9 +32,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
     from mypy_imports import transaction_services
 
-(app_feedback_report_models, ) = models.Registry.import_models(
-    [models.Names.APP_FEEDBACK_REPORT]
-)
+(app_feedback_report_models,) = models.Registry.import_models([
+    models.Names.APP_FEEDBACK_REPORT
+])
 transaction_services = models.Registry.import_transaction_services()
 
 PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
@@ -431,7 +431,8 @@ def get_android_report_from_model(
     """
     feedback_report = app_feedback_report_domain.AppFeedbackReport
     if android_report_model.android_report_info_schema_version < (
-            feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
+        feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
+    ):
         raise NotImplementedError(
             'Android app feedback report migrations must be added for new '
             'report schemas implemented.'
@@ -457,17 +458,13 @@ def get_android_report_from_model(
             )
         )
     )
-    entry_point = feedback_report.get_entry_point_from_json(
-        {
-            'entry_point_name': android_report_model.entry_point,
-            'entry_point_topic_id': android_report_model.entry_point_topic_id,
-            'entry_point_story_id': android_report_model.entry_point_story_id,
-            'entry_point_exploration_id': (
-                android_report_model.entry_point_exploration_id
-            ),
-            'entry_point_subtopic_id': (android_report_model.entry_point_subtopic_id)
-        }
-    )
+    entry_point = feedback_report.get_entry_point_from_json({
+        'entry_point_name': android_report_model.entry_point,
+        'entry_point_topic_id': android_report_model.entry_point_topic_id,
+        'entry_point_story_id': android_report_model.entry_point_story_id,
+        'entry_point_exploration_id': (android_report_model.entry_point_exploration_id),
+        'entry_point_subtopic_id': (android_report_model.entry_point_subtopic_id)
+    })
     app_context = app_feedback_report_domain.AndroidAppContext(
         entry_point, android_report_model.text_language_code,
         android_report_model.audio_language_code,
@@ -572,35 +569,37 @@ def save_feedback_report_to_storage(
     entry_point = app_context.entry_point
 
     report_info_json = {
-        'user_feedback_selected_items': (
-            user_supplied_feedback.user_feedback_selected_items
-        ),
-        'user_feedback_other_text_input': (
-            user_supplied_feedback.user_feedback_other_text_input
-        )
+        'user_feedback_selected_items':
+            (user_supplied_feedback.user_feedback_selected_items),
+        'user_feedback_other_text_input':
+            (user_supplied_feedback.user_feedback_other_text_input)
     }
 
     report_info_json = {
-        'user_feedback_selected_items': (
-            user_supplied_feedback.user_feedback_selected_items
-        ),
-        'user_feedback_other_text_input': (
-            user_supplied_feedback.user_feedback_other_text_input
-        ),
-        'event_logs': app_context.event_logs,
-        'logcat_logs': app_context.logcat_logs,
-        'package_version_code': str(device_system_context.package_version_code),
-        'android_device_language_locale_code': (
-            device_system_context.device_language_locale_code
-        ),
-        'build_fingerprint': device_system_context.build_fingerprint,
-        'network_type': device_system_context.network_type.value,
-        'text_size': app_context.text_size.value,
-        'only_allows_wifi_download_and_update': str(
-            app_context.only_allows_wifi_download_and_update
-        ),
-        'automatically_update_topics': str(app_context.automatically_update_topics),
-        'account_is_profile_admin': str(app_context.account_is_profile_admin)
+        'user_feedback_selected_items':
+            (user_supplied_feedback.user_feedback_selected_items),
+        'user_feedback_other_text_input':
+            (user_supplied_feedback.user_feedback_other_text_input),
+        'event_logs':
+            app_context.event_logs,
+        'logcat_logs':
+            app_context.logcat_logs,
+        'package_version_code':
+            str(device_system_context.package_version_code),
+        'android_device_language_locale_code':
+            (device_system_context.device_language_locale_code),
+        'build_fingerprint':
+            device_system_context.build_fingerprint,
+        'network_type':
+            device_system_context.network_type.value,
+        'text_size':
+            app_context.text_size.value,
+        'only_allows_wifi_download_and_update':
+            str(app_context.only_allows_wifi_download_and_update),
+        'automatically_update_topics':
+            str(app_context.automatically_update_topics),
+        'account_is_profile_admin':
+            str(app_context.account_is_profile_admin)
     }
 
     if new_incoming_report:
@@ -696,7 +695,8 @@ def reassign_ticket(
             old_ticket_obj.newest_report_creation_timestamp = None
         else:
             if old_ticket_obj.newest_report_creation_timestamp == (
-                    report.submitted_on_timestamp):
+                report.submitted_on_timestamp
+            ):
                 # Update the newest report timestamp.
                 report_models = get_report_models(old_ticket_obj.reports, strict=True)
                 latest_timestamp = report_models[0].submitted_on
@@ -720,9 +720,11 @@ def reassign_ticket(
     )
     new_ticket_obj = get_ticket_from_model(new_ticket_model)
     new_ticket_obj.reports.append(report.report_id)
-    if (new_ticket_obj.newest_report_creation_timestamp
-            and report.submitted_on_timestamp
-            > (new_ticket_obj.newest_report_creation_timestamp)):
+    if (
+        new_ticket_obj.newest_report_creation_timestamp and
+        report.submitted_on_timestamp
+        > (new_ticket_obj.newest_report_creation_timestamp)
+    ):
         new_ticket_obj.newest_report_creation_timestamp = (
             report.submitted_on_timestamp
         )

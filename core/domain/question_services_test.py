@@ -40,7 +40,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import question_models
 
-(question_models, ) = models.Registry.import_models([models.Names.QUESTION])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):
@@ -127,8 +127,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertIsNone(question_with_none)
 
         with self.assertRaisesRegex(
-                Exception, 'Entity for class QuestionModel with id question_id '
-                'not found'):
+            Exception, 'Entity for class QuestionModel with id question_id '
+            'not found'
+        ):
             question_services.get_question_by_id('question_id')
 
     def test_get_questions_by_skill_ids_with_fetch_by_difficulty(self) -> None:
@@ -177,23 +178,23 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question_count, 1)
 
         question_count = (
-            question_services.get_total_question_count_for_skill_ids(
-                ['skill_1', 'skill_2']
-            )
+            question_services.get_total_question_count_for_skill_ids([
+                'skill_1', 'skill_2'
+            ])
         )
         self.assertEqual(question_count, 3)
 
         question_count = (
-            question_services.get_total_question_count_for_skill_ids(
-                ['skill_1', 'skill_1']
-            )
+            question_services.get_total_question_count_for_skill_ids([
+                'skill_1', 'skill_1'
+            ])
         )
         self.assertEqual(question_count, 2)
 
         question_count = (
-            question_services.get_total_question_count_for_skill_ids(
-                ['skill_1', 'skill_1', 'skill_2']
-            )
+            question_services.get_total_question_count_for_skill_ids([
+                'skill_1', 'skill_1', 'skill_2'
+            ])
         )
         self.assertEqual(question_count, 3)
 
@@ -220,8 +221,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         )
         self.assertEqual(merged_question_skill_links[0].skill_difficulties, [0.9])
 
-        with self.assertRaisesRegex(Exception,
-                                    'The given question and skill are not linked.'):
+        with self.assertRaisesRegex(
+            Exception, 'The given question and skill are not linked.'
+        ):
             question_services.update_question_skill_link_difficulty(
                 self.question_id, 'skill_10', 0.9
             )
@@ -255,8 +257,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-                Exception, 'Question count is too high, please limit the question '
-                'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+            Exception, 'Question count is too high, please limit the question '
+            'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME
+        ):
             question_services.get_questions_by_skill_ids(
                 25, ['skill_1', 'skill_2'], False
             )
@@ -269,9 +272,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             content_id_generator.next_content_id_index
         )
 
-        with self.assertRaisesRegex(Exception,
-                                    'Skill difficulties and skill ids should match. '
-                                    'The lengths of the two lists are different.'):
+        with self.assertRaisesRegex(
+            Exception, 'Skill difficulties and skill ids should match. '
+            'The lengths of the two lists are different.'
+        ):
             question_services.link_multiple_skills_for_question(
                 self.editor_id, self.question_id, ['skill_1', 'skill_2'], [0.5]
             )
@@ -342,9 +346,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_create_and_get_question_skill_link(self) -> None:
         question_id_2 = question_services.get_new_question_id()
-        with self.assertRaisesRegex(Exception, re.escape(
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
                 'Entity for class QuestionModel with id %s not found' % (question_id_2)
-        )):
+            )
+        ):
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id_2, 'skill_1', 0.5
             )
@@ -383,8 +390,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                Exception, 'Querying linked question summaries for more than 3 '
-                'skills at a time is not supported currently.'):
+            Exception, 'Querying linked question summaries for more than 3 '
+            'skills at a time is not supported currently.'
+        ):
             question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], 0
             )
@@ -410,20 +418,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # question summaries.
         for index, link_object in enumerate(merged_question_skill_links):
             if question_ids[index] == self.question_id:
-                self.assertEqual(
-                    ['Skill Description 3', 'Skill Description 1'],
-                    link_object.skill_descriptions
-                )
+                self.assertEqual(['Skill Description 3', 'Skill Description 1'],
+                                 link_object.skill_descriptions)
                 self.assertEqual([0.8, 0.5], link_object.skill_difficulties)
             elif question_ids[index] == question_id_2:
-                self.assertEqual(
-                    ['Skill Description 1'], link_object.skill_descriptions
-                )
+                self.assertEqual(['Skill Description 1'],
+                                 link_object.skill_descriptions)
                 self.assertEqual([0.3], link_object.skill_difficulties)
             else:
-                self.assertEqual(
-                    ['Skill Description 2'], link_object.skill_descriptions
-                )
+                self.assertEqual(['Skill Description 2'],
+                                 link_object.skill_descriptions)
                 self.assertEqual([0.2], link_object.skill_difficulties)
 
         question_summaries_with_none, merged_question_skill_links = (
@@ -440,9 +444,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertItemsEqual(question_ids, [self.question_id, question_id_2])
 
         with self.assertRaisesRegex(
-                Exception,
-                'The question with ID %s is already linked to skill skill_1' %
-            (self.question_id)):
+            Exception, 'The question with ID %s is already linked to skill skill_1' %
+            (self.question_id)
+        ):
             question_services.create_new_question_skill_link(
                 self.editor_id, self.question_id, 'skill_1', 0.3
             )
@@ -532,9 +536,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertEqual(question_skill.skill_difficulty, 0.5)
 
     def test_get_question_summaries_by_ids(self) -> None:
-        question_summaries = question_services.get_question_summaries_by_ids(
-            [self.question_id, 'invalid_question_id']
-        )
+        question_summaries = question_services.get_question_summaries_by_ids([
+            self.question_id, 'invalid_question_id'
+        ])
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_summaries[0] is not None
@@ -554,14 +558,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.delete_question(self.editor_id, self.question_id)
 
         with self.assertRaisesRegex(
-                Exception, ('Entity for class QuestionModel with id %s not found' %
-                            (self.question_id))):
+            Exception, (
+                'Entity for class QuestionModel with id %s not found' %
+                (self.question_id)
+            )
+        ):
             question_models.QuestionModel.get(self.question_id)
 
         with self.assertRaisesRegex(
-                Exception,
-            ('Entity for class QuestionSummaryModel with id %s not found' %
-             (self.question_id))):
+            Exception, (
+                'Entity for class QuestionSummaryModel with id %s not found' %
+                (self.question_id)
+            )
+        ):
             question_models.QuestionSummaryModel.get(self.question_id)
 
     def test_delete_question_marked_deleted(self) -> None:
@@ -609,22 +618,18 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'DEF', self.content_id_generator
         )
         change_list = [
-            question_domain.QuestionChange(
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'next_content_id_index',
-                    'old_value': 0,
-                    'new_value': self.content_id_generator.next_content_id_index,
-                }
-            ),
-            question_domain.QuestionChange(
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'question_state_data',
-                    'new_value': new_question_data.to_dict(),
-                    'old_value': self.question.question_state_data.to_dict()
-                }
-            )
+            question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'next_content_id_index',
+                'old_value': 0,
+                'new_value': self.content_id_generator.next_content_id_index,
+            }),
+            question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'question_state_data',
+                'new_value': new_question_data.to_dict(),
+                'old_value': self.question.question_state_data.to_dict()
+            })
         ]
         question_services.update_question(
             self.editor_id, self.question_id, change_list, 'updated question data'
@@ -641,38 +646,36 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'DEF', self.content_id_generator
         )
         change_list = [
-            question_domain.QuestionChange(
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'question_state_data',
-                    'new_value': new_question_data.to_dict(),
-                    'old_value': self.question.question_state_data.to_dict()
-                }
-            ),
-            question_domain.QuestionChange(
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'next_content_id_index',
-                    'old_value': 0,
-                    'new_value': self.content_id_generator.next_content_id_index,
-                }
-            )
+            question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'question_state_data',
+                'new_value': new_question_data.to_dict(),
+                'old_value': self.question.question_state_data.to_dict()
+            }),
+            question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'next_content_id_index',
+                'old_value': 0,
+                'new_value': self.content_id_generator.next_content_id_index,
+            })
         ]
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(Exception,
-                                    'Expected a commit message, received none.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected a commit message, received none.'
+        ):
             question_services.update_question(
                 self.editor_id, self.question_id, change_list, None
             )  # type: ignore[arg-type]
 
     def test_cannot_update_question_with_no_change_list(self) -> None:
         with self.assertRaisesRegex(
-                Exception,
-                'Unexpected error: received an invalid change list when trying to '
-                'save question'):
+            Exception,
+            'Unexpected error: received an invalid change list when trying to '
+            'save question'
+        ):
             question_services.update_question(
                 self.editor_id, self.question_id, [], 'updated question data'
             )
@@ -751,18 +754,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_cannot_update_question_with_mismatch_of_versions(self) -> None:
         changelist = [
-            question_domain.QuestionChange(
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'language_code',
-                    'new_value': 'bn',
-                    'old_value': 'en'
-                }
-            )
+            question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'language_code',
+                'new_value': 'bn',
+                'old_value': 'en'
+            })
         ]
         with self.assertRaisesRegex(
-                Exception, 'Trying to update version 2 of question from version 1, '
-                'which is too old. Please reload the page and try again.'):
+            Exception, 'Trying to update version 2 of question from version 1, '
+            'which is too old. Please reload the page and try again.'
+        ):
             question_services.update_question(
                 self.editor_id, self.question_id_2, changelist, 'change language_code',
                 2
@@ -771,8 +773,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_model = question_models.QuestionModel.get(self.question_id_2)
         question_model.version = 100
         with self.assertRaisesRegex(
-                Exception, 'Unexpected error: trying to update version 1 of question '
-                'from version 100. Please reload the page and try again.'):
+            Exception, 'Unexpected error: trying to update version 1 of question '
+            'from version 100. Please reload the page and try again.'
+        ):
             question_services.update_question(
                 self.editor_id, self.question_id_2, changelist, 'change language_code',
                 1
@@ -844,9 +847,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             if question_skill.question_id == self.question_id:
                 self.assertEqual(question_skill.skill_difficulty, 0.5)
 
-        questions = question_fetchers.get_questions_by_ids(
-            [self.question_id, question_id_2, question_id_3]
-        )
+        questions = question_fetchers.get_questions_by_ids([
+            self.question_id, question_id_2, question_id_3
+        ])
         for question in questions:
             # Ruling out the possibility of None for mypy type checking.
             assert question is not None
@@ -870,8 +873,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question = question_services.get_question_by_id(self.question_id)
         question.question_state_data.interaction.id = None
 
-        with self.assertRaisesRegex(Exception,
-                                    'No interaction_id found for the given question.'):
+        with self.assertRaisesRegex(
+            Exception, 'No interaction_id found for the given question.'
+        ):
             question_services.compute_summary_of_question(question)
 
     def test_raises_error_when_the_question_provided_with_no_created_on_data(
@@ -882,13 +886,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question.created_on = None
 
         with self.assertRaisesRegex(
-                Exception, 'No data available for when the question was last_updated'):
+            Exception, 'No data available for when the question was last_updated'
+        ):
             question_services.compute_summary_of_question(question)
 
     def test_get_skills_of_question(self) -> None:
         # If the question id doesnt exist at all, it returns an empty list.
-        with self.assertRaisesRegex(Exception, 'Entity for class QuestionModel with id '
-                                    'non_existent_question_id not found'):
+        with self.assertRaisesRegex(
+            Exception, 'Entity for class QuestionModel with id '
+            'non_existent_question_id not found'
+        ):
             question_services.get_skills_linked_to_question('non_existent_question_id')
         question_id_2 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
@@ -978,100 +985,85 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             ) for _ in range(3)
         ]
         question_state_data.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': feedback_content_ids[0],
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': feedback_content_ids[0],
+                        'html': '<p>Feedback</p>'
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': {
-                                    'contentId': rule_content_ids[0],
-                                    'normalizedStrSet': ['Test0']
-                                }
-                            },
-                            'rule_type': 'Contains'
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': rule_content_ids[0],
+                            'normalizedStrSet': ['Test0']
                         }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': 'skillid12345-0'
-                }
-            ),
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': feedback_content_ids[1],
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': {
-                                    'contentId': rule_content_ids[1],
-                                    'normalizedStrSet': ['Test1']
-                                }
-                            },
-                            'rule_type': 'Contains'
-                        }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': 'skillid12345-1'
-                }
-            ),
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': feedback_content_ids[2],
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skillid12345-0'
+            }),
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': feedback_content_ids[1],
+                        'html': '<p>Feedback</p>'
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': {
-                                    'contentId': rule_content_ids[2],
-                                    'normalizedStrSet': ['Test2']
-                                }
-                            },
-                            'rule_type': 'Contains'
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': rule_content_ids[1],
+                            'normalizedStrSet': ['Test1']
                         }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': 'skillid12345-2'
-                }
-            )
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skillid12345-1'
+            }),
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': feedback_content_ids[2],
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': rule_content_ids[2],
+                            'normalizedStrSet': ['Test2']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skillid12345-2'
+            })
         ]
-        question_state_data.recorded_voiceovers.voiceovers_mapping.update(
-            {
-                content_id: {}
-                for content_id in (feedback_content_ids + rule_content_ids)
-            }
-        )
+        question_state_data.recorded_voiceovers.voiceovers_mapping.update({
+            content_id: {} for content_id in (feedback_content_ids + rule_content_ids)
+        })
 
         inapplicable_skill_misconception_ids = ['skillid12345-3', 'skillid12345-4']
         self.question = self.save_new_question(
@@ -1156,100 +1148,85 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             ) for _ in range(3)
         ]
         question_state_data.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': feedback_content_ids[0],
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': feedback_content_ids[0],
+                        'html': '<p>Feedback</p>'
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': {
-                                    'contentId': rule_content_ids[0],
-                                    'normalizedStrSet': ['Test0']
-                                }
-                            },
-                            'rule_type': 'Contains'
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': rule_content_ids[0],
+                            'normalizedStrSet': ['Test0']
                         }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': 'skillid12345-0'
-                }
-            ),
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': feedback_content_ids[1],
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': {
-                                    'contentId': rule_content_ids[1],
-                                    'normalizedStrSet': ['Test1']
-                                }
-                            },
-                            'rule_type': 'Contains'
-                        }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': 'skillid12345-1'
-                }
-            ),
-            state_domain.AnswerGroup.from_dict(
-                {
-                    'outcome': {
-                        'dest': None,
-                        'dest_if_really_stuck': None,
-                        'feedback': {
-                            'content_id': feedback_content_ids[2],
-                            'html': '<p>Feedback</p>'
-                        },
-                        'labelled_as_correct': True,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                        'missing_prerequisite_skill_id': None
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skillid12345-0'
+            }),
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': feedback_content_ids[1],
+                        'html': '<p>Feedback</p>'
                     },
-                    'rule_specs': [
-                        {
-                            'inputs': {
-                                'x': {
-                                    'contentId': rule_content_ids[2],
-                                    'normalizedStrSet': ['Test2']
-                                }
-                            },
-                            'rule_type': 'Contains'
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': rule_content_ids[1],
+                            'normalizedStrSet': ['Test1']
                         }
-                    ],
-                    'training_data': [],
-                    'tagged_skill_misconception_id': 'skillid12345-2'
-                }
-            )
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skillid12345-1'
+            }),
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': feedback_content_ids[2],
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': rule_content_ids[2],
+                            'normalizedStrSet': ['Test2']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skillid12345-2'
+            })
         ]
-        question_state_data.recorded_voiceovers.voiceovers_mapping.update(
-            {
-                content_id: {}
-                for content_id in (feedback_content_ids + rule_content_ids)
-            }
-        )
+        question_state_data.recorded_voiceovers.voiceovers_mapping.update({
+            content_id: {} for content_id in (feedback_content_ids + rule_content_ids)
+        })
         inapplicable_skill_misconception_ids = ['skillid12345-3', 'skillid12345-4']
         self.question = self.save_new_question(
             self.question_id,
@@ -1277,24 +1254,18 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
         # Delete few misconceptions.
         change_list = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
-                    'misconception_id': 0,
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
-                    'misconception_id': 2,
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
-                    'misconception_id': 4,
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': 0,
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': 2,
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': 4,
+            })
         ]
         skill_services.update_skill(
             self.editor_id, 'skillid12345', change_list, 'Delete misconceptions.'
@@ -1500,9 +1471,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=29
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -1613,9 +1584,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=30
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -1662,14 +1633,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': ['A', 'B', 'C']
-                    },
-                    'rule_type': 'HasElementsIn'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['A', 'B', 'C']
+                },
+                'rule_type': 'HasElementsIn'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1733,9 +1702,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=31
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -1839,9 +1808,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=32
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -1961,7 +1930,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             )
         )
         commit_cmd = (
-            question_domain.QuestionChange({'cmd': question_domain.CMD_CREATE_NEW})
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            })
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
@@ -1995,19 +1966,17 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': 'x+y'
-                    },
-                    'rule_type': 'IsMathematicallyEquivalentTo'
-                }, {
-                    'inputs': {
-                        'x': 'x=y'
-                    },
-                    'rule_type': 'IsMathematicallyEquivalentTo'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }, {
+                'inputs': {
+                    'x': 'x=y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2082,9 +2051,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=34
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -2122,19 +2091,17 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': 'x+y'
-                    },
-                    'rule_type': 'IsMathematicallyEquivalentTo'
-                }, {
-                    'inputs': {
-                        'x': '1.2 + 3'
-                    },
-                    'rule_type': 'IsMathematicallyEquivalentTo'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }, {
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2209,9 +2176,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=34
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -2230,7 +2197,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(answer_groups[0].rule_specs), 2)
         self.assertEqual(answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+        self.assertEqual(answer_groups[0].rule_specs[0].inputs, {
+            'x': 'x+y'
+        })
 
         answer_group = {
             'outcome': {
@@ -2245,14 +2214,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': '1,2 + 3'
-                    },
-                    'rule_type': 'IsMathematicallyEquivalentTo'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': '1,2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2327,9 +2294,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=34
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -2348,57 +2315,53 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(answer_groups[0].rule_specs), 1)
         self.assertEqual(answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(answer_groups[0].rule_specs[0].inputs, {'x': '1.2 + 3'})
+        self.assertEqual(answer_groups[0].rule_specs[0].inputs, {
+            'x': '1.2 + 3'
+        })
 
-        answer_groups_list = [
-            {
-                'outcome': {
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        answer_groups_list = [{
+            'outcome': {
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
                 },
-                'rule_specs': [
-                    {
-                        'inputs': {
-                            'x': 'x=y'
-                        },
-                        'rule_type': 'IsMathematicallyEquivalentTo'
-                    }
-                ],
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }, {
-                'outcome': {
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': True,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'x=y'
                 },
-                'rule_specs': [
-                    {
-                        'inputs': {
-                            'x': '1.2 + 3'
-                        },
-                        'rule_type': 'IsMathematicallyEquivalentTo'
-                    }
-                ],
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }, {
+            'outcome': {
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
         question_state_dict = {
             'content': {
                 'content_id': 'content',
@@ -2453,9 +2416,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=34
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -2548,7 +2511,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             )
         )
         commit_cmd = (
-            question_domain.QuestionChange({'cmd': question_domain.CMD_CREATE_NEW})
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            })
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
@@ -2626,7 +2591,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             )
         )
         commit_cmd = (
-            question_domain.QuestionChange({'cmd': question_domain.CMD_CREATE_NEW})
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            })
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
@@ -2640,7 +2607,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         )
         migrated_ca = question.question_state_data.to_dict(
         )['interaction']['customization_args']
-        self.assertEqual(migrated_ca, {'initialCode': {'value': 'code'}})
+        self.assertEqual(migrated_ca, {
+            'initialCode': {
+                'value': 'code'
+            }
+        })
 
         # Test population of default value of SubtitledHtml list.
         question_state_dict = {
@@ -2702,7 +2673,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             )
         )
         commit_cmd = (
-            question_domain.QuestionChange({'cmd': question_domain.CMD_CREATE_NEW})
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            })
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
@@ -2788,7 +2761,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             )
         )
         commit_cmd = (
-            question_domain.QuestionChange({'cmd': question_domain.CMD_CREATE_NEW})
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            })
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
@@ -2805,18 +2780,16 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             migrated_ca, {
                 'choices': {
-                    'value': [
-                        {
-                            'content_id': 'ca_choices_2',
-                            'html': 'one'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': 'two'
-                        }, {
-                            'content_id': 'ca_choices_4',
-                            'html': 'three'
-                        }
-                    ]
+                    'value': [{
+                        'content_id': 'ca_choices_2',
+                        'html': 'one'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': 'two'
+                    }, {
+                        'content_id': 'ca_choices_4',
+                        'html': 'three'
+                    }]
                 },
                 'showChoicesInShuffledOrder': {
                     'value': True
@@ -2852,32 +2825,28 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 }
             },
             'interaction': {
-                'answer_groups': [
-                    {
-                        'outcome': {
-                            'dest': None,
-                            'dest_if_really_stuck': None,
-                            'feedback': {
-                                'content_id': 'default_outcome_2',
-                                'html': 'Correct Ans2er'
-                            },
-                            'param_changes': [],
-                            'refresher_exploration_id': None,
-                            'labelled_as_correct': True,
-                            'missing_prerequisite_skill_id': None
+                'answer_groups': [{
+                    'outcome': {
+                        'dest': None,
+                        'dest_if_really_stuck': None,
+                        'feedback': {
+                            'content_id': 'default_outcome_2',
+                            'html': 'Correct Ans2er'
                         },
-                        'rule_specs': [
-                            {
-                                'inputs': {
-                                    'x': 'test'
-                                },
-                                'rule_type': 'CaseSensitiveEquals'
-                            }
-                        ],
-                        'tagged_skill_misconception_id': None,
-                        'training_data': []
-                    }
-                ],
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'labelled_as_correct': True,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'rule_specs': [{
+                        'inputs': {
+                            'x': 'test'
+                        },
+                        'rule_type': 'CaseSensitiveEquals'
+                    }],
+                    'tagged_skill_misconception_id': None,
+                    'training_data': []
+                }],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'placeholder': {
@@ -2923,7 +2892,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             )
         )
         commit_cmd = (
-            question_domain.QuestionChange({'cmd': question_domain.CMD_CREATE_NEW})
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            })
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
@@ -2966,14 +2937,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': '((x)^(2))/(2.5)-(alpha)/(beta)'
-                    },
-                    'rule_type': 'MatchesExactlyWith'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': '((x)^(2))/(2.5)-(alpha)/(beta)'
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -3038,9 +3007,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=37
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -3139,9 +3108,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=38
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -3252,9 +3221,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=40
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -3365,9 +3334,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=40
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -3406,14 +3375,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': ['<p>Choice 1</p>', '<p>Choice 2</p>']
-                    },
-                    'rule_type': 'Equals'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['<p>Choice 1</p>', '<p>Choice 2</p>']
+                },
+                'rule_type': 'Equals'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -3449,15 +3416,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_2',
-                                'html': '<p>Choice 1</p>'
-                            }, {
-                                'content_id': 'ca_choices_3',
-                                'html': '<p>Choice 2</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Choice 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>Choice 2</p>'
+                        }]
                     },
                     'maxAllowableSelectionCount': {
                         'value': 2
@@ -3502,9 +3467,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=41
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -3540,31 +3505,29 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': [['<p>Choice 1</p>', '<p>Choice 2</p>', 'invalid']]
-                    },
-                    'rule_type': 'IsEqualToOrdering'
-                }, {
-                    'inputs': {
-                        'x': [['<p>Choice 1</p>']]
-                    },
-                    'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-                }, {
-                    'inputs': {
-                        'x': '<p>Choice 1</p>',
-                        'y': 1
-                    },
-                    'rule_type': 'HasElementXAtPositionY'
-                }, {
-                    'inputs': {
-                        'x': '<p>Choice 1</p>',
-                        'y': '<p>Choice 2</p>'
-                    },
-                    'rule_type': 'HasElementXBeforeElementY'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': [['<p>Choice 1</p>', '<p>Choice 2</p>', 'invalid']]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'inputs': {
+                    'x': [['<p>Choice 1</p>']]
+                },
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+            }, {
+                'inputs': {
+                    'x': '<p>Choice 1</p>',
+                    'y': 1
+                },
+                'rule_type': 'HasElementXAtPositionY'
+            }, {
+                'inputs': {
+                    'x': '<p>Choice 1</p>',
+                    'y': '<p>Choice 2</p>'
+                },
+                'rule_type': 'HasElementXBeforeElementY'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -3603,15 +3566,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'value': True
                     },
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_2',
-                                'html': '<p>Choice 1</p>'
-                            }, {
-                                'content_id': 'ca_choices_3',
-                                'html': '<p>Choice 2</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Choice 1</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>Choice 2</p>'
+                        }]
                     }
                 },
                 'default_outcome': {
@@ -3650,9 +3611,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=41
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -3740,10 +3701,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {
                     'placeholder': {
                         'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': (
-                                'Type an expression here, using only numbers.'
-                            )
+                            'content_id':
+                                'ca_placeholder_0',
+                            'unicode_str':
+                                ('Type an expression here, using only numbers.')
                         }
                     }
                 },
@@ -3781,9 +3742,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=42
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -3889,9 +3850,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=43
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -3994,9 +3955,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=44
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts
@@ -4025,30 +3986,28 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': 'a - b'
-                    },
-                    'rule_type': 'ContainsSomeOf'
-                }, {
-                    'inputs': {
-                        'x': 'a - b'
-                    },
-                    'rule_type': 'MatchesExactlyWith'
-                }, {
-                    'inputs': {
-                        'x': 'a - b'
-                    },
-                    'rule_type': 'OmitsSomeOf'
-                }, {
-                    'inputs': {
-                        'x': 'a - b',
-                        'y': []
-                    },
-                    'rule_type': 'MatchesWithGeneralForm'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }, {
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'OmitsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesWithGeneralForm'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -4065,20 +4024,18 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [
-                {
-                    'inputs': {
-                        'x': 'a - b'
-                    },
-                    'rule_type': 'ContainsSomeOf'
-                }, {
-                    'inputs': {
-                        'x': 'a - b',
-                        'y': []
-                    },
-                    'rule_type': 'MatchesWithGeneralForm'
-                }
-            ],
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesWithGeneralForm'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -4147,9 +4104,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=45
         )
-        commit_cmd = question_domain.QuestionChange(
-            {'cmd': question_domain.CMD_CREATE_NEW}
-        )
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts

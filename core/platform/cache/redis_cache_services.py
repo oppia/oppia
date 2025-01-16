@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides the redis cache service functionality."""
 
 from __future__ import annotations
@@ -34,9 +33,7 @@ OPPIA_REDIS_CLIENT = redis.StrictRedis(
 
 # Redis client for the Cloud NDB cache.
 CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
-    host=feconf.REDISHOST,
-    port=feconf.REDISPORT,
-    db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+    host=feconf.REDISHOST, port=feconf.REDISPORT, db=feconf.CLOUD_NDB_REDIS_DB_INDEX
 )
 
 
@@ -52,8 +49,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     """
     redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
     memory_stats = caching_domain.MemoryCacheStats(
-        redis_full_profile['total.allocated'],
-        redis_full_profile['peak.allocated'],
+        redis_full_profile['total.allocated'], redis_full_profile['peak.allocated'],
         redis_full_profile['keys.count']
     )
 

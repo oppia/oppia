@@ -6,15 +6,26 @@ from ..transport import Transport
 
 logger: logging.Logger
 
+
 class Elasticsearch(object):
     indices: IndicesClient
 
     def __init__(
-        self, hosts: Any = ..., transport_class: Type[Transport] = ..., **kwargs: Any
-    ) -> None: ...
-    def __repr__(self) -> str: ...
-    def __enter__(self) -> 'Elasticsearch': ...
-    def __exit__(self, *_: Any) -> None: ...
+        self,
+        hosts: Any = ...,
+        transport_class: Type[Transport] = ...,
+        **kwargs: Any
+    ) -> None:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+
+    def __enter__(self) -> 'Elasticsearch':
+        ...
+
+    def __exit__(self, *_: Any) -> None:
+        ...
 
     def index(
         self,
@@ -43,7 +54,8 @@ class Elasticsearch(object):
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
         headers: Optional[MutableMapping[str, str]] = ...
-    ) -> Any: ...
+    ) -> Any:
+        ...
 
     def exists(
         self,
@@ -71,7 +83,8 @@ class Elasticsearch(object):
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
         headers: Optional[MutableMapping[str, str]] = ...
-    ) -> bool: ...
+    ) -> bool:
+        ...
 
     def delete(
         self,
@@ -97,7 +110,8 @@ class Elasticsearch(object):
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
         headers: Optional[MutableMapping[str, str]] = ...
-    ) -> Any: ...
+    ) -> Any:
+        ...
 
     def delete_by_query(
         self,
@@ -147,7 +161,8 @@ class Elasticsearch(object):
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
         headers: Optional[MutableMapping[str, str]] = ...
-    ) -> Any: ...
+    ) -> Any:
+        ...
 
     def search(
         self,
@@ -207,4 +222,5 @@ class Elasticsearch(object):
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
         headers: Optional[MutableMapping[str, str]] = ...
-    ) -> Any: ...
+    ) -> Any:
+        ...

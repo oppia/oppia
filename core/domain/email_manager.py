@@ -49,9 +49,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import transaction_services
 
-(email_models, suggestion_models) = models.Registry.import_models(
-    [models.Names.EMAIL, models.Names.SUGGESTION]
-)
+(email_models, suggestion_models) = models.Registry.import_models([
+    models.Names.EMAIL, models.Names.SUGGESTION
+])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 secrets_services = models.Registry.import_secrets_services()
@@ -60,10 +60,14 @@ PlatformParameterRegistry = platform_parameter_registry.Registry
 
 NEW_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION: {
-        'task': 'review',
-        'category': 'translations',
-        'to_review': 'translation suggestions',
-        'description_template': '%s language translations',
+        'task':
+            'review',
+        'category':
+            'translations',
+        'to_review':
+            'translation suggestions',
+        'description_template':
+            '%s language translations',
         'rights_message_template': (
             'review translation suggestions made by contributors in the %s '
             'language'
@@ -87,7 +91,8 @@ NEW_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
 
 REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION: {
-        'category': 'translation',
+        'category':
+            'translation',
         'role_description_template': ('translation reviewer role in the %s language'),
         'rights_message_template': (
             'review translation suggestions made by contributors in the %s '
@@ -185,7 +190,8 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
         '<br><br>'
         '<ol>%%s</ol>'
     ) % constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS,
-    'email_subject': 'Chapter Publication Notifications'
+    'email_subject':
+        'Chapter Publication Notifications'
 }
 
 HTML_FOR_SUGGESTION_DESCRIPTION: Dict[
@@ -232,7 +238,8 @@ ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA: Dict[str, str] = {
         'Best Wishes!<br>'
         '- The Oppia Contributor Dashboard Team'
     ),
-    'email_subject': 'Reviewers Needed for Contributor Dashboard',
+    'email_subject':
+        'Reviewers Needed for Contributor Dashboard',
     # The templates below are for listing the information for each suggestion
     # type that needs more reviewers. For translation languages there are two
     # templates to account for: whether one or multiple languages needs more
@@ -277,10 +284,9 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
         'Best Wishes!<br><br>'
         '- The Oppia Contributor Dashboard Team'
     ),
-    'email_subject': (
-        'Contributor Dashboard Suggestions Have Been Waiting Too Long for '
-        'Review'
-    )
+    'email_subject':
+        ('Contributor Dashboard Suggestions Have Been Waiting Too Long for '
+         'Review')
 }
 
 CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION: Dict[str, Dict[str, Dict[str, str]]] = {
@@ -386,54 +392,41 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_DAILY_BATCH: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
+    feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ONBOARD_CD_USER: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REMOVE_CD_USER: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
+    feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ACCOUNT_DELETED: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (user_services.is_curriculum_admin),
     feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (user_services.is_curriculum_admin),
-    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
-    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID
-    ),
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT:
+        (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_TEST: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
 }
 
@@ -547,8 +540,9 @@ def _send_email(
                                                    ).replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
-    if email_models.SentEmailModel.check_duplicate_message(recipient_id, email_subject,
-                                                           cleaned_plaintext_body):
+    if email_models.SentEmailModel.check_duplicate_message(
+        recipient_id, email_subject, cleaned_plaintext_body
+    ):
         logging.error(
             'Duplicate email:\n'
             'Details:\n%s %s\n%s\n\n' %
@@ -736,16 +730,18 @@ def send_post_signup_email(
             platform_parameter_registry.Registry.
             get_platform_parameter(email_body_content_param_name).default_value
         )
-        if not email_subject_content or (email_subject_content_default_value
-                                         == email_subject_content):
+        if not email_subject_content or (
+            email_subject_content_default_value == email_subject_content
+        ):
             logging.error(
                 'Please ensure that the value for the admin platform '
                 'property SIGNUP_EMAIL_SUBJECT_CONTENT is set, before allowing '
                 'post-signup emails to be sent.'
             )
             return
-        if not email_body_content or (email_body_content_default_value
-                                      == email_body_content):
+        if not email_body_content or (
+            email_body_content_default_value == email_body_content
+        ):
             logging.error(
                 'Please ensure that the value for the admin platform '
                 'property SIGNUP_EMAIL_BODY_CONTENT is set, before allowing '
@@ -1094,9 +1090,9 @@ def send_feedback_message_email(
             count_messages += 1
         messages_html += '</ul></li>'
 
-    email_subject = email_subject_template % (
-        (count_messages, 's') if count_messages > 1 else ('a', '')
-    )
+    email_subject = email_subject_template % ((count_messages,
+                                               's') if count_messages > 1 else
+                                              ('a', ''))
 
     email_footer = platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamName.EMAIL_FOOTER.value
@@ -1139,14 +1135,14 @@ def can_users_receive_thread_email(
     if has_suggestion:
         for user_global_prefs, user_exploration_prefs in zipped_preferences:
             result.append(
-                user_global_prefs.can_receive_feedback_message_email
-                and not user_exploration_prefs.mute_suggestion_notifications
+                user_global_prefs.can_receive_feedback_message_email and
+                not user_exploration_prefs.mute_suggestion_notifications
             )
     else:
         for user_global_prefs, user_exploration_prefs in zipped_preferences:
             result.append(
-                user_global_prefs.can_receive_feedback_message_email
-                and not user_exploration_prefs.mute_feedback_notifications
+                user_global_prefs.can_receive_feedback_message_email and
+                not user_exploration_prefs.mute_feedback_notifications
             )
 
     return result
@@ -1678,8 +1674,9 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         return
 
     if not platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value):
+        platform_parameter_list.ParamName.
+        ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+    ):
         logging.error(
             'The "notify_admins_suggestions_waiting_too_long" property '
             'must be enabled on the admin config page in order to send '
@@ -1703,15 +1700,19 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
     # Get the html for the list of suggestions that have been waiting too long
     # for a review.
     for reviewable_suggestion_email_info in reviewable_suggestion_email_infos:
-        if (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT ==
-                reviewable_suggestion_email_info.suggestion_type):
+        if (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT ==
+            reviewable_suggestion_email_info.suggestion_type
+        ):
             translation_suggestion_descriptions.append(
                 _create_html_for_reviewable_suggestion_email_info(
                     reviewable_suggestion_email_info
                 )
             )
-        if (feconf.SUGGESTION_TYPE_ADD_QUESTION ==
-                reviewable_suggestion_email_info.suggestion_type):
+        if (
+            feconf.SUGGESTION_TYPE_ADD_QUESTION ==
+            reviewable_suggestion_email_info.suggestion_type
+        ):
             question_suggestion_descriptions.append(
                 _create_html_for_reviewable_suggestion_email_info(
                     reviewable_suggestion_email_info
@@ -1760,11 +1761,9 @@ def _send_suggestions_waiting_too_long_email(
     admin_user_settings = user_services.get_users_settings(admin_ids)
     curriculum_admin_usernames, admin_emails = list(
         zip(
-            *[
-                (admin_user_setting.username, admin_user_setting.email
-                 ) if admin_user_setting is not None else (None, None)
-                for admin_user_setting in admin_user_settings
-            ]
+            *[(admin_user_setting.username, admin_user_setting.email
+              ) if admin_user_setting is not None else (None, None)
+              for admin_user_setting in admin_user_settings]
         )
     )
 
@@ -1898,8 +1897,9 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         return
 
     if not platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
+        platform_parameter_list.ParamName.
+        ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
+    ):
         logging.error(
             'The "enable_admin_notifications_for_reviewer_shortage" '
             'property must be enabled on the admin config page in order to '
@@ -1936,13 +1936,11 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             )
 
         else:
-            html_for_languages_that_need_more_reviewers = ''.join(
-                [
-                    '<li><b>%s</b></li><br>' %
-                    (utils.get_supported_audio_language_description(language_code))
-                    for language_code in sorted(language_codes_that_need_reviewers)
-                ]
-            )
+            html_for_languages_that_need_more_reviewers = ''.join([
+                '<li><b>%s</b></li><br>' %
+                (utils.get_supported_audio_language_description(language_code))
+                for language_code in sorted(language_codes_that_need_reviewers)
+            ])
             translation_suggestions_needing_reviewers_paragraphs.append(
                 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'multi_language_template'] % (
@@ -1994,11 +1992,9 @@ def _send_reviews_needed_email_to_admins(
     admin_user_settings = user_services.get_users_settings(admin_ids)
     curriculum_admin_usernames, admin_emails = list(
         zip(
-            *[
-                (admin_user_setting.username, admin_user_setting.email
-                 ) if admin_user_setting is not None else (None, None)
-                for admin_user_setting in admin_user_settings
-            ]
+            *[(admin_user_setting.username, admin_user_setting.email
+              ) if admin_user_setting is not None else (None, None)
+              for admin_user_setting in admin_user_settings]
         )
     )
 
@@ -2056,8 +2052,9 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         return
 
     if not platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.
-            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
+        platform_parameter_list.ParamName.
+        CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+    ):
         logging.error(
             'The "contributor_dashboard_reviewer_emails_is_enabled" property '
             'must be enabled on the platform parameters tab on the admin page '
@@ -2072,11 +2069,9 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
     reviewer_user_settings = user_services.get_users_settings(reviewer_ids)
     reviewer_usernames, reviewer_emails = list(
         zip(
-            *[
-                (reviewer_user_setting.username, reviewer_user_setting.email
-                 ) if reviewer_user_setting is not None else (None, None)
-                for reviewer_user_setting in reviewer_user_settings
-            ]
+            *[(reviewer_user_setting.username, reviewer_user_setting.email
+              ) if reviewer_user_setting is not None else (None, None)
+              for reviewer_user_setting in reviewer_user_settings]
         )
     )
 
@@ -2156,7 +2151,8 @@ def send_mail_to_notify_contributor_ranking_achievement(
                 contributor_ranking_email_info.contribution_subtype]
         email_body = ''
         if contributor_ranking_email_info.contribution_type == (
-                feconf.CONTRIBUTION_TYPE_TRANSLATION):
+            feconf.CONTRIBUTION_TYPE_TRANSLATION
+        ):
             # Ruling out the possibility of None for mypy type checking. It is
             # obvious that for the contribution_type
             # CONTRIBUTION_TYPE_TRANSLATION the language_code will not be None.
@@ -2223,7 +2219,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
         story_link = (
             '%s%s/%s' % (
                 str(feconf.OPPIA_SITE_URL), str(feconf.STORY_EDITOR_URL_PREFIX
-                                                ), overdue_story.id
+                                               ), overdue_story.id
             )
         )
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
@@ -2247,7 +2243,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
         story_link = (
             '%s%s/%s' % (
                 str(feconf.OPPIA_SITE_URL), str(feconf.STORY_EDITOR_URL_PREFIX
-                                                ), upcoming_story.id
+                                               ), upcoming_story.id
             )
         )
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
@@ -2356,7 +2352,7 @@ def send_email_to_new_cd_user(
     )
 
     if category in [
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
     ]:
         if language_code is None:
             raise Exception(
@@ -2387,8 +2383,10 @@ def send_email_to_new_cd_user(
 
     email_body_template = '%s %s %s %s'
     recipient_username = user_services.get_username(recipient_id)
-    if category in [constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION]:
+    if category in [
+        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
+    ]:
         to_review = category_data['to_review']
         email_body_template = (
             'Hi %s,<br><br>'

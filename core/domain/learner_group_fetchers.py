@@ -28,9 +28,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import learner_group_models
     from mypy_imports import user_models
 
-(learner_group_models, user_models) = models.Registry.import_models(
-    [models.Names.LEARNER_GROUP, models.Names.USER]
-)
+(learner_group_models, user_models) = models.Registry.import_models([
+    models.Names.LEARNER_GROUP, models.Names.USER
+])
 
 
 def get_new_learner_group_id() -> str:
@@ -72,7 +72,7 @@ def get_learner_group_by_id(
 
 def get_learner_group_by_id(group_id: str,
                             strict: bool = False
-                            ) -> Optional[learner_group_domain.LearnerGroup]:
+                           ) -> Optional[learner_group_domain.LearnerGroup]:
     """Returns the learner group domain object given the learner group id.
 
     Args:

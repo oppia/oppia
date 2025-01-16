@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the base issue specification."""
 
 from __future__ import annotations
@@ -23,7 +22,7 @@ from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
 
 (stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
@@ -36,11 +35,11 @@ class IssueUnitTests(test_utils.GenericTestBase):
         """Test the standard properties of early quit issue."""
 
         issue = playthrough_issue_registry.Registry.get_issue_by_type(
-            stats_models.ISSUE_TYPE_EARLY_QUIT)
+            stats_models.ISSUE_TYPE_EARLY_QUIT
+        )
 
         issue_dict = issue.to_dict()
-        self.assertItemsEqual(list(issue_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(list(issue_dict.keys()), ['customization_arg_specs'])
         self.assertEqual(
             issue_dict['customization_arg_specs'], [{
                 'name': 'state_name',
@@ -53,12 +52,14 @@ class IssueUnitTests(test_utils.GenericTestBase):
                 'name': 'time_spent_in_exp_in_msecs',
                 'description': (
                     'Time spent in the exploration before quitting in '
-                    'milliseconds'),
+                    'milliseconds'
+                ),
                 'schema': {
                     'type': 'int',
                 },
                 'default_value': 0
-            }])
+            }]
+        )
 
     def test_issue_properties_for_multiple_incorrect_submissions(self) -> None:
         """Test the standard properties of multiple incorrect submissions
@@ -66,11 +67,11 @@ class IssueUnitTests(test_utils.GenericTestBase):
         """
 
         issue = playthrough_issue_registry.Registry.get_issue_by_type(
-            stats_models.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)
+            stats_models.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS
+        )
 
         issue_dict = issue.to_dict()
-        self.assertItemsEqual(list(issue_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(list(issue_dict.keys()), ['customization_arg_specs'])
         self.assertEqual(
             issue_dict['customization_arg_specs'], [{
                 'name': 'state_name',
@@ -81,23 +82,23 @@ class IssueUnitTests(test_utils.GenericTestBase):
                 'default_value': ''
             }, {
                 'name': 'num_times_answered_incorrectly',
-                'description': (
-                    'Number of times incorrect answers were submitted'),
+                'description': ('Number of times incorrect answers were submitted'),
                 'schema': {
                     'type': 'int',
                 },
                 'default_value': 0
-            }])
+            }]
+        )
 
     def test_issue_properties_for_cyclic_state_transitions(self) -> None:
         """Test the standard properties of cyclic state transitions issue."""
 
         issue = playthrough_issue_registry.Registry.get_issue_by_type(
-            stats_models.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS)
+            stats_models.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS
+        )
 
         issue_dict = issue.to_dict()
-        self.assertItemsEqual(list(issue_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(list(issue_dict.keys()), ['customization_arg_specs'])
         self.assertEqual(
             issue_dict['customization_arg_specs'], [{
                 'name': 'state_names',
@@ -109,4 +110,5 @@ class IssueUnitTests(test_utils.GenericTestBase):
                     },
                 },
                 'default_value': []
-            }])
+            }]
+        )

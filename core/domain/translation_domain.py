@@ -333,11 +333,13 @@ class BaseTranslatableObject:
 
             if (translatable_content.content_id not in entity_translation.translations):
                 content_id_to_translatable_content[translatable_content.content_id
-                                                   ] = translatable_content
-            elif (entity_translation.translations[translatable_content.content_id
-                                                  ].needs_update):
+                                                  ] = translatable_content
+            elif (
+                entity_translation.translations[translatable_content.content_id
+                                               ].needs_update
+            ):
                 content_id_to_translatable_content[translatable_content.content_id
-                                                   ] = translatable_content
+                                                  ] = translatable_content
 
         return content_id_to_translatable_content
 
@@ -384,9 +386,12 @@ class BaseTranslatableObject:
             content_id_to_translatable_content
         )
         for content_id, translatable_content in (
-                content_id_to_translatable_content.items()):
-            if (translatable_content.content_type == ContentType.RULE
-                    and not content_id in entity_translation.translations):
+            content_id_to_translatable_content.items()
+        ):
+            if (
+                translatable_content.content_type == ContentType.RULE and
+                not content_id in entity_translation.translations
+            ):
                 # Rule-related translations cannot be missing.
                 return False
 
@@ -449,8 +454,10 @@ class BaseTranslatableObject:
         for content_id in content_id_to_translatable_content.keys():
             content_id_suffix = content_id.split('_')[-1]
 
-            if (content_id_suffix.isdigit()
-                    and int(content_id_suffix) > next_content_id_index):
+            if (
+                content_id_suffix.isdigit() and
+                int(content_id_suffix) > next_content_id_index
+            ):
                 raise utils.ValidationError(
                     'Expected all content id indexes to be less than the "next '
                     'content id index(%s)", but received content id %s' %
@@ -667,8 +674,8 @@ class MachineTranslation:
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
         if not utils.is_supported_audio_language_code(
-                self.source_language_code) and not utils.is_valid_language_code(
-                    self.source_language_code):
+            self.source_language_code
+        ) and not utils.is_valid_language_code(self.source_language_code):
             raise utils.ValidationError(
                 'Invalid source language code: %s' % self.source_language_code
             )
@@ -676,19 +683,17 @@ class MachineTranslation:
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
         if not utils.is_supported_audio_language_code(
-                self.target_language_code) and not utils.is_valid_language_code(
-                    self.target_language_code):
+            self.target_language_code
+        ) and not utils.is_valid_language_code(self.target_language_code):
             raise utils.ValidationError(
                 'Invalid target language code: %s' % self.target_language_code
             )
 
         if self.source_language_code == self.target_language_code:
-            raise utils.ValidationError(
-                (
-                    'Expected source_language_code to be different from '
-                    'target_language_code: "%s" = "%s"'
-                ) % (self.source_language_code, self.target_language_code)
-            )
+            raise utils.ValidationError((
+                'Expected source_language_code to be different from '
+                'target_language_code: "%s" = "%s"'
+            ) % (self.source_language_code, self.target_language_code))
 
     def to_dict(self) -> Dict[str, str]:
         """Converts the MachineTranslation domain instance into a dictionary
@@ -849,11 +854,11 @@ class WrittenTranslations:
             dict. A dict, mapping all fields of WrittenTranslations instance.
         """
         translations_mapping: Dict[str, Dict[str, WrittenTranslationDict]] = {}
-        for (content_id, language_code_to_written_translation) in (
-                self.translations_mapping.items()):
+        for (content_id, language_code_to_written_translation
+            ) in (self.translations_mapping.items()):
             translations_mapping[content_id] = {}
-            for (language_code,
-                 written_translation) in (language_code_to_written_translation.items()):
+            for (language_code, written_translation
+                ) in (language_code_to_written_translation.items()):
                 translations_mapping[content_id][language_code] = (
                     written_translation.to_dict()
                 )
@@ -878,11 +883,11 @@ class WrittenTranslations:
             object.
         """
         translations_mapping: Dict[str, Dict[str, WrittenTranslation]] = {}
-        for (content_id, language_code_to_written_translation) in (
-                written_translations_dict['translations_mapping'].items()):
+        for (content_id, language_code_to_written_translation
+            ) in (written_translations_dict['translations_mapping'].items()):
             translations_mapping[content_id] = {}
-            for (language_code,
-                 written_translation) in (language_code_to_written_translation.items()):
+            for (language_code, written_translation
+                ) in (language_code_to_written_translation.items()):
                 translations_mapping[content_id][language_code] = (
                     WrittenTranslation.from_dict(written_translation)
                 )
@@ -902,15 +907,15 @@ class WrittenTranslations:
         """
         if expected_content_id_list is not None:
             if not set(self.translations_mapping.keys()
-                       ) == (set(expected_content_id_list)):
+                      ) == (set(expected_content_id_list)):
                 raise utils.ValidationError(
                     'Expected state written_translations to match the listed '
                     'content ids %s, found %s' %
                     (expected_content_id_list, list(self.translations_mapping.keys()))
                 )
 
-        for (content_id, language_code_to_written_translation) in (
-                self.translations_mapping.items()):
+        for (content_id, language_code_to_written_translation
+            ) in (self.translations_mapping.items()):
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s' % content_id
@@ -920,8 +925,8 @@ class WrittenTranslations:
                     'Expected content_id value to be a dict, received %s' %
                     language_code_to_written_translation
                 )
-            for (language_code,
-                 written_translation) in (language_code_to_written_translation.items()):
+            for (language_code, written_translation
+                ) in (language_code_to_written_translation.items()):
                 if not isinstance(language_code, str):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s' %

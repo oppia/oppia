@@ -57,7 +57,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models, ) = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -211,7 +211,11 @@ def clean_math_expression(math_expression: str) -> str:
         '\u03c8': 'psi',
         '\u03c9': 'omega',
     }
-    inverse_trig_fns_mapping = {'asin': 'arcsin', 'acos': 'arccos', 'atan': 'arctan'}
+    inverse_trig_fns_mapping = {
+        'asin': 'arcsin',
+        'acos': 'arccos',
+        'atan': 'arctan'
+    }
     trig_fns = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
 
     # Shifting powers in trig functions to the end.
@@ -1005,19 +1009,16 @@ class TransientCheckpointUrl:
         """
 
         return {
-            'exploration_id': self.exploration_id,
-            'furthest_reached_checkpoint_exp_version': (
-                self.furthest_reached_checkpoint_exp_version
-            ),
-            'furthest_reached_checkpoint_state_name': (
-                self.furthest_reached_checkpoint_state_name
-            ),
-            'most_recently_reached_checkpoint_exp_version': (
-                self.most_recently_reached_checkpoint_exp_version
-            ),
-            'most_recently_reached_checkpoint_state_name': (
-                self.most_recently_reached_checkpoint_state_name
-            )
+            'exploration_id':
+                self.exploration_id,
+            'furthest_reached_checkpoint_exp_version':
+                (self.furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name':
+                (self.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version':
+                (self.most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name':
+                (self.most_recently_reached_checkpoint_state_name)
         }
 
     def validate(self) -> None:
@@ -1166,7 +1167,10 @@ class ExpVersionReference:
         Returns:
             dict. A dict, mapping all fields of ExpVersionReference instance.
         """
-        return {'exp_id': self.exp_id, 'version': self.version}
+        return {
+            'exp_id': self.exp_id,
+            'version': self.version
+        }
 
     def validate(self) -> None:
         """Validates properties of the ExpVersionReference.
@@ -1249,8 +1253,7 @@ class ExplorationVersionsDiff:
         self.deleted_state_names = deleted_state_names
         self.new_to_old_state_names = new_to_old_state_names
         self.old_to_new_state_names = {
-            value: key
-            for key, value in new_to_old_state_names.items()
+            value: key for key, value in new_to_old_state_names.items()
         }
 
 
@@ -1502,7 +1505,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             is_initial_state=True
         ).to_dict()
 
-        states_dict = {init_state_name: init_state_dict}
+        states_dict = {
+            init_state_name: init_state_dict
+        }
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '', '',
@@ -1716,8 +1721,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'received \'%s\'' % tag
                 )
 
-            if (tag[0] not in string.ascii_lowercase
-                    or tag[-1] not in string.ascii_lowercase):
+            if (
+                tag[0] not in string.ascii_lowercase or
+                tag[-1] not in string.ascii_lowercase
+            ):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
                     ' \'%s\'' % tag
@@ -1793,8 +1800,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 interaction_default_outcome = state.interaction.default_outcome
                 if interaction_default_outcome.dest_if_really_stuck is not None:
-                    if not isinstance(interaction_default_outcome.dest_if_really_stuck,
-                                      str):
+                    if not isinstance(
+                        interaction_default_outcome.dest_if_really_stuck, str
+                    ):
                         raise utils.ValidationError(
                             'Expected dest_if_really_stuck to be a '
                             'string, received %s' %
@@ -1912,8 +1920,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     )
 
                 # Check default if-stuck destinations.
-                if (default_outcome.dest_if_really_stuck is not None and
-                        default_outcome.dest_if_really_stuck not in all_state_names):
+                if (
+                    default_outcome.dest_if_really_stuck is not None and
+                    default_outcome.dest_if_really_stuck not in all_state_names
+                ):
                     raise utils.ValidationError(
                         'The destination for the stuck learner %s '
                         'is not a valid state.' % default_outcome.dest_if_really_stuck
@@ -1921,8 +1931,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
-                if (default_outcome.refresher_exploration_id is not None
-                        and default_outcome.dest != state_name):
+                if (
+                    default_outcome.refresher_exploration_id is not None and
+                    default_outcome.dest != state_name
+                ):
                     raise utils.ValidationError(
                         'The default outcome for state %s has a refresher '
                         'exploration ID, but is not a self-loop.' % state_name
@@ -1936,8 +1948,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     )
 
                 # Check group if-stuck destinations.
-                if (group.outcome.dest_if_really_stuck is not None
-                        and group.outcome.dest_if_really_stuck not in all_state_names):
+                if (
+                    group.outcome.dest_if_really_stuck is not None and
+                    group.outcome.dest_if_really_stuck not in all_state_names
+                ):
                     raise utils.ValidationError(
                         'The destination for the stuck learner %s '
                         'is not a valid state.' % group.outcome.dest_if_really_stuck
@@ -1945,8 +1959,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
-                if (group.outcome.refresher_exploration_id is not None
-                        and group.outcome.dest != state_name):
+                if (
+                    group.outcome.refresher_exploration_id is not None and
+                    group.outcome.dest != state_name
+                ):
                     raise utils.ValidationError(
                         'The outcome for an answer group in state %s has a '
                         'refresher exploration ID, but is not a self-loop.' % state_name
@@ -2037,8 +2053,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             if self.states[dest_state].interaction.is_terminal:
                                 excluded_state_is_bypassable = True
                                 break
-                            if (dest_state not in curr_queue
-                                    and dest_state not in processed_state_names):
+                            if (
+                                dest_state not in curr_queue and
+                                dest_state not in processed_state_names
+                            ):
                                 curr_queue.append(dest_state)
                     if excluded_state_is_bypassable:
                         raise utils.ValidationError(
@@ -2080,8 +2098,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if default_outcome is not None:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
-                    if (default_outcome.dest == state_name
-                            and default_outcome.labelled_as_correct):
+                    if (
+                        default_outcome.dest == state_name and
+                        default_outcome.labelled_as_correct
+                    ):
                         raise utils.ValidationError(
                             'The default outcome for state %s is labelled '
                             'correct but is a self-loop.' % state_name
@@ -2090,15 +2110,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for group in interaction.answer_groups:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
-                    if (group.outcome.dest == state_name
-                            and group.outcome.labelled_as_correct):
+                    if (
+                        group.outcome.dest == state_name and
+                        group.outcome.labelled_as_correct
+                    ):
                         raise utils.ValidationError(
                             'The outcome for an answer group in state %s is '
                             'labelled correct but is a self-loop.' % state_name
                         )
 
-                    if (group.outcome.labelled_as_correct
-                            and group.outcome.dest_if_really_stuck is not None):
+                    if (
+                        group.outcome.labelled_as_correct and
+                        group.outcome.dest_if_really_stuck is not None
+                    ):
                         raise utils.ValidationError(
                             'The outcome for the state is labelled '
                             'correct but a destination for the stuck learner '
@@ -2139,12 +2163,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     for outcome in all_outcomes:
                         dest_state = outcome.dest
                         dest_if_stuck_state = outcome.dest_if_really_stuck
-                        if (dest_state is not None and dest_state not in curr_queue
-                                and dest_state not in processed_queue):
+                        if (
+                            dest_state is not None and dest_state not in curr_queue and
+                            dest_state not in processed_queue
+                        ):
                             curr_queue.append(dest_state)
-                        if (dest_if_stuck_state is not None
-                                and dest_if_stuck_state not in curr_queue
-                                and dest_if_stuck_state not in processed_queue):
+                        if (
+                            dest_if_stuck_state is not None and
+                            dest_if_stuck_state not in curr_queue and
+                            dest_if_stuck_state not in processed_queue
+                        ):
                             curr_queue.append(dest_if_stuck_state)
 
         if len(self.states) != len(processed_queue):
@@ -2177,8 +2205,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 processed_queue.append(curr_state_name)
 
                 for (state_name, state) in self.states.items():
-                    if (state_name not in curr_queue
-                            and state_name not in processed_queue):
+                    if (
+                        state_name not in curr_queue and
+                        state_name not in processed_queue
+                    ):
                         all_outcomes = (state.interaction.get_all_outcomes())
                         for outcome in all_outcomes:
                             if outcome.dest == curr_state_name:
@@ -2231,8 +2261,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. Dict of parameter specs.
         """
         return {
-            ps_name: ps_val.to_dict()
-            for (ps_name, ps_val) in self.param_specs.items()
+            ps_name: ps_val.to_dict() for (ps_name, ps_val) in self.param_specs.items()
         }
 
     @property
@@ -2785,12 +2814,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state_dict in states_dict.values():
             interaction_id = state_dict['interaction']['id']
-            if interaction_id not in ['NumericExpressionInput',
-                                      'AlgebraicExpressionInput', 'MathEquationInput']:
+            if interaction_id not in [
+                'NumericExpressionInput', 'AlgebraicExpressionInput',
+                'MathEquationInput'
+            ]:
                 continue
 
             customization_args = state_dict['interaction']['customization_args']
-            customization_args.update({'useFractionForDivision': {'value': True}})
+            customization_args.update({
+                'useFractionForDivision': {
+                    'value': True
+                }
+            })
 
         return states_dict
 
@@ -2974,7 +3009,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for state_dict in states_dict.values():
             if state_dict['interaction']['id'] == 'NumericInput':
                 customization_args = state_dict['interaction']['customization_args']
-                customization_args.update({'requireNonnegativeInput': {'value': False}})
+                customization_args.update({
+                    'requireNonnegativeInput': {
+                        'value': False
+                    }
+                })
 
         return states_dict
 
@@ -3042,7 +3081,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             if state_dict['interaction']['default_outcome'] is not None:
                 state_dict['interaction']['default_outcome']['dest_if_really_stuck'
-                                                             ] = None
+                                                            ] = None
 
         return states_dict
 
@@ -3206,7 +3245,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for state_dict in states_dict.values():
             if state_dict['interaction']['id'] == 'TextInput':
                 customization_args = state_dict['interaction']['customization_args']
-                customization_args.update({'catchMisspellings': {'value': False}})
+                customization_args.update({
+                    'catchMisspellings': {
+                        'value': False
+                    }
+                })
 
         return states_dict
 
@@ -3311,14 +3354,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         assert isinstance(rule_inputs, dict)
                         rule_values = rule_inputs['x']
                         assert isinstance(rule_values, list)
-                        if any(item in rule_values
-                               for item in invalid_choices_content_ids):
+                        if any(
+                            item in rule_values for item in invalid_choices_content_ids
+                        ):
                             invalid_rules.append(rule_spec)
 
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
-            if (len(answer_group['rule_specs']) == 0
-                    and answer_group not in empty_ans_groups):
+            if (
+                len(answer_group['rule_specs']) == 0 and
+                answer_group not in empty_ans_groups
+            ):
                 empty_ans_groups.append(answer_group)
 
         for empty_ans_group in empty_ans_groups:
@@ -3328,8 +3374,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if state_dict['interaction']['solution'] is not None:
             solution = state_dict['interaction']['solution']['correct_answer']
             if isinstance(solution, list) and any(
-                    invalid_choice['content_id'] in solution
-                    for invalid_choice in choices_to_remove):
+                invalid_choice['content_id'] in solution
+                for invalid_choice in choices_to_remove
+            ):
                 state_dict['interaction']['solution'] = None
 
         for choice_to_remove in choices_to_remove:
@@ -3340,8 +3387,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
             choice_translations = state_dict['written_translations'
-                                             ][  # type: ignore[misc]
-                                                 'translations_mapping'][content_id]
+                                            ][  # type: ignore[misc]
+                                                'translations_mapping'][content_id]
             for translation in choice_translations.values():
                 translation['needs_update'] = True
 
@@ -3390,9 +3437,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Returns True if both rule's ranges are enclosed.
         """
-        if (base_range['lower_bound'] is None or test_range['lower_bound'] is None
-                or base_range['upper_bound'] is None
-                or test_range['upper_bound'] is None):
+        if (
+            base_range['lower_bound'] is None or test_range['lower_bound'] is None or
+            base_range['upper_bound'] is None or test_range['upper_bound'] is None
+        ):
             return False
 
         lb_satisfied = (
@@ -3424,10 +3472,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Returns True if the rules passes the range criteria check.
         """
-        if earlier_rule['rule_type'] in ('HasDenominatorEqualTo', 'IsEquivalentTo',
-                                         'IsLessThan',
-                                         'IsEquivalentToAndInSimplestForm',
-                                         'IsGreaterThan'):
+        if earlier_rule['rule_type'] in (
+            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan',
+            'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
+        ):
             return True
         return later_rule['rule_type'] in (
             'HasDenominatorEqualTo', 'IsLessThan', 'IsGreaterThan'
@@ -3477,12 +3525,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for answer_group in answer_groups:
             for rule_spec in answer_group['rule_specs']:
                 if rule_spec in seen_rules_with_try_again_dest_node:
-                    if (answer_group['outcome']['dest'] != state_name
-                            and rule_spec not in seen_rules_with_diff_dest_node):
+                    if (
+                        answer_group['outcome']['dest'] != state_name and
+                        rule_spec not in seen_rules_with_diff_dest_node
+                    ):
                         seen_rules_with_diff_dest_node.append(rule_spec)
                         rules_to_remove_with_try_again_dest_node.append(rule_spec)
-                    elif (answer_group['outcome']['dest'] != state_name
-                          and rule_spec in seen_rules_with_diff_dest_node):
+                    elif (
+                        answer_group['outcome']['dest'] != state_name and
+                        rule_spec in seen_rules_with_diff_dest_node
+                    ):
                         rules_to_remove_with_diff_dest_node.append(rule_spec)
                     else:
                         rules_to_remove_with_try_again_dest_node.append(rule_spec)
@@ -3494,11 +3546,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rules_to_remove_with_try_again_dest_node.append(rule_spec)
 
                 else:
-                    if (rule_spec not in seen_rules_with_try_again_dest_node
-                            and answer_group['outcome']['dest'] == state_name):
+                    if (
+                        rule_spec not in seen_rules_with_try_again_dest_node and
+                        answer_group['outcome']['dest'] == state_name
+                    ):
                         seen_rules_with_try_again_dest_node.append(rule_spec)
-                    if (rule_spec not in seen_rules_with_diff_dest_node
-                            and answer_group['outcome']['dest'] != state_name):
+                    if (
+                        rule_spec not in seen_rules_with_diff_dest_node and
+                        answer_group['outcome']['dest'] != state_name
+                    ):
                         seen_rules_with_diff_dest_node.append(rule_spec)
 
         empty_ans_groups = []
@@ -3506,14 +3562,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
             removed_try_again_rule = False
             for answer_group in reversed(answer_groups):
                 for rule_spec in reversed(answer_group['rule_specs']):
-                    if (rule_spec == rule_to_remove
-                            and answer_group['outcome']['dest'] == state_name):
+                    if (
+                        rule_spec == rule_to_remove and
+                        answer_group['outcome']['dest'] == state_name
+                    ):
                         removed_try_again_rule = True
                         answer_group['rule_specs'].remove(rule_to_remove)
                         break
 
-                if (len(answer_group['rule_specs']) == 0
-                        and answer_group not in empty_ans_groups):
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
                 if removed_try_again_rule:
@@ -3523,14 +3583,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
             removed_dest_rule = False
             for answer_group in reversed(answer_groups):
                 for rule_spec in reversed(answer_group['rule_specs']):
-                    if (rule_spec == rule_to_remove
-                            and answer_group['outcome']['dest'] != state_name):
+                    if (
+                        rule_spec == rule_to_remove and
+                        answer_group['outcome']['dest'] != state_name
+                    ):
                         removed_dest_rule = True
                         answer_group['rule_specs'].remove(rule_to_remove)
                         break
 
-                if (len(answer_group['rule_specs']) == 0
-                        and answer_group not in empty_ans_groups):
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
                 if removed_dest_rule:
@@ -3767,7 +3831,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             rule_spec['inputs']['b'] = value_a
                         elif value_a == value_b:
                             rule_spec['rule_type'] = 'Equals'
-                            rule_spec['inputs'] = {'x': value_a}
+                            rule_spec['inputs'] = {
+                                'x': value_a
+                            }
                             assert isinstance(rule_spec['inputs']['x'], float)
                             rule_value = float(rule_spec['inputs']['x'])
                             cls._set_lower_and_upper_bounds(
@@ -3803,8 +3869,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec == invalid_rule:
                         answer_group['rule_specs'].remove(rule_spec)
 
-                if (len(answer_group['rule_specs']) == 0
-                        and answer_group not in empty_ans_groups):
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         for empty_ans_group in empty_ans_groups:
@@ -3874,8 +3942,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
                         continue
 
-                if rule_spec['rule_type'] in ('IsEquivalentTo', 'IsExactlyEqualTo',
-                                              'IsEquivalentToAndInSimplestForm'):
+                if rule_spec['rule_type'] in (
+                    'IsEquivalentTo', 'IsExactlyEqualTo',
+                    'IsEquivalentToAndInSimplestForm'
+                ):
                     rule_value_equal: float = (
                         cls._get_rule_value_of_fraction_interaction(rule_spec)
                     )
@@ -3926,8 +3996,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for range_ele in ranges:
                     earlier_rule = answer_groups[range_ele['ans_group_index']][
                         'rule_specs'][range_ele['rule_spec_index']]
-                    if (cls._should_check_range_criteria(earlier_rule, rule_spec)
-                            and cls._is_enclosed_by(range_var, range_ele)):
+                    if (
+                        cls._should_check_range_criteria(earlier_rule, rule_spec) and
+                        cls._is_enclosed_by(range_var, range_ele)
+                    ):
                         invalid_rules.append(rule_spec)
 
                 for den in matched_denominator_list:
@@ -3947,8 +4019,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec == invalid_rule:
                         answer_group['rule_specs'].remove(rule_spec)
 
-                if (len(answer_group['rule_specs']) == 0
-                        and answer_group not in empty_ans_groups):
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         for empty_ans_group in empty_ans_groups:
@@ -4073,8 +4147,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     rule_value = rule_spec['inputs']['x']
                     assert isinstance(rule_value, list)
                     if (len(rule_value) < min_value or len(rule_value) > max_value):
-                        if (answer_group['outcome']['dest'] == state_name
-                                or len(rule_value) == 0):
+                        if (
+                            answer_group['outcome']['dest'] == state_name or
+                            len(rule_value) == 0
+                        ):
                             invalid_rules.append(rule_spec)
                         else:
                             min_value = min(min_value, len(rule_value))
@@ -4083,8 +4159,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
 
-            if (len(answer_group['rule_specs']) == 0
-                    and answer_group not in empty_ans_groups):
+            if (
+                len(answer_group['rule_specs']) == 0 and
+                answer_group not in empty_ans_groups
+            ):
                 empty_ans_groups.append(answer_group)
 
         for empty_ans_group in empty_ans_groups:
@@ -4230,8 +4308,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 assert isinstance(rule_inputs, dict)
                 rule_spec_x = rule_inputs['x']
 
-                if (rule_spec['rule_type'] ==
-                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+                if (
+                    rule_spec['rule_type'] ==
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                ):
                     # Here we use cast because we are certain with the type
                     # of the rule spec and to avoid the mypy type check failure.
                     rule_spec_val = cast(List[List[str]], rule_spec_x)
@@ -4277,7 +4357,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             invalid_rules.append(rule_spec)
                             continue
 
-                    ele_x_at_y_rules.append({'element': element, 'position': position})
+                    ele_x_at_y_rules.append({
+                        'element': element,
+                        'position': position
+                    })
 
                 elif rule_spec['rule_type'] == 'IsEqualToOrdering':
                     # Here we use cast because we are certain with the type
@@ -4342,8 +4425,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec == invalid_rule:
                         answer_group['rule_specs'].remove(rule_spec)
 
-                if (len(answer_group['rule_specs']) == 0
-                        and answer_group not in empty_ans_groups):
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         for empty_ans_group in empty_ans_groups:
@@ -4459,8 +4544,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if rule_spec == invalid_rule:
                         answer_group['rule_specs'].remove(rule_spec)
 
-                if (len(answer_group['rule_specs']) == 0
-                        and answer_group not in empty_ans_groups):
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         for empty_ans_group in empty_ans_groups:
@@ -4624,10 +4711,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag.has_attr('autoplay-with-value'):
                 tag['autoplay-with-value'] = 'false'
             else:
-                if tag['autoplay-with-value'].strip() not in ('true', 'false',
-                                                              '\'true\'', '\'false\'',
-                                                              '\"true\"', '\"false\"',
-                                                              True, False):
+                if tag['autoplay-with-value'].strip() not in (
+                    'true', 'false', '\'true\'', '\'false\'', '\"true\"', '\"false\"',
+                    True, False
+                ):
                     tag['autoplay-with-value'] = 'false'
 
             if cls._is_tag_removed_with_invalid_attributes(tag, 'video_id-with-value'):
@@ -4660,8 +4747,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     tag['text-with-value'] = tag['url-with-value']
 
         for tag in soup.find_all('oppia-noninteractive-math'):
-            if cls._is_tag_removed_with_invalid_attributes(tag,
-                                                           'math_content-with-value'):
+            if cls._is_tag_removed_with_invalid_attributes(
+                tag, 'math_content-with-value'
+            ):
                 continue
 
             math_content_json = utils.unescape_html(tag['math_content-with-value'])
@@ -4749,8 +4837,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if tag.has_attr('tab_contents-with-value'):
                 tab_content_json = utils.unescape_html(tag['tab_contents-with-value'])
                 tab_content_list = json.loads(tab_content_json)
-                if cls._is_tag_removed_with_empty_content(tag, tab_content_list,
-                                                          is_collapsible=False):
+                if cls._is_tag_removed_with_empty_content(
+                    tag, tab_content_list, is_collapsible=False
+                ):
                     continue
 
                 empty_tab_contents = []
@@ -4766,8 +4855,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for empty_content in empty_tab_contents:
                     tab_content_list.remove(empty_content)
 
-                if cls._is_tag_removed_with_empty_content(tag, tab_content_list,
-                                                          is_collapsible=False):
+                if cls._is_tag_removed_with_empty_content(
+                    tag, tab_content_list, is_collapsible=False
+                ):
                     continue
 
                 tab_content_json = json.dumps(tab_content_list)
@@ -4783,15 +4873,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     utils.unescape_html(tag['content-with-value'])
                 )
                 collapsible_content = json.loads(collapsible_content_json)
-                if cls._is_tag_removed_with_empty_content(tag, collapsible_content,
-                                                          is_collapsible=True):
+                if cls._is_tag_removed_with_empty_content(
+                    tag, collapsible_content, is_collapsible=True
+                ):
                     continue
 
                 collapsible_content = cls._fix_rte_tags(
                     collapsible_content, is_tags_nested_inside_tabs_or_collapsible=True
                 )
-                if cls._is_tag_removed_with_empty_content(tag, collapsible_content,
-                                                          is_collapsible=True):
+                if cls._is_tag_removed_with_empty_content(
+                    tag, collapsible_content, is_collapsible=True
+                ):
                     continue
 
                 collapsible_content_json = json.dumps(collapsible_content)
@@ -5419,8 +5511,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             )
 
         exploration_schema_version = exploration_dict['schema_version']
-        if not (cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION <= exploration_schema_version
-                <= cls.CURRENT_EXP_SCHEMA_VERSION):
+        if not (
+            cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION <= exploration_schema_version <=
+            cls.CURRENT_EXP_SCHEMA_VERSION
+        ):
             raise Exception(
                 'Sorry, we can only process v%s to v%s exploration YAML files '
                 'at present.' % (
@@ -5525,7 +5619,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # which causes MyPy to throw error 'TypedDict has no key schema_version'
         # thus to silence the error, we used ignore here.
         exp_dict['schema_version'
-                 ] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
+                ] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
@@ -5542,30 +5636,28 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             dict. A dict mapping all fields of Exploration instance.
         """
-        exploration_dict: ExplorationDict = (
-            {
-                'id': self.id,
-                'title': self.title,
-                'category': self.category,
-                'author_notes': self.author_notes,
-                'blurb': self.blurb,
-                'states_schema_version': self.states_schema_version,
-                'init_state_name': self.init_state_name,
-                'language_code': self.language_code,
-                'objective': self.objective,
-                'param_changes': self.param_change_dicts,
-                'param_specs': self.param_specs_dict,
-                'tags': self.tags,
-                'auto_tts_enabled': self.auto_tts_enabled,
-                'next_content_id_index': self.next_content_id_index,
-                'edits_allowed': self.edits_allowed,
-                'states': {
-                    state_name: state.to_dict()
-                    for (state_name, state) in self.states.items()
-                },
-                'version': self.version
-            }
-        )
+        exploration_dict: ExplorationDict = ({
+            'id': self.id,
+            'title': self.title,
+            'category': self.category,
+            'author_notes': self.author_notes,
+            'blurb': self.blurb,
+            'states_schema_version': self.states_schema_version,
+            'init_state_name': self.init_state_name,
+            'language_code': self.language_code,
+            'objective': self.objective,
+            'param_changes': self.param_change_dicts,
+            'param_specs': self.param_specs_dict,
+            'tags': self.tags,
+            'auto_tts_enabled': self.auto_tts_enabled,
+            'next_content_id_index': self.next_content_id_index,
+            'edits_allowed': self.edits_allowed,
+            'states': {
+                state_name: state.to_dict()
+                for (state_name, state) in self.states.items()
+            },
+            'version': self.version
+        })
         exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
         return exploration_dict_deepcopy
 
@@ -5827,8 +5919,10 @@ class ExplorationSummary:
                     'received \'%s\'' % tag
                 )
 
-            if (tag[0] not in string.ascii_lowercase
-                    or tag[-1] not in string.ascii_lowercase):
+            if (
+                tag[0] not in string.ascii_lowercase or
+                tag[-1] not in string.ascii_lowercase
+            ):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
                     '\'%s\'' % tag
@@ -5999,8 +6093,8 @@ class ExplorationSummary:
             bool. Whether the given user has any role in the exploration.
         """
         return (
-            user_id in self.owner_ids or user_id in self.editor_ids
-            or user_id in self.voice_artist_ids or user_id in self.viewer_ids
+            user_id in self.owner_ids or user_id in self.editor_ids or
+            user_id in self.voice_artist_ids or user_id in self.viewer_ids
         )
 
     def add_contribution_by_user(self, contributor_id: str) -> None:
@@ -6179,8 +6273,7 @@ class ExplorationChangeMergeVerifier:
             to merge the change list.
         """
         old_to_new_state_names = {
-            value: key
-            for key, value in self.new_to_old_state_names.items()
+            value: key for key, value in self.new_to_old_state_names.items()
         }
 
         if self.added_state_names or self.deleted_state_names:
@@ -6213,8 +6306,10 @@ class ExplorationChangeMergeVerifier:
                     )
                 else:
                     state_names_of_renamed_states[new_state_name] = (old_state_name)
-                if (state_names_of_renamed_states[new_state_name]
-                        not in old_to_new_state_names):
+                if (
+                    state_names_of_renamed_states[new_state_name]
+                    not in old_to_new_state_names
+                ):
                     change_is_mergeable = True
             elif change.cmd == CMD_EDIT_STATE_PROPERTY:
                 state_name = state_names_of_renamed_states.get(
@@ -6231,18 +6326,23 @@ class ExplorationChangeMergeVerifier:
                 current_exp_states = (current_exploration.states[state_name])
                 if (change.property_name == STATE_PROPERTY_CONTENT):
                     if (old_exp_states.content.html == current_exp_states.content.html):
-                        if (STATE_PROPERTY_CONTENT
-                                not in self.changed_translations[state_name]
-                                and STATE_PROPERTY_RECORDED_VOICEOVERS
-                                not in self.changed_properties[state_name]):
+                        if (
+                            STATE_PROPERTY_CONTENT
+                            not in self.changed_translations[state_name] and
+                            STATE_PROPERTY_RECORDED_VOICEOVERS
+                            not in self.changed_properties[state_name]
+                        ):
                             change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name == STATE_PROPERTY_INTERACTION_ID):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id):
+                    if (
+                        old_exp_states.interaction.id ==
+                        current_exp_states.interaction.id
+                    ):
                         if not self.changed_properties[state_name].intersection(
-                            (self.PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES)):
+                            (self.PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES)
+                        ):
                             change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
@@ -6260,32 +6360,45 @@ class ExplorationChangeMergeVerifier:
                 # So we will not be handling the merge on the basis of
                 # individual fields.
                 elif (change.property_name == STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id):
+                    if (
+                        old_exp_states.interaction.id ==
+                        current_exp_states.interaction.id
+                    ):
                         if not self.changed_properties[state_name].intersection(
-                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
-                            [STATE_PROPERTY_INTERACTION_CUST_ARGS]):
-                            if (change.property_name
-                                    not in self.changed_translations[state_name]):
+                            self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                            [STATE_PROPERTY_INTERACTION_CUST_ARGS]
+                        ):
+                            if (
+                                change.property_name
+                                not in self.changed_translations[state_name]
+                            ):
                                 change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name == STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id):
+                    if (
+                        old_exp_states.interaction.id ==
+                        current_exp_states.interaction.id
+                    ):
                         if not self.changed_properties[state_name].intersection(
-                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
-                            [STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]):
-                            if (change.property_name
-                                    not in self.changed_translations[state_name]):
+                            self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                            [STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]
+                        ):
+                            if (
+                                change.property_name
+                                not in self.changed_translations[state_name]
+                            ):
                                 change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
-                elif (change.property_name == STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                      ):
-                    if (change.property_name not in self.changed_properties[state_name]
-                            and change.property_name
-                            not in self.changed_translations[state_name]):
+                elif (
+                    change.property_name == STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                ):
+                    if (
+                        change.property_name not in self.changed_properties[state_name]
+                        and change.property_name
+                        not in self.changed_translations[state_name]
+                    ):
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
@@ -6298,35 +6411,45 @@ class ExplorationChangeMergeVerifier:
                 # list as a new value.
                 # So it will not be possible to find out the exact change.
                 elif (change.property_name == STATE_PROPERTY_INTERACTION_HINTS):
-                    if (change.property_name not in self.changed_properties[state_name]
-                            and change.property_name
-                            not in self.changed_translations[state_name]):
+                    if (
+                        change.property_name not in self.changed_properties[state_name]
+                        and change.property_name
+                        not in self.changed_translations[state_name]
+                    ):
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name == STATE_PROPERTY_INTERACTION_SOLUTION):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id):
+                    if (
+                        old_exp_states.interaction.id ==
+                        current_exp_states.interaction.id
+                    ):
                         if not self.changed_properties[state_name].intersection(
-                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
-                            [STATE_PROPERTY_INTERACTION_SOLUTION]):
-                            if (change.property_name
-                                    not in self.changed_translations[state_name]):
+                            self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                            [STATE_PROPERTY_INTERACTION_SOLUTION]
+                        ):
+                            if (
+                                change.property_name
+                                not in self.changed_translations[state_name]
+                            ):
                                 change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name == STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
-                    if (old_exp_states.interaction.id
-                            == current_exp_states.interaction.id
-                            and old_exp_states.solicit_answer_details
-                            == current_exp_states.solicit_answer_details):
+                    if (
+                        old_exp_states.interaction.id
+                        == current_exp_states.interaction.id and
+                        old_exp_states.solicit_answer_details
+                        == current_exp_states.solicit_answer_details
+                    ):
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name == STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not self.changed_properties[state_name].intersection(
-                            self.PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES +
-                        [STATE_PROPERTY_RECORDED_VOICEOVERS]):
+                        self.PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES +
+                        [STATE_PROPERTY_RECORDED_VOICEOVERS]
+                    ):
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True

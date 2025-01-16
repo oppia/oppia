@@ -130,7 +130,9 @@ RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
-USER_PREFERENCES: Dict[str, Optional[str]] = {'open_new_tab_in_browser': None}
+USER_PREFERENCES: Dict[str, Optional[str]] = {
+    'open_new_tab_in_browser': None
+}
 
 FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
@@ -304,13 +306,11 @@ NODE_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'node')
 NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
-os.environ['PATH'] = os.pathsep.join(
-    [
-        os.path.dirname(NODE_BIN_PATH),
-        os.path.join(YARN_PATH, 'bin'),
-        os.environ['PATH'],
-    ]
-)
+os.environ['PATH'] = os.pathsep.join([
+    os.path.dirname(NODE_BIN_PATH),
+    os.path.join(YARN_PATH, 'bin'),
+    os.environ['PATH'],
+])
 
 
 def run_cmd(cmd_tokens: List[str]) -> str:
@@ -344,8 +344,8 @@ def require_cwd_to_be_oppia(allow_deploy_dir: bool = False) -> None:
 
     current_dirname = os.path.basename(os.path.normpath(os.getcwd()))
     is_deploy_dir = (
-        current_dirname.startswith('deploy-')
-        and os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia'))
+        current_dirname.startswith('deploy-') and
+        os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia'))
     )
 
     if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
@@ -377,10 +377,9 @@ def open_new_tab_in_browser_if_possible(url: str) -> None:
     # Re-order the browsers by moving the user selected browser to the
     # first position and copying over the browsers before and after
     # the selected browser in the same order as they were present.
-    ordered_browser_cmds = (
-        [browser_cmds[default_index]] + browser_cmds[:default_index] +
-        browser_cmds[default_index + 1:]
-    )
+    ordered_browser_cmds = ([browser_cmds[default_index]] +
+                            browser_cmds[:default_index] +
+                            browser_cmds[default_index + 1:])
     for cmd in ordered_browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
@@ -399,9 +398,8 @@ def open_new_tab_in_browser_if_possible(url: str) -> None:
 
 def get_remote_alias(remote_urls: List[str]) -> str:
     """Finds the correct alias for the given remote repository URLs."""
-    git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v'], encoding='utf-8'
-    ).split('\n')
+    git_remote_output = subprocess.check_output(['git', 'remote', '-v'],
+                                                encoding='utf-8').split('\n')
     remote_alias = None
     remote_url = None
     for remote_url in remote_urls:
@@ -425,8 +423,10 @@ def verify_local_repo_is_clean() -> None:
 
     branch_is_clean_message_1 = b'nothing to commit, working directory clean'
     branch_is_clean_message_2 = b'nothing to commit, working tree clean'
-    if (not branch_is_clean_message_1 in git_status_output
-            and not branch_is_clean_message_2 in git_status_output):
+    if (
+        not branch_is_clean_message_1 in git_status_output and
+        not branch_is_clean_message_2 in git_status_output
+    ):
         raise Exception('ERROR: This script should be run from a clean branch.')
 
 
@@ -686,8 +686,10 @@ def inplace_replace_file(
             for line in new_contents:
                 new_file.write(line)
 
-        if (expected_number_of_replacements is not None
-                and total_number_of_replacements != expected_number_of_replacements):
+        if (
+            expected_number_of_replacements is not None and
+            total_number_of_replacements != expected_number_of_replacements
+        ):
             raise ValueError(
                 'Wrong number of replacements. Expected %s. Performed %s.' %
                 (expected_number_of_replacements, total_number_of_replacements)
@@ -709,12 +711,16 @@ def wait_for_port_to_be_in_use(port_number: int) -> None:
         port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (not is_port_in_use(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+    while (
+        not is_port_in_use(port_number) and
+        waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+    ):
         time.sleep(1)
         waited_seconds += 1
-    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
-            and not is_port_in_use(port_number)):
+    if (
+        waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
+        not is_port_in_use(port_number)
+    ):
         print('Failed to start server on port %s, exiting ...' % port_number)
         print(
             'This may be because you do not have enough available '
@@ -735,8 +741,10 @@ def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
         bool. Whether the port closed in time.
     """
     waited_seconds = 0
-    while (is_port_in_use(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
+    while (
+        is_port_in_use(port_number) and
+        waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS
+    ):
         time.sleep(1)
         waited_seconds += 1
     return not is_port_in_use(port_number)
@@ -868,12 +876,14 @@ def url_retrieve(
     success = False
     while not success and failures < max_attempts:
         try:
-            with urlrequest.urlopen(url,
-                                    context=ssl.create_default_context()) as response:
+            with urlrequest.urlopen(
+                url, context=ssl.create_default_context()
+            ) as response:
                 with open(output_path, 'wb') as output_file:
                     output_file.write(response.read())
-        except (urlerror.URLError, ssl.SSLError, client.IncompleteRead,
-                ConnectionResetError) as exception:
+        except (
+            urlerror.URLError, ssl.SSLError, client.IncompleteRead, ConnectionResetError
+        ) as exception:
             failures += 1
             print(
                 'Attempt %d of %d failed when downloading %s.' %

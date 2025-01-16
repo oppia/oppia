@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Option class for configuring the behavior of Oppia jobs."""
 
 from __future__ import annotations
@@ -31,18 +30,15 @@ from typing import List, Optional
 # assume that PipelineOptions class is of type Any. Thus to avoid MyPy's
 # error (Class cannot subclass 'PipelineOptions' (has type 'Any')), we
 # added an ignore here.
-class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
+class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
-        'namespace': (
-            str, 'Namespace for isolating the NDB operations during tests.'),
+        'namespace': (str, 'Namespace for isolating the NDB operations during tests.'),
     }
 
     def __init__(
-        self,
-        flags: Optional[List[str]] = None,
-        **job_options: Optional[str]
+        self, flags: Optional[List[str]] = None, **job_options: Optional[str]
     ) -> None:
         """Initializes a new JobOptions instance.
 
@@ -60,8 +56,7 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
         unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
         if unsupported_options:
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
-            raise ValueError(
-                'Unsupported option(s): %s' % joined_unsupported_options)
+            raise ValueError('Unsupported option(s): %s' % joined_unsupported_options)
         super().__init__(
             # Needed by PipelineOptions.
             flags=flags,
@@ -78,7 +73,8 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             # the Dataflow dashboard that is available to the Oppia admins.
             experiments=['use_runner_v2', 'enable_recommendations'],
             extra_packages=[feconf.OPPIA_PYTHON_PACKAGE_PATH],
-            **job_options)
+            **job_options
+        )
 
     @classmethod
     def _add_argparse_args(cls, parser: argparse.ArgumentParser) -> None:
@@ -88,5 +84,4 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             parser: argparse.ArgumentParser. An ArgumentParser instance.
         """
         for option_name, (option_type, option_doc) in cls.JOB_OPTIONS.items():
-            parser.add_argument(
-                '--%s' % option_name, help=option_doc, type=option_type)
+            parser.add_argument('--%s' % option_name, help=option_doc, type=option_type)

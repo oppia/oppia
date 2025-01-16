@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Base class for defining interactions.
 
 A note on terminology: state_customization_args refers to the values of
@@ -168,8 +167,8 @@ class BaseInteraction:
     @property
     def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         return [
-            domain.CustomizationArgSpec(**cas)
-            for cas in self._customization_arg_specs]
+            domain.CustomizationArgSpec(**cas) for cas in self._customization_arg_specs
+        ]
 
     @property
     def answer_visualization_specs(self) -> List[Dict[str, str]]:
@@ -180,19 +179,20 @@ class BaseInteraction:
         result = []
         for spec in self._answer_visualization_specs:
             factory_cls = (
-                visualization_registry.Registry.get_visualization_class(
-                    spec['id']))
+                visualization_registry.Registry.get_visualization_class(spec['id'])
+            )
             result.append(
                 factory_cls(
                     spec['calculation_id'], spec['options'],
-                    spec['addressed_info_is_supported']))
+                    spec['addressed_info_is_supported']
+                )
+            )
         return result
 
     @property
     def answer_calculation_ids(self) -> Set[str]:
         visualizations = self.answer_visualizations
-        return set(
-            [visualization.calculation_id for visualization in visualizations])
+        return set([visualization.calculation_id for visualization in visualizations])
 
     @property
     def dependency_ids(self) -> List[str]:
@@ -206,8 +206,8 @@ class BaseInteraction:
         if self.answer_type is None:
             return None
         else:
-            return object_registry.Registry.get_object_class_by_type(
-                self.answer_type).normalize(answer)
+            return object_registry.Registry.get_object_class_by_type(self.answer_type
+                                                                    ).normalize(answer)
 
     @property
     def rules_dict(self) -> Dict[str, Dict[str, str]]:
@@ -217,7 +217,9 @@ class BaseInteraction:
 
         rules_index_dict = json.loads(
             constants.get_package_file_contents(
-                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH
+            )
+        )
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
@@ -239,8 +241,9 @@ class BaseInteraction:
         interaction itself and the other for displaying the learner's response
         in a read-only view after it has been submitted.
         """
-        html_templates = utils.get_file_contents(os.path.join(
-            feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
+        html_templates = utils.get_file_contents(
+            os.path.join(feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id)
+        )
         return html_templates
 
     @property
@@ -249,11 +252,12 @@ class BaseInteraction:
         customization_args and submission handler.
         """
         return (
-            '<script>%s</script>\n' %
-            utils.get_file_contents(os.path.join(
-                feconf.INTERACTIONS_DIR,
-                self.id,
-                '%sValidationService.js' % self.id)))
+            '<script>%s</script>\n' % utils.get_file_contents(
+                os.path.join(
+                    feconf.INTERACTIONS_DIR, self.id, '%sValidationService.js' % self.id
+                )
+            )
+        )
 
     def to_dict(self) -> BaseInteractionDict:
         """Gets a dict representing this interaction. Only default values are
@@ -290,9 +294,8 @@ class BaseInteraction:
         else:
             return self.rules_dict[rule_name]['description']
 
-    def get_rule_param_list(
-        self, rule_name: str
-    ) -> List[Tuple[str, objects.BaseObject]]:
+    def get_rule_param_list(self,
+                            rule_name: str) -> List[Tuple[str, objects.BaseObject]]:
         """Gets the parameter list for a given rule."""
         description = self.get_rule_description(rule_name)
 
@@ -309,9 +312,7 @@ class BaseInteraction:
             normalizer_string = description[:closing_index]
             description = description[closing_index + 2:]
 
-            param_list.append(
-                (param_name, getattr(objects, normalizer_string))
-            )
+            param_list.append((param_name, getattr(objects, normalizer_string)))
 
         return param_list
 
@@ -324,5 +325,4 @@ class BaseInteraction:
         for param_name, param_type in rule_param_list:
             if param_name == rule_param_name:
                 return param_type
-        raise Exception(
-            'Rule %s has no param called %s' % (rule_name, rule_param_name))
+        raise Exception('Rule %s has no param called %s' % (rule_name, rule_param_name))

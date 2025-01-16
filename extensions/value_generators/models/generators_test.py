@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for value generators."""
 
 from __future__ import annotations
@@ -30,13 +29,14 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(generator.generate_value(None, 'a'), 'a')
         self.assertIn(
             '[initArgs]="initArgs" [(value)]="customizationArgs.value"',
-            generator.get_html_template())
+            generator.get_html_template()
+        )
 
     def test_random_selector(self) -> None:
         generator = generators.RandomSelector()
-        self.assertIn(generator.generate_value(
-            {}, ['a', 'b', 'c']), ['a', 'b', 'c'])
+        self.assertIn(generator.generate_value({}, ['a', 'b', 'c']), ['a', 'b', 'c'])
         self.assertIn(
             '[schema]="SCHEMA" '
             '[(ngModel)]="customizationArgs.list_of_values"',
-            generator.get_html_template())
+            generator.get_html_template()
+        )

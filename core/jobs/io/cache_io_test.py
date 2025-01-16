@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.io.cache_io."""
 
 from __future__ import annotations
@@ -30,7 +29,9 @@ class FlushCacheTests(job_test_utils.PipelinedTestBase):
     def test_cache_is_flushed(self) -> None:
         items = [1] * 100
 
-        called_functions = {'flush_caches': False}
+        called_functions = {
+            'flush_caches': False
+        }
 
         class MockMemoryCachingServices:
 
@@ -43,10 +44,7 @@ class FlushCacheTests(job_test_utils.PipelinedTestBase):
             caching_services, 'memory_cache_services', MockMemoryCachingServices
         ):
             self.assert_pcoll_equal(
-                self.pipeline
-                | beam.Create(items)
-                | cache_io.FlushCache(),
-                [None]
+                self.pipeline | beam.Create(items) | cache_io.FlushCache(), [None]
             )
 
         self.assertTrue(called_functions['flush_caches'])

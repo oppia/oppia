@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for SetInput interaction."""
 
 from __future__ import annotations
@@ -56,25 +55,28 @@ class SetInput(base.BaseInteraction):
         }
     }]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top 10 answers',
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Table with answer counts for top N answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top 10 answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
         },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }, {
-        # Table with most commonly submitted elements of set.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Element', 'Count'],
-            'title': 'Commonly submitted elements',
-        },
-        'calculation_id': 'FrequencyCommonlySubmittedElements',
-        # Since individual answer elements are not generally intended to be
-        # used as a single response to SetInput interactions, we omit the
-        # addressed column entirely.
-        'addressed_info_is_supported': False,
-    }]
+        {
+            # Table with most commonly submitted elements of set.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Element', 'Count'],
+                'title': 'Commonly submitted elements',
+            },
+            'calculation_id': 'FrequencyCommonlySubmittedElements',
+            # Since individual answer elements are not generally intended to be
+            # used as a single response to SetInput interactions, we omit the
+            # addressed column entirely.
+            'addressed_info_is_supported': False,
+        }
+    ]

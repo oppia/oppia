@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Services for handling mailchimp API calls."""
 
 from __future__ import annotations
@@ -31,7 +30,7 @@ from mailchimp3 import mailchimpclient
 from typing import Any, Dict, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
@@ -50,8 +49,7 @@ def _get_subscriber_hash(email: str) -> str:
         Exception. Invalid type for email, expected string.
     """
     if not isinstance(email, str):
-        raise Exception(
-            'Invalid type for email. Expected string, received %s' % email)
+        raise Exception('Invalid type for email. Expected string, received %s' % email)
     md5_hash = hashlib.md5()
     # The md5 accepts only bytes, so we first need to encode the email to bytes.
     md5_hash.update(email.encode('utf-8'))
@@ -68,8 +66,7 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
         Mailchimp|None. A mailchimp class instance with the API key and username
         initialized.
     """
-    mailchimp_api_key: Optional[str] = secrets_services.get_secret(
-        'MAILCHIMP_API_KEY')
+    mailchimp_api_key: Optional[str] = secrets_services.get_secret('MAILCHIMP_API_KEY')
     if not mailchimp_api_key:
         logging.error('Mailchimp API key is not available.')
         return None
@@ -112,7 +109,8 @@ def _create_user_in_mailchimp_db(
     """
     try:
         client.lists.members.create(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data)
+            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data
+        )
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the
@@ -150,10 +148,10 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
     subscriber_hash = _get_subscriber_hash(user_email)
     try:
-        client.lists.members.get(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+        client.lists.members.get(feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
         client.lists.members.delete_permanent(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash
+        )
     except mailchimpclient.MailChimpError as error:
         # This has to be done since the message can only be accessed from
         # MailChimpError by error.message in Python2, but this is deprecated in
@@ -169,10 +167,7 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
 
 def add_or_update_user_status(
-    user_email: str,
-    merge_fields: Dict[str, str],
-    tag: str,
-    *,
+    user_email: str, merge_fields: Dict[str, str], tag: str, *,
     can_receive_email_updates: bool
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
@@ -214,8 +209,7 @@ def add_or_update_user_status(
         raise Exception('Invalid tag: %s' % tag)
 
     invalid_keys = [
-        key for key in merge_fields
-        if key not in feconf.VALID_MAILCHIMP_FIELD_KEYS
+        key for key in merge_fields if key not in feconf.VALID_MAILCHIMP_FIELD_KEYS
     ]
     if invalid_keys:
         raise Exception('Invalid Merge Fields: %s' % invalid_keys)
@@ -263,15 +257,12 @@ def add_or_update_user_status(
         }
 
         if 'NAME' in merge_fields and merge_fields['NAME'] is not None:
-            new_user_mailchimp_data['merge_fields']['NAME'] = (
-                merge_fields['NAME'])
-            subscribed_mailchimp_data['merge_fields']['NAME'] = (
-                merge_fields['NAME'])
+            new_user_mailchimp_data['merge_fields']['NAME'] = (merge_fields['NAME'])
+            subscribed_mailchimp_data['merge_fields']['NAME'] = (merge_fields['NAME'])
 
     try:
         try:
-            client.lists.members.get(
-                feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+            client.lists.members.get(feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
 
             # If member is already added to mailchimp list, we cannot
             # permanently delete a list member, since they cannot be
@@ -279,14 +270,17 @@ def add_or_update_user_status(
             # preference.
             if can_receive_email_updates:
                 client.lists.members.tags.update(
-                    feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash, tag_data)
+                    feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash, tag_data
+                )
                 client.lists.members.update(
                     feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
-                    subscribed_mailchimp_data)
+                    subscribed_mailchimp_data
+                )
             else:
                 client.lists.members.update(
                     feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
-                    unsubscribed_mailchimp_data)
+                    unsubscribed_mailchimp_data
+                )
         except mailchimpclient.MailChimpError as mailchimp_err:
             # This has to be done since the message can only be accessed from
             # MailChimpError by error.message in Python2, but this is deprecated
@@ -300,7 +294,8 @@ def add_or_update_user_status(
             if error_message['status'] == 404:
                 if can_receive_email_updates:
                     user_creation_successful = _create_user_in_mailchimp_db(
-                        client, new_user_mailchimp_data)
+                        client, new_user_mailchimp_data
+                    )
                     if not user_creation_successful:
                         return False
             else:

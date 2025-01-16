@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Base class for defining interactions.
 
 A note on terminology: state_customization_args refers to the values of
@@ -60,10 +59,7 @@ DISPLAY_MODE_INLINE: Final = 'inline'
 # separate object from the conversation.
 DISPLAY_MODE_SUPPLEMENTAL: Final = 'supplemental'
 
-ALLOWED_DISPLAY_MODES: Final = [
-    DISPLAY_MODE_SUPPLEMENTAL,
-    DISPLAY_MODE_INLINE
-]
+ALLOWED_DISPLAY_MODES: Final = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
 
 class AnswerVisualizationSpecsDict(TypedDict):
@@ -174,8 +170,8 @@ class BaseInteraction:
     def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         """The customization arg specs for the interaction."""
         return [
-            domain.CustomizationArgSpec(**cas)
-            for cas in self._customization_arg_specs]
+            domain.CustomizationArgSpec(**cas) for cas in self._customization_arg_specs
+        ]
 
     @property
     def answer_visualization_specs(self) -> List[AnswerVisualizationSpecsDict]:
@@ -188,12 +184,14 @@ class BaseInteraction:
         result = []
         for spec in self._answer_visualization_specs:
             factory_cls = (
-                visualization_registry.Registry.get_visualization_class(
-                    spec['id']))
+                visualization_registry.Registry.get_visualization_class(spec['id'])
+            )
             result.append(
                 factory_cls(
                     spec['calculation_id'], spec['options'],
-                    spec['addressed_info_is_supported']))
+                    spec['addressed_info_is_supported']
+                )
+            )
         return result
 
     @property
@@ -209,9 +207,9 @@ class BaseInteraction:
             return None
         else:
             answers: state_domain.AcceptableCorrectAnswerTypes = (
-                    object_registry.Registry.get_object_class_by_type(
-                        self.answer_type).normalize(answer)
-                )
+                object_registry.Registry.get_object_class_by_type(self.answer_type
+                                                                 ).normalize(answer)
+            )
             return answers
 
     @property
@@ -222,7 +220,9 @@ class BaseInteraction:
 
         rules_index_dict = json.loads(
             constants.get_package_file_contents(
-                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH
+            )
+        )
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
@@ -294,20 +294,16 @@ class BaseInteraction:
             normalizer_string = description[:closing_index]
             description = description[closing_index + 2:]
 
-            param_list.append(
-                (param_name, getattr(objects, normalizer_string))
-            )
+            param_list.append((param_name, getattr(objects, normalizer_string)))
 
         return param_list
 
-    def get_rule_param_type(
-        self, rule_name: str, rule_param_name: str
-    ) -> Type[objects.BaseObject]:
+    def get_rule_param_type(self, rule_name: str,
+                            rule_param_name: str) -> Type[objects.BaseObject]:
         """Gets the parameter type for a given rule parameter name."""
         rule_param_list = self.get_rule_param_list(rule_name)
 
         for param_name, param_type in rule_param_list:
             if param_name == rule_param_name:
                 return param_type
-        raise Exception(
-            'Rule %s has no param called %s' % (rule_name, rule_param_name))
+        raise Exception('Rule %s has no param called %s' % (rule_name, rule_param_name))

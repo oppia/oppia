@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.batch_jobs.collection_info_jobs."""
 
 from __future__ import annotations
@@ -28,7 +27,7 @@ from core.platform import models
 from typing import Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import collection_models
     from mypy_imports import feedback_models
     from mypy_imports import user_models
@@ -42,9 +41,8 @@ if MYPY: # pragma: no cover
 
 class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        collection_info_jobs.GetCollectionOwnersEmailsJob
-    ] = collection_info_jobs.GetCollectionOwnersEmailsJob
+    JOB_CLASS: Type[collection_info_jobs.GetCollectionOwnersEmailsJob
+                   ] = collection_info_jobs.GetCollectionOwnersEmailsJob
 
     USER_ID_1: Final = 'id_1'
     USER_ID_2: Final = 'id_2'
@@ -77,8 +75,8 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout=(
-                    'collection_ids: [\'col_1\'], email: [\'some@email.com\']'))
+                stdout=('collection_ids: [\'col_1\'], email: [\'some@email.com\']')
+            )
         ])
 
     def test_counts_multiple_collection(self) -> None:
@@ -132,22 +130,22 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout=(
-                    'collection_ids: [\'col_1\'], email: '
-                    '[\'some@email.com\']')),
+                stdout=('collection_ids: [\'col_1\'], email: '
+                        '[\'some@email.com\']')
+            ),
             job_run_result.JobRunResult(
                 stdout=(
                     'collection_ids: [\'col_1\', \'col_2\'], email: '
-                    '[\'some2@email.com\']')
+                    '[\'some2@email.com\']'
                 )
+            )
         ])
 
 
 class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        collection_info_jobs.MatchEntityTypeCollectionJob
-    ] = collection_info_jobs.MatchEntityTypeCollectionJob
+    JOB_CLASS: Type[collection_info_jobs.MatchEntityTypeCollectionJob
+                   ] = collection_info_jobs.MatchEntityTypeCollectionJob
 
     USER_ID: Final = 'user_1'
     ENTITY_ID: Final = 'col_id_1'
@@ -183,9 +181,7 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 1')])
 
     def test_match_multiple_collection(self) -> None:
         feedback_thread_model = self.create_model(
@@ -233,6 +229,4 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
         feedback_thread_model2.update_timestamps()
         feedback_thread_model2.put()
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 1')])

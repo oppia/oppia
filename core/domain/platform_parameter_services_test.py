@@ -115,7 +115,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_get_unknown_platform_param_value_results_in_error(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'Unknown platform parameter: unknown_platform_param'):
+            Exception, 'Unknown platform parameter: unknown_platform_param'
+        ):
             with self.swap_all_platform_params_list:
                 parameter_services.get_platform_parameter_value(
                     'unknown_platform_param'
@@ -123,12 +124,10 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_create_evaluation_context_for_client_returns_correct_context(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):
-            context = parameter_services.create_evaluation_context_for_client(
-                {
-                    'platform_type': 'Android',
-                    'app_version': '1.0.0',
-                }
-            )
+            context = parameter_services.create_evaluation_context_for_client({
+                'platform_type': 'Android',
+                'app_version': '1.0.0',
+            })
             self.assertEqual(context.server_mode, FeatureStages.DEV)
             self.assertEqual(context.platform_type, 'Android')
             self.assertEqual(context.app_version, '1.0.0')
@@ -141,17 +140,13 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
             registry.Registry.update_platform_parameter(
                 self.param_c.name, self.user_id, 'edit rules', [
-                    platform_parameter_domain.PlatformParameterRule.from_dict(
-                        {
-                            'filters': [
-                                {
-                                    'type': 'app_version',
-                                    'conditions': [['>=', '3.3.1']],
-                                }
-                            ],
-                            'value_when_matched': True
-                        }
-                    )
+                    platform_parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [{
+                            'type': 'app_version',
+                            'conditions': [['>=', '3.3.1']],
+                        }],
+                        'value_when_matched': True
+                    })
                 ], False
             )
 
@@ -172,20 +167,17 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_platform_parameter_schema_acc_to_data_type(self) -> None:
         with self.swap_all_platform_params_list:
-            self.assertEqual(
-                {'type': 'unicode'},
-                parameter_services.get_platform_parameter_schema(self.param_a.name)
-            )
+            self.assertEqual({
+                'type': 'unicode'
+            }, parameter_services.get_platform_parameter_schema(self.param_a.name))
 
-            self.assertEqual(
-                {'type': 'bool'},
-                parameter_services.get_platform_parameter_schema(self.param_b.name)
-            )
+            self.assertEqual({
+                'type': 'bool'
+            }, parameter_services.get_platform_parameter_schema(self.param_b.name))
 
-            self.assertEqual(
-                {'type': 'float'},
-                parameter_services.get_platform_parameter_schema(self.param_c.name)
-            )
+            self.assertEqual({
+                'type': 'float'
+            }, parameter_services.get_platform_parameter_schema(self.param_c.name))
 
     def test_raise_exception_when_invalid_data_type_trying_to_get_schema(self) -> None:
         param_dict = {
@@ -193,9 +185,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             'description': 'param description',
             'data_type': 'unknown',
             'rules': [],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            ),
+            'rule_schema_version':
+                (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': 'abc',
             'is_feature': False,
             'feature_stage': None
@@ -211,8 +202,10 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
 
         with swap_get_platform_parameter, self.assertRaisesRegex(
-                Exception,
-            ('The param_name platform parameter has a data type of unknown '
-             'which is not valid. Please use one of these data types instead: '
-             'typing.Union\\[str, int, bool, float].')):
+            Exception, (
+                'The param_name platform parameter has a data type of unknown '
+                'which is not valid. Please use one of these data types instead: '
+                'typing.Union\\[str, int, bool, float].'
+            )
+        ):
             parameter_services.get_platform_parameter_schema(parameter.name)

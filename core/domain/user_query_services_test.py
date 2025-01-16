@@ -175,13 +175,11 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             email_services,
             'send_bulk_mail',
             lambda *_: None,
-            expected_args=[
-                (
-                    '%s <%s>' %
-                    (self.CURRICULUM_ADMIN_USERNAME, self.CURRICULUM_ADMIN_EMAIL),
-                    [self.NEW_USER_EMAIL], 'subject', 'body', 'body', None
-                )
-            ]
+            expected_args=[(
+                '%s <%s>' %
+                (self.CURRICULUM_ADMIN_USERNAME, self.CURRICULUM_ADMIN_EMAIL),
+                [self.NEW_USER_EMAIL], 'subject', 'body', 'body', None
+            )]
         )
 
         with send_bulk_email_swap:

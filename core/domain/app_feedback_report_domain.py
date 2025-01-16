@@ -37,9 +37,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
-(app_feedback_report_models, ) = models.Registry.import_models(
-    [models.Names.APP_FEEDBACK_REPORT]
-)
+(app_feedback_report_models,) = models.Registry.import_models([
+    models.Names.APP_FEEDBACK_REPORT
+])
 
 
 class AppFeedbackReportDict(TypedDict):
@@ -122,18 +122,28 @@ class AppFeedbackReport:
             dict. A dict, mapping all fields of AppFeedbackReport instance.
         """
         return {
-            'report_id': self.report_id,
-            'schema_version': self.schema_version,
-            'platform': self.platform,
-            'submitted_on_timestamp': utils.get_human_readable_time_string(
-                utils.get_time_in_millisecs(self.submitted_on_timestamp)
-            ),
-            'local_timezone_offset_hrs': self.local_timezone_offset_hrs,
-            'ticket_id': self.ticket_id,
-            'scrubbed_by': self.scrubbed_by,
-            'user_supplied_feedback': self.user_supplied_feedback.to_dict(),
-            'device_system_context': self.device_system_context.to_dict(),
-            'app_context': self.app_context.to_dict()
+            'report_id':
+                self.report_id,
+            'schema_version':
+                self.schema_version,
+            'platform':
+                self.platform,
+            'submitted_on_timestamp':
+                utils.get_human_readable_time_string(
+                    utils.get_time_in_millisecs(self.submitted_on_timestamp)
+                ),
+            'local_timezone_offset_hrs':
+                self.local_timezone_offset_hrs,
+            'ticket_id':
+                self.ticket_id,
+            'scrubbed_by':
+                self.scrubbed_by,
+            'user_supplied_feedback':
+                self.user_supplied_feedback.to_dict(),
+            'device_system_context':
+                self.device_system_context.to_dict(),
+            'app_context':
+                self.app_context.to_dict()
         }
 
     def validate(self) -> None:
@@ -156,9 +166,11 @@ class AppFeedbackReport:
         if self.scrubbed_by is not None:
             self.require_valid_scrubber_id(self.scrubbed_by)
 
-        if not (app_feedback_report_constants.TIMEZONE_MINIMUM_OFFSET <=
-                self.local_timezone_offset_hrs <=
-                app_feedback_report_constants.TIMEZONE_MAXIMUM_OFFSET):
+        if not (
+            app_feedback_report_constants.TIMEZONE_MINIMUM_OFFSET <=
+            self.local_timezone_offset_hrs <=
+            app_feedback_report_constants.TIMEZONE_MAXIMUM_OFFSET
+        ):
             raise utils.ValidationError(
                 'Expected local timezone offset to be in [%d, %d], '
                 'received: %d' % (
@@ -246,7 +258,8 @@ class AppFeedbackReport:
                 'The scrubbed_by user must be a string, but got %r' % (scrubber_id)
             )
         if not utils.is_user_id_valid(scrubber_id) and (
-                scrubber_id != feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID):
+            scrubber_id != feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID
+        ):
             raise utils.ValidationError(
                 'The scrubbed_by user id %r is invalid.' % scrubber_id
             )
@@ -270,7 +283,8 @@ class AppFeedbackReport:
             NotImplementedError. Domain objects for web reports not implemented.
         """
         if report_dict['platform_type'] == (
-                app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):
+            app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
+        ):
             return cls.get_android_report_from_dict(report_dict)
         else:
             raise NotImplementedError(
@@ -400,7 +414,8 @@ class AppFeedbackReport:
             AndroidTextSize. The enum representing the text size.
         """
         for text_size_type in (
-                app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
+            app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES
+        ):
             if text_size_name == text_size_type.value:
                 return text_size_type
         raise utils.InvalidInputException(
@@ -428,10 +443,12 @@ class AppFeedbackReport:
         """
         entry_point_name = entry_point_json['entry_point_name']
         if entry_point_name == (
-                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value):
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value
+        ):
             return NavigationDrawerEntryPoint()
         elif entry_point_name == (
-                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value):
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value
+        ):
             if entry_point_json['entry_point_topic_id'] is None:
                 raise Exception('No topic_id provided for LessonPlayerEntryPoint.')
             if entry_point_json['entry_point_story_id'] is None:
@@ -446,7 +463,8 @@ class AppFeedbackReport:
                 entry_point_json['entry_point_exploration_id']
             )
         elif entry_point_name == (
-                app_feedback_report_constants.EntryPoint.REVISION_CARD.value):
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.value
+        ):
             if entry_point_json['entry_point_topic_id'] is None:
                 raise Exception('No topic_id provided for RevisionCardEntryPoint.')
             if entry_point_json['entry_point_subtopic_id'] is None:
@@ -475,7 +493,8 @@ class AppFeedbackReport:
             AndroidNetworkType. The enum representing the network type.
         """
         for network_type in (
-                app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
+            app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES
+        ):
             if network_type_name == network_type.value:
                 return network_type
         raise utils.InvalidInputException(
@@ -616,7 +635,8 @@ class UserSuppliedFeedback:
                 category are not valid.
         """
         if category in (
-                app_feedback_report_constants.ALLOWED_SELECTION_ITEMS_CATEGORIES):
+            app_feedback_report_constants.ALLOWED_SELECTION_ITEMS_CATEGORIES
+        ):
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
             cls.require_valid_selected_items_for_category(selected_items)
@@ -625,7 +645,8 @@ class UserSuppliedFeedback:
         # validate that the user_feedback_selected_items is None and that
         # there is a user_feedback_other_text_input.
         if category in (
-                app_feedback_report_constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES):
+            app_feedback_report_constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES
+        ):
             if len(selected_items) != 0:
                 raise utils.ValidationError(
                     'Report cannot have selection options for category %r.' %
@@ -956,7 +977,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if network_type is None:
             raise utils.ValidationError('No network type supplied.')
         if network_type not in (
-                app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
+            app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES
+        ):
             raise utils.ValidationError(
                 'Invalid network type, received: %s.' % network_type
             )
@@ -1092,9 +1114,8 @@ class AndroidAppContext(AppContext):
             'text_language_code': self.text_language_code,
             'audio_language_code': self.audio_language_code,
             'text_size': self.text_size.value,
-            'only_allows_wifi_download_and_update': (
-                self.only_allows_wifi_download_and_update
-            ),
+            'only_allows_wifi_download_and_update':
+                (self.only_allows_wifi_download_and_update),
             'automatically_update_topics': self.automatically_update_topics,
             'account_is_profile_admin': self.account_is_profile_admin,
             'event_logs': self.event_logs,
@@ -1112,20 +1133,23 @@ class AndroidAppContext(AppContext):
         self.require_valid_language_code('text', self.text_language_code)
         self.require_valid_language_code('audio', self.audio_language_code)
         self.require_valid_text_size(self.text_size)
-        if self.only_allows_wifi_download_and_update is None or not (isinstance(
-                self.only_allows_wifi_download_and_update, bool)):
+        if self.only_allows_wifi_download_and_update is None or not (
+            isinstance(self.only_allows_wifi_download_and_update, bool)
+        ):
             raise utils.ValidationError(
                 'only_allows_wifi_download_and_update field should be a '
                 'boolean, received: %r' % (self.only_allows_wifi_download_and_update)
             )
-        if self.automatically_update_topics is None or not (isinstance(
-                self.automatically_update_topics, bool)):
+        if self.automatically_update_topics is None or not (
+            isinstance(self.automatically_update_topics, bool)
+        ):
             raise utils.ValidationError(
                 'automatically_update_topics field should be a '
                 'boolean, received: %r' % self.automatically_update_topics
             )
-        if self.account_is_profile_admin is None or not (isinstance(
-                self.account_is_profile_admin, bool)):
+        if self.account_is_profile_admin is None or not (
+            isinstance(self.account_is_profile_admin, bool)
+        ):
             raise utils.ValidationError(
                 'account_is_profile_admin field should be a '
                 'boolean, received: %r' % self.account_is_profile_admin
@@ -1356,7 +1380,9 @@ class NavigationDrawerEntryPoint(EntryPoint):
             dict. A dict, mapping all fields of NavigationDrawerEntryPoint
             instance.
         """
-        return {'entry_point_name': self.entry_point_name}
+        return {
+            'entry_point_name': self.entry_point_name
+        }
 
     def validate(self) -> None:
         """Validates this NavigationDrawerEntryPoint domain object.
@@ -1514,7 +1540,9 @@ class CrashEntryPoint(EntryPoint):
             dict. A dict, mapping all fields of CrashEntryPoint
             instance.
         """
-        return {'entry_point_name': self.entry_point_name}
+        return {
+            'entry_point_name': self.entry_point_name
+        }
 
     def validate(self) -> None:
         """Validates this CrashEntryPoint domain object.
@@ -1662,8 +1690,8 @@ class AppFeedbackReportTicket:
             raise utils.ValidationError(
                 'The ticket name should be a string, received: %s' % (ticket_name)
             )
-        if len(ticket_name) > (
-                app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH):
+        if len(ticket_name
+              ) > (app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH):
             raise utils.ValidationError(
                 'The ticket name is too long, has %d characters but only '
                 'allowed %d characters' % (
@@ -1690,8 +1718,9 @@ class AppFeedbackReportTicket:
                 'The reports list should be a list, received: %r' % (report_ids)
             )
         for report_id in report_ids:
-            if app_feedback_report_models.AppFeedbackReportModel.get_by_id(report_id
-                                                                           ) is None:
+            if app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                report_id
+            ) is None:
                 raise utils.ValidationError(
                     'The report with id %s is invalid.' % report_id
                 )
@@ -1952,12 +1981,10 @@ class AppFeedbackReportFilter:
         """
         if self.filter_field not in (app_feedback_report_constants.ALLOWED_FILTERS):
             raise utils.ValidationError(
-                'The filter field should be one of %s, received: %s' % (
-                    [
-                        item.name
-                        for item in (app_feedback_report_constants.ALLOWED_FILTERS)
-                    ], self.filter_field.name
-                )
+                'The filter field should be one of %s, received: %s' % ([
+                    item.name
+                    for item in (app_feedback_report_constants.ALLOWED_FILTERS)
+                ], self.filter_field.name)
             )
         if not isinstance(self.filter_options, list):
             raise utils.ValidationError(

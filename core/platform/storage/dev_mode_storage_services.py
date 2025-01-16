@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides various functions from the Cloud Storage emulator."""
 
 from __future__ import annotations
@@ -55,10 +54,8 @@ def get(unused_bucket_name: str, filepath: str) -> bytes:
 
 
 def commit(
-        unused_bucket_name: str,
-        filepath: str,
-        raw_bytes: Union[bytes, str],
-        mimetype: Optional[str]
+    unused_bucket_name: str, filepath: str, raw_bytes: Union[bytes, str],
+    mimetype: Optional[str]
 ) -> None:
     """Commits bytes to the relevant file.
 
@@ -71,7 +68,8 @@ def commit(
     # TODO(#13500): Refactor this method that only bytes are passed
     # into raw_bytes.
     blob = cloud_storage_emulator.EmulatorBlob(
-        filepath, raw_bytes, content_type=mimetype)
+        filepath, raw_bytes, content_type=mimetype
+    )
     CLIENT.upload_blob(filepath, blob)
 
 
@@ -86,7 +84,7 @@ def delete(unused_bucket_name: str, filepath: str) -> None:
 
 
 def copy(
-        unused_bucket_name: str, source_assets_path: str, dest_assets_path: str
+    unused_bucket_name: str, source_assets_path: str, dest_assets_path: str
 ) -> None:
     """Copies images from source_path.
 
@@ -109,9 +107,8 @@ def copy(
     CLIENT.copy_blob(src_blob, dest_assets_path)
 
 
-def listdir(
-        unused_bucket_name: str, dir_name: str
-) -> List[cloud_storage_emulator.EmulatorBlob]:
+def listdir(unused_bucket_name: str,
+            dir_name: str) -> List[cloud_storage_emulator.EmulatorBlob]:
     """Lists all files in a directory.
 
     Args:

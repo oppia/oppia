@@ -30,9 +30,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import config_models
     from mypy_imports import suggestion_models
 
-(config_models, suggestion_models) = models.Registry.import_models(
-    [models.Names.CONFIG, models.Names.SUGGESTION]
-)
+(config_models, suggestion_models) = models.Registry.import_models([
+    models.Names.CONFIG, models.Names.SUGGESTION
+])
 
 ParamName = platform_parameter_list.ParamName
 
@@ -40,12 +40,15 @@ ParamName = platform_parameter_list.ParamName
 class Registry:
     """Registry of all platform parameters."""
 
-    DEFAULT_VALUE_BY_TYPE_DICT: Dict[platform_parameter_domain.DataTypes, Union[
-        bool, str, int, float]] = {
-            platform_parameter_domain.DataTypes.BOOL: False,
-            platform_parameter_domain.DataTypes.NUMBER: 0,
-            platform_parameter_domain.DataTypes.STRING: '',
-        }
+    DEFAULT_VALUE_BY_TYPE_DICT: Dict[platform_parameter_domain.DataTypes,
+                                     Union[bool, str, int, float]] = {
+                                         platform_parameter_domain.DataTypes.BOOL:
+                                             False,
+                                         platform_parameter_domain.DataTypes.NUMBER:
+                                             0,
+                                         platform_parameter_domain.DataTypes.STRING:
+                                             '',
+                                     }
 
     # The keys of parameter_registry are the property names, and the values
     # are PlatformParameter instances with initial settings defined in this
@@ -94,9 +97,8 @@ class Registry:
             'description': description,
             'data_type': data_type.value,
             'rules': [],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            ),
+            'rule_schema_version':
+                (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': default
         }
         return cls.init_platform_parameter_from_dict(param_dict)
@@ -192,15 +194,12 @@ class Registry:
         model_instance.rules = [rule.to_dict() for rule in param.rules]
         model_instance.default_value = default_value
         model_instance.commit(
-            committer_id, commit_message, [
-                {
-                    'cmd': (
-                        platform_parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
-                    ),
-                    'new_rules': new_rule_dicts,
-                    'default_value': default_value
-                }
-            ]
+            committer_id, commit_message, [{
+                'cmd':
+                    (platform_parameter_domain.PlatformParameterChange.CMD_EDIT_RULES),
+                'new_rules': new_rule_dicts,
+                'default_value': default_value
+            }]
         )
 
         caching_services.delete_multi(
@@ -278,16 +277,14 @@ class Registry:
                 default_value = param_with_init_settings.default_value
             else:
                 default_value = parameter_model.default_value
-            return platform_parameter_domain.PlatformParameter.from_dict(
-                {
-                    'name': param_with_init_settings.name,
-                    'description': param_with_init_settings.description,
-                    'data_type': param_with_init_settings.data_type,
-                    'rules': parameter_model.rules,
-                    'rule_schema_version': parameter_model.rule_schema_version,
-                    'default_value': default_value
-                }
-            )
+            return platform_parameter_domain.PlatformParameter.from_dict({
+                'name': param_with_init_settings.name,
+                'description': param_with_init_settings.description,
+                'data_type': param_with_init_settings.data_type,
+                'rules': parameter_model.rules,
+                'rule_schema_version': parameter_model.rule_schema_version,
+                'default_value': default_value
+            })
         else:
             return None
 

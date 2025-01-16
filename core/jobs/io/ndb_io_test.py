@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.io.ndb_io."""
 
 from __future__ import annotations
@@ -53,7 +52,8 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
             model_list: list(Model). The models to put into the datastore.
         """
         datastore_services.update_timestamps_multi(
-            model_list, update_last_updated_time=False)
+            model_list, update_last_updated_time=False
+        )
         datastore_services.put_multi(model_list)
 
     def test_read_from_datastore(self) -> None:
@@ -82,7 +82,8 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         self.assertItemsEqual(self.get_base_models(), [])
 
         self.assert_pcoll_empty(
-            self.pipeline | beam.Create(model_list) | ndb_io.PutModels())
+            self.pipeline | beam.Create(model_list) | ndb_io.PutModels()
+        )
         self.assertItemsEqual(self.get_base_models(), model_list)
 
     def test_delete_from_datastore(self) -> None:
@@ -96,8 +97,8 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         self.assertItemsEqual(self.get_base_models(), model_list)
 
         self.assert_pcoll_empty(
-            self.pipeline
-            | beam.Create([model.key for model in model_list])
-            | ndb_io.DeleteModels())
+            self.pipeline | beam.Create([model.key for model in model_list]) |
+            ndb_io.DeleteModels()
+        )
 
         self.assertItemsEqual(self.get_base_models(), [])

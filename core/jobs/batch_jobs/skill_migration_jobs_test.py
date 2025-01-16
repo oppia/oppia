@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.batch_jobs.exp_recommendation_computation_jobs."""
 
 from __future__ import annotations
@@ -30,7 +29,7 @@ from core.platform import models
 from typing import Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
 
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
@@ -38,9 +37,8 @@ if MYPY: # pragma: no cover
 
 class MigrateSkillJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        skill_migration_jobs.MigrateSkillJob
-    ] = skill_migration_jobs.MigrateSkillJob
+    JOB_CLASS: Type[skill_migration_jobs.MigrateSkillJob
+                   ] = skill_migration_jobs.MigrateSkillJob
 
     SKILL_1_ID: Final = 'skill_1'
     SKILL_2_ID: Final = 'skill_2'
@@ -104,7 +102,8 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=4,
             rubrics=[{
                 'difficulty': 'Easy',
@@ -118,15 +117,18 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             }],
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             next_misconception_id=2,
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
@@ -137,12 +139,11 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
         self.assertEqual(migrated_skill_model.version, 2)
         self.assertEqual(
             migrated_skill_model.rubric_schema_version,
-            feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+        )
         self.assertEqual(migrated_skill_model.rubrics, self.latest_rubrics)
 
-    def test_unmigrated_skill_with_unmigrated_misconceptions_is_migrated(
-        self
-    ) -> None:
+    def test_unmigrated_skill_with_unmigrated_misconceptions_is_migrated(self) -> None:
         skill_model = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
@@ -152,7 +153,8 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             rubrics=self.latest_rubrics,
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             misconceptions=[{
                 'id': 1,
@@ -165,9 +167,11 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
@@ -178,21 +182,20 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
         self.assertEqual(migrated_skill_model.version, 2)
         self.assertEqual(
             migrated_skill_model.misconceptions_schema_version,
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+        )
         self.assertEqual(
-            migrated_skill_model.misconceptions,
-            self.latest_misconceptions
+            migrated_skill_model.misconceptions, self.latest_misconceptions
         )
 
-    def test_unmigrated_skill_with_unmigrated_skill_contents_is_migrated(
-        self
-    ) -> None:
+    def test_unmigrated_skill_with_unmigrated_skill_contents_is_migrated(self) -> None:
         skill_model = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             rubrics=self.latest_rubrics,
             language_code='cs',
@@ -218,9 +221,11 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
@@ -231,10 +236,10 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
         self.assertEqual(migrated_skill_model.version, 2)
         self.assertEqual(
             migrated_skill_model.skill_contents_schema_version,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+        )
         self.assertEqual(
-            migrated_skill_model.skill_contents,
-            self.latest_skill_contents
+            migrated_skill_model.skill_contents, self.latest_skill_contents
         )
 
     def test_skill_summary_of_unmigrated_skill_is_updated(self) -> None:
@@ -243,7 +248,8 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             rubrics=self.latest_rubrics,
             language_code='cs',
@@ -269,9 +275,11 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
@@ -279,7 +287,8 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
         ])
 
         migrated_skill_summary_model = skill_models.SkillSummaryModel.get(
-            self.SKILL_1_ID)
+            self.SKILL_1_ID
+        )
         self.assertEqual(migrated_skill_summary_model.version, 2)
 
     def test_broken_skill_is_not_migrated(self) -> None:
@@ -288,7 +297,8 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=4,
             rubrics=[{
                 'difficulty': 'Easy',
@@ -302,22 +312,26 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             }],
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             next_misconception_id=2,
             all_questions_merged=False
         )
         skill_model_one.update_timestamps()
-        skill_model_one.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model_one.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         skill_model_two = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_2_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=4,
             rubrics=[{
                 'difficulty': 'Easy',
@@ -331,19 +345,23 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             }],
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             next_misconception_id=2,
             all_questions_merged=False
         )
         skill_model_two.update_timestamps()
-        skill_model_two.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model_two.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'SKILL PROCESSED ERROR: "(\'skill_1\', ''ValidationError('
+                    'SKILL PROCESSED ERROR: "(\'skill_1\', '
+                    'ValidationError('
                     '\'Invalid difficulty received for rubric: aaa\'))": 1'
                 )
             ),
@@ -361,25 +379,28 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             rubrics=self.latest_rubrics,
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             next_misconception_id=2,
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='SKILL PREVIOUSLY MIGRATED SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='SKILL PREVIOUSLY MIGRATED SUCCESS: 1')
         ])
 
         unmigrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)
@@ -388,9 +409,8 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
 
 class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        skill_migration_jobs.AuditSkillMigrationJob
-    ] = skill_migration_jobs.AuditSkillMigrationJob
+    JOB_CLASS: Type[skill_migration_jobs.AuditSkillMigrationJob
+                   ] = skill_migration_jobs.AuditSkillMigrationJob
 
     SKILL_1_ID: Final = 'skill_1'
 
@@ -453,7 +473,8 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=4,
             rubrics=[{
                 'difficulty': 'Easy',
@@ -467,15 +488,18 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             }],
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             next_misconception_id=2,
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
@@ -485,9 +509,7 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
         migrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)
         self.assertEqual(migrated_skill_model.version, 1)
 
-    def test_unmigrated_skill_with_unmigrated_misconceptions_is_migrated(
-        self
-    ) -> None:
+    def test_unmigrated_skill_with_unmigrated_misconceptions_is_migrated(self) -> None:
         skill_model = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
@@ -497,7 +519,8 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             rubrics=self.latest_rubrics,
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             misconceptions=[{
                 'id': 1,
@@ -510,9 +533,11 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
@@ -522,15 +547,14 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
         migrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)
         self.assertEqual(migrated_skill_model.version, 1)
 
-    def test_unmigrated_skill_with_unmigrated_skill_contents_is_migrated(
-        self
-    ) -> None:
+    def test_unmigrated_skill_with_unmigrated_skill_contents_is_migrated(self) -> None:
         skill_model = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             rubrics=self.latest_rubrics,
             language_code='cs',
@@ -556,9 +580,11 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
@@ -574,7 +600,8 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             rubrics=self.latest_rubrics,
             language_code='cs',
@@ -600,9 +627,11 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
@@ -610,7 +639,8 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
         ])
 
         migrated_skill_summary_model = skill_models.SkillSummaryModel.get(
-            self.SKILL_1_ID)
+            self.SKILL_1_ID
+        )
         self.assertEqual(migrated_skill_summary_model.version, 1)
 
     def test_broken_skill_is_not_migrated(self) -> None:
@@ -619,7 +649,8 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=4,
             rubrics=[{
                 'difficulty': 'Easy',
@@ -633,20 +664,24 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             }],
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             next_misconception_id=2,
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'SKILL PROCESSED ERROR: "(\'skill_1\', ''ValidationError('
+                    'SKILL PROCESSED ERROR: "(\'skill_1\', '
+                    'ValidationError('
                     '\'Invalid difficulty received for rubric: aaa\'))": 1'
                 )
             )
@@ -661,25 +696,28 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconceptions_schema_version=(
-                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION),
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            ),
             rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             rubrics=self.latest_rubrics,
             language_code='cs',
             skill_contents_schema_version=(
-                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            ),
             skill_contents=self.latest_skill_contents,
             next_misconception_id=2,
             all_questions_merged=False
         )
         skill_model.update_timestamps()
-        skill_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
-            'cmd': skill_domain.CMD_CREATE_NEW
-        }])
+        skill_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Create skill', [{
+                'cmd': skill_domain.CMD_CREATE_NEW
+            }]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='SKILL PREVIOUSLY MIGRATED SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='SKILL PREVIOUSLY MIGRATED SUCCESS: 1')
         ])
 
         unmigrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)

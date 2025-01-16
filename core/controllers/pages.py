@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
 from __future__ import annotations
@@ -27,7 +26,9 @@ class ForumRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A handler to redirect to Oppia's Google group."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -39,7 +40,9 @@ class AboutRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A page that redirects to the main About page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -51,7 +54,9 @@ class TeachRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A page that redirects to the main Teach page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:

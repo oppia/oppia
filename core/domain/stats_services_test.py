@@ -39,7 +39,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import stats_models
 
-(stats_models, ) = models.Registry.import_models([models.Names.STATISTICS])
+(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -69,8 +69,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-                Exception,
-                'No PlaythroughModel exists for the playthrough_id: invalid_id'):
+            Exception, 'No PlaythroughModel exists for the playthrough_id: invalid_id'
+        ):
             stats_services.get_playthrough_models_by_ids(['invalid_id'], strict=True)
 
     def test_get_exploration_stats_with_new_exp_id(self) -> None:
@@ -213,7 +213,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats, None)
 
         with self.assertRaisesRegex(
-                Exception, 'ExplorationStatsModel id="exp_id1.1" does not exist'):
+            Exception, 'ExplorationStatsModel id="exp_id1.1" does not exist'
+        ):
             stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self) -> None:
@@ -396,8 +397,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         )
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list: List[Tuple[str, bytes]] = []
-        with self.swap(stats_services, 'get_stats_for_new_exploration',
-                       stats_for_new_exploration_log):
+        with self.swap(
+            stats_services, 'get_stats_for_new_exploration',
+            stats_for_new_exploration_log
+        ):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id, assets_list
             )
@@ -413,32 +416,32 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exploration.next_content_id_index
         )
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'add_state',
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    'add_state',
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            })
         ]
-        with self.swap(stats_services, 'get_stats_for_new_exp_version',
-                       stats_for_new_exp_version_log):
+        with self.swap(
+            stats_services, 'get_stats_for_new_exp_version',
+            stats_for_new_exp_version_log
+        ):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, ''
             )
@@ -561,7 +564,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.add_states(['New state', 'New state 2'])
         exploration.version += 1
         with self.assertRaisesRegex(
-                Exception, 'ExplorationVersionsDiff cannot be None when the change'):
+            Exception, 'ExplorationVersionsDiff cannot be None when the change'
+        ):
             stats_services.get_stats_for_new_exp_version(
                 exploration.id, exploration.version, list(exploration.states.keys()),
                 None, None
@@ -586,7 +590,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.add_states(['New state', 'New state 2'])
         exploration.version += 1
         with self.assertRaisesRegex(
-                Exception, 'ExplorationVersionsDiff cannot be None when the change'):
+            Exception, 'ExplorationVersionsDiff cannot be None when the change'
+        ):
             stats_services.get_updated_exp_issues_models_for_new_exp_version(
                 exploration, None, None
             )
@@ -612,52 +617,48 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.add_states(['New state', 'New state 2'])
         exploration.version += 1
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'add_state',
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    'add_state',
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'add_state',
-                    'state_name': 'New state 2',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    'add_state',
+                'state_name':
+                    'New state 2',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
+                    )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            })
         ]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -694,13 +695,11 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.rename_state('New state 2', 'Renamed state')
         exploration.version += 1
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'rename_state',
-                    'old_state_name': 'New state 2',
-                    'new_state_name': 'Renamed state'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'New state 2',
+                'new_state_name': 'Renamed state'
+            })
         ]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -726,12 +725,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.delete_state('New state')
         exploration.version += 1
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'delete_state',
-                    'state_name': 'New state'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': 'delete_state',
+                'state_name': 'New state'
+            })
         ]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -759,42 +756,36 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.delete_state('Renamed state 2')
         exploration.version += 1
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'add_state',
-                    'state_name': 'New state 2',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    'add_state',
+                'state_name':
+                    'New state 2',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'rename_state',
-                    'old_state_name': 'New state 2',
-                    'new_state_name': 'Renamed state 2'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'delete_state',
-                    'state_name': 'Renamed state 2'
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'New state 2',
+                'new_state_name': 'Renamed state 2'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'delete_state',
+                'state_name': 'Renamed state 2'
+            })
         ]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -822,43 +813,37 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.rename_state('New state 3', 'New state 4')
         exploration.version += 1
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'add_state',
-                    'state_name': 'New state 2',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    'add_state',
+                'state_name':
+                    'New state 2',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'rename_state',
-                    'old_state_name': 'New state 2',
-                    'new_state_name': 'New state 3'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'rename_state',
-                    'old_state_name': 'New state 3',
-                    'new_state_name': 'New state 4'
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'New state 2',
+                'new_state_name': 'New state 3'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'New state 3',
+                'new_state_name': 'New state 4'
+            })
         ]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -895,7 +880,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats_model.state_stats_mapping['Renamed state'][
             'first_hit_count_v2'] = 2
         exploration_stats_model.state_stats_mapping['End']['useful_feedback_count_v2'
-                                                           ] = 4
+                                                          ] = 4
         exploration_stats_model.update_timestamps()
         exploration_stats_model.put()
 
@@ -905,42 +890,36 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.rename_state('New state', 'New state 4')
         exploration.version += 1
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'delete_state',
-                    'state_name': 'New state 4'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'add_state',
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd': 'delete_state',
+                'state_name': 'New state 4'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    'add_state',
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'rename_state',
-                    'old_state_name': 'New state',
-                    'new_state_name': 'New state 4'
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'New state',
+                'new_state_name': 'New state 4'
+            })
         ]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -1007,52 +986,48 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.add_states(['New state 5', 'New state 6'])
         exploration.version += 1
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'add_state',
-                    'state_name': 'New state 5',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    'add_state',
+                'state_name':
+                    'New state 5',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'add_state',
-                    'state_name': 'New state 6',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    'add_state',
+                'state_name':
+                    'New state 6',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
+                    )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            })
         ]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -1066,27 +1041,21 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.rename_state('New state 7', 'New state 6')
         exploration.version += 1
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'rename_state',
-                    'old_state_name': 'New state 5',
-                    'new_state_name': 'New state 7'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'rename_state',
-                    'old_state_name': 'New state 6',
-                    'new_state_name': 'New state 5'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'rename_state',
-                    'old_state_name': 'New state 7',
-                    'new_state_name': 'New state 6'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'New state 5',
+                'new_state_name': 'New state 7'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'New state 6',
+                'new_state_name': 'New state 5'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'New state 7',
+                'new_state_name': 'New state 6'
+            })
         ]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -1361,57 +1330,51 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 'value': state_names
             }
         }
-        actions: List[stats_domain.LearnerActionDict] = [
-            {
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': state_names[0]
-                    },
+        actions: List[stats_domain.LearnerActionDict] = [{
+            'action_type': 'ExplorationStart',
+            'action_customization_args': {
+                'state_name': {
+                    'value': state_names[0]
                 },
-                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
-            }
-        ]
-        actions.extend(
-            {
-                'action_type': 'AnswerSubmit',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': state_name
-                    },
-                    'dest_state_name': {
-                        'value': dest_state_name
-                    },
-                    'interaction_id': {
-                        'value': 'TextInput'
-                    },
-                    'submitted_answer': {
-                        'value': 'Foo!'
-                    },
-                    'feedback': {
-                        'value': ''
-                    },
-                    'time_spent_in_exp_in_msecs': {
-                        'value': 1000
-                    },
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        }]
+        actions.extend({
+            'action_type': 'AnswerSubmit',
+            'action_customization_args': {
+                'state_name': {
+                    'value': state_name
                 },
-                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
-            } for state_name, dest_state_name in zip(state_names[:-1], state_names[1:])
-        )
-        actions.append(
-            {
-                'action_type': 'ExplorationQuit',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': state_names[-1]
-                    },
-                    'time_spent_in_state_in_msecs': {
-                        'value': 1000
-                    },
+                'dest_state_name': {
+                    'value': dest_state_name
                 },
-                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
-            }
-        )
+                'interaction_id': {
+                    'value': 'TextInput'
+                },
+                'submitted_answer': {
+                    'value': 'Foo!'
+                },
+                'feedback': {
+                    'value': ''
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 1000
+                },
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        } for state_name, dest_state_name in zip(state_names[:-1], state_names[1:]))
+        actions.append({
+            'action_type': 'ExplorationQuit',
+            'action_customization_args': {
+                'state_name': {
+                    'value': state_names[-1]
+                },
+                'time_spent_in_state_in_msecs': {
+                    'value': 1000
+                },
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        })
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, 'CyclicStateTransitions',
             issue_customization_args, actions
@@ -1434,28 +1397,26 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 'value': 200
             },
         }
-        actions: List[stats_domain.LearnerActionDict] = [
-            {
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': state_name
-                    }
+        actions: List[stats_domain.LearnerActionDict] = [{
+            'action_type': 'ExplorationStart',
+            'action_customization_args': {
+                'state_name': {
+                    'value': state_name
+                }
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        }, {
+            'action_type': 'ExplorationQuit',
+            'action_customization_args': {
+                'state_name': {
+                    'value': state_name
                 },
-                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
-            }, {
-                'action_type': 'ExplorationQuit',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': state_name
-                    },
-                    'time_spent_in_state_in_msecs': {
-                        'value': 1000
-                    },
+                'time_spent_in_state_in_msecs': {
+                    'value': 1000
                 },
-                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
-            }
-        ]
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        }]
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, 'EarlyQuit', issue_customization_args,
             actions
@@ -1483,57 +1444,51 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 'value': num_times_answered_incorrectly
             },
         }
-        actions: List[stats_domain.LearnerActionDict] = [
-            {
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': state_name
-                    }
+        actions: List[stats_domain.LearnerActionDict] = [{
+            'action_type': 'ExplorationStart',
+            'action_customization_args': {
+                'state_name': {
+                    'value': state_name
+                }
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        }]
+        actions.extend({
+            'action_type': 'AnswerSubmit',
+            'action_customization_args': {
+                'state_name': {
+                    'value': state_name
                 },
-                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
-            }
-        ]
-        actions.extend(
-            {
-                'action_type': 'AnswerSubmit',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': state_name
-                    },
-                    'dest_state_name': {
-                        'value': state_name
-                    },
-                    'interaction_id': {
-                        'value': 'TextInput'
-                    },
-                    'submitted_answer': {
-                        'value': 'Foo!'
-                    },
-                    'feedback': {
-                        'value': ''
-                    },
-                    'time_spent_in_exp_in_msecs': {
-                        'value': 1000
-                    },
+                'dest_state_name': {
+                    'value': state_name
                 },
-                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
-            } for _ in range(num_times_answered_incorrectly)
-        )
-        actions.append(
-            {
-                'action_type': 'ExplorationQuit',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': state_name
-                    },
-                    'time_spent_in_state_in_msecs': {
-                        'value': 1000
-                    },
+                'interaction_id': {
+                    'value': 'TextInput'
                 },
-                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
-            }
-        )
+                'submitted_answer': {
+                    'value': 'Foo!'
+                },
+                'feedback': {
+                    'value': ''
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 1000
+                },
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        } for _ in range(num_times_answered_incorrectly))
+        actions.append({
+            'action_type': 'ExplorationQuit',
+            'action_customization_args': {
+                'state_name': {
+                    'value': state_name
+                },
+                'time_spent_in_state_in_msecs': {
+                    'value': 1000
+                },
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        })
         return stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, 'MultipleIncorrectSubmissions',
             issue_customization_args, actions
@@ -1687,10 +1642,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(
                 self.exp.id, self.exp.version, [
-                    self._create_cst_exp_issue(
-                        [self._create_cst_playthrough(['A', 'B', 'A'])],
-                        ['A', 'B', 'A']
-                    )
+                    self._create_cst_exp_issue([
+                        self._create_cst_playthrough(['A', 'B', 'A'])
+                    ], ['A', 'B', 'A'])
                 ]
             )
         )
@@ -1711,23 +1665,20 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(
                 self.exp.id, self.exp.version, [
-                    self._create_cst_exp_issue(
-                        [self._create_cst_playthrough(['A', 'B', 'A'])],
-                        ['A', 'B', 'A']
-                    )
+                    self._create_cst_exp_issue([
+                        self._create_cst_playthrough(['A', 'B', 'A'])
+                    ], ['A', 'B', 'A'])
                 ]
             )
         )
 
         exp_services.update_exploration(
             self.owner_id, self.exp.id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'rename_state',
-                        'old_state_name': 'A',
-                        'new_state_name': 'Z',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
             ], 'change'
         )
 
@@ -1794,13 +1745,11 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         exp_services.update_exploration(
             self.owner_id, self.exp.id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'rename_state',
-                        'old_state_name': 'A',
-                        'new_state_name': 'Z',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
             ], 'change'
         )
 
@@ -1832,21 +1781,18 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(
                 self.exp.id, self.exp.version, [
-                    self._create_mis_exp_issue(
-                        [self._create_mis_playthrough('B', 2)], 'B', 2
-                    )
+                    self._create_mis_exp_issue([self._create_mis_playthrough('B', 2)],
+                                               'B', 2)
                 ]
             )
         )
 
         exp_services.update_exploration(
             self.owner_id, self.exp.id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'delete_state',
-                        'state_name': 'B'
-                    }
-                ),
+                exp_domain.ExplorationChange({
+                    'cmd': 'delete_state',
+                    'state_name': 'B'
+                }),
             ], 'Delete B'
         )
 
@@ -1858,22 +1804,19 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         stats_services.save_exp_issues_model(
             stats_domain.ExplorationIssues(
                 self.exp.id, self.exp.version, [
-                    self._create_mis_exp_issue(
-                        [self._create_mis_playthrough('A', 2)], 'A', 2
-                    )
+                    self._create_mis_exp_issue([self._create_mis_playthrough('A', 2)],
+                                               'A', 2)
                 ]
             )
         )
 
         exp_services.update_exploration(
             self.owner_id, self.exp.id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'rename_state',
-                        'old_state_name': 'A',
-                        'new_state_name': 'Z',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': 'A',
+                    'new_state_name': 'Z',
+                })
             ], 'change'
         )
 
@@ -1912,25 +1855,21 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             stats_domain.ExplorationIssues(
                 self.exp.id, self.exp.version, [
                     self._create_eq_exp_issue([self._create_eq_playthrough('B')], 'B'),
-                    self._create_cst_exp_issue(
-                        [self._create_cst_playthrough(['A', 'B', 'A'])],
-                        ['A', 'B', 'A']
-                    ),
-                    self._create_mis_exp_issue(
-                        [self._create_mis_playthrough('B', 3)], 'B', 3
-                    ),
+                    self._create_cst_exp_issue([
+                        self._create_cst_playthrough(['A', 'B', 'A'])
+                    ], ['A', 'B', 'A']),
+                    self._create_mis_exp_issue([self._create_mis_playthrough('B', 3)],
+                                               'B', 3),
                 ]
             )
         )
 
         exp_services.update_exploration(
             self.owner_id, self.exp.id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'delete_state',
-                        'state_name': 'B'
-                    }
-                ),
+                exp_domain.ExplorationChange({
+                    'cmd': 'delete_state',
+                    'state_name': 'B'
+                }),
             ], 'commit'
         )
 
@@ -1953,9 +1892,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     ) -> None:
         exp_issues = stats_domain.ExplorationIssues(
             self.exp.id, self.exp.version, [
-                self._create_cst_exp_issue(
-                    [self._create_cst_playthrough(['A', 'B', 'A'])], ['A', 'B', 'A']
-                )
+                self._create_cst_exp_issue([
+                    self._create_cst_playthrough(['A', 'B', 'A'])
+                ], ['A', 'B', 'A'])
             ]
         )
         exp_issues.exp_id = 'Invalid_id'
@@ -1995,129 +1934,112 @@ class AnswerEventTests(test_utils.GenericTestBase):
         third_state_name = 'State 3'
         exp_services.update_exploration(
             'fake@user.com', 'eid', [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': first_state_name,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'new_value': 'TextInput',
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': first_state_name,
-                        'property_name': exp_domain.
-                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'new_value': {
-                            'placeholder': {
-                                'value': {
-                                    'content_id': 'ca_placeholder_0',
-                                    'unicode_str': 'Enter here'
-                                }
-                            },
-                            'rows': {
-                                'value': 1
-                            },
-                            'catchMisspellings': {
-                                'value': False
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': 'Enter here'
                             }
+                        },
+                        'rows': {
+                            'value': 1
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': second_state_name,
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        second_state_name,
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': third_state_name,
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': second_state_name,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'new_value': 'TextInput',
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': second_state_name,
-                        'property_name': exp_domain.
-                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'new_value': {
-                            'placeholder': {
-                                'value': {
-                                    'content_id': 'ca_placeholder_0',
-                                    'unicode_str': 'Enter here'
-                                }
-                            },
-                            'rows': {
-                                'value': 1
-                            },
-                            'catchMisspellings': {
-                                'value': False
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        third_state_name,
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
+                        )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': 'Enter here'
                             }
+                        },
+                        'rows': {
+                            'value': 1
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': third_state_name,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'new_value': 'Continue',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': third_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'Continue',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': third_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'new_value': {
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'ca_buttonText_1',
+                                'unicode_str': 'Continue'
+                            }
+                        },
                     }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': third_state_name,
-                        'property_name': exp_domain.
-                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'new_value': {
-                            'buttonText': {
-                                'value': {
-                                    'content_id': 'ca_buttonText_1',
-                                    'unicode_str': 'Continue'
-                                }
-                            },
-                        }
-                    }
-                )
+                })
             ], 'Add new state'
         )
         exp = exp_fetchers.get_exploration_by_id('eid')
@@ -2157,8 +2079,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
         # Answer is a list of dicts.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 3, 0,
-            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT, self.PARAMS,
-            [{
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT, self.PARAMS, [{
                 'a': 'some',
                 'b': 'text'
             }, {
@@ -2185,113 +2106,117 @@ class AnswerEventTests(test_utils.GenericTestBase):
             None
         )
 
-        expected_submitted_answer_list1 = [
-            {
-                'answer': 'answer1',
-                'time_spent_in_sec': 5.0,
-                'answer_group_index': 0,
-                'rule_spec_index': 0,
-                'classification_categorization': 'explicit',
-                'session_id': 'sid1',
-                'interaction_id': 'TextInput',
-                'params': {},
-                'answer_str': None,
-                'rule_spec_str': None
+        expected_submitted_answer_list1 = [{
+            'answer': 'answer1',
+            'time_spent_in_sec': 5.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'sid1',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
+        }, {
+            'answer': 'answer1',
+            'time_spent_in_sec': 5.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': 'explicit',
+            'session_id': 'sid2',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
+        }, {
+            'answer': {
+                'x': 1.0,
+                'y': 5.0
+            },
+            'time_spent_in_sec': 5.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'sid1',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
+        }, {
+            'answer': 10,
+            'time_spent_in_sec': 5.0,
+            'answer_group_index': 2,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'sid1',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
+        }, {
+            'answer': [{
+                'a': 'some',
+                'b': 'text'
             }, {
-                'answer': 'answer1',
-                'time_spent_in_sec': 5.0,
-                'answer_group_index': 0,
-                'rule_spec_index': 1,
-                'classification_categorization': 'explicit',
-                'session_id': 'sid2',
-                'interaction_id': 'TextInput',
-                'params': {},
-                'answer_str': None,
-                'rule_spec_str': None
-            }, {
-                'answer': {
-                    'x': 1.0,
-                    'y': 5.0
-                },
-                'time_spent_in_sec': 5.0,
-                'answer_group_index': 1,
-                'rule_spec_index': 0,
-                'classification_categorization': 'explicit',
-                'session_id': 'sid1',
-                'interaction_id': 'TextInput',
-                'params': {},
-                'answer_str': None,
-                'rule_spec_str': None
-            }, {
-                'answer': 10,
-                'time_spent_in_sec': 5.0,
-                'answer_group_index': 2,
-                'rule_spec_index': 0,
-                'classification_categorization': 'explicit',
-                'session_id': 'sid1',
-                'interaction_id': 'TextInput',
-                'params': {},
-                'answer_str': None,
-                'rule_spec_str': None
-            }, {
-                'answer': [{
-                    'a': 'some',
-                    'b': 'text'
-                }, {
-                    'a': 1.0,
-                    'c': 2.0
-                }],
-                'time_spent_in_sec': 5.0,
-                'answer_group_index': 3,
-                'rule_spec_index': 0,
-                'classification_categorization': 'explicit',
-                'session_id': 'sid1',
-                'interaction_id': 'TextInput',
-                'params': {},
-                'answer_str': None,
-                'rule_spec_str': None
-            }
-        ]
-        expected_submitted_answer_list2 = [
-            {
-                'answer': [2, 4, 8],
-                'time_spent_in_sec': 5.0,
-                'answer_group_index': 2,
-                'rule_spec_index': 0,
-                'classification_categorization': 'explicit',
-                'session_id': 'sid3',
-                'interaction_id': 'TextInput',
-                'params': {},
-                'answer_str': None,
-                'rule_spec_str': None
-            }, {
-                'answer': self.UNICODE_TEST_STRING,
-                'time_spent_in_sec': 5.0,
-                'answer_group_index': 1,
-                'rule_spec_index': 1,
-                'classification_categorization': 'explicit',
-                'session_id': 'sid4',
-                'interaction_id': 'TextInput',
-                'params': {},
-                'answer_str': None,
-                'rule_spec_str': None
-            }
-        ]
-        expected_submitted_answer_list3: List[Dict[str, Union[str, Optional[int], Dict[
-            str, str], float]]] = [
-                {
-                    'answer': None,
-                    'time_spent_in_sec': 5.0,
-                    'answer_group_index': 1,
-                    'rule_spec_index': 1,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'sid5',
-                    'interaction_id': 'Continue',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }
-            ]
+                'a': 1.0,
+                'c': 2.0
+            }],
+            'time_spent_in_sec': 5.0,
+            'answer_group_index': 3,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'sid1',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
+        }]
+        expected_submitted_answer_list2 = [{
+            'answer': [2, 4, 8],
+            'time_spent_in_sec': 5.0,
+            'answer_group_index': 2,
+            'rule_spec_index': 0,
+            'classification_categorization': 'explicit',
+            'session_id': 'sid3',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
+        }, {
+            'answer': self.UNICODE_TEST_STRING,
+            'time_spent_in_sec': 5.0,
+            'answer_group_index': 1,
+            'rule_spec_index': 1,
+            'classification_categorization': 'explicit',
+            'session_id': 'sid4',
+            'interaction_id': 'TextInput',
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
+        }]
+        expected_submitted_answer_list3: List[Dict[str, Union[str, Optional[int],
+                                                              Dict[str, str], float]]
+                                             ] = [{
+                                                 'answer':
+                                                     None,
+                                                 'time_spent_in_sec':
+                                                     5.0,
+                                                 'answer_group_index':
+                                                     1,
+                                                 'rule_spec_index':
+                                                     1,
+                                                 'classification_categorization':
+                                                     'explicit',
+                                                 'session_id':
+                                                     'sid5',
+                                                 'interaction_id':
+                                                     'Continue',
+                                                 'params': {},
+                                                 'answer_str':
+                                                     None,
+                                                 'rule_spec_str':
+                                                     None
+                                             }]
 
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, first_state_name
@@ -2353,20 +2278,18 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert state_answers is not None
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(), [
-                {
-                    'answer': 'first answer',
-                    'time_spent_in_sec': 1.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 0,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'a_session_id_val',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }
-            ]
+            state_answers.get_submitted_answer_dict_list(), [{
+                'answer': 'first answer',
+                'time_spent_in_sec': 1.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': 'explicit',
+                'session_id': 'a_session_id_val',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }]
         )
 
     def test_record_and_retrieve_single_answer(self) -> None:
@@ -2394,20 +2317,18 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(), [
-                {
-                    'answer': 'some text',
-                    'time_spent_in_sec': 10.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 1,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'a_session_id_val',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }
-            ]
+            state_answers.get_submitted_answer_dict_list(), [{
+                'answer': 'some text',
+                'time_spent_in_sec': 10.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': 'explicit',
+                'session_id': 'a_session_id_val',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }]
         )
 
     def test_record_and_retrieve_single_answer_with_preexisting_entry(self) -> None:
@@ -2426,20 +2347,18 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert state_answers is not None
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(), [
-                {
-                    'answer': 'first answer',
-                    'time_spent_in_sec': 1.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 0,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'a_session_id_val',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }
-            ]
+            state_answers.get_submitted_answer_dict_list(), [{
+                'answer': 'first answer',
+                'time_spent_in_sec': 1.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': 'explicit',
+                'session_id': 'a_session_id_val',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }]
         )
 
         stats_services.record_answer(
@@ -2461,31 +2380,29 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(), [
-                {
-                    'answer': 'first answer',
-                    'time_spent_in_sec': 1.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 0,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'a_session_id_val',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }, {
-                    'answer': 'some text',
-                    'time_spent_in_sec': 10.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 1,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'a_session_id_val',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }
-            ]
+            state_answers.get_submitted_answer_dict_list(), [{
+                'answer': 'first answer',
+                'time_spent_in_sec': 1.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': 'explicit',
+                'session_id': 'a_session_id_val',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }, {
+                'answer': 'some text',
+                'time_spent_in_sec': 10.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': 'explicit',
+                'session_id': 'a_session_id_val',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }]
         )
 
     def test_record_many_answers(self) -> None:
@@ -2524,49 +2441,48 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(), [
-                {
-                    'answer': 'answer a',
-                    'time_spent_in_sec': 10.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 1,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'session_id_v',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }, {
-                    'answer': 'answer ccc',
-                    'time_spent_in_sec': 3.0,
-                    'answer_group_index': 1,
-                    'rule_spec_index': 1,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'session_id_v',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }, {
-                    'answer': 'answer bbbbb',
-                    'time_spent_in_sec': 7.5,
-                    'answer_group_index': 1,
-                    'rule_spec_index': 0,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'session_id_v',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }
-            ]
+            state_answers.get_submitted_answer_dict_list(), [{
+                'answer': 'answer a',
+                'time_spent_in_sec': 10.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': 'explicit',
+                'session_id': 'session_id_v',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }, {
+                'answer': 'answer ccc',
+                'time_spent_in_sec': 3.0,
+                'answer_group_index': 1,
+                'rule_spec_index': 1,
+                'classification_categorization': 'explicit',
+                'session_id': 'session_id_v',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }, {
+                'answer': 'answer bbbbb',
+                'time_spent_in_sec': 7.5,
+                'answer_group_index': 1,
+                'rule_spec_index': 0,
+                'classification_categorization': 'explicit',
+                'session_id': 'session_id_v',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }]
         )
 
     def test_record_answers_exceeding_one_shard(self) -> None:
         # Use a smaller max answer list size so less answers are needed to
         # exceed a shard.
-        with self.swap(stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
-                       100000):
+        with self.swap(
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 100000
+        ):
             state_answers = stats_services.get_state_answers(
                 self.EXP_ID, self.exploration.version, self.exploration.init_state_name
             )
@@ -2630,20 +2546,18 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert state_answers is not None
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(), [
-                {
-                    'answer': '1 answer',
-                    'time_spent_in_sec': 1.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 0,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'a_session_id_val',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }
-            ]
+            state_answers.get_submitted_answer_dict_list(), [{
+                'answer': '1 answer',
+                'time_spent_in_sec': 1.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': 'explicit',
+                'session_id': 'a_session_id_val',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }]
         )
 
         submitted_answer_list = [
@@ -2676,53 +2590,51 @@ class RecordAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(state_answers.state_name, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(), [
-                {
-                    'answer': '1 answer',
-                    'time_spent_in_sec': 1.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 0,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'a_session_id_val',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }, {
-                    'answer': 'answer aaa',
-                    'time_spent_in_sec': 10.0,
-                    'answer_group_index': 0,
-                    'rule_spec_index': 1,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'session_id_v',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }, {
-                    'answer': 'answer ccccc',
-                    'time_spent_in_sec': 3.0,
-                    'answer_group_index': 1,
-                    'rule_spec_index': 1,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'session_id_v',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }, {
-                    'answer': 'answer bbbbbbb',
-                    'time_spent_in_sec': 7.5,
-                    'answer_group_index': 1,
-                    'rule_spec_index': 0,
-                    'classification_categorization': 'explicit',
-                    'session_id': 'session_id_v',
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'answer_str': None,
-                    'rule_spec_str': None
-                }
-            ]
+            state_answers.get_submitted_answer_dict_list(), [{
+                'answer': '1 answer',
+                'time_spent_in_sec': 1.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': 'explicit',
+                'session_id': 'a_session_id_val',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }, {
+                'answer': 'answer aaa',
+                'time_spent_in_sec': 10.0,
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': 'explicit',
+                'session_id': 'session_id_v',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }, {
+                'answer': 'answer ccccc',
+                'time_spent_in_sec': 3.0,
+                'answer_group_index': 1,
+                'rule_spec_index': 1,
+                'classification_categorization': 'explicit',
+                'session_id': 'session_id_v',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }, {
+                'answer': 'answer bbbbbbb',
+                'time_spent_in_sec': 7.5,
+                'answer_group_index': 1,
+                'rule_spec_index': 0,
+                'classification_categorization': 'explicit',
+                'session_id': 'session_id_v',
+                'interaction_id': 'TextInput',
+                'params': {},
+                'answer_str': None,
+                'rule_spec_str': None
+            }]
         )
 
 
@@ -2808,8 +2720,9 @@ class SampleAnswerTests(test_utils.GenericTestBase):
     def test_only_sample_answers_in_main_shard_returned(self) -> None:
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard.
-        with self.swap(stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
-                       15000):
+        with self.swap(
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 15000
+        ):
             state_answers = stats_services.get_state_answers(
                 self.EXP_ID, self.exploration.version, self.exploration.init_state_name
             )
@@ -2833,7 +2746,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         model = stats_models.StateAnswersModel.get(
             '%s:%s:%s:%s' % (
                 self.exploration.id, str(self.exploration.version
-                                         ), self.exploration.init_state_name, '0'
+                                        ), self.exploration.init_state_name, '0'
             )
         )
         self.assertGreater(model.shard_count, 1)
@@ -2906,8 +2819,9 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = self.save_new_default_exploration(self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])
-        with self.assertRaisesRegex(utils.InvalidInputException,
-                                    'No state with the given state name was found'):
+        with self.assertRaisesRegex(
+            utils.InvalidInputException, 'No state with the given state name was found'
+        ):
             stats_services.get_state_reference_for_exploration(
                 self.exp_id, 'state_name'
             )
@@ -2925,8 +2839,9 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(state_reference, 'exp_id1:Introduction')
 
     def test_get_state_reference_for_question_with_invalid_question_id(self) -> None:
-        with self.assertRaisesRegex(utils.InvalidInputException,
-                                    'No question with the given question id exists'):
+        with self.assertRaisesRegex(
+            utils.InvalidInputException, 'No question with the given question id exists'
+        ):
             stats_services.get_state_reference_for_question('fake_question_id')
 
     def test_get_state_reference_for_question_with_valid_question_id(self) -> None:
@@ -3009,8 +2924,9 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
 
     def test_delete_learner_answer_info_with_invalid_input(self) -> None:
         with self.assertRaisesRegex(
-                utils.InvalidInputException,
-                'No learner answer details found with the given state reference'):
+            utils.InvalidInputException,
+            'No learner answer details found with the given state reference'
+        ):
             stats_services.delete_learner_answer_info(
                 feconf.ENTITY_TYPE_EXPLORATION, 'expID:stateName', 'id_1'
             )
@@ -3037,8 +2953,9 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         assert learner_answer_details is not None
         self.assertEqual(len(learner_answer_details.learner_answer_info_list), 1)
         learner_answer_info_id = 'id_1'
-        with self.assertRaisesRegex(Exception,
-                                    'Learner answer info with the given id not found'):
+        with self.assertRaisesRegex(
+            Exception, 'Learner answer info with the given id not found'
+        ):
             stats_services.delete_learner_answer_info(
                 feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration,
                 learner_answer_info_id
@@ -3088,8 +3005,9 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
 
     def test_update_with_invalid_input_raises_exception(self) -> None:
         with self.assertRaisesRegex(
-                utils.InvalidInputException,
-                'No learner answer details found with the given state reference'):
+            utils.InvalidInputException,
+            'No learner answer details found with the given state reference'
+        ):
             stats_services.update_state_reference(
                 feconf.ENTITY_TYPE_EXPLORATION, 'expID:stateName', 'newexp:statename'
             )

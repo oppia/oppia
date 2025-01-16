@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides PTransforms for manipulating with cache."""
 
 from __future__ import annotations
@@ -28,14 +27,12 @@ from typing import Any
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class FlushCache(beam.PTransform): # type: ignore[misc]
+class FlushCache(beam.PTransform):  # type: ignore[misc]
     """Flushes the memory caches."""
 
     # Here we use type Any because we do not care about the type of items passed
     # here.
-    def expand(
-        self, items: beam.PCollection[Any]
-    ) -> beam.pvalue.PDone:
+    def expand(self, items: beam.PCollection[Any]) -> beam.pvalue.PDone:
         """Flushes the memory caches.
 
         Args:
@@ -45,7 +42,6 @@ class FlushCache(beam.PTransform): # type: ignore[misc]
             PCollection. An empty PCollection.
         """
         return (
-            items
-            | beam.CombineGlobally(lambda _: [])
-            | beam.Map(lambda _: caching_services.flush_memory_caches())
+            items | beam.CombineGlobally(lambda _: []) |
+            beam.Map(lambda _: caching_services.flush_memory_caches())
         )

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for AlgebraicExpressionInput interaction."""
 
 from __future__ import annotations
@@ -44,7 +43,8 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         'description': (
             'Shortcut variables that the learner can access in the on-screen '
             'keyboard. (The order of these variables will be reflected in the '
-            'learner\'s keyboard)'),
+            'learner\'s keyboard)'
+        ),
         'schema': {
             'type': 'custom',
             'obj_type': 'AllowedVariables',
@@ -52,8 +52,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         'default_value': []
     }, {
         'name': 'useFractionForDivision',
-        'description': (
-            'Represent division using fractions (rather than ÷).'),
+        'description': ('Represent division using fractions (rather than ÷).'),
         'schema': {
             'type': 'bool'
         },

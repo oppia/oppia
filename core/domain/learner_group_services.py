@@ -38,9 +38,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import learner_group_models
     from mypy_imports import user_models
 
-(learner_group_models, user_models) = models.Registry.import_models(
-    [models.Names.LEARNER_GROUP, models.Names.USER]
-)
+(learner_group_models, user_models) = models.Registry.import_models([
+    models.Names.LEARNER_GROUP, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -281,16 +281,21 @@ def get_matching_learner_group_syllabus_to_add(
 
     keyword = keyword.lower()
     for topic in matching_topics:
-        if language_code not in (constants.DEFAULT_ADD_SYLLABUS_FILTER,
-                                 topic.language_code):
+        if language_code not in (
+            constants.DEFAULT_ADD_SYLLABUS_FILTER, topic.language_code
+        ):
             continue
 
         if keyword in topic.canonical_name:
             # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the filtered
             # story ids.
-            if (search_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
-                                constants.DEFAULT_ADD_SYLLABUS_FILTER)):
+            if (
+                search_type in (
+                    constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                    constants.DEFAULT_ADD_SYLLABUS_FILTER
+                )
+            ):
                 matching_story_syllabus_item_dicts.extend(
                     get_matching_story_syllabus_item_dicts(topic, group_story_ids)
                 )
@@ -298,8 +303,12 @@ def get_matching_learner_group_syllabus_to_add(
             # If search type is set to default or search type is set to
             # 'Skill', add all subtopics of this topic to the filtered
             # subtopics.
-            if (search_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
-                                constants.DEFAULT_ADD_SYLLABUS_FILTER)):
+            if (
+                search_type in (
+                    constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                    constants.DEFAULT_ADD_SYLLABUS_FILTER
+                )
+            ):
                 matching_subtopics_dicts.extend(
                     get_matching_subtopic_syllabus_item_dicts(
                         topic, group_subtopic_page_ids
@@ -309,8 +318,12 @@ def get_matching_learner_group_syllabus_to_add(
             # If search type is set to default or search type is set to
             # 'Skill', add the subtopics which have the keyword in their
             # title to the filtered subtopics.
-            if (search_type in (constants.LEARNER_GROUP_ADD_SKILL_FILTER,
-                                constants.DEFAULT_ADD_SYLLABUS_FILTER)):
+            if (
+                search_type in (
+                    constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                    constants.DEFAULT_ADD_SYLLABUS_FILTER
+                )
+            ):
                 matching_subtopics_dicts.extend(
                     get_matching_subtopic_syllabus_item_dicts(
                         topic, group_subtopic_page_ids, keyword
@@ -320,8 +333,12 @@ def get_matching_learner_group_syllabus_to_add(
             # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the possible
             # story ids.
-            if (search_type in (constants.LEARNER_GROUP_ADD_STORY_FILTER,
-                                constants.DEFAULT_ADD_SYLLABUS_FILTER)):
+            if (
+                search_type in (
+                    constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                    constants.DEFAULT_ADD_SYLLABUS_FILTER
+                )
+            ):
                 matching_story_syllabus_item_dicts.extend(
                     get_matching_story_syllabus_item_dicts(
                         topic, group_story_ids, keyword
@@ -360,19 +377,17 @@ def get_matching_subtopic_syllabus_item_dicts(
         subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
         if subtopic_page_id not in group_subtopic_page_ids:
             if keyword is None or keyword in subtopic.title.lower():
-                matching_subtopic_syllabus_item_dicts.append(
-                    {
-                        'subtopic_id': subtopic.id,
-                        'subtopic_title': subtopic.title,
-                        'parent_topic_id': topic.id,
-                        'parent_topic_name': topic.name,
-                        'thumbnail_filename': subtopic.thumbnail_filename,
-                        'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                        'subtopic_mastery': None,
-                        'parent_topic_url_fragment': topic.url_fragment,
-                        'classroom_url_fragment': None
-                    }
-                )
+                matching_subtopic_syllabus_item_dicts.append({
+                    'subtopic_id': subtopic.id,
+                    'subtopic_title': subtopic.title,
+                    'parent_topic_id': topic.id,
+                    'parent_topic_name': topic.name,
+                    'thumbnail_filename': subtopic.thumbnail_filename,
+                    'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                    'subtopic_mastery': None,
+                    'parent_topic_url_fragment': topic.url_fragment,
+                    'classroom_url_fragment': None
+                })
 
     return matching_subtopic_syllabus_item_dicts
 
@@ -408,30 +423,27 @@ def get_matching_story_syllabus_item_dicts(
         if keyword is None or keyword in story_summary.title.lower():
             story = stories[ind]
             summary_dict = story_summary.to_dict()
-            matching_story_syllabus_item_dicts.append(
-                {
-                    'id': summary_dict['id'],
-                    'title': summary_dict['title'],
-                    'description': summary_dict['description'],
-                    'language_code': summary_dict['language_code'],
-                    'version': summary_dict['version'],
-                    'node_titles': summary_dict['node_titles'],
-                    'thumbnail_filename': summary_dict['thumbnail_filename'],
-                    'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
-                    'url_fragment': summary_dict['url_fragment'],
-                    'story_model_created_on': summary_dict['story_model_created_on'],
-                    'story_model_last_updated': summary_dict['story_model_last_updated'
-                                                             ],
-                    'story_is_published': True,
-                    'completed_node_titles': [],
-                    'all_node_dicts': [
-                        node.to_dict() for node in story.story_contents.nodes
-                    ],
-                    'topic_name': topic.name,
-                    'topic_url_fragment': topic.url_fragment,
-                    'classroom_url_fragment': None
-                }
-            )
+            matching_story_syllabus_item_dicts.append({
+                'id': summary_dict['id'],
+                'title': summary_dict['title'],
+                'description': summary_dict['description'],
+                'language_code': summary_dict['language_code'],
+                'version': summary_dict['version'],
+                'node_titles': summary_dict['node_titles'],
+                'thumbnail_filename': summary_dict['thumbnail_filename'],
+                'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
+                'url_fragment': summary_dict['url_fragment'],
+                'story_model_created_on': summary_dict['story_model_created_on'],
+                'story_model_last_updated': summary_dict['story_model_last_updated'],
+                'story_is_published': True,
+                'completed_node_titles': [],
+                'all_node_dicts': [
+                    node.to_dict() for node in story.story_contents.nodes
+                ],
+                'topic_name': topic.name,
+                'topic_url_fragment': topic.url_fragment,
+                'classroom_url_fragment': None
+            })
 
     return matching_story_syllabus_item_dicts
 
@@ -719,12 +731,10 @@ def update_progress_sharing_permission(
     learner_grps_user_model.learner_groups_user_details = []
     for group_details in old_user_details:
         if group_details['group_id'] == group_id:
-            learner_grps_user_model.learner_groups_user_details.append(
-                {
-                    'group_id': group_id,
-                    'progress_sharing_is_turned_on': new_progress_sharing_permission
-                }
-            )
+            learner_grps_user_model.learner_groups_user_details.append({
+                'group_id': group_id,
+                'progress_sharing_is_turned_on': new_progress_sharing_permission
+            })
         else:
             learner_grps_user_model.learner_groups_user_details.append(group_details)
 

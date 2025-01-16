@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Common utilities for test classes."""
 
 from __future__ import annotations
@@ -210,7 +209,7 @@ class PopenStub:
         self.poll_count += 1
         return None if self.alive else self._return_code
 
-    def wait(self, timeout: Optional[int] = None) -> None: # pylint: disable=unused-argument
+    def wait(self, timeout: Optional[int] = None) -> None:  # pylint: disable=unused-argument
         """Wait for the process completion.
 
         Mocks the process waiting for completion before it continues execution.
@@ -234,7 +233,7 @@ class PopenStub:
         else:
             raise RuntimeError('PopenStub has entered an infinite loop')
 
-    def communicate(self, input: bytes = b'') -> Tuple[bytes, bytes]: # pylint: disable=unused-argument, redefined-builtin
+    def communicate(self, input: bytes = b'') -> Tuple[bytes, bytes]:  # pylint: disable=unused-argument, redefined-builtin
         """Mocks an interaction with the process.
 
         Args:

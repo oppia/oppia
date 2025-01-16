@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the collections editor."""
 
 from __future__ import annotations
@@ -39,13 +38,15 @@ def _require_valid_version(
     """Check that the payload version matches the given collection version."""
     if version_from_payload is None:
         raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
+            'Invalid POST request: a version must be specified.'
+        )
 
     if version_from_payload != collection_version:
         raise base.BaseHandler.InvalidInputException(
             'Trying to update version %s of collection from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (collection_version, version_from_payload))
+            'which is too old. Please reload the page and try again.' %
+            (collection_version, version_from_payload)
+        )
 
 
 class EditableCollectionDataHandlerNormalizedPayloadDict(TypedDict):
@@ -59,10 +60,7 @@ class EditableCollectionDataHandlerNormalizedPayloadDict(TypedDict):
 
 
 class EditableCollectionDataHandler(
-    base.BaseHandler[
-        EditableCollectionDataHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[EditableCollectionDataHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """A data handler for collections which supports writing."""
 
@@ -85,7 +83,8 @@ class EditableCollectionDataHandler(
             },
             'commit_message': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
@@ -115,8 +114,9 @@ class EditableCollectionDataHandler(
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
-                collection_id, self.user,
-                allow_invalid_explorations=True))
+                collection_id, self.user, allow_invalid_explorations=True
+            )
+        )
 
         self.values.update({
             'collection': collection_dict
@@ -141,16 +141,15 @@ class EditableCollectionDataHandler(
         change_list = self.normalized_payload['change_list']
 
         collection_services.update_collection(
-            self.user_id,
-            collection_id,
-            [change.to_dict() for change in change_list],
+            self.user_id, collection_id, [change.to_dict() for change in change_list],
             commit_message
         )
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
-                collection_id, self.user,
-                allow_invalid_explorations=True))
+                collection_id, self.user, allow_invalid_explorations=True
+            )
+        )
 
         # Send the updated collection back to the frontend.
         self.values.update({
@@ -160,9 +159,7 @@ class EditableCollectionDataHandler(
         self.render_json(self.values)
 
 
-class CollectionRightsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class CollectionRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles management of collection editing rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -173,7 +170,9 @@ class CollectionRightsHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_collection
     def get(self, collection_id: str) -> None:
@@ -186,23 +185,28 @@ class CollectionRightsHandler(
             Exception. No collection found for the given collection_id.
         """
         (collection, collection_rights) = (
-            collection_services.get_collection_and_collection_rights_by_id(
-                collection_id))
+            collection_services.
+            get_collection_and_collection_rights_by_id(collection_id)
+        )
 
         if collection is None:
             raise Exception(
-                'No collection found for the given collection_id: %s' %
-                collection_id
+                'No collection found for the given collection_id: %s' % collection_id
             )
 
         self.values.update({
-            'can_edit': True,
-            'can_unpublish': rights_manager.check_can_unpublish_activity(
-                self.user, collection_rights),
-            'collection_id': collection.id,
-            'is_private': rights_manager.is_collection_private(collection_id),
-            'owner_names': rights_manager.get_collection_owner_names(
-                collection_id)
+            'can_edit':
+                True,
+            'can_unpublish':
+                rights_manager.check_can_unpublish_activity(
+                    self.user, collection_rights
+                ),
+            'collection_id':
+                collection.id,
+            'is_private':
+                rights_manager.is_collection_private(collection_id),
+            'owner_names':
+                rights_manager.get_collection_owner_names(collection_id)
         })
 
         self.render_json(self.values)
@@ -217,10 +221,7 @@ class CollectionPublishHandlerNormalizedPayloadDict(TypedDict):
 
 
 class CollectionPublishHandler(
-    base.BaseHandler[
-        CollectionPublishHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[CollectionPublishHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handles the publication of the given collection."""
 
@@ -257,25 +258,30 @@ class CollectionPublishHandler(
         _require_valid_version(version, collection.version)
 
         collection.validate(strict=True)
-        collection_services.validate_exps_in_collection_are_public(
-            collection)
+        collection_services.validate_exps_in_collection_are_public(collection)
 
         collection_services.publish_collection_and_update_user_profiles(
-            self.user, collection_id)
-        collection_services.index_collections_given_ids([
-            collection_id])
+            self.user, collection_id
+        )
+        collection_services.index_collections_given_ids([collection_id])
 
         collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
+            collection_id, strict=False
+        )
 
         self.values.update({
-            'can_edit': True,
-            'can_unpublish': rights_manager.check_can_unpublish_activity(
-                self.user, collection_rights),
-            'collection_id': collection.id,
-            'is_private': rights_manager.is_collection_private(collection_id),
-            'owner_names': rights_manager.get_collection_owner_names(
-                collection_id)
+            'can_edit':
+                True,
+            'can_unpublish':
+                rights_manager.check_can_unpublish_activity(
+                    self.user, collection_rights
+                ),
+            'collection_id':
+                collection.id,
+            'is_private':
+                rights_manager.is_collection_private(collection_id),
+            'owner_names':
+                rights_manager.get_collection_owner_names(collection_id)
         })
         self.render_json(self.values)
 
@@ -289,10 +295,7 @@ class CollectionUnpublishHandlerNormalizedPayloadDict(TypedDict):
 
 
 class CollectionUnpublishHandler(
-    base.BaseHandler[
-        CollectionUnpublishHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[CollectionUnpublishHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handles the unpublication of the given collection."""
 
@@ -327,20 +330,25 @@ class CollectionUnpublishHandler(
         _require_valid_version(version, collection.version)
 
         rights_manager.unpublish_collection(self.user, collection_id)
-        search_services.delete_collections_from_search_index([
-            collection_id])
+        search_services.delete_collections_from_search_index([collection_id])
 
         collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
+            collection_id, strict=False
+        )
 
         self.values.update({
-            'can_edit': True,
-            'can_unpublish': rights_manager.check_can_unpublish_activity(
-                self.user, collection_rights),
-            'collection_id': collection.id,
-            'is_private': rights_manager.is_collection_private(collection_id),
-            'owner_names': rights_manager.get_collection_owner_names(
-                collection_id)
+            'can_edit':
+                True,
+            'can_unpublish':
+                rights_manager.check_can_unpublish_activity(
+                    self.user, collection_rights
+                ),
+            'collection_id':
+                collection.id,
+            'is_private':
+                rights_manager.is_collection_private(collection_id),
+            'owner_names':
+                rights_manager.get_collection_owner_names(collection_id)
         })
         self.render_json(self.values)
 
@@ -355,10 +363,8 @@ class ExplorationMetadataSearchHandlerNormalizedRequestDict(TypedDict):
 
 
 class ExplorationMetadataSearchHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        ExplorationMetadataSearchHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str],
+                     ExplorationMetadataSearchHandlerNormalizedRequestDict]
 ):
     """Provides data for exploration search."""
 
@@ -395,7 +401,9 @@ class ExplorationMetadataSearchHandler(
 
         collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(
-                query_string, search_offset, self.user))
+                query_string, search_offset, self.user
+            )
+        )
 
         self.values.update({
             'collection_node_metadata_list': collection_node_metadata_list,

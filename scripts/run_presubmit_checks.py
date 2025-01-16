@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """This script runs the following tests in all cases.
 - Javascript and Python Linting
 - Backend Python tests
@@ -47,11 +46,14 @@ Only when frontend files are changed will it run Frontend Karma unit tests.
 If any of these tests result in errors, this script will terminate.
 Note: The test scripts are arranged in increasing order of time taken. This
 enables a broken build to be detected as quickly as possible.
-""")
+"""
+)
 
 _PARSER.add_argument(
-    '--branch', '-b',
-    help='optional; if specified, the origin branch to compare against.')
+    '--branch',
+    '-b',
+    help='optional; if specified, the origin branch to compare against.'
+)
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -64,19 +66,17 @@ def main(args: Optional[List[str]] = None) -> None:
     print('Linting passed.')
     print('')
 
-    current_branch = subprocess.check_output(
-        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], encoding='utf-8'
-    )
+    current_branch = subprocess.check_output([
+        'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+    ],
+                                             encoding='utf-8')
 
     # If the current branch exists on remote origin, matched_branch_num=1
     # else matched_branch_num=0.
-    matched_branch_num = subprocess.check_output(
-        [
-            'git', 'ls-remote', '--heads', 'origin', current_branch, '|',
-            'wc', '-l'
-        ],
-        encoding='utf-8'
-    )
+    matched_branch_num = subprocess.check_output([
+        'git', 'ls-remote', '--heads', 'origin', current_branch, '|', 'wc', '-l'
+    ],
+                                                 encoding='utf-8')
 
     # Set the origin branch to develop if it's not specified.
     if parsed_args.branch:
@@ -88,13 +88,10 @@ def main(args: Optional[List[str]] = None) -> None:
 
     print('Comparing the current branch with %s' % branch)
 
-    all_changed_files = subprocess.check_output(
-        [
-            'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
-            branch
-        ],
-        encoding='utf-8'
-    )
+    all_changed_files = subprocess.check_output([
+        'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch
+    ],
+                                                encoding='utf-8')
 
     if common.FRONTEND_DIR in all_changed_files:
         # Run frontend unit tests.
@@ -104,8 +101,8 @@ def main(args: Optional[List[str]] = None) -> None:
     else:
         # If files in common.FRONTEND_DIR were not changed, skip the tests.
         common.print_each_string_after_two_new_lines([
-            'No frontend files were changed.',
-            'Skipped frontend tests'])
+            'No frontend files were changed.', 'Skipped frontend tests'
+        ])
 
     # Run backend tests.
     print('Running backend tests')

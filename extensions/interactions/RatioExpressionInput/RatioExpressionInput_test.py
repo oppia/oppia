@@ -13,13 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for RatioExpressionInput.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.RatioExpressionInput import RatioExpressionInput # pylint: disable=unused-import, line-too-long # isort: skip
+from extensions.interactions.RatioExpressionInput import RatioExpressionInput  # pylint: disable=unused-import, line-too-long # isort: skip
 
 
 class RatioExpressionInputTests(test_utils.GenericTestBase):

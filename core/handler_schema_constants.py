@@ -18,7 +18,6 @@
 # not have schema. In order to add schema incrementally this list is
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
-
 """Contains a list of handler class names that do not contain schemas.
 This is a temporary file which will be removed once all of the handlers
 mentioned in the list have a schema. This file resides in this folder as
@@ -59,4 +58,5 @@ HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
 # ready for schema validation.
 HANDLER_CLASS_NAMES_WITH_NO_SCHEMA = (
     HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS +
-    HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS)
+    HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS
+)

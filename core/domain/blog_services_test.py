@@ -36,7 +36,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models, ) = models.Registry.import_models([models.Names.BLOG])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 search_services = models.Registry.import_search_services()
 
@@ -337,8 +337,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(updated_blog_post.tags, ['one', 'two'])
 
         with self.assertRaisesRegex(
-                Exception,
-            ('Blog Post with given title already exists: %s' % 'Sample Title')):
+            Exception,
+            ('Blog Post with given title already exists: %s' % 'Sample Title')
+        ):
             blog_services.update_blog_post(self.blog_post_b_id, self.change_dict_one)
 
     def test_get_blog_post_by_url_fragment(self) -> None:
@@ -357,8 +358,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-                Exception, 'Blog Post URL fragment should be a string. Recieved:'
-                r'\[123\]'):
+            Exception, 'Blog Post URL fragment should be a string. Recieved:'
+            r'\[123\]'
+        ):
             blog_services.does_blog_post_with_url_fragment_exist(
                 [123]
             )  # type: ignore[arg-type]
@@ -367,8 +369,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-                Exception, 'Blog Post URL fragment should be a string. Recieved:'
-                '123'):
+            Exception, 'Blog Post URL fragment should be a string. Recieved:'
+            '123'
+        ):
             blog_services.does_blog_post_with_url_fragment_exist(
                 123
             )  # type: ignore[arg-type]
@@ -530,32 +533,36 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
         # Invalid month.
         with self.assertRaisesRegex(
-                Exception, 'time data \'123/09/2000, 00:00:00:00\' does not match'
-                ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
+            Exception, 'time data \'123/09/2000, 00:00:00:00\' does not match'
+            ' format \'%m/%d/%Y, %H:%M:%S:%f\''
+        ):
             blog_services.update_blog_models_author_and_published_on_date(
                 self.blog_post_a_id, self.user_id_b, '123/09/2000'
             )
 
         # Invalid day.
         with self.assertRaisesRegex(
-                Exception, 'time data \'01/38/2000, 00:00:00:00\' does not match'
-                ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
+            Exception, 'time data \'01/38/2000, 00:00:00:00\' does not match'
+            ' format \'%m/%d/%Y, %H:%M:%S:%f\''
+        ):
             blog_services.update_blog_models_author_and_published_on_date(
                 self.blog_post_a_id, self.user_id_b, '01/38/2000'
             )
 
         # Invalid year.
         with self.assertRaisesRegex(
-                Exception, 'time data \'01/22/31126, 00:00:00:00\' does not match'
-                ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
+            Exception, 'time data \'01/22/31126, 00:00:00:00\' does not match'
+            ' format \'%m/%d/%Y, %H:%M:%S:%f\''
+        ):
             blog_services.update_blog_models_author_and_published_on_date(
                 self.blog_post_a_id, self.user_id_b, '01/22/31126'
             )
 
     def test_update_blog_model_author_and_publish_on_with_invalid_blog_id(self) -> None:
         with self.assertRaisesRegex(
-                Exception,
-                'Entity for class BlogPostModel with id invalid_blog_id not found'):
+            Exception,
+            'Entity for class BlogPostModel with id invalid_blog_id not found'
+        ):
             blog_services.update_blog_models_author_and_published_on_date(
                 'invalid_blog_id', self.user_id_b, '01/12/2000'
             )
@@ -731,7 +738,8 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
 
         with get_author_details_swap:
             with self.assertRaisesRegex(
-                    Exception, ('Unable to fetch author details for the given user.')):
+                Exception, ('Unable to fetch author details for the given user.')
+            ):
                 blog_services.get_blog_author_details(self.user_id)
 
     def test_update_blog_author_details(self) -> None:
@@ -766,8 +774,9 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         self.assertNotEqual(pre_update_author_details.author_bio, new_author_bio)
 
         with self.assertRaisesRegex(
-                Exception,
-            ('Author name can only have alphanumeric characters and spaces.')):
+            Exception,
+            ('Author name can only have alphanumeric characters and spaces.')
+        ):
             blog_services.update_blog_author_details(
                 self.user_id, new_author_name, new_author_bio
             )
@@ -922,12 +931,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             sorted(blog_post_ids),
-            sorted(
-                [
-                    self.ids_of_blog_posts_by_user_A[0],
-                    self.ids_of_blog_posts_by_user_A[2],
-                ]
-            )
+            sorted([
+                self.ids_of_blog_posts_by_user_A[0],
+                self.ids_of_blog_posts_by_user_A[2],
+            ])
         )
 
         # Search for blog posts containing 'Basic'.
@@ -936,12 +943,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             sorted(blog_post_ids),
-            sorted(
-                [
-                    self.ids_of_blog_posts_by_user_B[1],
-                    self.ids_of_blog_posts_by_user_B[2],
-                ]
-            )
+            sorted([
+                self.ids_of_blog_posts_by_user_B[1],
+                self.ids_of_blog_posts_by_user_B[2],
+            ])
         )
 
         # Search for blog posts containing tag 'Math' and 'Social'.
@@ -961,12 +966,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             sorted(blog_post_ids),
-            sorted(
-                [
-                    self.ids_of_blog_posts_by_user_B[0],
-                    self.ids_of_blog_posts_by_user_B[1],
-                ]
-            )
+            sorted([
+                self.ids_of_blog_posts_by_user_B[0],
+                self.ids_of_blog_posts_by_user_B[1],
+            ])
         )
 
         # Search for blog posts containing 'Lessons' and tag 'Social'.
@@ -983,8 +986,9 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
     def test_blog_post_summaries_pagination_in_filled_search_results(self) -> None:
         # Ensure the maximum number of blog posts that can fit on the search
         # results page is maintained by the summaries function.
-        with self.swap(feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE',
-                       2):
+        with self.swap(
+            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2
+        ):
             # Need to load 3 pages to find all of the blog posts. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all blog posts are returned. We validate the correct
@@ -1054,8 +1058,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             """
             pass
 
-        with self.swap(search_services, 'delete_documents_from_index',
-                       _mock_delete_documents_from_index):
+        with self.swap(
+            search_services, 'delete_documents_from_index',
+            _mock_delete_documents_from_index
+        ):
             blog_services.delete_blog_post(self.all_blog_post_ids[0])
             blog_services.delete_blog_post(self.all_blog_post_ids[1])
 

@@ -95,10 +95,9 @@ class AuthClaims:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         # https://docs.python.org/2/library/constants.html#NotImplemented.
-        return NotImplemented if not isinstance(other, AuthClaims) else (
-            (self.auth_id, self.email, self.role_is_super_admin)
-            == (other.auth_id, other.email, other.role_is_super_admin)
-        )
+        return NotImplemented if not isinstance(other, AuthClaims) else ((
+            self.auth_id, self.email, self.role_is_super_admin
+        ) == (other.auth_id, other.email, other.role_is_super_admin))
 
 
 class UserAuthDetailsDict(TypedDict):
@@ -183,14 +182,18 @@ class UserAuthDetails:
                 'gae_id must be a string, but got %r' % self.gae_id
             )
 
-        if (self.firebase_auth_id is not None
-                and not isinstance(self.firebase_auth_id, str)):
+        if (
+            self.firebase_auth_id is not None and
+            not isinstance(self.firebase_auth_id, str)
+        ):
             raise utils.ValidationError(
                 'firebase_auth_id must be a string, but got %r' % self.firebase_auth_id
             )
 
-        if (self.parent_user_id is not None
-                and not utils.is_user_id_valid(self.parent_user_id)):
+        if (
+            self.parent_user_id is not None and
+            not utils.is_user_id_valid(self.parent_user_id)
+        ):
             raise utils.ValidationError(
                 'parent_user_id=%r has the wrong format' % self.parent_user_id
             )

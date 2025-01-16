@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Base class for defining actions."""
 
 from __future__ import annotations
@@ -38,8 +37,8 @@ class BaseLearnerActionSpec:
     def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         """The customization arg specs for the action definition."""
         return [
-            domain.CustomizationArgSpec(**cas)
-            for cas in self._customization_arg_specs]
+            domain.CustomizationArgSpec(**cas) for cas in self._customization_arg_specs
+        ]
 
     def to_dict(self) -> Dict[str, List[domain.CustomizationArgSpecsDict]]:
         """Gets a dict representing this issue. Only default values are

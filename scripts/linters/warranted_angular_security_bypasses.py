@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tuple of warranted angular safety bypasses in the codebase."""
 
 from __future__ import annotations
@@ -34,5 +33,6 @@ EXCLUDED_BYPASS_SECURITY_TRUST_FILES: Final = (
     # mechanism. The svg-sanitizer file is going to be a permanent member in
     # this list due to the aforementioned reason.
     'core/templates/services/svg-sanitizer.service.spec.ts',
-    'core/templates/services/svg-sanitizer.service.ts')
+    'core/templates/services/svg-sanitizer.service.ts'
+)
 EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES: Final = ()

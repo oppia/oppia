@@ -30,7 +30,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import activity_models
 
-(activity_models, ) = models.Registry.import_models([models.Names.ACTIVITY])
+(activity_models,) = models.Registry.import_models([models.Names.ACTIVITY])
 
 
 def get_featured_activity_references() -> List[activity_domain.ActivityReference]:

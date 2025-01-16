@@ -41,8 +41,9 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.swap_name_to_description_feature_stage_dict = self.swap(
-            registry, 'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
-            {FeatureNames.FEATURE_A.value: ('test description', FeatureStages.DEV)}
+            registry, 'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE', {
+                FeatureNames.FEATURE_A.value: ('test description', FeatureStages.DEV)
+            }
         )
 
     def test_get_feature_flag(self) -> None:
@@ -118,9 +119,10 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             with self.swap(constants, 'DEV_MODE', False):
                 with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                     with self.assertRaisesRegex(
-                            utils.ValidationError,
-                            'Feature flag in dev stage cannot be updated in test '
-                            'environment.'):
+                        utils.ValidationError,
+                        'Feature flag in dev stage cannot be updated in test '
+                        'environment.'
+                    ):
                         feature_flag = registry.Registry.get_feature_flag(
                             FeatureNames.FEATURE_A.value
                         )
@@ -133,9 +135,10 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             with self.swap(constants, 'DEV_MODE', False):
                 with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                     with self.assertRaisesRegex(
-                            utils.ValidationError,
-                            'Feature flag in dev stage cannot be updated in prod '
-                            'environment.'):
+                        utils.ValidationError,
+                        'Feature flag in dev stage cannot be updated in prod '
+                        'environment.'
+                    ):
                         feature_flag = registry.Registry.get_feature_flag(
                             FeatureNames.FEATURE_A.value
                         )
@@ -145,16 +148,18 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
     def test_updating_test_feature_in_prod_env_raises_exception(self) -> None:
         swap_name_to_description_feature_stage_dict = self.swap(
-            registry, 'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
-            {FeatureNames.FEATURE_A.value: ('test description', FeatureStages.TEST)}
+            registry, 'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE', {
+                FeatureNames.FEATURE_A.value: ('test description', FeatureStages.TEST)
+            }
         )
         with swap_name_to_description_feature_stage_dict:
             with self.swap(constants, 'DEV_MODE', False):
                 with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                     with self.assertRaisesRegex(
-                            utils.ValidationError,
-                            'Feature flag in test stage cannot be updated in prod '
-                            'environment.'):
+                        utils.ValidationError,
+                        'Feature flag in test stage cannot be updated in prod '
+                        'environment.'
+                    ):
                         feature_flag = registry.Registry.get_feature_flag(
                             FeatureNames.FEATURE_A.value
                         )

@@ -47,39 +47,45 @@ class ActivityRightsTests(test_utils.GenericTestBase):
     def test_validate_community_owned_explorations(self) -> None:
         self.activity_rights.community_owned = True
         with self.assertRaisesRegex(
-                Exception, 'Community-owned explorations should have no owners, '
-                'editors, voice artists or viewers specified.'):
+            Exception, 'Community-owned explorations should have no owners, '
+            'editors, voice artists or viewers specified.'
+        ):
             self.activity_rights.validate()
 
         self.activity_rights.owner_ids = []
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegex(Exception,
-                                    'Community-owned explorations cannot be private'):
+        with self.assertRaisesRegex(
+            Exception, 'Community-owned explorations cannot be private'
+        ):
             self.activity_rights.validate()
 
     def test_validate_private_explorations(self) -> None:
         self.activity_rights.viewer_ids = [self.viewer_id]
         with self.assertRaisesRegex(
-                Exception, 'Public explorations should have no viewers specified.'):
+            Exception, 'Public explorations should have no viewers specified.'
+        ):
             self.activity_rights.validate()
 
     def test_validate_owner_cannot_be_editor(self) -> None:
         self.activity_rights.editor_ids = [self.owner_id]
-        with self.assertRaisesRegex(Exception,
-                                    'A user cannot be both an owner and an editor.'):
+        with self.assertRaisesRegex(
+            Exception, 'A user cannot be both an owner and an editor.'
+        ):
             self.activity_rights.validate()
 
     def test_validate_owner_cannot_be_voice_artist(self) -> None:
         self.activity_rights.voice_artist_ids = [self.owner_id]
         with self.assertRaisesRegex(
-                Exception, 'A user cannot be both an owner and a voice artist.'):
+            Exception, 'A user cannot be both an owner and a voice artist.'
+        ):
             self.activity_rights.validate()
 
     def test_validate_owner_cannot_be_viewer(self) -> None:
         self.activity_rights.viewer_ids = [self.owner_id]
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegex(Exception,
-                                    'A user cannot be both an owner and a viewer.'):
+        with self.assertRaisesRegex(
+            Exception, 'A user cannot be both an owner and a viewer.'
+        ):
             self.activity_rights.validate()
 
     def test_validate_editor_cannot_be_voice_artist(self) -> None:
@@ -87,15 +93,17 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.editor_ids = [self.viewer_id]
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
         with self.assertRaisesRegex(
-                Exception, 'A user cannot be both an editor and a voice artist.'):
+            Exception, 'A user cannot be both an editor and a voice artist.'
+        ):
             self.activity_rights.validate()
 
     def test_validate_editor_cannot_be_viewer(self) -> None:
         self.activity_rights.viewer_ids = [self.viewer_id]
         self.activity_rights.editor_ids = [self.viewer_id]
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegex(Exception,
-                                    'A user cannot be both an editor and a viewer.'):
+        with self.assertRaisesRegex(
+            Exception, 'A user cannot be both an editor and a viewer.'
+        ):
             self.activity_rights.validate()
 
     def test_validate_voice_artist_cannot_be_viewer(self) -> None:
@@ -103,7 +111,8 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.voice_artist_ids = [self.viewer_id]
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
         with self.assertRaisesRegex(
-                Exception, 'A user cannot be both a voice artist and a viewer.'):
+            Exception, 'A user cannot be both a voice artist and a viewer.'
+        ):
             self.activity_rights.validate()
 
     def test_check_cannot_access_activity_with_no_activity_rights(self) -> None:
@@ -170,8 +179,9 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.community_owned = False
         self.activity_rights.owner_ids = []
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Activity should have atleast one owner.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Activity should have atleast one owner.'
+        ):
             self.activity_rights.validate()
 
     def test_to_dict(self) -> None:
@@ -237,26 +247,30 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.editor_ids = []
         self.activity_rights.viewer_ids = []
 
-        with self.assertRaisesRegex(Exception,
-                                    'This user already owns this exploration.'):
+        with self.assertRaisesRegex(
+            Exception, 'This user already owns this exploration.'
+        ):
             self.activity_rights.assign_new_role('123456', rights_domain.ROLE_OWNER)
 
         self.activity_rights.assign_new_role('123456', rights_domain.ROLE_EDITOR)
-        with self.assertRaisesRegex(Exception,
-                                    'This user already can edit this exploration.'):
+        with self.assertRaisesRegex(
+            Exception, 'This user already can edit this exploration.'
+        ):
             self.activity_rights.assign_new_role('123456', rights_domain.ROLE_EDITOR)
 
         self.activity_rights.assign_new_role('123456', rights_domain.ROLE_VOICE_ARTIST)
         with self.assertRaisesRegex(
-                Exception, 'This user already can voiceover this exploration.'):
+            Exception, 'This user already can voiceover this exploration.'
+        ):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VOICE_ARTIST
             )
 
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
         self.activity_rights.assign_new_role('123456', rights_domain.ROLE_VIEWER)
-        with self.assertRaisesRegex(Exception,
-                                    'This user already can view this exploration.'):
+        with self.assertRaisesRegex(
+            Exception, 'This user already can view this exploration.'
+        ):
             self.activity_rights.assign_new_role('123456', rights_domain.ROLE_VIEWER)
 
     def test_cannot_assign_viewer_to_public_exp(self) -> None:
@@ -265,91 +279,97 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.viewer_ids = []
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PUBLIC
 
-        with self.assertRaisesRegex(Exception,
-                                    'Public explorations can be viewed by anyone.'):
+        with self.assertRaisesRegex(
+            Exception, 'Public explorations can be viewed by anyone.'
+        ):
             self.activity_rights.assign_new_role('123456', rights_domain.ROLE_VIEWER)
 
 
 class ExplorationRightsChangeTests(test_utils.GenericTestBase):
 
     def test_exploration_rights_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
-            rights_domain.ExplorationRightsChange({'invalid': 'data'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
+            rights_domain.ExplorationRightsChange({
+                'invalid': 'data'
+            })
 
     def test_exploration_rights_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command invalid is not allowed'):
-            rights_domain.ExplorationRightsChange({'cmd': 'invalid'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command invalid is not allowed'
+        ):
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'invalid'
+            })
 
     def test_exploration_rights_change_object_with_missing_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('The following required attributes are missing: '
-                                     'new_role, old_role')):
-            rights_domain.ExplorationRightsChange(
-                {
-                    'cmd': 'change_role',
-                    'assignee_id': 'assignee_id',
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('The following required attributes are missing: '
+             'new_role, old_role')
+        ):
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+            })
 
     def test_exploration_rights_change_object_with_extra_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('The following extra attributes are present: invalid')):
-            rights_domain.ExplorationRightsChange(
-                {
-                    'cmd': 'change_private_viewability',
-                    'old_viewable_if_private': 'old_viewable_if_private',
-                    'new_viewable_if_private': 'new_viewable_if_private',
-                    'invalid': 'invalid'
-                }
-            )
+            utils.ValidationError,
+            ('The following extra attributes are present: invalid')
+        ):
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'change_private_viewability',
+                'old_viewable_if_private': 'old_viewable_if_private',
+                'new_viewable_if_private': 'new_viewable_if_private',
+                'invalid': 'invalid'
+            })
 
     def test_exploration_rights_change_object_with_invalid_role(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Value for new_role in cmd change_role: '
-                                     'invalid is not allowed')):
-            rights_domain.ExplorationRightsChange(
-                {
-                    'cmd': 'change_role',
-                    'assignee_id': 'assignee_id',
-                    'old_role': rights_domain.ROLE_OWNER,
-                    'new_role': 'invalid',
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Value for new_role in cmd change_role: '
+             'invalid is not allowed')
+        ):
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': rights_domain.ROLE_OWNER,
+                'new_role': 'invalid',
+            })
 
     def test_exploration_rights_change_object_with_invalid_status(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for new_status in cmd change_exploration_status: '
-             'invalid is not allowed')):
-            rights_domain.ExplorationRightsChange(
-                {
-                    'cmd': 'change_exploration_status',
-                    'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
-                    'new_status': 'invalid'
-                }
+            utils.ValidationError, (
+                'Value for new_status in cmd change_exploration_status: '
+                'invalid is not allowed'
             )
+        ):
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'change_exploration_status',
+                'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
+                'new_status': 'invalid'
+            })
 
     def test_exploration_rights_change_object_with_create_new(self) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange({'cmd': 'create_new'})
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'create_new'
+            })
         )
         self.assertEqual(exploration_rights_change_object.cmd, 'create_new')
 
     def test_exploration_rights_change_object_with_change_role(self) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange(
-                {
-                    'cmd': 'change_role',
-                    'assignee_id': 'assignee_id',
-                    'old_role': rights_domain.ROLE_OWNER,
-                    'new_role': rights_domain.ROLE_VIEWER
-                }
-            )
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': rights_domain.ROLE_OWNER,
+                'new_role': rights_domain.ROLE_VIEWER
+            })
         )
 
         self.assertEqual(exploration_rights_change_object.cmd, 'change_role')
@@ -363,7 +383,9 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
 
     def test_exploration_rights_change_object_with_release_ownership(self) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange({'cmd': 'release_ownership'})
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'release_ownership'
+            })
         )
 
         self.assertEqual(exploration_rights_change_object.cmd, 'release_ownership')
@@ -372,13 +394,11 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange(
-                {
-                    'cmd': 'change_private_viewability',
-                    'old_viewable_if_private': 'old_viewable_if_private',
-                    'new_viewable_if_private': 'new_viewable_if_private'
-                }
-            )
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'change_private_viewability',
+                'old_viewable_if_private': 'old_viewable_if_private',
+                'new_viewable_if_private': 'new_viewable_if_private'
+            })
         )
 
         self.assertEqual(
@@ -397,13 +417,11 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange(
-                {
-                    'cmd': 'update_first_published_msec',
-                    'old_first_published_msec': 'old_first_published_msec',
-                    'new_first_published_msec': 'new_first_published_msec'
-                }
-            )
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'update_first_published_msec',
+                'old_first_published_msec': 'old_first_published_msec',
+                'new_first_published_msec': 'new_first_published_msec'
+            })
         )
 
         self.assertEqual(
@@ -422,13 +440,11 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration_rights_change_object = (
-            rights_domain.ExplorationRightsChange(
-                {
-                    'cmd': 'change_exploration_status',
-                    'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
-                    'new_status': rights_domain.ACTIVITY_STATUS_PUBLIC
-                }
-            )
+            rights_domain.ExplorationRightsChange({
+                'cmd': 'change_exploration_status',
+                'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
+                'new_status': rights_domain.ACTIVITY_STATUS_PUBLIC
+            })
         )
 
         self.assertEqual(
@@ -460,83 +476,86 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
 class CollectionRightsChangeTests(test_utils.GenericTestBase):
 
     def test_collection_rights_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
-            rights_domain.CollectionRightsChange({'invalid': 'data'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
+            rights_domain.CollectionRightsChange({
+                'invalid': 'data'
+            })
 
     def test_collection_rights_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command invalid is not allowed'):
-            rights_domain.CollectionRightsChange({'cmd': 'invalid'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command invalid is not allowed'
+        ):
+            rights_domain.CollectionRightsChange({
+                'cmd': 'invalid'
+            })
 
     def test_collection_rights_change_object_with_missing_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('The following required attributes are missing: '
-                                     'new_role, old_role')):
-            rights_domain.CollectionRightsChange(
-                {
-                    'cmd': 'change_role',
-                    'assignee_id': 'assignee_id',
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('The following required attributes are missing: '
+             'new_role, old_role')
+        ):
+            rights_domain.CollectionRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+            })
 
     def test_collection_rights_change_object_with_extra_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('The following extra attributes are present: invalid')):
-            rights_domain.CollectionRightsChange(
-                {
-                    'cmd': 'change_private_viewability',
-                    'old_viewable_if_private': 'old_viewable_if_private',
-                    'new_viewable_if_private': 'new_viewable_if_private',
-                    'invalid': 'invalid'
-                }
-            )
+            utils.ValidationError,
+            ('The following extra attributes are present: invalid')
+        ):
+            rights_domain.CollectionRightsChange({
+                'cmd': 'change_private_viewability',
+                'old_viewable_if_private': 'old_viewable_if_private',
+                'new_viewable_if_private': 'new_viewable_if_private',
+                'invalid': 'invalid'
+            })
 
     def test_collection_rights_change_object_with_invalid_role(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Value for new_role in cmd change_role: '
-                                     'invalid is not allowed')):
-            rights_domain.CollectionRightsChange(
-                {
-                    'cmd': 'change_role',
-                    'assignee_id': 'assignee_id',
-                    'old_role': rights_domain.ROLE_OWNER,
-                    'new_role': 'invalid',
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Value for new_role in cmd change_role: '
+             'invalid is not allowed')
+        ):
+            rights_domain.CollectionRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': rights_domain.ROLE_OWNER,
+                'new_role': 'invalid',
+            })
 
     def test_collection_rights_change_object_with_invalid_status(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for new_status in cmd change_collection_status: '
-             'invalid is not allowed')):
-            rights_domain.CollectionRightsChange(
-                {
-                    'cmd': 'change_collection_status',
-                    'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
-                    'new_status': 'invalid'
-                }
+            utils.ValidationError, (
+                'Value for new_status in cmd change_collection_status: '
+                'invalid is not allowed'
             )
+        ):
+            rights_domain.CollectionRightsChange({
+                'cmd': 'change_collection_status',
+                'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
+                'new_status': 'invalid'
+            })
 
     def test_collection_rights_change_object_with_create_new(self) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange(
-            {'cmd': 'create_new'}
-        )
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
+            'cmd': 'create_new'
+        })
 
         self.assertEqual(collection_rights_change_object.cmd, 'create_new')
 
     def test_collection_rights_change_object_with_change_role(self) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange(
-            {
-                'cmd': 'change_role',
-                'assignee_id': 'assignee_id',
-                'old_role': rights_domain.ROLE_OWNER,
-                'new_role': rights_domain.ROLE_VIEWER
-            }
-        )
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+            'old_role': rights_domain.ROLE_OWNER,
+            'new_role': rights_domain.ROLE_VIEWER
+        })
 
         self.assertEqual(collection_rights_change_object.cmd, 'change_role')
         self.assertEqual(collection_rights_change_object.assignee_id, 'assignee_id')
@@ -548,22 +567,20 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
         )
 
     def test_collection_rights_change_object_with_release_ownership(self) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange(
-            {'cmd': 'release_ownership'}
-        )
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
+            'cmd': 'release_ownership'
+        })
 
         self.assertEqual(collection_rights_change_object.cmd, 'release_ownership')
 
     def test_collection_rights_change_object_with_change_private_viewability(
         self
     ) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange(
-            {
-                'cmd': 'change_private_viewability',
-                'old_viewable_if_private': 'old_viewable_if_private',
-                'new_viewable_if_private': 'new_viewable_if_private'
-            }
-        )
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
+            'cmd': 'change_private_viewability',
+            'old_viewable_if_private': 'old_viewable_if_private',
+            'new_viewable_if_private': 'new_viewable_if_private'
+        })
 
         self.assertEqual(
             collection_rights_change_object.cmd, 'change_private_viewability'
@@ -580,13 +597,11 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
     def test_collection_rights_change_object_with_update_first_published_msec(
         self
     ) -> None:
-        collection_rights_change_object = rights_domain.CollectionRightsChange(
-            {
-                'cmd': 'update_first_published_msec',
-                'old_first_published_msec': 'old_first_published_msec',
-                'new_first_published_msec': 'new_first_published_msec'
-            }
-        )
+        collection_rights_change_object = rights_domain.CollectionRightsChange({
+            'cmd': 'update_first_published_msec',
+            'old_first_published_msec': 'old_first_published_msec',
+            'new_first_published_msec': 'new_first_published_msec'
+        })
 
         self.assertEqual(
             collection_rights_change_object.cmd, 'update_first_published_msec'
@@ -604,13 +619,11 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
         self
     ) -> None:
         collection_rights_change_object = (
-            rights_domain.CollectionRightsChange(
-                {
-                    'cmd': 'change_collection_status',
-                    'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
-                    'new_status': rights_domain.ACTIVITY_STATUS_PUBLIC
-                }
-            )
+            rights_domain.CollectionRightsChange({
+                'cmd': 'change_collection_status',
+                'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
+                'new_status': rights_domain.ACTIVITY_STATUS_PUBLIC
+            })
         )
 
         self.assertEqual(

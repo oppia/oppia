@@ -33,9 +33,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
-(app_feedback_report_models, ) = models.Registry.import_models(
-    [models.Names.APP_FEEDBACK_REPORT]
-)
+(app_feedback_report_models,) = models.Registry.import_models([
+    models.Names.APP_FEEDBACK_REPORT
+])
 
 
 class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
@@ -93,7 +93,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'language_locale_code': 'en'
     }
     WEB_PLATFORM_VERSION = '3.0.8'
-    WEB_REPORT_INFO = {'user_feedback_other_text_input': 'add an admin'}
+    WEB_REPORT_INFO = {
+        'user_feedback_other_text_input': 'add an admin'
+    }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
     WEB_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -217,16 +219,17 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_reports_returns_same_report(self) -> None:
-        optional_report_models = app_feedback_report_services.get_report_models(
-            [self.android_report_id]
-        )
+        optional_report_models = app_feedback_report_services.get_report_models([
+            self.android_report_id
+        ])
         # Ruling out the possibility of None for mypy type checking.
         assert optional_report_models[0] is not None
         self.assertEqual(optional_report_models[0].id, self.android_report_id)
 
     def test_invalid_report_id_raises_error_if_method_is_called_strictly(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'No AppFeedbackReportModel exists for the id invalid_id'):
+            Exception, 'No AppFeedbackReportModel exists for the id invalid_id'
+        ):
             app_feedback_report_services.get_report_models(['invalid_id'], strict=True)
 
     def test_get_multiple_reports_returns_all_reports(self) -> None:
@@ -259,9 +262,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.ANDROID_REPORT_INFO, None
         )
 
-        optional_report_models = app_feedback_report_services.get_report_models(
-            [self.android_report_id, new_report_id_1, new_report_id_2]
-        )
+        optional_report_models = app_feedback_report_services.get_report_models([
+            self.android_report_id, new_report_id_1, new_report_id_2
+        ])
         report_ids = [
             report_model.id for report_model in optional_report_models
             if report_model is not None
@@ -290,8 +293,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_model.platform = self.PLATFORM_WEB
 
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Web app feedback report domain objects must be defined.'):
+            NotImplementedError,
+            'Web app feedback report domain objects must be defined.'
+        ):
             app_feedback_report_services.get_report_from_model(mock_web_report_model)
 
     def test_get_report_from_model_has_same_user_supplied_feedback_info(self) -> None:
@@ -393,9 +397,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Android app feedback report migrations must be added for new '
-                'report schemas implemented.'):
+            NotImplementedError,
+            'Android app feedback report migrations must be added for new '
+            'report schemas implemented.'
+        ):
             app_feedback_report_services.get_report_from_model(
                 self.android_report_model
             )
@@ -426,8 +431,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = self.PLATFORM_WEB
 
-        with self.assertRaisesRegex(utils.InvalidInputException,
-                                    'Web report domain objects have not been defined.'):
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Web report domain objects have not been defined.'
+        ):
             app_feedback_report_services.save_feedback_report_to_storage(
                 mock_web_report_obj
             )
@@ -540,44 +547,44 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         )
         daily_stats = {
             'platform': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {self.PLATFORM_ANDROID: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    self.PLATFORM_ANDROID: 1
+                })
             ),
             'report_type': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {self.REPORT_TYPE_SUGGESTION.value: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    self.REPORT_TYPE_SUGGESTION.value: 1
+                })
             ),
             'country_locale_code': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {self.COUNTRY_LOCALE_CODE_INDIA: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    self.COUNTRY_LOCALE_CODE_INDIA: 1
+                })
             ),
             'entry_point_name': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {self.ENTRY_POINT_NAVIGATION_DRAWER.value: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    self.ENTRY_POINT_NAVIGATION_DRAWER.value: 1
+                })
             ),
             'text_language_code': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {self.TEXT_LANGUAGE_CODE_ENGLISH: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    self.TEXT_LANGUAGE_CODE_ENGLISH: 1
+                })
             ),
             'audio_language_code': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {self.AUDIO_LANGUAGE_CODE_ENGLISH: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
+                })
             ),
             'android_sdk_version': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {str(self.ANDROID_SDK_VERSION): 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    str(self.ANDROID_SDK_VERSION): 1
+                })
             ),
             'version_name': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {self.ANDROID_PLATFORM_VERSION: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    self.ANDROID_PLATFORM_VERSION: 1
+                })
             )
         }
         expected_stats_obj = (
@@ -639,10 +646,12 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
     def test_create_report_from_json_web_report_throws_error(self) -> None:
-        web_dict = {'platform_type': 'web'}
+        web_dict = {
+            'platform_type': 'web'
+        }
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Domain objects for web reports must be implemented.'):
+            NotImplementedError, 'Domain objects for web reports must be implemented.'
+        ):
             app_feedback_report_services.create_report_from_json(
                 web_dict
             )  # type: ignore[arg-type]
@@ -655,9 +664,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             report_obj, new_incoming_report=True
         )
         report_id = report_obj.report_id
-        optional_report_models = app_feedback_report_services.get_report_models(
-            [report_id]
-        )
+        optional_report_models = app_feedback_report_services.get_report_models([
+            report_id
+        ])
         # Ruling out the possibility of None for mypy type checking.
         assert optional_report_models[0] is not None
         actual_model = optional_report_models[0]
@@ -834,7 +843,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     filter_obj.filter_options[0], self.ANDROID_PLATFORM_VERSION
                 )
             elif filter_obj.filter_field == (
-                    filter_field_names.ANDROID_DEVICE_COUNTRY_LOCALE_CODE):  # pylint: disable=line-too-long
+                filter_field_names.ANDROID_DEVICE_COUNTRY_LOCALE_CODE):  # pylint: disable=line-too-long
                 self.assertEqual(
                     filter_obj.filter_options[0], self.COUNTRY_LOCALE_CODE_INDIA
                 )
@@ -1317,8 +1326,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_obj.platform = self.PLATFORM_WEB
 
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Assigning web reports to tickets has not been implemented yet.'):
+            NotImplementedError,
+            'Assigning web reports to tickets has not been implemented yet.'
+        ):
             app_feedback_report_services.reassign_ticket(mock_web_report_obj, None)
 
     def test_reassign_ticket_with_invalid_stats_model_raises_error(self) -> None:
@@ -1326,8 +1336,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         # id for this ticket's stats model.
         self.android_report_obj.ticket_id = 'invalid_id'
         with self.assertRaisesRegex(
-                utils.InvalidInputException,
-                'The report is being removed from an invalid ticket id'):
+            utils.InvalidInputException,
+            'The report is being removed from an invalid ticket id'
+        ):
             app_feedback_report_services.reassign_ticket(self.android_report_obj, None)
 
     def test_scrub_android_report_removes_info(self) -> None:
@@ -1383,7 +1394,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all()
         )
         current_models: Sequence[app_feedback_report_models.AppFeedbackReportModel
-                                 ] = (current_models_query.fetch())
+                                ] = (current_models_query.fetch())
         self.assertEqual(len(current_models), 0)
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             'scrubber_user'
@@ -1393,7 +1404,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all()
         )
         stored_models: Sequence[app_feedback_report_models.AppFeedbackReportStatsModel
-                                ] = (stored_models_query.fetch())
+                               ] = (stored_models_query.fetch())
         self.assertEqual(len(stored_models), 0)
 
     def test_scrubbing_on_only_current_reports_does_not_scrub_models(self) -> None:
@@ -1464,9 +1475,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Stats aggregation for incoming web reports have not been '
-                'implemented yet.'):
+            NotImplementedError,
+            'Stats aggregation for incoming web reports have not been '
+            'implemented yet.'
+        ):
             app_feedback_report_services.store_incoming_report_stats(
                 mock_web_report_obj
             )
@@ -1474,7 +1486,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_calculate_new_stats_count_for_parameter_adds_new_stats_val_to_dict(
         self
     ) -> None:
-        stats_map = {'value_1': 1}
+        stats_map = {
+            'value_1': 1
+        }
         delta = 1
 
         new_stats_map = (
@@ -1484,13 +1498,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_stats_map['value_2'], delta)
 
     def test_calculate_new_stats_count_with_invalid_delta_raises_error(self) -> None:
-        stats_map = {'current_value': 1}
+        stats_map = {
+            'current_value': 1
+        }
         delta = -1
 
         with self.assertRaisesRegex(
-                utils.InvalidInputException,
-                'Cannot decrement a count for a parameter value that does '
-                'not exist'):
+            utils.InvalidInputException,
+            'Cannot decrement a count for a parameter value that does '
+            'not exist'
+        ):
             app_feedback_report_services.calculate_new_stats_count_for_parameter( # pylint: disable=line-too-long
                 stats_map, 'value_2', delta)
 

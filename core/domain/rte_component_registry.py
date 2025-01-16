@@ -137,7 +137,7 @@ class Registry:
                 if inspect.isclass(obj) and name == component_name:
                     component_types_to_component_classes['oppia-noninteractive-%s' %
                                                          component_name.lower()
-                                                         ] = (obj)
+                                                        ] = (obj)
 
         return component_types_to_component_classes
 

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.batch_jobs.
 rejecting_suggestion_for_invalid_content_ids_jobs.
 """
@@ -22,13 +21,12 @@ from __future__ import annotations
 
 from core import feconf
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import (
-    rejecting_suggestion_for_invalid_content_ids_jobs)
+from core.jobs.batch_jobs import (rejecting_suggestion_for_invalid_content_ids_jobs)
 from core.jobs.types import job_run_result
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import suggestion_models
 
@@ -37,7 +35,10 @@ if MYPY: # pragma: no cover
 ])
 
 STATE_DICT_IN_V52 = {
-    'content': {'content_id': 'content', 'html': ''},
+    'content': {
+        'content_id': 'content',
+        'html': ''
+    },
     'param_changes': [],
     'interaction': {
         'solution': None,
@@ -112,8 +113,8 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
 ):
 
     JOB_CLASS = (
-        rejecting_suggestion_for_invalid_content_ids_jobs
-        .RejectTranslationSuggestionsWithMissingContentIdJob
+        rejecting_suggestion_for_invalid_content_ids_jobs.
+        RejectTranslationSuggestionsWithMissingContentIdJob
     )
     TARGET_ID = 'exp1'
 
@@ -136,7 +137,9 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52
+            },
         )
         self.put_multi([self.exp_1])
 
@@ -187,25 +190,19 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             job_run_result.JobRunResult(
                 stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
             ),
-            job_run_result.JobRunResult(
-                stdout='REJECTED SUGGESTIONS COUNT SUCCESS: 1'
-            )
+            job_run_result.JobRunResult(stdout='REJECTED SUGGESTIONS COUNT SUCCESS: 1')
         ])
 
-        updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
-            suggestion.id)
-        self.assertEqual(
-            updated_suggestion.status,
-            suggestion_models.STATUS_REJECTED
-        )
+        updated_suggestion = suggestion_models.GeneralSuggestionModel.get(suggestion.id)
+        self.assertEqual(updated_suggestion.status, suggestion_models.STATUS_REJECTED)
 
 
 class AuditTranslationSuggestionsWithMissingContentIdJobTests(
     job_test_utils.JobTestBase
 ):
     JOB_CLASS = (
-        rejecting_suggestion_for_invalid_content_ids_jobs
-        .AuditTranslationSuggestionsWithMissingContentIdJob
+        rejecting_suggestion_for_invalid_content_ids_jobs.
+        AuditTranslationSuggestionsWithMissingContentIdJob
     )
     TARGET_ID = 'exp2'
 
@@ -226,7 +223,9 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52
+            },
         )
         self.put_multi([self.exp_2])
 
@@ -248,8 +247,7 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             language_code='bn'
         )
         suggestion_model.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([
-            suggestion_model])
+        suggestion_models.GeneralSuggestionModel.put_multi([suggestion_model])
 
         errored_value = (
             '{\'exp_id\': \'exp2\', \'obsolete_content\': '
@@ -261,20 +259,15 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             job_run_result.JobRunResult(
                 stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
             ),
-            job_run_result.JobRunResult(
-                stdout='OBSOLETE SUGGESTIONS COUNT SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult.as_stdout(
-                f'Results are - {errored_value}'
-            )
+            job_run_result.JobRunResult(stdout='OBSOLETE SUGGESTIONS COUNT SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout(f'Results are - {errored_value}')
         ])
 
         obsolete_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get(suggestion_model.id)
         )
         self.assertEqual(
-            obsolete_suggestion_model.status,
-            suggestion_models.STATUS_IN_REVIEW
+            obsolete_suggestion_model.status, suggestion_models.STATUS_IN_REVIEW
         )
 
     def test_non_obsolete_suggestions_are_not_reported(self) -> None:
@@ -293,8 +286,7 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             language_code='bn'
         )
         valid_suggestion_model.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([
-            valid_suggestion_model])
+        suggestion_models.GeneralSuggestionModel.put_multi([valid_suggestion_model])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -303,10 +295,6 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
         ])
 
         suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(
-                valid_suggestion_model.id)
+            suggestion_models.GeneralSuggestionModel.get(valid_suggestion_model.id)
         )
-        self.assertEqual(
-            suggestion_model.status,
-            suggestion_models.STATUS_IN_REVIEW
-        )
+        self.assertEqual(suggestion_model.status, suggestion_models.STATUS_IN_REVIEW)

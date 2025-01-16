@@ -36,9 +36,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import transaction_services
     from mypy_imports import user_models
 
-(stats_models, user_models) = models.Registry.import_models(
-    [models.Names.STATISTICS, models.Names.USER]
-)
+(stats_models, user_models) = models.Registry.import_models([
+    models.Names.STATISTICS, models.Names.USER
+])
 
 transaction_services = models.Registry.import_transaction_services()
 

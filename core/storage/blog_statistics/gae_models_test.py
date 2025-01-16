@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for Blog Post Statistics Models."""
 
 from __future__ import annotations
@@ -26,9 +25,8 @@ from core.tests import test_utils
 
 from typing import Final
 
-
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import blog_stats_models
 
@@ -55,8 +53,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         self.event_model_one = (
             blog_stats_models.BlogPostViewedEventLogEntryModel(
-                id='event_model_1',
-                blog_post_id=self.BLOG_POST_ONE_ID
+                id='event_model_1', blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
         self.event_model_one.update_timestamps()
@@ -64,8 +61,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         self.event_model_two = (
             blog_stats_models.BlogPostViewedEventLogEntryModel(
-                id='event_model_2',
-                blog_post_id=self.BLOG_POST_ONE_ID
+                id='event_model_2', blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
         self.event_model_two.update_timestamps()
@@ -73,8 +69,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         self.event_model_three = (
             blog_stats_models.BlogPostViewedEventLogEntryModel(
-                id='event_model_3',
-                blog_post_id=self.BLOG_POST_ONE_ID
+                id='event_model_3', blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
         self.event_model_three.update_timestamps()
@@ -82,8 +77,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         self.event_model_four = (
             blog_stats_models.BlogPostViewedEventLogEntryModel(
-                id='event_model_4',
-                blog_post_id=self.BLOG_POST_TWO_ID
+                id='event_model_4', blog_post_id=self.BLOG_POST_TWO_ID
             )
         )
         self.event_model_four.update_timestamps()
@@ -91,8 +85,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-            .get_deletion_policy(),
+            blog_stats_models.BlogPostViewedEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
@@ -100,34 +93,36 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         stats_model_class = blog_stats_models.BlogPostViewedEventLogEntryModel
         with self.assertRaisesRegex(
             Exception, 'The id generator for the model is producing too many'
-            ' collisions.'):
+            ' collisions.'
+        ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
-                blog_stats_models.BlogPostViewedEventLogEntryModel,
-                'get_by_id', types.MethodType(
+                blog_stats_models.BlogPostViewedEventLogEntryModel, 'get_by_id',
+                types.MethodType(
                     lambda x, y: True,
-                    blog_stats_models.BlogPostViewedEventLogEntryModel)):
+                    blog_stats_models.BlogPostViewedEventLogEntryModel
+                )
+            ):
                 stats_model_class.create('blog_post_id')
 
     def test_get_new_event_entity_id(self) -> None:
         time_in_millisecs = utils.get_current_time_in_millisecs()
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         rand_hash = '123456789123'
-        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+
+        def mock_convert_to_hash(input_string: str, max_length: int) -> str:  # pylint: disable=unused-argument
             return rand_hash
+
         with self.swap(
-            utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs
+            utils, 'get_current_time_in_millisecs', mock_get_current_time_in_millisecs
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = (
-                    blog_stats_models.BlogPostViewedEventLogEntryModel
-                        .get_new_event_entity_id('BLOG')
+                    blog_stats_models.BlogPostViewedEventLogEntryModel.
+                    get_new_event_entity_id('BLOG')
                 )
                 self.assertEqual(
-                    new_id,
-                    ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
+                    new_id, ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
                 )
 
     def test_create_and_get_event_models(self) -> None:
@@ -136,15 +131,14 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 self.BLOG_POST_TWO_ID
             )
         )
-        event_model = blog_stats_models.BlogPostViewedEventLogEntryModel.get(
-            entity_id)
+        event_model = blog_stats_models.BlogPostViewedEventLogEntryModel.get(entity_id)
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_model_association_to_user(),
+            blog_stats_models.BlogPostViewedEventLogEntryModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -156,8 +150,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.BlogPostViewedEventLogEntryModel
-                .get_export_policy(),
+            blog_stats_models.BlogPostViewedEventLogEntryModel.get_export_policy(),
             expected_export_policy_dict
         )
 
@@ -179,16 +172,14 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.event_model_one = blog_stats_models.BlogPostReadEventLogEntryModel(
-            id='event_model_1',
-            blog_post_id=self.BLOG_POST_ONE_ID
+            id='event_model_1', blog_post_id=self.BLOG_POST_ONE_ID
         )
         self.event_model_one.update_timestamps()
         self.event_model_one.put()
 
         self.event_model_two = (
             blog_stats_models.BlogPostReadEventLogEntryModel(
-                id='event_model_2',
-                blog_post_id=self.BLOG_POST_ONE_ID
+                id='event_model_2', blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
         self.event_model_two.update_timestamps()
@@ -196,8 +187,7 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         self.event_model_three = (
             blog_stats_models.BlogPostReadEventLogEntryModel(
-                id='event_model_3',
-                blog_post_id=self.BLOG_POST_ONE_ID
+                id='event_model_3', blog_post_id=self.BLOG_POST_ONE_ID
             )
         )
         self.event_model_three.update_timestamps()
@@ -205,8 +195,7 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
         self.event_model_four = (
             blog_stats_models.BlogPostReadEventLogEntryModel(
-                id='event_model_4',
-                blog_post_id=self.BLOG_POST_TWO_ID
+                id='event_model_4', blog_post_id=self.BLOG_POST_TWO_ID
             )
         )
         self.event_model_four.update_timestamps()
@@ -214,8 +203,7 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-            .get_deletion_policy(),
+            blog_stats_models.BlogPostReadEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
@@ -223,34 +211,35 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         time_in_millisecs = utils.get_current_time_in_millisecs()
         rand_hash = '123456789123'
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
-        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+
+        def mock_convert_to_hash(input_string: str, max_length: int) -> str:  # pylint: disable=unused-argument
             return rand_hash
+
         with self.swap(
-            utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs
+            utils, 'get_current_time_in_millisecs', mock_get_current_time_in_millisecs
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = (
-                    blog_stats_models.BlogPostReadEventLogEntryModel
-                        .get_new_event_entity_id('BLOG')
+                    blog_stats_models.BlogPostReadEventLogEntryModel.
+                    get_new_event_entity_id('BLOG')
                 )
                 self.assertEqual(
-                    new_id,
-                    ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
+                    new_id, ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
                 )
 
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         stats_model_class = blog_stats_models.BlogPostReadEventLogEntryModel
         with self.assertRaisesRegex(
             Exception, 'The id generator for the model is producing too many'
-            ' collisions.'):
+            ' collisions.'
+        ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
-                blog_stats_models.BlogPostReadEventLogEntryModel,
-                'get_by_id', types.MethodType(
-                    lambda x, y: True,
-                    blog_stats_models.BlogPostReadEventLogEntryModel)):
+                blog_stats_models.BlogPostReadEventLogEntryModel, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True, blog_stats_models.BlogPostReadEventLogEntryModel
+                )
+            ):
                 stats_model_class.create('blog_post_id')
 
     def test_create_and_get_event_models(self) -> None:
@@ -259,15 +248,14 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 self.BLOG_POST_TWO_ID
             )
         )
-        event_model = blog_stats_models.BlogPostReadEventLogEntryModel.get(
-            entity_id)
+        event_model = blog_stats_models.BlogPostReadEventLogEntryModel.get(entity_id)
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .get_model_association_to_user(),
+            blog_stats_models.BlogPostReadEventLogEntryModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -279,8 +267,7 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.BlogPostReadEventLogEntryModel
-                .get_export_policy(),
+            blog_stats_models.BlogPostReadEventLogEntryModel.get_export_policy(),
             expected_export_policy_dict
         )
 
@@ -343,8 +330,7 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-            .get_deletion_policy(),
+            blog_stats_models.BlogPostExitedEventLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
@@ -352,21 +338,20 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         time_in_millisecs = utils.get_current_time_in_millisecs()
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         rand_hash = '123456789123'
-        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+
+        def mock_convert_to_hash(input_string: str, max_length: int) -> str:  # pylint: disable=unused-argument
             return rand_hash
+
         with self.swap(
-            utils,
-            'get_current_time_in_millisecs',
-            mock_get_current_time_in_millisecs
+            utils, 'get_current_time_in_millisecs', mock_get_current_time_in_millisecs
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = (
-                    blog_stats_models.BlogPostExitedEventLogEntryModel
-                        .get_new_event_entity_id('BLOG')
+                    blog_stats_models.BlogPostExitedEventLogEntryModel.
+                    get_new_event_entity_id('BLOG')
                 )
                 self.assertEqual(
-                    new_id,
-                    ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
+                    new_id, ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash])
                 )
 
     def test_create_and_get_event_models(self) -> None:
@@ -375,8 +360,7 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 self.BLOG_POST_TWO_ID, 0.5
             )
         )
-        event_model = blog_stats_models.BlogPostExitedEventLogEntryModel.get(
-            entity_id)
+        event_model = blog_stats_models.BlogPostExitedEventLogEntryModel.get(entity_id)
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
         self.assertEqual(event_model.time_user_stayed_on_blog_post, 0.5)
@@ -385,34 +369,35 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         stats_model_class = blog_stats_models.BlogPostExitedEventLogEntryModel
         with self.assertRaisesRegex(
             Exception, 'The id generator for the model is producing too many'
-            ' collisions.'):
+            ' collisions.'
+        ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
-                blog_stats_models.BlogPostExitedEventLogEntryModel,
-                'get_by_id', types.MethodType(
+                blog_stats_models.BlogPostExitedEventLogEntryModel, 'get_by_id',
+                types.MethodType(
                     lambda x, y: True,
-                    blog_stats_models.BlogPostExitedEventLogEntryModel)):
+                    blog_stats_models.BlogPostExitedEventLogEntryModel
+                )
+            ):
                 stats_model_class.create('blog_post_id', 7.2)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .get_model_association_to_user(),
+            blog_stats_models.BlogPostExitedEventLogEntryModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_user_stayed_on_blog_post': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'time_user_stayed_on_blog_post': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.BlogPostExitedEventLogEntryModel
-                .get_export_policy(),
+            blog_stats_models.BlogPostExitedEventLogEntryModel.get_export_policy(),
             expected_export_policy_dict
         )
 
@@ -443,8 +428,7 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostViewsAggregatedStatsModel
-            .get_deletion_policy(),
+            blog_stats_models.BlogPostViewsAggregatedStatsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
@@ -453,7 +437,8 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
             self.BLOG_POST_TWO_ID
         )
         stats_model = blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
-            self.BLOG_POST_TWO_ID)
+            self.BLOG_POST_TWO_ID
+        )
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
@@ -463,17 +448,17 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-            Exception,
-            'A blog post views stats model with the given blog post ID'
-            'exists already.'):
+            Exception, 'A blog post views stats model with the given blog post ID'
+            'exists already.'
+        ):
             blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
-                 self.BLOG_POST_THREE_ID
+                self.BLOG_POST_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostViewsAggregatedStatsModel
-                .get_model_association_to_user(),
+            blog_stats_models.BlogPostViewsAggregatedStatsModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -487,8 +472,7 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.BlogPostViewsAggregatedStatsModel
-                .get_export_policy(),
+            blog_stats_models.BlogPostViewsAggregatedStatsModel.get_export_policy(),
             expected_export_policy_dict
         )
 
@@ -519,8 +503,7 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostReadsAggregatedStatsModel
-            .get_deletion_policy(),
+            blog_stats_models.BlogPostReadsAggregatedStatsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
@@ -529,7 +512,8 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
             self.BLOG_POST_TWO_ID
         )
         stats_model = blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
-            self.BLOG_POST_TWO_ID)
+            self.BLOG_POST_TWO_ID
+        )
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
@@ -539,17 +523,17 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-            Exception,
-            'A blog post reads stats model with the given blog post ID'
-            'exists already.'):
+            Exception, 'A blog post reads stats model with the given blog post ID'
+            'exists already.'
+        ):
             blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
                 self.BLOG_POST_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostReadsAggregatedStatsModel
-                .get_model_association_to_user(),
+            blog_stats_models.BlogPostReadsAggregatedStatsModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -563,8 +547,7 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.BlogPostReadsAggregatedStatsModel
-                .get_export_policy(),
+            blog_stats_models.BlogPostReadsAggregatedStatsModel.get_export_policy(),
             expected_export_policy_dict
         )
 
@@ -603,37 +586,30 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostReadingTimeModel
-            .get_deletion_policy(),
+            blog_stats_models.BlogPostReadingTimeModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
     def test_create_and_get_stats_models(self) -> None:
-        blog_stats_models.BlogPostReadingTimeModel.create(
+        blog_stats_models.BlogPostReadingTimeModel.create(self.BLOG_POST_TWO_ID)
+        stats_model = blog_stats_models.BlogPostReadingTimeModel.get(
             self.BLOG_POST_TWO_ID
         )
-        stats_model = blog_stats_models.BlogPostReadingTimeModel.get(
-            self.BLOG_POST_TWO_ID)
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
     def test_create_raises_exception_with_existing_blog_id(self) -> None:
-        blog_stats_models.BlogPostReadingTimeModel.create(
-            self.BLOG_POST_THREE_ID
-        )
+        blog_stats_models.BlogPostReadingTimeModel.create(self.BLOG_POST_THREE_ID)
 
         with self.assertRaisesRegex(
-            Exception,
-            'A blog post reading time model with the given blog post ID'
-            'exists already.'):
-            blog_stats_models.BlogPostReadingTimeModel.create(
-                self.BLOG_POST_THREE_ID
-            )
+            Exception, 'A blog post reading time model with the given blog post ID'
+            'exists already.'
+        ):
+            blog_stats_models.BlogPostReadingTimeModel.create(self.BLOG_POST_THREE_ID)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostReadingTimeModel
-                .get_model_association_to_user(),
+            blog_stats_models.BlogPostReadingTimeModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -655,15 +631,12 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.BlogPostReadingTimeModel
-                .get_export_policy(),
+            blog_stats_models.BlogPostReadingTimeModel.get_export_policy(),
             expected_export_policy_dict
         )
 
 
-class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
-    test_utils.GenericTestBase
-):
+class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the BlogPostReadsAggregatedStatsModel class."""
 
     AUTHOR_ONE_ID: Final = 'author_one'
@@ -690,9 +663,8 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.
+            get_deletion_policy(), base_models.DELETION_POLICY.DELETE
         )
 
     def test_create_and_get_stats_models(self) -> None:
@@ -713,18 +685,19 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
         )
 
         with self.assertRaisesRegex(
-            Exception,
-            'A author blog post reads stats model with the given author ID'
-            ' exists already.'):
+            Exception, 'A author blog post reads stats model with the given author ID'
+            ' exists already.'
+        ):
             (
-                blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-                    .create(self.AUTHOR_THREE_ID)
+                blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
+                    self.AUTHOR_THREE_ID
+                )
             )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-                .get_model_association_to_user(),
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -738,23 +711,22 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-                .get_export_policy(),
-            expected_export_policy_dict
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get_export_policy(
+            ), expected_export_policy_dict
         )
 
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
-            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-                .has_reference_to_user_id(self.AUTHOR_ONE_ID))
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.
+            has_reference_to_user_id(self.AUTHOR_ONE_ID)
+        )
         self.assertFalse(
-            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-                .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.
+            has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
 
 
-class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
-    test_utils.GenericTestBase
-):
+class AuthorBlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the BlogPostViewsAggregatedStatsModel class."""
 
     AUTHOR_ONE_ID: Final = 'author_one'
@@ -781,9 +753,8 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.
+            get_deletion_policy(), base_models.DELETION_POLICY.DELETE
         )
 
     def test_create_and_get_stats_models(self) -> None:
@@ -804,17 +775,17 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
         )
 
         with self.assertRaisesRegex(
-            Exception,
-            'A author blog post views stats model with the given author ID'
-            ' exists already.'):
+            Exception, 'A author blog post views stats model with the given author ID'
+            ' exists already.'
+        ):
             blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
                 self.AUTHOR_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel
-                .get_model_association_to_user(),
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -828,18 +799,19 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel
-                .get_export_policy(),
-            expected_export_policy_dict
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get_export_policy(
+            ), expected_export_policy_dict
         )
 
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
-            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel
-                .has_reference_to_user_id(self.AUTHOR_ONE_ID))
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.
+            has_reference_to_user_id(self.AUTHOR_ONE_ID)
+        )
         self.assertFalse(
-            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel
-                .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.
+            has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
 
 
 class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
@@ -877,9 +849,8 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.
+            get_deletion_policy(), base_models.DELETION_POLICY.DELETE
         )
 
     def test_create_and_get_stats_models(self) -> None:
@@ -897,9 +868,9 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
         # Test should raise exception if model with given author id already
         # exists.
         with self.assertRaisesRegex(
-            Exception,
-            'A author blog post reading time model with the given author ID'
-            ' exists already.'):
+            Exception, 'A author blog post reading time model with the given author ID'
+            ' exists already.'
+        ):
             blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
                 self.AUTHOR_TWO_ID
             )
@@ -910,17 +881,17 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-            Exception,
-            'A author blog post reading time model with the given author ID'
-            ' exists already.'):
+            Exception, 'A author blog post reading time model with the given author ID'
+            ' exists already.'
+        ):
             blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
                 self.AUTHOR_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel
-                .get_model_association_to_user(),
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.
+            get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -942,15 +913,16 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel
-                .get_export_policy(),
-            expected_export_policy_dict
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.
+            get_export_policy(), expected_export_policy_dict
         )
 
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel
-                .has_reference_to_user_id(self.AUTHOR_ONE_ID))
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.
+            has_reference_to_user_id(self.AUTHOR_ONE_ID)
+        )
         self.assertFalse(
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel
-                .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.
+            has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )

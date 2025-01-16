@@ -61,34 +61,32 @@ class SubtopicPageChange(change_domain.BaseChange):
         SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS
     ]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
-        {
-            'name': CMD_CREATE_NEW,
-            'required_attribute_names': ['topic_id', 'subtopic_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-            'required_attribute_names': [
-                'property_name', 'new_value', 'old_value', 'subtopic_id'
-            ],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': SUBTOPIC_PAGE_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }
-    ]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['topic_id', 'subtopic_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+        'required_attribute_names': [
+            'property_name', 'new_value', 'old_value', 'subtopic_id'
+        ],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': SUBTOPIC_PAGE_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }]
 
 
 AllowedUpdateSubtopicPagePropertyCmdTypes = Union[
@@ -212,16 +210,16 @@ class SubtopicPageContents:
         content_id = feconf.DEFAULT_SUBTOPIC_PAGE_CONTENT_ID
         return cls(
             state_domain.SubtitledHtml.create_default_subtitled_html(content_id),
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
                     content_id: {}
-                }}
-            ),
-            translation_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {
+                }
+            }),
+            translation_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
                     content_id: {}
-                }}
-            )
+                }
+            })
         )
 
     def to_dict(self) -> SubtopicPageContentsDict:
@@ -528,8 +526,10 @@ class SubtopicPage:
                 'Expected page contents schema version to be an integer, '
                 'received %s' % self.page_contents_schema_version
             )
-        if (self.page_contents_schema_version
-                != feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+        if (
+            self.page_contents_schema_version
+            != feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+        ):
             raise utils.ValidationError(
                 'Expected page contents schema version to be %s, received %s' % (
                     feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
@@ -542,8 +542,10 @@ class SubtopicPage:
                 'Expected language code to be a string, received %s' %
                 self.language_code
             )
-        if not any(self.language_code == lc['code']
-                   for lc in constants.SUPPORTED_CONTENT_LANGUAGES):
+        if not any(
+            self.language_code == lc['code']
+            for lc in constants.SUPPORTED_CONTENT_LANGUAGES
+        ):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code
             )

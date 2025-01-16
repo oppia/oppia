@@ -1,5 +1,6 @@
 class Task:
     name: str = ...
 
+
 class HttpMethod:
     POST: str = ...

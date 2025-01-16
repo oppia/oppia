@@ -17,8 +17,11 @@ class Request:
     params: Dict[str, str]
     domain: str
 
-    def arguments(self) -> List[str]: ...
-    def get(self, value: str) -> Any: ...
+    def arguments(self) -> List[str]:
+        ...
+
+    def get(self, value: str) -> Any:
+        ...
 
     @classmethod
     def blank(
@@ -29,10 +32,15 @@ class Request:
         headers: List[Tuple[str, str]] = ...,
         POST: Dict[str, Any] = ...,
         **kwargs: Any
-    ) -> Request: ...
+    ) -> Request:
+        ...
+
 
 class ResponseHeaders(Dict[str, Any]):
-    def get_all(self, key: str) -> List[str]: ...
+
+    def get_all(self, key: str) -> List[str]:
+        ...
+
 
 class Response:
     headers: ResponseHeaders = ...
@@ -45,7 +53,9 @@ class Response:
     status: int
     body: bytes
 
-    def write(self, content: Union[bytes, str]) -> None: ...
+    def write(self, content: Union[bytes, str]) -> None:
+        ...
+
     def set_cookie(
         self,
         key: str,
@@ -57,14 +67,14 @@ class Response:
         path: str = ...,
         domain: Optional[str] = ...,
         comment: Optional[str] = ...,
-    ) -> None: ...
+    ) -> None:
+        ...
 
     def delete_cookie(
-        self,
-        key: str,
-        path: str = ...,
-        domain: Optional[str] = ...
-    ) -> None: ...
+        self, key: str, path: str = ..., domain: Optional[str] = ...
+    ) -> None:
+        ...
+
 
 class WSGIApplication:
     debug: bool
@@ -74,34 +84,43 @@ class WSGIApplication:
         routes: List[Route] = ...,
         debug: bool = ...,
         config: Dict[str, Any] = ...
-    ) -> None: ...
+    ) -> None:
+        ...
 
-    def __call__(
-        self,
-        environ: Dict[str, str],
-        start_response: Response
-    ) -> Response: ...
+    def __call__(self, environ: Dict[str, str], start_response: Response) -> Response:
+        ...
+
 
 class Route:
+
     def __init__(
         self,
         template: Union[str, Pattern[str]],
         handler: Callable[..., object],
         *,
         name: str = ...
-    ) -> None: ...
+    ) -> None:
+        ...
+
 
 class RequestHandler:
     request: Request
     response: Response
     app: WSGIApplication
 
-    def error(self, code: int) -> None: ...
-    def dispatch(self) -> None: ...
-    def initialize(self, request: Request, response: Response) -> None: ...
+    def error(self, code: int) -> None:
+        ...
+
+    def dispatch(self) -> None:
+        ...
+
+    def initialize(self, request: Request, response: Response) -> None:
+        ...
 
     @classmethod
-    def write(cls, content: bytes) -> None: ...
+    def write(cls, content: bytes) -> None:
+        ...
+
     @classmethod
     def redirect(
         cls,
@@ -110,4 +129,5 @@ class RequestHandler:
         abort: bool = False,
         code: Optional[int] = None,
         body: Any = None
-    ) -> Response: ...
+    ) -> Response:
+        ...

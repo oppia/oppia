@@ -34,7 +34,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import subtopic_models
 
-(subtopic_models, ) = models.Registry.import_models([models.Names.SUBTOPIC])
+(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
 def _migrate_page_contents_to_latest_schema(
@@ -56,15 +56,19 @@ def _migrate_page_contents_to_latest_schema(
             is supported at present.
     """
     page_contents_schema_version = versioned_page_contents['schema_version']
-    if not (1 <= page_contents_schema_version <=
-            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+    if not (
+        1 <= page_contents_schema_version <=
+        feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+    ):
         raise Exception(
             'Sorry, we can only process v1-v%d page schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
         )
 
-    while (page_contents_schema_version
-           < feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+    while (
+        page_contents_schema_version
+        < feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+    ):
         subtopic_page_domain.SubtopicPage.update_page_contents_from_model(
             versioned_page_contents, page_contents_schema_version
         )
@@ -83,14 +87,17 @@ def get_subtopic_page_from_model(
     Returns:
         SubtopicPage. The domain object corresponding to the given model object.
     """
-    versioned_page_contents: (
-        subtopic_page_domain.VersionedSubtopicPageContentsDict
-    ) = {
-        'schema_version': subtopic_page_model.page_contents_schema_version,
-        'page_contents': copy.deepcopy(subtopic_page_model.page_contents)
-    }
-    if (subtopic_page_model.page_contents_schema_version
-            != feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+    versioned_page_contents: (subtopic_page_domain.VersionedSubtopicPageContentsDict
+                             ) = {
+                                 'schema_version':
+                                     subtopic_page_model.page_contents_schema_version,
+                                 'page_contents':
+                                     copy.deepcopy(subtopic_page_model.page_contents)
+                             }
+    if (
+        subtopic_page_model.page_contents_schema_version
+        != feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+    ):
         _migrate_page_contents_to_latest_schema(versioned_page_contents)
     return subtopic_page_domain.SubtopicPage(
         subtopic_page_model.id, subtopic_page_model.topic_id,
@@ -361,10 +368,7 @@ def get_topic_ids_from_subtopic_page_ids(subtopic_page_ids: List[str]) -> List[s
         alphabetically.
     """
     return sorted(
-        list(
-            {subtopic_page_id.split(':')[0]
-             for subtopic_page_id in subtopic_page_ids}
-        )
+        list({subtopic_page_id.split(':')[0] for subtopic_page_id in subtopic_page_ids})
     )
 
 
@@ -387,11 +391,9 @@ def get_multi_users_subtopic_pages_progress(
     topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
 
     all_skill_ids_lists = [topic.get_all_skill_ids() for topic in topics if topic]
-    all_skill_ids = list(
-        {skill_id
-         for skill_list in all_skill_ids_lists
-         for skill_id in skill_list}
-    )
+    all_skill_ids = list({
+        skill_id for skill_list in all_skill_ids_lists for skill_id in skill_list
+    })
 
     all_users_skill_mastery_dicts = (
         skill_services.get_multi_users_skills_mastery(user_ids, all_skill_ids)
@@ -399,8 +401,7 @@ def get_multi_users_subtopic_pages_progress(
 
     all_users_subtopic_prog_summaries: Dict[
         str, List[subtopic_page_domain.SubtopicPageSummaryDict]] = {
-            user_id: []
-            for user_id in user_ids
+            user_id: [] for user_id in user_ids
         }
     for topic in topics:
         for subtopic in topic.subtopics:
@@ -421,22 +422,28 @@ def get_multi_users_subtopic_pages_progress(
                         sum(skill_mastery_dict.values()) / len(skill_mastery_dict)
                     )
 
-                all_users_subtopic_prog_summaries[user_id].append(
-                    {
-                        'subtopic_id': subtopic.id,
-                        'subtopic_title': subtopic.title,
-                        'parent_topic_id': topic.id,
-                        'parent_topic_name': topic.name,
-                        'thumbnail_filename': subtopic.thumbnail_filename,
-                        'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                        'subtopic_mastery': subtopic_mastery,
-                        'parent_topic_url_fragment': topic.url_fragment,
-                        'classroom_url_fragment': (
-                            classroom_config_services.
-                            get_classroom_url_fragment_for_topic_id(topic.id)
-                        )
-                    }
-                )
+                all_users_subtopic_prog_summaries[user_id].append({
+                    'subtopic_id':
+                        subtopic.id,
+                    'subtopic_title':
+                        subtopic.title,
+                    'parent_topic_id':
+                        topic.id,
+                    'parent_topic_name':
+                        topic.name,
+                    'thumbnail_filename':
+                        subtopic.thumbnail_filename,
+                    'thumbnail_bg_color':
+                        subtopic.thumbnail_bg_color,
+                    'subtopic_mastery':
+                        subtopic_mastery,
+                    'parent_topic_url_fragment':
+                        topic.url_fragment,
+                    'classroom_url_fragment': (
+                        classroom_config_services.
+                        get_classroom_url_fragment_for_topic_id(topic.id)
+                    )
+                })
 
     return all_users_subtopic_prog_summaries
 
@@ -463,19 +470,17 @@ def get_learner_group_syllabus_subtopic_page_summaries(
             subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
             if subtopic_page_id not in subtopic_page_ids:
                 continue
-            all_learner_group_subtopic_page_summaries.append(
-                {
-                    'subtopic_id': subtopic.id,
-                    'subtopic_title': subtopic.title,
-                    'parent_topic_id': topic.id,
-                    'parent_topic_name': topic.name,
-                    'thumbnail_filename': subtopic.thumbnail_filename,
-                    'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                    'subtopic_mastery': None,
-                    'parent_topic_url_fragment': topic.url_fragment,
-                    'classroom_url_fragment': None
-                }
-            )
+            all_learner_group_subtopic_page_summaries.append({
+                'subtopic_id': subtopic.id,
+                'subtopic_title': subtopic.title,
+                'parent_topic_id': topic.id,
+                'parent_topic_name': topic.name,
+                'thumbnail_filename': subtopic.thumbnail_filename,
+                'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                'subtopic_mastery': None,
+                'parent_topic_url_fragment': topic.url_fragment,
+                'classroom_url_fragment': None
+            })
 
     return all_learner_group_subtopic_page_summaries
 

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for Continue interaction."""
 
 from __future__ import annotations
@@ -50,8 +49,10 @@ class Continue(base.BaseInteraction):
         'name': 'buttonText',
         'description': 'Button label',
         'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode',
+            'type':
+                'custom',
+            'obj_type':
+                'SubtitledUnicode',
             'validators': [{
                 'id': 'has_expected_subtitled_content_length',
                 'max_value': 20

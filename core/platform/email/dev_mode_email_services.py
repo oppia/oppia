@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides email services api to log emails in DEV_MODE."""
 
 from __future__ import annotations
@@ -26,16 +25,15 @@ from typing import Dict, List, Optional, Union
 
 
 def send_email_to_recipients(
-        sender_email: str,
-        recipient_emails: List[str],
-        subject: str,
-        plaintext_body: str,
-        html_body: str,
-        bcc: Optional[List[str]] = None,
-        reply_to: Optional[str] = None,
-        recipient_variables: Optional[
-            Dict[str, Dict[str, Union[str, float]]]] = None,
-        attachments: Optional[List[Dict[str, str]]] = None
+    sender_email: str,
+    recipient_emails: List[str],
+    subject: str,
+    plaintext_body: str,
+    html_body: str,
+    bcc: Optional[List[str]] = None,
+    reply_to: Optional[str] = None,
+    recipient_variables: Optional[Dict[str, Dict[str, Union[str, float]]]] = None,
+    attachments: Optional[List[Dict[str, str]]] = None
 ) -> bool:
     """Prints information about sent emails to the terminal console, in order
     to model sending an email in development mode.
@@ -77,14 +75,15 @@ def send_email_to_recipients(
     """
     logging.info(
         email_services.convert_email_to_loggable_string(
-            sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc, reply_to, recipient_variables, attachments
+            sender_email, recipient_emails, subject, plaintext_body, html_body, bcc,
+            reply_to, recipient_variables, attachments
         )
     )
     logging.info(
         'You are not currently sending out real emails since this is a'
         ' dev environment. Emails are sent out in the production'
-        ' environment.')
+        ' environment.'
+    )
     # Returns True signifying that the "send_email_to_recipients" action was
     # successful.
     return True

@@ -81,16 +81,14 @@ class PlatformParameterChange(change_domain.BaseChange):
     """
 
     CMD_EDIT_RULES: Final = 'edit_rules'
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
-        {
-            'name': CMD_EDIT_RULES,
-            'required_attribute_names': ['new_rules'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }
-    ]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
+        'name': CMD_EDIT_RULES,
+        'required_attribute_names': ['new_rules'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }]
 
 
 class EditRulesPlatformParameterCmd(PlatformParameterChange):
@@ -170,8 +168,8 @@ class EvaluationContext:
             parameters.
         """
         return (
-            self._platform_type is not None
-            and self._platform_type in ALLOWED_PLATFORM_TYPES
+            self._platform_type is not None and
+            self._platform_type in ALLOWED_PLATFORM_TYPES
         )
 
     def validate(self) -> None:
@@ -186,8 +184,10 @@ class EvaluationContext:
                     (self._app_version, APP_VERSION_WITH_HASH_REGEXP)
                 )
 
-            if (match.group(2) is not None
-                    and match.group(2) not in ALLOWED_APP_VERSION_FLAVORS):
+            if (
+                match.group(2) is not None and
+                match.group(2) not in ALLOWED_APP_VERSION_FLAVORS
+            ):
                 raise utils.ValidationError(
                     'Invalid version flavor \'%s\', must be one of %s if'
                     ' specified.' % (match.group(2), ALLOWED_APP_VERSION_FLAVORS)
@@ -796,8 +796,10 @@ class PlatformParameter:
         Raises:
             Exception. Given schema version is not supported.
         """
-        if (param_dict['rule_schema_version']
-                != feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION):
+        if (
+            param_dict['rule_schema_version']
+            != feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+        ):
             # NOTE: When there's a new rule schema version, a new method with
             # name of the form '_convert_rule_v1_dict_to_v2_dict` should be
             # added to the class and called here to convert the rule dicts to

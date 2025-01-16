@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for custom landing pages."""
 
 from __future__ import annotations
@@ -24,13 +23,13 @@ from core.controllers import base
 from typing import Dict
 
 
-class FractionLandingRedirectPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class FractionLandingRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The handler redirecting to the Fractions landing page."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -38,9 +37,7 @@ class FractionLandingRedirectPage(
         self.redirect('/math/fractions')
 
 
-class TopicLandingRedirectPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class TopicLandingRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The handler redirecting the old landing page URL to the new one."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -50,7 +47,9 @@ class TopicLandingRedirectPage(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, topic: str) -> None:

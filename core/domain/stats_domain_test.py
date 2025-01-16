@@ -34,7 +34,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
 
-(stats_models, ) = models.Registry.import_models([models.Names.STATISTICS])
+(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 
 
 class ExplorationStatsTests(test_utils.GenericTestBase):
@@ -145,8 +145,9 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     # test method validate() input type.
     def test_validate_with_int_exp_id(self) -> None:
         self.exploration_stats.exp_id = 10  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected exp_id to be a string')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected exp_id to be a string')
+        ):
             self.exploration_stats.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -154,8 +155,9 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     # test method validate() input type.
     def test_validation_with_string_num_actual_starts(self) -> None:
         self.exploration_stats.num_actual_starts_v2 = '0'  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected num_actual_starts_v2 to be an int')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected num_actual_starts_v2 to be an int')
+        ):
             self.exploration_stats.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -163,15 +165,17 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     # test method validate() input type.
     def test_validation_with_list_state_stats_mapping(self) -> None:
         self.exploration_stats.state_stats_mapping = []  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected state_stats_mapping to be a dict')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected state_stats_mapping to be a dict')
+        ):
             self.exploration_stats.validate()
 
     def test_validation_with_negative_num_completions(self) -> None:
         self.exploration_stats.num_completions_v2 = -5
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('%s cannot have negative values' %
-                                     ('num_completions_v2'))):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('%s cannot have negative values' % ('num_completions_v2'))
+        ):
             self.exploration_stats.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -179,8 +183,9 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     # test method validate().
     def test_validate_exp_version(self) -> None:
         self.exploration_stats.exp_version = 'invalid_exp_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected exp_version to be an int')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected exp_version to be an int')
+        ):
             self.exploration_stats.validate()
 
     def test_to_frontend_dict(self) -> None:
@@ -311,7 +316,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     def test_repr(self) -> None:
         state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
         self.assertEqual(
-            '%r' % (state_stats, ), 'StateStats('
+            '%r' % (state_stats,), 'StateStats('
             'total_answers_count_v1=1, total_answers_count_v2=2, '
             'useful_feedback_count_v1=3, useful_feedback_count_v2=4, '
             'total_hit_count_v1=5, total_hit_count_v2=6, '
@@ -323,7 +328,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     def test_str(self) -> None:
         state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
         self.assertEqual(
-            '%s' % (state_stats, ), 'StateStats('
+            '%s' % (state_stats,), 'StateStats('
             'total_answers_count=3, '
             'useful_feedback_count=7, '
             'total_hit_count=11, '
@@ -453,15 +458,17 @@ class StateStatsTests(test_utils.GenericTestBase):
     # test method validate() input type.
     def test_validation_for_state_stats_with_string_total_answers_count(self) -> None:
         self.state_stats.total_answers_count_v2 = '10'  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected total_answers_count_v2 to be an int')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected total_answers_count_v2 to be an int')
+        ):
             self.state_stats.validate()
 
     def test_validation_for_state_stats_with_negative_total_answers_count(self) -> None:
         self.state_stats.total_answers_count_v2 = -5
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('%s cannot have negative values' %
-                                     ('total_answers_count_v2'))):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('%s cannot have negative values' % ('total_answers_count_v2'))
+        ):
             self.state_stats.validate()
 
     def test_to_frontend_dict(self) -> None:
@@ -542,7 +549,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
     def test_repr(self) -> None:
         session_state_stats = stats_domain.SessionStateStats(1, 2, 3, 4, 5, 6)
         self.assertEqual(
-            '%r' % (session_state_stats, ), 'SessionStateStats('
+            '%r' % (session_state_stats,), 'SessionStateStats('
             'total_answers_count=1, '
             'useful_feedback_count=2, '
             'total_hit_count=3, '
@@ -628,8 +635,9 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
                 }
             }
         }
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'num_starts not in aggregated stats dict.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'num_starts not in aggregated stats dict.'
+        ):
             stats_domain.SessionStateStats.validate_aggregated_stats_dict(
                 sessions_state_stats
             )
@@ -656,8 +664,9 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
             }
         }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected num_actual_starts to be an int, received invalid_type'):
+            utils.ValidationError,
+            'Expected num_actual_starts to be an int, received invalid_type'
+        ):
             stats_domain.SessionStateStats.validate_aggregated_stats_dict(
                 sessions_state_stats
             )
@@ -680,9 +689,10 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
             }
         }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'total_answers_count not in state stats mapping of Home in '
-                'aggregated stats dict.'):
+            utils.ValidationError,
+            'total_answers_count not in state stats mapping of Home in '
+            'aggregated stats dict.'
+        ):
             stats_domain.SessionStateStats.validate_aggregated_stats_dict(
                 sessions_state_stats
             )
@@ -709,8 +719,9 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
             }
         }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected first_hit_count to be an int, received invalid_count'):
+            utils.ValidationError,
+            'Expected first_hit_count to be an int, received invalid_count'
+        ):
             stats_domain.SessionStateStats.validate_aggregated_stats_dict(
                 sessions_state_stats
             )
@@ -745,22 +756,20 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         self.exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', 1, [
-                stats_domain.ExplorationIssue.from_dict(
-                    {
-                        'issue_type': 'EarlyQuit',
-                        'issue_customization_args': {
-                            'state_name': {
-                                'value': 'state_name1'
-                            },
-                            'time_spent_in_exp_in_msecs': {
-                                'value': 200
-                            }
+                stats_domain.ExplorationIssue.from_dict({
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {
+                            'value': 'state_name1'
                         },
-                        'playthrough_ids': ['playthrough_id1'],
-                        'schema_version': 1,
-                        'is_valid': True
-                    }
-                )
+                        'time_spent_in_exp_in_msecs': {
+                            'value': 200
+                        }
+                    },
+                    'playthrough_ids': ['playthrough_id1'],
+                    'schema_version': 1,
+                    'is_valid': True
+                })
             ]
         )
 
@@ -776,44 +785,42 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_issues_dict['exp_id'], 'exp_id1')
         self.assertEqual(exp_issues_dict['exp_version'], 1)
         self.assertEqual(
-            exp_issues_dict['unresolved_issues'], [
-                {
-                    'issue_type': 'EarlyQuit',
-                    'issue_customization_args': {
-                        'state_name': {
-                            'value': 'state_name1'
-                        },
-                        'time_spent_in_exp_in_msecs': {
-                            'value': 200
-                        }
+            exp_issues_dict['unresolved_issues'], [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
                     },
-                    'playthrough_ids': ['playthrough_id1'],
-                    'schema_version': 1,
-                    'is_valid': True
-                }
-            ]
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1'],
+                'schema_version': 1,
+                'is_valid': True
+            }]
         )
 
     def test_from_dict(self) -> None:
         exp_issues_dict: stats_domain.ExplorationIssuesDict = {
-            'exp_id': 'exp_id1',
-            'exp_version': 1,
-            'unresolved_issues': [
-                {
-                    'issue_type': 'EarlyQuit',
-                    'issue_customization_args': {
-                        'state_name': {
-                            'value': 'state_name1'
-                        },
-                        'time_spent_in_exp_in_msecs': {
-                            'value': 200
-                        }
+            'exp_id':
+                'exp_id1',
+            'exp_version':
+                1,
+            'unresolved_issues': [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
                     },
-                    'playthrough_ids': ['playthrough_id1'],
-                    'schema_version': 1,
-                    'is_valid': True
-                }
-            ]
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1'],
+                'schema_version': 1,
+                'is_valid': True
+            }]
         }
 
         exp_issues = stats_domain.ExplorationIssues.from_dict(exp_issues_dict)
@@ -845,9 +852,10 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     # test method validate() input type.
     def test_validate_with_int_exp_id(self) -> None:
         self.exp_issues.exp_id = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected exp_id to be a string, received %s' %
-                                     (type(5)))):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected exp_id to be a string, received %s' % (type(5)))
+        ):
             self.exp_issues.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -856,8 +864,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     def test_validate_exp_version(self) -> None:
         self.exp_issues.exp_version = 'invalid_version'  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected exp_version to be an int')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected exp_version to be an int')
+        ):
             self.exp_issues.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -866,8 +875,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     def test_validate_unresolved_issues(self) -> None:
         self.exp_issues.unresolved_issues = 0  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected unresolved_issues to be a list')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected unresolved_issues to be a list')
+        ):
             self.exp_issues.validate()
 
 
@@ -890,17 +900,15 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [
-                stats_domain.LearnerAction.from_dict(
-                    {
-                        'action_type': 'ExplorationStart',
-                        'action_customization_args': {
-                            'state_name': {
-                                'value': 'state_name1'
-                            }
-                        },
-                        'schema_version': 1
-                    }
-                )
+                stats_domain.LearnerAction.from_dict({
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {
+                            'value': 'state_name1'
+                        }
+                    },
+                    'schema_version': 1
+                })
             ]
         )
         playthrough.validate()
@@ -916,17 +924,15 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [
-                stats_domain.LearnerAction.from_dict(
-                    {
-                        'action_type': 'ExplorationStart',
-                        'action_customization_args': {
-                            'state_name': {
-                                'value': 'state_name1'
-                            }
-                        },
-                        'schema_version': 1
-                    }
-                )
+                stats_domain.LearnerAction.from_dict({
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {
+                            'value': 'state_name1'
+                        }
+                    },
+                    'schema_version': 1
+                })
             ]
         )
 
@@ -946,25 +952,26 @@ class PlaythroughTests(test_utils.GenericTestBase):
             }
         )
         self.assertEqual(
-            playthrough_dict['actions'], [
-                {
-                    'action_type': 'ExplorationStart',
-                    'action_customization_args': {
-                        'state_name': {
-                            'value': 'state_name1'
-                        }
-                    },
-                    'schema_version': 1
-                }
-            ]
+            playthrough_dict['actions'], [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }]
         )
 
     def test_from_dict(self) -> None:
         """Test the from_dict() method."""
         playthrough_dict: stats_domain.PlaythroughDict = {
-            'exp_id': 'exp_id1',
-            'exp_version': 1,
-            'issue_type': 'EarlyQuit',
+            'exp_id':
+                'exp_id1',
+            'exp_version':
+                1,
+            'issue_type':
+                'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
                     'value': 'state_name1'
@@ -973,17 +980,15 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             },
-            'actions': [
-                {
-                    'action_type': 'ExplorationStart',
-                    'action_customization_args': {
-                        'state_name': {
-                            'value': 'state_name1'
-                        }
-                    },
-                    'schema_version': 1
-                }
-            ],
+            'actions': [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }],
         }
 
         playthrough = stats_domain.Playthrough.from_dict(playthrough_dict)
@@ -1025,8 +1030,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'issue_customization_args': {},
             'actions': []
         }
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'exp_id not in playthrough data dict.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'exp_id not in playthrough data dict.'
+        ):
             stats_domain.Playthrough.from_dict(playthrough_dict)
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1034,34 +1040,35 @@ class PlaythroughTests(test_utils.GenericTestBase):
     # test method validate() input type.
     def test_validate_with_string_exp_version(self) -> None:
         self.playthrough.exp_version = '1'  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected exp_version to be an int, received %s' %
-                                     (type('1')))):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected exp_version to be an int, received %s' % (type('1')))
+        ):
             self.playthrough.validate()
 
     def test_validate_with_invalid_issue_type(self) -> None:
         self.playthrough.issue_type = 'InvalidIssueType'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Invalid issue type: %s' % self.playthrough.issue_type)):
+            utils.ValidationError,
+            ('Invalid issue type: %s' % self.playthrough.issue_type)
+        ):
             self.playthrough.validate()
 
     def test_validate_with_invalid_action_type(self) -> None:
         self.playthrough.actions = [
-            stats_domain.LearnerAction.from_dict(
-                {
-                    'action_type': 'InvalidActionType',
-                    'schema_version': 1,
-                    'action_customization_args': {
-                        'state_name': {
-                            'value': 'state_name1'
-                        }
-                    },
-                }
-            )
+            stats_domain.LearnerAction.from_dict({
+                'action_type': 'InvalidActionType',
+                'schema_version': 1,
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+            })
         ]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Invalid action type: %s' % 'InvalidActionType')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Invalid action type: %s' % 'InvalidActionType')
+        ):
             self.playthrough.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1070,8 +1077,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_non_str_exp_id(self) -> None:
         self.playthrough.exp_id = 0  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected exp_id to be a string')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected exp_id to be a string')
+        ):
             self.playthrough.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1080,8 +1088,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_non_str_issue_type(self) -> None:
         self.playthrough.issue_type = 0  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected issue_type to be a string')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected issue_type to be a string')
+        ):
             self.playthrough.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1090,8 +1099,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_non_list_actions(self) -> None:
         self.playthrough.actions = 0  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected actions to be a list')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected actions to be a list')
+        ):
             self.playthrough.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1100,8 +1110,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_non_dict_issue_customization_args(self) -> None:
         self.playthrough.issue_customization_args = 0  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected issue_customization_args to be a dict')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected issue_customization_args to be a dict')
+        ):
             self.playthrough.validate()
 
 
@@ -1158,7 +1169,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         issue_dict['schema_version'] = 2
         if issue_dict['issue_type'] == 'EarlyQuit':
             issue_dict['issue_customization_args']['time_spent_in_exp_in_msecs'
-                                                   ] = self.DUMMY_TIME_SPENT_IN_MSECS
+                                                  ] = self.DUMMY_TIME_SPENT_IN_MSECS
 
         return issue_dict
 
@@ -1201,15 +1212,13 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'value': ''
             }
         }
-        exp_issue = stats_domain.ExplorationIssue.from_dict(
-            {
-                'issue_type': 'EarlyQuit',
-                'issue_customization_args': expected_customization_args,
-                'playthrough_ids': [],
-                'schema_version': 1,
-                'is_valid': True
-            }
-        )
+        exp_issue = stats_domain.ExplorationIssue.from_dict({
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': expected_customization_args,
+            'playthrough_ids': [],
+            'schema_version': 1,
+            'is_valid': True
+        })
         exp_issue_dict = exp_issue.to_dict()
         self.assertEqual(
             exp_issue_dict, {
@@ -1233,8 +1242,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         }
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'issue_type not in exploration issue dict.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'issue_type not in exploration issue dict.'
+        ):
             stats_domain.ExplorationIssue.from_dict(exp_issue_dict)
 
     def test_update_exp_issue_from_model(self) -> None:
@@ -1325,9 +1335,10 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         assert exp_issues_model is not None
 
         with self.assertRaisesRegex(
-                Exception,
-                'Sorry, we can only process v1-v%d and unversioned issue schemas at'
-                ' present.' % stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
+            Exception,
+            'Sorry, we can only process v1-v%d and unversioned issue schemas at'
+            ' present.' % stats_models.CURRENT_ISSUE_SCHEMA_VERSION
+        ):
             stats_services.get_exp_issues_from_model(exp_issues_model)
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1344,19 +1355,27 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert exp_issues_model is not None
 
-        with self.assertRaisesRegex(Exception, re.escape(
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
                 'unsupported operand type(s) for +=: \'NoneType\' '
-                'and \'int\'')):
+                'and \'int\''
+            )
+        ):
             stats_services.get_exp_issues_from_model(exp_issues_model)
 
     def test_actual_update_exp_issue_from_model_raises_error(self) -> None:
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
 
-        with self.assertRaisesRegex(NotImplementedError, re.escape(
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
                 'The _convert_issue_v1_dict_to_v2_dict() method is missing '
                 'from the derived class. It should be implemented in the '
-                'derived class.')):
+                'derived class.'
+            )
+        ):
             stats_domain.ExplorationIssue.update_exp_issue_from_model(exp_issue_dict)
 
     def test_validate_for_exp_issues_with_correct_data(self) -> None:
@@ -1367,9 +1386,10 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # test the validate() method input type.
     def test_validate_with_int_issue_type(self) -> None:
         self.exp_issue.issue_type = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected issue_type to be a string, received %s' %
-                                     (type(5)))):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Expected issue_type to be a string, received %s' % (type(5)))
+        ):
             self.exp_issue.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1378,8 +1398,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     def test_validate_with_string_schema_version(self) -> None:
         self.exp_issue.schema_version = '1'  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Expected schema_version to be an int, received %s' % (type('1')))):
+            utils.ValidationError,
+            ('Expected schema_version to be an int, received %s' % (type('1')))
+        ):
             self.exp_issue.validate()
 
     def test_validate_issue_type(self) -> None:
@@ -1392,8 +1413,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # test the validate() method input type.
     def test_validate_playthrough_ids(self) -> None:
         self.exp_issue.playthrough_ids = 'invalid_playthrough_ids'  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected playthrough_ids to be a list')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected playthrough_ids to be a list')
+        ):
             self.exp_issue.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we Remove this test after
@@ -1401,8 +1423,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # test that playthrough_id is a string.
     def test_validate_playthrough_id_type(self) -> None:
         self.exp_issue.playthrough_ids = [0, 1]  # type: ignore[list-item]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Expected each playthrough_id to be a string')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, ('Expected each playthrough_id to be a string')
+        ):
             self.exp_issue.validate()
 
     def test_comparison_between_exploration_issues_returns_correctly(self) -> None:
@@ -1436,9 +1459,11 @@ class LearnerActionTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.learner_action = stats_domain.LearnerAction(
-            'ExplorationStart', {'state_name': {
-                'value': ''
-            }}, 1
+            'ExplorationStart', {
+                'state_name': {
+                    'value': ''
+                }
+            }, 1
         )
 
     def _dummy_convert_action_v1_dict_to_v2_dict(
@@ -1448,18 +1473,26 @@ class LearnerActionTests(test_utils.GenericTestBase):
         action_dict['schema_version'] = 2
         if action_dict['action_type'] == 'ExplorationStart':
             action_dict['action_type'] = 'ExplorationStart1'
-            action_dict['action_customization_args']['new_key'] = {'value': 5}
+            action_dict['action_customization_args']['new_key'] = {
+                'value': 5
+            }
 
         return action_dict
 
     def test_to_dict(self) -> None:
         learner_action = stats_domain.LearnerAction(
-            'ExplorationStart', {'state_name': {
-                'value': ''
-            }}, 1
+            'ExplorationStart', {
+                'state_name': {
+                    'value': ''
+                }
+            }, 1
         )
         learner_action_dict = learner_action.to_dict()
-        expected_customization_args = {'state_name': {'value': ''}}
+        expected_customization_args = {
+            'state_name': {
+                'value': ''
+            }
+        }
         self.assertEqual(
             learner_action_dict, {
                 'action_type': 'ExplorationStart',
@@ -1499,7 +1532,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         self.assertEqual(playthrough.actions[0].action_type, 'ExplorationStart1')
         self.assertEqual(
-            playthrough.actions[0].action_customization_args['new_key'], {'value': 5}
+            playthrough.actions[0].action_customization_args['new_key'], {
+                'value': 5
+            }
         )
 
         # For other action types, no changes happen during migration.
@@ -1554,9 +1589,10 @@ class LearnerActionTests(test_utils.GenericTestBase):
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
         with self.assertRaisesRegex(
-                Exception,
-                'Sorry, we can only process v1-v%d and unversioned action schemas'
-                ' at present.' % stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
+            Exception,
+            'Sorry, we can only process v1-v%d and unversioned action schemas'
+            ' at present.' % stats_models.CURRENT_ISSUE_SCHEMA_VERSION
+        ):
             stats_services.get_playthrough_from_model(playthrough_model)
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1581,19 +1617,27 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
-        with self.assertRaisesRegex(Exception, re.escape(
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
                 'unsupported operand type(s) for +=: \'NoneType\' '
-                'and \'int\'')):
+                'and \'int\''
+            )
+        ):
             stats_services.get_playthrough_from_model(playthrough_model)
 
     def test_actual_update_learner_action_from_model_raises_error(self) -> None:
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
         learner_action_dict = learner_action.to_dict()
 
-        with self.assertRaisesRegex(NotImplementedError, re.escape(
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
                 'The _convert_action_v1_dict_to_v2_dict() method is missing '
                 'from the derived class. It should be implemented in the '
-                'derived class.')):
+                'derived class.'
+            )
+        ):
             stats_domain.LearnerAction.update_learner_action_from_model(
                 learner_action_dict
             )
@@ -1607,8 +1651,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
     def test_validate_with_int_action_type(self) -> None:
         self.learner_action.action_type = 5  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Expected action_type to be a string, received %s' % (type(5)))):
+            utils.ValidationError,
+            ('Expected action_type to be a string, received %s' % (type(5)))
+        ):
             self.learner_action.validate()
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -1617,8 +1662,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
     def test_validate_with_string_schema_version(self) -> None:
         self.learner_action.schema_version = '1'  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Expected schema_version to be an int, received %s' % (type('1')))):
+            utils.ValidationError,
+            ('Expected schema_version to be an int, received %s' % (type('1')))
+        ):
             self.learner_action.validate()
 
 
@@ -1654,35 +1700,30 @@ class StateAnswersTests(test_utils.GenericTestBase):
         )
         submitted_answer_dict_list = (state_answers.get_submitted_answer_dict_list())
         self.assertEqual(
-            submitted_answer_dict_list, [
-                {
-                    'answer': 'Text',
-                    'interaction_id': 'TextInput',
-                    'answer_group_index': 0,
-                    'rule_spec_index': 1,
-                    'classification_categorization': (
-                        exp_domain.EXPLICIT_CLASSIFICATION
-                    ),
-                    'params': {},
-                    'session_id': 'sess',
-                    'time_spent_in_sec': 10.5,
-                    'rule_spec_str': 'rule spec str1',
-                    'answer_str': 'answer str1'
-                }, {
-                    'answer': 'Other text',
-                    'interaction_id': 'TextInput',
-                    'answer_group_index': 1,
-                    'rule_spec_index': 0,
-                    'classification_categorization': (
-                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
-                    ),
-                    'params': {},
-                    'session_id': 'sess',
-                    'time_spent_in_sec': 7.5,
-                    'rule_spec_str': 'rule spec str2',
-                    'answer_str': 'answer str2'
-                }
-            ]
+            submitted_answer_dict_list, [{
+                'answer': 'Text',
+                'interaction_id': 'TextInput',
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
+                'params': {},
+                'session_id': 'sess',
+                'time_spent_in_sec': 10.5,
+                'rule_spec_str': 'rule spec str1',
+                'answer_str': 'answer str1'
+            }, {
+                'answer': 'Other text',
+                'interaction_id': 'TextInput',
+                'answer_group_index': 1,
+                'rule_spec_index': 0,
+                'classification_categorization':
+                    (exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                'params': {},
+                'session_id': 'sess',
+                'time_spent_in_sec': 7.5,
+                'rule_spec_str': 'rule spec str2',
+                'answer_str': 'answer str2'
+            }]
         )
 
 
@@ -1985,20 +2026,18 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
             })
 
     def test_can_be_created_from_full_dict(self) -> None:
-        submitted_answer = stats_domain.SubmittedAnswer.from_dict(
-            {
-                'answer': 'Text',
-                'interaction_id': 'TextInput',
-                'answer_group_index': 0,
-                'rule_spec_index': 1,
-                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
-                'params': {},
-                'session_id': 'sess',
-                'time_spent_in_sec': 10.5,
-                'rule_spec_str': 'rule spec str',
-                'answer_str': 'answer str'
-            }
-        )
+        submitted_answer = stats_domain.SubmittedAnswer.from_dict({
+            'answer': 'Text',
+            'interaction_id': 'TextInput',
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
+            'params': {},
+            'session_id': 'sess',
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': 'rule spec str',
+            'answer_str': 'answer str'
+        })
         self.assertEqual(submitted_answer.answer, 'Text')
         self.assertEqual(submitted_answer.interaction_id, 'TextInput')
         self.assertEqual(submitted_answer.answer_group_index, 0)
@@ -2014,20 +2053,18 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(submitted_answer.answer_str, 'answer str')
 
     def test_can_be_created_from_dict_missing_rule_spec_and_answer(self) -> None:
-        submitted_answer = stats_domain.SubmittedAnswer.from_dict(
-            {
-                'answer': 'Text',
-                'interaction_id': 'TextInput',
-                'answer_group_index': 0,
-                'rule_spec_index': 1,
-                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
-                'params': {},
-                'session_id': 'sess',
-                'time_spent_in_sec': 10.5,
-                'rule_spec_str': None,
-                'answer_str': None
-            }
-        )
+        submitted_answer = stats_domain.SubmittedAnswer.from_dict({
+            'answer': 'Text',
+            'interaction_id': 'TextInput',
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
+            'params': {},
+            'session_id': 'sess',
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': None,
+            'answer_str': None
+        })
         self.assertEqual(submitted_answer.answer, 'Text')
         self.assertEqual(submitted_answer.interaction_id, 'TextInput')
         self.assertEqual(submitted_answer.answer_group_index, 0)
@@ -2240,17 +2277,13 @@ class AnswerFrequencyListDomainTests(test_utils.GenericTestBase):
 
     def test_create_list_from_raw_object(self) -> None:
         answer_frequency_list = (
-            stats_domain.AnswerFrequencyList.from_raw_type(
-                [
-                    {
-                        'answer': 'answer a',
-                        'frequency': 3
-                    }, {
-                        'answer': 'answer b',
-                        'frequency': 2
-                    }
-                ]
-            )
+            stats_domain.AnswerFrequencyList.from_raw_type([{
+                'answer': 'answer a',
+                'frequency': 3
+            }, {
+                'answer': 'answer b',
+                'frequency': 2
+            }])
         )
         answer_occurrences = answer_frequency_list.answer_occurrences
         self.assertEqual(len(answer_occurrences), 2)
@@ -2260,19 +2293,17 @@ class AnswerFrequencyListDomainTests(test_utils.GenericTestBase):
         self.assertEqual(answer_occurrences[1].frequency, 2)
 
     def test_convert_list_to_raw_object(self) -> None:
-        answer_frequency_list = stats_domain.AnswerFrequencyList(
-            [self.ANSWER_A, self.ANSWER_B]
-        )
+        answer_frequency_list = stats_domain.AnswerFrequencyList([
+            self.ANSWER_A, self.ANSWER_B
+        ])
         self.assertEqual(
-            answer_frequency_list.to_raw_type(), [
-                {
-                    'answer': 'answer a',
-                    'frequency': 3
-                }, {
-                    'answer': 'answer b',
-                    'frequency': 2
-                }
-            ]
+            answer_frequency_list.to_raw_type(), [{
+                'answer': 'answer a',
+                'frequency': 3
+            }, {
+                'answer': 'answer b',
+                'frequency': 2
+            }]
         )
 
 
@@ -2298,23 +2329,19 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
 
     def test_create_list_from_raw_object(self) -> None:
         answer_frequency_lists = (
-            stats_domain.CategorizedAnswerFrequencyLists.from_raw_type(
-                {
-                    'category a': [{
-                        'answer': 'answer a',
-                        'frequency': 3
-                    }],
-                    'category b': [
-                        {
-                            'answer': 'answer b',
-                            'frequency': 2
-                        }, {
-                            'answer': 'answer c',
-                            'frequency': 1
-                        }
-                    ]
-                }
-            )
+            stats_domain.CategorizedAnswerFrequencyLists.from_raw_type({
+                'category a': [{
+                    'answer': 'answer a',
+                    'frequency': 3
+                }],
+                'category b': [{
+                    'answer': 'answer b',
+                    'frequency': 2
+                }, {
+                    'answer': 'answer c',
+                    'frequency': 1
+                }]
+            })
         )
         self.assertEqual(len(answer_frequency_lists.categorized_answer_freq_lists), 2)
         self.assertIn(
@@ -2343,29 +2370,25 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
         self.assertEqual(category_b_answers[1].frequency, 1)
 
     def test_convert_list_to_raw_object(self) -> None:
-        answer_frequency_lists = stats_domain.CategorizedAnswerFrequencyLists(
-            {
-                'category a': stats_domain.AnswerFrequencyList([self.ANSWER_A]),
-                'category b': stats_domain.AnswerFrequencyList(
-                    [self.ANSWER_B, self.ANSWER_C]
-                ),
-            }
-        )
+        answer_frequency_lists = stats_domain.CategorizedAnswerFrequencyLists({
+            'category a':
+                stats_domain.AnswerFrequencyList([self.ANSWER_A]),
+            'category b':
+                stats_domain.AnswerFrequencyList([self.ANSWER_B, self.ANSWER_C]),
+        })
         self.assertEqual(
             answer_frequency_lists.to_raw_type(), {
                 'category a': [{
                     'answer': 'answer a',
                     'frequency': 3
                 }],
-                'category b': [
-                    {
-                        'answer': 'answer b',
-                        'frequency': 2
-                    }, {
-                        'answer': 'answer c',
-                        'frequency': 1
-                    }
-                ]
+                'category b': [{
+                    'answer': 'answer b',
+                    'frequency': 2
+                }, {
+                    'answer': 'answer c',
+                    'frequency': 1
+                }]
             }
         )
 
@@ -2459,14 +2482,12 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             'state_reference': 'exp_id:state_name',
             'entity_type': 'exploration',
             'interaction_id': 'TextInput',
-            'learner_answer_info_list': [
-                {
-                    'id': 'id_1',
-                    'answer': 'This is my answer',
-                    'answer_details': 'This is my answer details',
-                    'created_on': '2019-06-19 13:59:29.153073'
-                }
-            ],
+            'learner_answer_info_list': [{
+                'id': 'id_1',
+                'answer': 'This is my answer',
+                'answer_details': 'This is my answer details',
+                'created_on': '2019-06-19 13:59:29.153073'
+            }],
             'accumulated_answer_info_json_size_bytes': 4000,
             'learner_answer_info_schema_version': 1
         }
@@ -2480,14 +2501,12 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             'state_reference': 'exp_id:state_name',
             'entity_type': 'exploration',
             'interaction_id': 'TextInput',
-            'learner_answer_info_list': [
-                {
-                    'id': 'id_1',
-                    'answer': 'This is my answer',
-                    'answer_details': 'This is my answer details',
-                    'created_on': '2019-06-19 13:59:29.153073'
-                }
-            ],
+            'learner_answer_info_list': [{
+                'id': 'id_1',
+                'answer': 'This is my answer',
+                'answer_details': 'This is my answer details',
+                'created_on': '2019-06-19 13:59:29.153073'
+            }],
             'accumulated_answer_info_json_size_bytes': 4000,
             'learner_answer_info_schema_version': 1
         }
@@ -2557,8 +2576,9 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         self.assertNotEqual(
             self.learner_answer_details.accumulated_answer_info_json_size_bytes, 0
         )
-        with self.assertRaisesRegex(Exception,
-                                    'Learner answer info with the given id not found'):
+        with self.assertRaisesRegex(
+            Exception, 'Learner answer info with the given id not found'
+        ):
             self.learner_answer_details.delete_learner_answer_info('id_3')
         self.assertEqual(len(self.learner_answer_details.learner_answer_info_list), 1)
 
@@ -2589,7 +2609,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             self.learner_answer_details, 'Expected entity_type to be a string'
         )
 
-    def test_entity_type_must_be_valid(self, ) -> None:
+    def test_entity_type_must_be_valid(self,) -> None:
         self.learner_answer_details.entity_type = 'topic'
         self._assert_validation_error(
             self.learner_answer_details, 'Invalid entity type received topic'

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Jobs used for populating story node."""
 
 from __future__ import annotations
@@ -30,19 +29,18 @@ from core.platform import models
 from typing import Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import story_models
     from mypy_imports import topic_models
 
-(story_models, topic_models) = models.Registry.import_models([
-    models.Names.STORY, models.Names.TOPIC])
+(story_models,
+ topic_models) = models.Registry.import_models([models.Names.STORY, models.Names.TOPIC])
 
 
 class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        story_node_jobs.PopulateStoryNodeJob
-    ] = story_node_jobs.PopulateStoryNodeJob
+    JOB_CLASS: Type[story_node_jobs.PopulateStoryNodeJob
+                   ] = story_node_jobs.PopulateStoryNodeJob
 
     STORY_1_ID: Final = 'story_1_id'
     STORY_2_ID: Final = 'story_2_id'
@@ -221,55 +219,62 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             created_on=self.TOPIC_SNAPSHOT_2_DATE
         )
 
-        self.put_multi(
-            [story_model_1, story_model_2, topic_model,
-            story_1_snapshot_metadata_model_1,
-            story_1_snapshot_metadata_model_2,
-            story_2_snapshot_metadata_model_1,
-            topic_snapshot_metadata_model_1,
-            topic_snapshot_metadata_model_2])
+        self.put_multi([
+            story_model_1, story_model_2, topic_model,
+            story_1_snapshot_metadata_model_1, story_1_snapshot_metadata_model_2,
+            story_2_snapshot_metadata_model_1, topic_snapshot_metadata_model_1,
+            topic_snapshot_metadata_model_2
+        ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='TOPIC MODELS WHOSE STORIES ARE UPDATED SUCCESS: 1'
             )
         ])
-        updated_story_model_1 = story_models.StoryModel.get(
-            self.STORY_1_ID
-        )
+        updated_story_model_1 = story_models.StoryModel.get(self.STORY_1_ID)
         story_1_nodes = updated_story_model_1.story_contents['nodes']
 
         self.assertEqual(story_1_nodes[0]['status'], 'Published')
         self.assertEqual(story_1_nodes[0]['unpublishing_reason'], None)
-        self.assertEqual(story_1_nodes[0]['first_publication_date_msecs'], (
-            utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)))
-        self.assertEqual(story_1_nodes[0]['planned_publication_date_msecs'], (
-            utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)))
-        self.assertEqual(story_1_nodes[0]['last_modified_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)))
+        self.assertEqual(
+            story_1_nodes[0]['first_publication_date_msecs'],
+            (utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE))
+        )
+        self.assertEqual(
+            story_1_nodes[0]['planned_publication_date_msecs'],
+            (utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE))
+        )
+        self.assertEqual(
+            story_1_nodes[0]['last_modified_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE))
+        )
 
         self.assertEqual(story_1_nodes[1]['status'], 'Published')
         self.assertEqual(story_1_nodes[1]['unpublishing_reason'], None)
-        self.assertEqual(story_1_nodes[1]['first_publication_date_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)))
-        self.assertEqual(story_1_nodes[1]['planned_publication_date_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)))
-        self.assertEqual(story_1_nodes[1]['last_modified_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)))
-
-        updated_story_model_2 = story_models.StoryModel.get(
-            self.STORY_2_ID
+        self.assertEqual(
+            story_1_nodes[1]['first_publication_date_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE))
         )
+        self.assertEqual(
+            story_1_nodes[1]['planned_publication_date_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE))
+        )
+        self.assertEqual(
+            story_1_nodes[1]['last_modified_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE))
+        )
+
+        updated_story_model_2 = story_models.StoryModel.get(self.STORY_2_ID)
         story_2_nodes = updated_story_model_2.story_contents['nodes']
 
         self.assertEqual(story_2_nodes[0]['status'], 'Draft')
         self.assertEqual(story_2_nodes[0]['unpublishing_reason'], None)
-        self.assertEqual(story_2_nodes[0]['first_publication_date_msecs'], (
-            None))
-        self.assertEqual(story_2_nodes[0]['planned_publication_date_msecs'], (
-            None))
-        self.assertEqual(story_2_nodes[0]['last_modified_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_2_SHAPSHOT_1_DATE)))
+        self.assertEqual(story_2_nodes[0]['first_publication_date_msecs'], (None))
+        self.assertEqual(story_2_nodes[0]['planned_publication_date_msecs'], (None))
+        self.assertEqual(
+            story_2_nodes[0]['last_modified_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_2_SHAPSHOT_1_DATE))
+        )
 
     def test_topic_with_no_story_reference_raises_error(self) -> None:
         story_model_1 = self.create_model(
@@ -311,9 +316,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             committer_id='user_1',
             created_on=self.STORY_1_SHAPSHOT_1_DATE
         )
-        self.put_multi(
-            [story_model_1, topic_model,
-             story_snapshot_metadata_model])
+        self.put_multi([story_model_1, topic_model, story_snapshot_metadata_model])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -378,10 +381,10 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             committer_id='user_1',
             created_on=self.TOPIC_SNAPSHOT_1_DATE
         )
-        self.put_multi(
-            [story_model_1, topic_model,
-             story_snapshot_metadata_model,
-             topic_snapshot_metadata_model])
+        self.put_multi([
+            story_model_1, topic_model, story_snapshot_metadata_model,
+            topic_snapshot_metadata_model
+        ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -396,9 +399,8 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
 class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        story_node_jobs.AuditPopulateStoryNodeJob
-    ] = story_node_jobs.AuditPopulateStoryNodeJob
+    JOB_CLASS: Type[story_node_jobs.AuditPopulateStoryNodeJob
+                   ] = story_node_jobs.AuditPopulateStoryNodeJob
 
     STORY_1_ID: Final = 'story_1_id'
     STORY_2_ID: Final = 'story_2_id'
@@ -577,13 +579,12 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             created_on=self.TOPIC_SNAPSHOT_2_DATE
         )
 
-        self.put_multi(
-            [story_model_1, story_model_2, topic_model,
-            story_1_snapshot_metadata_model_1,
-            story_1_snapshot_metadata_model_2,
-            story_2_snapshot_metadata_model_1,
-            topic_snapshot_metadata_model_1,
-            topic_snapshot_metadata_model_2])
+        self.put_multi([
+            story_model_1, story_model_2, topic_model,
+            story_1_snapshot_metadata_model_1, story_1_snapshot_metadata_model_2,
+            story_2_snapshot_metadata_model_1, topic_snapshot_metadata_model_1,
+            topic_snapshot_metadata_model_2
+        ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -631,9 +632,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             committer_id='user_1',
             created_on=self.STORY_1_SHAPSHOT_1_DATE
         )
-        self.put_multi(
-            [story_model_1, topic_model,
-             story_snapshot_metadata_model])
+        self.put_multi([story_model_1, topic_model, story_snapshot_metadata_model])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -698,10 +697,10 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             committer_id='user_1',
             created_on=self.TOPIC_SNAPSHOT_1_DATE
         )
-        self.put_multi(
-            [story_model_1, topic_model,
-             story_snapshot_metadata_model,
-             topic_snapshot_metadata_model])
+        self.put_multi([
+            story_model_1, topic_model, story_snapshot_metadata_model,
+            topic_snapshot_metadata_model
+        ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(

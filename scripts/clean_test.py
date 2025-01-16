@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for scripts/clean_test.py."""
 
 from __future__ import annotations
@@ -38,8 +37,10 @@ class CleanTests(test_utils.GenericTestBase):
         expected_check_function_calls = {
             'rmtree_is_called': False
         }
+
         def mock_rmtree(unused_path: str) -> None:
             check_function_calls['rmtree_is_called'] = True
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
@@ -56,8 +57,10 @@ class CleanTests(test_utils.GenericTestBase):
         expected_check_function_calls = {
             'rmtree_is_called': True
         }
+
         def mock_rmtree(unused_path: str) -> None:
             check_function_calls['rmtree_is_called'] = True
+
         def mock_exists(unused_path: str) -> Literal[True]:
             return True
 
@@ -74,8 +77,10 @@ class CleanTests(test_utils.GenericTestBase):
         expected_check_function_calls = {
             'remove_is_called': False
         }
+
         def mock_remove(unused_path: str) -> None:
             check_function_calls['remove_is_called'] = True
+
         def mock_isfile(unused_path: str) -> Literal[False]:
             return False
 
@@ -92,8 +97,10 @@ class CleanTests(test_utils.GenericTestBase):
         expected_check_function_calls = {
             'remove_is_called': True
         }
+
         def mock_remove(unused_path: str) -> None:
             check_function_calls['remove_is_called'] = True
+
         def mock_isfile(unused_path: str) -> Literal[True]:
             return True
 
@@ -112,14 +119,17 @@ class CleanTests(test_utils.GenericTestBase):
             'delete_directory_tree_is_called': 9,
             'delete_file_is_called': 4
         }
+
         def mock_delete_dir(unused_path: str) -> None:
             check_function_calls['delete_directory_tree_is_called'] += 1
+
         def mock_delete_file(unused_path: str) -> None:
             check_function_calls['delete_file_is_called'] += 1
+
         def mock_listdir(unused_path: str) -> List[str]:
             return ['some_dir', 'tmpcompiledjs_dir']
-        delete_dir_swap = self.swap(
-            clean, 'delete_directory_tree', mock_delete_dir)
+
+        delete_dir_swap = self.swap(clean, 'delete_directory_tree', mock_delete_dir)
         delete_file_swap = self.swap(clean, 'delete_file', mock_delete_file)
         listdir_swap = self.swap(os, 'listdir', mock_listdir)
 

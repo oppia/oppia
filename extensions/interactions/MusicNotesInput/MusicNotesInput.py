@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for MusicNotesInput interaction."""
 
 from __future__ import annotations
@@ -33,7 +32,8 @@ class MusicNotesInput(base.BaseInteraction):
     name: str = 'Music Notes Input'
     description: str = (
         'Allows learners to drag and drop notes onto the lines of a music '
-        'staff.')
+        'staff.'
+    )
     display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids: List[str] = ['midijs']
     answer_type: str = 'MusicPhrase'

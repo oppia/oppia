@@ -33,9 +33,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import recommendations_models
 
-(recommendations_models, ) = models.Registry.import_models(
-    [models.Names.RECOMMENDATIONS]
-)
+(recommendations_models,) = models.Registry.import_models([
+    models.Names.RECOMMENDATIONS
+])
 
 
 # pylint: disable=line-too-long, single-line-pragma
@@ -140,8 +140,7 @@ def create_default_topic_similarities(
     """
 
     topic_similarities_dict: Dict[str, Dict[str, float]] = {
-        topic: {}
-        for topic in RECOMMENDATION_CATEGORIES
+        topic: {} for topic in RECOMMENDATION_CATEGORIES
     }
     raw_data = DEFAULT_TOPIC_SIMILARITIES_STRING.splitlines()
     data = list(csv.reader(raw_data))
@@ -251,8 +250,10 @@ def validate_topic_similarities(csv_data: str) -> None:
 
     for row_ind in range(topics_length):
         for col_ind in range(topics_length):
-            if (topic_similarities_values[row_ind][col_ind]
-                    != topic_similarities_values[col_ind][row_ind]):
+            if (
+                topic_similarities_values[row_ind][col_ind]
+                != topic_similarities_values[col_ind][row_ind]
+            ):
                 raise Exception('Expected topic similarities to be symmetric.')
 
 

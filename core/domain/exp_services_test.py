@@ -81,13 +81,11 @@ if MYPY:  # pragma: no cover
     suggestion_models,
     user_models,
     voiceover_models,
-) = models.Registry.import_models(
-    [
-        models.Names.FEEDBACK, models.Names.EXPLORATION, models.Names.OPPORTUNITY,
-        models.Names.RECOMMENDATIONS, models.Names.TRANSLATION, models.Names.STATISTICS,
-        models.Names.SUGGESTION, models.Names.USER, models.Names.VOICEOVER
-    ]
-)
+) = models.Registry.import_models([
+    models.Names.FEEDBACK, models.Names.EXPLORATION, models.Names.OPPORTUNITY,
+    models.Names.RECOMMENDATIONS, models.Names.TRANSLATION, models.Names.STATISTICS,
+    models.Names.SUGGESTION, models.Names.USER, models.Names.VOICEOVER
+])
 
 search_services = models.Registry.import_search_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -151,8 +149,9 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     def test_raises_error_if_guest_user_try_to_publish_the_exploration(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(
-                Exception, 'To publish explorations and update users\' profiles, '
-                'user must be logged in and have admin access.'):
+            Exception, 'To publish explorations and update users\' profiles, '
+            'user must be logged in and have admin access.'
+        ):
             exp_services.publish_exploration_and_update_user_profiles(
                 guest_user, 'exp_id'
             )
@@ -162,20 +161,22 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         self.save_new_default_exploration('A', self.owner_id, title='TitleA')
         self.assertEqual(
-            exp_services.get_exploration_titles_and_categories(['A']),
-            {'A': {
-                'category': 'Algebra',
-                'title': 'TitleA'
-            }}
+            exp_services.get_exploration_titles_and_categories(['A']), {
+                'A': {
+                    'category': 'Algebra',
+                    'title': 'TitleA'
+                }
+            }
         )
 
         self.save_new_default_exploration('B', self.owner_id, title='TitleB')
         self.assertEqual(
-            exp_services.get_exploration_titles_and_categories(['A']),
-            {'A': {
-                'category': 'Algebra',
-                'title': 'TitleA'
-            }}
+            exp_services.get_exploration_titles_and_categories(['A']), {
+                'A': {
+                    'category': 'Algebra',
+                    'title': 'TitleA'
+                }
+            }
         )
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'B']), {
@@ -190,11 +191,12 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             }
         )
         self.assertEqual(
-            exp_services.get_exploration_titles_and_categories(['A', 'C']),
-            {'A': {
-                'category': 'Algebra',
-                'title': 'TitleA'
-            }}
+            exp_services.get_exploration_titles_and_categories(['A', 'C']), {
+                'A': {
+                    'category': 'Algebra',
+                    'title': 'TitleA'
+                }
+            }
         )
 
     def test_get_interaction_id_for_state(self) -> None:
@@ -210,15 +212,13 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             ) + _get_change_list(
                 'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': False
@@ -230,8 +230,9 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.get_interaction_id_for_state(self.EXP_0_ID, 'Introduction'),
             'MultipleChoiceInput'
         )
-        with self.assertRaisesRegex(Exception,
-                                    'There exist no state in the exploration'):
+        with self.assertRaisesRegex(
+            Exception, 'There exist no state in the exploration'
+        ):
             exp_services.get_interaction_id_for_state(self.EXP_0_ID, 'Fake state name')
 
 
@@ -323,12 +324,10 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         rights_manager.publish_exploration(self.owner, self.EXP_ID_6)
 
         # Add the explorations to the search index.
-        exp_services.index_explorations_given_ids(
-            [
-                self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
-                self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6
-            ]
-        )
+        exp_services.index_explorations_given_ids([
+            self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_4,
+            self.EXP_ID_5, self.EXP_ID_6
+        ])
 
     def test_get_exploration_summaries_with_no_query(self) -> None:
         # An empty query should return all explorations.
@@ -451,7 +450,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
             # Page 1: 3 initial explorations.
             (exp_ids, search_offset
-             ) = (exp_services.get_exploration_ids_matching_query('', [], []))
+            ) = (exp_services.get_exploration_ids_matching_query('', [], []))
             self.assertEqual(len(exp_ids), 3)
             self.assertIsNotNone(search_offset)
             found_exp_ids += exp_ids
@@ -506,8 +505,10 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             """
             pass
 
-        with self.swap(search_services, 'delete_documents_from_index',
-                       _mock_delete_documents_from_index):
+        with self.swap(
+            search_services, 'delete_documents_from_index',
+            _mock_delete_documents_from_index
+        ):
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
 
@@ -540,9 +541,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
         with self.assertRaisesRegex(
-                Exception,
-                'Entity for class ExplorationModel with id An_exploration_0_id '
-                'not found'):
+            Exception, 'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'
+        ):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -603,14 +604,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
         with self.assertRaisesRegex(
-                Exception,
-                'Entity for class ExplorationModel with id An_exploration_0_id '
-                'not found'):
+            Exception, 'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'
+        ):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         with self.assertRaisesRegex(
-                Exception,
-                'Entity for class ExplorationModel with id An_exploration_1_id '
-                'not found'):
+            Exception, 'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'
+        ):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -692,9 +693,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, force_deletion=True
         )
         with self.assertRaisesRegex(
-                Exception,
-                'Entity for class ExplorationModel with id An_exploration_0_id '
-                'not found'):
+            Exception, 'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'
+        ):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -718,14 +719,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID], force_deletion=True
         )
         with self.assertRaisesRegex(
-                Exception,
-                'Entity for class ExplorationModel with id An_exploration_0_id '
-                'not found'):
+            Exception, 'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'
+        ):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         with self.assertRaisesRegex(
-                Exception,
-                'Entity for class ExplorationModel with id An_exploration_1_id '
-                'not found'):
+            Exception, 'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'
+        ):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted explorations does not show up in any queries.
@@ -751,9 +752,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, force_deletion=True
         )
         with self.assertRaisesRegex(
-                Exception,
-                'Entity for class ExplorationModel with id An_exploration_0_id '
-                'not found'):
+            Exception, 'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'
+        ):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration summary does not show up in any queries.
@@ -914,7 +915,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         self.assertEqual(
             user_models.UserContributionsModel.get(self.owner_id
-                                                   ).created_exploration_ids,
+                                                  ).created_exploration_ids,
             [self.EXP_2_ID]
         )
         self.assertEqual(
@@ -923,12 +924,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         )
         self.assertEqual(
             user_models.UserContributionsModel.get('other_user_id'
-                                                   ).created_exploration_ids,
+                                                  ).created_exploration_ids,
             [self.EXP_2_ID]
         )
         self.assertEqual(
             user_models.UserContributionsModel.get('other_user_id'
-                                                   ).edited_exploration_ids, []
+                                                  ).edited_exploration_ids, []
         )
 
     def test_feedbacks_belonging_to_exploration_are_deleted(self) -> None:
@@ -996,24 +997,22 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_that_default_exploration_fails_strict_validation(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(self.EXP_0_ID)
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'This state does not have any interaction specified.'):
+            utils.ValidationError, 'This state does not have any interaction specified.'
+        ):
             exploration.validate(strict=True)
 
     def test_save_and_retrieve_exploration(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'param_specs',
-                        'new_value': {
-                            'theParameter': param_domain.ParamSpec('UnicodeString'
-                                                                   ).to_dict()
-                        }
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'param_specs',
+                    'new_value': {
+                        'theParameter':
+                            param_domain.ParamSpec('UnicodeString').to_dict()
                     }
-                )
+                })
             ], ''
         )
 
@@ -1032,36 +1031,30 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # Change param spec.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'param_specs',
-                        'new_value': {
-                            'theParameter': param_domain.ParamSpec('UnicodeString'
-                                                                   ).to_dict()
-                        }
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'param_specs',
+                    'new_value': {
+                        'theParameter':
+                            param_domain.ParamSpec('UnicodeString').to_dict()
                     }
-                )
+                })
             ], ''
         )
 
         # Change title and category.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'A new title'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'category',
-                        'new_value': 'A new category'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'A new title'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'category',
+                    'new_value': 'A new category'
+                })
             ], 'Change title and category'
         )
 
@@ -1096,14 +1089,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             }
         }
         change_list_voiceover = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-                    'state_name': 'State 1',
-                    'new_value': recorded_voiceovers_dict
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                'state_name': 'State 1',
+                'new_value': recorded_voiceovers_dict
+            })
         ]
         changed_exploration_voiceover = (
             exp_services.apply_change_list(self.EXP_0_ID, change_list_voiceover)
@@ -1115,13 +1106,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             changed_exp_voiceover_obj.to_dict(), recorded_voiceovers_dict
         )
         change_list_objective = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'objective',
-                    'new_value': 'new objective'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'objective',
+                'new_value': 'new objective'
+            })
         ]
         changed_exploration_objective = (
             exp_services.apply_change_list(self.EXP_0_ID, change_list_objective)
@@ -1132,24 +1121,20 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         exp_services.update_exploration(
             self.editor_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'A new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'A new title'
+                })
             ], 'changed title'
         )
         exp_services.update_exploration(
             self.voice_artist_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Another new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Another new title'
+                })
             ], 'changed title again'
         )
         owner_action = user_services.get_user_actions_info(self.owner_id)
@@ -1180,41 +1165,35 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             }
         }
         change_list_voiceover = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-                    'state_name': 'State 1',
-                    'new_value': recorded_voiceovers_dict
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                'state_name': 'State 1',
+                'new_value': recorded_voiceovers_dict
+            })
         ]
         self.assertTrue(exp_services.is_voiceover_change_list(change_list_voiceover))
         not_voiceover_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'title',
-                    'new_value': 'New title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            })
         ]
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list)
         )
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT]
-    )
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT
+    ])
     def test_changes_in_voiceover_list_with_feature_flag_enabled(self) -> None:
         not_voiceover_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'title',
-                    'new_value': 'New title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            })
         ]
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list)
@@ -1227,16 +1206,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'duration_secs': 6.1
         }
         change_list_voiceover = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_UPDATE_VOICEOVERS,
-                    'language_accent_code': 'en-US',
-                    'content_id': 'content_0',
-                    'voiceovers': {
-                        'manual': manual_voiceover_1
-                    }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_UPDATE_VOICEOVERS,
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
                 }
-            )
+            })
         ]
         self.assertTrue(exp_services.is_voiceover_change_list(change_list_voiceover))
 
@@ -1286,7 +1263,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, category='Algebra'
         )
-        exploration.param_specs = {'myParam': param_domain.ParamSpec('UnicodeString')}
+        exploration.param_specs = {
+            'myParam': param_domain.ParamSpec('UnicodeString')
+        }
         error_string = (
             'Expected no exploration in a story to have parameter '
             'values in it. Invalid exploration: %s' % exploration.id
@@ -1308,35 +1287,31 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'mobile app.' % ('CodeRepl', exploration.id)
         )
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': exploration.init_state_name,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'CodeRepl'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': exploration.init_state_name,
-                    'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'new_value': {
-                        'language': {
-                            'value': 'python'
-                        },
-                        'placeholder': {
-                            'value': '# Type your code here.'
-                        },
-                        'preCode': {
-                            'value': ''
-                        },
-                        'postCode': {
-                            'value': ''
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'CodeRepl'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'language': {
+                        'value': 'python'
+                    },
+                    'placeholder': {
+                        'value': '# Type your code here.'
+                    },
+                    'preCode': {
+                        'value': ''
+                    },
+                    'postCode': {
+                        'value': ''
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed to CodeRepl'
@@ -1359,36 +1334,29 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'EndExploration interaction.' % (exploration.id)
         )
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': exploration.init_state_name,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'EndExploration'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': exploration.init_state_name,
-                    'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'new_value': {
-                        'recommendedExplorationIds': {
-                            'value': ['EXP_1', 'EXP_2']
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'EndExploration'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'recommendedExplorationIds': {
+                        'value': ['EXP_1', 'EXP_2']
                     }
                 }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                    ),
-                    'state_name': exploration.init_state_name,
-                    'new_value': None
-                }
-            )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    (exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                'state_name': exploration.init_state_name,
+                'new_value': None
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed to EndExploration'
@@ -1411,37 +1379,31 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             '4 choices.' % (exploration.id, exploration.init_state_name)
         )
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': exploration.init_state_name,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'MultipleChoiceInput'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': exploration.init_state_name,
-                    'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'new_value': {
-                        'choices': {
-                            'value': [
-                                {
-                                    'content_id': 'ca_choices_0',
-                                    'html': '<p>1</p>'
-                                }, {
-                                    'content_id': 'ca_choices_1',
-                                    'html': '<p>2</p>'
-                                }
-                            ]
-                        },
-                        'showChoicesInShuffledOrder': {
-                            'value': True
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>1</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': True
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed to MultipleChoiceInput'
@@ -1468,7 +1430,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
-                'content_id': 'solution',
+                'content_id':
+                    'solution',
                 'html': (
                     '<oppia-noninteractive-collapsible content-with-value='
                     '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
@@ -1585,13 +1548,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
             ], 'Did migration.'
         )
 
@@ -1610,13 +1571,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
             ], 'Did migration.'
         )
 
@@ -1635,13 +1594,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
             ], 'Did migration.'
         )
 
@@ -1668,9 +1625,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             objective='objective 2'
         )
 
-        explorations = exp_fetchers.get_multiple_explorations_by_id(
-            ['exp_id_1', 'exp_id_2']
-        )
+        explorations = exp_fetchers.get_multiple_explorations_by_id([
+            'exp_id_1', 'exp_id_2'
+        ])
 
         self.assertEqual(len(explorations), 2)
         self.assertEqual(explorations['exp_id_1'].title, 'title 1')
@@ -1695,23 +1652,21 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'param_changes': [],
                 'interaction': {
                     'customization_args': {},
-                    'id': 'Continue',
-                    'handlers': [
-                        {
-                            'name': 'invalid_handler_name',
-                            'rule_specs': [
-                                {
-                                    'dest': 'END',
-                                    'dest_if_really_stuck': None,
-                                    'feedback': [],
-                                    'param_changes': [],
-                                    'definition': {
-                                        'rule_type': 'default'
-                                    }
-                                }
-                            ]
-                        }
-                    ]
+                    'id':
+                        'Continue',
+                    'handlers': [{
+                        'name':
+                            'invalid_handler_name',
+                        'rule_specs': [{
+                            'dest': 'END',
+                            'dest_if_really_stuck': None,
+                            'feedback': [],
+                            'param_changes': [],
+                            'definition': {
+                                'rule_type': 'default'
+                            }
+                        }]
+                    }]
                 },
             }
         }
@@ -1727,18 +1682,21 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         )
 
         exploration_model.commit(
-            self.owner_id, 'exploration model created',
-            [{
+            self.owner_id, 'exploration model created', [{
                 'cmd': 'create',
                 'title': 'title 1',
                 'category': 'category 1',
             }]
         )
 
-        with self.assertRaisesRegex(Exception, re.escape(
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
                 'Exploration(id=exp_id_1, version=1, states_schema_version=3) '
                 'does not match the latest schema version %s' %
-                feconf.CURRENT_STATE_SCHEMA_VERSION)):
+                feconf.CURRENT_STATE_SCHEMA_VERSION
+            )
+        ):
             (
                 exp_fetchers.
                 get_multiple_versioned_exp_interaction_ids_mapping_by_version(
@@ -1785,12 +1743,14 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_load_demo_with_invalid_demo_exploration_id_raises_error(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'Invalid demo exploration id invalid_exploration_id'):
+            Exception, 'Invalid demo exploration id invalid_exploration_id'
+        ):
             exp_services.load_demo('invalid_exploration_id')
 
     def test_delete_demo_with_invalid_demo_exploration_id_raises_error(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'Invalid demo exploration id invalid_exploration_id'):
+            Exception, 'Invalid demo exploration id invalid_exploration_id'
+        ):
             exp_services.delete_demo('invalid_exploration_id')
 
 
@@ -2185,8 +2145,9 @@ title: Title
             self.SOLUTION_AUDIO_FILE
         )
 
-        with self.assertRaisesRegex(Exception,
-                                    'Invalid YAML file: missing schema version'):
+        with self.assertRaisesRegex(
+            Exception, 'Invalid YAML file: missing schema version'
+        ):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.owner_id, yaml_with_no_schema_version, self.EXP_ID, []
             )
@@ -2206,9 +2167,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2 = exploration.states['state2']
         state3 = exploration.states['state3']
         content1_dict: state_domain.SubtitledHtmlDict = {
-            'content_id': content_id_generator.generate(
-                translation_domain.ContentType.CONTENT
-            ),
+            'content_id':
+                content_id_generator.generate(translation_domain.ContentType.CONTENT),
             'html': (
                 '<blockquote>Hello, this is state1</blockquote>'
                 '<oppia-noninteractive-image filepath-with-value='
@@ -2218,16 +2178,16 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             )
         }
         content2_dict: state_domain.SubtitledHtmlDict = {
-            'content_id': content_id_generator.generate(
-                translation_domain.ContentType.CONTENT
-            ),
-            'html': '<pre>Hello, this is state2</pre>'
+            'content_id':
+                content_id_generator.generate(translation_domain.ContentType.CONTENT),
+            'html':
+                '<pre>Hello, this is state2</pre>'
         }
         content3_dict: state_domain.SubtitledHtmlDict = {
-            'content_id': content_id_generator.generate(
-                translation_domain.ContentType.CONTENT
-            ),
-            'html': '<p>Hello, this is state3</p>'
+            'content_id':
+                content_id_generator.generate(translation_domain.ContentType.CONTENT),
+            'html':
+                '<p>Hello, this is state3</p>'
         }
         state1.update_content(state_domain.SubtitledHtml.from_dict(content1_dict))
         state2.update_content(state_domain.SubtitledHtml.from_dict(content2_dict))
@@ -2248,50 +2208,47 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 },
                 'imageAndRegions': {
                     'value': {
-                        'imagePath': 's1ImagePath.png',
-                        'labeledRegions': [
-                            {
-                                'label': 'classdef',
-                                'region': {
-                                    'area': [
-                                        [0.004291845493562232, 0.004692192192192192],
-                                        [0.40987124463519314, 0.05874624624624625]
-                                    ],
-                                    'regionType': 'Rectangle'
-                                }
+                        'imagePath':
+                            's1ImagePath.png',
+                        'labeledRegions': [{
+                            'label': 'classdef',
+                            'region': {
+                                'area': [[0.004291845493562232, 0.004692192192192192],
+                                         [0.40987124463519314, 0.05874624624624625]],
+                                'regionType': 'Rectangle'
                             }
-                        ]
+                        }]
                     }
                 }
             }
-        customization_args_choices: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'content_id': content_id_generator.generate(
+        customization_args_choices: List[state_domain.SubtitledHtmlDict] = [{
+            'content_id':
+                content_id_generator.generate(
                     translation_domain.ContentType.CUSTOMIZATION_ARG,
                     extra_prefix='choices'
                 ),
-                'html': (
-                    '<p>This is value1 for MultipleChoice'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;'
-                    'image&amp;quot;"></oppia-noninteractive-image></p>'
-                )
-            }, {
-                'content_id': content_id_generator.generate(
+            'html': (
+                '<p>This is value1 for MultipleChoice'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;'
+                'image&amp;quot;"></oppia-noninteractive-image></p>'
+            )
+        }, {
+            'content_id':
+                content_id_generator.generate(
                     translation_domain.ContentType.CUSTOMIZATION_ARG,
                     extra_prefix='choices'
                 ),
-                'html': (
-                    '<p>This is value2 for MultipleChoice'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                    '</p></p>'
-                )
-            }
-        ]
+            'html': (
+                '<p>This is value2 for MultipleChoice'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value='
+                '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                '</p></p>'
+            )
+        }]
         customization_args_dict2: Dict[str, Dict[str, Union[
             bool, List[state_domain.SubtitledHtmlDict]]]] = {
                 'choices': {
@@ -2301,48 +2258,49 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     'value': True
                 }
             }
-        customization_args_choices = [
-            {
-                'content_id': content_id_generator.generate(
+        customization_args_choices = [{
+            'content_id':
+                content_id_generator.generate(
                     translation_domain.ContentType.CUSTOMIZATION_ARG,
                     extra_prefix='choices'
                 ),
-                'html': (
-                    '<p>This is value1 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'
-                )
-            }, {
-                'content_id': content_id_generator.generate(
+            'html': (
+                '<p>This is value1 for ItemSelection'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value='
+                '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                '</p>'
+            )
+        }, {
+            'content_id':
+                content_id_generator.generate(
                     translation_domain.ContentType.CUSTOMIZATION_ARG,
                     extra_prefix='choices'
                 ),
-                'html': (
-                    '<p>This is value2 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'
-                )
-            }, {
-                'content_id': content_id_generator.generate(
+            'html': (
+                '<p>This is value2 for ItemSelection'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value='
+                '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                '</p>'
+            )
+        }, {
+            'content_id':
+                content_id_generator.generate(
                     translation_domain.ContentType.CUSTOMIZATION_ARG,
                     extra_prefix='choices'
                 ),
-                'html': (
-                    '<p>This is value3 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'
-                )
-            }
-        ]
+            'html': (
+                '<p>This is value3 for ItemSelection'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value='
+                '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                '</p>'
+            )
+        }]
         customization_args_dict3: Dict[str, Dict[str, Union[
             int, List[state_domain.SubtitledHtmlDict]]]] = {
                 'choices': {
@@ -2408,8 +2366,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         )
                     ), False, [], None, None
                 ), [
-                    state_domain.RuleSpec('Equals', {'x': 0}),
-                    state_domain.RuleSpec('Equals', {'x': 1})
+                    state_domain.RuleSpec('Equals', {
+                        'x': 0
+                    }),
+                    state_domain.RuleSpec('Equals', {
+                        'x': 1
+                    })
                 ], [], None
             ),
             state_domain.AnswerGroup(
@@ -2420,7 +2382,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                             translation_domain.ContentType.FEEDBACK
                         ), '<p>Outcome2 for state2</p>'
                     ), False, [], None, None
-                ), [state_domain.RuleSpec('Equals', {'x': 0})], [], None
+                ), [state_domain.RuleSpec('Equals', {
+                    'x': 0
+                })], [], None
             )
         ]
         state_answer_group_list3 = [
@@ -2435,32 +2399,28 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 ), [
                     state_domain.RuleSpec(
                         'Equals', {
-                            'x': [
-                                (
-                                    '<p>This is value1 for ItemSelection</p>'
-                                    '<oppia-noninteractive-image filepath-with-'
-                                    'value='
-                                    '"&amp;quot;s3Choice1.png&amp;quot;"'
-                                    ' caption-with-value="&amp;quot;&amp;quot;" '
-                                    'alt-with-value="&amp;quot;image&amp;quot;">'
-                                    '</oppia-noninteractive-image>'
-                                )
-                            ]
+                            'x': [(
+                                '<p>This is value1 for ItemSelection</p>'
+                                '<oppia-noninteractive-image filepath-with-'
+                                'value='
+                                '"&amp;quot;s3Choice1.png&amp;quot;"'
+                                ' caption-with-value="&amp;quot;&amp;quot;" '
+                                'alt-with-value="&amp;quot;image&amp;quot;">'
+                                '</oppia-noninteractive-image>'
+                            )]
                         }
                     ),
                     state_domain.RuleSpec(
                         'Equals', {
-                            'x': [
-                                (
-                                    '<p>This is value3 for ItemSelection</p>'
-                                    '<oppia-noninteractive-image filepath-with-'
-                                    'value='
-                                    '"&amp;quot;s3Choice3.png&amp;quot;"'
-                                    ' caption-with-value="&amp;quot;&amp;quot;" '
-                                    'alt-with-value="&amp;quot;image&amp;quot;">'
-                                    '</oppia-noninteractive-image>'
-                                )
-                            ]
+                            'x': [(
+                                '<p>This is value3 for ItemSelection</p>'
+                                '<oppia-noninteractive-image filepath-with-'
+                                'value='
+                                '"&amp;quot;s3Choice3.png&amp;quot;"'
+                                ' caption-with-value="&amp;quot;&amp;quot;" '
+                                'alt-with-value="&amp;quot;image&amp;quot;">'
+                                '</oppia-noninteractive-image>'
+                            )]
                         }
                     )
                 ], [], None
@@ -2719,96 +2679,91 @@ version: 3
         default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                        ),
-                        'state_name': exploration.init_state_name,
-                        'new_value': default_outcome_dict
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'New state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        (exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'state_name': 'New state',
-                        'new_value': 'TextInput'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.
-                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'state_name': 'New state',
-                        'new_value': {
-                            'placeholder': {
-                                'value': {
-                                    'content_id': content_id_generator.generate(
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'New state',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id':
+                                    content_id_generator.generate(
                                         (
                                             translation_domain.ContentType.
                                             CUSTOMIZATION_ARG
                                         ),
                                         extra_prefix='placeholder'
                                     ),
-                                    'unicode_str': ''
-                                }
-                            },
-                            'rows': {
-                                'value': 1
-                            },
-                            'catchMisspellings': {
-                                'value': False
+                                'unicode_str':
+                                    ''
                             }
+                        },
+                        'rows': {
+                            'value': 1
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'New state',
-                        'old_value': state_domain.SubtitledHtml('content_3',
-                                                                '').to_dict(),
-                        'new_value': state_domain.SubtitledHtml(
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name':
+                        'New state',
+                    'old_value':
+                        state_domain.SubtitledHtml('content_3', '').to_dict(),
+                    'new_value':
+                        state_domain.SubtitledHtml(
                             'content_3',
                             '<oppia-noninteractive-image filepath-with-value='
                             '"&quot;abc.png&quot;" caption-with-value="&quot;'
                             '&quot;" alt-with-value="&quot;Image&quot;">'
                             '</oppia-noninteractive-image>'
                         ).to_dict()
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                ),
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                }),
             ], 'Add state name'
         )
 
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('image/abc.png', raw_image)
@@ -2866,102 +2821,98 @@ version: 3
         default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                        ),
-                        'state_name': exploration.init_state_name,
-                        'new_value': default_outcome_dict
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'New state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        (exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'state_name': 'New state',
-                        'new_value': 'TextInput'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.
-                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'state_name': 'New state',
-                        'new_value': {
-                            'placeholder': {
-                                'value': {
-                                    'content_id': content_id_generator.generate(
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'New state',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id':
+                                    content_id_generator.generate(
                                         (
                                             translation_domain.ContentType.
                                             CUSTOMIZATION_ARG
                                         ),
                                         extra_prefix='placeholder'
                                     ),
-                                    'unicode_str': ''
-                                }
-                            },
-                            'rows': {
-                                'value': 1
-                            },
-                            'catchMisspellings': {
-                                'value': False
+                                'unicode_str':
+                                    ''
                             }
+                        },
+                        'rows': {
+                            'value': 1
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'New state',
-                        'old_value': state_domain.SubtitledHtml('content_3',
-                                                                '').to_dict(),
-                        'new_value': state_domain.SubtitledHtml(
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name':
+                        'New state',
+                    'old_value':
+                        state_domain.SubtitledHtml('content_3', '').to_dict(),
+                    'new_value':
+                        state_domain.SubtitledHtml(
                             'content_3',
                             '<oppia-noninteractive-image filepath-with-value='
                             '"&quot;abc.png&quot;" caption-with-value="'
                             '&quot;&quot;" alt-with-value="&quot;Image&quot;">'
                             '</oppia-noninteractive-image>'
                         ).to_dict()
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Add state name'
         )
 
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('image/abc.png', raw_image)
         # Audio files should not be included in asset downloads.
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         fs.commit('audio/cafe.mp3', raw_audio)
 
@@ -2992,89 +2943,84 @@ version: 3
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                    ),
-                    'state_name': exploration.init_state_name,
-                    'new_value': default_outcome_dict
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                    'content_id_for_state_content': content_id_generator.generate(
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    (exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                'state_name': exploration.init_state_name,
+                'new_value': default_outcome_dict
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state',
+                'content_id_for_state_content':
+                    content_id_generator.generate(
                         translation_domain.ContentType.CONTENT
                     ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'New state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'TextInput'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'New state',
-                    'new_value': {
-                        'placeholder': {
-                            'value': {
-                                'content_id': (
-                                    content_id_generator.generate(
-                                        translation_domain.ContentType.
-                                        CUSTOMIZATION_ARG,
-                                        extra_prefix='placeholder'
-                                    )
-                                ),
-                                'unicode_str': ''
-                            }
-                        },
-                        'rows': {
-                            'value': 1
-                        },
-                        'catchMisspellings': {
-                            'value': False
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'New state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'state_name': 'New state',
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': (
+                                content_id_generator.generate(
+                                    translation_domain.ContentType.CUSTOMIZATION_ARG,
+                                    extra_prefix='placeholder'
+                                )
+                            ),
+                            'unicode_str': ''
                         }
+                    },
+                    'rows': {
+                        'value': 1
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'state_name': 'New state',
-                    'old_value': state_domain.SubtitledHtml('content_3', '').to_dict(),
-                    'new_value': state_domain.SubtitledHtml(
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name':
+                    'New state',
+                'old_value':
+                    state_domain.SubtitledHtml('content_3', '').to_dict(),
+                'new_value':
+                    state_domain.SubtitledHtml(
                         'content_3', '<oppia-noninteractive-image filepath-with-value='
                         '"&quot;abc.png&quot;" caption-with-value="&quot;&quot;" '
                         'alt-with-value="&quot;Image&quot;">'
                         '</oppia-noninteractive-image>'
                     ).to_dict()
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            })
         ]
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('image/abc.png', raw_image)
@@ -3083,13 +3029,11 @@ version: 3
         self.assertEqual(exploration.version, 2)
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'New state',
-                    'new_state_name': 'Renamed state'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'New state',
+                'new_state_name': 'Renamed state'
+            })
         ]
         exp_services.update_exploration(self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3164,7 +3108,8 @@ solicit_answer_details: false
     ) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT: Final = {
-        feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
+        feconf.DEFAULT_INIT_STATE_NAME:
+            _SAMPLE_INIT_STATE_CONTENT,
         'New state': (
             """card_is_checkpoint: false
 classifier_model_id: null
@@ -3210,7 +3155,8 @@ solicit_answer_details: false
     }
 
     UPDATED_SAMPLE_DICT: Final = {
-        feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
+        feconf.DEFAULT_INIT_STATE_NAME:
+            _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': (
             """card_is_checkpoint: false
 classifier_model_id: null
@@ -3270,75 +3216,67 @@ solicit_answer_details: false
         default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                        ),
-                        'state_name': exploration.init_state_name,
-                        'new_value': default_outcome_dict
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'New state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        (exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'state_name': 'New state',
-                        'new_value': 'TextInput'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.
-                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'state_name': 'New state',
-                        'new_value': {
-                            'placeholder': {
-                                'value': {
-                                    'content_id': content_id_generator.generate(
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'New state',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id':
+                                    content_id_generator.generate(
                                         (
                                             translation_domain.ContentType.
                                             CUSTOMIZATION_ARG
                                         ),
                                         extra_prefix='placeholder'
                                     ),
-                                    'unicode_str': ''
-                                }
-                            },
-                            'rows': {
-                                'value': 1
-                            },
-                            'catchMisspellings': {
-                                'value': False
+                                'unicode_str':
+                                    ''
                             }
+                        },
+                        'rows': {
+                            'value': 1
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Add state name'
         )
 
@@ -3361,75 +3299,69 @@ solicit_answer_details: false
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                    ),
-                    'state_name': exploration.init_state_name,
-                    'new_value': default_outcome_dict
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    (exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                'state_name': exploration.init_state_name,
+                'new_value': default_outcome_dict
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'New state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'TextInput'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'New state',
-                    'new_value': {
-                        'placeholder': {
-                            'value': {
-                                'content_id': content_id_generator.generate(
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'New state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'state_name': 'New state',
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id':
+                                content_id_generator.generate(
                                     (translation_domain.ContentType.CUSTOMIZATION_ARG),
                                     extra_prefix='placeholder'
                                 ),
-                                'unicode_str': ''
-                            }
-                        },
-                        'rows': {
-                            'value': 1
-                        },
-                        'catchMisspellings': {
-                            'value': False
+                            'unicode_str':
+                                ''
                         }
+                    },
+                    'rows': {
+                        'value': 1
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 }
-            )
+            })
         ]
         exploration.objective = 'The objective'
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('abc.png', raw_image)
@@ -3438,13 +3370,11 @@ solicit_answer_details: false
         self.assertEqual(exploration.version, 2)
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'New state',
-                    'new_state_name': 'Renamed state'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'New state',
+                'new_state_name': 'Renamed state'
+            })
         ]
         exp_services.update_exploration(self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3472,14 +3402,12 @@ def _get_change_list(
 ) -> List[exp_domain.ExplorationChange]:
     """Generates a change list for a single state change."""
     return [
-        exp_domain.ExplorationChange(
-            {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': property_name,
-                'new_value': new_value
-            }
-        )
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': property_name,
+            'new_value': new_value
+        })
     ]
 
 
@@ -3492,41 +3420,37 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.init_state_name = exploration.init_state_name
 
-        self.param_changes = [
-            {
-                'customization_args': {
-                    'list_of_values': ['1', '2'],
-                    'parse_with_jinja': False
-                },
-                'name': 'myParam',
-                'generator_id': 'RandomSelector'
-            }
-        ]
+        self.param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'],
+                'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        }]
         # List of answer groups to add into an interaction.
-        self.interaction_answer_groups: List[state_domain.AnswerGroupDict] = [
-            {
-                'rule_specs': [{
-                    'rule_type': 'Equals',
-                    'inputs': {
-                        'x': 0
-                    },
-                }],
-                'outcome': {
-                    'dest': self.init_state_name,
-                    'dest_if_really_stuck': None,
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': '<p>Try again</p>'
-                    },
-                    'labelled_as_correct': False,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        self.interaction_answer_groups: List[state_domain.AnswerGroupDict] = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': 0
                 },
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
+            }],
+            'outcome': {
+                'dest': self.init_state_name,
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Try again</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome: state_domain.OutcomeDict = {
             'dest': self.init_state_name,
@@ -3552,29 +3476,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'new state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'new state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Add state name'
         )
 
@@ -3588,36 +3510,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'State 1',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
-                        )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
-            ], 'Added state'
-        )
-        change_list_same_state_name = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'State 1',
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'State 1',
                     'content_id_for_state_content': (
                         content_id_generator.generate(
                             translation_domain.ContentType.CONTENT
@@ -3628,8 +3525,31 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             translation_domain.ContentType.DEFAULT_OUTCOME
                         )
                     )
-                }
-            )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
+            ], 'Added state'
+        )
+        change_list_same_state_name = [
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'State 1',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
+                    )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            })
         ]
         updated_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertFalse(
@@ -3649,41 +3569,37 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'new state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'new state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Add state name'
         )
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_state_name': 'state',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': 'state',
+                })
             ], 'Change state name'
         )
 
@@ -3692,13 +3608,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'new state',
-                    'new_state_name': 'new state changed name',
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'new state',
+                'new_state_name': 'new state changed name',
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list
@@ -3720,13 +3634,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_state_name': '¡Hola! αβγ',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': '¡Hola! αβγ',
+                })
             ], 'Change state name'
         )
 
@@ -3742,29 +3654,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'new state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'new state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Add state name'
         )
 
@@ -3774,12 +3684,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_DELETE_STATE,
-                        'state_name': 'new state',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'new state',
+                })
             ], 'delete state'
         )
 
@@ -3798,41 +3706,37 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         change_list = [
             # Add state.
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'new state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'new state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
             # Add content.
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'state_name': 'new state',
-                    'new_value': {
-                        'content_id': content_id,
-                        'html': '<p>old content html</p>'
-                    }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'new state',
+                'new_value': {
+                    'content_id': content_id,
+                    'html': '<p>old content html</p>'
                 }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Initial commit'
@@ -3867,12 +3771,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_DELETE_STATE,
-                        'state_name': 'new state',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'new state',
+                })
             ], 'delete state'
         )
 
@@ -3890,17 +3792,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of param_changes."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'param_specs',
-                    'new_value': {
-                        'myParam': {
-                            'obj_type': 'UnicodeString'
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'myParam': {
+                        'obj_type': 'UnicodeString'
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(self.owner_id, self.EXP_0_ID, change_list, '')
         exp_services.update_exploration(
@@ -3923,8 +3823,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_invalid_param_changes(self) -> None:
         """Check that updates cannot be made to non-existent parameters."""
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                r'The parameter with name \'myParam\' .* does not exist .*'):
+            utils.ValidationError,
+            r'The parameter with name \'myParam\' .* does not exist .*'
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -3933,19 +3834,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             )
 
     def test_update_reserved_param_changes(self) -> None:
-        param_changes = [
-            {
-                'customization_args': {
-                    'list_of_values': ['1', '2'],
-                    'parse_with_jinja': False
-                },
-                'name': 'all',
-                'generator_id': 'RandomSelector'
-            }
-        ]
-        with self.assertRaisesRegex(utils.ValidationError, re.escape(
+        param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'],
+                'parse_with_jinja': False
+            },
+            'name': 'all',
+            'generator_id': 'RandomSelector'
+        }]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            re.escape(
                 'The parameter name \'all\' is reserved. Please choose '
-                'a different name for the parameter being set in')):
+                'a different name for the parameter being set in'
+            )
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(self.init_state_name, 'param_changes', param_changes),
@@ -3955,17 +3858,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_invalid_generator(self) -> None:
         """Test for check that the generator_id in param_changes exists."""
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'param_specs',
-                    'new_value': {
-                        'myParam': {
-                            'obj_type': 'UnicodeString'
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'myParam': {
+                        'obj_type': 'UnicodeString'
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(self.owner_id, self.EXP_0_ID, change_list, '')
 
@@ -3988,15 +3889,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             ) + _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': False
@@ -4051,15 +3950,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             ) + _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': False
@@ -4205,29 +4102,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'State 2',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'State 2',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ] + _get_change_list(
                 'State 2', exp_domain.STATE_PROPERTY_INTERACTION_ID, 'TextInput'
             ) + _get_change_list(
@@ -4250,8 +4145,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.interaction_default_outcome['dest'] = 'State 2'
         with self.assertRaisesRegex(
-                utils.InvalidInputException,
-                'Editing interaction handlers is no longer supported'):
+            utils.InvalidInputException,
+            'Editing interaction handlers is no longer supported'
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -4273,29 +4169,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'State 2',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'State 2',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ] + _get_change_list(
                 'State 2', exp_domain.STATE_PROPERTY_INTERACTION_ID, 'TextInput'
             ) + _get_change_list(
@@ -4326,15 +4220,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             ) + _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_0',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option B</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': False
@@ -4357,7 +4249,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         rule_specs = init_interaction.answer_groups[0].rule_specs
         outcome = init_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')
-        self.assertEqual(rule_specs[0].inputs, {'x': 0})
+        self.assertEqual(rule_specs[0].inputs, {
+            'x': 0
+        })
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         # Ruling out the possibility of None for mypy type checking.
@@ -4371,45 +4265,41 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             ) + _get_change_list(
                 'State 2', exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {
                     'choices': {
-                        'value': [
-                            {
-                                'content_id': 'ca_choices_1',
-                                'html': '<p>Option A</p>'
-                            }, {
-                                'content_id': 'ca_choices_2',
-                                'html': '<p>Option B</p>'
-                            }
-                        ]
+                        'value': [{
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>Option B</p>'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': False
                     }
                 }
             ) + _get_change_list(
-                'State 2', exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS, [
-                    {
-                        'rule_specs': [{
-                            'rule_type': 'Equals',
-                            'inputs': {
-                                'x': 0
-                            },
-                        }],
-                        'outcome': {
-                            'dest': 'State 2',
-                            'dest_if_really_stuck': None,
-                            'feedback': {
-                                'content_id': 'feedback_3',
-                                'html': '<p>Try again</p>'
-                            },
-                            'labelled_as_correct': False,
-                            'param_changes': [],
-                            'refresher_exploration_id': None,
-                            'missing_prerequisite_skill_id': None
+                'State 2', exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS, [{
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 0
                         },
-                        'training_data': [],
-                        'tagged_skill_misconception_id': None
-                    }
-                ]
+                    }],
+                    'outcome': {
+                        'dest': 'State 2',
+                        'dest_if_really_stuck': None,
+                        'feedback': {
+                            'content_id': 'feedback_3',
+                            'html': '<p>Try again</p>'
+                        },
+                        'labelled_as_correct': False,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
             ) + _get_change_list(
                 'State 2', exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME, {
                     'dest': 'State 2',
@@ -4438,7 +4328,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         rule_specs = second_state_interaction.answer_groups[0].rule_specs
         outcome = second_state_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')
-        self.assertEqual(rule_specs[0].inputs, {'x': 0})
+        self.assertEqual(rule_specs[0].inputs, {
+            'x': 0
+        })
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, 'State 2')
         self.assertEqual(second_state_interaction.default_outcome.dest, 'State 2')
@@ -4446,8 +4338,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_state_invalid_state(self) -> None:
         """Test that rule destination states cannot be non-existent."""
         self.interaction_answer_groups[0]['outcome']['dest'] = 'INVALID'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The destination INVALID is not a valid state'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The destination INVALID is not a valid state'
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -4457,15 +4350,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {
                         'choices': {
-                            'value': [
-                                {
-                                    'content_id': 'ca_choices_0',
-                                    'html': '<p>Option A</p>'
-                                }, {
-                                    'content_id': 'ca_choices_1',
-                                    'html': '<p>Option B</p>'
-                                }
-                            ]
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Option A</p>'
+                            }, {
+                                'content_id': 'ca_choices_1',
+                                'html': '<p>Option B</p>'
+                            }]
                         },
                         'showChoicesInShuffledOrder': {
                             'value': False
@@ -4486,8 +4377,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test that parameters in rules must have the correct type."""
         self.interaction_answer_groups[0]['rule_specs'][0]['inputs']['x'] = 'abc'
         with self.assertRaisesRegex(
-                Exception, 'Value has the wrong type. It should be a NonnegativeInt. '
-                'The value is abc'):
+            Exception, 'Value has the wrong type. It should be a NonnegativeInt. '
+            'The value is abc'
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -4571,7 +4463,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(
-                Exception, ('Expected solicit_answer_details to be a bool, received ')):
+            Exception, ('Expected solicit_answer_details to be a bool, received ')
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -4603,7 +4496,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegex(
-                Exception, ('Expected solicit_answer_details to be a bool, received ')):
+            Exception, ('Expected solicit_answer_details to be a bool, received ')
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, change_list, ''
             )
@@ -4625,29 +4519,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(exploration.init_state.linked_skill_id, None)
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'State1',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'State1',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Add state name'
         )
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4701,29 +4593,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'State1',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'State1',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Add state name'
         )
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4786,29 +4676,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(exploration.init_state.card_is_checkpoint, True)
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'State1',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'State1',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Add state name'
         )
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -4857,7 +4745,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.init_state.card_is_checkpoint, True)
         with self.assertRaisesRegex(
-                Exception, ('Expected card_is_checkpoint to be a bool, received ')):
+            Exception, ('Expected card_is_checkpoint to be a bool, received ')
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -4887,7 +4776,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegex(
-                Exception, ('Expected card_is_checkpoint to be a bool, received ')):
+            Exception, ('Expected card_is_checkpoint to be a bool, received ')
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -4929,13 +4819,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test migrate exploration state schema to the latest version."""
         latest_schema_version = str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         migration_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                    'from_version': '0',
-                    'to_version': latest_schema_version
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '0',
+                'to_version': latest_schema_version
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, migration_change_list,
@@ -4950,13 +4838,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         latest_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         not_latest_schema_version = str(latest_schema_version - 1)
         migration_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                    'from_version': '0',
-                    'to_version': not_latest_schema_version
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '0',
+                'to_version': not_latest_schema_version
+            })
         ]
         exception_string = (
             'Expected to migrate to the latest state schema '
@@ -4994,7 +4880,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(self.EXP_0_ID
-                                                            )[1]['commit_message'],
+                                                           )[1]['commit_message'],
             'A message'
         )
 
@@ -5003,9 +4889,10 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
         with self.assertRaisesRegex(
-                ValueError,
-                'Exploration is public so expected a commit message but received '
-                'none.'):
+            ValueError,
+            'Exploration is public so expected a commit message but received '
+            'none.'
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -5056,13 +4943,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
             ], 'Did migration.'
         )
 
@@ -5086,21 +4971,17 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID
         )
         self.assertEqual(len(snapshots_metadata), 1)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'Algebra',
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': ('New exploration created with title \'A title\'.'),
-                'commit_type': 'create',
-                'version_number': 1
-            }, snapshots_metadata[0]
-        )
+        self.assertDictContainsSubset({
+            'commit_cmds': [{
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'Algebra',
+            }],
+            'committer_id': self.owner_id,
+            'commit_message': ('New exploration created with title \'A title\'.'),
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Publish the exploration. This does not affect the exploration version
@@ -5111,32 +4992,26 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID
         )
         self.assertEqual(len(snapshots_metadata), 1)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'Algebra'
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': ('New exploration created with title \'A title\'.'),
-                'commit_type': 'create',
-                'version_number': 1
-            }, snapshots_metadata[0]
-        )
+        self.assertDictContainsSubset({
+            'commit_cmds': [{
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'Algebra'
+            }],
+            'committer_id': self.owner_id,
+            'commit_message': ('New exploration created with title \'A title\'.'),
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Modify the exploration. This affects the exploration version history.
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'First title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'First title'
+            })
         ]
         change_list_dict = [change.to_dict() for change in change_list]
         exp_services.update_exploration(
@@ -5148,30 +5023,24 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         )
         self.assertEqual(len(snapshots_metadata), 2)
         self.assertIn('created_on_ms', snapshots_metadata[0])
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'Algebra'
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': ('New exploration created with title \'A title\'.'),
-                'commit_type': 'create',
-                'version_number': 1
-            }, snapshots_metadata[0]
-        )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': change_list_dict,
-                'committer_id': self.owner_id,
-                'commit_message': 'Changed title.',
-                'commit_type': 'edit',
-                'version_number': 2,
-            }, snapshots_metadata[1]
-        )
+        self.assertDictContainsSubset({
+            'commit_cmds': [{
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'Algebra'
+            }],
+            'committer_id': self.owner_id,
+            'commit_message': ('New exploration created with title \'A title\'.'),
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'commit_cmds': change_list_dict,
+            'committer_id': self.owner_id,
+            'commit_message': 'Changed title.',
+            'commit_type': 'edit',
+            'version_number': 2,
+        }, snapshots_metadata[1])
         self.assertLess(
             snapshots_metadata[0]['created_on_ms'],
             snapshots_metadata[1]['created_on_ms']
@@ -5181,21 +5050,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         change_list_swap = self.swap_to_always_return(
             exp_services, 'apply_change_list', value=v1_exploration
         )
-        with change_list_swap, self.assertRaisesRegex(Exception,
-                                                      'version 1, which is too old'):
+        with change_list_swap, self.assertRaisesRegex(
+            Exception, 'version 1, which is too old'
+        ):
             exp_services.update_exploration(
                 second_committer_id, self.EXP_0_ID, None, 'commit_message'
             )
 
         # Another person modifies the exploration.
         new_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'New title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })
         ]
         new_change_list_dict = [change.to_dict() for change in new_change_list]
 
@@ -5207,39 +5075,31 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID
         )
         self.assertEqual(len(snapshots_metadata), 3)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'Algebra'
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': ('New exploration created with title \'A title\'.'),
-                'commit_type': 'create',
-                'version_number': 1
-            }, snapshots_metadata[0]
-        )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': change_list_dict,
-                'committer_id': self.owner_id,
-                'commit_message': 'Changed title.',
-                'commit_type': 'edit',
-                'version_number': 2,
-            }, snapshots_metadata[1]
-        )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': new_change_list_dict,
-                'committer_id': second_committer_id,
-                'commit_message': 'Second commit.',
-                'commit_type': 'edit',
-                'version_number': 3,
-            }, snapshots_metadata[2]
-        )
+        self.assertDictContainsSubset({
+            'commit_cmds': [{
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'Algebra'
+            }],
+            'committer_id': self.owner_id,
+            'commit_message': ('New exploration created with title \'A title\'.'),
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'commit_cmds': change_list_dict,
+            'committer_id': self.owner_id,
+            'commit_message': 'Changed title.',
+            'commit_type': 'edit',
+            'version_number': 2,
+        }, snapshots_metadata[1])
+        self.assertDictContainsSubset({
+            'commit_cmds': new_change_list_dict,
+            'committer_id': second_committer_id,
+            'commit_message': 'Second commit.',
+            'commit_type': 'edit',
+            'version_number': 3,
+        }, snapshots_metadata[2])
         self.assertLess(
             snapshots_metadata[1]['created_on_ms'],
             snapshots_metadata[2]['created_on_ms']
@@ -5249,13 +5109,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         exploration = self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'First title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'First title'
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.'
@@ -5275,58 +5133,52 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             exploration.next_content_id_index
         )
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'New state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'TextInput'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'New state',
-                    'new_value': {
-                        'placeholder': {
-                            'value': {
-                                'content_id': 'ca_placeholder_0',
-                                'unicode_str': ''
-                            }
-                        },
-                        'rows': {
-                            'value': 1
-                        },
-                        'catchMisspellings': {
-                            'value': False
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'New state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'state_name': 'New state',
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
                         }
+                    },
+                    'rows': {
+                        'value': 1
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(
             'second_committer_id', exploration.id, change_list, 'Added new state'
@@ -5356,12 +5208,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Now delete the new state.
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'New state'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'New state'
+            })
         ]
         exp_services.update_exploration(
             'committer_id_3', exploration.id, change_list, 'Deleted state: New state'
@@ -5395,13 +5245,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # In version 1, the title was 'A title'.
         # In version 2, the title becomes 'V2 title'.
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'V2 title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'V2 title'
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.'
@@ -5413,58 +5261,52 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             exploration.next_content_id_index
         )
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'New state',
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'TextInput'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'New state',
-                    'new_value': {
-                        'placeholder': {
-                            'value': {
-                                'content_id': 'ca_placeholder_0',
-                                'unicode_str': ''
-                            }
-                        },
-                        'rows': {
-                            'value': 1
-                        },
-                        'catchMisspellings': {
-                            'value': False
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'New state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'state_name': 'New state',
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
                         }
+                    },
+                    'rows': {
+                        'value': 1
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(
             'committer_id_v3', exploration.id, change_list, 'Added new state'
@@ -5513,111 +5355,46 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # Upgrade to version 2.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'old_value': 'A title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'old_value': 'A title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         # Change list for version 3.
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'New state',
-                    'old_value': None,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                    'new_value': 'TextInput'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'state_name': 'New state',
-                    'old_value': None,
-                    'new_value': {
-                        'placeholder': {
-                            'value': {
-                                'content_id': 'ca_placeholder_0',
-                                'unicode_str': ''
-                            }
-                        },
-                        'rows': {
-                            'value': 1
-                        },
-                        'catchMisspellings': {
-                            'value': False
-                        }
-                    }
-                }
-            )
-        ]
-        exp_services.update_exploration(
-            'second_committer_id', exploration.id, change_list,
-            'Added new state and interaction'
-        )
-
-        # Change list for version 4.
-        change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'New state'
-                }
-            )
-        ]
-        exp_services.update_exploration(
-            'committer_id_3', exploration.id, change_list, 'Deleted state: New state'
-        )
-
-        # Complete change list from version 1 to 4.
-        composite_change_list_dict_expected = [
-            {
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'New state',
-                'content_id_for_state_content': 'content_3',
-                'content_id_for_default_outcome': 'default_outcome_4'
-            }, {
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'next_content_id_index',
-                'new_value': 5,
-                'old_value': None
-            }, {
+                'new_value': content_id_generator.next_content_id_index
+            }),
+            exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'old_value': None,
                 'state_name': 'New state',
+                'old_value': None,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'TextInput'
-            }, {
+            }),
+            exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                 'state_name': 'New state',
@@ -5636,16 +5413,69 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'value': False
                     }
                 }
-            }, {
+            })
+        ]
+        exp_services.update_exploration(
+            'second_committer_id', exploration.id, change_list,
+            'Added new state and interaction'
+        )
+
+        # Change list for version 4.
+        change_list = [
+            exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_DELETE_STATE,
                 'state_name': 'New state'
-            }
+            })
         ]
+        exp_services.update_exploration(
+            'committer_id_3', exploration.id, change_list, 'Deleted state: New state'
+        )
+
+        # Complete change list from version 1 to 4.
+        composite_change_list_dict_expected = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state',
+            'content_id_for_state_content': 'content_3',
+            'content_id_for_default_outcome': 'default_outcome_4'
+        }, {
+            'cmd': 'edit_exploration_property',
+            'property_name': 'next_content_id_index',
+            'new_value': 5,
+            'old_value': None
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'old_value': None,
+            'state_name': 'New state',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'old_value': None,
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            }
+        }, {
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'New state'
+        }]
 
         with self.assertRaisesRegex(
-                Exception,
-                'Unexpected error: Trying to find change list from version %s '
-                'of exploration to version %s.' % (4, 1)):
+            Exception, 'Unexpected error: Trying to find change list from version %s '
+            'of exploration to version %s.' % (4, 1)
+        ):
             exp_services.get_composite_change_list(self.EXP_0_ID, 4, 1)
 
         composite_change_list = exp_services.get_composite_change_list(
@@ -5662,78 +5492,70 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration('0', self.owner_id)
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 1'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 2'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 3'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 4'
         )
 
@@ -5752,78 +5574,70 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration('0', self.owner_id)
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 1'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 2'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 3'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 4'
         )
 
@@ -5846,78 +5660,70 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration('0', self.owner_id)
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 1'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 2'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 3'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 4'
         )
 
@@ -5936,78 +5742,70 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration('0', self.owner_id)
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 1'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 2'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 3'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 4'
         )
 
@@ -6031,78 +5829,70 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration('0', self.owner_id)
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 1'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 2'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 3'
         )
         exp_services.update_exploration(
             self.owner_id, '0', [
-                exp_domain.ExplorationChange(
-                    {
-                        'new_value': {
-                            'content_id': 'content_0',
-                            'html': 'content 1'
-                        },
-                        'state_name': 'Introduction',
-                        'old_value': {
-                            'content_id': 'content_0',
-                            'html': ''
-                        },
-                        'cmd': 'edit_state_property',
-                        'property_name': 'content'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                })
             ], 'Update 4'
         )
 
@@ -6231,13 +6021,11 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
             change_list = [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
             ]
             exp_services.update_exploration(
                 self.bob_id, self.EXP_ID_1, change_list, 'Changed title.'
@@ -6246,13 +6034,11 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
             change_list = [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 Albert title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 Albert title'
+                })
             ]
             exp_services.update_exploration(
                 self.albert_id, self.EXP_ID_1, change_list,
@@ -6260,13 +6046,11 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             )
 
             change_list = [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 2 Albert title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 2 Albert title'
+                })
             ]
             exp_services.update_exploration(
                 self.albert_id, self.EXP_ID_2, change_list, 'Changed title to Albert2.'
@@ -6277,8 +6061,9 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_exploration(self.albert_id, self.EXP_ID_1)
 
             # This commit should not be recorded.
-            with self.assertRaisesRegex(Exception,
-                                        'This exploration cannot be published'):
+            with self.assertRaisesRegex(
+                Exception, 'This exploration cannot be published'
+            ):
                 rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
 
             rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
@@ -6292,7 +6077,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self
     ) -> None:
         with self.assertRaisesRegex(
-                Exception, 'max_age must be a datetime.timedelta instance. or None.'):
+            Exception, 'max_age must be a datetime.timedelta instance. or None.'
+        ):
             exp_services.get_next_page_of_all_non_private_commits(
                 max_age='invalid_max_age'
             )  # type: ignore[arg-type]
@@ -6324,16 +6110,15 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        change_list = exp_domain.ExplorationChange(
-            {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Home',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                'new_value': state_solution_dict,
-            }
-        )
-        with self.assertRaisesRegex(Exception,
-                                    'solution cannot exist with None interaction id.'):
+        change_list = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Home',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+            'new_value': state_solution_dict,
+        })
+        with self.assertRaisesRegex(
+            Exception, 'solution cannot exist with None interaction id.'
+        ):
             exp_services.apply_change_list('test_id', [change_list])
 
 
@@ -6434,13 +6219,11 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             actual_docs = []
             exp_services.update_exploration(
                 self.owner_id, exp_id, [
-                    exp_domain.ExplorationChange(
-                        {
-                            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                            'property_name': 'category',
-                            'new_value': 'cat1'
-                        }
-                    )
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'cat1'
+                    })
                 ], 'update category'
             )
 
@@ -6509,7 +6292,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         for filename in os.listdir(feconf.SAMPLE_EXPLORATIONS_DIR):
             full_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, filename)
             valid_exploration_path = os.path.isdir(full_filepath
-                                                   ) or (filename.endswith('yaml'))
+                                                  ) or (filename.endswith('yaml'))
             self.assertTrue(valid_exploration_path)
 
     def test_get_demo_exploration_components_with_invalid_path_raises_error(
@@ -6581,13 +6364,11 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Have Albert update that exploration.
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
             ], 'Changed title.'
         )
         # Have Bob revert Albert's update.
@@ -6620,18 +6401,18 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
     def test_contributors_summary(self) -> None:
         # Have Albert create a new exploration. Version 1.
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
-        self._check_contributors_summary(self.EXP_ID_1, {self.albert_id: 1})
+        self._check_contributors_summary(self.EXP_ID_1, {
+            self.albert_id: 1
+        })
 
         # Have Bob update that exploration. Version 2.
         exp_services.update_exploration(
             self.bob_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
             ], 'Changed title.'
         )
         self.process_and_flush_pending_tasks()
@@ -6644,13 +6425,11 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Have Bob update that exploration. Version 3.
         exp_services.update_exploration(
             self.bob_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
             ], 'Changed title.'
         )
         self.process_and_flush_pending_tasks()
@@ -6664,13 +6443,11 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Have Albert update that exploration. Version 4.
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
             ], 'Changed title.'
         )
         self.process_and_flush_pending_tasks()
@@ -6701,13 +6478,11 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         exp_services.update_exploration(
             self.bob_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
             ], 'Changed title.'
         )
         exp_services.regenerate_exploration_and_contributors_summaries(self.EXP_ID_1)
@@ -6722,7 +6497,9 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         user_services.mark_user_for_deletion(self.bob_id)
         exp_services.regenerate_exploration_and_contributors_summaries(self.EXP_ID_1)
 
-        self._check_contributors_summary(self.EXP_ID_1, {self.albert_id: 1})
+        self._check_contributors_summary(self.EXP_ID_1, {
+            self.albert_id: 1
+        })
 
     def test_regenerate_summary_with_new_contributor_with_invalid_exp_id(self) -> None:
         observed_log_messages = []
@@ -6748,8 +6525,9 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
         exp_rights = rights_manager.get_exploration_rights('exp_id', strict=True)
         exploration.created_on = None
-        with self.assertRaisesRegex(Exception,
-                                    'No data available for when the exploration was'):
+        with self.assertRaisesRegex(
+            Exception, 'No data available for when the exploration was'
+        ):
             exp_services.generate_new_exploration_summary(exploration, exp_rights)
 
     def test_raises_error_while_updating_summary_if_no_created_on_data_present(
@@ -6763,8 +6541,9 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             exploration, exp_rights
         )
         exploration.created_on = None
-        with self.assertRaisesRegex(Exception,
-                                    'No data available for when the exploration was'):
+        with self.assertRaisesRegex(
+            Exception, 'No data available for when the exploration was'
+        ):
             exp_services.update_exploration_summary(
                 exploration, exp_rights, exp_summary
             )
@@ -6814,13 +6593,11 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.bob_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
             ], 'Changed title.'
         )
 
@@ -6828,25 +6605,21 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 Albert title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 Albert title'
+                })
             ], 'Changed title to Albert1 title.'
         )
 
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_2, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 2 Albert title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 2 Albert title'
+                })
             ], 'Changed title to Albert2 title.'
         )
 
@@ -6866,16 +6639,19 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         actual_summaries = exp_services.get_non_private_exploration_summaries()
 
         expected_summaries = {
-            self.EXP_ID_2: exp_domain.ExplorationSummary(
-                self.EXP_ID_2,
-                'Exploration 2 Albert title', 'Algebra', 'An objective', 'en', [],
-                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_domain.ACTIVITY_STATUS_PUBLIC, False, [self.albert_id], [], [],
-                [], [self.albert_id], {self.albert_id: 1}, self.EXPECTED_VERSION_2,
-                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
-                actual_summaries[self.EXP_ID_2].first_published_msec
-            )
+            self.EXP_ID_2:
+                exp_domain.ExplorationSummary(
+                    self.EXP_ID_2,
+                    'Exploration 2 Albert title', 'Algebra', 'An objective', 'en', [],
+                    feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
+                    rights_domain.ACTIVITY_STATUS_PUBLIC, False, [self.albert_id], [],
+                    [], [], [self.albert_id], {
+                        self.albert_id: 1
+                    }, self.EXPECTED_VERSION_2,
+                    actual_summaries[self.EXP_ID_2].exploration_model_created_on,
+                    actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
+                    actual_summaries[self.EXP_ID_2].first_published_msec
+                )
         }
 
         # Check actual summaries equal expected summaries.
@@ -6897,28 +6673,33 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         actual_summaries = exp_services.get_all_exploration_summaries()
 
         expected_summaries = {
-            self.EXP_ID_1: exp_domain.ExplorationSummary(
-                self.EXP_ID_1, 'Exploration 1 title', 'Algebra', 'An objective', 'en',
-                [], feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_domain.ACTIVITY_STATUS_PRIVATE, False, [self.albert_id], [], [],
-                [], [self.albert_id, self.bob_id], {
-                    self.albert_id: 1,
-                    self.bob_id: 1
-                }, self.EXPECTED_VERSION_1,
-                actual_summaries[self.EXP_ID_1].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_1].exploration_model_last_updated,
-                actual_summaries[self.EXP_ID_1].first_published_msec
-            ),
-            self.EXP_ID_2: exp_domain.ExplorationSummary(
-                self.EXP_ID_2,
-                'Exploration 2 Albert title', 'Algebra', 'An objective', 'en', [],
-                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_domain.ACTIVITY_STATUS_PUBLIC, False, [self.albert_id], [], [],
-                [], [self.albert_id], {self.albert_id: 1}, self.EXPECTED_VERSION_2,
-                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
-                actual_summaries[self.EXP_ID_2].first_published_msec
-            )
+            self.EXP_ID_1:
+                exp_domain.ExplorationSummary(
+                    self.EXP_ID_1,
+                    'Exploration 1 title', 'Algebra', 'An objective', 'en', [],
+                    feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
+                    rights_domain.ACTIVITY_STATUS_PRIVATE, False, [self.albert_id], [],
+                    [], [], [self.albert_id, self.bob_id], {
+                        self.albert_id: 1,
+                        self.bob_id: 1
+                    }, self.EXPECTED_VERSION_1,
+                    actual_summaries[self.EXP_ID_1].exploration_model_created_on,
+                    actual_summaries[self.EXP_ID_1].exploration_model_last_updated,
+                    actual_summaries[self.EXP_ID_1].first_published_msec
+                ),
+            self.EXP_ID_2:
+                exp_domain.ExplorationSummary(
+                    self.EXP_ID_2,
+                    'Exploration 2 Albert title', 'Algebra', 'An objective', 'en', [],
+                    feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
+                    rights_domain.ACTIVITY_STATUS_PUBLIC, False, [self.albert_id], [],
+                    [], [], [self.albert_id], {
+                        self.albert_id: 1
+                    }, self.EXPECTED_VERSION_2,
+                    actual_summaries[self.EXP_ID_2].exploration_model_created_on,
+                    actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
+                    actual_summaries[self.EXP_ID_2].first_published_msec
+                )
         }
 
         # Check actual summaries equal expected summaries.
@@ -6972,22 +6753,18 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.save_new_story(story_id, self.albert_id, topic_id)
         topic_services.add_canonical_story(self.albert_id, topic_id, story_id)
         change_list = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
-                    'title': 'Title 1'
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                    'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
-                    'old_value': None,
-                    'new_value': self.EXP_ID_1
-                }
-            )
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
+                'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
+                'old_value': None,
+                'new_value': self.EXP_ID_1
+            })
         ]
         story_services.update_story(
             self.albert_id, story_id, change_list, 'Added node.'
@@ -7004,18 +6781,18 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertIsNotNone(exploration_description)
 
         exploration = self.save_new_valid_exploration(self.EXP_0_ID, self.albert_id)
-        exploration.param_specs = {'myParam': param_domain.ParamSpec('UnicodeString')}
+        exploration.param_specs = {
+            'myParam': param_domain.ParamSpec('UnicodeString')
+        }
         init_state_name = exploration.init_state_name
-        param_changes = [
-            {
-                'customization_args': {
-                    'list_of_values': ['1', '2'],
-                    'parse_with_jinja': False
-                },
-                'name': 'myParam',
-                'generator_id': 'RandomSelector'
-            }
-        ]
+        param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'],
+                'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        }]
         draft_change_list = _get_change_list(
             init_state_name, 'param_changes', param_changes
         )
@@ -7160,8 +6937,7 @@ title: Old Title
         rights_manager.create_new_exploration_rights('exp_id', self.albert_id)
 
         exp_model.commit(
-            self.albert_id, 'New exploration created',
-            [{
+            self.albert_id, 'New exploration created', [{
                 'cmd': 'create_new',
                 'title': 'title',
                 'category': 'category',
@@ -7169,9 +6945,10 @@ title: Old Title
         )
 
         with self.assertRaisesRegex(
-                Exception,
-                'Sorry, we can only process v41-v%d exploration state schemas at '
-                'present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
+            Exception,
+            'Sorry, we can only process v41-v%d exploration state schemas at '
+            'present.' % feconf.CURRENT_STATE_SCHEMA_VERSION
+        ):
             exp_fetchers.get_exploration_from_model(exp_model)
 
     def test_update_exploration_by_voice_artist(self) -> None:
@@ -7179,18 +6956,16 @@ title: Old Title
         user_id = 'user_id'
         self.save_new_default_exploration(exp_id, user_id)
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'new title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'new title'
+            })
         ]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Voice artist does not have permission to make some '
-                'changes in the change list.'):
+            utils.ValidationError, 'Voice artist does not have permission to make some '
+            'changes in the change list.'
+        ):
             exp_services.update_exploration(
                 user_id, exp_id, change_list, 'By voice artist', True
             )
@@ -7217,32 +6992,26 @@ title: Old Title
         self.save_new_story(story_id, user_id, topic_id)
         topic_services.add_canonical_story(user_id, topic_id, story_id)
         change_list_story = [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
-                    'title': 'Title 1'
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                    'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
-                    'old_value': None,
-                    'new_value': exp_id
-                }
-            )
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
+                'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
+                'old_value': None,
+                'new_value': exp_id
+            })
         ]
         story_services.update_story(user_id, story_id, change_list_story, 'Added node.')
         change_list_exp = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'new title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'new title'
+            })
         ]
         opportunity_services.add_new_exploration_opportunities(story_id, [exp_id])
         exp_services.update_exploration(
@@ -7285,18 +7054,16 @@ title: Old Title
         )
 
         with fetch_swap, self.assertRaisesRegex(
-                Exception,
-                'Unexpected error: trying to update version 1 of exploration '
-                'from version 2. Please reload the page and try again.'):
+            Exception, 'Unexpected error: trying to update version 1 of exploration '
+            'from version 2. Please reload the page and try again.'
+        ):
             exp_services.update_exploration(
                 'user_id', 'exp_id', [
-                    exp_domain.ExplorationChange(
-                        {
-                            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                            'property_name': 'title',
-                            'new_value': 'new title'
-                        }
-                    )
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'title',
+                        'new_value': 'new title'
+                    })
                 ], 'changed title'
             )
 
@@ -7305,13 +7072,11 @@ title: Old Title
         self.assertEqual(exploration.language_code, 'en')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -7322,24 +7087,20 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'language_code',
-                        'new_value': 'bn'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'language_code',
+                    'new_value': 'bn'
+                })
             ], 'Changed language code.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'new changed title'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'new changed title'
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -7359,13 +7120,11 @@ title: Old Title
         self.assertEqual(exploration.language_code, 'en')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'language_code',
-                        'new_value': 'bn'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'language_code',
+                    'new_value': 'bn'
+                })
             ], 'Changed language code.'
         )
 
@@ -7377,24 +7136,20 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'language_code',
-                    'new_value': 'en'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'en'
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -7414,13 +7169,11 @@ title: Old Title
         self.assertEqual(exploration.tags, [])
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'tags',
-                        'new_value': ['test']
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'tags',
+                    'new_value': ['test']
+                })
             ], 'Changed tags.'
         )
 
@@ -7432,24 +7185,20 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'tags',
-                    'new_value': ['test', 'skill']
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'tags',
+                'new_value': ['test', 'skill']
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -7469,13 +7218,11 @@ title: Old Title
         self.assertEqual(exploration.author_notes, '')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'author_notes',
-                        'new_value': 'author_notes'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'author_notes',
+                    'new_value': 'author_notes'
+                })
             ], 'Changed author_notes.'
         )
 
@@ -7487,24 +7234,20 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'author_notes',
-                    'new_value': 'author_notes_updated_again'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'author_notes',
+                'new_value': 'author_notes_updated_again'
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -7524,13 +7267,11 @@ title: Old Title
         self.assertEqual(exploration.blurb, '')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'blurb',
-                        'new_value': 'blurb'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'blurb',
+                    'new_value': 'blurb'
+                })
             ], 'Changed blurb.'
         )
 
@@ -7542,24 +7283,20 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'blurb',
-                    'new_value': 'blurb_changed'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'blurb',
+                'new_value': 'blurb_changed'
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -7579,42 +7316,36 @@ title: Old Title
         self.assertEqual(exploration.param_changes, [])
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'param_specs',
-                    'new_value': {
-                        'myParam': {
-                            'obj_type': 'UnicodeString'
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'myParam': {
+                        'obj_type': 'UnicodeString'
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list, ''
         )
 
-        param_changes: List[param_domain.ParamChangeDict] = [
-            {
-                'customization_args': {
-                    'list_of_values': ['1', '2'],
-                    'parse_with_jinja': False
-                },
-                'name': 'myParam',
-                'generator_id': 'RandomSelector'
-            }
-        ]
+        param_changes: List[param_domain.ParamChangeDict] = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'],
+                'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        }]
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'param_changes',
-                        'new_value': param_changes
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'param_changes',
+                    'new_value': param_changes
+                })
             ], 'Changed param_changes.'
         )
 
@@ -7630,29 +7361,27 @@ title: Old Title
         )
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'State',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'State',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
+                })
             ], 'Added new state.'
         )
 
@@ -7660,29 +7389,23 @@ title: Old Title
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'init_state_name',
-                        'new_value': 'State',
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': 'State',
-                        'property_name': 'card_is_checkpoint',
-                        'new_value': True,
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'property_name': 'card_is_checkpoint',
-                        'new_value': False,
-                    }
-                ),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'init_state_name',
+                    'new_value': 'State',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'State',
+                    'property_name': 'card_is_checkpoint',
+                    'new_value': True,
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'property_name': 'card_is_checkpoint',
+                    'new_value': False,
+                }),
             ], 'Changed init_state_name and checkpoints.'
         )
 
@@ -7694,40 +7417,32 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'init_state_name',
-                    'new_value': feconf.DEFAULT_INIT_STATE_NAME,
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'State',
-                    'property_name': 'card_is_checkpoint',
-                    'new_value': False,
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                    'property_name': 'card_is_checkpoint',
-                    'new_value': True,
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'init_state_name',
+                'new_value': feconf.DEFAULT_INIT_STATE_NAME,
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State',
+                'property_name': 'card_is_checkpoint',
+                'new_value': False,
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'property_name': 'card_is_checkpoint',
+                'new_value': True,
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 3, change_list
@@ -7748,13 +7463,11 @@ title: Old Title
         self.assertEqual(exploration.auto_tts_enabled, False)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'auto_tts_enabled',
-                        'new_value': False
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'auto_tts_enabled',
+                    'new_value': False
+                })
             ], 'Changed auto_tts_enabled.'
         )
 
@@ -7766,24 +7479,20 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'auto_tts_enabled',
-                    'new_value': True
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'auto_tts_enabled',
+                'new_value': True
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -7804,13 +7513,11 @@ title: Old Title
         self.assertEqual(exploration.language_code, 'en')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'language_code',
-                        'new_value': 'hi'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'language_code',
+                    'new_value': 'hi'
+                })
             ], 'Changed language code.'
         )
 
@@ -7822,24 +7529,20 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'language_code',
-                    'new_value': 'en'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'en'
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -7876,12 +7579,10 @@ title: Old Title
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
-                        'content_id': 'content_0'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+                    'content_id': 'content_0'
+                })
             ], 'Marked translation need update.'
         )
         entity_translations = (
@@ -7915,15 +7616,11 @@ title: Old Title
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': (
-                            exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE
-                        ),
-                        'content_id': 'content_0',
-                        'language_code': 'hi'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': (exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE),
+                    'content_id': 'content_0',
+                    'language_code': 'hi'
+                })
             ], 'Marked translation need update.'
         )
         entity_translations = (
@@ -7966,12 +7663,10 @@ title: Old Title
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_REMOVE_TRANSLATIONS,
-                        'content_id': 'content_0'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_REMOVE_TRANSLATIONS,
+                    'content_id': 'content_0'
+                })
             ], 'Marked translation need update.'
         )
 
@@ -7993,14 +7688,12 @@ title: Old Title
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
-                        'state_name': exploration.init_state_name,
-                        'new_value': ['test']
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+                    'state_name': exploration.init_state_name,
+                    'new_value': ['test']
+                })
             ], 'Changed confirmed_unclassified_answers.'
         )
 
@@ -8014,25 +7707,21 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
-                    'state_name': exploration.init_state_name,
-                    'new_value': ['test', 'skill']
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+                'state_name': exploration.init_state_name,
+                'new_value': ['test', 'skill']
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -8055,32 +7744,29 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.init_state.interaction.hints, [])
 
-        hint_list: List[state_domain.HintDict] = [
-            {
-                'hint_content': {
-                    'content_id': 'hint_1',
-                    'html': (
-                        '<p>Hello, this is html1 for state2'
-                        '<oppia-noninteractive-image filepath-with-value="'
-                        '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                        '"&amp;quot;&amp;quot;" alt-with-value='
-                        '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                        '</p>'
-                    )
-                }
+        hint_list: List[state_domain.HintDict] = [{
+            'hint_content': {
+                'content_id':
+                    'hint_1',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>'
+                )
             }
-        ]
+        }]
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                        'state_name': exploration.init_state_name,
-                        'new_value': hint_list
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                    'state_name': exploration.init_state_name,
+                    'new_value': hint_list
+                })
             ], 'Changed hints.'
         )
 
@@ -8097,53 +7783,49 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
-        hint_list_2: List[state_domain.HintDict] = [
-            {
-                'hint_content': {
-                    'content_id': 'hint_1',
-                    'html': (
-                        '<p>Hello, this is html1 for state2'
-                        '<oppia-noninteractive-image filepath-with-value="'
-                        '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                        '"&amp;quot;&amp;quot;" alt-with-value='
-                        '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                        '</p>'
-                    )
-                }
-            }, {
-                'hint_content': {
-                    'content_id': 'hint_2',
-                    'html': (
-                        '<p>Hello, this is html1 for state2'
-                        '<oppia-noninteractive-image filepath-with-value="'
-                        '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                        '"&amp;quot;&amp;quot;" alt-with-value='
-                        '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                        '</p>'
-                    )
-                }
+        hint_list_2: List[state_domain.HintDict] = [{
+            'hint_content': {
+                'content_id':
+                    'hint_1',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>'
+                )
             }
-        ]
+        }, {
+            'hint_content': {
+                'content_id':
+                    'hint_2',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>'
+                )
+            }
+        }]
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                    'state_name': exploration.init_state_name,
-                    'new_value': hint_list_2
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': hint_list_2
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list
@@ -8173,7 +7855,8 @@ title: Old Title
         # The passed hints should be a list.
         hint_dict = {
             'hint_content': {
-                'content_id': 'hint_1',
+                'content_id':
+                    'hint_1',
                 'html': (
                     '<p>Hello, this is html1 for state2'
                     '<oppia-noninteractive-image filepath-with-value="'
@@ -8186,14 +7869,12 @@ title: Old Title
         }
 
         with self.assertRaisesRegex(Exception, 'Expected hints_list to be a list.*'):
-            hints_update = exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                    'state_name': exploration.init_state_name,
-                    'new_value': hint_dict
-                }
-            )
+            hints_update = exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': hint_dict
+            })
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, [hints_update], 'Changed hints.'
             )
@@ -8203,19 +7884,18 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         hint_dict = {
             'hint_content': {
-                'content_id': 'hint_1',
+                'content_id':
+                    'hint_1',
                 'html': (
                     '<p>Hello, this is html1 for state2'
                     '<oppia-noninteractive-image filepath-with-value="'
@@ -8228,14 +7908,12 @@ title: Old Title
         }
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                    'state_name': exploration.init_state_name,
-                    'new_value': hint_dict
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': hint_dict
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list
@@ -8255,19 +7933,18 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         hint_dict = {
             'hint_content': {
-                'content_id': 'hint_1',
+                'content_id':
+                    'hint_1',
                 'html': (
                     '<p>Hello, this is html1 for state2'
                     '<oppia-noninteractive-image filepath-with-value="'
@@ -8280,14 +7957,12 @@ title: Old Title
         }
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                    'state_name': exploration.init_state_name,
-                    'new_value': hint_dict
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': hint_dict
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list
@@ -8315,45 +7990,40 @@ title: Old Title
             },
         }
 
-        hint_list: List[state_domain.HintDict] = [
-            {
-                'hint_content': {
-                    'content_id': 'hint_1',
-                    'html': (
-                        '<p>Hello, this is html1 for state2'
-                        '<oppia-noninteractive-image filepath-with-value="'
-                        '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                        '"&amp;quot;&amp;quot;" alt-with-value='
-                        '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                        '</p>'
-                    )
-                }
+        hint_list: List[state_domain.HintDict] = [{
+            'hint_content': {
+                'content_id':
+                    'hint_1',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>'
+                )
             }
-        ]
+        }]
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                        'state_name': exploration.init_state_name,
-                        'new_value': hint_list
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                    'state_name': exploration.init_state_name,
+                    'new_value': hint_list
+                })
             ], 'Changed hints.'
         )
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                        'state_name': exploration.init_state_name,
-                        'new_value': solution
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                    'state_name': exploration.init_state_name,
+                    'new_value': solution
+                })
             ], 'Changed interaction_solutions.'
         )
 
@@ -8366,14 +8036,12 @@ title: Old Title
         solution = None
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                        'state_name': exploration.init_state_name,
-                        'new_value': solution
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                    'state_name': exploration.init_state_name,
+                    'new_value': solution
+                })
             ], 'Changed interaction_solutions.'
         )
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -8384,13 +8052,11 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
@@ -8404,14 +8070,12 @@ title: Old Title
         }
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                    'state_name': exploration.init_state_name,
-                    'new_value': solution_2
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'state_name': exploration.init_state_name,
+                'new_value': solution_2
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 4, change_list
@@ -8434,20 +8098,18 @@ title: Old Title
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected recorded_voiceovers to be a dict'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected recorded_voiceovers to be a dict'
+        ):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, [
-                    exp_domain.ExplorationChange(
-                        {
-                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                            'property_name': (
-                                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
-                            ),
-                            'state_name': exploration.init_state_name,
-                            'new_value': 'invalid_recorded_voiceovers'
-                        }
-                    )
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name':
+                            (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                        'state_name': exploration.init_state_name,
+                        'new_value': 'invalid_recorded_voiceovers'
+                    })
                 ], 'Changed recorded_voiceovers.'
             )
 
@@ -8456,32 +8118,29 @@ title: Old Title
         # Add change to upgrade the version.
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'new title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })
             ], 'Changed title.'
         )
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-                    'state_name': exploration.init_state_name,
-                    'new_value': 'invalid_recorded_voiceovers'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                'state_name': exploration.init_state_name,
+                'new_value': 'invalid_recorded_voiceovers'
+            })
         ]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list
         )
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegex(Exception,
-                                    'Expected recorded_voiceovers to be a dict'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected recorded_voiceovers to be a dict'
+        ):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed recorded_voiceovers.'
@@ -8511,13 +8170,11 @@ title: Old Title
         exploration_model = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         exp_services.update_exploration(
             self.albert_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
             ], 'Changed title'
         )
         user_actions_info = user_services.get_user_actions_info(self.albert_id)
@@ -8537,9 +8194,9 @@ title: Old Title
         exploration_model.version = 0
 
         with self.assertRaisesRegex(
-                Exception,
-                'Unexpected error: trying to update version 0 of exploration '
-                'from version 1. Please reload the page and try again.'):
+            Exception, 'Unexpected error: trying to update version 0 of exploration '
+            'from version 1. Please reload the page and try again.'
+        ):
             exp_services.revert_exploration('user_id', 'exp_id', 1, 0)
 
 
@@ -8608,88 +8265,79 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
         self.assertEqual(translation_counts['hi'], 3)
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'Introduction',
-                    'property_name': 'widget_id',
-                    'new_value': 'MultipleChoiceInput',
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'Introduction',
-                    'property_name': 'widget_customization_args',
-                    'new_value': {
-                        'choices': {
-                            'value': [
-                                {
-                                    'content_id': 'ca_choices_5',
-                                    'html': '<p>1</p>'
-                                }, {
-                                    'content_id': 'ca_choices_6',
-                                    'html': '<p>2</p>'
-                                }, {
-                                    'content_id': 'ca_choices_7',
-                                    'html': '<p>3</p>'
-                                }, {
-                                    'content_id': 'ca_choices_8',
-                                    'html': '<p>4</p>'
-                                }
-                            ]
-                        },
-                        'showChoicesInShuffledOrder': {
-                            'value': False
-                        },
-                        'maxAllowableSelectionCount': {
-                            'value': 1
-                        },
-                        'minAllowableSelectionCount': {
-                            'value': 1
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput',
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_5',
+                            'html': '<p>1</p>'
+                        }, {
+                            'content_id': 'ca_choices_6',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'ca_choices_7',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'ca_choices_8',
+                            'html': '<p>4</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': False
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
                     }
                 }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'Introduction',
-                    'property_name': 'answer_groups',
-                    'new_value': [
-                        {
-                            'outcome': {
-                                'dest': 'End',
-                                'dest_if_really_stuck': None,
-                                'param_changes': [],
-                                'refresher_exploration_id': None,
-                                'missing_prerequisite_skill_id': None,
-                                'feedback': {
-                                    'html': '<p>correct</p>',
-                                    'content_id': 'feedback_9'
-                                },
-                                'labelled_as_correct': True
-                            },
-                            'rule_specs': [{
-                                'rule_type': 'Equals',
-                                'inputs': {
-                                    'x': 0
-                                }
-                            }],
-                            'training_data': [],
-                            'tagged_skill_misconception_id': None
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name':
+                    'Introduction',
+                'property_name':
+                    'answer_groups',
+                'new_value': [{
+                    'outcome': {
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'html': '<p>correct</p>',
+                            'content_id': 'feedback_9'
+                        },
+                        'labelled_as_correct': True
+                    },
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 0
                         }
-                    ],
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'new_value': 10,
-                    'old_value': 9,
-                    'property_name': 'next_content_id_index'
-                }
-            )
+                    }],
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }],
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'new_value': 10,
+                'old_value': 9,
+                'property_name': 'next_content_id_index'
+            })
         ]
 
         exp_services.update_exploration(
@@ -8775,108 +8423,98 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
         self.assertEqual(translation_counts['hi'], 3)
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'Introduction',
-                    'property_name': 'widget_id',
-                    'new_value': 'MultipleChoiceInput',
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'Introduction',
-                    'property_name': 'widget_customization_args',
-                    'new_value': {
-                        'choices': {
-                            'value': [
-                                {
-                                    'content_id': 'ca_choices_5',
-                                    'html': '<p>1</p>'
-                                }, {
-                                    'content_id': 'ca_choices_6',
-                                    'html': '<p>2</p>'
-                                }, {
-                                    'content_id': 'ca_choices_7',
-                                    'html': '<p>3</p>'
-                                }, {
-                                    'content_id': 'ca_choices_8',
-                                    'html': '<p>4</p>'
-                                }
-                            ]
-                        },
-                        'showChoicesInShuffledOrder': {
-                            'value': False
-                        },
-                        'maxAllowableSelectionCount': {
-                            'value': 1
-                        },
-                        'minAllowableSelectionCount': {
-                            'value': 1
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput',
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_5',
+                            'html': '<p>1</p>'
+                        }, {
+                            'content_id': 'ca_choices_6',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'ca_choices_7',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'ca_choices_8',
+                            'html': '<p>4</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': False
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
                     }
                 }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'Introduction',
-                    'property_name': 'answer_groups',
-                    'new_value': [
-                        {
-                            'outcome': {
-                                'dest': 'End',
-                                'dest_if_really_stuck': None,
-                                'param_changes': [],
-                                'refresher_exploration_id': None,
-                                'missing_prerequisite_skill_id': None,
-                                'feedback': {
-                                    'html': '<p>correct</p>',
-                                    'content_id': 'feedback_9'
-                                },
-                                'labelled_as_correct': True
-                            },
-                            'rule_specs': [{
-                                'rule_type': 'Equals',
-                                'inputs': {
-                                    'x': 0
-                                }
-                            }],
-                            'training_data': [],
-                            'tagged_skill_misconception_id': None
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name':
+                    'Introduction',
+                'property_name':
+                    'answer_groups',
+                'new_value': [{
+                    'outcome': {
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'html': '<p>correct</p>',
+                            'content_id': 'feedback_9'
+                        },
+                        'labelled_as_correct': True
+                    },
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 0
                         }
-                    ],
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                    'state_name': exploration.init_state_name,
-                    'new_value': [
-                        {
-                            'hint_content': {
-                                'content_id': 'hint_10',
-                                'html': '<p>Hint 1</p>'
-                            }
-                        }, {
-                            'hint_content': {
-                                'content_id': 'hint_11',
-                                'html': '<p>Hint 2</p>'
-                            }
-                        }
-                    ]
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'new_value': 12,
-                    'old_value': 11,
-                    'property_name': 'next_content_id_index'
-                }
-            )
+                    }],
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }],
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name':
+                    exploration.init_state_name,
+                'new_value': [{
+                    'hint_content': {
+                        'content_id': 'hint_10',
+                        'html': '<p>Hint 1</p>'
+                    }
+                }, {
+                    'hint_content': {
+                        'content_id': 'hint_11',
+                        'html': '<p>Hint 2</p>'
+                    }
+                }]
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'new_value': 12,
+                'old_value': 11,
+                'property_name': 'next_content_id_index'
+            })
         ]
 
         exp_services.update_exploration(
@@ -8995,13 +8633,11 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     OLDER_DATETIME: Final = datetime.datetime.strptime('2016-01-16', '%Y-%m-%d')
     NEWER_DATETIME: Final = datetime.datetime.strptime('2016-03-16', '%Y-%m-%d')
     NEW_CHANGELIST: Final = [
-        exp_domain.ExplorationChange(
-            {
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'New title'
-            }
-        )
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'New title'
+        })
     ]
     NEW_CHANGELIST_DICT: Final = [NEW_CHANGELIST[0].to_dict()]
 
@@ -9016,32 +8652,28 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         # Create explorations.
         exploration = self.save_new_valid_exploration(self.EXP_ID1, self.USER_ID)
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'param_specs',
-                    'new_value': {
-                        'myParam': {
-                            'obj_type': 'UnicodeString'
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'myParam': {
+                        'obj_type': 'UnicodeString'
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(self.USER_ID, self.EXP_ID1, change_list, '')
         self.save_new_valid_exploration(self.EXP_ID2, self.USER_ID)
         self.save_new_valid_exploration(self.EXP_ID3, self.USER_ID)
         self.init_state_name = exploration.init_state_name
-        self.param_changes = [
-            {
-                'customization_args': {
-                    'list_of_values': ['1', '2'],
-                    'parse_with_jinja': False
-                },
-                'name': 'myParam',
-                'generator_id': 'RandomSelector'
-            }
-        ]
+        self.param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'],
+                'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        }]
         self.draft_change_list = _get_change_list(
             self.init_state_name, 'param_changes', self.param_changes
         )
@@ -9117,9 +8749,9 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_create_or_update_draft_when_by_voice_artist(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Voice artist does not have permission to make some '
-                'changes in the change list.'):
+            utils.ValidationError, 'Voice artist does not have permission to make some '
+            'changes in the change list.'
+        ):
             exp_services.create_or_update_draft(
                 self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5, self.NEWER_DATETIME,
                 True
@@ -9260,21 +8892,19 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        choices_subtitled_html_dicts: List[state_domain.SubtitledHtmlDict] = [
-            {
-                'content_id': 'ca_choices_0',
-                'html': '<p>state customization arg html 1</p>'
-            }, {
-                'content_id': 'ca_choices_1',
-                'html': '<p>state customization arg html 2</p>'
-            }, {
-                'content_id': 'ca_choices_2',
-                'html': '<p>state customization arg html 3</p>'
-            }, {
-                'content_id': 'ca_choices_3',
-                'html': '<p>state customization arg html 4</p>'
-            }
-        ]
+        choices_subtitled_html_dicts: List[state_domain.SubtitledHtmlDict] = [{
+            'content_id': 'ca_choices_0',
+            'html': '<p>state customization arg html 1</p>'
+        }, {
+            'content_id': 'ca_choices_1',
+            'html': '<p>state customization arg html 2</p>'
+        }, {
+            'content_id': 'ca_choices_2',
+            'html': '<p>state customization arg html 3</p>'
+        }, {
+            'content_id': 'ca_choices_3',
+            'html': '<p>state customization arg html 4</p>'
+        }]
         state_customization_args_dict: Dict[str, Dict[str, Union[
             int, List[state_domain.SubtitledHtmlDict]]]] = {
                 'choices': {
@@ -9291,43 +8921,40 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         state.update_interaction_customization_args(state_customization_args_dict)
         exp_services.save_new_exploration(self.USER_ID, exploration)
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'State1',
-                    'property_name': 'widget_customization_args',
-                    'new_value': {
-                        'choices': {
-                            'value': [
-                                {
-                                    'content_id': 'ca_choices_0',
-                                    'html': '<p>1</p>'
-                                }, {
-                                    'content_id': 'ca_choices_1',
-                                    'html': '<p>2</p>'
-                                }, {
-                                    'content_id': 'ca_choices_2',
-                                    'html': (
-                                        '<oppia-noninteractive-math raw_latex-with'
-                                        '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
-                                        '..(x - a_n)&amp;quot;"></oppia-noninteractive-'
-                                        'math>'
-                                    )
-                                }, {
-                                    'content_id': 'ca_choices_3',
-                                    'html': '<p>4</p>'
-                                }
-                            ]
-                        },
-                        'maxAllowableSelectionCount': {
-                            'value': 1
-                        },
-                        'minAllowableSelectionCount': {
-                            'value': 1
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State1',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>1</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id':
+                                'ca_choices_2',
+                            'html': (
+                                '<oppia-noninteractive-math raw_latex-with'
+                                '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
+                                '..(x - a_n)&amp;quot;"></oppia-noninteractive-'
+                                'math>'
+                            )
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>4</p>'
+                        }]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
                     }
                 }
-            ).to_dict()
+            }).to_dict()
         ]
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_ID, 'exp_id'),
@@ -9358,28 +8985,24 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(self.EXP_ID1, self.USER_ID)
 
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'param_specs',
-                    'new_value': {
-                        'myParam': {
-                            'obj_type': 'UnicodeString'
-                        }
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'myParam': {
+                        'obj_type': 'UnicodeString'
                     }
                 }
-            )
+            })
         ]
         exp_services.update_exploration(self.USER_ID, self.EXP_ID1, change_list, '')
 
         migration_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                    'from_version': 55,
-                    'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': 55,
+                'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+            })
         ]
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID1, migration_change_list, 'Migrate state schema.'
@@ -9423,13 +9046,11 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'New title'
-                }
-            ).to_dict()
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            }).to_dict()
         ]
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_ID, self.EXP_ID1),
@@ -9468,9 +9089,8 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         )
         version_history_model = self.version_history_model_class.get(version_history_id)
         expected_state_version_history_dict = {
-            feconf.DEFAULT_INIT_STATE_NAME: state_domain.StateVersionHistory(
-                None, None, self.owner_id
-            ).to_dict()
+            feconf.DEFAULT_INIT_STATE_NAME:
+                state_domain.StateVersionHistory(None, None, self.owner_id).to_dict()
         }
 
         self.assertEqual(
@@ -9542,30 +9162,28 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'New state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index,
-                        'old_value': 0
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                    'old_value': 0
+                })
             ], 'Added state'
         )
 
@@ -9586,30 +9204,28 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'New state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index,
-                        'old_value': 0
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                    'old_value': 0
+                })
             ], 'Added state'
         )
         old_model = self.version_history_model_class.get(
@@ -9623,12 +9239,10 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_DELETE_STATE,
-                        'state_name': 'New state',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'New state',
+                })
             ], 'Deleted state'
         )
         new_model = self.version_history_model_class.get(
@@ -9651,13 +9265,11 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_state_name': new_state_name
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': new_state_name
+                })
             ], 'Renamed state'
         )
 
@@ -9690,20 +9302,16 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_state_name': new_state_name
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': new_state_name,
-                        'new_state_name': feconf.DEFAULT_INIT_STATE_NAME
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': new_state_name
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': new_state_name,
+                    'new_state_name': feconf.DEFAULT_INIT_STATE_NAME
+                })
             ], 'Renamed state'
         )
 
@@ -9728,36 +9336,31 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_value': 'TextInput'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.
-                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_value': {
-                            'placeholder': {
-                                'value': {
-                                    'content_id': 'ca_placeholder_0',
-                                    'unicode_str': ''
-                                }
-                            },
-                            'rows': {
-                                'value': 1
-                            },
-                            'catchMisspellings': {
-                                'value': False
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
                             }
+                        },
+                        'rows': {
+                            'value': 1
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     }
-                )
+                })
             ], 'Edited interaction'
         )
 
@@ -9786,22 +9389,18 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_value': 'TextInput'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_value': None
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': None
+                })
             ], 'Edited interaction id'
         )
 
@@ -9840,14 +9439,12 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             }
         }
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                    'new_value': recorded_voiceovers_dict
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_value': recorded_voiceovers_dict
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Translation commits'
@@ -9872,13 +9469,11 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
             ], 'Changed title'
         )
 
@@ -9899,20 +9494,16 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': feconf.DEFAULT_EXPLORATION_TITLE
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': feconf.DEFAULT_EXPLORATION_TITLE
+                })
             ], 'Changed title'
         )
 
@@ -9930,23 +9521,21 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         # Note that these translations might not correspond to any actual text
         # in the exploration, but this discrepancy shouldn't affect the behavior
         # we're trying to test.
-        datastore_services.put_multi(
-            [
-                translation_models.EntityTranslationsModel.create_new(
-                    feconf.TranslatableEntityType.EXPLORATION.value,
-                    self.EXP_0_ID,
-                    1,
-                    'ak',
-                    {
-                        'content_4': {
-                            'content_value': '<p>a</p>',
-                            'content_format': 'html',
-                            'needs_update': False,
-                        },
+        datastore_services.put_multi([
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.TranslatableEntityType.EXPLORATION.value,
+                self.EXP_0_ID,
+                1,
+                'ak',
+                {
+                    'content_4': {
+                        'content_value': '<p>a</p>',
+                        'content_format': 'html',
+                        'needs_update': False,
                     },
-                )
-            ]
-        )
+                },
+            )
+        ])
         old_translations = tuple(
             translation.to_dict()['translations'] for translation in
             translation_fetchers.get_all_entity_translations_for_entity(
@@ -9956,43 +9545,37 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
             ], 'Changed title'
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_state_name': 'Another state'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': 'Another state'
+                })
             ], 'Renamed state'
         )
-        datastore_services.put_multi(
-            [
-                translation_models.EntityTranslationsModel.create_new(
-                    feconf.TranslatableEntityType.EXPLORATION.value,
-                    self.EXP_0_ID,
-                    3,
-                    'ak',
-                    {
-                        'content_5': {
-                            'content_value': '<p>a</p>',
-                            'content_format': 'html',
-                            'needs_update': False,
-                        },
+        datastore_services.put_multi([
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.TranslatableEntityType.EXPLORATION.value,
+                self.EXP_0_ID,
+                3,
+                'ak',
+                {
+                    'content_5': {
+                        'content_value': '<p>a</p>',
+                        'content_format': 'html',
+                        'needs_update': False,
                     },
-                )
-            ]
-        )
+                },
+            )
+        ])
         pre_revert_translations = tuple(
             translation.to_dict()['translations'] for translation in
             translation_fetchers.get_all_entity_translations_for_entity(
@@ -10036,28 +9619,26 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             self.exploration.next_content_id_index
         )
         change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'New state',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'New state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_DELETE_STATE,
-                    'state_name': 'New state'
-                }
-            )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'New state'
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Added and deleted state'
@@ -10074,46 +9655,44 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             self.exploration.next_content_id_index
         )
         change_list_from_v1_to_v2 = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'first',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'first',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_ADD_STATE,
-                    'state_name': 'second',
-                    'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT
-                        )
-                    ),
-                    'content_id_for_default_outcome': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME
-                        )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
                     )
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index,
-                    'old_value': 0
-                }
-            )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd':
+                    exp_domain.CMD_ADD_STATE,
+                'state_name':
+                    'second',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
+                    )
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    )
+                )
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index,
+                'old_value': 0
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_from_v1_to_v2,
@@ -10134,27 +9713,21 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
 
         # Correctly interchanging the state names.
         change_list_from_v2_to_v3 = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'first',
-                    'new_state_name': 'temporary'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'second',
-                    'new_state_name': 'first'
-                }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_RENAME_STATE,
-                    'old_state_name': 'temporary',
-                    'new_state_name': 'second'
-                }
-            )
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'first',
+                'new_state_name': 'temporary'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'second',
+                'new_state_name': 'first'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'temporary',
+                'new_state_name': 'second'
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_from_v2_to_v3,
@@ -10185,58 +9758,54 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
         )
         exp_services.update_exploration(
             self.editor_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'New state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'New state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index,
-                        'old_value': 0
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                    'old_value': 0
+                })
             ], 'Added a state'
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'Another state',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
+                exp_domain.ExplorationChange({
+                    'cmd':
+                        exp_domain.CMD_ADD_STATE,
+                    'state_name':
+                        'Another state',
+                    'content_id_for_state_content': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT
                         )
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index,
-                        'old_value': 0
-                    }
-                )
+                    ),
+                    'content_id_for_default_outcome': (
+                        content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME
+                        )
+                    )
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index,
+                    'old_value': 0
+                })
             ], 'Added a state'
         )
         new_model = self.version_history_model_class.get(
@@ -10516,13 +10085,11 @@ title: Title
         # Now version of exploration becomes 4.
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': 'Introduction',
-                        'new_state_name': 'Intro',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'Intro',
+                })
             ], 'Change state name'
         )
 
@@ -10583,13 +10150,11 @@ title: Title
         # Now version of exploration becomes 2.
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': 'Introduction',
-                        'new_state_name': 'Intro',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'Intro',
+                })
             ], 'Change state name'
         )
 
@@ -11085,24 +10650,20 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, 'owner_id')
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 1'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 1'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 2'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 2'
+                })
             ], 'Changed title.'
         )
         exp_stats_list = (
@@ -11129,46 +10690,38 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, 'owner_id')
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 1'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 1'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 2'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 2'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 3'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 3'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 4'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 4'
+                })
             ], 'Changed title.'
         )
         exp_services.revert_exploration(owner_id, exp_id, 5, 4)
@@ -11179,8 +10732,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_stats_model_to_delete.delete()
 
         self.assertItemsEqual(
-            exp_services.regenerate_missing_stats_for_exploration('ID1'),
-            ([
+            exp_services.regenerate_missing_stats_for_exploration('ID1'), ([
                 'ExplorationStats(exp_id=\'ID1\', exp_version=6)',
             ], [], 5, 6)
         )
@@ -11191,46 +10743,38 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, 'owner_id')
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 1'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 1'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 2'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 2'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 3'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 3'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 4'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 4'
+                })
             ], 'Changed title.'
         )
         exp_services.revert_exploration(owner_id, exp_id, 5, 4)
@@ -11240,12 +10784,10 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         stats_services.save_stats_model(exp_stats)
 
         self.assertItemsEqual(
-            exp_services.regenerate_missing_stats_for_exploration('ID1'), (
-                [], [
-                    'StateStats(exp_id=\'ID1\', exp_version=6, '
-                    'state_name=\'Introduction\')'
-                ], 5, 6
-            )
+            exp_services.regenerate_missing_stats_for_exploration('ID1'), ([], [
+                'StateStats(exp_id=\'ID1\', exp_version=6, '
+                'state_name=\'Introduction\')'
+            ], 5, 6)
         )
 
     def test_when_few_exp_stats_models_are_missing(self) -> None:
@@ -11254,57 +10796,47 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, 'owner_id')
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 1'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 1'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 2'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 2'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 3'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 3'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 4'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 4'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 5'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 5'
+                })
             ], 'Changed title.'
         )
 
@@ -11320,12 +10852,10 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_stats_model_for_version_4.delete()
 
         self.assertItemsEqual(
-            exp_services.regenerate_missing_stats_for_exploration('ID1'), (
-                [
-                    'ExplorationStats(exp_id=\'ID1\', exp_version=2)',
-                    'ExplorationStats(exp_id=\'ID1\', exp_version=4)'
-                ], [], 4, 6
-            )
+            exp_services.regenerate_missing_stats_for_exploration('ID1'), ([
+                'ExplorationStats(exp_id=\'ID1\', exp_version=2)',
+                'ExplorationStats(exp_id=\'ID1\', exp_version=4)'
+            ], [], 4, 6)
         )
 
     def test_when_v1_version_exp_stats_model_is_missing(self) -> None:
@@ -11334,57 +10864,47 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, 'owner_id')
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 1'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 1'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 2'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 2'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 3'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 3'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 4'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 4'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 5'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 5'
+                })
             ], 'Changed title.'
         )
         exp_stats_model_for_version_1 = (
@@ -11406,13 +10926,11 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_stats_model_for_version_3.delete()
 
         self.assertItemsEqual(
-            exp_services.regenerate_missing_stats_for_exploration('ID1'), (
-                [
-                    'ExplorationStats(exp_id=\'ID1\', exp_version=1)',
-                    'ExplorationStats(exp_id=\'ID1\', exp_version=2)',
-                    'ExplorationStats(exp_id=\'ID1\', exp_version=3)'
-                ], [], 3, 6
-            )
+            exp_services.regenerate_missing_stats_for_exploration('ID1'), ([
+                'ExplorationStats(exp_id=\'ID1\', exp_version=1)',
+                'ExplorationStats(exp_id=\'ID1\', exp_version=2)',
+                'ExplorationStats(exp_id=\'ID1\', exp_version=3)'
+            ], [], 3, 6)
         )
 
     def test_generate_exp_stats_when_revert_commit_is_present(self) -> None:
@@ -11421,46 +10939,38 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, 'owner_id')
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 1'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 1'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 2'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 2'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 3'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 3'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 4'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 4'
+                })
             ], 'Changed title.'
         )
         exp_services.revert_exploration(owner_id, exp_id, 5, 3)
@@ -11478,12 +10988,10 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_stats_model_for_version_2.delete()
 
         self.assertItemsEqual(
-            exp_services.regenerate_missing_stats_for_exploration('ID1'), (
-                [
-                    'ExplorationStats(exp_id=\'ID1\', exp_version=1)',
-                    'ExplorationStats(exp_id=\'ID1\', exp_version=2)'
-                ], [], 4, 6
-            )
+            exp_services.regenerate_missing_stats_for_exploration('ID1'), ([
+                'ExplorationStats(exp_id=\'ID1\', exp_version=1)',
+                'ExplorationStats(exp_id=\'ID1\', exp_version=2)'
+            ], [], 4, 6)
         )
 
     def test_when_all_exp_stats_models_are_missing(self) -> None:
@@ -11505,57 +11013,47 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, 'owner_id')
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 1'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 1'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 2'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 2'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 3'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 3'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 4'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 4'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 5'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 5'
+                })
             ], 'Changed title.'
         )
         exp_stats = stats_services.get_exploration_stats_by_id(exp_id, 2)
@@ -11564,12 +11062,10 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         stats_services.save_stats_model(exp_stats)
 
         self.assertItemsEqual(
-            exp_services.regenerate_missing_stats_for_exploration('ID1'), (
-                [], [
-                    'StateStats(exp_id=\'ID1\', exp_version=2, '
-                    'state_name=\'Introduction\')'
-                ], 6, 5
-            )
+            exp_services.regenerate_missing_stats_for_exploration('ID1'), ([], [
+                'StateStats(exp_id=\'ID1\', exp_version=2, '
+                'state_name=\'Introduction\')'
+            ], 6, 5)
         )
 
     def test_when_few_state_stats_models_are_missing_for_old_exps(self) -> None:
@@ -11584,46 +11080,38 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 2'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 2'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 3'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 3'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 4'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 4'
+                })
             ], 'Changed title.'
         )
         exp_services.update_exploration(
             owner_id, exp_id, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'New title 5'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title 5'
+                })
             ], 'Changed title.'
         )
         exp_stats = stats_services.get_exploration_stats_by_id(exp_id, 2)
@@ -11632,14 +11120,12 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         stats_services.save_stats_model(exp_stats)
 
         self.assertItemsEqual(
-            exp_services.regenerate_missing_stats_for_exploration('ID1'), (
-                [], [
-                    'StateStats(exp_id=\'ID1\', exp_version=2, '
-                    'state_name=\'Introduction\')',
-                    'StateStats(exp_id=\'ID1\', exp_version=2, '
-                    'state_name=\'END\')',
-                ], 8, 5
-            )
+            exp_services.regenerate_missing_stats_for_exploration('ID1'), ([], [
+                'StateStats(exp_id=\'ID1\', exp_version=2, '
+                'state_name=\'Introduction\')',
+                'StateStats(exp_id=\'ID1\', exp_version=2, '
+                'state_name=\'END\')',
+            ], 8, 5)
         )
 
 
@@ -11677,26 +11163,22 @@ class ComputeVoiceoversModelFromExplorationChangeTest(ExplorationServicesUnitTes
         }
 
         voiceover_changes = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'update_voiceovers',
-                    'language_accent_code': 'en-US',
-                    'content_id': 'content_0',
-                    'voiceovers': {
-                        'manual': manual_voiceover_1
-                    }
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
                 }
-            ),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': 'update_voiceovers',
-                    'language_accent_code': 'en-US',
-                    'content_id': 'default_outcome_1',
-                    'voiceovers': {
-                        'manual': manual_voiceover_2
-                    }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'default_outcome_1',
+                'voiceovers': {
+                    'manual': manual_voiceover_2
                 }
-            )
+            })
         ]
 
         models_to_put = (

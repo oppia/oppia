@@ -27,9 +27,8 @@ class LearnerProgressInTopicsAndStoriesUnitTests(test_utils.GenericTestBase):
     def test_initialization(self) -> None:
         """Tests init method."""
         user_learner_progress = (
-            learner_progress_domain.LearnerProgressInTopicsAndStories(
-                [], [], [], [], [], [], [], []
-            )
+            learner_progress_domain.LearnerProgressInTopicsAndStories([], [], [], [],
+                                                                      [], [], [], [])
         )
 
         self.assertEqual(user_learner_progress.partially_learnt_topic_summaries, [])

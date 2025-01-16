@@ -28,7 +28,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models, ) = models.Registry.import_models([models.Names.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 def _get_user_query_from_model(
@@ -111,9 +111,8 @@ def get_recent_user_queries(
         num_queries_to_fetch, cursor
     )
 
-    return (
-        [_get_user_query_from_model(model) for model in user_query_models], next_cursor
-    )
+    return ([_get_user_query_from_model(model) for model in user_query_models],
+            next_cursor)
 
 
 def _save_user_query(user_query: user_query_domain.UserQuery) -> str:

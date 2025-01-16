@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Beam DoFns and PTransforms to provide validation of story models."""
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from core.platform import models
 from typing import Optional, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import story_models
 
 (story_models,) = models.Registry.import_models([models.Names.STORY])
@@ -35,14 +34,14 @@ if MYPY: # pragma: no cover
 
 @validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel)
 class ValidateStorySnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        story_models.StorySnapshotMetadataModel
-    ]
+    base_validation.BaseValidateCommitCmdsSchema[story_models.StorySnapshotMetadataModel
+                                                ]
 ):
     """Overrides _get_change_domain_class for StorySnapshotMetadataModel."""
 
     def _get_change_domain_class(
-        self, unused_input_model: story_models.StorySnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        unused_input_model: story_models.StorySnapshotMetadataModel  # pylint: disable=unused-argument
     ) -> Type[story_domain.StoryChange]:
         """Returns a change domain class.
 
@@ -58,9 +57,7 @@ class ValidateStorySnapshotMetadataModel(
 
 @validation_decorators.AuditsExisting(story_models.StoryCommitLogEntryModel)
 class ValidateStoryCommitLogEntryModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        story_models.StoryCommitLogEntryModel
-    ]
+    base_validation.BaseValidateCommitCmdsSchema[story_models.StoryCommitLogEntryModel]
 ):
     """Overrides _get_change_domain_class for StoryCommitLogEntryModel."""
 

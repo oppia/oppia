@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Jobs for translation suggestions with invalid content IDs."""
 
 from __future__ import annotations
@@ -32,7 +31,7 @@ import apache_beam as beam
 from typing import Dict, Iterable, List, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import suggestion_models
 
@@ -82,44 +81,37 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         """
         suggestion_dicts = _get_suggestion_dicts(self.pipeline)
         total_processed_suggestions_count_job_run_results = (
-            suggestion_dicts
-            | 'Get suggestions' >> beam.FlatMap(
-                lambda suggestions_dict: suggestions_dict['suggestions']
+            suggestion_dicts | 'Get suggestions' >>
+            beam.FlatMap(lambda suggestions_dict: suggestions_dict['suggestions']) |
+            'Total processed suggestion count' >> (
+                job_result_transforms.
+                CountObjectsToJobRunResult('TOTAL PROCESSED SUGGESTIONS COUNT')
             )
-            | 'Total processed suggestion count' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL PROCESSED SUGGESTIONS COUNT'))
         )
 
         updated_suggestions = (
-            suggestion_dicts
-            | 'Update suggestion models' >> beam.Map(
+            suggestion_dicts | 'Update suggestion models' >> beam.Map(
                 lambda suggestions_dict: self._reject_obsolete_suggestions(
-                    suggestions_dict['suggestions'],
-                    suggestions_dict['exploration'])
+                    suggestions_dict['suggestions'], suggestions_dict['exploration']
                 )
-            | 'Flatten suggestion models' >> beam.FlatMap(lambda x: x)
+            ) | 'Flatten suggestion models' >> beam.FlatMap(lambda x: x)
         )
 
         updated_suggestions_count_job_run_results = (
-            updated_suggestions
-            | 'Rejected translation suggestion count' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'REJECTED SUGGESTIONS COUNT'))
+            updated_suggestions | 'Rejected translation suggestion count' >> (
+                job_result_transforms.
+                CountObjectsToJobRunResult('REJECTED SUGGESTIONS COUNT')
+            )
         )
 
         unused_put_results = (
-            updated_suggestions
-            | 'Put models into the datastore' >> ndb_io.PutModels()
+            updated_suggestions | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return (
-            (
-                total_processed_suggestions_count_job_run_results,
-                updated_suggestions_count_job_run_results
-            )
-            | 'Combine results' >> beam.Flatten()
-        )
+        return ((
+            total_processed_suggestions_count_job_run_results,
+            updated_suggestions_count_job_run_results
+        ) | 'Combine results' >> beam.Flatten())
 
 
 class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
@@ -145,32 +137,27 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             list(dict). Audit report result.
         """
         obsolete_content = []
-        obsolete_translation_suggestion_error_report: List[
-            Dict[str, Union[
+        obsolete_translation_suggestion_error_report: List[Dict[
+            str,
+            Union[
                 # Exploration ID.
                 str,
                 # Obsolete content dict.
-                List[Dict[str, str]]
-            ]]
-        ] = []
+                List[Dict[str, str]]]]] = []
 
         translatable_content_ids = exploration.get_translatable_content_ids()
         for suggestion in suggestions:
             suggestion_change = suggestion.change_cmd
             if not suggestion_change['content_id'] in translatable_content_ids:
-                obsolete_content.append(
-                    {
-                        'content_id': suggestion_change['content_id'],
-                        'state_name': suggestion_change['state_name']
-                    }
-                )
+                obsolete_content.append({
+                    'content_id': suggestion_change['content_id'],
+                    'state_name': suggestion_change['state_name']
+                })
 
-        obsolete_translation_suggestion_error_report.append(
-            {
-                'exp_id': exploration.id,
-                'obsolete_content': obsolete_content,
-            }
-        )
+        obsolete_translation_suggestion_error_report.append({
+            'exp_id': exploration.id,
+            'obsolete_content': obsolete_content,
+        })
 
         return obsolete_translation_suggestion_error_report
 
@@ -182,59 +169,46 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         """
         suggestion_dicts = _get_suggestion_dicts(self.pipeline)
         total_processed_suggestions_count_job_run_results = (
-            suggestion_dicts
-            | 'Get suggestions' >> beam.FlatMap(
-                lambda suggestions_dict: suggestions_dict['suggestions']
+            suggestion_dicts | 'Get suggestions' >>
+            beam.FlatMap(lambda suggestions_dict: suggestions_dict['suggestions']) |
+            'Total processed suggestion count' >> (
+                job_result_transforms.
+                CountObjectsToJobRunResult('TOTAL PROCESSED SUGGESTIONS COUNT')
             )
-            | 'Total processed suggestion count' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL PROCESSED SUGGESTIONS COUNT'))
         )
 
         suggestion_results = (
-            suggestion_dicts
-            | 'Report obsolete suggestions' >> beam.Map(
+            suggestion_dicts | 'Report obsolete suggestions' >> beam.Map(
                 lambda suggestions_dict: (
                     self._report_suggestions_with_missing_content_ids(
-                        suggestions_dict['suggestions'],
-                        suggestions_dict['exploration']
+                        suggestions_dict['suggestions'], suggestions_dict['exploration']
                     )
-                ))
-            | 'Flatten reports' >> beam.FlatMap(lambda x: x)
-            | 'Filter out reports with no obsolete suggestions' >> (
-                beam.Filter(
-                    lambda report: len(report['obsolete_content']) > 0))
+                )
+            ) | 'Flatten reports' >> beam.FlatMap(lambda x: x) |
+            'Filter out reports with no obsolete suggestions' >>
+            (beam.Filter(lambda report: len(report['obsolete_content']) > 0))
         )
 
         job_run_results = (
-            suggestion_results
-            | 'Report the obsolete suggestions' >> beam.Map(
-                lambda result: (
-                    job_run_result.JobRunResult.as_stdout(
-                        f'Results are - {result}'
-                    )
-                )
+            suggestion_results | 'Report the obsolete suggestions' >> beam.Map(
+                lambda result:
+                (job_run_result.JobRunResult.as_stdout(f'Results are - {result}'))
             )
         )
 
         obsolete_suggestions_count_job_run_results = (
-            suggestion_results
-            | 'Flatten obsolete suggestions' >> (
-                beam.FlatMap(lambda report: report['obsolete_content']))
-            | 'Report the obsolete suggestions count' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'OBSOLETE SUGGESTIONS COUNT')
+            suggestion_results | 'Flatten obsolete suggestions' >>
+            (beam.FlatMap(lambda report: report['obsolete_content'])) |
+            'Report the obsolete suggestions count' >> (
+                job_result_transforms.
+                CountObjectsToJobRunResult('OBSOLETE SUGGESTIONS COUNT')
             )
         )
 
-        return (
-            (
-                job_run_results,
-                total_processed_suggestions_count_job_run_results,
-                obsolete_suggestions_count_job_run_results
-            )
-            | 'Combine results' >> beam.Flatten()
-        )
+        return ((
+            job_run_results, total_processed_suggestions_count_job_run_results,
+            obsolete_suggestions_count_job_run_results
+        ) | 'Combine results' >> beam.Flatten())
 
 
 def _get_suggestion_dicts(
@@ -292,16 +266,17 @@ def _get_suggestion_dicts(
         #   suggestions: [suggestions],
         #   exploration: [exploration]
         # }>.
-        | 'Group by exploration ID' >> beam.CoGroupByKey()
-        | 'Remove keys' >> beam.Values() # pylint: disable=no-value-for-parameter
-        | 'Filter out explorations with no suggestions' >> beam.Filter(
-            lambda exp_id_dict: len(exp_id_dict['suggestions']) != 0)
-        | 'Get single exploration for exploration key' >> beam.Map(
+        | 'Group by exploration ID' >> beam.CoGroupByKey() |
+        'Remove keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        | 'Filter out explorations with no suggestions' >>
+        beam.Filter(lambda exp_id_dict: len(exp_id_dict['suggestions']) != 0) |
+        'Get single exploration for exploration key' >> beam.Map(
             lambda suggestions_dict: {
                 'suggestions': suggestions_dict['suggestions'],
                 # There should only be 1 exploration per exp_id.
                 'exploration': suggestions_dict['explorations'][0]
-            })
+            }
+        )
     )
 
     return suggestion_dicts

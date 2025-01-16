@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for core.platform.app_identity.gae_app_identity_services."""
 
 from __future__ import annotations
@@ -27,8 +26,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def test_get_application_id(self) -> None:
         with self.swap(feconf, 'OPPIA_PROJECT_ID', 'some_id'):
-            self.assertEqual(
-                gae_app_identity_services.get_application_id(), 'some_id')
+            self.assertEqual(gae_app_identity_services.get_application_id(), 'some_id')
 
     def test_get_application_id_throws_error(self) -> None:
         with self.swap(feconf, 'OPPIA_PROJECT_ID', None):
@@ -41,4 +39,5 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'OPPIA_PROJECT_ID', 'some_id'):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
-                'some_id-resources')
+                'some_id-resources'
+            )

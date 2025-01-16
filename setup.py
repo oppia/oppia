@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """This file is used to build a Python package that can then by used by
 Google Cloud Dataflow workers (Apache Beam).
 
@@ -31,16 +30,13 @@ import setuptools
 def main() -> None:
     """Builds python package used by Google Cloud Dataflow workers."""
     # Configure the required packages and scripts to install.
-    with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
+    with open('requirements.txt', encoding='utf-8') as requirements_txt:  # pylint: disable=replace-disallowed-function-calls
         requirements_content = requirements_txt.read()
         # Removing the hashes from the requirements.txt file because they are
         # not supported by the 'pkg_resources.parse_requirements' function while
         # parsing the requirements.
         modified_requirements_content = re.sub(
-            r'^\s*--hash=sha256:.*$|\\$',
-            '',
-            requirements_content,
-            flags=re.MULTILINE
+            r'^\s*--hash=sha256:.*$|\\$', '', requirements_content, flags=re.MULTILINE
         )
 
         # The 'parse_requirements' returns a list of 'Requirement' objects.
@@ -50,7 +46,8 @@ def main() -> None:
             # Here we use MyPy ignore because mypy type hint on
             # pkg_resources.parse_requirements is 'TextIO' only, which is wrong,
             # it can also be a string.
-            for requirement in pkg_resources.parse_requirements(modified_requirements_content)  # type: ignore[arg-type]
+            for requirement in pkg_resources.
+            parse_requirements(modified_requirements_content)  # type: ignore[arg-type]
         ]
 
     setuptools.setup(

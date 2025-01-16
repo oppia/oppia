@@ -27,7 +27,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import translation_models
 
-(translation_models, ) = models.Registry.import_models([models.Names.TRANSLATION])
+(translation_models,) = models.Registry.import_models([models.Names.TRANSLATION])
 
 
 class MachineTranslationFetchersTests(test_utils.GenericTestBase):
@@ -96,12 +96,10 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(entity_translations), 2)
-        self.assertItemsEqual(
-            [
-                entity_translation.language_code
-                for entity_translation in entity_translations
-            ], language_codes
-        )
+        self.assertItemsEqual([
+            entity_translation.language_code
+            for entity_translation in entity_translations
+        ], language_codes)
 
     def test_get_entity_translation_returns_correctly(self) -> None:
         exp_id = 'exp1'

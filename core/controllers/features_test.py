@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for fetching the features Oppia provides to its users."""
 
 from __future__ import annotations
@@ -41,7 +40,8 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.save_new_valid_exploration(
-            self.EXP_ID, editor_id, title='Explore!', end_state_name='END')
+            self.EXP_ID, editor_id, title='Explore!', end_state_name='END'
+        )
         editor_actions_info = user_services.get_user_actions_info(editor_id)
         rights_manager.publish_exploration(editor_actions_info, self.EXP_ID)
 
@@ -51,9 +51,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
     def test_can_record_playthroughs_in_curated_explorations(self) -> None:
         with self.swap_to_always_return(
-            opportunity_services,
-            'is_exploration_available_for_contribution',
-            True
+            opportunity_services, 'is_exploration_available_for_contribution', True
         ):
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
@@ -61,9 +59,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
     def test_can_not_record_playthroughs_with_non_curated_exps(self) -> None:
         with self.swap_to_always_return(
-            opportunity_services,
-            'is_exploration_available_for_contribution',
-            False
+            opportunity_services, 'is_exploration_available_for_contribution', False
         ):
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Interface for storage model switching."""
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from core.constants import constants
 from typing import List, Tuple, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
 # Constant for valid model names.
@@ -51,9 +50,7 @@ class Platform:
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
-    def import_models(
-            cls, unused_model_names: List[Names]
-    ) -> Tuple[ModuleType, ...]:
+    def import_models(cls, unused_model_names: List[Names]) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
 
@@ -62,7 +59,8 @@ class Platform:
                 classes.
         """
         raise NotImplementedError(
-            'import_models() method is not overwritten in derived classes')
+            'import_models() method is not overwritten in derived classes'
+        )
 
 
 class _Gae(Platform):
@@ -97,7 +95,8 @@ class _Gae(Platform):
                 returned_models.append(activity_models)
             elif name == Names.APP_FEEDBACK_REPORT:
                 from core.storage.app_feedback_report import (
-                    gae_models as app_feedback_report_models)
+                    gae_models as app_feedback_report_models
+                )
                 returned_models.append(app_feedback_report_models)
             elif name == Names.AUDIT:
                 from core.storage.audit import gae_models as audit_models
@@ -116,15 +115,14 @@ class _Gae(Platform):
                 returned_models.append(blog_models)
             elif name == Names.BLOG_STATISTICS:
                 from core.storage.blog_statistics import (
-                    gae_models as blog_stats_models)
+                    gae_models as blog_stats_models
+                )
                 returned_models.append(blog_stats_models)
             elif name == Names.CLASSROOM:
-                from core.storage.classroom import (
-                    gae_models as classroom_models)
+                from core.storage.classroom import (gae_models as classroom_models)
                 returned_models.append(classroom_models)
             elif name == Names.COLLECTION:
-                from core.storage.collection import (
-                    gae_models as collection_models)
+                from core.storage.collection import (gae_models as collection_models)
                 returned_models.append(collection_models)
             elif name == Names.CONFIG:
                 from core.storage.config import gae_models as config_models
@@ -140,32 +138,33 @@ class _Gae(Platform):
                 returned_models.append(feedback_models)
             elif name == Names.IMPROVEMENTS:
                 from core.storage.improvements import (
-                    gae_models as improvements_models)
+                    gae_models as improvements_models
+                )
                 returned_models.append(improvements_models)
             elif name == Names.JOB:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
             elif name == Names.LEARNER_GROUP:
                 from core.storage.learner_group import (
-                    gae_models as learner_group_models)
+                    gae_models as learner_group_models
+                )
                 returned_models.append(learner_group_models)
             elif name == Names.OPPORTUNITY:
-                from core.storage.opportunity import (
-                    gae_models as opportunity_models)
+                from core.storage.opportunity import (gae_models as opportunity_models)
                 returned_models.append(opportunity_models)
             elif name == Names.QUESTION:
                 from core.storage.question import gae_models as question_models
                 returned_models.append(question_models)
             elif name == Names.RECOMMENDATIONS:
                 from core.storage.recommendations import (
-                    gae_models as recommendations_models)
+                    gae_models as recommendations_models
+                )
                 returned_models.append(recommendations_models)
             elif name == Names.SKILL:
                 from core.storage.skill import gae_models as skill_models
                 returned_models.append(skill_models)
             elif name == Names.STATISTICS:
-                from core.storage.statistics import (
-                    gae_models as statistics_models)
+                from core.storage.statistics import (gae_models as statistics_models)
                 returned_models.append(statistics_models)
             elif name == Names.STORY:
                 from core.storage.story import gae_models as story_models
@@ -174,22 +173,19 @@ class _Gae(Platform):
                 from core.storage.subtopic import gae_models as subtopic_models
                 returned_models.append(subtopic_models)
             elif name == Names.SUGGESTION:
-                from core.storage.suggestion import (
-                    gae_models as suggestion_models)
+                from core.storage.suggestion import (gae_models as suggestion_models)
                 returned_models.append(suggestion_models)
             elif name == Names.TOPIC:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)
             elif name == Names.TRANSLATION:
-                from core.storage.translation import (
-                    gae_models as translation_models)
+                from core.storage.translation import (gae_models as translation_models)
                 returned_models.append(translation_models)
             elif name == Names.USER:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
             elif name == Names.VOICEOVER:
-                from core.storage.voiceover import (
-                    gae_models as voiceover_models)
+                from core.storage.voiceover import (gae_models as voiceover_models)
                 returned_models.append(voiceover_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
@@ -216,8 +212,8 @@ class _Gae(Platform):
                 if inspect.isclass(member_obj):
                     clazz = getattr(module, member_name)
                     all_base_classes = [
-                        base_class.__name__ for base_class in inspect.getmro(
-                            clazz)]
+                        base_class.__name__ for base_class in inspect.getmro(clazz)
+                    ]
                     if 'Model' in all_base_classes:
                         model_classes.append(clazz)
         return model_classes
@@ -290,15 +286,13 @@ class _Gae(Platform):
         if constants.DEV_MODE:
             from core.platform.email import dev_mode_email_services
             return dev_mode_email_services
-        elif (
-                feconf.EMAIL_SERVICE_PROVIDER ==
-                feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+        elif (feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
         else:
             raise Exception(
-                'Invalid email service provider: %s' % (
-                    feconf.EMAIL_SERVICE_PROVIDER))
+                'Invalid email service provider: %s' % (feconf.EMAIL_SERVICE_PROVIDER)
+            )
 
     @classmethod
     def import_bulk_email_services(cls) -> ModuleType:
@@ -317,14 +311,16 @@ class _Gae(Platform):
             from core.platform.bulk_email import dev_mode_bulk_email_services
             return dev_mode_bulk_email_services
         elif (
-                feconf.BULK_EMAIL_SERVICE_PROVIDER ==
-                feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP):
+            feconf.BULK_EMAIL_SERVICE_PROVIDER ==
+            feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
+        ):
             from core.platform.bulk_email import mailchimp_bulk_email_services
             return mailchimp_bulk_email_services
         else:
             raise Exception(
-                'Invalid bulk email service provider: %s' % (
-                    feconf.BULK_EMAIL_SERVICE_PROVIDER))
+                'Invalid bulk email service provider: %s' %
+                (feconf.BULK_EMAIL_SERVICE_PROVIDER)
+            )
 
     @classmethod
     def import_cache_services(cls) -> ModuleType:

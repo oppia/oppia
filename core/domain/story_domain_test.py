@@ -33,115 +33,114 @@ from typing import Final
 class StoryChangeTests(test_utils.GenericTestBase):
 
     def test_story_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
-            story_domain.StoryChange({'invalid': 'data'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
+            story_domain.StoryChange({
+                'invalid': 'data'
+            })
 
     def test_story_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command invalid is not allowed'):
-            story_domain.StoryChange({'cmd': 'invalid'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command invalid is not allowed'
+        ):
+            story_domain.StoryChange({
+                'cmd': 'invalid'
+            })
 
     def test_story_change_object_with_missing_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('The following required attributes are missing: '
-                                     'new_value, old_value')):
-            story_domain.StoryChange(
-                {
-                    'cmd': 'update_story_property',
-                    'property_name': 'title',
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('The following required attributes are missing: '
+             'new_value, old_value')
+        ):
+            story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'title',
+            })
 
     def test_story_change_object_with_extra_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('The following extra attributes are present: invalid')):
-            story_domain.StoryChange(
-                {
-                    'cmd': 'add_story_node',
-                    'node_id': 'node_id',
-                    'invalid': 'invalid'
-                }
-            )
+            utils.ValidationError,
+            ('The following extra attributes are present: invalid')
+        ):
+            story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_id',
+                'invalid': 'invalid'
+            })
 
     def test_story_change_object_with_invalid_story_property(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for property_name in cmd update_story_property: '
-             'invalid is not allowed')):
-            story_domain.StoryChange(
-                {
-                    'cmd': 'update_story_property',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
+            utils.ValidationError, (
+                'Value for property_name in cmd update_story_property: '
+                'invalid is not allowed'
             )
+        ):
+            story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
     def test_story_change_object_with_invalid_story_node_property(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for property_name in cmd update_story_node_property: '
-             'invalid is not allowed')):
-            story_domain.StoryChange(
-                {
-                    'cmd': 'update_story_node_property',
-                    'node_id': 'node_id',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
+            utils.ValidationError, (
+                'Value for property_name in cmd update_story_node_property: '
+                'invalid is not allowed'
             )
+        ):
+            story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'node_id': 'node_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
     def test_story_change_object_with_invalid_story_contents_property(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for property_name in cmd update_story_contents_property:'
-             ' invalid is not allowed')):
-            story_domain.StoryChange(
-                {
-                    'cmd': 'update_story_contents_property',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
+            utils.ValidationError, (
+                'Value for property_name in cmd update_story_contents_property:'
+                ' invalid is not allowed'
             )
+        ):
+            story_domain.StoryChange({
+                'cmd': 'update_story_contents_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
     def test_story_change_object_with_add_story_node(self) -> None:
-        story_change_object = story_domain.StoryChange(
-            {
-                'cmd': 'add_story_node',
-                'node_id': 'node_id',
-                'title': 'title'
-            }
-        )
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'add_story_node',
+            'node_id': 'node_id',
+            'title': 'title'
+        })
 
         self.assertEqual(story_change_object.cmd, 'add_story_node')
         self.assertEqual(story_change_object.node_id, 'node_id')
         self.assertEqual(story_change_object.title, 'title')
 
     def test_story_change_object_with_delete_story_node(self) -> None:
-        story_change_object = story_domain.StoryChange(
-            {
-                'cmd': 'delete_story_node',
-                'node_id': 'node_id'
-            }
-        )
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'delete_story_node',
+            'node_id': 'node_id'
+        })
 
         self.assertEqual(story_change_object.cmd, 'delete_story_node')
         self.assertEqual(story_change_object.node_id, 'node_id')
 
     def test_story_change_object_with_update_story_node_property(self) -> None:
-        story_change_object = story_domain.StoryChange(
-            {
-                'cmd': 'update_story_node_property',
-                'node_id': 'node_id',
-                'property_name': 'title',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'update_story_node_property',
+            'node_id': 'node_id',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(story_change_object.cmd, 'update_story_node_property')
         self.assertEqual(story_change_object.node_id, 'node_id')
@@ -150,14 +149,12 @@ class StoryChangeTests(test_utils.GenericTestBase):
         self.assertEqual(story_change_object.old_value, 'old_value')
 
     def test_story_change_object_with_update_story_property(self) -> None:
-        story_change_object = story_domain.StoryChange(
-            {
-                'cmd': 'update_story_property',
-                'property_name': 'title',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'update_story_property',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(story_change_object.cmd, 'update_story_property')
         self.assertEqual(story_change_object.property_name, 'title')
@@ -165,14 +162,12 @@ class StoryChangeTests(test_utils.GenericTestBase):
         self.assertEqual(story_change_object.old_value, 'old_value')
 
     def test_story_change_object_with_update_story_contents_property(self) -> None:
-        story_change_object = story_domain.StoryChange(
-            {
-                'cmd': 'update_story_contents_property',
-                'property_name': 'initial_node_id',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'update_story_contents_property',
+            'property_name': 'initial_node_id',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(story_change_object.cmd, 'update_story_contents_property')
         self.assertEqual(story_change_object.property_name, 'initial_node_id')
@@ -180,14 +175,12 @@ class StoryChangeTests(test_utils.GenericTestBase):
         self.assertEqual(story_change_object.old_value, 'old_value')
 
     def test_story_change_object_with_update_story_node_outline_status(self) -> None:
-        story_change_object = story_domain.StoryChange(
-            {
-                'cmd': 'update_story_node_outline_status',
-                'node_id': 'node_id',
-                'old_value': 'old_value',
-                'new_value': 'new_value'
-            }
-        )
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'update_story_node_outline_status',
+            'node_id': 'node_id',
+            'old_value': 'old_value',
+            'new_value': 'new_value'
+        })
 
         self.assertEqual(story_change_object.cmd, 'update_story_node_outline_status')
         self.assertEqual(story_change_object.node_id, 'node_id')
@@ -195,31 +188,30 @@ class StoryChangeTests(test_utils.GenericTestBase):
         self.assertEqual(story_change_object.new_value, 'new_value')
 
     def test_story_change_object_with_create_new(self) -> None:
-        story_change_object = story_domain.StoryChange(
-            {
-                'cmd': 'create_new',
-                'title': 'title',
-            }
-        )
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'create_new',
+            'title': 'title',
+        })
 
         self.assertEqual(story_change_object.cmd, 'create_new')
         self.assertEqual(story_change_object.title, 'title')
 
     def test_story_change_object_with_migrate_schema_to_latest_version(self) -> None:
-        story_change_object = story_domain.StoryChange(
-            {
-                'cmd': 'migrate_schema_to_latest_version',
-                'from_version': 'from_version',
-                'to_version': 'to_version',
-            }
-        )
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'migrate_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
 
         self.assertEqual(story_change_object.cmd, 'migrate_schema_to_latest_version')
         self.assertEqual(story_change_object.from_version, 'from_version')
         self.assertEqual(story_change_object.to_version, 'to_version')
 
     def test_to_dict(self) -> None:
-        story_change_dict = {'cmd': 'create_new', 'title': 'title'}
+        story_change_dict = {
+            'cmd': 'create_new',
+            'title': 'title'
+        }
         story_change_object = story_domain.StoryChange(story_change_dict)
         self.assertEqual(story_change_object.to_dict(), story_change_dict)
 
@@ -382,15 +374,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_story_node_update_thumbnail_filename(self) -> None:
         # Test exception when thumbnail is not found on filesystem.
         with self.assertRaisesRegex(
-                Exception,
-                'The thumbnail img.svg for story node with id %s does not exist'
-                ' in the filesystem.' % (self.story_id)):
+            Exception, 'The thumbnail img.svg for story node with id %s does not exist'
+            ' in the filesystem.' % (self.story_id)
+        ):
             self.story.update_node_thumbnail_filename(self.NODE_ID_1, 'img.svg')
 
         # Test successful update of thumbnail_filename when the thumbnail
         # is found in the filesystem.
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.story.id)
         fs.commit(
@@ -411,7 +404,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                Exception, 'The node with id invalid_id is not part of this story.'):
+            Exception, 'The node with id invalid_id is not part of this story.'
+        ):
             self.story.update_node_thumbnail_filename(
                 'invalid_id', 'invalid_thumbnail.svg'
             )
@@ -466,9 +460,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'initial_node_id': None,
                 'next_node_id': self.NODE_ID_1
             },
-            'story_contents_schema_version': (
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
-            ),
+            'story_contents_schema_version':
+                (feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'corresponding_topic_id': topic_id,
             'version': 0,
@@ -481,18 +474,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].acquired_skill_ids = ['skill_1']
         self.story.story_contents.nodes[1].acquired_skill_ids = ['skill_2']
         self.assertEqual(
-            self.story.get_acquired_skill_ids_for_node_ids(
-                [self.NODE_ID_1, self.NODE_ID_2]
-            ), ['skill_1', 'skill_2']
+            self.story.get_acquired_skill_ids_for_node_ids([
+                self.NODE_ID_1, self.NODE_ID_2
+            ]), ['skill_1', 'skill_2']
         )
 
     def test_get_acquired_skill_ids_for_node_ids_empty(self) -> None:
         self.story.story_contents.nodes[0].acquired_skill_ids = []
         self.story.story_contents.nodes[1].acquired_skill_ids = []
         self.assertEqual(
-            self.story.get_acquired_skill_ids_for_node_ids(
-                [self.NODE_ID_1, self.NODE_ID_2]
-            ), []
+            self.story.get_acquired_skill_ids_for_node_ids([
+                self.NODE_ID_1, self.NODE_ID_2
+            ]), []
         )
 
     def test_get_acquired_skill_ids_for_node_ids_multi_skills(self) -> None:
@@ -501,9 +494,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].acquired_skill_ids = ['skill_1', 'skill_2']
         self.story.story_contents.nodes[1].acquired_skill_ids = ['skill_3']
         self.assertEqual(
-            self.story.get_acquired_skill_ids_for_node_ids(
-                [self.NODE_ID_1, self.NODE_ID_2]
-            ), ['skill_1', 'skill_2', 'skill_3']
+            self.story.get_acquired_skill_ids_for_node_ids([
+                self.NODE_ID_1, self.NODE_ID_2
+            ]), ['skill_1', 'skill_2', 'skill_3']
         )
 
     def test_get_acquired_skill_ids_for_node_ids_overlapping_skills(self) -> None:
@@ -512,9 +505,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].acquired_skill_ids = ['skill_1', 'skill_2']
         self.story.story_contents.nodes[1].acquired_skill_ids = ['skill_1']
         self.assertEqual(
-            self.story.get_acquired_skill_ids_for_node_ids(
-                [self.NODE_ID_1, self.NODE_ID_2]
-            ), ['skill_1', 'skill_2']
+            self.story.get_acquired_skill_ids_for_node_ids([
+                self.NODE_ID_1, self.NODE_ID_2
+            ]), ['skill_1', 'skill_2']
         )
 
     def test_get_acquired_skill_ids_with_empty_node_ids_ids_is_empty_list(self) -> None:
@@ -573,13 +566,15 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.story.thumbnail_filename, None)
         # Test exception when thumbnail is not found on filesystem.
         with self.assertRaisesRegex(
-                Exception, 'The thumbnail img.svg for story with id %s does not exist'
-                ' in the filesystem.' % (self.story_id)):
+            Exception, 'The thumbnail img.svg for story with id %s does not exist'
+            ' in the filesystem.' % (self.story_id)
+        ):
             self.story.update_thumbnail_filename('img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.story.id)
         fs.commit(
@@ -649,16 +644,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_add_node_validation(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'The node id node_4 does not match the expected '
-                                    'next node id for the story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node id node_4 does not match the expected '
+            'next node id for the story'
+        ):
             self.story.add_node('node_4', 'Title 4')
 
     def test_delete_node_with_two_nodes_must_in_order(self) -> None:
         self.assertEqual(len(self.story.story_contents.nodes), 2)
         with self.assertRaisesRegex(
-                ValueError, 'The node with id %s is the starting node for the story, '
-                'change the starting node before deleting it.' % self.NODE_ID_1):
+            ValueError, 'The node with id %s is the starting node for the story, '
+            'change the starting node before deleting it.' % self.NODE_ID_1
+        ):
             self.story.delete_node(self.NODE_ID_1)
         self.story.delete_node(self.NODE_ID_2)
         self.assertEqual(self.story.story_contents.nodes[0].id, 'node_1')
@@ -819,27 +816,25 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(
-                {
-                    'id': 'node_1',
-                    'thumbnail_filename': None,
-                    'thumbnail_bg_color': None,
-                    'thumbnail_size_in_bytes': None,
-                    'title': 'Title 1',
-                    'description': 'Description 1',
-                    'destination_node_ids': [self.NODE_ID_2],
-                    'prerequisite_skill_ids': [],
-                    'acquired_skill_ids': [],
-                    'outline': 'Outline',
-                    'outline_is_finalized': False,
-                    'exploration_id': 'exploration_id',
-                    'status': None,
-                    'planned_publication_date_msecs': None,
-                    'last_modified_msecs': None,
-                    'first_publication_date_msecs': None,
-                    'unpublishing_reason': 'BAD_CONTENT'
-                }
-            )
+            story_domain.StoryNode.from_dict({
+                'id': 'node_1',
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None,
+                'thumbnail_size_in_bytes': None,
+                'title': 'Title 1',
+                'description': 'Description 1',
+                'destination_node_ids': [self.NODE_ID_2],
+                'prerequisite_skill_ids': [],
+                'acquired_skill_ids': [],
+                'outline': 'Outline',
+                'outline_is_finalized': False,
+                'exploration_id': 'exploration_id',
+                'status': None,
+                'planned_publication_date_msecs': None,
+                'last_modified_msecs': None,
+                'first_publication_date_msecs': None,
+                'unpublishing_reason': 'BAD_CONTENT'
+            })
         ]
         self._assert_validation_error('Expected all destination nodes to exist')
         # The following line is to remove the 'Expected all destination nodes to
@@ -947,8 +942,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         def _mock_get_current_time_in_millisecs() -> int:
             return 1672483686000
 
-        with self.swap(utils, 'get_current_time_in_millisecs',
-                       _mock_get_current_time_in_millisecs):
+        with self.swap(
+            utils, 'get_current_time_in_millisecs', _mock_get_current_time_in_millisecs
+        ):
             self.assertEqual(
                 self.story.story_contents.nodes[0].is_node_upcoming(), True
             )
@@ -971,8 +967,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         def _mock_get_current_time_in_millisecs() -> int:
             return 1672483686000
 
-        with self.swap(utils, 'get_current_time_in_millisecs',
-                       _mock_get_current_time_in_millisecs):
+        with self.swap(
+            utils, 'get_current_time_in_millisecs', _mock_get_current_time_in_millisecs
+        ):
             self.assertEqual(
                 self.story.story_contents.nodes[0].is_node_behind_schedule(), False
             )
@@ -1237,8 +1234,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_2)
         ]
 
-        with self.assertRaisesRegex(ValueError,
-                                    'A node with exploration id exp_2 already exists.'):
+        with self.assertRaisesRegex(
+            ValueError, 'A node with exploration id exp_2 already exists.'
+        ):
             self.story.update_node_exploration_id('node_1', 'exp_2')
 
     def test_get_all_linked_exp_ids_lists_each_exp_id_linked_to_each_story_node(
@@ -1671,7 +1669,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.initial_node_id = 'node_1'
         self.story.story_contents.nodes = [story_domain.StoryNode.from_dict(node_1)]
         with self.assertRaisesRegex(
-                Exception, 'Unable to find the exploration id in any node: invalid_id'):
+            Exception, 'Unable to find the exploration id in any node: invalid_id'
+        ):
             self.story.story_contents.get_node_with_corresponding_exp_id('invalid_id')
 
     def test_all_nodes_visited(self) -> None:
@@ -1960,34 +1959,38 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be a number, '
-                                    'received None'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be a number, '
+            'received None'
+        ):
             self.story.rearrange_node_in_story(None, 2)  # type: ignore[arg-type]
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be a number, '
-                                    'received a'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be a number, '
+            'received a'
+        ):
             self.story.rearrange_node_in_story('a', 2)  # type: ignore[arg-type]
 
     def test_rearrange_node_in_story_fail_with_invalid_to_index_value(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be a number, '
-                                    'received None'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be a number, '
+            'received None'
+        ):
             self.story.rearrange_node_in_story(1, None)  # type: ignore[arg-type]
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be a number, '
-                                    'received a'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be a number, '
+            'received a'
+        ):
             self.story.rearrange_node_in_story(1, 'a')  # type: ignore[arg-type]
 
     def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(self) -> None:
@@ -2033,20 +2036,24 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_1),
             story_domain.StoryNode.from_dict(node_2)
         ]
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be with-in bounds.'
+        ):
             self.story.rearrange_node_in_story(10, 0)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be with-in bounds.'
+        ):
             self.story.rearrange_node_in_story(-1, 0)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be with-in bounds.'
+        ):
             self.story.rearrange_node_in_story(0, 10)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be with-in bounds.'
+        ):
             self.story.rearrange_node_in_story(0, -1)
 
     def test_update_url_fragment(self) -> None:
@@ -2055,9 +2062,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.story.url_fragment, 'updated-title')
 
     def test_rearrange_node_in_story_fail_with_identical_index_values(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index and to_index values to be '
-                                    'different.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index and to_index values to be '
+            'different.'
+        ):
             self.story.rearrange_node_in_story(1, 1)
 
     def test_rearrange_node_in_story(self) -> None:
@@ -2167,7 +2175,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validate_non_str_exploration_id(self) -> None:
         self.story.story_contents.nodes[0
-                                        ].exploration_id = 1  # type: ignore[assignment]
+                                       ].exploration_id = 1  # type: ignore[assignment]
         self._assert_validation_error('Expected exploration ID to be a string')
 
     def test_validate_empty_str_exploration_id(self) -> None:
@@ -2334,20 +2342,23 @@ class StorySummaryTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_title(self) -> None:
         self.story_summary.title = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected title to be a string, received 0'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected title to be a string, received 0'
+        ):
             self.story_summary.validate()
 
     def test_validation_fails_with_empty_title(self) -> None:
         self.story_summary.title = ''
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Title field should not be empty'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Title field should not be empty'
+        ):
             self.story_summary.validate()
 
     def test_validation_fails_with_empty_url_fragment(self) -> None:
         self.story_summary.url_fragment = ''
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Story Url Fragment field should not be empty'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Story Url Fragment field should not be empty'
+        ):
             self.story_summary.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2356,26 +2367,31 @@ class StorySummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_nonstring_url_fragment(self) -> None:
         self.story_summary.url_fragment = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Story Url Fragment field must be a string. Received 0.'):
+            utils.ValidationError,
+            'Story Url Fragment field must be a string. Received 0.'
+        ):
             self.story_summary.validate()
 
     def test_validation_fails_with_lengthy_url_fragment(self) -> None:
         self.story_summary.url_fragment = 'abcd' * 10
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Story Url Fragment field should not exceed %d characters, '
-                'received %s.' % (constants.MAX_CHARS_IN_STORY_URL_FRAGMENT,
-                                  self.story_summary.url_fragment)):
+            utils.ValidationError,
+            'Story Url Fragment field should not exceed %d characters, '
+            'received %s.' % (
+                constants.MAX_CHARS_IN_STORY_URL_FRAGMENT,
+                self.story_summary.url_fragment
+            )
+        ):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_chars_in_url_fragment(self) -> None:
         self.story_summary.url_fragment = 'Abc Def!'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Story Url Fragment field contains invalid characters. '
-                'Only lowercase words separated by hyphens are allowed. '
-                'Received Abc Def!.'):
+            utils.ValidationError,
+            'Story Url Fragment field contains invalid characters. '
+            'Only lowercase words separated by hyphens are allowed. '
+            'Received Abc Def!.'
+        ):
             self.story_summary.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2383,8 +2399,9 @@ class StorySummaryTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_description(self) -> None:
         self.story_summary.description = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected description to be a string, received 0'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected description to be a string, received 0'
+        ):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_node_titles(self) -> None:
@@ -2393,8 +2410,8 @@ class StorySummaryTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         self.story_summary.node_titles = '10'  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected node_titles to be a list, received \'10\''):
+            utils.ValidationError, 'Expected node_titles to be a list, received \'10\''
+        ):
             self.story_summary.validate()
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2402,8 +2419,9 @@ class StorySummaryTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         self.story_summary.node_titles = [5]  # type: ignore[list-item]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected each chapter title to be a string, received 5'):
+            utils.ValidationError,
+            'Expected each chapter title to be a string, received 5'
+        ):
             self.story_summary.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -2412,14 +2430,15 @@ class StorySummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_language_code(self) -> None:
         self.story_summary.language_code = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected language code to be a string, received 0'):
+            utils.ValidationError, 'Expected language code to be a string, received 0'
+        ):
             self.story_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.story_summary.language_code = 'invalid'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid language code: invalid'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language code: invalid'
+        ):
             self.story_summary.validate()
 
 

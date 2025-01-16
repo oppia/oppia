@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Beam DoFns and PTransforms to provide validation of improvements models."""
 
 from __future__ import annotations
@@ -28,11 +27,10 @@ import apache_beam as beam
 from typing import Iterator
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
-(improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS])
+(improvements_models,) = models.Registry.import_models([models.Names.IMPROVEMENTS])
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -60,10 +58,11 @@ class ValidateCompositeEntityId(beam.DoFn):  # type: ignore[misc]
         """
         model = job_utils.clone_model(input_model)
         expected_composite_entity_id = (
-            improvements_models.ExplorationStatsTaskEntryModel
-            .generate_composite_entity_id(
-                model.entity_type, model.entity_id, model.entity_version))
+            improvements_models.ExplorationStatsTaskEntryModel.
+            generate_composite_entity_id(
+                model.entity_type, model.entity_id, model.entity_version
+            )
+        )
 
         if model.composite_entity_id != expected_composite_entity_id:
-            yield improvements_validation_errors.InvalidCompositeEntityError(
-                model)
+            yield improvements_validation_errors.InvalidCompositeEntityError(model)

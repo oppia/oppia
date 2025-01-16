@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """This script starts up a development server running Oppia. It installs any
 missing third-party dependencies and starts up a local GAE development
 server.
@@ -32,52 +31,60 @@ from . import install_third_party_libs
 # libraries that use the builtins python module (e.g. build).
 install_third_party_libs.main()
 
-from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import build  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import extend_index_yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core.constants import constants  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
     python -m scripts.start
 Note that the root folder MUST be named 'oppia'.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--save_datastore',
     help='optional; if specified, does not clear the datastore.',
-    action='store_true')
+    action='store_true'
+)
 _PARSER.add_argument(
     '--disable_host_checking',
     help='optional; if specified, disables host checking so that the dev '
-         'server can be accessed by any device on the same network using the '
-         'host device\'s IP address. DO NOT use this flag if you\'re running '
-         'on an untrusted network.',
-    action='store_true')
+    'server can be accessed by any device on the same network using the '
+    'host device\'s IP address. DO NOT use this flag if you\'re running '
+    'on an untrusted network.',
+    action='store_true'
+)
 _PARSER.add_argument(
     '--prod_env',
     help='optional; if specified, runs Oppia in a production environment.',
-    action='store_true')
+    action='store_true'
+)
 _PARSER.add_argument(
     '--maintenance_mode',
     help='optional; if specified, puts Oppia into maintenance mode.',
-    action='store_true')
+    action='store_true'
+)
 _PARSER.add_argument(
     '--no_browser',
     help='optional; if specified, does not open a browser.',
-    action='store_true')
+    action='store_true'
+)
 _PARSER.add_argument(
     '--no_auto_restart',
     help='optional; if specified, does not automatically restart when files '
-         'are changed.',
-    action='store_true')
+    'are changed.',
+    action='store_true'
+)
 _PARSER.add_argument(
     '--source_maps',
     help='optional; if specified, build webpack with source maps.',
-    action='store_true')
+    action='store_true'
+)
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
@@ -101,7 +108,8 @@ def alert_on_exit() -> Iterator[None]:
             'Servers are shutting down, please wait for them to end gracefully!'
             # ANSI escape sequence for resetting formatting.
             '\033[0m'
-            '\n\n')
+            '\n\n'
+        )
         # Give developers an opportunity to read the alert.
         time.sleep(5)
 
@@ -118,7 +126,8 @@ def notify_about_successful_shutdown() -> None:
         'Done! Thank you for waiting.'
         # ANSI escape sequence for resetting formatting.
         '\033[0m'
-        '\n\n')
+        '\n\n'
+    )
 
 
 def call_extend_index_yaml() -> None:
@@ -160,10 +169,16 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         stack.enter_context(servers.managed_elasticsearch_dev_server())
 
         if constants.EMULATOR_MODE:
-            stack.enter_context(servers.managed_firebase_auth_emulator(
-                recover_users=parsed_args.save_datastore))
-            stack.enter_context(servers.managed_cloud_datastore_emulator(
-                clear_datastore=not parsed_args.save_datastore))
+            stack.enter_context(
+                servers.managed_firebase_auth_emulator(
+                    recover_users=parsed_args.save_datastore
+                )
+            )
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(
+                    clear_datastore=not parsed_args.save_datastore
+                )
+            )
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
@@ -171,20 +186,27 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             # we don't get the error "assets/hashes.json file doesn't exist".
             build.save_hashes_to_file({})
             stack.enter_context(servers.managed_ng_build(watch_mode=True))
-            stack.enter_context(servers.managed_webpack_compiler(
-                use_prod_env=False, use_source_maps=parsed_args.source_maps,
-                watch_mode=True))
+            stack.enter_context(
+                servers.managed_webpack_compiler(
+                    use_prod_env=False,
+                    use_source_maps=parsed_args.source_maps,
+                    watch_mode=True
+                )
+            )
 
         env = os.environ.copy()
         env['PIP_NO_DEPS'] = 'True'
         app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
-        dev_appserver = stack.enter_context(servers.managed_dev_appserver(
-            app_yaml_path,
-            enable_host_checking=not parsed_args.disable_host_checking,
-            automatic_restart=not parsed_args.no_auto_restart,
-            skip_sdk_update_check=True,
-            port=PORT_NUMBER_FOR_GAE_SERVER,
-            env=env))
+        dev_appserver = stack.enter_context(
+            servers.managed_dev_appserver(
+                app_yaml_path,
+                enable_host_checking=not parsed_args.disable_host_checking,
+                automatic_restart=not parsed_args.no_auto_restart,
+                skip_sdk_update_check=True,
+                port=PORT_NUMBER_FOR_GAE_SERVER,
+                env=env
+            )
+        )
 
         if parsed_args.no_browser:
             common.print_each_string_after_two_new_lines([
@@ -195,8 +217,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             ])
         else:
             try:
-                stack.enter_context(servers.create_managed_web_browser(
-                    PORT_NUMBER_FOR_GAE_SERVER))
+                stack.enter_context(
+                    servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER)
+                )
                 common.print_each_string_after_two_new_lines([
                     'INFORMATION',
                     'Local development server is ready! Opening a default web '

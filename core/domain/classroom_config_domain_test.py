@@ -353,7 +353,9 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         self.classroom.validate(strict=True)
 
         # Test valid graph 3.
-        self.classroom.topic_id_to_prerequisite_topic_ids = {'topic_id_1': []}
+        self.classroom.topic_id_to_prerequisite_topic_ids = {
+            'topic_id_1': []
+        }
         self.classroom.validate(strict=True)
 
         # Test valid graph 4.

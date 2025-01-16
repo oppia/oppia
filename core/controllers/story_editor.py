@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the story editor."""
 
 from __future__ import annotations
@@ -51,10 +50,7 @@ class EditableStoryDataHandlerNormalizedPayloadDict(TypedDict):
 
 
 class EditableStoryDataHandler(
-    base.BaseHandler[
-        EditableStoryDataHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[EditableStoryDataHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """A data handler for stories which support writing."""
 
@@ -69,7 +65,8 @@ class EditableStoryDataHandler(
         'PUT': {
             'version': {
                 'schema': {
-                    'type': 'int',
+                    'type':
+                        'int',
                     'validators': [{
                         'id': 'is_at_least',
                         # Version must be greater than zero.
@@ -79,7 +76,8 @@ class EditableStoryDataHandler(
             },
             'commit_message': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
                         'id': 'has_length_at_most',
                         'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
@@ -100,9 +98,7 @@ class EditableStoryDataHandler(
     }
 
     def _require_valid_version(
-        self,
-        version_from_payload: int,
-        story_version: int
+        self, version_from_payload: int, story_version: int
     ) -> None:
         """Check that the payload version matches the given story
         version.
@@ -117,8 +113,9 @@ class EditableStoryDataHandler(
         if version_from_payload != story_version:
             raise base.BaseHandler.InvalidInputException(
                 'Trying to update version %s of story from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (story_version, version_from_payload))
+                'which is too old. Please reload the page and try again.' %
+                (story_version, version_from_payload)
+            )
 
     @acl_decorators.can_edit_story
     def get(self, story_id: str) -> None:
@@ -135,8 +132,8 @@ class EditableStoryDataHandler(
         skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
         classroom_url_fragment = (
-            classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                topic.id))
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(topic.id)
+        )
 
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id == story_id:
@@ -175,7 +172,8 @@ class EditableStoryDataHandler(
             # Update the Story and its corresponding TopicSummary.
             topic_services.update_story_and_topic_summary(
                 self.user_id, story_id, change_dicts, commit_message,
-                story.corresponding_topic_id)
+                story.corresponding_topic_id
+            )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -208,10 +206,7 @@ class StoryPublishHandlerNormalizedPayloadDict(TypedDict):
 
 
 class StoryPublishHandler(
-    base.BaseHandler[
-        StoryPublishHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[StoryPublishHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """A data handler for publishing and unpublishing stories."""
 
@@ -265,10 +260,7 @@ class ValidateExplorationsHandlerNormalizedRequestDict(TypedDict):
 # TODO(#16538): Change the type of `comma_separated_exp_ids` handler
 # argument to `JsonEncodedInString`.
 class ValidateExplorationsHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        ValidateExplorationsHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], ValidateExplorationsHandlerNormalizedRequestDict]
 ):
     """A data handler for validating the explorations in a story."""
 
@@ -298,20 +290,18 @@ class ValidateExplorationsHandler(
             unused_story_id: str. The unused story ID.
         """
         assert self.normalized_request is not None
-        comma_separated_exp_ids = self.normalized_request[
-            'comma_separated_exp_ids']
+        comma_separated_exp_ids = self.normalized_request['comma_separated_exp_ids']
         exp_ids = comma_separated_exp_ids.split(',')
         validation_error_messages = (
-            story_services.validate_explorations_for_story(exp_ids, False))
+            story_services.validate_explorations_for_story(exp_ids, False)
+        )
         self.values.update({
             'validation_error_messages': validation_error_messages
         })
         self.render_json(self.values)
 
 
-class StoryUrlFragmentHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class StoryUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A data handler for checking if a story with given url fragment exists.
     """
 
@@ -319,7 +309,9 @@ class StoryUrlFragmentHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, story_url_fragment: str) -> None:
@@ -330,8 +322,7 @@ class StoryUrlFragmentHandler(
             story_url_fragment: str. The story URL fragment.
         """
         self.values.update({
-            'story_url_fragment_exists': (
-                story_services.does_story_exist_with_url_fragment(
-                    story_url_fragment))
+            'story_url_fragment_exists':
+                (story_services.does_story_exist_with_url_fragment(story_url_fragment))
         })
         self.render_json(self.values)

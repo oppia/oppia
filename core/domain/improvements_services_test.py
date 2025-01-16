@@ -32,7 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
-(improvements_models, ) = (models.Registry.import_models([models.Names.IMPROVEMENTS]))
+(improvements_models,) = (models.Registry.import_models([models.Names.IMPROVEMENTS]))
 
 
 class ImprovementsServicesTestBase(test_utils.GenericTestBase):
@@ -184,7 +184,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
 
     def test_fetch_when_number_of_open_tasks_exceed_single_fetch_limit(self) -> None:
         tasks = [
-            self._new_open_task(state_name='State %d' % (i, ))
+            self._new_open_task(state_name='State %d' % (i,))
             for i in range(int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))
         ]
         improvements_services.put_tasks(tasks)
@@ -193,9 +193,8 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
         )
 
         self.assertEqual(resolved_task_types_by_state_name, {})
-        self.assertItemsEqual(
-            [t.to_dict() for t in tasks], [t.to_dict() for t in open_tasks]
-        )
+        self.assertItemsEqual([t.to_dict() for t in tasks],
+                              [t.to_dict() for t in open_tasks])
 
     def test_fetch_identifies_the_resolved_tasks_of_each_state(self) -> None:
         tasks = [
@@ -266,7 +265,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
 
     def test_fetch_ignores_obsolete_tasks(self) -> None:
         tasks = [
-            self._new_obsolete_task(state_name='State %d' % (i, )) for i in range(50)
+            self._new_obsolete_task(state_name='State %d' % (i,)) for i in range(50)
         ]
         improvements_services.put_tasks(tasks)
         open_tasks, resolved_task_types_by_state_name = (
@@ -335,7 +334,7 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
         task_entries = []
         for i in range(1, 26):
             task_entry = self._new_resolved_task(
-                state_name='State %d' % (i, ), exploration_version=i
+                state_name='State %d' % (i,), exploration_version=i
             )
             task_entry.resolved_on = (
                 self.MOCK_DATE + datetime.timedelta(minutes=5 * i)
@@ -349,20 +348,18 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
             improvements_services.fetch_exploration_task_history_page(self.exp)
         )
 
-        self.assertEqual(
-            [t.target_id for t in results], [
-                'State 25',
-                'State 24',
-                'State 23',
-                'State 22',
-                'State 21',
-                'State 20',
-                'State 19',
-                'State 18',
-                'State 17',
-                'State 16',
-            ]
-        )
+        self.assertEqual([t.target_id for t in results], [
+            'State 25',
+            'State 24',
+            'State 23',
+            'State 22',
+            'State 21',
+            'State 20',
+            'State 19',
+            'State 18',
+            'State 17',
+            'State 16',
+        ])
         self.assertTrue(more)
         self.assertIsNotNone(cursor)
 
@@ -376,35 +373,33 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
             )
             aggregated_tasks.extend(results)
 
-        self.assertEqual(
-            [t.target_id for t in aggregated_tasks], [
-                'State 25',
-                'State 24',
-                'State 23',
-                'State 22',
-                'State 21',
-                'State 20',
-                'State 19',
-                'State 18',
-                'State 17',
-                'State 16',
-                'State 15',
-                'State 14',
-                'State 13',
-                'State 12',
-                'State 11',
-                'State 10',
-                'State 9',
-                'State 8',
-                'State 7',
-                'State 6',
-                'State 5',
-                'State 4',
-                'State 3',
-                'State 2',
-                'State 1',
-            ]
-        )
+        self.assertEqual([t.target_id for t in aggregated_tasks], [
+            'State 25',
+            'State 24',
+            'State 23',
+            'State 22',
+            'State 21',
+            'State 20',
+            'State 19',
+            'State 18',
+            'State 17',
+            'State 16',
+            'State 15',
+            'State 14',
+            'State 13',
+            'State 12',
+            'State 11',
+            'State 10',
+            'State 9',
+            'State 8',
+            'State 7',
+            'State 6',
+            'State 5',
+            'State 4',
+            'State 3',
+            'State 2',
+            'State 1',
+        ])
         self.assertFalse(more)
 
     def test_fetch_first_page_after_fetching_next_page_returns_same_results(
@@ -424,10 +419,8 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
             improvements_services.fetch_exploration_task_history_page(self.exp)
         )
 
-        self.assertEqual(
-            [t.to_dict() for t in initial_results],
-            [t.to_dict() for t in subsequent_results]
-        )
+        self.assertEqual([t.to_dict() for t in initial_results],
+                         [t.to_dict() for t in subsequent_results])
         self.assertEqual(initial_cursor, subsequent_cursor)
         self.assertEqual(initial_more, subsequent_more)
 
@@ -539,9 +532,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         task_entry = self._new_resolved_task()
 
         with self.mock_datetime_utcnow(updated_on):
-            improvements_services.put_tasks(
-                [task_entry], update_last_updated_time=False
-            )
+            improvements_services.put_tasks([task_entry],
+                                            update_last_updated_time=False)
 
         model = improvements_models.ExplorationStatsTaskEntryModel.get(
             task_entry.task_id

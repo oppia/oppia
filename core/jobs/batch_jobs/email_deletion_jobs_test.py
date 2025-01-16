@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.blog_validation_jobs."""
 
 from __future__ import annotations
@@ -29,7 +28,7 @@ from core.platform import models
 from typing import Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import email_models
     from mypy_imports import feedback_models
     from mypy_imports import user_models
@@ -41,9 +40,8 @@ if MYPY: # pragma: no cover
 
 class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob
-    ] = email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob
+    JOB_CLASS: Type[email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob
+                   ] = email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob
 
     USER_ID: Final = 'user_id'
     DATETIME: Final = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
@@ -107,7 +105,8 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assertIsNone(
-            email_models.SentEmailModel.get('sent_email_id', strict=False))
+            email_models.SentEmailModel.get('sent_email_id', strict=False)
+        )
 
     def test_job_deletes_sent_email_model_with_user_as_recipient(self) -> None:
         self.sent_email_model_with_recipient.update_timestamps()
@@ -118,7 +117,8 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assertIsNone(
-            email_models.SentEmailModel.get('sent_email_id', strict=False))
+            email_models.SentEmailModel.get('sent_email_id', strict=False)
+        )
 
     def test_job_deletes_bulk_email_model_with_user_as_sender(self) -> None:
         self.bulk_email_model.update_timestamps()
@@ -129,7 +129,8 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assertIsNone(
-            email_models.BulkEmailModel.get('bulk_email_id', strict=False))
+            email_models.BulkEmailModel.get('bulk_email_id', strict=False)
+        )
 
     def test_job_deletes_unsent_feedback_email_model(self) -> None:
         self.unsent_feedback_email_model.update_timestamps()
@@ -140,8 +141,8 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assertIsNone(
-            feedback_models.UnsentFeedbackEmailModel.get(
-                self.USER_ID, strict=False))
+            feedback_models.UnsentFeedbackEmailModel.get(self.USER_ID, strict=False)
+        )
 
     def test_job_deletes_bulk_email_model(self) -> None:
         self.user_bulk_emails_model.update_timestamps()
@@ -152,7 +153,8 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assertIsNone(
-            user_models.UserBulkEmailsModel.get(self.USER_ID, strict=False))
+            user_models.UserBulkEmailsModel.get(self.USER_ID, strict=False)
+        )
 
     def test_job_deletes_multiple_models(self) -> None:
         self.sent_email_model_with_sender.update_timestamps()
@@ -161,10 +163,8 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
         self.unsent_feedback_email_model.update_timestamps()
         self.user_bulk_emails_model.update_timestamps()
         self.put_multi([
-            self.sent_email_model_with_sender,
-            self.sent_email_model_with_recipient,
-            self.bulk_email_model,
-            self.unsent_feedback_email_model,
+            self.sent_email_model_with_sender, self.sent_email_model_with_recipient,
+            self.bulk_email_model, self.unsent_feedback_email_model,
             self.user_bulk_emails_model
         ])
 
@@ -176,4 +176,5 @@ class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assertIsNone(
-            user_models.UserBulkEmailsModel.get(self.USER_ID, strict=False))
+            user_models.UserBulkEmailsModel.get(self.USER_ID, strict=False)
+        )

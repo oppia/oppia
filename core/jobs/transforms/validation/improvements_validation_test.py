@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.transforms.improvements_validation."""
 
 from __future__ import annotations
@@ -26,11 +25,10 @@ from core.platform import models
 import apache_beam as beam
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
-(improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS])
+(improvements_models,) = models.Registry.import_models([models.Names.IMPROVEMENTS])
 
 
 class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):
@@ -50,13 +48,12 @@ class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
         output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(improvements_validation.ValidateCompositeEntityId())
+            self.pipeline | beam.Create([model]) |
+            beam.ParDo(improvements_validation.ValidateCompositeEntityId())
         )
-        self.assert_pcoll_equal(output, [
-            improvements_validation_errors.InvalidCompositeEntityError(model)
-        ])
+        self.assert_pcoll_equal(
+            output, [improvements_validation_errors.InvalidCompositeEntityError(model)]
+        )
 
     def test_model_with_valid_composite_entity(self) -> None:
         # Value has the form: "[entity_type].[entity_id].[entity_version]".
@@ -74,8 +71,7 @@ class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
         output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(improvements_validation.ValidateCompositeEntityId())
+            self.pipeline | beam.Create([model]) |
+            beam.ParDo(improvements_validation.ValidateCompositeEntityId())
         )
         self.assert_pcoll_equal(output, [])

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for scripts/extend_index_yaml.py."""
 
 from __future__ import annotations
@@ -35,19 +34,19 @@ class ReformatXmlToYamlTests(test_utils.GenericTestBase):
                     '@kind': 'TopicModel',
                     '@ancestor': 'false',
                     '@source-service': 'auto',
-                    'property': [
-                        {
-                            '@name': 'property',
-                            '@direction': 'asc'
-                        }
-                    ]
+                    'property': [{
+                        '@name': 'property',
+                        '@direction': 'asc'
+                    }]
                 }]
             }
         }
         expected_yaml_dict: extend_index_yaml.YamlIndexesDict = {
             'indexes': [{
                 'kind': 'TopicModel',
-                'properties': [{'name': 'property'}]
+                'properties': [{
+                    'name': 'property'
+                }]
             }]
         }
         self.assertEqual(
@@ -55,42 +54,35 @@ class ReformatXmlToYamlTests(test_utils.GenericTestBase):
             expected_yaml_dict
         )
 
-    def test_dict_with_one_index_multiple_attributes_ascending(
-        self
-    ) -> None:
+    def test_dict_with_one_index_multiple_attributes_ascending(self) -> None:
         xml_dict: extend_index_yaml.XmlIndexesDict = {
             'datastore-indexes': {
                 'datastore-index': [{
-                    '@kind': 'TopicModel',
-                    '@ancestor': 'false',
-                    '@source-service': 'auto',
-                    'property': [
-                        {
-                            '@name': 'property1',
-                            '@direction': 'asc'
-                        },
-                        {
-                            '@name': 'property2',
-                            '@direction': 'asc'
-                        }
-                    ]
+                    '@kind':
+                        'TopicModel',
+                    '@ancestor':
+                        'false',
+                    '@source-service':
+                        'auto',
+                    'property': [{
+                        '@name': 'property1',
+                        '@direction': 'asc'
+                    }, {
+                        '@name': 'property2',
+                        '@direction': 'asc'
+                    }]
                 }]
             }
         }
         expected_yaml_dict: extend_index_yaml.YamlIndexesDict = {
-            'indexes': [
-                {
-                    'kind': 'TopicModel',
-                    'properties': [
-                        {
-                            'name': 'property1'
-                        },
-                        {
-                            'name': 'property2'
-                        }
-                    ]
-                }
-            ]
+            'indexes': [{
+                'kind': 'TopicModel',
+                'properties': [{
+                    'name': 'property1'
+                }, {
+                    'name': 'property2'
+                }]
+            }]
         }
         self.assertEqual(
             extend_index_yaml.reformat_xml_dict_into_yaml_dict(xml_dict),
@@ -100,67 +92,57 @@ class ReformatXmlToYamlTests(test_utils.GenericTestBase):
     def test_dict_with_multiple_indexes_properties_descending(self) -> None:
         xml_dict: extend_index_yaml.XmlIndexesDict = {
             'datastore-indexes': {
-                'datastore-index': [
-                    {
-                        '@kind': 'TopicModel',
-                        '@ancestor': 'false',
-                        '@source-service': 'auto',
-                        'property': [
-                            {
-                                '@name': 'property1',
-                                '@direction': 'asc'
-                            },
-                            {
-                                '@name': 'property2',
-                                '@direction': 'desc'
-                            }
-                        ]
-                    },
-                    {
-                        '@kind': 'CollectionModel',
-                        '@ancestor': 'false',
-                        '@source-service': 'auto',
-                        'property': [
-                            {
-                                '@name': 'property3',
-                                '@direction': 'asc'
-                            },
-                            {
-                                '@name': 'property4',
-                                '@direction': 'desc'
-                            }
-                        ]
-                    }
-                ]
+                'datastore-index': [{
+                    '@kind':
+                        'TopicModel',
+                    '@ancestor':
+                        'false',
+                    '@source-service':
+                        'auto',
+                    'property': [{
+                        '@name': 'property1',
+                        '@direction': 'asc'
+                    }, {
+                        '@name': 'property2',
+                        '@direction': 'desc'
+                    }]
+                }, {
+                    '@kind':
+                        'CollectionModel',
+                    '@ancestor':
+                        'false',
+                    '@source-service':
+                        'auto',
+                    'property': [{
+                        '@name': 'property3',
+                        '@direction': 'asc'
+                    }, {
+                        '@name': 'property4',
+                        '@direction': 'desc'
+                    }]
+                }]
             }
         }
         expected_yaml_dict: extend_index_yaml.YamlIndexesDict = {
-            'indexes': [
-                {
-                    'kind': 'TopicModel',
-                    'properties': [
-                        {
-                            'name': 'property1'
-                        },
-                        {
-                            'name': 'property2',
-                            'direction': 'desc'
-                        }
-                    ]
-                },
-                {
-                    'kind': 'CollectionModel',
-                    'properties': [
-                        {
-                            'name': 'property3'
-                        },
-                        {
-                            'name': 'property4',
-                            'direction': 'desc'
-                        }
-                    ]
-                }
-            ]
+            'indexes': [{
+                'kind':
+                    'TopicModel',
+                'properties': [{
+                    'name': 'property1'
+                }, {
+                    'name': 'property2',
+                    'direction': 'desc'
+                }]
+            }, {
+                'kind':
+                    'CollectionModel',
+                'properties': [{
+                    'name': 'property3'
+                }, {
+                    'name': 'property4',
+                    'direction': 'desc'
+                }]
+            }]
         }
         self.assertEqual(
             extend_index_yaml.reformat_xml_dict_into_yaml_dict(xml_dict),
@@ -178,17 +160,17 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
         self.index_yaml_file_name = self.index_yaml_file.name
         self.web_inf_index_xml_file_name = self.web_inf_index_xml_file.name
         self.index_yaml_swap = self.swap(
-            extend_index_yaml, 'INDEX_YAML_PATH',
-            self.index_yaml_file.name)
+            extend_index_yaml, 'INDEX_YAML_PATH', self.index_yaml_file.name
+        )
         self.web_inf_index_xml_swap = self.swap(
             extend_index_yaml, 'WEB_INF_INDEX_XML_PATH',
-            self.web_inf_index_xml_file.name)
-        self.open_index_yaml_r = open(
-            self.index_yaml_file.name, 'r', encoding='utf-8')
-        self.open_index_yaml_w = open(
-            self.index_yaml_file.name, 'w', encoding='utf-8')
+            self.web_inf_index_xml_file.name
+        )
+        self.open_index_yaml_r = open(self.index_yaml_file.name, 'r', encoding='utf-8')
+        self.open_index_yaml_w = open(self.index_yaml_file.name, 'w', encoding='utf-8')
         self.open_web_inf_index_xml = open(
-            self.web_inf_index_xml_file.name, 'a', encoding='utf-8')
+            self.web_inf_index_xml_file.name, 'a', encoding='utf-8'
+        )
 
     def _run_test_for_extend_index_yaml(
         self, index_yaml: str, web_inf_index_xml: str, expected_index_yaml: str
@@ -254,7 +236,8 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 """
 
         self._run_test_for_extend_index_yaml(
-            index_yaml, web_inf_index_xml, expected_index_yaml)
+            index_yaml, web_inf_index_xml, expected_index_yaml
+        )
 
     def test_extend_index_yaml_without_changes(self) -> None:
         index_yaml = """indexes:
@@ -281,8 +264,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 </datastore-indexes>
 """
 
-        self._run_test_for_extend_index_yaml(
-            index_yaml, web_inf_index_xml, index_yaml)
+        self._run_test_for_extend_index_yaml(index_yaml, web_inf_index_xml, index_yaml)
 
     def test_extend_index_yaml_with_empty_web_inf_ind_xml(self) -> None:
         index_yaml = """indexes:
@@ -303,8 +285,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 <datastore-indexes autoGenerate="true"/>
 """
 
-        self._run_test_for_extend_index_yaml(
-            index_yaml, web_inf_index_xml, index_yaml)
+        self._run_test_for_extend_index_yaml(index_yaml, web_inf_index_xml, index_yaml)
 
     def test_extend_index_yaml_with_same_kind(self) -> None:
         index_yaml = """indexes:
@@ -362,7 +343,8 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 """
 
         self._run_test_for_extend_index_yaml(
-            index_yaml, web_inf_index_xml, expected_index_yaml)
+            index_yaml, web_inf_index_xml, expected_index_yaml
+        )
 
     def test_extend_index_yaml_with_same_kind_in_web_inf_xml(self) -> None:
         index_yaml = """indexes:
@@ -419,7 +401,8 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 """
 
         self._run_test_for_extend_index_yaml(
-            index_yaml, web_inf_index_xml, expected_index_yaml)
+            index_yaml, web_inf_index_xml, expected_index_yaml
+        )
 
     def test_extend_index_yaml_with_same_kind_different_order(self) -> None:
         index_yaml = """indexes:
@@ -492,4 +475,5 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
 """
 
         self._run_test_for_extend_index_yaml(
-            index_yaml, web_inf_index_xml, expected_index_yaml)
+            index_yaml, web_inf_index_xml, expected_index_yaml
+        )

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for jobs.types.job_run_result."""
 
 from __future__ import annotations
@@ -72,10 +71,8 @@ class JobRunResultTests(test_utils.TestBase):
             job_run_result.JobRunResult(stdout='def', stderr='456'),
         ])[0]
 
-        self.assertItemsEqual(
-            single_job_run_result.stdout.split('\n'), ['abc', 'def'])
-        self.assertItemsEqual(
-            single_job_run_result.stderr.split('\n'), ['123', '456'])
+        self.assertItemsEqual(single_job_run_result.stdout.split('\n'), ['abc', 'def'])
+        self.assertItemsEqual(single_job_run_result.stderr.split('\n'), ['123', '456'])
 
     def test_accumulate_one_less_than_limit_is_not_truncated(self) -> None:
         accumulated_results = job_run_result.JobRunResult.accumulate([
@@ -86,7 +83,8 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertEqual(len(accumulated_results), 1)
 
         self.assertItemsEqual(
-            accumulated_results[0].stderr.split('\n'), ['a' * 1999, 'b' * 3000])
+            accumulated_results[0].stderr.split('\n'), ['a' * 1999, 'b' * 3000]
+        )
 
     def test_accumulate_one_more_than_limit_case_is_split(self) -> None:
         accumulated_results = job_run_result.JobRunResult.accumulate([
@@ -98,16 +96,11 @@ class JobRunResultTests(test_utils.TestBase):
 
     def test_accumulate_with_enormous_outputs(self) -> None:
         accumulated_results = job_run_result.JobRunResult.accumulate([
-            job_run_result.JobRunResult(
-                stdout='a' * 5002, stderr='b' * 5002),
-            job_run_result.JobRunResult(
-                stdout='a' * 2000, stderr='b' * 2000),
-            job_run_result.JobRunResult(
-                stdout='a' * 1000, stderr='b' * 1000),
-            job_run_result.JobRunResult(
-                stdout='a' * 1000, stderr='b' * 1000),
-            job_run_result.JobRunResult(
-                stdout='a' * 2000, stderr='b' * 2000),
+            job_run_result.JobRunResult(stdout='a' * 5002, stderr='b' * 5002),
+            job_run_result.JobRunResult(stdout='a' * 2000, stderr='b' * 2000),
+            job_run_result.JobRunResult(stdout='a' * 1000, stderr='b' * 1000),
+            job_run_result.JobRunResult(stdout='a' * 1000, stderr='b' * 1000),
+            job_run_result.JobRunResult(stdout='a' * 2000, stderr='b' * 2000),
         ])
 
         # 100000 and 200000 are small enough ot fit as one, but the others will
@@ -141,5 +134,4 @@ class JobRunResultTests(test_utils.TestBase):
     def test_repr(self) -> None:
         run_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
 
-        self.assertEqual(
-            repr(run_result), 'JobRunResult(stdout="abc", stderr="123")')
+        self.assertEqual(repr(run_result), 'JobRunResult(stdout="abc", stderr="123")')

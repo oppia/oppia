@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controller for user query related pages and handlers."""
 
 from __future__ import annotations
@@ -50,10 +49,10 @@ def _generate_user_query_dicts(
         list(dict(str, str)). List of data dicts for the user queries.
     """
     submitters_settings = user_services.get_users_settings(
-        list(set(model.submitter_id for model in user_queries)), strict=True)
+        list(set(model.submitter_id for model in user_queries)), strict=True
+    )
     user_id_to_username = {
-        submitter.user_id: submitter.username
-        for submitter in submitters_settings
+        submitter.user_id: submitter.username for submitter in submitters_settings
     }
     generated_user_query_dicts: List[UserQueryDict] = []
     for user_query in user_queries:
@@ -89,10 +88,8 @@ class EmailDashboardDataHandlerNormalizedPayloadDict(TypedDict):
 
 
 class EmailDashboardDataHandler(
-    base.BaseHandler[
-        EmailDashboardDataHandlerNormalizedPayloadDict,
-        EmailDashboardDataHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[EmailDashboardDataHandlerNormalizedPayloadDict,
+                     EmailDashboardDataHandlerNormalizedRequestDict]
 ):
     """Query data handler."""
 
@@ -108,7 +105,8 @@ class EmailDashboardDataHandler(
             },
             'num_queries_to_fetch': {
                 'schema': {
-                    'type': 'int',
+                    'type':
+                        'int',
                     'validators': [{
                         'id': 'is_at_least',
                         # The min_value ensures that the value is non-negative.
@@ -120,9 +118,10 @@ class EmailDashboardDataHandler(
         'POST': {
             'data': {
                 'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        domain_objects_validator.validate_email_dashboard_data)
+                    'type':
+                        'object_dict',
+                    'validation_method':
+                        (domain_objects_validator.validate_email_dashboard_data)
                 }
             }
         }
@@ -132,12 +131,11 @@ class EmailDashboardDataHandler(
     def get(self) -> None:
         assert self.normalized_request is not None
         cursor = self.normalized_request.get('cursor')
-        num_queries_to_fetch = (
-            self.normalized_request['num_queries_to_fetch'])
+        num_queries_to_fetch = (self.normalized_request['num_queries_to_fetch'])
 
         user_queries, next_cursor = (
-            user_query_services.get_recent_user_queries(
-                num_queries_to_fetch, cursor))
+            user_query_services.get_recent_user_queries(num_queries_to_fetch, cursor)
+        )
 
         data = {
             'recent_queries': _generate_user_query_dicts(user_queries),
@@ -151,14 +149,14 @@ class EmailDashboardDataHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         data = self.normalized_payload['data']
-        kwargs = {key: data[key] for key in data if data[key] is not None}
+        kwargs = {
+            key: data[key] for key in data if data[key] is not None
+        }
 
-        user_query_id = user_query_services.save_new_user_query(
-            self.user_id, kwargs)
+        user_query_id = user_query_services.save_new_user_query(self.user_id, kwargs)
 
         # Start MR job in background.
-        user_query = (
-            user_query_services.get_user_query(user_query_id, strict=True))
+        user_query = (user_query_services.get_user_query(user_query_id, strict=True))
         json_data = {
             'query': _generate_user_query_dicts([user_query])[0]
         }
@@ -174,9 +172,7 @@ class QueryStatusCheckHandlerNormalizedRequestDict(TypedDict):
 
 
 class QueryStatusCheckHandler(
-    base.BaseHandler[
-        Dict[str, str], QueryStatusCheckHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], QueryStatusCheckHandlerNormalizedRequestDict]
 ):
     """Handler for checking status of individual queries."""
 
@@ -219,20 +215,23 @@ class EmailDashboardCancelEmailHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'POST': {}
+    }
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id: str) -> None:
         user_query = user_query_services.get_user_query(query_id)
         if (
-                user_query is None or
-                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
+            user_query is None or
+            user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
         ):
             raise self.InvalidInputException('400 Invalid query id.')
 
         if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.' % self.username)
+                '%s is not an authorized user for this query.' % self.username
+            )
         user_query_services.archive_user_query(user_query.id)
         self.render_json({})
 
@@ -247,10 +246,8 @@ class EmailDashboardTestBulkEmailHandlerNormalizedPayloadDict(TypedDict):
 
 
 class EmailDashboardTestBulkEmailHandler(
-    base.BaseHandler[
-        EmailDashboardTestBulkEmailHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[EmailDashboardTestBulkEmailHandlerNormalizedPayloadDict, Dict[str,
+                                                                                   str]]
 ):
     """Handler for testing bulk email before sending it.
 
@@ -285,18 +282,20 @@ class EmailDashboardTestBulkEmailHandler(
         assert self.normalized_payload is not None
         user_query = user_query_services.get_user_query(query_id)
         if (
-                user_query is None or
-                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
+            user_query is None or
+            user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
         ):
             raise self.InvalidInputException('400 Invalid query id.')
 
         if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.' % self.username)
+                '%s is not an authorized user for this query.' % self.username
+            )
 
         email_subject = self.normalized_payload['email_subject']
         email_body = self.normalized_payload['email_body']
         test_email_body = '[This is a test email.]<br><br> %s' % email_body
         email_manager.send_test_email_for_bulk_emails(
-            user_query.submitter_id, email_subject, test_email_body)
+            user_query.submitter_id, email_subject, test_email_body
+        )
         self.render_json({})

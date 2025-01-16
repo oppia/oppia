@@ -227,8 +227,9 @@ class UserSettings:
             )
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not utils.is_user_id_valid(self.user_id, allow_system_user_id=True,
-                                      allow_pseudonymous_id=True):
+        if not utils.is_user_id_valid(
+            self.user_id, allow_system_user_id=True, allow_pseudonymous_id=True
+        ):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if not isinstance(self.banned, bool):
@@ -276,8 +277,10 @@ class UserSettings:
                     'Expected PIN to be a string, received %s' % self.pin
                 )
 
-            if (len(self.pin) != feconf.FULL_USER_PIN_LENGTH
-                    and len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH):
+            if (
+                len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
+                len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH
+            ):
                 raise utils.ValidationError(
                     'User PIN can only be of length %s or %s' %
                     (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
@@ -301,8 +304,10 @@ class UserSettings:
             )
         if not self.email:
             raise utils.ValidationError('No user email specified.')
-        if ('@' not in self.email or self.email.startswith('@')
-                or self.email.endswith('@')):
+        if (
+            '@' not in self.email or self.email.startswith('@') or
+            self.email.endswith('@')
+        ):
             raise utils.ValidationError('Invalid email address: %s' % self.email)
 
         if not isinstance(self.creator_dashboard_display_pref, str):
@@ -310,9 +315,10 @@ class UserSettings:
                 'Expected dashboard display preference to be a string, '
                 'received %s' % self.creator_dashboard_display_pref
             )
-        if (self.creator_dashboard_display_pref
-                not in list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
-                            )):
+        if (
+            self.creator_dashboard_display_pref
+            not in list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values())
+        ):
             raise utils.ValidationError(
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref)
@@ -349,8 +355,10 @@ class UserSettings:
             ValidationError. None or empty value is provided for display alias
                 attribute.
         """
-        if (not modifiable_user_data.display_alias
-                or not isinstance(modifiable_user_data.display_alias, str)):
+        if (
+            not modifiable_user_data.display_alias or
+            not isinstance(modifiable_user_data.display_alias, str)
+        ):
             raise utils.ValidationError(
                 'Expected display_alias to be a string, received %s.' %
                 modifiable_user_data.display_alias
@@ -377,39 +385,51 @@ class UserSettings:
             in a dictionary form.
         """
         return {
-            'email': self.email,
-            'roles': self.roles,
-            'banned': self.banned,
-            'username': self.username,
-            'normalized_username': self.normalized_username,
-            'last_agreed_to_terms': self.last_agreed_to_terms,
-            'last_started_state_editor_tutorial': (
-                self.last_started_state_editor_tutorial
-            ),
-            'last_started_state_translation_tutorial': (
-                self.last_started_state_translation_tutorial
-            ),
-            'last_logged_in': self.last_logged_in,
+            'email':
+                self.email,
+            'roles':
+                self.roles,
+            'banned':
+                self.banned,
+            'username':
+                self.username,
+            'normalized_username':
+                self.normalized_username,
+            'last_agreed_to_terms':
+                self.last_agreed_to_terms,
+            'last_started_state_editor_tutorial':
+                (self.last_started_state_editor_tutorial),
+            'last_started_state_translation_tutorial':
+                (self.last_started_state_translation_tutorial),
+            'last_logged_in':
+                self.last_logged_in,
             'last_edited_an_exploration': (self.last_edited_an_exploration),
             'last_created_an_exploration': (self.last_created_an_exploration),
-            'default_dashboard': self.default_dashboard,
+            'default_dashboard':
+                self.default_dashboard,
             'creator_dashboard_display_pref': (self.creator_dashboard_display_pref),
-            'user_bio': self.user_bio,
-            'subject_interests': self.subject_interests,
-            'first_contribution_msec': self.first_contribution_msec,
-            'preferred_language_codes': self.preferred_language_codes,
+            'user_bio':
+                self.user_bio,
+            'subject_interests':
+                self.subject_interests,
+            'first_contribution_msec':
+                self.first_contribution_msec,
+            'preferred_language_codes':
+                self.preferred_language_codes,
             'preferred_site_language_code': (self.preferred_site_language_code),
             'preferred_audio_language_code': (self.preferred_audio_language_code),
-            'preferred_translation_language_code': (
-                self.preferred_translation_language_code
-            ),
-            'pin': self.pin,
-            'display_alias': self.display_alias,
-            'deleted': self.deleted,
-            'created_on': self.created_on,
-            'has_viewed_lesson_info_modal_once': (
-                self.has_viewed_lesson_info_modal_once
-            )
+            'preferred_translation_language_code':
+                (self.preferred_translation_language_code),
+            'pin':
+                self.pin,
+            'display_alias':
+                self.display_alias,
+            'deleted':
+                self.deleted,
+            'created_on':
+                self.created_on,
+            'has_viewed_lesson_info_modal_once':
+                (self.has_viewed_lesson_info_modal_once)
         }
 
     @property
@@ -1266,8 +1286,8 @@ class UserContributionRights:
         # 'can_review_voiceover_for_language_codes' are List[str], so we need
         # the bool cast to ensure that the return value is boolean.
         return bool(
-            self.can_review_translation_for_language_codes
-            or self.can_review_voiceover_for_language_codes or self.can_review_questions
+            self.can_review_translation_for_language_codes or
+            self.can_review_voiceover_for_language_codes or self.can_review_questions
         )
 
     def can_submit_at_least_one_item(self) -> bool:
@@ -1292,7 +1312,7 @@ class UserContributionRights:
                     'Invalid language_code: %s' % (language_code)
                 )
         if len(self.can_review_translation_for_language_codes
-               ) != len(set(self.can_review_translation_for_language_codes)):
+              ) != len(set(self.can_review_translation_for_language_codes)):
             raise utils.ValidationError(
                 'Expected can_review_translation_for_language_codes list not '
                 'to have duplicate values, found: %s' %
@@ -1310,7 +1330,7 @@ class UserContributionRights:
                     'Invalid language_code: %s' % (language_code)
                 )
         if len(self.can_review_voiceover_for_language_codes
-               ) != len(set(self.can_review_voiceover_for_language_codes)):
+              ) != len(set(self.can_review_voiceover_for_language_codes)):
             raise utils.ValidationError(
                 'Expected can_review_voiceover_for_language_codes list not to '
                 'have duplicate values, found: %s' %
@@ -1456,8 +1476,10 @@ class ModifiableUserData:
                 'Version has invalid type, expected int, '
                 'received %s' % type(data_schema_version)
             )
-        if (not isinstance(data_schema_version, int) or data_schema_version < 1
-                or data_schema_version > cls.CURRENT_SCHEMA_VERSION):
+        if (
+            not isinstance(data_schema_version, int) or data_schema_version < 1 or
+            data_schema_version > cls.CURRENT_SCHEMA_VERSION
+        ):
             raise Exception(
                 'Invalid version %s received. At present we can only process v1'
                 ' to v%s modifiable user data.' %
@@ -1601,26 +1623,29 @@ class ExplorationUserData:
         """
 
         return {
-            'rating': self.rating,
-            'rated_on': self.rated_on,
-            'draft_change_list': self.draft_change_list,
+            'rating':
+                self.rating,
+            'rated_on':
+                self.rated_on,
+            'draft_change_list':
+                self.draft_change_list,
             'draft_change_list_last_updated': (self.draft_change_list_last_updated),
-            'draft_change_list_exp_version': self.draft_change_list_exp_version,
-            'draft_change_list_id': self.draft_change_list_id,
-            'mute_suggestion_notifications': self.mute_suggestion_notifications,
-            'mute_feedback_notifications': self.mute_feedback_notifications,
-            'furthest_reached_checkpoint_exp_version': (
-                self.furthest_reached_checkpoint_exp_version
-            ),
-            'furthest_reached_checkpoint_state_name': (
-                self.furthest_reached_checkpoint_state_name
-            ),
-            'most_recently_reached_checkpoint_exp_version': (
-                self.most_recently_reached_checkpoint_exp_version
-            ),
-            'most_recently_reached_checkpoint_state_name': (
-                self.most_recently_reached_checkpoint_state_name
-            )
+            'draft_change_list_exp_version':
+                self.draft_change_list_exp_version,
+            'draft_change_list_id':
+                self.draft_change_list_id,
+            'mute_suggestion_notifications':
+                self.mute_suggestion_notifications,
+            'mute_feedback_notifications':
+                self.mute_feedback_notifications,
+            'furthest_reached_checkpoint_exp_version':
+                (self.furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name':
+                (self.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version':
+                (self.most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name':
+                (self.most_recently_reached_checkpoint_state_name)
         }
 
 
@@ -1709,12 +1734,14 @@ class LearnerGroupsUser:
         ]
 
         return {
-            'user_id': self.user_id,
-            'invited_to_learner_groups_ids': self.invited_to_learner_groups_ids,
-            'learner_groups_user_details': learner_groups_user_details_dict,
-            'learner_groups_user_details_schema_version': (
-                self.learner_groups_user_details_schema_version
-            )
+            'user_id':
+                self.user_id,
+            'invited_to_learner_groups_ids':
+                self.invited_to_learner_groups_ids,
+            'learner_groups_user_details':
+                learner_groups_user_details_dict,
+            'learner_groups_user_details_schema_version':
+                (self.learner_groups_user_details_schema_version)
         }
 
     def validate(self) -> None:

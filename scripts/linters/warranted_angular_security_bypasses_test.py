@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for scripts/linters/warranted_angular_security_bypasses.py"""
 
 from __future__ import annotations
@@ -26,10 +25,11 @@ class WarrantedAngularSecurityBypassesTests(test_utils.GenericTestBase):
 
     def test_svg_sanitizer_service_is_present_in_excluded_files(self) -> None:
         excluded_files = (
-            warranted_angular_security_bypasses
-            .EXCLUDED_BYPASS_SECURITY_TRUST_FILES)
+            warranted_angular_security_bypasses.EXCLUDED_BYPASS_SECURITY_TRUST_FILES
+        )
         self.assertIn(
-            'core/templates/services/svg-sanitizer.service.spec.ts',
-            excluded_files)
+            'core/templates/services/svg-sanitizer.service.spec.ts', excluded_files
+        )
         self.assertIn(
-            'core/templates/services/svg-sanitizer.service.ts', excluded_files)
+            'core/templates/services/svg-sanitizer.service.ts', excluded_files
+        )

@@ -66,13 +66,11 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
 
-    @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'EMAIL_FOOTER'),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin')
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+        (platform_parameter_list.ParamName.EMAIL_FOOTER, 'EMAIL_FOOTER'),
+        (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin')
+    ])
     def test_inform_subscribers(self) -> None:
         subscription_services.subscribe_to_creator(self.user_id_2, self.editor_id)
         subscription_services.subscribe_to_creator(self.new_user_id, self.editor_id)
@@ -104,7 +102,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
 
             # Make sure correct email models are stored.
             all_models: Sequence[email_models.SentEmailModel
-                                 ] = (email_models.SentEmailModel.get_all().fetch())
+                                ] = (email_models.SentEmailModel.get_all().fetch())
             self.assertEqual(
                 True, any(model.recipient_id == self.user_id for model in all_models)
             )

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for scripts/concurrent_task_utils.py."""
 
 from __future__ import annotations
@@ -30,8 +29,10 @@ from typing import Callable, List
 
 
 def test_function(unused_arg: str) -> Callable[[], None]:
+
     def task_func() -> None:
         pass
+
     return task_func
 
 
@@ -52,6 +53,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
                     in the same line of output.
             """
             self.task_stdout.append(' '.join(str(arg) for arg in args))
+
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
 
@@ -59,20 +61,16 @@ class TaskResultTests(ConcurrentTaskUtilsTests):
     """Tests for TaskResult class."""
 
     def test_all_messages_with_success_message(self) -> None:
-        output_object = concurrent_task_utils.TaskResult(
-            'Test', False, [], [])
+        output_object = concurrent_task_utils.TaskResult('Test', False, [], [])
         self.assertEqual(output_object.trimmed_messages, [])
-        self.assertEqual(
-            output_object.get_report(), ['SUCCESS  Test check passed'])
+        self.assertEqual(output_object.get_report(), ['SUCCESS  Test check passed'])
         self.assertFalse(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
     def test_all_messages_with_failed_message(self) -> None:
-        output_object = concurrent_task_utils.TaskResult(
-            'Test', True, [], [])
+        output_object = concurrent_task_utils.TaskResult('Test', True, [], [])
         self.assertEqual(output_object.trimmed_messages, [])
-        self.assertEqual(
-            output_object.get_report(), ['FAILED  Test check failed'])
+        self.assertEqual(output_object.get_report(), ['FAILED  Test check failed'])
         self.assertTrue(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
@@ -81,8 +79,7 @@ class CreateTaskTests(ConcurrentTaskUtilsTests):
     """Tests for create_task method."""
 
     def test_create_task_with_success(self) -> None:
-        task = concurrent_task_utils.create_task(
-            test_function, True, self.semaphore)
+        task = concurrent_task_utils.create_task(test_function, True, self.semaphore)
         self.assertTrue(isinstance(task, concurrent_task_utils.TaskThread))
 
 
@@ -91,8 +88,12 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_success(self) -> None:
         task = concurrent_task_utils.TaskThread(
-            test_function('unused_arg'), False, self.semaphore, name='test',
-            report_enabled=True)
+            test_function('unused_arg'),
+            False,
+            self.semaphore,
+            name='test',
+            report_enabled=True
+        )
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -103,8 +104,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_exception(self) -> None:
         task = concurrent_task_utils.TaskThread(
-            test_function, True, self.semaphore, name='test',
-            report_enabled=True)
+            test_function, True, self.semaphore, name='test', report_enabled=True
+        )
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -112,51 +113,59 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             task.join()
         self.assertIn(
             'test_function() missing 1 required '
-            'positional argument: \'unused_arg\'',
-            self.task_stdout
+            'positional argument: \'unused_arg\'', self.task_stdout
         )
 
     def test_task_thread_with_verbose_mode_enabled(self) -> None:
+
         class HelperTests:
+
             def test_show(self) -> concurrent_task_utils.TaskResult:
                 return concurrent_task_utils.TaskResult('name', True, [], [])
-            def test_perform_all_check(
-                self
-            ) -> List[concurrent_task_utils.TaskResult]:
+
+            def test_perform_all_check(self) -> List[concurrent_task_utils.TaskResult]:
                 return [self.test_show()]
 
         def test_func() -> HelperTests:
             return HelperTests()
 
         task = concurrent_task_utils.TaskThread(
-            test_func().test_perform_all_check, True,
-            self.semaphore, name='test', report_enabled=True)
+            test_func().test_perform_all_check,
+            True,
+            self.semaphore,
+            name='test',
+            report_enabled=True
+        )
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
             task.start()
             task.join()
         self.assertRegex(
-            self.task_stdout[0],
-            r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
-            'name check failed')
+            self.task_stdout[0], r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
+            'name check failed'
+        )
 
     def test_task_thread_with_task_report_disabled(self) -> None:
+
         class HelperTests:
+
             def test_show(self) -> concurrent_task_utils.TaskResult:
-                return concurrent_task_utils.TaskResult(
-                    '', False, [], ['msg'])
-            def test_perform_all_check(
-                self
-            ) -> List[concurrent_task_utils.TaskResult]:
+                return concurrent_task_utils.TaskResult('', False, [], ['msg'])
+
+            def test_perform_all_check(self) -> List[concurrent_task_utils.TaskResult]:
                 return [self.test_show()]
 
         def test_func() -> HelperTests:
             return HelperTests()
 
         task = concurrent_task_utils.TaskThread(
-            test_func().test_perform_all_check, True,
-            self.semaphore, name='test', report_enabled=False)
+            test_func().test_perform_all_check,
+            True,
+            self.semaphore,
+            name='test',
+            report_enabled=False
+        )
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -171,7 +180,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_single_task(self) -> None:
         task = concurrent_task_utils.create_task(
-            test_function('unused_arg'), False, self.semaphore, name='test')
+            test_function('unused_arg'), False, self.semaphore, name='test'
+        )
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
@@ -181,7 +191,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in range(6):
             task = concurrent_task_utils.create_task(
-                test_function('unused_arg'), False, self.semaphore)
+                test_function('unused_arg'), False, self.semaphore
+            )
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
@@ -192,12 +203,12 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in range(6):
             task = concurrent_task_utils.create_task(
-                test_function, True, self.semaphore)
+                test_function, True, self.semaphore
+            )
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
         self.assertIn(
             'test_function() missing 1 required '
-            'positional argument: \'unused_arg\'',
-            self.task_stdout
+            'positional argument: \'unused_arg\'', self.task_stdout
         )

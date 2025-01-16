@@ -49,113 +49,109 @@ title: A title
 class CollectionChangeTests(test_utils.GenericTestBase):
 
     def test_collection_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
-            collection_domain.CollectionChange({'invalid': 'data'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
+            collection_domain.CollectionChange({
+                'invalid': 'data'
+            })
 
     def test_collection_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command invalid is not allowed'):
-            collection_domain.CollectionChange({'cmd': 'invalid'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command invalid is not allowed'
+        ):
+            collection_domain.CollectionChange({
+                'cmd': 'invalid'
+            })
 
     def test_collection_change_object_with_missing_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('The following required attributes are missing: '
-                                     'exploration_id, new_value')):
-            collection_domain.CollectionChange(
-                {
-                    'cmd': 'edit_collection_node_property',
-                    'property_name': 'category',
-                    'old_value': 'old_value'
-                }
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'exploration_id, new_value'
             )
+        ):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_node_property',
+                'property_name': 'category',
+                'old_value': 'old_value'
+            })
 
     def test_collection_change_object_with_extra_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('The following extra attributes are present: invalid')):
-            collection_domain.CollectionChange(
-                {
-                    'cmd': 'edit_collection_node_property',
-                    'exploration_id': 'exploration_id',
-                    'property_name': 'category',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                    'invalid': 'invalid'
-                }
-            )
+            utils.ValidationError,
+            ('The following extra attributes are present: invalid')
+        ):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_node_property',
+                'exploration_id': 'exploration_id',
+                'property_name': 'category',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+                'invalid': 'invalid'
+            })
 
     def test_collection_change_object_with_invalid_collection_property(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for property_name in cmd edit_collection_property: '
-             'invalid is not allowed')):
-            collection_domain.CollectionChange(
-                {
-                    'cmd': 'edit_collection_property',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
+            utils.ValidationError, (
+                'Value for property_name in cmd edit_collection_property: '
+                'invalid is not allowed'
             )
+        ):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
     def test_collection_change_object_with_create_new(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'create_new',
-                'category': 'category',
-                'title': 'title'
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'create_new',
+            'category': 'category',
+            'title': 'title'
+        })
 
         self.assertEqual(col_change_object.cmd, 'create_new')
         self.assertEqual(col_change_object.category, 'category')
         self.assertEqual(col_change_object.title, 'title')
 
     def test_collection_change_object_with_add_collection_node(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'add_collection_node',
-                'exploration_id': 'exploration_id',
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_collection_node',
+            'exploration_id': 'exploration_id',
+        })
 
         self.assertEqual(col_change_object.cmd, 'add_collection_node')
         self.assertEqual(col_change_object.exploration_id, 'exploration_id')
 
     def test_collection_change_object_with_delete_collection_node(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'delete_collection_node',
-                'exploration_id': 'exploration_id',
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'delete_collection_node',
+            'exploration_id': 'exploration_id',
+        })
 
         self.assertEqual(col_change_object.cmd, 'delete_collection_node')
         self.assertEqual(col_change_object.exploration_id, 'exploration_id')
 
     def test_collection_change_object_with_swap_nodes(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'swap_nodes',
-                'first_index': 'first_index',
-                'second_index': 'second_index'
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'swap_nodes',
+            'first_index': 'first_index',
+            'second_index': 'second_index'
+        })
 
         self.assertEqual(col_change_object.cmd, 'swap_nodes')
         self.assertEqual(col_change_object.first_index, 'first_index')
         self.assertEqual(col_change_object.second_index, 'second_index')
 
     def test_collection_change_object_with_edit_collection_property(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'edit_collection_property',
-                'property_name': 'category',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'edit_collection_property',
+            'property_name': 'category',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(col_change_object.cmd, 'edit_collection_property')
         self.assertEqual(col_change_object.property_name, 'category')
@@ -163,15 +159,13 @@ class CollectionChangeTests(test_utils.GenericTestBase):
         self.assertEqual(col_change_object.old_value, 'old_value')
 
     def test_collection_change_object_with_edit_collection_node_property(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'edit_collection_node_property',
-                'exploration_id': 'exploration_id',
-                'property_name': 'title',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'edit_collection_node_property',
+            'exploration_id': 'exploration_id',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(col_change_object.cmd, 'edit_collection_node_property')
         self.assertEqual(col_change_object.exploration_id, 'exploration_id')
@@ -182,61 +176,51 @@ class CollectionChangeTests(test_utils.GenericTestBase):
     def test_collection_change_object_with_migrate_schema_to_latest_version(
         self
     ) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'migrate_schema_to_latest_version',
-                'from_version': 'from_version',
-                'to_version': 'to_version',
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'migrate_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
 
         self.assertEqual(col_change_object.cmd, 'migrate_schema_to_latest_version')
         self.assertEqual(col_change_object.from_version, 'from_version')
         self.assertEqual(col_change_object.to_version, 'to_version')
 
     def test_collection_change_object_with_add_collection_skill(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'add_collection_skill',
-                'name': 'name'
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_collection_skill',
+            'name': 'name'
+        })
 
         self.assertEqual(col_change_object.cmd, 'add_collection_skill')
         self.assertEqual(col_change_object.name, 'name')
 
     def test_collection_change_object_with_delete_collection_skill(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'delete_collection_skill',
-                'skill_id': 'skill_id'
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'delete_collection_skill',
+            'skill_id': 'skill_id'
+        })
 
         self.assertEqual(col_change_object.cmd, 'delete_collection_skill')
         self.assertEqual(col_change_object.skill_id, 'skill_id')
 
     def test_collection_change_object_with_add_question_id_to_skill(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'add_question_id_to_skill',
-                'skill_id': 'skill_id',
-                'question_id': 'question_id'
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_question_id_to_skill',
+            'skill_id': 'skill_id',
+            'question_id': 'question_id'
+        })
 
         self.assertEqual(col_change_object.cmd, 'add_question_id_to_skill')
         self.assertEqual(col_change_object.skill_id, 'skill_id')
         self.assertEqual(col_change_object.question_id, 'question_id')
 
     def test_collection_change_object_with_remove_question_id_from_skill(self) -> None:
-        col_change_object = collection_domain.CollectionChange(
-            {
-                'cmd': 'remove_question_id_from_skill',
-                'skill_id': 'skill_id',
-                'question_id': 'question_id'
-            }
-        )
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'remove_question_id_from_skill',
+            'skill_id': 'skill_id',
+            'question_id': 'question_id'
+        })
 
         self.assertEqual(col_change_object.cmd, 'remove_question_id_from_skill')
         self.assertEqual(col_change_object.skill_id, 'skill_id')
@@ -373,8 +357,12 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Expected nodes to be a list')
 
         self.collection.nodes = [
-            collection_domain.CollectionNode.from_dict({'exploration_id': '0'}),
-            collection_domain.CollectionNode.from_dict({'exploration_id': '0'})
+            collection_domain.CollectionNode.from_dict({
+                'exploration_id': '0'
+            }),
+            collection_domain.CollectionNode.from_dict({
+                'exploration_id': '0'
+            })
         ]
 
         self._assert_validation_error(
@@ -502,7 +490,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 1)
 
         with self.assertRaisesRegex(
-                ValueError, 'Exploration is already part of this collection: test_exp'):
+            ValueError, 'Exploration is already part of this collection: test_exp'
+        ):
             collection.add_node('test_exp')
 
         collection.add_node('another_exp')
@@ -511,15 +500,17 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.swap_nodes(0, 1)
         self.assertEqual(collection.nodes[0].exploration_id, 'another_exp')
         self.assertEqual(collection.nodes[1].exploration_id, 'test_exp')
-        with self.assertRaisesRegex(ValueError,
-                                    'Both indices point to the same collection node.'):
+        with self.assertRaisesRegex(
+            ValueError, 'Both indices point to the same collection node.'
+        ):
             collection.swap_nodes(0, 0)
 
         collection.delete_node('another_exp')
         self.assertEqual(len(collection.nodes), 1)
 
         with self.assertRaisesRegex(
-                ValueError, 'Exploration is not part of this collection: another_exp'):
+            ValueError, 'Exploration is not part of this collection: another_exp'
+        ):
             collection.delete_node('another_exp')
 
         collection.delete_node('test_exp')
@@ -578,8 +569,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(versioned_collection_contents['schema_version'], 6)
         self.assertEqual(
-            versioned_collection_contents['collection_contents']['nodes'],
-            [{
+            versioned_collection_contents['collection_contents']['nodes'], [{
                 'other_field': 'value1'
             }, {
                 'other_field': 'value2'
@@ -598,9 +588,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         }
 
         with self.assertRaisesRegex(
-                Exception,
-                'Collection is version .+ but current collection schema version '
-                'is %d' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            Exception, 'Collection is version .+ but current collection schema version '
+            'is %d' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION
+        ):
             collection_domain.Collection.update_collection_contents_from_model(
                 versioned_collection_contents, feconf.CURRENT_COLLECTION_SCHEMA_VERSION
             )
@@ -612,7 +602,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.collection.to_dict(),
             collection_domain.Collection.deserialize(self.collection.serialize()
-                                                     ).to_dict()
+                                                    ).to_dict()
         )
 
 
@@ -780,9 +770,10 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         # Should not be able to create a collection from no YAML content.
         with self.assertRaisesRegex(
-                utils.InvalidInputException,
-                'Please ensure that you are uploading a YAML text file, '
-                'not a zip file. The YAML parser returned the following error: '):
+            utils.InvalidInputException,
+            'Please ensure that you are uploading a YAML text file, '
+            'not a zip file. The YAML parser returned the following error: '
+        ):
             collection_domain.Collection.from_yaml('collection3', '')
 
     def test_from_yaml_with_no_schema_version_specified_raises_error(self) -> None:
@@ -795,8 +786,9 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         yaml_content = collection.to_yaml()
 
-        with self.assertRaisesRegex(Exception,
-                                    'Invalid YAML file: no schema version specified.'):
+        with self.assertRaisesRegex(
+            Exception, 'Invalid YAML file: no schema version specified.'
+        ):
             collection_domain.Collection.from_yaml(self.COLLECTION_ID, yaml_content)
 
     def test_from_yaml_with_invalid_schema_version_raises_error(self) -> None:
@@ -807,9 +799,9 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         yaml_content = collection.to_yaml()
 
         with self.assertRaisesRegex(
-                Exception,
-                'Sorry, we can only process v1 to .+ collection YAML files at '
-                'present.'):
+            Exception, 'Sorry, we can only process v1 to .+ collection YAML files at '
+            'present.'
+        ):
             collection_domain.Collection.from_yaml(self.COLLECTION_ID, yaml_content)
 
 
@@ -1080,8 +1072,9 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.collection_summary.language_code = 'invalid'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid language code: invalid'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language code: invalid'
+        ):
             self.collection_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self) -> None:
@@ -1091,36 +1084,44 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_unallowed_characters_in_tag(self) -> None:
         self.collection_summary.tags = ['123', 'abc']
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Tags should only contain lowercase '
-                                     'letters and spaces, received \'123\'')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Tags should only contain lowercase '
+                'letters and spaces, received \'123\''
+            )
+        ):
             self.collection_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_start(self) -> None:
         self.collection_summary.tags = [' ab', 'abc']
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Tags should not start or end with whitespace, received \' ab\''):
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, received \' ab\''
+        ):
             self.collection_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_end(self) -> None:
         self.collection_summary.tags = ['ab ', 'abc']
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Tags should not start or end with whitespace, received \'ab \''):
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, received \'ab \''
+        ):
             self.collection_summary.validate()
 
     def test_validation_fails_with_adjacent_whitespace_in_tag(self) -> None:
         self.collection_summary.tags = ['a   b', 'abc']
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Adjacent whitespace in tags should '
-                                     'be collapsed, received \'a   b\'')):
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Adjacent whitespace in tags should '
+             'be collapsed, received \'a   b\'')
+        ):
             self.collection_summary.validate()
 
     def test_validation_fails_with_duplicate_tags(self) -> None:
         self.collection_summary.tags = ['abc', 'abc', 'ab']
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected tags to be unique, but found duplicates'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected tags to be unique, but found duplicates'
+        ):
             self.collection_summary.validate()
 
     def test_is_private(self) -> None:

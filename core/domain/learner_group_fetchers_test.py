@@ -60,8 +60,9 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(learner_group.group_id, self.LEARNER_GROUP_ID)
 
         with self.assertRaisesRegex(
-                Exception, 'No LearnerGroupModel found for the given group_id: '
-                'fake_learner_group_id'):
+            Exception, 'No LearnerGroupModel found for the given group_id: '
+            'fake_learner_group_id'
+        ):
             learner_group_fetchers.get_learner_group_by_id(
                 fake_learner_group_id, strict=True
             )
@@ -70,11 +71,10 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-                Exception,
-                'No LearnerGroupsUserModel exists for the user_id: invalid_id'):
-            learner_group_fetchers.get_learner_group_models_by_ids(
-                ['invalid_id'], strict=True
-            )
+            Exception, 'No LearnerGroupsUserModel exists for the user_id: invalid_id'
+        ):
+            learner_group_fetchers.get_learner_group_models_by_ids(['invalid_id'],
+                                                                   strict=True)
 
     def test_get_learner_groups_of_facilitator(self) -> None:
         fake_facilitator_id = 'fake_facilitator_id'
@@ -102,9 +102,9 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            learner_group_fetchers.can_multi_learners_share_progress(
-                [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
-            ), [True, False]
+            learner_group_fetchers.can_multi_learners_share_progress([
+                self.LEARNER_ID_1, self.LEARNER_ID_2
+            ], self.LEARNER_GROUP_ID), [True, False]
         )
 
     def test_get_invited_learner_groups_of_learner(self) -> None:

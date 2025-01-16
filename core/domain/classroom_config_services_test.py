@@ -33,7 +33,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import classroom_models
 
-(classroom_models, ) = models.Registry.import_models([models.Names.CLASSROOM])
+(classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
 
 
 class ClassroomServicesTests(test_utils.GenericTestBase):
@@ -306,17 +306,15 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         )
         self.save_new_valid_classroom('math', 'math', 'math', is_published=True)
 
-        classroom_index_mappings = [
-            {
-                'classroom_id': 'history',
-                'classroom_name': 'History',
-                'classroom_index': '1'
-            }, {
-                'classroom_id': 'math',
-                'classroom_name': 'Math',
-                'classroom_index': '0'
-            }
-        ]
+        classroom_index_mappings = [{
+            'classroom_id': 'history',
+            'classroom_name': 'History',
+            'classroom_index': '1'
+        }, {
+            'classroom_id': 'math',
+            'classroom_name': 'Math',
+            'classroom_index': '0'
+        }]
         classroom_config_services.update_classroom_id_to_index_mappings(
             classroom_index_mappings
         )

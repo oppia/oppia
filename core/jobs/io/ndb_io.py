@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides an Apache Beam API for operating on NDB models."""
 
 from __future__ import annotations
@@ -39,7 +38,7 @@ datastore_services = models.Registry.import_datastore_services()
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class GetModels(beam.PTransform): # type: ignore[misc]
+class GetModels(beam.PTransform):  # type: ignore[misc]
     """Reads NDB models from the datastore using a query."""
 
     def __init__(
@@ -54,9 +53,8 @@ class GetModels(beam.PTransform): # type: ignore[misc]
         super().__init__(label=label)
         self.query = query
 
-    def expand(
-        self, pbegin: pvalue.PBegin
-    ) -> beam.PCollection[datastore_services.Model]:
+    def expand(self,
+               pbegin: pvalue.PBegin) -> beam.PCollection[datastore_services.Model]:
         """Returns a PCollection with models matching the corresponding query.
 
         This overrides the expand() method from the parent class.
@@ -69,13 +67,13 @@ class GetModels(beam.PTransform): # type: ignore[misc]
             PCollection. The PCollection of models.
         """
         query = job_utils.get_beam_query_from_ndb_query(
-            self.query, namespace=pbegin.pipeline.options.namespace)
+            self.query, namespace=pbegin.pipeline.options.namespace
+        )
         return (
-            pbegin.pipeline
-            | 'Reading %r from the datastore' % self.query >> (
-                datastoreio.ReadFromDatastore(query))
-            | 'Transforming %r into NDB models' % self.query >> (
-                beam.Map(job_utils.get_ndb_model_from_beam_entity))
+            pbegin.pipeline | 'Reading %r from the datastore' % self.query >>
+            (datastoreio.ReadFromDatastore(query)) |
+            'Transforming %r into NDB models' % self.query >>
+            (beam.Map(job_utils.get_ndb_model_from_beam_entity))
         )
 
 
@@ -83,7 +81,7 @@ class GetModels(beam.PTransform): # type: ignore[misc]
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class PutModels(beam.PTransform): # type: ignore[misc]
+class PutModels(beam.PTransform):  # type: ignore[misc]
     """Writes NDB models to the datastore."""
 
     def expand(
@@ -102,11 +100,10 @@ class PutModels(beam.PTransform): # type: ignore[misc]
             expand() methods need to return some PCollection.
         """
         return (
-            entities
-            | 'Transforming the NDB models into Apache Beam entities' >> (
-                beam.Map(job_utils.get_beam_entity_from_ndb_model))
-            | 'Writing the NDB models to the datastore' >> (
-                datastoreio.WriteToDatastore(feconf.OPPIA_PROJECT_ID))
+            entities | 'Transforming the NDB models into Apache Beam entities' >>
+            (beam.Map(job_utils.get_beam_entity_from_ndb_model)) |
+            'Writing the NDB models to the datastore' >>
+            (datastoreio.WriteToDatastore(feconf.OPPIA_PROJECT_ID))
         )
 
 
@@ -114,7 +111,7 @@ class PutModels(beam.PTransform): # type: ignore[misc]
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class DeleteModels(beam.PTransform): # type: ignore[misc]
+class DeleteModels(beam.PTransform):  # type: ignore[misc]
     """Deletes NDB models from the datastore."""
 
     def expand(
@@ -133,9 +130,8 @@ class DeleteModels(beam.PTransform): # type: ignore[misc]
             expand() methods need to return some PCollection.
         """
         return (
-            entities
-            | 'Transforming the NDB keys into Apache Beam keys' >> (
-                beam.Map(job_utils.get_beam_key_from_ndb_key))
-            | 'Deleting the NDB keys from the datastore' >> (
-                datastoreio.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID))
+            entities | 'Transforming the NDB keys into Apache Beam keys' >>
+            (beam.Map(job_utils.get_beam_key_from_ndb_key)) |
+            'Deleting the NDB keys from the datastore' >>
+            (datastoreio.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID))
         )

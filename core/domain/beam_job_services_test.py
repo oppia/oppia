@@ -36,7 +36,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import beam_job_models
 
-(beam_job_models, ) = models.Registry.import_models([models.Names.BEAM_JOB])
+(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 
 class NoOpJob(base_jobs.JobBase):
@@ -50,9 +50,8 @@ class BeamJobServicesTests(test_utils.TestBase):
 
     def test_gets_jobs_from_registry(self) -> None:
         beam_jobs = beam_job_services.get_beam_jobs()
-        self.assertItemsEqual(
-            [j.name for j in beam_jobs], jobs_registry.get_all_job_names()
-        )
+        self.assertItemsEqual([j.name for j in beam_jobs],
+                              jobs_registry.get_all_job_names())
 
 
 class BeamJobRunServicesTests(test_utils.GenericTestBase):
@@ -214,8 +213,9 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         beam_job_models.BeamJobRunModel.update_timestamps_multi(beam_job_run_models)
         beam_job_models.BeamJobRunModel.put_multi(beam_job_run_models)
 
-        with self.swap_to_always_return(jobs_manager,
-                                        'refresh_state_of_beam_job_run_model'):
+        with self.swap_to_always_return(
+            jobs_manager, 'refresh_state_of_beam_job_run_model'
+        ):
             self.assert_domains_equal_models(
                 beam_job_services.get_beam_job_runs(refresh=True), beam_job_run_models
             )
@@ -318,9 +318,8 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 class GetBeamJobRunResultTests(test_utils.GenericTestBase):
 
     def test_get_beam_run_result(self) -> None:
-        beam_job_models.BeamJobRunResultModel(
-            job_id='123', stdout='abc', stderr='def'
-        ).put()
+        beam_job_models.BeamJobRunResultModel(job_id='123', stdout='abc',
+                                              stderr='def').put()
 
         beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
 
@@ -336,9 +335,8 @@ class GetBeamJobRunResultTests(test_utils.GenericTestBase):
     def test_get_beam_run_result_with_result_batches(self) -> None:
         beam_job_models.BeamJobRunResultModel(job_id='123', stdout='abc').put()
         beam_job_models.BeamJobRunResultModel(job_id='123', stderr='123').put()
-        beam_job_models.BeamJobRunResultModel(
-            job_id='123', stdout='def', stderr='456'
-        ).put()
+        beam_job_models.BeamJobRunResultModel(job_id='123', stdout='def',
+                                              stderr='456').put()
 
         beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
 

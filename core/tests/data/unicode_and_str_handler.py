@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """This is a sample file for testing unicode and str characters.
 Unless the strings are explicitly wrapped with b'', they would denote unicode,
 otherwise str.
@@ -23,7 +22,6 @@ from __future__ import annotations
 
 import os
 import sys
-
 
 # This will be read as unicode.
 SOME_STR_TEXT = 'example text'

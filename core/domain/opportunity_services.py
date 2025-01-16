@@ -42,9 +42,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import user_models
 
-(opportunity_models, user_models) = models.Registry.import_models(
-    [models.Names.OPPORTUNITY, models.Names.USER]
-)
+(opportunity_models, user_models) = models.Registry.import_models([
+    models.Names.OPPORTUNITY, models.Names.USER
+])
 
 # NOTE TO DEVELOPERS: The functions:
 #   - delete_all_exploration_opportunity_summary_models()
@@ -384,8 +384,10 @@ def update_translation_opportunity_with_accepted_suggestion(
     else:
         exp_opportunity_summary.translation_counts[language_code] = 1
 
-    if (exp_opportunity_summary.content_count ==
-            exp_opportunity_summary.translation_counts[language_code]):
+    if (
+        exp_opportunity_summary.content_count ==
+        exp_opportunity_summary.translation_counts[language_code]
+    ):
         exp_opportunity_summary.incomplete_translation_language_codes.remove(
             language_code
         )
@@ -621,8 +623,7 @@ def get_exploration_opportunity_summaries_by_ids(
     """
     opportunities: Dict[str,
                         Optional[opportunity_domain.ExplorationOpportunitySummary]] = {
-                            opportunity_id: None
-                            for opportunity_id in ids
+                            opportunity_id: None for opportunity_id in ids
                         }
     exp_opportunity_summary_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids)
@@ -777,8 +778,7 @@ def get_skill_opportunities_by_ids(
         domain objects corresponding to the opportunity id if exist else None.
     """
     opportunities: Dict[str, Optional[opportunity_domain.SkillOpportunity]] = {
-        opportunity_id: None
-        for opportunity_id in ids
+        opportunity_id: None for opportunity_id in ids
     }
     skill_opportunity_models = (opportunity_models.SkillOpportunityModel.get_multi(ids))
 

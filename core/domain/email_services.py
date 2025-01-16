@@ -25,7 +25,7 @@ from core.platform import models
 
 from typing import Dict, List, Optional, Union
 
-(email_models, ) = models.Registry.import_models([models.Names.EMAIL])
+(email_models,) = models.Registry.import_models([models.Names.EMAIL])
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -136,13 +136,11 @@ def send_mail(
     )
 
     if not response:
-        raise Exception(
-            (
-                'Email to %s failed to send. Please try again later or '
-                'contact us to report a bug at '
-                'https://www.oppia.org/contact.'
-            ) % recipient_email
-        )
+        raise Exception((
+            'Email to %s failed to send. Please try again later or '
+            'contact us to report a bug at '
+            'https://www.oppia.org/contact.'
+        ) % recipient_email)
 
 
 def send_bulk_mail(
@@ -263,9 +261,9 @@ def convert_email_to_loggable_string(
         str. The loggable email string.
     """
     # Show the first 3 emails in the recipient list.
-    recipient_email_list_str = ' '.join(
-        ['%s' % (recipient_email, ) for recipient_email in recipient_emails[:3]]
-    )
+    recipient_email_list_str = ' '.join([
+        '%s' % (recipient_email,) for recipient_email in recipient_emails[:3]
+    ])
     if len(recipient_emails) > 3:
         recipient_email_list_str += (
             '... Total: %s emails.' % (str(len(recipient_emails)))
@@ -278,7 +276,7 @@ def convert_email_to_loggable_string(
 
     # Show the first 3 emails in bcc email list.
     if bcc:
-        bcc_email_list_str = ' '.join(['%s' % (bcc_email, ) for bcc_email in bcc[:3]])
+        bcc_email_list_str = ' '.join(['%s' % (bcc_email,) for bcc_email in bcc[:3]])
         if len(bcc) > 3:
             bcc_email_list_str += '... Total: %s emails.' % str(len(bcc))
 

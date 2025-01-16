@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Models for storing statistics data related to blog posts."""
 
 from __future__ import annotations
@@ -24,11 +23,11 @@ from core.platform import models
 from typing import Dict
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models, ) = models.Registry.import_models([models.Names.BASE_MODEL])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -40,9 +39,7 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
     """
 
     # ID of blog post currently being viewed.
-    blog_post_id = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
+    blog_post_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -59,13 +56,13 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
         # a random hash is appended to the event model id.
         for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH
+                str(utils.get_random_int(base_models.RAND_RANGE)), base_models.ID_LENGTH
             )
-            new_id = ('%s:%s:%s' % (
-                str(int(utils.get_current_time_in_millisecs())),
-                blog_post_id,
-                random_hash)
+            new_id = (
+                '%s:%s:%s' % (
+                    str(int(utils.get_current_time_in_millisecs())
+                       ), blog_post_id, random_hash
+                )
             )
             if not cls.get_by_id(new_id):
                 return new_id
@@ -75,22 +72,18 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            blog_post_id: str,
+        cls,
+        blog_post_id: str,
     ) -> str:
         """Creates a new blog post viewed event entry."""
         entity_id = cls.get_new_event_entity_id(blog_post_id)
-        event_entity = cls(
-            id=entity_id,
-            blog_post_id=blog_post_id
-        )
+        event_entity = cls(id=entity_id, blog_post_id=blog_post_id)
         event_entity.update_timestamps()
         event_entity.put()
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -101,9 +94,11 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
 
 class BlogPostReadEventLogEntryModel(base_models.BaseModel):
@@ -116,9 +111,7 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
     """
 
     # ID of blog post currently being read.
-    blog_post_id = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
+    blog_post_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -135,13 +128,13 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
         # a random hash is appended to the event model id.
         for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH
+                str(utils.get_random_int(base_models.RAND_RANGE)), base_models.ID_LENGTH
             )
-            new_id = ('%s:%s:%s' % (
-                str(int(utils.get_current_time_in_millisecs())),
-                blog_post_id,
-                random_hash)
+            new_id = (
+                '%s:%s:%s' % (
+                    str(int(utils.get_current_time_in_millisecs())
+                       ), blog_post_id, random_hash
+                )
             )
             if not cls.get_by_id(new_id):
                 return new_id
@@ -150,24 +143,16 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def create(
-            cls,
-            blog_post_id: str
-    ) -> str:
+    def create(cls, blog_post_id: str) -> str:
         """Creates a new blog post read event entry."""
         entity_id = cls.get_new_event_entity_id(blog_post_id)
-        event_entity = cls(
-            id=entity_id,
-            blog_post_id=blog_post_id
-        )
+        event_entity = cls(id=entity_id, blog_post_id=blog_post_id)
         event_entity.update_timestamps()
         event_entity.put()
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user() -> (
-        base_models.MODEL_ASSOCIATION_TO_USER
-    ):
+    def get_model_association_to_user() -> (base_models.MODEL_ASSOCIATION_TO_USER):
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -178,9 +163,11 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
 
 class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
@@ -193,9 +180,7 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
     """
 
     # ID of blog post being exited.
-    blog_post_id = datastore_services.StringProperty(
-        indexed=True, required=True
-    )
+    blog_post_id = datastore_services.StringProperty(indexed=True, required=True)
     # Time user stayed on the blog post.
     time_user_stayed_on_blog_post = (
         datastore_services.FloatProperty(indexed=True, required=True)
@@ -216,13 +201,13 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
         # a random hash is appended to the event model id.
         for _ in range(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH
+                str(utils.get_random_int(base_models.RAND_RANGE)), base_models.ID_LENGTH
             )
-            new_id = ('%s:%s:%s' % (
-                str(int(utils.get_current_time_in_millisecs())),
-                blog_post_id,
-                random_hash)
+            new_id = (
+                '%s:%s:%s' % (
+                    str(int(utils.get_current_time_in_millisecs())
+                       ), blog_post_id, random_hash
+                )
             )
             if not cls.get_by_id(new_id):
                 return new_id
@@ -232,23 +217,23 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            blog_post_id: str,
-            time_user_stayed_on_blog_post: float,
+        cls,
+        blog_post_id: str,
+        time_user_stayed_on_blog_post: float,
     ) -> str:
         """Creates a new blog post exited event entry."""
         entity_id = cls.get_new_event_entity_id(blog_post_id)
         event_entity = cls(
             id=entity_id,
             blog_post_id=blog_post_id,
-            time_user_stayed_on_blog_post=time_user_stayed_on_blog_post)
+            time_user_stayed_on_blog_post=time_user_stayed_on_blog_post
+        )
         event_entity.update_timestamps()
         event_entity.put()
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -259,11 +244,14 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_user_stayed_on_blog_post': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE)
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'blog_post_id':
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'time_user_stayed_on_blog_post':
+                    (base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            }
+        )
 
 
 class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
@@ -279,18 +267,21 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
     # views for past 3 days (including the ongoing day) and delete the rest
     # whenever a PUT request is performed on the storage model.
     views_by_hour = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of key-value pairs where key is the month(YYYY-MM) and
     # value is dict with keys as UTC date and values as  number of views on the
     # blog posts on that date. At max there will be views by date keyed to 3
     # months (ongoing month and the past 2 months(all the days of the month)).
     views_by_date = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of a dict of dictionaries where key is the year (in the
     # UTC format) and value is dict with keys as month number (in the UTC
     # format) and number of views in that month as value.
     views_by_month = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -298,8 +289,7 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The model doesn't contain relevant data corresponding to users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -308,11 +298,13 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'views_by_hour': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'views_by_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'views_by_month': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'views_by_hour': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'views_by_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'views_by_month': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )
 
     @classmethod
     def create(cls, blog_post_id: str) -> BlogPostViewsAggregatedStatsModel:
@@ -333,12 +325,10 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         if cls.get_by_id(blog_post_id):
             raise Exception(
                 'A blog post views stats model with the given blog post ID'
-                'exists already.')
+                'exists already.'
+            )
         entity = cls(
-            id=blog_post_id,
-            views_by_hour={},
-            views_by_date={},
-            views_by_month={}
+            id=blog_post_id, views_by_hour={}, views_by_date={}, views_by_month={}
         )
         entity.update_timestamps()
         entity.put()
@@ -359,18 +349,21 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
     # reads for past 3 days (including the ongoing day) and delete the rest
     # whenever a PUT request is performed on the storage model.
     reads_by_hour = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of key-value pairs where key is the month(YYYY-MM) and
     # value is dict with keys as UTC date and values as number of reads on the
     # blog posts on that date. At max there will be reads by date keyed to 3
     # months (ongoing month and the past 2 months(all the days of the month)).
     reads_by_date = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of a dict of dictionaries where key is the year (in the
     # UTC format) and value is dict with keys as month number (in the UTC
     # format) and number of reads in that month as value.
     reads_by_month = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -378,8 +371,7 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The model doesn't contain relevant data corresponding to users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -388,11 +380,13 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'reads_by_hour': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'reads_by_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'reads_by_month': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'reads_by_hour': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'reads_by_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'reads_by_month': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
     @classmethod
     def create(cls, blog_post_id: str) -> BlogPostReadsAggregatedStatsModel:
@@ -413,12 +407,10 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         if cls.get_by_id(blog_post_id):
             raise Exception(
                 'A blog post reads stats model with the given blog post ID'
-                'exists already.')
+                'exists already.'
+            )
         entity = cls(
-            id=blog_post_id,
-            reads_by_hour={},
-            reads_by_date={},
-            reads_by_month={}
+            id=blog_post_id, reads_by_hour={}, reads_by_date={}, reads_by_month={}
         )
         entity.update_timestamps()
         entity.put()
@@ -437,37 +429,48 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
 
     # Number of user taking less than a minute to read the blog post.
     zero_to_one_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking one to two minutes to read the blog post.
     one_to_two_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking two to three minutes to read the blog post.
     two_to_three_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking three to four minutes to read the blog post.
     three_to_four_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking four to five minutes to read the blog post.
     four_to_five_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking five to six minutes to read the blog post.
     five_to_six_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking six to seven minutes to read the blog post.
     six_to_seven_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking seven to eight minutes to read the blog post.
     seven_to_eight_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking eight to nine minutes to read the blog post.
     eight_to_nine_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking nine to ten minutes to read the blog post.
     nine_to_ten_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking more than ten minutes to read the blog post.
     more_than_ten_min = datastore_services.IntegerProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -475,8 +478,7 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The model doesn't contain relevant data corresponding to users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -485,19 +487,21 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'zero_to_one_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'one_to_two_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'two_to_three_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'three_to_four_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'four_to_five_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'five_to_six_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'six_to_seven_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'seven_to_eight_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'eight_to_nine_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'nine_to_ten_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'more_than_ten_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'zero_to_one_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'one_to_two_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'two_to_three_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'three_to_four_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'four_to_five_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'five_to_six_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'six_to_seven_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'seven_to_eight_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'eight_to_nine_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'nine_to_ten_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'more_than_ten_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )
 
     @classmethod
     def create(cls, blog_post_id: str) -> BlogPostReadingTimeModel:
@@ -518,7 +522,8 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
         if cls.get_by_id(blog_post_id):
             raise Exception(
                 'A blog post reading time model with the given blog post ID'
-                'exists already.')
+                'exists already.'
+            )
         entity = cls(
             id=blog_post_id,
             zero_to_one_min=0,
@@ -553,18 +558,21 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
     # views for past 3 days (including the ongoing day) and delete the rest
     # whenever a PUT request is performed on the storage model.
     views_by_hour = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of key-value pairs where key is the month(YYYY-MM) and
     # value is dict with keys as UTC date and values as number of views on the
     # blog posts on that date. At max there will be views by date keyed to 3
     # months (ongoing month and the past 2 months(all the days of the month)).
     views_by_date = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of a dict of dictionaries where key is the year (in the
     # UTC format) and value is dict with keys as month number (in the UTC
     # format) and number of views in that month as value.
     views_by_month = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -572,8 +580,7 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -584,11 +591,13 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'views_by_hour': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'views_by_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'views_by_month': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'views_by_hour': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'views_by_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'views_by_month': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
     @classmethod
     def create(cls, author_id: str) -> AuthorBlogPostViewsAggregatedStatsModel:
@@ -611,12 +620,10 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         if cls.get_by_id(author_id):
             raise Exception(
                 'A author blog post views stats model with the given author ID'
-                ' exists already.')
+                ' exists already.'
+            )
         entity = cls(
-            id=author_id,
-            views_by_hour={},
-            views_by_date={},
-            views_by_month={}
+            id=author_id, views_by_hour={}, views_by_date={}, views_by_month={}
         )
         entity.update_timestamps()
         entity.put()
@@ -688,8 +695,7 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -700,19 +706,21 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'zero_to_one_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'one_to_two_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'two_to_three_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'three_to_four_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'four_to_five_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'five_to_six_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'six_to_seven_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'seven_to_eight_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'eight_to_nine_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'nine_to_ten_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'more_than_ten_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'zero_to_one_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'one_to_two_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'two_to_three_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'three_to_four_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'four_to_five_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'five_to_six_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'six_to_seven_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'seven_to_eight_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'eight_to_nine_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'nine_to_ten_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'more_than_ten_min': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -727,9 +735,7 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @classmethod
-    def create(
-        cls, author_id: str
-    ) -> AuthorBlogPostAggregatedReadingTimeModel:
+    def create(cls, author_id: str) -> AuthorBlogPostAggregatedReadingTimeModel:
         """Creates a new AuthorBlogPostAggregatedReadingTimeModel entry.
 
         Args:
@@ -746,7 +752,8 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
         if cls.get_by_id(author_id):
             raise Exception(
                 'A author blog post reading time model with the given author ID'
-                ' exists already.')
+                ' exists already.'
+            )
 
         entity = cls(
             id=author_id,
@@ -782,18 +789,21 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
     # reads for past 3 days (including the ongoing day) and delete the rest
     # whenever a PUT request is performed on the storage model.
     reads_by_hour = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of key-value pairs where key is the month(YYYY-MM) and
     # value is dict with keys as UTC date and values as number of reads on the
     # blog posts on that date. At max there will be reads by date keyed to 3
     # months (ongoing month and the past 2 months(all the days of the month)).
     reads_by_date = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of a dict of dictionaries where key is the year ( in the
     # UTC format) and value is dict with keys as month number (in the UTC
     # format) and number of reads in that month as value.
     reads_by_month = datastore_services.JsonProperty(
-        indexed=False, required=True, repeated=False)
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -801,8 +811,7 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -813,11 +822,13 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user that
         should be exported.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'reads_by_hour': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'reads_by_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'reads_by_month': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(), **{
+                'reads_by_hour': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'reads_by_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'reads_by_month': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        )
 
     @classmethod
     def create(cls, author_id: str) -> AuthorBlogPostReadsAggregatedStatsModel:
@@ -837,13 +848,11 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         if cls.get_by_id(author_id):
             raise Exception(
                 'A author blog post reads stats model with the given author ID'
-                ' exists already.')
+                ' exists already.'
+            )
 
         entity = cls(
-            id=author_id,
-            reads_by_hour={},
-            reads_by_date={},
-            reads_by_month={}
+            id=author_id, reads_by_hour={}, reads_by_date={}, reads_by_month={}
         )
         entity.update_timestamps()
         entity.put()

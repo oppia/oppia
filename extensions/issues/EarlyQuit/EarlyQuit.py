@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for recording early quit issue."""
 
 from __future__ import annotations
@@ -39,8 +38,8 @@ class EarlyQuit(base.BaseExplorationIssueSpec):
         'default_value': ''
     }, {
         'name': 'time_spent_in_exp_in_msecs',
-        'description': (
-            'Time spent in the exploration before quitting in milliseconds'),
+        'description':
+            ('Time spent in the exploration before quitting in milliseconds'),
         'schema': {
             'type': 'int',
         },

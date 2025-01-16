@@ -48,9 +48,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(suggestion_models, opportunity_models) = models.Registry.import_models(
-    [models.Names.SUGGESTION, models.Names.OPPORTUNITY]
-)
+(suggestion_models, opportunity_models) = models.Registry.import_models([
+    models.Names.SUGGESTION, models.Names.OPPORTUNITY
+])
 
 ChangeType = Dict[str, Union[str, float, Dict[str, Union[str, int,
                                                          state_domain.StateDict]]]]
@@ -71,38 +71,43 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_base_class_accept_raises_error(self) -> None:
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Subclasses of BaseSuggestion should implement accept.'):
+            NotImplementedError, 'Subclasses of BaseSuggestion should implement accept.'
+        ):
             self.base_suggestion.accept('test_message')
 
     def test_base_class_pre_accept_validate_raises_error(self) -> None:
-        with self.assertRaisesRegex(NotImplementedError,
-                                    'Subclasses of BaseSuggestion should implement'
-                                    ' pre_accept_validate.'):
+        with self.assertRaisesRegex(
+            NotImplementedError, 'Subclasses of BaseSuggestion should implement'
+            ' pre_accept_validate.'
+        ):
             self.base_suggestion.pre_accept_validate()
 
     def test_base_class_populate_old_value_of_change_raises_error(self) -> None:
-        with self.assertRaisesRegex(NotImplementedError,
-                                    'Subclasses of BaseSuggestion should implement'
-                                    ' populate_old_value_of_change.'):
+        with self.assertRaisesRegex(
+            NotImplementedError, 'Subclasses of BaseSuggestion should implement'
+            ' populate_old_value_of_change.'
+        ):
             self.base_suggestion.populate_old_value_of_change()
 
     def test_base_class_pre_update_validate_raises_error(self) -> None:
-        with self.assertRaisesRegex(NotImplementedError,
-                                    'Subclasses of BaseSuggestion should implement'
-                                    ' pre_update_validate.'):
+        with self.assertRaisesRegex(
+            NotImplementedError, 'Subclasses of BaseSuggestion should implement'
+            ' pre_update_validate.'
+        ):
             self.base_suggestion.pre_update_validate({})
 
     def test_base_class_get_all_html_content_strings(self) -> None:
-        with self.assertRaisesRegex(NotImplementedError,
-                                    'Subclasses of BaseSuggestion should implement'
-                                    ' get_all_html_content_strings.'):
+        with self.assertRaisesRegex(
+            NotImplementedError, 'Subclasses of BaseSuggestion should implement'
+            ' get_all_html_content_strings.'
+        ):
             self.base_suggestion.get_all_html_content_strings()
 
     def test_base_class_get_target_entity_html_strings(self) -> None:
-        with self.assertRaisesRegex(NotImplementedError,
-                                    'Subclasses of BaseSuggestion should implement'
-                                    ' get_target_entity_html_strings.'):
+        with self.assertRaisesRegex(
+            NotImplementedError, 'Subclasses of BaseSuggestion should implement'
+            ' get_target_entity_html_strings.'
+        ):
             self.base_suggestion.get_target_entity_html_strings()
 
     def test_base_class_convert_html_in_suggestion_change(self) -> None:
@@ -111,9 +116,10 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             """Temporary function."""
             return 'abcd'
 
-        with self.assertRaisesRegex(NotImplementedError,
-                                    'Subclasses of BaseSuggestion should implement'
-                                    ' convert_html_in_suggestion_change.'):
+        with self.assertRaisesRegex(
+            NotImplementedError, 'Subclasses of BaseSuggestion should implement'
+            ' convert_html_in_suggestion_change.'
+        ):
             self.base_suggestion.convert_html_in_suggestion_change(conversion_fn)
 
 
@@ -240,8 +246,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.suggestion_type = 'invalid_suggestion_type'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected suggestion_type to be among allowed choices'):
+            utils.ValidationError,
+            'Expected suggestion_type to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_target_type(self) -> None:
@@ -260,8 +267,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected target_type to be among allowed choices'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected target_type to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_target_id(self) -> None:
@@ -283,8 +291,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.target_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected target_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected target_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_target_version_at_submission(self) -> None:
@@ -307,8 +316,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.target_version_at_submission = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected target_version_at_submission to be an int'):
+            utils.ValidationError, 'Expected target_version_at_submission to be an int'
+        ):
             suggestion.validate()
 
     def test_validate_status(self) -> None:
@@ -327,8 +336,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.status = 'invalid_status'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected status to be among allowed choices'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected status to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_author_id(self) -> None:
@@ -350,8 +360,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.author_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected author_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected author_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_author_id_format(self) -> None:
@@ -374,8 +385,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.author_id = ''
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected author_id to be in a valid user ID format'):
+            utils.ValidationError, 'Expected author_id to be in a valid user ID format'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id(self) -> None:
@@ -397,8 +408,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected final_reviewer_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected final_reviewer_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id_format(self) -> None:
@@ -421,8 +433,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.final_reviewer_id = ''
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected final_reviewer_id to be in a valid user ID format'):
+            utils.ValidationError,
+            'Expected final_reviewer_id to be in a valid user ID format'
+        ):
             suggestion.validate()
 
     def test_validate_score_category(self) -> None:
@@ -444,8 +457,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.score_category = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected score_category to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected score_category to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_score_category_format(self) -> None:
@@ -464,15 +478,17 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'score.score_type.score_sub_type'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected score_category to be of the form'
-                                    ' score_type.score_sub_type'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected score_category to be of the form'
+            ' score_type.score_sub_type'
+        ):
             suggestion.validate()
 
         suggestion.score_category = 'invalid_score_category'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected score_category to be of the form'
-                                    ' score_type.score_sub_type'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected score_category to be of the form'
+            ' score_type.score_sub_type'
+        ):
             suggestion.validate()
 
     def test_validate_score_type(self) -> None:
@@ -492,9 +508,10 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the first part of score_category to be among allowed'
-                ' choices'):
+            utils.ValidationError,
+            'Expected the first part of score_category to be among allowed'
+            ' choices'
+        ):
             suggestion.validate()
 
     def test_validate_change(self) -> None:
@@ -516,8 +533,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.change_cmd = {}  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected change_cmd to be an ExplorationChange'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected change_cmd to be an ExplorationChange'
+        ):
             suggestion.validate()
 
     def test_validate_score_type_content(self) -> None:
@@ -537,8 +555,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.score_category = 'question.score_sub_type'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the first part of score_category to be content'):
+            utils.ValidationError,
+            'Expected the first part of score_category to be content'
+        ):
             suggestion.validate()
 
     def test_validate_change_cmd(self) -> None:
@@ -556,8 +575,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change_cmd.cmd = 'invalid_cmd'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected cmd to be edit_state_property'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected cmd to be edit_state_property'
+        ):
             suggestion.validate()
 
     def test_validate_change_property_name(self) -> None:
@@ -580,8 +600,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # which causes MyPy to throw an error. Thus to avoid the error, we used
         # ignore here.
         suggestion.change_cmd.property_name = 'invalid_property'  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected property_name to be content'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected property_name to be content'
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
@@ -603,8 +624,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.language_code = 'wrong_language_code'
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected language_code to be None, received wrong_language_code'):
+            utils.ValidationError,
+            'Expected language_code to be None, received wrong_language_code'
+        ):
             suggestion.validate()
 
     def test_pre_accept_validate_state_name(self) -> None:
@@ -627,8 +649,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.change_cmd.state_name = 'invalid_state_name'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected invalid_state_name to be a valid state name'):
+            utils.ValidationError,
+            'Expected invalid_state_name to be a valid state name'
+        ):
             suggestion.pre_accept_validate()
 
     def test_populate_old_value_of_change_with_invalid_state(self) -> None:
@@ -674,9 +697,10 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The following extra attributes are present: new_value, '
-                'old_value, property_name'):
+            utils.ValidationError,
+            'The following extra attributes are present: new_value, '
+            'old_value, property_name'
+        ):
             suggestion.pre_update_validate(
                 exp_domain.EditExpStatePropertyContentCmd(change_cmd)
             )
@@ -702,8 +726,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The new change_cmd property_name must be equal to content'):
+            utils.ValidationError,
+            'The new change_cmd property_name must be equal to content'
+        ):
             suggestion.pre_update_validate(
                 exp_domain.EditExpStatePropertyContentCmd(change_cmd)
             )
@@ -729,8 +754,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The new change_cmd state_name must be equal to state_1'):
+            utils.ValidationError,
+            'The new change_cmd state_name must be equal to state_1'
+        ):
             suggestion.pre_update_validate(
                 exp_domain.EditExpStatePropertyContentCmd(change_cmd)
             )
@@ -760,8 +786,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': new_content,
             'old_value': None
         }
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The new html must not match the old html'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The new html must not match the old html'
+        ):
             suggestion.pre_update_validate(
                 exp_domain.EditExpStatePropertyContentCmd(change_cmd)
             )
@@ -780,16 +807,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The new change_cmd cmd must be equal to edit_state_property'):
+            utils.ValidationError,
+            'The new change_cmd cmd must be equal to edit_state_property'
+        ):
             suggestion.pre_update_validate(
-                exp_domain.EditExpStatePropertyContentCmd(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 Albert title'
-                    }
-                )
+                exp_domain.EditExpStatePropertyContentCmd({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 Albert title'
+                })
             )
 
     def test_get_all_html_content_strings(self) -> None:
@@ -972,10 +998,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date
         )
 
-        change = {'cmd': exp_domain.CMD_DELETE_STATE, 'state_name': 'Introduction'}
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The new change_cmd cmd must be equal to %s' %
-                                    (exp_domain.CMD_ADD_WRITTEN_TRANSLATION)):
+        change = {
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'Introduction'
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The new change_cmd cmd must be equal to %s' %
+            (exp_domain.CMD_ADD_WRITTEN_TRANSLATION)
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_change_state_name(self) -> None:
@@ -1000,8 +1030,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The new change_cmd state_name must be equal to Introduction'):
+            utils.ValidationError,
+            'The new change_cmd state_name must be equal to Introduction'
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_change_language_code(self) -> None:
@@ -1025,8 +1056,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The language code must be equal to hi'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The language code must be equal to hi'
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_change_content_html(self) -> None:
@@ -1051,9 +1083,10 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The new change_cmd content_html must be equal to <p>This is a '
-                'content.</p>'):
+            utils.ValidationError,
+            'The new change_cmd content_html must be equal to <p>This is a '
+            'content.</p>'
+        ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_create_suggestion_add_translation(self) -> None:
@@ -1122,8 +1155,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.suggestion_type = 'invalid_suggestion_type'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected suggestion_type to be among allowed choices'):
+            utils.ValidationError,
+            'Expected suggestion_type to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_target_type(self) -> None:
@@ -1142,8 +1176,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected target_type to be among allowed choices'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected target_type to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_target_id(self) -> None:
@@ -1165,8 +1200,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.target_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected target_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected target_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_target_version_at_submission(self) -> None:
@@ -1189,8 +1225,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.target_version_at_submission = 'invalid_version'  # type: ignore[assignment]
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected target_version_at_submission to be an int'):
+            utils.ValidationError, 'Expected target_version_at_submission to be an int'
+        ):
             suggestion.validate()
 
     def test_validate_status(self) -> None:
@@ -1209,8 +1245,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.status = 'invalid_status'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected status to be among allowed choices'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected status to be among allowed choices'
+        ):
             suggestion.validate()
 
     def test_validate_author_id(self) -> None:
@@ -1232,8 +1269,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.author_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected author_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected author_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_author_id_format(self) -> None:
@@ -1253,8 +1291,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.author_id = ''
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected author_id to be in a valid user ID format.'):
+            utils.ValidationError, 'Expected author_id to be in a valid user ID format.'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id(self) -> None:
@@ -1276,8 +1314,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected final_reviewer_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected final_reviewer_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id_format(self) -> None:
@@ -1297,8 +1336,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.final_reviewer_id = ''
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected final_reviewer_id to be in a valid user ID format'):
+            utils.ValidationError,
+            'Expected final_reviewer_id to be in a valid user ID format'
+        ):
             suggestion.validate()
 
     def test_validate_score_category(self) -> None:
@@ -1320,8 +1360,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.score_category = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected score_category to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected score_category to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_score_category_format(self) -> None:
@@ -1340,15 +1381,17 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'score.score_type.score_sub_type'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected score_category to be of the form'
-                                    ' score_type.score_sub_type'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected score_category to be of the form'
+            ' score_type.score_sub_type'
+        ):
             suggestion.validate()
 
         suggestion.score_category = 'invalid_score_category'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected score_category to be of the form'
-                                    ' score_type.score_sub_type'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected score_category to be of the form'
+            ' score_type.score_sub_type'
+        ):
             suggestion.validate()
 
     def test_validate_score_type(self) -> None:
@@ -1368,9 +1411,10 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the first part of score_category to be among allowed'
-                ' choices'):
+            utils.ValidationError,
+            'Expected the first part of score_category to be among allowed'
+            ' choices'
+        ):
             suggestion.validate()
 
     def test_validate_change(self) -> None:
@@ -1392,8 +1436,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.change_cmd = {}  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected change_cmd to be an ExplorationChange'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected change_cmd to be an ExplorationChange'
+        ):
             suggestion.validate()
 
     def test_validate_score_type_translation(self) -> None:
@@ -1413,8 +1458,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.score_category = 'question.score_sub_type'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the first part of score_category to be translation'):
+            utils.ValidationError,
+            'Expected the first part of score_category to be translation'
+        ):
             suggestion.validate()
 
     def test_validate_change_cmd(self) -> None:
@@ -1433,8 +1479,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change_cmd.cmd = 'invalid_cmd'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected cmd to be add_written_translation'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected cmd to be add_written_translation'
+        ):
             suggestion.validate()
 
     def test_validate_translation_html_rte_tags(self) -> None:
@@ -1457,8 +1504,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Image tag does not have \'alt-with-value\' attribute.'):
+            utils.ValidationError,
+            'Image tag does not have \'alt-with-value\' attribute.'
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
@@ -1483,8 +1531,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.language_code = 'wrong_language_code'
 
         with self.assertRaisesRegex(
-                utils.ValidationError, 'Expected language_code to be %s, '
-                'received wrong_language_code' % expected_language_code):
+            utils.ValidationError, 'Expected language_code to be %s, '
+            'received wrong_language_code' % expected_language_code
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
@@ -1508,8 +1557,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.language_code = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'language_code cannot be None'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'language_code cannot be None'
+        ):
             suggestion.validate()
 
     def test_validate_change_with_invalid_language_code_fails_validation(self) -> None:
@@ -1528,8 +1578,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change_cmd.language_code = 'invalid_code'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid language_code: invalid_code'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language_code: invalid_code'
+        ):
             suggestion.validate()
 
     def test_pre_accept_validate_state_name(self) -> None:
@@ -1548,17 +1599,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         exp_services.update_exploration(
             self.author_id, 'exp1', [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'new_value': {
-                            'content_id': 'content',
-                            'html': '<p>This is a content.</p>'
-                        },
-                        'state_name': 'Introduction',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>This is a content.</p>'
+                    },
+                    'state_name': 'Introduction',
+                })
             ], 'Added state'
         )
 
@@ -1568,8 +1617,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.change_cmd.state_name = 'invalid_state_name'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected invalid_state_name to be a valid state name'):
+            utils.ValidationError,
+            'Expected invalid_state_name to be a valid state name'
+        ):
             suggestion.pre_accept_validate()
 
     def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
@@ -1782,18 +1832,18 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'change_cmd': {
                 'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
                 'question_dict': {
-                    'question_state_data': self._create_valid_question_data(
-                        'default_state', content_id_generator
-                    ).to_dict(),
-                    'language_code': 'en',
-                    'question_state_data_schema_version': (
-                        feconf.CURRENT_STATE_SCHEMA_VERSION
-                    ),
+                    'question_state_data':
+                        self._create_valid_question_data(
+                            'default_state', content_id_generator
+                        ).to_dict(),
+                    'language_code':
+                        'en',
+                    'question_state_data_schema_version':
+                        (feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
                     'inapplicable_skill_misconception_ids': ['skillid12345-1'],
-                    'next_content_id_index': (
-                        content_id_generator.next_content_id_index
-                    )
+                    'next_content_id_index':
+                        (content_id_generator.next_content_id_index)
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1873,8 +1923,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.score_category = 'content.score_sub_type'
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the first part of score_category to be "question"'):
+            utils.ValidationError,
+            'Expected the first part of score_category to be "question"'
+        ):
             suggestion.validate()
 
     def test_validate_change_type(self) -> None:
@@ -1898,9 +1949,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.change_cmd = 'invalid_change'  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected change_cmd to be an '
-                                    'instance of QuestionSuggestionChange'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected change_cmd to be an '
+            'instance of QuestionSuggestionChange'
+        ):
             suggestion.validate()
 
     def test_validate_change_cmd(self) -> None:
@@ -1921,8 +1973,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change_cmd.cmd = None
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected change_cmd to contain cmd'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected change_cmd to contain cmd'
+        ):
             suggestion.validate()
 
     def test_validate_change_cmd_type(self) -> None:
@@ -1944,8 +1997,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change_cmd.cmd = 'invalid_cmd'
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected cmd to be create_new_fully_specified_question'):
+            utils.ValidationError,
+            'Expected cmd to be create_new_fully_specified_question'
+        ):
             suggestion.validate()
 
     def test_validate_change_question_dict(self) -> None:
@@ -1969,8 +2023,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.change_cmd.question_dict = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected change_cmd to contain question_dict'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected change_cmd to contain question_dict'
+        ):
             suggestion.validate()
 
     def test_validate_change_question_state_data_schema_version(self) -> None:
@@ -2000,9 +2055,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         question_dict['question_state_data_schema_version'] = 0
         suggestion.change_cmd.question_dict = question_dict
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected question state schema version to be %s, '
-                                    'received 0' % feconf.CURRENT_STATE_SCHEMA_VERSION):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected question state schema version to be %s, '
+            'received 0' % feconf.CURRENT_STATE_SCHEMA_VERSION
+        ):
             suggestion.validate()
 
     def test_validate_change_skill_difficulty_none(self) -> None:
@@ -2024,8 +2080,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.change_cmd.skill_difficulty = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected change_cmd to contain skill_difficulty'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected change_cmd to contain skill_difficulty'
+        ):
             suggestion.validate()
 
     def test_validate_change_skill_difficulty_invalid_value(self) -> None:
@@ -2045,8 +2102,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change_cmd.skill_difficulty = 0.4
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected change_cmd skill_difficulty to be one of '):
+            utils.ValidationError, 'Expected change_cmd skill_difficulty to be one of '
+        ):
             suggestion.validate()
 
     def test_pre_accept_validate_change_skill_id(self) -> None:
@@ -2074,8 +2131,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.change_cmd.skill_id = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected change_cmd to contain skill_id'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected change_cmd to contain skill_id'
+        ):
             suggestion.pre_accept_validate()
 
     def test_pre_accept_validate_change_invalid_skill_id(self) -> None:
@@ -2100,8 +2158,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change_cmd.skill_id = skill_services.get_new_skill_id()
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The skill with the given id doesn\'t exist.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The skill with the given id doesn\'t exist.'
+        ):
             suggestion.pre_accept_validate()
 
     def test_populate_old_value_of_change(self) -> None:
@@ -2142,8 +2201,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change_cmd.skill_id = skill_services.get_new_skill_id()
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The skill with the given id doesn\'t exist.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The skill with the given id doesn\'t exist.'
+        ):
             suggestion.accept('commit message')
 
     def test_pre_update_validate_change_cmd(self) -> None:
@@ -2169,9 +2229,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'The new change_cmd cmd must be equal to '
-                                    'create_new_fully_specified_question'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The new change_cmd cmd must be equal to '
+            'create_new_fully_specified_question'
+        ):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change)
             )  # type: ignore[arg-type]
@@ -2194,21 +2255,23 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator
-                ).to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data':
+                    self._create_valid_question_data(
+                        'default_state', content_id_generator
+                    ).to_dict(),
+                'language_code':
+                    'en',
+                'question_state_data_schema_version':
+                    (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'next_content_id_index': (content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_2'
         }
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'The new change_cmd skill_id must be equal to skill_1'):
+            utils.ValidationError,
+            'The new change_cmd skill_id must be equal to skill_1'
+        ):
             suggestion.pre_update_validate(
                 question_domain.CreateNewFullySpecifiedQuestionCmd(change)
             )
@@ -2218,13 +2281,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator
-                ).to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data':
+                    self._create_valid_question_data(
+                        'default_state', content_id_generator
+                    ).to_dict(),
+                'language_code':
+                    'en',
+                'question_state_data_schema_version':
+                    (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'next_content_id_index': (content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
@@ -2241,13 +2305,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator
-                ).to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data':
+                    self._create_valid_question_data(
+                        'default_state', content_id_generator
+                    ).to_dict(),
+                'language_code':
+                    'en',
+                'question_state_data_schema_version':
+                    (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'next_content_id_index': (content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
@@ -2255,9 +2320,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         }
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'At least one of the new skill_difficulty or question_dict '
-                'should be changed.'):
+            utils.ValidationError,
+            'At least one of the new skill_difficulty or question_dict '
+            'should be changed.'
+        ):
             suggestion.pre_update_validate(
                 question_domain.
                 CreateNewFullySpecifiedQuestionSuggestionCmd(new_change)
@@ -2270,13 +2336,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator
-                ).to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data':
+                    self._create_valid_question_data(
+                        'default_state', content_id_generator
+                    ).to_dict(),
+                'language_code':
+                    'en',
+                'question_state_data_schema_version':
+                    (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'next_content_id_index': (content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
@@ -2293,13 +2360,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator
-                ).to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data':
+                    self._create_valid_question_data(
+                        'default_state', content_id_generator
+                    ).to_dict(),
+                'language_code':
+                    'en',
+                'question_state_data_schema_version':
+                    (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'next_content_id_index': (content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
@@ -2324,13 +2392,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator
-                ).to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data':
+                    self._create_valid_question_data(
+                        'default_state', content_id_generator
+                    ).to_dict(),
+                'language_code':
+                    'en',
+                'question_state_data_schema_version':
+                    (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'next_content_id_index': (content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
@@ -2347,13 +2416,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator
-                ).to_dict(),
-                'language_code': 'hi',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data':
+                    self._create_valid_question_data(
+                        'default_state', content_id_generator
+                    ).to_dict(),
+                'language_code':
+                    'hi',
+                'question_state_data_schema_version':
+                    (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'next_content_id_index': (content_id_generator.next_content_id_index)
             },
             'skill_id': 'skill_1',
@@ -2392,8 +2462,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.author_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected author_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected author_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_author_id_format(self) -> None:
@@ -2413,8 +2484,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.author_id = ''
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected author_id to be in a valid user ID format.'):
+            utils.ValidationError, 'Expected author_id to be in a valid user ID format.'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id(self) -> None:
@@ -2436,8 +2507,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected final_reviewer_id to be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected final_reviewer_id to be a string'
+        ):
             suggestion.validate()
 
     def test_validate_final_reviewer_id_format(self) -> None:
@@ -2457,8 +2529,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.final_reviewer_id = ''
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected final_reviewer_id to be in a valid user ID format'):
+            utils.ValidationError,
+            'Expected final_reviewer_id to be in a valid user ID format'
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
@@ -2489,9 +2562,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         expected_question_dict['language_code'] = 'wrong_language_code'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected question language_code.wrong_language_code. to be same '
-                'as suggestion language_code.en.'):
+            utils.ValidationError,
+            'Expected question language_code.wrong_language_code. to be same '
+            'as suggestion language_code.en.'
+        ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
@@ -2515,8 +2589,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.language_code = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected language_code to be en, received None'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected language_code to be en, received None'
+        ):
             suggestion.validate()
 
     def test_get_all_html_content_strings(self) -> None:
@@ -2643,9 +2718,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'question_dict': {
                     'question_state_data': question_state_dict,
                     'language_code': 'en',
-                    'question_state_data_schema_version': (
-                        feconf.CURRENT_STATE_SCHEMA_VERSION
-                    ),
+                    'question_state_data_schema_version':
+                        (feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
                     'inapplicable_skill_misconception_ids': ['skillid12345-1']
                 },
@@ -2690,8 +2764,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'default_state', content_id_generator
         ).to_dict()
         question_state_dict['content']['html'] = html_content
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         fs_services.save_original_and_compressed_versions_of_image(
@@ -2711,16 +2786,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'change_cmd': {
                 'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
                 'question_dict': {
-                    'question_state_data': question_state_dict,
-                    'language_code': 'en',
-                    'question_state_data_schema_version': (
-                        feconf.CURRENT_STATE_SCHEMA_VERSION
-                    ),
+                    'question_state_data':
+                        question_state_dict,
+                    'language_code':
+                        'en',
+                    'question_state_data_schema_version':
+                        (feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
                     'inapplicable_skill_misconception_ids': [],
-                    'next_content_id_index': (
-                        content_id_generator.next_content_id_index
-                    )
+                    'next_content_id_index':
+                        (content_id_generator.next_content_id_index)
                 },
                 'skill_id': 'skill1',
                 'skill_difficulty': 0.3,
@@ -2741,8 +2816,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.accept('commit_message')
 
     def test_accept_suggestion_with_image_region_interactions(self) -> None:
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             original_image_content = f.read()
         fs_services.save_original_and_compressed_versions_of_image(
             'image.png', 'question_suggestions', 'skill1', original_image_content,
@@ -2750,19 +2826,17 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         )
 
         image_and_region_ca_dict: domain.ImageAndRegionDict = {
-            'imagePath': 'image.png',
-            'labeledRegions': [
-                {
-                    'label': 'Region1',
-                    'region': {
-                        'regionType': 'Rectangle',
-                        'area': [
-                            [0.2644628099173554, 0.21807065217391305],
-                            [0.9201101928374655, 0.8847373188405797]
-                        ]
-                    }
+            'imagePath':
+                'image.png',
+            'labeledRegions': [{
+                'label': 'Region1',
+                'region': {
+                    'regionType':
+                        'Rectangle',
+                    'area': [[0.2644628099173554, 0.21807065217391305],
+                             [0.9201101928374655, 0.8847373188405797]]
                 }
-            ]
+            }]
         }
 
         # Here, the expected type for `solution` key is SolutionDict but
@@ -2777,32 +2851,28 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'linked_skill_id': None,
             'interaction': {
-                'answer_groups': [
-                    {
-                        'rule_specs': [
-                            {
-                                'rule_type': 'IsInRegion',
-                                'inputs': {
-                                    'x': 'Region1'
-                                }
-                            }
-                        ],
-                        'outcome': {
-                            'dest': None,
-                            'dest_if_really_stuck': None,
-                            'feedback': {
-                                'html': '<p>assas</p>',
-                                'content_id': 'feedback_2'
-                            },
-                            'labelled_as_correct': True,
-                            'param_changes': [],
-                            'refresher_exploration_id': None,
-                            'missing_prerequisite_skill_id': None
+                'answer_groups': [{
+                    'rule_specs': [{
+                        'rule_type': 'IsInRegion',
+                        'inputs': {
+                            'x': 'Region1'
+                        }
+                    }],
+                    'outcome': {
+                        'dest': None,
+                        'dest_if_really_stuck': None,
+                        'feedback': {
+                            'html': '<p>assas</p>',
+                            'content_id': 'feedback_2'
                         },
-                        'training_data': [],
-                        'tagged_skill_misconception_id': None
-                    }
-                ],
+                        'labelled_as_correct': True,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'imageAndRegions': {
@@ -2824,14 +2894,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None
                 },
-                'hints': [
-                    {
-                        'hint_content': {
-                            'html': '<p>assaas</p>',
-                            'content_id': 'hint_3'
-                        }
+                'hints': [{
+                    'hint_content': {
+                        'html': '<p>assaas</p>',
+                        'content_id': 'hint_3'
                     }
-                ],
+                }],
                 'id': 'ImageClickInput',
                 'solution': None
             },
@@ -2862,9 +2930,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'question_dict': {
                     'question_state_data': question_state_dict,
                     'language_code': 'en',
-                    'question_state_data_schema_version': (
-                        feconf.CURRENT_STATE_SCHEMA_VERSION
-                    ),
+                    'question_state_data_schema_version':
+                        (feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill1'],
                     'next_content_id_index': 4,
                     'inapplicable_skill_misconception_ids': []
@@ -2955,8 +3022,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected state schema version to be in between 25'):
+            utils.ValidationError, 'Expected state schema version to be in between 25'
+        ):
             suggestion_registry.SuggestionAddQuestion(
                 'suggestionId', 'target_id', 1, suggestion_models.STATUS_IN_REVIEW,
                 self.author_id, 'test_reviewer', change, score_category, 'en', False,
@@ -2967,9 +3034,15 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the CommunityContributionStats class."""
 
-    translation_reviewer_counts_by_lang_code: Dict[str, int] = {'hi': 0, 'en': 1}
+    translation_reviewer_counts_by_lang_code: Dict[str, int] = {
+        'hi': 0,
+        'en': 1
+    }
 
-    translation_suggestion_counts_by_lang_code: Dict[str, int] = {'fr': 6, 'en': 5}
+    translation_suggestion_counts_by_lang_code: Dict[str, int] = {
+        'fr': 6,
+        'en': 5
+    }
 
     question_reviewer_count: int = 1
     question_suggestion_count: int = 4
@@ -3040,8 +3113,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            (community_contribution_stats.translation_reviewer_counts_by_lang_code),
-            {self.sample_language_code: 2}
+            (community_contribution_stats.translation_reviewer_counts_by_lang_code), {
+                self.sample_language_code: 2
+            }
         )
 
     def test_set_translation_reviewer_count_for_lang_code_updates_count_value(
@@ -3063,8 +3137,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            (community_contribution_stats.translation_reviewer_counts_by_lang_code),
-            {self.sample_language_code: 2}
+            (community_contribution_stats.translation_reviewer_counts_by_lang_code), {
+                self.sample_language_code: 2
+            }
         )
 
     def test_set_translation_reviewer_count_for_lang_code_adds_new_lang_key(
@@ -3106,8 +3181,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            (community_contribution_stats.translation_suggestion_counts_by_lang_code),
-            {self.sample_language_code: 2}
+            (community_contribution_stats.translation_suggestion_counts_by_lang_code), {
+                self.sample_language_code: 2
+            }
         )
 
     def test_set_translation_suggestion_count_for_lang_code_updates_count_value(
@@ -3129,8 +3205,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            (community_contribution_stats.translation_suggestion_counts_by_lang_code),
-            {self.sample_language_code: 2}
+            (community_contribution_stats.translation_suggestion_counts_by_lang_code), {
+                self.sample_language_code: 2
+            }
         )
 
     def test_set_translation_suggestion_count_for_lang_code_adds_new_lang_key(
@@ -3210,14 +3287,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                platform_parameter_list.ParamName.
-                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1
-            )  # pylint: disable=line-too-long
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1)  # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_are_needed_if_num_suggestions_past_max(self) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
@@ -3235,14 +3307,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(reviewers_are_needed)
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                platform_parameter_list.ParamName.
-                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1
-            )  # pylint: disable=line-too-long
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1)  # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_not_needed_if_num_suggestions_eqs_max(self) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
@@ -3260,14 +3327,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(reviewers_are_needed)
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                platform_parameter_list.ParamName.
-                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1
-            )  # pylint: disable=line-too-long
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1)  # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_not_needed_if_num_suggestions_less_max(self) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
@@ -3317,14 +3379,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(stats.are_question_reviewers_needed())
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                platform_parameter_list.ParamName.
-                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1
-            )  # pylint: disable=line-too-long
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1)  # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_are_needed_if_num_suggestions_past_max(self) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
@@ -3334,14 +3391,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(reviewers_are_needed)
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                platform_parameter_list.ParamName.
-                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1
-            )  # pylint: disable=line-too-long
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1)  # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_not_needed_if_num_suggestions_eqs_max(self) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
@@ -3351,14 +3403,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(reviewers_are_needed)
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                platform_parameter_list.ParamName.
-                MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1
-            )  # pylint: disable=line-too-long
-        ]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1)  # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_not_needed_if_num_suggestions_less_max(self) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 1
@@ -3388,10 +3435,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the translation reviewer count to be non-negative for '
-                '%s language code, received: %s.' %
-            (self.sample_language_code, self.negative_count)):
+            utils.ValidationError,
+            'Expected the translation reviewer count to be non-negative for '
+            '%s language code, received: %s.' %
+            (self.sample_language_code, self.negative_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_negative_counts(
@@ -3408,10 +3456,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the translation suggestion count to be non-negative for '
-                '%s language code, received: %s.' %
-            (self.sample_language_code, self.negative_count)):
+            utils.ValidationError,
+            'Expected the translation suggestion count to be non-negative for '
+            '%s language code, received: %s.' %
+            (self.sample_language_code, self.negative_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_question_reviewer_count_fails_for_negative_count(self) -> None:
@@ -3421,10 +3470,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats.question_reviewer_count = (self.negative_count)
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the question reviewer count to be non-negative, '
-                'received: %s.' %
-            (community_contribution_stats.question_reviewer_count)):
+            utils.ValidationError,
+            'Expected the question reviewer count to be non-negative, '
+            'received: %s.' % (community_contribution_stats.question_reviewer_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_question_suggestion_count_fails_for_negative_count(self) -> None:
@@ -3434,10 +3483,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         community_contribution_stats.question_suggestion_count = (self.negative_count)
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the question suggestion count to be non-negative, '
-                'received: %s.' %
-            (community_contribution_stats.question_suggestion_count)):
+            utils.ValidationError,
+            'Expected the question suggestion count to be non-negative, '
+            'received: %s.' % (community_contribution_stats.question_suggestion_count)
+        ):
             community_contribution_stats.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3457,10 +3506,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the translation reviewer count to be an integer for '
-                '%s language code, received: %s.' %
-            (self.sample_language_code, self.non_integer_count)):
+            utils.ValidationError,
+            'Expected the translation reviewer count to be an integer for '
+            '%s language code, received: %s.' %
+            (self.sample_language_code, self.non_integer_count)
+        ):
             community_contribution_stats.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3480,10 +3530,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the translation suggestion count to be an integer for '
-                '%s language code, received: %s.' %
-            (self.sample_language_code, self.non_integer_count)):
+            utils.ValidationError,
+            'Expected the translation suggestion count to be an integer for '
+            '%s language code, received: %s.' %
+            (self.sample_language_code, self.non_integer_count)
+        ):
             community_contribution_stats.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3498,10 +3549,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the question reviewer count to be an integer, '
-                'received: %s.' %
-            (community_contribution_stats.question_reviewer_count)):
+            utils.ValidationError,
+            'Expected the question reviewer count to be an integer, '
+            'received: %s.' % (community_contribution_stats.question_reviewer_count)
+        ):
             community_contribution_stats.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -3518,10 +3569,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected the question suggestion count to be an integer, '
-                'received: %s.' %
-            (community_contribution_stats.question_suggestion_count)):
+            utils.ValidationError,
+            'Expected the question suggestion count to be an integer, '
+            'received: %s.' % (community_contribution_stats.question_suggestion_count)
+        ):
             community_contribution_stats.validate()
 
     def test_validate_translation_reviewer_counts_fails_for_invalid_lang_code(
@@ -3538,9 +3589,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Invalid language code for the translation reviewer counts: '
-                '%s.' % self.invalid_language_code):
+            utils.ValidationError,
+            'Invalid language code for the translation reviewer counts: '
+            '%s.' % self.invalid_language_code
+        ):
             community_contribution_stats.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_invalid_lang_code(
@@ -3557,9 +3609,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Invalid language code for the translation suggestion counts: '
-                '%s.' % self.invalid_language_code):
+            utils.ValidationError,
+            'Invalid language code for the translation suggestion counts: '
+            '%s.' % self.invalid_language_code
+        ):
             community_contribution_stats.validate()
 
 
@@ -3617,9 +3670,8 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             'reviewed_translation_word_count': (self.REVIEWED_TRANSLATION_WORD_COUNT),
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
             'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            'accepted_translations_with_reviewer_edits_count': (
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_translations_with_reviewer_edits_count':
+                (self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
             'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
             'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
         }
@@ -3652,9 +3704,8 @@ class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
             'topic_id': self.TOPIC_ID,
             'submitted_questions_count': (self.SUBMITTED_QUESTION_COUNT),
             'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_without_reviewer_edits_count': (
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_questions_without_reviewer_edits_count':
+                (self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE),
             'last_contribution_date': (self.LAST_CONTRIBUTION_DATE)
         }
@@ -3686,9 +3737,8 @@ class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
             'topic_id': self.TOPIC_ID,
             'reviewed_questions_count': self.REVIEWED_QUESTIONS_COUNT,
             'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_with_reviewer_edits_count': (
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_questions_with_reviewer_edits_count':
+                (self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE),
             'last_contribution_date': self.LAST_CONTRIBUTION_DATE
         }
@@ -3762,9 +3812,8 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             'submitted_translations_count': self.SUBMITTED_TRANSLATIONS_COUNT,
             'submitted_translation_word_count': (self.SUBMITTED_TRANSLATION_WORD_COUNT),
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
-            'accepted_translations_without_reviewer_edits_count': (
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_translations_without_reviewer_edits_count':
+                (self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
             'rejected_translations_count': self.REJECTED_TRANSLATIONS_COUNT,
             'rejected_translation_word_count': (self.REJECTED_TRANSLATION_WORD_COUNT),
@@ -3778,9 +3827,8 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             'reviewed_translation_word_count': (self.REVIEWED_TRANSLATION_WORD_COUNT),
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
             'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            'accepted_translations_with_reviewer_edits_count': (
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_translations_with_reviewer_edits_count':
+                (self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
             'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
             'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
         }
@@ -3789,9 +3837,8 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             'topic_id': self.TOPIC_ID,
             'submitted_questions_count': (self.SUBMITTED_QUESTION_COUNT),
             'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_without_reviewer_edits_count': (
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_questions_without_reviewer_edits_count':
+                (self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE),
             'last_contribution_date': (self.LAST_CONTRIBUTION_DATE)
         }
@@ -3800,9 +3847,8 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             'topic_id': self.TOPIC_ID,
             'reviewed_questions_count': self.REVIEWED_QUESTIONS_COUNT,
             'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_with_reviewer_edits_count': (
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_questions_with_reviewer_edits_count':
+                (self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE),
             'last_contribution_date': self.LAST_CONTRIBUTION_DATE
         }
@@ -3913,26 +3959,27 @@ class TranslationSubmitterTotalContributionStatsUnitTests(test_utils.GenericTest
             next_subtopic_id=1
         )
         expected_frontend_dict = {
-            'language_code': self.SUGGESTION_LANGUAGE_CODE,
-            'contributor_name': username,
+            'language_code':
+                self.SUGGESTION_LANGUAGE_CODE,
+            'contributor_name':
+                username,
             'topic_names': (self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
-            'recent_performance': self.RECENT_PERFORMANCE,
-            'overall_accuracy': self.OVERALL_ACCURACY,
+            'recent_performance':
+                self.RECENT_PERFORMANCE,
+            'overall_accuracy':
+                self.OVERALL_ACCURACY,
             'submitted_translations_count': (self.SUBMITTED_TRANSLATIONS_COUNT),
             'submitted_translation_word_count': (self.SUBMITTED_TRANSLATION_WORD_COUNT),
             'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
-            'accepted_translations_without_reviewer_edits_count': (
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_translations_without_reviewer_edits_count':
+                (self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
             'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
             'rejected_translation_word_count': (self.REJECTED_TRANSLATION_WORD_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')
-            ),
-            'last_contributed_in_days': (
-                utils.get_number_of_days_since_date(self.LAST_CONTRIBUTION_DATE)
-            )
+            'first_contribution_date':
+                (self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'last_contributed_in_days':
+                (utils.get_number_of_days_since_date(self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.TranslationSubmitterTotalContributionStats( # pylint: disable=line-too-long
@@ -4008,22 +4055,21 @@ class TranslationReviewerTotalContributionStatsUnitTests(test_utils.GenericTestB
             next_subtopic_id=1
         )
         expected_stats_dict = {
-            'language_code': self.SUGGESTION_LANGUAGE_CODE,
-            'contributor_name': username,
+            'language_code':
+                self.SUGGESTION_LANGUAGE_CODE,
+            'contributor_name':
+                username,
             'topic_names': (self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
             'reviewed_translations_count': (self.REVIEWED_TRANSLATIONS_COUNT),
             'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
-            'accepted_translations_with_reviewer_edits_count': (
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_translations_with_reviewer_edits_count':
+                (self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
             'accepted_translation_word_count': (self.ACCEPTED_TRANSLATION_WORD_COUNT),
             'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')
-            ),
-            'last_contributed_in_days': (
-                utils.get_number_of_days_since_date(self.LAST_CONTRIBUTION_DATE)
-            )
+            'first_contribution_date':
+                (self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'last_contributed_in_days':
+                (utils.get_number_of_days_since_date(self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.TranslationReviewerTotalContributionStats( # pylint: disable=line-too-long
@@ -4099,22 +4145,22 @@ class QuestionSubmitterTotalContributionStatsUnitTests(test_utils.GenericTestBas
             next_subtopic_id=1
         )
         expected_stats_dict = {
-            'contributor_name': username,
+            'contributor_name':
+                username,
             'topic_names': (self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
-            'recent_performance': self.RECENT_PERFORMANCE,
-            'overall_accuracy': self.OVERALL_ACCURACY,
+            'recent_performance':
+                self.RECENT_PERFORMANCE,
+            'overall_accuracy':
+                self.OVERALL_ACCURACY,
             'submitted_questions_count': (self.SUBMITTED_QUESTIONS_COUNT),
             'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_without_reviewer_edits_count': (
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_questions_without_reviewer_edits_count':
+                (self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             'rejected_questions_count': (self.REJECTED_QUESTIONS_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')
-            ),
-            'last_contributed_in_days': (
-                utils.get_number_of_days_since_date(self.LAST_CONTRIBUTION_DATE)
-            )
+            'first_contribution_date':
+                (self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'last_contributed_in_days':
+                (utils.get_number_of_days_since_date(self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.QuestionSubmitterTotalContributionStats( # pylint: disable=line-too-long
@@ -4184,20 +4230,18 @@ class QuestionReviewerTotalContributionStatsUnitTests(test_utils.GenericTestBase
             next_subtopic_id=1
         )
         expected_stats_dict = {
-            'contributor_name': username,
+            'contributor_name':
+                username,
             'topic_names': (self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
             'reviewed_questions_count': (self.REVIEWED_QUESTIONS_COUNT),
             'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_with_reviewer_edits_count': (
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
-            ),
+            'accepted_questions_with_reviewer_edits_count':
+                (self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             'rejected_questions_count': (self.REJECTED_QUESTIONS_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')
-            ),
-            'last_contributed_in_days': (
-                utils.get_number_of_days_since_date(self.LAST_CONTRIBUTION_DATE)
-            )
+            'first_contribution_date':
+                (self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'last_contributed_in_days':
+                (utils.get_number_of_days_since_date(self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.QuestionReviewerTotalContributionStats( # pylint: disable=line-too-long

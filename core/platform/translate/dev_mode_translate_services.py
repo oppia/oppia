@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides translate_text functionality from the cloud translate emulator.
 Responses are prepopulated, to add additional translations, use:
     CLIENT.add_expected_response(
@@ -28,9 +27,7 @@ from core.platform.translate import cloud_translate_services
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
 
-def translate_text(
-        text: str, source_language: str, target_language: str
-) -> str:
+def translate_text(text: str, source_language: str, target_language: str) -> str:
     """Translates text into the target language.
 
     For more information on ISO 639-1 see:

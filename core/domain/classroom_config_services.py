@@ -29,7 +29,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import classroom_models
     from mypy_imports import transaction_services
 
-(classroom_models, ) = models.Registry.import_models([models.Names.CLASSROOM])
+(classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
 transaction_services = models.Registry.import_transaction_services()
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
@@ -61,8 +61,7 @@ def get_classroom_id_to_classroom_name_dict() -> Dict[str, str]:
         value for all the classrooms present in the datastore.
     """
     return {
-        classroom.classroom_id: classroom.name
-        for classroom in
+        classroom.classroom_id: classroom.name for classroom in
         sorted(get_all_classrooms(), key=lambda classroom: classroom.index)
     }
 

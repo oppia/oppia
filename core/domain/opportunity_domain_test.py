@@ -29,38 +29,34 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.mock_supported_audio_languages = [
-            {
-                'id': 'en'
-            }, {
-                'id': 'hi'
-            }, {
-                'id': 'hi-en'
-            }
-        ]
+        self.mock_supported_audio_languages = [{
+            'id': 'en'
+        }, {
+            'id': 'hi'
+        }, {
+            'id': 'hi-en'
+        }]
         self.mock_supported_audio_languages_context = self.swap(
             constants, 'SUPPORTED_AUDIO_LANGUAGES', self.mock_supported_audio_languages
         )
 
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary = (
-                opportunity_domain.ExplorationOpportunitySummary.from_dict(
-                    {
-                        'id': 'exp_1',
-                        'topic_id': 'topic_1',
-                        'topic_name': 'A topic',
-                        'story_id': 'story_1',
-                        'story_title': 'A new story',
-                        'chapter_title': 'A new chapter',
-                        'content_count': 5,
-                        'incomplete_translation_language_codes': ['hi-en'],
-                        'translation_counts': {},
-                        'language_codes_needing_voice_artists': ['en'],
-                        'language_codes_with_assigned_voice_artists': ['hi'],
-                        'translation_in_review_counts': {},
-                        'is_pinned': False
-                    }
-                )
+                opportunity_domain.ExplorationOpportunitySummary.from_dict({
+                    'id': 'exp_1',
+                    'topic_id': 'topic_1',
+                    'topic_name': 'A topic',
+                    'story_id': 'story_1',
+                    'story_title': 'A new story',
+                    'chapter_title': 'A new chapter',
+                    'content_count': 5,
+                    'incomplete_translation_language_codes': ['hi-en'],
+                    'translation_counts': {},
+                    'language_codes_needing_voice_artists': ['en'],
+                    'language_codes_with_assigned_voice_artists': ['hi'],
+                    'translation_in_review_counts': {},
+                    'is_pinned': False
+                })
             )
         # Re-initializing this swap, so that we can use this in test method.
         self.mock_supported_audio_languages_context = self.swap(
@@ -130,7 +126,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             set(need_voice_artist_languages
-                ).isdisjoint(assigned_voice_artist_languages)
+               ).isdisjoint(assigned_voice_artist_languages)
         )
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
@@ -147,7 +143,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             )
             self.assertFalse(
                 set(need_voice_artist_languages
-                    ).isdisjoint(assigned_voice_artist_languages)
+                   ).isdisjoint(assigned_voice_artist_languages)
             )
 
             self._assert_validation_error(
@@ -162,12 +158,16 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
     def test_translation_counts_with_invalid_language_code_fails_validation(
         self
     ) -> None:
-        self.valid_exp_opp_summary.translation_counts = {'hi': 4}
+        self.valid_exp_opp_summary.translation_counts = {
+            'hi': 4
+        }
         with self.mock_supported_audio_languages_context:
             # Object with valid language_code in translation_counts passes the
             # validation.
             self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.translation_counts = {'invalid_language_code': 4}
+            self.valid_exp_opp_summary.translation_counts = {
+                'invalid_language_code': 4
+            }
             # Object with chapter_id as boolean fails the validation check.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
@@ -175,12 +175,16 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             )
 
     def test_translation_counts_with_invalid_count_fails_validation(self) -> None:
-        self.valid_exp_opp_summary.translation_counts = {'hi': 4}
+        self.valid_exp_opp_summary.translation_counts = {
+            'hi': 4
+        }
         with self.mock_supported_audio_languages_context:
             # Object with valid language_code in translation_counts passes the
             # validation.
             self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.translation_counts = {'hi': -5}
+            self.valid_exp_opp_summary.translation_counts = {
+                'hi': -5
+            }
             # Object with invalid language_code in translation_counts fails the
             # validation.
             self._assert_validation_error(
@@ -191,12 +195,16 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_translation_counts_with_invalid_count_value_fails_validation(self) -> None:
         self.valid_exp_opp_summary.content_count = 5
-        self.valid_exp_opp_summary.translation_counts = {'hi': 4}
+        self.valid_exp_opp_summary.translation_counts = {
+            'hi': 4
+        }
         with self.mock_supported_audio_languages_context:
             # Object with valid count value i.e, less than or equal to
             # content_count in translation_counts passes the validation.
             self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.translation_counts = {'hi': 8}
+            self.valid_exp_opp_summary.translation_counts = {
+                'hi': 8
+            }
             # Object with invalid count value i.e, more than content_count
             # in translation_counts fails the validation.
             self._assert_validation_error(

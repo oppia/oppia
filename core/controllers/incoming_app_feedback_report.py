@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the incoming app feedback reports."""
 
 from __future__ import annotations
@@ -23,9 +22,9 @@ from core.domain import app_feedback_report_services
 
 from typing import Dict, TypedDict
 
-
 USER_SUPPLIED_FEEDBACK_DICT_SCHEMA = {
-    'type': 'dict',
+    'type':
+        'dict',
     'properties': [{
         'name': 'report_type',
         'schema': {
@@ -52,9 +51,9 @@ USER_SUPPLIED_FEEDBACK_DICT_SCHEMA = {
     }]
 }
 
-
 ANDROID_SYSTEM_CONTEXT_DICT_SCHEMA = {
-    'type': 'dict',
+    'type':
+        'dict',
     'properties': [{
         'name': 'platform_version',
         'schema': {
@@ -78,9 +77,9 @@ ANDROID_SYSTEM_CONTEXT_DICT_SCHEMA = {
     }]
 }
 
-
 ANDROID_DEVICE_CONTEXT_DICT_SCHEMA = {
-    'type': 'dict',
+    'type':
+        'dict',
     'properties': [{
         'name': 'android_device_model',
         'schema': {
@@ -104,9 +103,9 @@ ANDROID_DEVICE_CONTEXT_DICT_SCHEMA = {
     }]
 }
 
-
 ENTRY_POINT_DICT_SCHEMA = {
-    'type': 'dict',
+    'type':
+        'dict',
     'properties': [{
         'name': 'entry_point_name',
         'schema': {
@@ -135,9 +134,9 @@ ENTRY_POINT_DICT_SCHEMA = {
     }]
 }
 
-
 ANDROID_APP_CONTEXT_DICT_SCHEMA = {
-    'type': 'dict',
+    'type':
+        'dict',
     'properties': [{
         'name': 'entry_point',
         'schema': ENTRY_POINT_DICT_SCHEMA
@@ -200,10 +199,8 @@ class IncomingAndroidFeedbackReportHandlerNormalizedPayloadDict(TypedDict):
 
 
 class IncomingAndroidFeedbackReportHandler(
-    base.BaseHandler[
-        IncomingAndroidFeedbackReportHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[IncomingAndroidFeedbackReportHandlerNormalizedPayloadDict,
+                     Dict[str, str]]
 ):
     """Handles incoming android feedback reports from the app."""
 
@@ -212,7 +209,8 @@ class IncomingAndroidFeedbackReportHandler(
         'POST': {
             'report': {
                 'schema': {
-                    'type': 'dict',
+                    'type':
+                        'dict',
                     'properties': [{
                         'name': 'platform_type',
                         'schema': {
@@ -261,12 +259,14 @@ class IncomingAndroidFeedbackReportHandler(
         assert self.normalized_payload is not None
         report_dict = self.normalized_payload['report']
         report_obj = (
-            app_feedback_report_domain.AppFeedbackReport.from_submitted_feedback_dict(  # pylint: disable=line-too-long
+            app_feedback_report_domain.AppFeedbackReport.
+            from_submitted_feedback_dict(  # pylint: disable=line-too-long
                 report_dict
             )
         )
         app_feedback_report_services.save_feedback_report_to_storage(
-            report_obj, new_incoming_report=True)
+            report_obj, new_incoming_report=True
+        )
         app_feedback_report_services.store_incoming_report_stats(report_obj)
 
         return self.render_json({})

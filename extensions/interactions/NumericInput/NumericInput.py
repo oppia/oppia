@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for NumericInput interaction."""
 
 from __future__ import annotations
@@ -31,8 +30,7 @@ class NumericInput(base.BaseInteraction):
     """Interaction for numeric input."""
 
     name: str = 'Number Input'
-    description: str = (
-        'Allows learners to enter integers and floating point numbers.')
+    description: str = ('Allows learners to enter integers and floating point numbers.')
     display_mode: str = base.DISPLAY_MODE_INLINE
     is_trainable: bool = False
     _dependency_ids: List[str] = []
@@ -45,8 +43,7 @@ class NumericInput(base.BaseInteraction):
 
     _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'requireNonnegativeInput',
-        'description': (
-            'Allow only input greater than or equal to zero.'),
+        'description': ('Allow only input greater than or equal to zero.'),
         'schema': {
             'type': 'bool'
         },

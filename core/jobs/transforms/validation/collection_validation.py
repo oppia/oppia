@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Beam DoFns and PTransforms to provide validation of collection models."""
 
 from __future__ import annotations
@@ -29,24 +28,23 @@ from core.platform import models
 from typing import Iterator, List, Optional, Tuple, Type, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import collection_models
 
 (collection_models,) = models.Registry.import_models([models.Names.COLLECTION])
 
 
-@validation_decorators.AuditsExisting(
-    collection_models.CollectionSnapshotMetadataModel)
+@validation_decorators.AuditsExisting(collection_models.CollectionSnapshotMetadataModel)
 class ValidateCollectionSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
-        collection_models.CollectionSnapshotMetadataModel
-    ]
+        collection_models.CollectionSnapshotMetadataModel]
 ):
     """Overrides _get_change_domain_class for CollectionSnapshotMetadataModel.
     """
 
     def _get_change_domain_class(
-        self, input_model: collection_models.CollectionSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        input_model: collection_models.CollectionSnapshotMetadataModel  # pylint: disable=unused-argument
     ) -> Type[collection_domain.CollectionChange]:
         """Returns a change domain class.
 
@@ -63,15 +61,8 @@ class ValidateCollectionSnapshotMetadataModel(
 @validation_decorators.RelationshipsOf(collection_models.CollectionSummaryModel)
 def collection_summary_model_relationships(
     model: Type[collection_models.CollectionSummaryModel]
-) -> Iterator[
-    Tuple[
-        model_property.PropertyType,
-        List[Type[Union[
-            collection_models.CollectionModel,
-            collection_models.CollectionRightsModel
-        ]]]
-    ]
-]:
+) -> Iterator[Tuple[model_property.PropertyType, List[Type[Union[
+    collection_models.CollectionModel, collection_models.CollectionRightsModel]]]]]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [collection_models.CollectionModel]
@@ -79,11 +70,11 @@ def collection_summary_model_relationships(
 
 
 @validation_decorators.AuditsExisting(
-    collection_models.CollectionRightsSnapshotMetadataModel)
+    collection_models.CollectionRightsSnapshotMetadataModel
+)
 class ValidateCollectionRightsSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
-        collection_models.CollectionRightsSnapshotMetadataModel
-    ]
+        collection_models.CollectionRightsSnapshotMetadataModel]
 ):
     """Overrides _get_change_domain_class for
     CollectionRightsSnapshotMetadataModel.
@@ -105,12 +96,10 @@ class ValidateCollectionRightsSnapshotMetadataModel(
         return rights_domain.CollectionRightsChange
 
 
-@validation_decorators.AuditsExisting(
-    collection_models.CollectionCommitLogEntryModel)
+@validation_decorators.AuditsExisting(collection_models.CollectionCommitLogEntryModel)
 class ValidateCollectionCommitLogEntryModel(
     base_validation.BaseValidateCommitCmdsSchema[
-        collection_models.CollectionCommitLogEntryModel
-    ]
+        collection_models.CollectionCommitLogEntryModel]
 ):
     """Overrides _get_change_domain_class for CollectionCommitLogEntryModel."""
 

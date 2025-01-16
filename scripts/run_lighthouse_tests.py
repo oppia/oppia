@@ -45,31 +45,34 @@ APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml'
 }
-LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
-    'core', 'tests', 'lighthouse-pages.json')
+LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join('core', 'tests', 'lighthouse-pages.json')
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
     python -m scripts.run_lighthouse_tests
 Note that the root folder MUST be named 'oppia'.
-""")
+"""
+)
 
 _PARSER.add_argument(
-    '--mode', help='Sets the mode for the lighthouse tests',
+    '--mode',
+    help='Sets the mode for the lighthouse tests',
     required=True,
-    choices=['accessibility', 'performance'])
+    choices=['accessibility', 'performance']
+)
+
+_PARSER.add_argument('--pages', help='Sets the pages to run the lighthouse tests on')
 
 _PARSER.add_argument(
-    '--pages', help='Sets the pages to run the lighthouse tests on')
+    '--skip_build', help='Sets whether to skip webpack build', action='store_true'
+)
 
 _PARSER.add_argument(
-    '--skip_build', help='Sets whether to skip webpack build',
-    action='store_true')
-
-_PARSER.add_argument(
-    '--record_screen', help='Sets whether LHCI Puppeteer script is recorded',
-    action='store_true')
+    '--record_screen',
+    help='Sets whether LHCI Puppeteer script is recorded',
+    action='store_true'
+)
 
 
 def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
@@ -83,8 +86,7 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     Returns:
         dict(str, str). The entities and their IDs that were collected.
     """
-    puppeteer_path = (
-        os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
+    puppeteer_path = (os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
     if record:
         # Add arguments to lighthouse_setup that enable video recording.
@@ -98,7 +100,8 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('Video Path:' + video_path)
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print(stdout)
@@ -195,7 +198,8 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
     ]
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = process.communicate()
 
     print('OUTPUT:')
@@ -256,15 +260,12 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
-        injected_url = url.replace(
-            '{{%s}}' % entity_name, entities[entity_name])
+        injected_url = url.replace('{{%s}}' % entity_name, entities[entity_name])
     return injected_url
 
 
 def get_lighthouse_urls_to_run(
-    pages: List[str],
-    entities: dict[str, str],
-    pages_config: dict[str, str]
+    pages: List[str], entities: dict[str, str], pages_config: dict[str, str]
 ) -> List[str]:
     """Gets the URLs to run Lighthouse checks on.
 
@@ -305,8 +306,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 build.main(args=['--prod_env'])
             else:
                 # Skip webpack build if skip_build flag is passed.
-                print(
-                    'Building files in production mode skipping webpack build.')
+                print('Building files in production mode skipping webpack build.')
                 build.main(args=[])
                 common.run_ng_compilation()
                 run_webpack_compilation()
@@ -327,33 +327,32 @@ def main(args: Optional[List[str]] = None) -> None:
 
             env = os.environ.copy()
             env['PIP_NO_DEPS'] = 'True'
-            stack.enter_context(servers.managed_dev_appserver(
-                APP_YAML_FILENAMES[server_mode],
-                port=GOOGLE_APP_ENGINE_PORT,
-                log_level='critical',
-                skip_sdk_update_check=True,
-                env=env))
+            stack.enter_context(
+                servers.managed_dev_appserver(
+                    APP_YAML_FILENAMES[server_mode],
+                    port=GOOGLE_APP_ENGINE_PORT,
+                    log_level='critical',
+                    skip_sdk_update_check=True,
+                    env=env
+                )
+            )
 
         entities = run_lighthouse_puppeteer_script(parsed_args.record_screen)
         pages_config: dict[str, str] = get_lighthouse_pages_config()
         os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(
             get_lighthouse_urls_to_run(
-                list(pages_config.keys()),
-                entities,
-                pages_config
+                list(pages_config.keys()), entities, pages_config
             )
         )
         if parsed_args.pages:
             os.environ['LIGHTHOUSE_URLS_TO_RUN'] = ','.join(
-                get_lighthouse_urls_to_run(
-                    [page.strip() for page in parsed_args.pages.split(',')],
-                    entities,
-                    pages_config
-                )
+                get_lighthouse_urls_to_run([
+                    page.strip() for page in parsed_args.pages.split(',')
+                ], entities, pages_config)
             )
 
         run_lighthouse_checks(lighthouse_mode)
 
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

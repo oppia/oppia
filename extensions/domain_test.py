@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for extensions domain."""
 
 from __future__ import annotations
@@ -26,11 +25,12 @@ class CustomizationArgSpecDomainUnitTests(test_utils.GenericTestBase):
     """Tests for CustomizationArgSpec domain object methods."""
 
     def test_to_dict(self) -> None:
-        ca_spec = domain.CustomizationArgSpec(
-            'name', 'description', {}, None)
-        self.assertEqual(ca_spec.to_dict(), {
-            'name': 'name',
-            'description': 'description',
-            'schema': {},
-            'default_value': None
-        })
+        ca_spec = domain.CustomizationArgSpec('name', 'description', {}, None)
+        self.assertEqual(
+            ca_spec.to_dict(), {
+                'name': 'name',
+                'description': 'description',
+                'schema': {},
+                'default_value': None
+            }
+        )

@@ -53,9 +53,10 @@ class DragAndDropSortInput(base.BaseInteraction):
             'items': {
                 'type': 'SubtitledHtml',
                 'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Enter an option for the learner to drag' +
-                                   ' and drop.',
+                    'hide_complex_extensions':
+                        True,
+                    'placeholder':
+                        'Enter an option for the learner to drag' + ' and drop.',
                 },
             },
             'ui_config': {

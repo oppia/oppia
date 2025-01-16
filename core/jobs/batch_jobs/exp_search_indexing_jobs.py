@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Jobs that are run by CRON scheduler."""
 
 from __future__ import annotations
@@ -33,7 +32,7 @@ import result
 from typing import Final, Iterable, List
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import search_services as platform_search_services
 
@@ -56,18 +55,16 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
             the Elastic Search.
         """
         return (
-            self.pipeline
-            | 'Get all non-deleted models' >> (
+            self.pipeline | 'Get all non-deleted models' >> (
                 ndb_io.GetModels(
-                    exp_models.ExpSummaryModel.get_all(include_deleted=False)))
-            | 'Convert ExpSummaryModels to domain objects' >> beam.Map(
-                exp_fetchers.get_exploration_summary_from_model)
-            | 'Split models into batches' >> beam.transforms.util.BatchElements(
-                max_batch_size=self.MAX_BATCH_SIZE)
-            | 'Index batches of models' >> beam.ParDo(
-                IndexExplorationSummaries())
-            | 'Count the output' >> (
-                job_result_transforms.ResultsToJobRunResults())
+                    exp_models.ExpSummaryModel.get_all(include_deleted=False)
+                )
+            ) | 'Convert ExpSummaryModels to domain objects' >>
+            beam.Map(exp_fetchers.get_exploration_summary_from_model) |
+            'Split models into batches' >>
+            beam.transforms.util.BatchElements(max_batch_size=self.MAX_BATCH_SIZE) |
+            'Index batches of models' >> beam.ParDo(IndexExplorationSummaries()) |
+            'Count the output' >> (job_result_transforms.ResultsToJobRunResults())
         )
 
 
@@ -75,7 +72,7 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
+class IndexExplorationSummaries(beam.DoFn):  # type: ignore[misc]
     """DoFn to index exploration summaries."""
 
     def process(

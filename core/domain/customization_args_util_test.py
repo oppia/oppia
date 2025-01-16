@@ -36,8 +36,8 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         """Test validate customization args and values method."""
 
         ca_item_selection_specs = (
-            interaction_registry.Registry.get_interaction_by_id('ItemSelectionInput').
-            customization_arg_specs
+            interaction_registry.Registry.get_interaction_by_id('ItemSelectionInput'
+                                                               ).customization_arg_specs
         )
 
         complete_customization_args: (Dict[str, Dict[str, Union[int, List[str]]]]) = {
@@ -127,8 +127,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         )
 
         # Check if error is produced when arg name is invalid.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid customization arg name: 23'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid customization arg name: 23'
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
@@ -140,9 +141,12 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Interaction ItemSelectionInput does not support '
-                                     'customization arg extraArg.')):
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Interaction ItemSelectionInput does not support '
+                'customization arg extraArg.'
+            )
+        ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction', 'ItemSelectionInput',
                 complete_customization_args_with_extra_arg, ca_item_selection_specs
@@ -160,8 +164,8 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         )
 
         ca_fraction_input_specs = (
-            interaction_registry.Registry.get_interaction_by_id('FractionInput').
-            customization_arg_specs
+            interaction_registry.Registry.get_interaction_by_id('FractionInput'
+                                                               ).customization_arg_specs
         )
 
         incomplete_customization_args = {
@@ -220,16 +224,18 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         # Check if error is produced for missing customization args.
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Customization argument is missing key: allowImproperFraction'):
+            utils.ValidationError,
+            'Customization argument is missing key: allowImproperFraction'
+        ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction', 'FractionInput', incomplete_customization_args,
                 ca_fraction_input_specs
             )
 
         # Check if error is produced when arg name is invalid.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid customization arg name: False'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid customization arg name: False'
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
@@ -242,9 +248,11 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
         # Check if error is produced when extra args are present.
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Interaction FractionInput does not support customization '
-             'arg extraArg.')):
+            utils.ValidationError, (
+                'Interaction FractionInput does not support customization '
+                'arg extraArg.'
+            )
+        ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction', 'FractionInput',
                 complete_customization_args_with_extra_arg, ca_fraction_input_specs
@@ -276,9 +284,10 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # is not of type dict.
         customization_args_with_invalid_type = 23
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected customization args to be a dict, received %s' %
-                customization_args_with_invalid_type):
+            utils.ValidationError,
+            'Expected customization args to be a dict, received %s' %
+            customization_args_with_invalid_type
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
@@ -294,8 +303,8 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         invalid schema and errors raised on validation failure.
         """
         ca_item_selection_specs = (
-            interaction_registry.Registry.get_interaction_by_id('ItemSelectionInput').
-            customization_arg_specs
+            interaction_registry.Registry.get_interaction_by_id('ItemSelectionInput'
+                                                               ).customization_arg_specs
         )
         invalid_customization_args: (Dict[str, Dict[str,
                                                     Union[str, int, List[str]]]]) = {
@@ -309,8 +318,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                                                             'value': ['']
                                                         }
                                                     }
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Could not convert str to int: 1b'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Could not convert str to int: 1b'
+        ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'ItemSelectionInput',

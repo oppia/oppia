@@ -89,12 +89,10 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner, self.COL_ID_2)
         self._compare_lists(activity_services.get_featured_activity_references(), [])
 
-        activity_services.update_featured_activity_references(
-            [
-                self._create_exploration_reference(self.EXP_ID_0),
-                self._create_collection_reference(self.COL_ID_2)
-            ]
-        )
+        activity_services.update_featured_activity_references([
+            self._create_exploration_reference(self.EXP_ID_0),
+            self._create_collection_reference(self.COL_ID_2)
+        ])
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0),
@@ -104,9 +102,9 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
     def test_update_featured_refs_clears_existing_featured_activities(self) -> None:
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
-        activity_services.update_featured_activity_references(
-            [self._create_exploration_reference(self.EXP_ID_0)]
-        )
+        activity_services.update_featured_activity_references([
+            self._create_exploration_reference(self.EXP_ID_0)
+        ])
         self._compare_lists(
             activity_services.get_featured_activity_references(),
             [self._create_exploration_reference(self.EXP_ID_0)]
@@ -121,23 +119,19 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(activity_services.get_featured_activity_references(), [])
 
         with self.assertRaisesRegex(Exception, 'should not have duplicates'):
-            activity_services.update_featured_activity_references(
-                [
-                    self._create_exploration_reference(self.EXP_ID_0),
-                    self._create_exploration_reference(self.EXP_ID_0)
-                ]
-            )
+            activity_services.update_featured_activity_references([
+                self._create_exploration_reference(self.EXP_ID_0),
+                self._create_exploration_reference(self.EXP_ID_0)
+            ])
 
     def test_deleted_activity_is_removed_from_featured_list(self) -> None:
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
         rights_manager.publish_collection(self.owner, self.COL_ID_2)
-        activity_services.update_featured_activity_references(
-            [
-                self._create_exploration_reference(self.EXP_ID_0),
-                self._create_collection_reference(self.COL_ID_2)
-            ]
-        )
+        activity_services.update_featured_activity_references([
+            self._create_exploration_reference(self.EXP_ID_0),
+            self._create_collection_reference(self.COL_ID_2)
+        ])
 
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
@@ -184,12 +178,10 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
         rights_manager.publish_collection(self.owner, self.COL_ID_2)
-        activity_services.update_featured_activity_references(
-            [
-                self._create_exploration_reference(self.EXP_ID_0),
-                self._create_collection_reference(self.COL_ID_2)
-            ]
-        )
+        activity_services.update_featured_activity_references([
+            self._create_exploration_reference(self.EXP_ID_0),
+            self._create_collection_reference(self.COL_ID_2)
+        ])
 
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
@@ -242,17 +234,15 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
         exploration_ab = self._create_exploration_reference('ab')
         self.assertEqual(
-            activity_services.split_by_type(
-                [exploration_123, collection_def, exploration_ab]
-            ), (['123', 'ab'], ['def'])
+            activity_services.split_by_type([
+                exploration_123, collection_def, exploration_ab
+            ]), (['123', 'ab'], ['def'])
         )
 
     def test_split_by_type_raises_error_if_given_invalid_activity_ref(self) -> None:
         exploration_123 = self._create_exploration_reference('123')
         with self.assertRaisesRegex(Exception, 'Invalid activity reference'):
-            activity_services.split_by_type(
-                [
-                    exploration_123,
-                    activity_domain.ActivityReference('invalid_type', 'bbb')
-                ]
-            )
+            activity_services.split_by_type([
+                exploration_123,
+                activity_domain.ActivityReference('invalid_type', 'bbb')
+            ])

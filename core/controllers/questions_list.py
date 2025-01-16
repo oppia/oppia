@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the questions list in topic editors and skill editors."""
 
 from __future__ import annotations
@@ -36,10 +35,7 @@ class QuestionsListHandlerNormalizedRequestDict(TypedDict):
 
 
 class QuestionsListHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        QuestionsListHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], QuestionsListHandlerNormalizedRequestDict]
 ):
     """Manages receiving of all question summaries for display in topic editor
     and skill editor page.
@@ -81,7 +77,8 @@ class QuestionsListHandler(
 
         question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                constants.NUM_QUESTIONS_PER_PAGE + 1, skill_ids, offset)
+                constants.NUM_QUESTIONS_PER_PAGE + 1, skill_ids, offset
+            )
         )
 
         if len(question_summaries) <= constants.NUM_QUESTIONS_PER_PAGE:
@@ -96,27 +93,25 @@ class QuestionsListHandler(
             if summary is not None:
                 if len(skill_ids) == 1:
                     return_dicts.append({
-                        'summary': summary.to_dict(),
-                        'skill_id': merged_question_skill_links[
-                            index].skill_ids[0],
-                        'skill_description': (
-                            merged_question_skill_links[
-                                index].skill_descriptions[0]),
-                        'skill_difficulty': (
-                            merged_question_skill_links[
-                                index].skill_difficulties[0])
+                        'summary':
+                            summary.to_dict(),
+                        'skill_id':
+                            merged_question_skill_links[index].skill_ids[0],
+                        'skill_description':
+                            (merged_question_skill_links[index].skill_descriptions[0]),
+                        'skill_difficulty':
+                            (merged_question_skill_links[index].skill_difficulties[0])
                     })
                 else:
                     return_dicts.append({
-                        'summary': summary.to_dict(),
-                        'skill_ids': merged_question_skill_links[
-                            index].skill_ids,
-                        'skill_descriptions': (
-                            merged_question_skill_links[
-                                index].skill_descriptions),
-                        'skill_difficulties': (
-                            merged_question_skill_links[
-                                index].skill_difficulties)
+                        'summary':
+                            summary.to_dict(),
+                        'skill_ids':
+                            merged_question_skill_links[index].skill_ids,
+                        'skill_descriptions':
+                            (merged_question_skill_links[index].skill_descriptions),
+                        'skill_difficulties':
+                            (merged_question_skill_links[index].skill_difficulties)
                     })
 
         self.values.update({
@@ -126,9 +121,7 @@ class QuestionsListHandler(
         self.render_json(self.values)
 
 
-class QuestionCountDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class QuestionCountDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data regarding the number of questions assigned to the given
     skill ids.
     """
@@ -144,7 +137,9 @@ class QuestionCountDataHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids: str) -> None:
@@ -152,7 +147,8 @@ class QuestionCountDataHandler(
         skill_ids = list(set(comma_separated_skill_ids.split(',')))
 
         total_question_count = (
-            question_services.get_total_question_count_for_skill_ids(skill_ids))
+            question_services.get_total_question_count_for_skill_ids(skill_ids)
+        )
 
         self.values.update({
             'total_question_count': total_question_count

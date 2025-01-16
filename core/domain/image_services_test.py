@@ -38,12 +38,15 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR,
-                                          'dummy_large_image.jpg'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'),
+            'rb',
+            encoding=None
+        ) as f:
             self.jpeg_raw_image = f.read()
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             self.png_raw_image = f.read()
 
     def test_image_dimensions_are_output_correctly(self) -> None:
@@ -98,9 +101,11 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(pil_image.format, 'PNG')
 
     def test_compression_results_in_identical_files(self) -> None:
-        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR,
-                                          'compressed_image.jpg'), 'rb',
-                             encoding=None) as f:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'compressed_image.jpg'),
+            'rb',
+            encoding=None
+        ) as f:
             correct_compressed_image = f.read()
         correct_height, correct_width = (
             image_services.get_image_dimensions(correct_compressed_image)

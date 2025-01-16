@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for the cloud_transaction_services.py"""
 
 from __future__ import annotations
@@ -28,7 +27,9 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             'enter_context': False,
             'exit_context': False,
         }
+
         class MockTransaction:
+
             def __enter__(self) -> None:
                 calls_made['enter_context'] = True
 
@@ -36,17 +37,17 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
                 calls_made['exit_context'] = True
 
         class MockClient:
-            def transaction(self) -> MockTransaction: # pylint: disable=missing-docstring
+
+            def transaction(self) -> MockTransaction:  # pylint: disable=missing-docstring
                 return MockTransaction()
 
-        swap_client = self.swap(
-            cloud_transaction_services, 'CLIENT', MockClient())
+        swap_client = self.swap(cloud_transaction_services, 'CLIENT', MockClient())
 
         def add(x: int, y: int) -> int:
             return x + y
+
         with swap_client:
-            wrapper_fn = cloud_transaction_services.run_in_transaction_wrapper(
-                add)
+            wrapper_fn = cloud_transaction_services.run_in_transaction_wrapper(add)
             result = wrapper_fn(1, 2)
 
         self.assertEqual(result, 3)

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Lint checks for python files."""
 
 from __future__ import annotations
@@ -71,22 +70,24 @@ class ThirdPartyCSSLintChecksManager(linter_utils.BaseLinter):
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(
-            'node_modules', 'stylelint', 'bin', 'stylelint.js')
+            'node_modules', 'stylelint', 'bin', 'stylelint.js'
+        )
         if not os.path.exists(stylelint_path):
             raise Exception(
                 'ERROR    Please run start.py first to install node-eslint '
-                'or node-stylelint and its dependencies.')
+                'or node-stylelint and its dependencies.'
+            )
 
         failed = False
         stripped_error_messages = []
         full_error_messages = []
         name = 'Stylelint'
 
-        stylelint_cmd_args = [
-            node_path, stylelint_path, '--config=' + STYLELINT_CONFIG]
+        stylelint_cmd_args = [node_path, stylelint_path, '--config=' + STYLELINT_CONFIG]
         proc_args = stylelint_cmd_args + self.all_filepaths
         proc = subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
         # Standard and error output is in bytes, we need to decode the line to
@@ -100,11 +101,13 @@ class ThirdPartyCSSLintChecksManager(linter_utils.BaseLinter):
         if linter_stdout:
             full_error_messages.append(linter_stdout)
             stripped_error_messages.append(
-                self._get_trimmed_error_output(linter_stdout))
+                self._get_trimmed_error_output(linter_stdout)
+            )
             failed = True
 
         return concurrent_task_utils.TaskResult(
-            name, failed, stripped_error_messages, full_error_messages)
+            name, failed, stripped_error_messages, full_error_messages
+        )
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
@@ -117,8 +120,9 @@ class ThirdPartyCSSLintChecksManager(linter_utils.BaseLinter):
         if not self.all_filepaths:
             return [
                 concurrent_task_utils.TaskResult(
-                    'CSS lint', False, [],
-                    ['There are no HTML or CSS files to lint.'])]
+                    'CSS lint', False, [], ['There are no HTML or CSS files to lint.']
+                )
+            ]
 
         return [self.lint_css_files()]
 

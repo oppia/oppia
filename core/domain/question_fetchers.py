@@ -31,9 +31,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import question_models
     from mypy_imports import skill_models
 
-(question_models, skill_models) = models.Registry.import_models(
-    [models.Names.QUESTION, models.Names.SKILL]
-)
+(question_models, skill_models) = models.Registry.import_models([
+    models.Names.QUESTION, models.Names.SKILL
+])
 
 QuestionAndSkillDescriptionsType = Tuple[List[Optional[question_domain.Question]],
                                          List[List[Optional[str]]]]
@@ -75,9 +75,9 @@ def get_questions_and_skill_descriptions_by_skill_ids(
 
     for skill_ids_list in grouped_skill_ids:
         skills = skill_models.SkillModel.get_multi(skill_ids_list)
-        grouped_skill_descriptions.append(
-            [skill.description if skill else None for skill in skills]
-        )
+        grouped_skill_descriptions.append([
+            skill.description if skill else None for skill in skills
+        ])
 
     questions = get_questions_by_ids(question_ids)
     return questions, grouped_skill_descriptions
@@ -126,8 +126,10 @@ def get_question_from_model(
 
     next_content_id_index = None
     # Migrate the question if it is not using the latest schema version.
-    if (question_model.question_state_data_schema_version
-            != feconf.CURRENT_STATE_SCHEMA_VERSION):
+    if (
+        question_model.question_state_data_schema_version
+        != feconf.CURRENT_STATE_SCHEMA_VERSION
+    ):
         next_content_id_index = migrate_state_schema(versioned_question_state)
 
     if next_content_id_index is not None:

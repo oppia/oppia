@@ -192,7 +192,9 @@ def _get_third_party_python_libs_directory_contents() -> Dict[str, str]:
         predicate=_dist_has_meta_data
     )
 
-    installed_packages = {pkg.project_name: pkg.version for pkg in standard_packages}
+    installed_packages = {
+        pkg.project_name: pkg.version for pkg in standard_packages
+    }
 
     for pkg in direct_url_packages:
         metadata = json.loads(pkg.get_metadata('direct_url.json'))
@@ -441,14 +443,12 @@ def verify_pip_is_installed() -> None:
         # okay that we don't use it.
         import pip  # pylint: disable=unused-import
     except ImportError as e:
-        common.print_each_string_after_two_new_lines(
-            [
-                'Pip is required to install Oppia dependencies, but pip wasn\'t '
-                'found on your local machine.',
-                'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
-                'page:'
-            ]
-        )
+        common.print_each_string_after_two_new_lines([
+            'Pip is required to install Oppia dependencies, but pip wasn\'t '
+            'found on your local machine.',
+            'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
+            'page:'
+        ])
 
         if common.is_mac_os():
             print(
@@ -518,9 +518,8 @@ def pip_install(
     if no_dependencies:
         additional_pip_args.append('--no-dependencies')
 
-    _run_pip_command(
-        ['install', versioned_package, '--target', install_path] + additional_pip_args
-    )
+    _run_pip_command(['install', versioned_package, '--target', install_path] +
+                     additional_pip_args)
 
 
 def _pip_install_requirements(install_path: str, requirements_path: str) -> None:
@@ -531,12 +530,10 @@ def _pip_install_requirements(install_path: str, requirements_path: str) -> None
         requirements_path: str. The path to the requirements file.
     """
     verify_pip_is_installed()
-    _run_pip_command(
-        [
-            'install', '--require-hashes', '--no-deps', '--target', install_path,
-            '--no-dependencies', '-r', requirements_path, '--upgrade'
-        ]
-    )
+    _run_pip_command([
+        'install', '--require-hashes', '--no-deps', '--target', install_path,
+        '--no-dependencies', '-r', requirements_path, '--upgrade'
+    ])
 
 
 def get_mismatches() -> MismatchType:
@@ -574,8 +571,10 @@ def get_mismatches() -> MismatchType:
         # Library exists in the directory and the requirements file.
         if normalized_library_name in directory_contents:
             # Library matches but version doesn't match.
-            if (directory_contents[normalized_library_name]
-                    != requirements_contents[normalized_library_name]):
+            if (
+                directory_contents[normalized_library_name]
+                != requirements_contents[normalized_library_name]
+            ):
                 mismatches[normalized_library_name] = (
                     requirements_contents[normalized_library_name],
                     directory_contents[normalized_library_name]
@@ -638,9 +637,10 @@ def validate_metadata_directories() -> None:
         # If any of the possible metadata directory names show up in the
         # directory, that is confirmation that <library_name> was installed
         # correctly with the correct metadata.
-        if not any(normalized_directory_name in normalized_directory_names
-                   for normalized_directory_name in possible_normalized_directory_names
-                   ):
+        if not any(
+            normalized_directory_name in normalized_directory_names
+            for normalized_directory_name in possible_normalized_directory_names
+        ):
             raise Exception(
                 'The python library %s was installed without the correct '
                 'metadata folders which may indicate that the convention for '

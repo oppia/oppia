@@ -53,12 +53,10 @@ if MYPY:  # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 (auth_models, user_models, audit_models, suggestion_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.AUTH, models.Names.USER, models.Names.AUDIT,
-            models.Names.SUGGESTION
-        ]
-    )
+    models.Registry.import_models([
+        models.Names.AUTH, models.Names.USER, models.Names.AUDIT,
+        models.Names.SUGGESTION
+    ])
 )
 bulk_email_services = models.Registry.import_bulk_email_services()
 
@@ -67,14 +65,12 @@ def _get_change_list(state_name: str, property_name: str,
                      new_value: bool) -> List[exp_domain.ExplorationChange]:
     """Generates a change list for a single state change."""
     return [
-        exp_domain.ExplorationChange(
-            {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': property_name,
-                'new_value': new_value
-            }
-        )
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': property_name,
+            'new_value': new_value
+        })
     ]
 
 
@@ -163,11 +159,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_usernames_for_pseudonymous_ids(self) -> None:
 
         # Handle usernames that exists.
-        self.assertEqual(
-            ['User_Aaaaaaaa', 'User_Bbbbbbbb'],
-            user_services.get_usernames(['pid_%s' % ('a' * 32),
-                                         'pid_%s' % ('b' * 32)])
-        )
+        self.assertEqual(['User_Aaaaaaaa', 'User_Bbbbbbbb'],
+                         user_services.get_usernames([
+                             'pid_%s' % ('a' * 32),
+                             'pid_%s' % ('b' * 32)
+                         ]))
 
     def test_get_usernames_empty_list(self) -> None:
         # Return empty list when no user id passed.
@@ -175,10 +171,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_usernames_system_admin(self) -> None:
         # Check that system admin has correct username.
-        self.assertEqual(
-            [feconf.SYSTEM_COMMITTER_ID],
-            user_services.get_usernames([feconf.SYSTEM_COMMITTER_ID])
-        )
+        self.assertEqual([feconf.SYSTEM_COMMITTER_ID],
+                         user_services.get_usernames([feconf.SYSTEM_COMMITTER_ID]))
 
     def test_get_username_for_nonexistent_user(self) -> None:
         with self.assertRaisesRegex(Exception, 'User with ID \'fakeUser\' not found.'):
@@ -274,9 +268,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         for display_alias, error_msg in bad_display_aliases_with_expected_error:
             with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 self.modifiable_new_user_data.display_alias = display_alias  # type: ignore[assignment]
-                user_services.update_multiple_users_data(
-                    [self.modifiable_new_user_data]
-                )
+                user_services.update_multiple_users_data([
+                    self.modifiable_new_user_data
+                ])
 
     def test_update_user_settings_valid_display_alias_set_successfully(self) -> None:
         auth_id = 'someUser'
@@ -296,13 +290,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             ('@', 'Invalid email address: @'), ('@@', 'Invalid email address: @@'),
             ('abc', 'Invalid email address: abc'), ('', 'No user email specified.'),
             (None, 'Expected email to be a string, received None'),
-            (
-                ['a', '@', 'b.com'],
-                re.escape(
-                    'Expected email to be a string, received '
-                    '[\'a\', \'@\', \'b.com\']'
-                )
-            )
+            (['a', '@', 'b.com'],
+             re.escape(
+                 'Expected email to be a string, received '
+                 '[\'a\', \'@\', \'b.com\']'
+             ))
         ]
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
@@ -337,9 +329,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         email = 'user@example.com'
         user_id = user_services.create_new_user(auth_id, email).user_id
 
-        with self.assertRaisesRegex(Exception,
-                                    'User %s already exists for auth_id %s.' %
-                                    (user_id, auth_id)):
+        with self.assertRaisesRegex(
+            Exception, 'User %s already exists for auth_id %s.' % (user_id, auth_id)
+        ):
             user_services.create_new_user(auth_id, email)
 
     def test_email_truncation(self) -> None:
@@ -379,7 +371,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Raises error for usernames which don't exist, if
         # 'get_user_id_from_username' called with strict.
         with self.assertRaisesRegex(
-                Exception, 'No user_id found for the given username: fakeUsername'):
+            Exception, 'No user_id found for the given username: fakeUsername'
+        ):
             user_services.get_user_id_from_username('fakeUsername', strict=True)
 
     def test_get_multi_user_ids_from_usernames(self) -> None:
@@ -416,37 +409,32 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         # Return None for usernames which don't exist.
         self.assertEqual(
-            user_services.get_multi_user_ids_from_usernames(
-                [
-                    'fakeUsername1', 'fakeUsername2', 'fakeUsername3', 'fakeUsername4',
-                    'fakeUsername5', 'fakeUsername6', 'fakeUsername7', 'fakeUsername8',
-                    'fakeUsername9'
-                ]
-            ), [None, None, None, None, None, None, None, None, None]
+            user_services.get_multi_user_ids_from_usernames([
+                'fakeUsername1', 'fakeUsername2', 'fakeUsername3', 'fakeUsername4',
+                'fakeUsername5', 'fakeUsername6', 'fakeUsername7', 'fakeUsername8',
+                'fakeUsername9'
+            ]), [None, None, None, None, None, None, None, None, None]
         )
         self.assertEqual(
-            user_services.get_multi_user_ids_from_usernames(
-                [
-                    'fakeUsername1', 'USERNAME1', 'fakeUsername3', 'fakeUsername4',
-                    'fakeUsername5', 'fakeUsername6', 'fakeUsername7', username2,
-                    'fakeUsername9'
-                ]
-            ), [None, user_id1, None, None, None, None, None, user_id2, None]
+            user_services.get_multi_user_ids_from_usernames([
+                'fakeUsername1', 'USERNAME1', 'fakeUsername3', 'fakeUsername4',
+                'fakeUsername5', 'fakeUsername6', 'fakeUsername7', username2,
+                'fakeUsername9'
+            ]), [None, user_id1, None, None, None, None, None, user_id2, None]
         )
 
         # Return empty list if empty list is passed in as arguments.
         self.assertEqual(user_services.get_multi_user_ids_from_usernames([]), [])
 
-        with self.assertRaisesRegex(Exception,
-                                    'No user_id found for the username: fakeusername1'):
-            user_services.get_multi_user_ids_from_usernames(
-                [
-                    'fakeUsername1', 'USERNAME1', 'fakeUsername3', 'fakeUsername4',
-                    'fakeUsername5', 'fakeUsername6', 'fakeUsername7', username2,
-                    'fakeUsername9'
-                ],
-                strict=True
-            )
+        with self.assertRaisesRegex(
+            Exception, 'No user_id found for the username: fakeusername1'
+        ):
+            user_services.get_multi_user_ids_from_usernames([
+                'fakeUsername1', 'USERNAME1', 'fakeUsername3', 'fakeUsername4',
+                'fakeUsername5', 'fakeUsername6', 'fakeUsername7', username2,
+                'fakeUsername9'
+            ],
+                                                            strict=True)
 
     def test_get_user_settings_from_username_returns_user_settings(self) -> None:
         auth_id = 'someUser'
@@ -647,7 +635,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             can_receive_email_updates: bool
         ) -> bool:
             """Mocks bulk_email_services.add_or_update_user_status()."""
-            self.assertDictEqual(merge_fields, {'NAME': 'Name'})
+            self.assertDictEqual(merge_fields, {
+                'NAME': 'Name'
+            })
             return can_receive_email_updates
 
         fn_swap = self.swap(
@@ -681,9 +671,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 user_services.add_user_to_mailing_list('email@example.com', 'Android')
             )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
         username = 'username'
@@ -779,9 +769,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+    ])
     def test_get_and_set_user_email_preferences_with_error(self) -> None:
         auth_id = 'someUser'
         username = 'username'
@@ -800,8 +790,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             """
             raise Exception('Server error')
 
-        with self.swap(bulk_email_services, 'add_or_update_user_status',
-                       _mock_add_or_update_user_status):
+        with self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status
+        ):
             try:
                 user_services.update_email_preferences(
                     user_id, False, feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -996,34 +988,31 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_system_user_returns_system_user_action_info(self) -> None:
         system_user_action = user_services.get_system_user()
-        expected_actions = set(
-            [
-                'MANAGE_TOPIC_RIGHTS', 'EDIT_ANY_PUBLIC_ACTIVITY', 'DELETE_ANY_SKILL',
-                'PUBLISH_OWNED_SKILL', 'DELETE_TOPIC', 'EDIT_OWNED_TOPIC',
-                'CREATE_NEW_TOPIC', 'ACCESS_MODERATOR_PAGE',
-                'RATE_ANY_PUBLIC_EXPLORATION', 'DELETE_ANY_PUBLIC_ACTIVITY',
-                'MANAGE_ACCOUNT', 'MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY',
-                'CREATE_EXPLORATION', 'UNPUBLISH_ANY_PUBLIC_ACTIVITY',
-                'CHANGE_TOPIC_STATUS', 'SEND_MODERATOR_EMAILS', 'FLAG_EXPLORATION',
-                'ACCESS_CREATOR_DASHBOARD', 'EDIT_ANY_TOPIC', 'ACCEPT_ANY_SUGGESTION',
-                'PUBLISH_OWNED_ACTIVITY', 'PLAY_ANY_PUBLIC_ACTIVITY',
-                'EDIT_ANY_SUBTOPIC_PAGE', 'VISIT_ANY_QUESTION_EDITOR_PAGE',
-                'ACCESS_LEARNER_DASHBOARD', 'ACCESS_FEEDBACK_UPDATES',
-                'EDIT_ANY_ACTIVITY', 'VISIT_ANY_TOPIC_EDITOR_PAGE', 'SUGGEST_CHANGES',
-                'DELETE_OWNED_PRIVATE_ACTIVITY', 'EDIT_OWNED_ACTIVITY',
-                'EDIT_SKILL_DESCRIPTION', 'DELETE_ANY_ACTIVITY', 'SUBSCRIBE_TO_USERS',
-                'PLAY_ANY_PRIVATE_ACTIVITY', 'MANAGE_QUESTION_SKILL_STATUS',
-                'MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY',
-                'ACCESS_TOPICS_AND_SKILLS_DASHBOARD', 'EDIT_SKILL',
-                'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY', 'PUBLISH_ANY_ACTIVITY',
-                'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL', 'CHANGE_STORY_STATUS',
-                'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS',
-                'ACCESS_CLASSROOM_ADMIN_PAGE', 'ACCESS_VOICEOVER_ADMIN_PAGE'
-            ]
-        )
-        expected_roles = set(
-            ['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR', 'VOICEOVER_ADMIN']
-        )
+        expected_actions = set([
+            'MANAGE_TOPIC_RIGHTS', 'EDIT_ANY_PUBLIC_ACTIVITY', 'DELETE_ANY_SKILL',
+            'PUBLISH_OWNED_SKILL', 'DELETE_TOPIC', 'EDIT_OWNED_TOPIC',
+            'CREATE_NEW_TOPIC', 'ACCESS_MODERATOR_PAGE', 'RATE_ANY_PUBLIC_EXPLORATION',
+            'DELETE_ANY_PUBLIC_ACTIVITY', 'MANAGE_ACCOUNT',
+            'MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY', 'CREATE_EXPLORATION',
+            'UNPUBLISH_ANY_PUBLIC_ACTIVITY', 'CHANGE_TOPIC_STATUS',
+            'SEND_MODERATOR_EMAILS', 'FLAG_EXPLORATION', 'ACCESS_CREATOR_DASHBOARD',
+            'EDIT_ANY_TOPIC', 'ACCEPT_ANY_SUGGESTION', 'PUBLISH_OWNED_ACTIVITY',
+            'PLAY_ANY_PUBLIC_ACTIVITY', 'EDIT_ANY_SUBTOPIC_PAGE',
+            'VISIT_ANY_QUESTION_EDITOR_PAGE', 'ACCESS_LEARNER_DASHBOARD',
+            'ACCESS_FEEDBACK_UPDATES', 'EDIT_ANY_ACTIVITY',
+            'VISIT_ANY_TOPIC_EDITOR_PAGE', 'SUGGEST_CHANGES',
+            'DELETE_OWNED_PRIVATE_ACTIVITY', 'EDIT_OWNED_ACTIVITY',
+            'EDIT_SKILL_DESCRIPTION', 'DELETE_ANY_ACTIVITY', 'SUBSCRIBE_TO_USERS',
+            'PLAY_ANY_PRIVATE_ACTIVITY', 'MANAGE_QUESTION_SKILL_STATUS',
+            'MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY', 'ACCESS_TOPICS_AND_SKILLS_DASHBOARD',
+            'EDIT_SKILL', 'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY',
+            'PUBLISH_ANY_ACTIVITY', 'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL',
+            'CHANGE_STORY_STATUS', 'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS',
+            'ACCESS_CLASSROOM_ADMIN_PAGE', 'ACCESS_VOICEOVER_ADMIN_PAGE'
+        ])
+        expected_roles = set([
+            'EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR', 'VOICEOVER_ADMIN'
+        ])
 
         self.assertEqual(set(system_user_action.actions), expected_actions)
         self.assertEqual(set(system_user_action.roles), expected_roles)
@@ -1042,8 +1031,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_remove_user_role_for_default_role_raises_error(self) -> None:
         user_id = user_services.create_new_user('someUser', 'user@example.com').user_id
 
-        with self.assertRaisesRegex(Exception,
-                                    'Removing a default role is not allowed.'):
+        with self.assertRaisesRegex(
+            Exception, 'Removing a default role is not allowed.'
+        ):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
 
     def test_add_user_role(self) -> None:
@@ -1479,54 +1469,47 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         profile_1_id = user_settings_list[0].user_id
         profile_2_id = user_settings_list[1].user_id
 
-        user_auth_details_models = [
-            {
-                'id': model.id,
-                'auth_id': model.gae_id,
-                'parent_user_id': model.parent_user_id
-            } for model in auth_services.get_all_profiles_by_parent_user_id(user_id)
-        ]
+        user_auth_details_models = [{
+            'id': model.id,
+            'auth_id': model.gae_id,
+            'parent_user_id': model.parent_user_id
+        } for model in auth_services.get_all_profiles_by_parent_user_id(user_id)]
 
-        expected_user_auth_output = [
-            {
-                'id': profile_1_id,
-                'auth_id': None,
-                'parent_user_id': user_id
-            }, {
-                'id': profile_2_id,
-                'auth_id': None,
-                'parent_user_id': user_id
-            }
-        ]
+        expected_user_auth_output = [{
+            'id': profile_1_id,
+            'auth_id': None,
+            'parent_user_id': user_id
+        }, {
+            'id': profile_2_id,
+            'auth_id': None,
+            'parent_user_id': user_id
+        }]
         self.assertItemsEqual(user_auth_details_models, expected_user_auth_output)
 
         user_settings_models = []
-        for model in user_models.UserSettingsModel.get_multi([profile_1_id,
-                                                              profile_2_id]):
+        for model in user_models.UserSettingsModel.get_multi([
+            profile_1_id, profile_2_id
+        ]):
             # Ruling out the possibility of None for mypy type checking.
             assert model is not None
-            user_settings_models.append(
-                {
-                    'id': model.id,
-                    'display_alias': model.display_alias,
-                    'pin': model.pin,
-                    'roles': model.roles
-                }
-            )
+            user_settings_models.append({
+                'id': model.id,
+                'display_alias': model.display_alias,
+                'pin': model.pin,
+                'roles': model.roles
+            })
 
-        expected_user_settings_output = [
-            {
-                'id': profile_1_id,
-                'display_alias': display_alias_2,
-                'pin': profile_pin,
-                'roles': [feconf.ROLE_ID_MOBILE_LEARNER]
-            }, {
-                'id': profile_2_id,
-                'display_alias': display_alias_3,
-                'pin': None,
-                'roles': [feconf.ROLE_ID_MOBILE_LEARNER]
-            }
-        ]
+        expected_user_settings_output = [{
+            'id': profile_1_id,
+            'display_alias': display_alias_2,
+            'pin': profile_pin,
+            'roles': [feconf.ROLE_ID_MOBILE_LEARNER]
+        }, {
+            'id': profile_2_id,
+            'display_alias': display_alias_3,
+            'pin': None,
+            'roles': [feconf.ROLE_ID_MOBILE_LEARNER]
+        }]
         self.assertItemsEqual(user_settings_models, expected_user_settings_output)
 
     def test_create_new_profile_with_nonexistent_user_raises_error(self) -> None:
@@ -1634,60 +1617,53 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Performing the actual action.
         modifiable_new_user_data_2.pin = '345'
         self.modifiable_new_user_data.display_alias = 'xyz'
-        user_services.update_multiple_users_data(
-            [self.modifiable_new_user_data, modifiable_new_user_data_2]
-        )
+        user_services.update_multiple_users_data([
+            self.modifiable_new_user_data, modifiable_new_user_data_2
+        ])
 
         # Post-checking.
         user_auth_details_models = []
         for model in auth_models.UserAuthDetailsModel.get_multi(profile_user_ids):
             # Ruling out the possibility of None for mypy type checking.
             assert model is not None
-            user_auth_details_models.append(
-                {
-                    'id': model.id,
-                    'auth_id': model.gae_id,
-                    'parent_user_id': model.parent_user_id
-                }
-            )
+            user_auth_details_models.append({
+                'id': model.id,
+                'auth_id': model.gae_id,
+                'parent_user_id': model.parent_user_id
+            })
 
-        expected_auth_details_output = [
-            {
-                'id': profile_user_ids[0],
-                'auth_id': None,
-                'parent_user_id': user_id
-            }, {
-                'id': profile_user_ids[1],
-                'auth_id': None,
-                'parent_user_id': user_id
-            }
-        ]
+        expected_auth_details_output = [{
+            'id': profile_user_ids[0],
+            'auth_id': None,
+            'parent_user_id': user_id
+        }, {
+            'id': profile_user_ids[1],
+            'auth_id': None,
+            'parent_user_id': user_id
+        }]
         self.assertItemsEqual(expected_auth_details_output, user_auth_details_models)
 
         user_settings_models = []
         for model_setting_model in user_models.UserSettingsModel.get_multi(
-                profile_user_ids):
+            profile_user_ids
+        ):
             # Ruling out the possibility of None for mypy type checking.
             assert model_setting_model is not None
-            user_settings_models.append(
-                {
-                    'id': model_setting_model.id,
-                    'display_alias': model_setting_model.display_alias,
-                    'pin': model_setting_model.pin
-                }
-            )
+            user_settings_models.append({
+                'id': model_setting_model.id,
+                'display_alias': model_setting_model.display_alias,
+                'pin': model_setting_model.pin
+            })
 
-        expected_user_settings_output = [
-            {
-                'id': profile_user_ids[0],
-                'display_alias': 'xyz',
-                'pin': profile_pin
-            }, {
-                'id': profile_user_ids[1],
-                'display_alias': display_alias_3,
-                'pin': '345'
-            }
-        ]
+        expected_user_settings_output = [{
+            'id': profile_user_ids[0],
+            'display_alias': 'xyz',
+            'pin': profile_pin
+        }, {
+            'id': profile_user_ids[1],
+            'display_alias': display_alias_3,
+            'pin': '345'
+        }]
         self.assertItemsEqual(expected_user_settings_output, user_settings_models)
 
     def test_mark_user_for_deletion_marks_user_settings_as_deleted(self) -> None:
@@ -1750,7 +1726,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(user_groups_data), 2)
 
         with self.assertRaisesRegex(
-                Exception, 'User group with id INVALID_USER_GROUP_ID does not exist.'):
+            Exception, 'User group with id INVALID_USER_GROUP_ID does not exist.'
+        ):
             user_services.delete_user_group('INVALID_USER_GROUP_ID')
 
     def test_add_new_user_group(self) -> None:
@@ -1829,8 +1806,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_user_group_trying_to_update_not_exists_raise_error(self) -> None:
         self._signup_test_users_and_create_user_groups()
         user_groups_data = user_services.get_all_user_groups()
-        with self.assertRaisesRegex(Exception,
-                                    'User group INVALID_USER_GROUP does not exist.'):
+        with self.assertRaisesRegex(
+            Exception, 'User group INVALID_USER_GROUP does not exist.'
+        ):
             user_services.update_user_group(
                 'INVALID_USER_GROUP_ID', 'INVALID_USER_GROUP',
                 ['user1', 'user2', 'user3']
@@ -1844,9 +1822,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_user_group(
             user_groups_data[0].user_group_id, 'USERGROUP1', ['user1', 'user2']
         )
-        with self.assertRaisesRegex(Exception,
-                                    r'Users list of user-group USERGROUP1 contains '
-                                    r'duplicates: \[\'user2\']\.'):
+        with self.assertRaisesRegex(
+            Exception, r'Users list of user-group USERGROUP1 contains '
+            r'duplicates: \[\'user2\']\.'
+        ):
             user_services.update_user_group(
                 user_groups_data[0].user_group_id, 'USERGROUP1',
                 ['user1', 'user2', 'user2']
@@ -1858,9 +1837,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_user_group(
             user_groups_data[0].user_group_id, 'USERGROUP1', ['user1', 'user2']
         )
-        with self.assertRaisesRegex(Exception,
-                                    r'Following users of user-group USERGROUP1 '
-                                    r'does not exist: \[\'user5\', \'user6\']\.'):
+        with self.assertRaisesRegex(
+            Exception, r'Following users of user-group USERGROUP1 '
+            r'does not exist: \[\'user5\', \'user6\']\.'
+        ):
             user_services.update_user_group(
                 user_groups_data[0].user_group_id, 'USERGROUP1',
                 ['user1', 'user2', 'user5', 'user6']
@@ -1931,8 +1911,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                ValueError,
-                'time data \'2016-13-01\' does not match format \'%Y-%m-%d\''):
+            ValueError, 'time data \'2016-13-01\' does not match format \'%Y-%m-%d\''
+        ):
             user_services.parse_date_from_string('2016-13-01')
         with self.assertRaisesRegex(ValueError, 'unconverted data remains: 2'):
             user_services.parse_date_from_string('2016-03-32')
@@ -2025,9 +2005,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         contributions = user_services.get_user_contributions(user_id, strict=True)
 
-        self.assertEqual(
-            ['exp1', 'exp2', 'exp3'], contributions.created_exploration_ids
-        )
+        self.assertEqual(['exp1', 'exp2', 'exp3'],
+                         contributions.created_exploration_ids)
 
         self.assertEqual(['exp2', 'exp3', 'exp4'], contributions.edited_exploration_ids)
 
@@ -2046,15 +2025,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_id, created_exp_ids, edited_exp_ids
         )
         contributions = user_services.get_user_contributions(user_id, strict=True)
-        self.assertEqual(
-            ['exp1', 'exp2', 'exp3'], contributions.created_exploration_ids
-        )
+        self.assertEqual(['exp1', 'exp2', 'exp3'],
+                         contributions.created_exploration_ids)
         self.assertEqual(['exp2', 'exp3', 'exp4'], contributions.edited_exploration_ids)
 
     def test_update_user_contributions_for_invalid_user_raises_error(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'User contributions model for user %s does not exist.' %
-                'non_existent_user_id'):
+            Exception, 'User contributions model for user %s does not exist.' %
+            'non_existent_user_id'
+        ):
             user_services.update_user_contributions(
                 'non_existent_user_id', ['exp1', 'exp2', 'exp3'],
                 ['exp2', 'exp3', 'exp4']
@@ -2181,10 +2160,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         state.update_interaction_id('TextInput')
         state.update_interaction_answer_groups(state_answer_group)
-        states = {'Introduction': state}
+        states = {
+            'Introduction': state
+        }
 
         with self.assertRaisesRegex(
-                Exception, 'States with a null destination can never be a checkpoint.'):
+            Exception, 'States with a null destination can never be a checkpoint.'
+        ):
             user_services.get_checkpoints_in_order('Introduction', states)
 
         state_answer_group = [
@@ -2212,15 +2194,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         state.interaction.default_outcome.dest = None
 
         with self.assertRaisesRegex(
-                Exception, 'States with a null destination can never be a checkpoint'):
+            Exception, 'States with a null destination can never be a checkpoint'
+        ):
             user_services.get_checkpoints_in_order('Introduction', states)
 
     def test_raises_error_if_sync_logged_in_learner_checkpoint_with_invalid_id(
         self
     ) -> None:
         with self.assertRaisesRegex(
-                Exception, 'No ExplorationUserDataModel found for the given user and '
-                'exploration ids: invalid_user_id, exp_1'):
+            Exception, 'No ExplorationUserDataModel found for the given user and '
+            'exploration ids: invalid_user_id, exp_1'
+        ):
             user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(   # pylint: disable=line-too-long
                 'invalid_user_id', 'exp_1', strict=True
             )
@@ -2508,13 +2492,11 @@ title: Title
         # Now version of exploration becomes 4.
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': 'Introduction',
-                        'new_state_name': 'Intro',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'Intro',
+                })
             ], 'Change state name'
         )
 
@@ -2567,13 +2549,11 @@ title: Title
         # Now version of exploration becomes 2.
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': 'Introduction',
-                        'new_state_name': 'Intro',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'Intro',
+                })
             ], 'Change state name'
         )
 
@@ -2650,34 +2630,28 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_state_property',
-                        'state_name': init_state_name,
-                        'property_name': 'widget_id',
-                        'new_value': 'MultipleChoiceInput'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_state_property',
-                        'state_name': init_state_name,
-                        'property_name': 'widget_customization_args',
-                        'new_value': {
-                            'choices': {
-                                'value': [
-                                    {
-                                        'content_id': 'ca_choices_0',
-                                        'html': '<p>Choice 1</p>'
-                                    }
-                                ]
-                            },
-                            'showChoicesInShuffledOrder': {
-                                'value': True
-                            }
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'state_name': init_state_name,
+                    'property_name': 'widget_id',
+                    'new_value': 'MultipleChoiceInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'state_name': init_state_name,
+                    'property_name': 'widget_customization_args',
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {
+                            'value': True
                         }
                     }
-                )
+                })
             ], 'commit'
         )
 
@@ -2701,34 +2675,28 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # contribution time.
         exp_services.update_exploration(
             self.admin_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_state_property',
-                        'state_name': init_state_name,
-                        'property_name': 'widget_id',
-                        'new_value': 'MultipleChoiceInput'
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_state_property',
-                        'state_name': init_state_name,
-                        'property_name': 'widget_customization_args',
-                        'new_value': {
-                            'choices': {
-                                'value': [
-                                    {
-                                        'content_id': 'ca_choices_0',
-                                        'html': '<p>Choice 1</p>'
-                                    }
-                                ]
-                            },
-                            'showChoicesInShuffledOrder': {
-                                'value': True
-                            }
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'state_name': init_state_name,
+                    'property_name': 'widget_id',
+                    'new_value': 'MultipleChoiceInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'state_name': init_state_name,
+                    'property_name': 'widget_customization_args',
+                    'new_value': {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Choice 1</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {
+                            'value': True
                         }
                     }
-                )
+                })
             ], ''
         )
         self.assertIsNone(
@@ -2742,13 +2710,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         )
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'rename_state',
-                        'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'new_state_name': '¡Hola! αβγ',
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'rename_state',
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': '¡Hola! αβγ',
+                })
             ], ''
         )
         self.assertIsNone(
@@ -2831,13 +2797,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_collection(self.admin, self.COL_ID)
 
         collection_services.update_collection(
-            self.editor_id, self.COL_ID, [
-                {
-                    'cmd': 'edit_collection_property',
-                    'property_name': 'title',
-                    'new_value': 'Some new title'
-                }
-            ], 'Changed the title'
+            self.editor_id, self.COL_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'Some new title'
+            }], 'Changed the title'
         )
 
         self.assertIsNotNone(
@@ -2865,13 +2829,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that commit to unpublished collection does not update
         # contribution time.
         collection_services.update_collection(
-            self.admin_id, self.COL_ID, [
-                {
-                    'cmd': 'edit_collection_property',
-                    'property_name': 'title',
-                    'new_value': 'Some new title'
-                }
-            ], ''
+            self.admin_id, self.COL_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'Some new title'
+            }], ''
         )
         self.assertIsNone(
             user_services.get_user_settings(self.admin_id).first_contribution_msec
@@ -2883,13 +2845,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.admin, self.COL_ID, self.editor_id, 'editor'
         )
         collection_services.update_collection(
-            self.editor_id, self.COL_ID, [
-                {
-                    'cmd': 'edit_collection_property',
-                    'property_name': 'category',
-                    'new_value': 'Some new category'
-                }
-            ], ''
+            self.editor_id, self.COL_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'category',
+                'new_value': 'Some new category'
+            }], ''
         )
         self.assertIsNone(
             user_services.get_user_settings(self.editor_id).first_contribution_msec
@@ -3013,20 +2973,20 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_last_week_dashboard_stats(self.owner_id), None
         )
 
-        with self.swap(user_services, 'get_current_date_as_string',
-                       self.mock_get_current_date_as_string):
+        with self.swap(
+            user_services, 'get_current_date_as_string',
+            self.mock_get_current_date_as_string
+        ):
             user_services.update_dashboard_stats_log(self.owner_id)
 
         self.assertEqual(
-            user_services.get_weekly_dashboard_stats(self.owner_id), [
-                {
-                    self.CURRENT_DATE_AS_STRING: {
-                        'total_plays': 1,
-                        'num_ratings': 0,
-                        'average_ratings': None
-                    }
+            user_services.get_weekly_dashboard_stats(self.owner_id), [{
+                self.CURRENT_DATE_AS_STRING: {
+                    'total_plays': 1,
+                    'num_ratings': 0,
+                    'average_ratings': None
                 }
-            ]
+            }]
         )
 
     def test_get_weekly_dashboard_stats(self) -> None:
@@ -3059,20 +3019,20 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_last_week_dashboard_stats(self.owner_id), None
         )
 
-        with self.swap(user_services, 'get_current_date_as_string',
-                       self.mock_get_current_date_as_string):
+        with self.swap(
+            user_services, 'get_current_date_as_string',
+            self.mock_get_current_date_as_string
+        ):
             user_services.update_dashboard_stats_log(self.owner_id)
 
         self.assertEqual(
-            user_services.get_weekly_dashboard_stats(self.owner_id), [
-                {
-                    self.CURRENT_DATE_AS_STRING: {
-                        'total_plays': 1,
-                        'num_ratings': 0,
-                        'average_ratings': None
-                    }
+            user_services.get_weekly_dashboard_stats(self.owner_id), [{
+                self.CURRENT_DATE_AS_STRING: {
+                    'total_plays': 1,
+                    'num_ratings': 0,
+                    'average_ratings': None
                 }
-            ]
+            }]
         )
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), {
@@ -3106,8 +3066,9 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
     def test_get_user_impact_score(self) -> None:
         expected_impact_score = 3
-        with self.swap(user_models.UserStatsModel, 'impact_score',
-                       expected_impact_score):
+        with self.swap(
+            user_models.UserStatsModel, 'impact_score', expected_impact_score
+        ):
             impact_score_for_user_with_no_activity = (
                 user_services.get_user_impact_score(self.owner_id)
             )
@@ -3155,9 +3116,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     def test_update_dashboard_stats_log_with_invalid_schema_version(self) -> None:
         with self.swap(user_models.UserStatsModel, 'schema_version', 5):
             with self.assertRaisesRegex(
-                    Exception,
-                    'Sorry, we can only process v1-v%d dashboard stats schemas at'
-                    ' present.' % (feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)):
+                Exception,
+                'Sorry, we can only process v1-v%d dashboard stats schemas at'
+                ' present.' % (feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
+            ):
                 user_services.update_dashboard_stats_log(self.owner_id)
 
 
@@ -3259,13 +3221,11 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'objective',
-                        'new_value': 'the objective'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'the objective'
+                })
             ], 'Test edit'
         )
 
@@ -3275,13 +3235,11 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
     def test_last_exp_edit_time_gets_updated(self) -> None:
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'objective',
-                        'new_value': 'the objective'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'the objective'
+                })
             ], 'Test edit'
         )
 
@@ -3305,22 +3263,18 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         # The editor edits the exploration 13 hours after it was created.
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'objective',
-                        'new_value': 'new objective'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'new objective'
+                })
             ], 'Test edit 2'
         )
 
         # Make sure last exploration edited time gets updated.
         editor_settings = user_services.get_user_settings(self.editor_id)
-        self.assertGreater(
-            (editor_settings.last_edited_an_exploration),
-            previous_last_edited_an_exploration
-        )
+        self.assertGreater((editor_settings.last_edited_an_exploration),
+                           previous_last_edited_an_exploration)
 
 
 class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
@@ -3360,8 +3314,9 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.owner_id)
         # Ruling out the possibility of None for mypy type checking.
         assert user_settings.last_created_an_exploration is not None
-        with self.mock_datetime_utcnow(user_settings.last_created_an_exploration -
-                                       datetime.timedelta(hours=13)):
+        with self.mock_datetime_utcnow(
+            user_settings.last_created_an_exploration - datetime.timedelta(hours=13)
+        ):
             user_services.record_user_created_an_exploration(self.owner_id)
 
         owner_settings = user_services.get_user_settings(self.owner_id)
@@ -3377,10 +3332,8 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
         # Make sure that last exploration created time gets updated.
         owner_settings = user_services.get_user_settings(self.owner_id)
-        self.assertGreater(
-            (owner_settings.last_created_an_exploration),
-            previous_last_created_an_exploration
-        )
+        self.assertGreater((owner_settings.last_created_an_exploration),
+                           previous_last_created_an_exploration)
 
 
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
@@ -3426,7 +3379,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
-        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {
+            'hi': 1
+        })
         self.assertDictEqual(stats.translation_suggestion_counts_by_lang_code, {})
 
     def test_grant_reviewer_translation_multi_reviewing_rights_increases_count(
@@ -3460,7 +3415,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
-        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {
+            'hi': 1
+        })
         self.assertDictEqual(stats.translation_suggestion_counts_by_lang_code, {})
 
         user_services.allow_user_to_review_translation_in_language(
@@ -3472,7 +3429,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
-        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {
+            'hi': 1
+        })
         self.assertDictEqual(stats.translation_suggestion_counts_by_lang_code, {})
 
     def test_remove_all_reviewer_translation_reviewing_rights_decreases_count(
@@ -3485,7 +3444,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
-        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {
+            'hi': 1
+        })
         self.assertDictEqual(stats.translation_suggestion_counts_by_lang_code, {})
 
         user_services.remove_translation_review_rights_in_language(
@@ -3526,7 +3487,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
-        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {'en': 1})
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {
+            'en': 1
+        })
         self.assertDictEqual(stats.translation_suggestion_counts_by_lang_code, {})
 
     def test_remove_translation_contribution_reviewer_decreases_count(self) -> None:
@@ -3712,7 +3675,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
-        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {'hi': 1})
+        self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {
+            'hi': 1
+        })
         self.assertDictEqual(stats.translation_suggestion_counts_by_lang_code, {})
 
         user_services.remove_translation_review_rights_in_language(
@@ -3944,10 +3909,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         )
 
         all_reviewers = user_services.get_all_reviewers_contribution_rights()
-        self.assertItemsEqual(
-            [reviewer.id for reviewer in all_reviewers],
-            [self.voice_artist_id, self.translator_id]
-        )
+        self.assertItemsEqual([reviewer.id for reviewer in all_reviewers],
+                              [self.voice_artist_id, self.translator_id])
 
     def test_get_reviewer_user_ids_to_notify_when_reviewers_want_notifications(
         self
@@ -4164,9 +4127,9 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
         self.user_id_admin = (self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.set_translation_coordinators(
-            [user_services.get_username(self.user_id_translationcoordinator)], 'en'
-        )
+        self.set_translation_coordinators([
+            user_services.get_username(self.user_id_translationcoordinator)
+        ], 'en')
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_translationcoordinator = user_services.get_user_actions_info(
@@ -4179,37 +4142,43 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
     ) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(
-                Exception,
-                'Guest users are not allowed to deassign users from all languages.'):
+            Exception,
+            'Guest users are not allowed to deassign users from all languages.'
+        ):
             user_services.deassign_user_from_all_languages(guest_user, 'user_id')
 
         with self.assertRaisesRegex(
-                Exception, 'Guest user is not allowed to deassign roles to a user.'):
+            Exception, 'Guest user is not allowed to deassign roles to a user.'
+        ):
             user_services.deassign_coordinator(guest_user, self.user_a, 'en')
 
     def test_non_admin_cannot_assign_roles(self) -> None:
 
         with self.assertRaisesRegex(
-                Exception, 'UnauthorizedUserException: Could not assign new role.'):
+            Exception, 'UnauthorizedUserException: Could not assign new role.'
+        ):
             user_services.assign_coordinator(self.user_b, self.user_a, 'en')
 
     def test_guest_user_cannot_assign_roles(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(
-                Exception, 'Guest user is not allowed to assign roles to a user.'):
+            Exception, 'Guest user is not allowed to assign roles to a user.'
+        ):
             user_services.assign_coordinator(guest_user, self.user_b, 'en')
 
     def test_roles_of_guest_user_cannot_be_changed_until_guest_is_logged_in(
         self
     ) -> None:
         guest_user = user_services.get_user_actions_info(None)
-        with self.assertRaisesRegex(Exception,
-                                    'Cannot change the role of the Guest user.'):
+        with self.assertRaisesRegex(
+            Exception, 'Cannot change the role of the Guest user.'
+        ):
             user_services.assign_coordinator(self.user_admin, guest_user, 'en')
 
     def test_reassigning_role_to_same_user(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'This user already is a coordinator for this language.'):
+            Exception, 'This user already is a coordinator for this language.'
+        ):
             user_services.assign_coordinator(
                 self.user_admin, self.user_translationcoordinator, 'en'
             )
@@ -4238,29 +4207,34 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
 
     def test_non_admin_cannot_deassign_roles(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'UnauthorizedUserException: Could not assign new role.'):
+            Exception, 'UnauthorizedUserException: Could not assign new role.'
+        ):
             user_services.deassign_coordinator(self.user_b, self.user_a, 'en')
 
     def test_guest_user_cannot_deassign_roles(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(
-                Exception, 'Guest user is not allowed to deassign roles to a user.'):
+            Exception, 'Guest user is not allowed to deassign roles to a user.'
+        ):
             user_services.deassign_coordinator(guest_user, self.user_b, 'en')
 
     def test_guest_user_cannot_be_deassgined(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'No model exists for provided language.'):
+        with self.assertRaisesRegex(
+            Exception, 'No model exists for provided language.'
+        ):
             user_services.deassign_coordinator(self.user_admin, self.user_a, 'no_model')
 
     def test_deassigning_for_non_existing_language_model(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
-        with self.assertRaisesRegex(Exception,
-                                    'Cannot change the role of the Guest user.'):
+        with self.assertRaisesRegex(
+            Exception, 'Cannot change the role of the Guest user.'
+        ):
             user_services.deassign_coordinator(self.user_admin, guest_user, 'en')
 
     def test_deassigning_role_from_non_coordinator(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'This user is not a coordinator for this language'):
+        with self.assertRaisesRegex(
+            Exception, 'This user is not a coordinator for this language'
+        ):
             user_services.deassign_coordinator(self.user_admin, self.user_a, 'en')
 
     def test_get_translation_rights_from_model(self) -> None:

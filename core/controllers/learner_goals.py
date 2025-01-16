@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the learner goals."""
 
 from __future__ import annotations
@@ -27,16 +26,15 @@ from core.domain import learner_progress_services
 from typing import Dict
 
 
-class LearnerGoalsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles operations related to the learner goals."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
@@ -46,9 +44,7 @@ class LearnerGoalsHandler(
         'activity_type': {
             'schema': {
                 'type': 'basestring',
-                'choices': [
-                    constants.ACTIVITY_TYPE_LEARN_TOPIC
-                ]
+                'choices': [constants.ACTIVITY_TYPE_LEARN_TOPIC]
             }
         }
     }
@@ -77,7 +73,9 @@ class LearnerGoalsHandler(
 
         belongs_to_learnt_list, goals_limit_exceeded = (
             learner_progress_services.validate_and_add_topic_to_learn_goal(
-                self.user_id, topic_id))
+                self.user_id, topic_id
+            )
+        )
 
         self.values.update({
             'belongs_to_learnt_list': belongs_to_learnt_list,
@@ -101,7 +99,6 @@ class LearnerGoalsHandler(
             topic_id: str. The topic ID.
         """
         assert self.user_id is not None
-        learner_goals_services.remove_topics_from_learn_goal(
-            self.user_id, [topic_id])
+        learner_goals_services.remove_topics_from_learn_goal(self.user_id, [topic_id])
 
         self.render_json(self.values)

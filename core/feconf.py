@@ -70,8 +70,10 @@ def check_dev_mode_is_true() -> None:
     """
     if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
         server_software = os.getenv('SERVER_SOFTWARE')
-        if (server_software and not server_software.startswith(
-            ('Development', 'gunicorn'))):
+        if (
+            server_software and
+            not server_software.startswith(('Development', 'gunicorn'))
+        ):
             raise Exception('DEV_MODE can\'t be true on production.')
 
 
@@ -425,7 +427,9 @@ COMPRESSIBLE_IMAGE_FORMATS = [IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
-ACCEPTED_AUDIO_EXTENSIONS = {'mp3': ['audio/mp3']}
+ACCEPTED_AUDIO_EXTENSIONS = {
+    'mp3': ['audio/mp3']
+}
 
 # Prefix for data sent from the server to the client via JSON.
 XSSI_PREFIX = b')]}\'\n'
@@ -438,7 +442,13 @@ LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-zA-Z]+)-)+([a-zA-Z]+)$'
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
 # TODO(Jacob): Refactor exp_services to remove this problem.
-_EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+_EMPTY_RATINGS = {
+    '1': 0,
+    '2': 0,
+    '3': 0,
+    '4': 0,
+    '5': 0
+}
 
 
 def get_empty_ratings() -> Dict[str, int]:
@@ -1326,105 +1336,97 @@ ALLOWED_ACTIVITY_STATUS = [
 ]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [
-    {
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_CHANGE_ROLE,
-        'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': ['assignee_id'],
-        'allowed_values': {
-            'new_role': ALLOWED_ACTIVITY_ROLES,
-            'old_role': ALLOWED_ACTIVITY_ROLES
-        },
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REMOVE_ROLE,
-        'required_attribute_names': ['removed_user_id', 'old_role'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': ['removed_user_id'],
-        'allowed_values': {
-            'old_role': ALLOWED_ACTIVITY_ROLES
-        },
-        'deprecated_values': {}
-    }, {
-        'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
-        'required_attribute_names': [
-            'old_viewable_if_private', 'new_viewable_if_private'
-        ],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_RELEASE_OWNERSHIP,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-        'required_attribute_names': [
-            'old_first_published_msec', 'new_first_published_msec'
-        ],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_COMMIT,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }
-]
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
+    'name': CMD_CREATE_NEW,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}, {
+    'name': CMD_CHANGE_ROLE,
+    'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['assignee_id'],
+    'allowed_values': {
+        'new_role': ALLOWED_ACTIVITY_ROLES,
+        'old_role': ALLOWED_ACTIVITY_ROLES
+    },
+    'deprecated_values': {}
+}, {
+    'name': CMD_REMOVE_ROLE,
+    'required_attribute_names': ['removed_user_id', 'old_role'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['removed_user_id'],
+    'allowed_values': {
+        'old_role': ALLOWED_ACTIVITY_ROLES
+    },
+    'deprecated_values': {}
+}, {
+    'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
+    'required_attribute_names': ['old_viewable_if_private', 'new_viewable_if_private'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}, {
+    'name': CMD_RELEASE_OWNERSHIP,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}, {
+    'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+    'required_attribute_names': [
+        'old_first_published_msec', 'new_first_published_msec'
+    ],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}, {
+    'name': CMD_DELETE_COMMIT,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append(
-    {
-        'name': CMD_CHANGE_COLLECTION_STATUS,
-        'required_attribute_names': ['old_status', 'new_status'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {
-            'old_status': ALLOWED_ACTIVITY_STATUS,
-            'new_status': ALLOWED_ACTIVITY_STATUS
-        },
-        'deprecated_values': {}
-    }
-)
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
+    'name': CMD_CHANGE_COLLECTION_STATUS,
+    'required_attribute_names': ['old_status', 'new_status'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {
+        'old_status': ALLOWED_ACTIVITY_STATUS,
+        'new_status': ALLOWED_ACTIVITY_STATUS
+    },
+    'deprecated_values': {}
+})
 
 EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
-EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append(
-    {
-        'name': CMD_CHANGE_EXPLORATION_STATUS,
-        'required_attribute_names': ['old_status', 'new_status'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {
-            'old_status': ALLOWED_ACTIVITY_STATUS,
-            'new_status': ALLOWED_ACTIVITY_STATUS
-        },
-        # TODO(#12991): Remove this once once we use the migration jobs to remove
-        # the deprecated values from the server data.
-        'deprecated_values': {
-            'new_status': ['publicized']
-        }
+EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
+    'name': CMD_CHANGE_EXPLORATION_STATUS,
+    'required_attribute_names': ['old_status', 'new_status'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {
+        'old_status': ALLOWED_ACTIVITY_STATUS,
+        'new_status': ALLOWED_ACTIVITY_STATUS
+    },
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated values from the server data.
+    'deprecated_values': {
+        'new_status': ['publicized']
     }
-)
+})
 
 CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
 CMD_PUBLISH_TOPIC = 'publish_topic'
@@ -1437,54 +1439,52 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = [
-    {
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_CHANGE_ROLE,
-        'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': ['assignee_id'],
-        'allowed_values': {
-            'new_role': ALLOWED_TOPIC_ROLES,
-            'old_role': ALLOWED_TOPIC_ROLES
-        },
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REMOVE_MANAGER_ROLE,
-        'required_attribute_names': ['removed_user_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': ['removed_user_id'],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_PUBLISH_TOPIC,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_UNPUBLISH_TOPIC,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_COMMIT,
-        'required_attribute_names': [],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }
-]
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
+    'name': CMD_CREATE_NEW,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}, {
+    'name': CMD_CHANGE_ROLE,
+    'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['assignee_id'],
+    'allowed_values': {
+        'new_role': ALLOWED_TOPIC_ROLES,
+        'old_role': ALLOWED_TOPIC_ROLES
+    },
+    'deprecated_values': {}
+}, {
+    'name': CMD_REMOVE_MANAGER_ROLE,
+    'required_attribute_names': ['removed_user_id'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['removed_user_id'],
+    'allowed_values': {},
+    'deprecated_values': {}
+}, {
+    'name': CMD_PUBLISH_TOPIC,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}, {
+    'name': CMD_UNPUBLISH_TOPIC,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}, {
+    'name': CMD_DELETE_COMMIT,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
+}]
 
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36

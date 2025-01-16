@@ -107,8 +107,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'entity_id must be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'entity_id must be a string'
+        ):
             self.entity_voiceovers_instance.entity_id = 123  # type: ignore[assignment]
             self.entity_voiceovers_instance.validate()
 
@@ -116,8 +117,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'entity_version must be an int'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'entity_version must be an int'
+        ):
             self.entity_voiceovers_instance.entity_version = 'version'  # type: ignore[assignment]
             self.entity_voiceovers_instance.validate()
 
@@ -125,8 +127,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'entity_type must be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'entity_type must be a string'
+        ):
             self.entity_voiceovers_instance.entity_type = 1  # type: ignore[assignment]
             self.entity_voiceovers_instance.validate()
 
@@ -138,8 +141,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'voiceover type must be VoiceoverType'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'voiceover type must be VoiceoverType'
+        ):
             self.entity_voiceovers_instance.voiceovers_mapping[
                 'content_id_0'][1] = ( # type: ignore[index]
                     self.entity_voiceovers_instance.voiceovers_mapping[
@@ -150,8 +154,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'language_accent_code must be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'language_accent_code must be a string'
+        ):
             self.entity_voiceovers_instance.language_accent_code = 1  # type: ignore[assignment]
             self.entity_voiceovers_instance.validate()
 
@@ -177,8 +182,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'content_id must be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'content_id must be a string'
+        ):
             self.entity_voiceovers_instance.voiceovers_mapping[
                 1] = None  # type: ignore[index, assignment]
             self.entity_voiceovers_instance.validate()

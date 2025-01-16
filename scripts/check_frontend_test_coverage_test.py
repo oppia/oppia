@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for scripts/check_frontend_test_coverage.py."""
 
 from __future__ import annotations
@@ -30,6 +29,7 @@ from . import check_frontend_test_coverage
 
 
 class CheckFrontendCoverageTests(test_utils.GenericTestBase):
+
     def setUp(self) -> None:
         super().setUp()
         self.lcov_items_list: Optional[str] = None
@@ -44,6 +44,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         self.printed_messages: List[str] = []
 
         class MockFile:
+
             def __init__(self, lcov_items_list: Optional[str]):
                 self.lcov_items_list = lcov_items_list
 
@@ -51,7 +52,8 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 return self.lcov_items_list
 
         def mock_open_file(
-            file_name: str, option: Dict[str, str]  # pylint: disable=unused-argument
+            file_name: str,
+            option: Dict[str, str]  # pylint: disable=unused-argument
         ) -> MockFile:  # pylint: disable=unused-argument
             self.check_function_calls['open_file_is_called'] = True
             return MockFile(self.lcov_items_list)
@@ -66,14 +68,10 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         def mock_check_call(command: str) -> None:  # pylint: disable=unused-argument
             self.check_function_calls['check_call_is_called'] = True
 
-        self.open_file_swap = self.swap(
-            utils, 'open_file', mock_open_file
-        )
+        self.open_file_swap = self.swap(utils, 'open_file', mock_open_file)
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
         self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call
-        )
+        self.check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
     def test_get_stanzas_from_lcov_file(self) -> None:
         self.lcov_items_list = (
@@ -106,12 +104,10 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             self.assertEqual(stanzas[2].covered_lines, 5)
 
     def test_get_stanzas_from_lcov_file_file_name_exception(self) -> None:
-        self.lcov_items_list = (
-            'SF:\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
-        )
+        self.lcov_items_list = ('SF:\n'
+                                'LF:10\n'
+                                'LH:5\n'
+                                'end_of_record\n')
         with self.open_file_swap:
             with self.assertRaisesRegex(
                 Exception,
@@ -164,14 +160,15 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
-            [
-                '/opensource/oppia/file.ts',
-                '/opensource/oppia/file2.ts'
-            ],
+            ['/opensource/oppia/file.ts', '/opensource/oppia/file2.ts'],
         )
 
-        check_function_calls = {'sys_exit_is_called': False}
-        expected_check_function_calls = {'sys_exit_is_called': False}
+        check_function_calls = {
+            'sys_exit_is_called': False
+        }
+        expected_check_function_calls = {
+            'sys_exit_is_called': False
+        }
 
         def mock_sys_exit(error_message: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['sys_exit_is_called'] = True
@@ -180,11 +177,10 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap:  # pylint: disable=line-too-long
             with not_fully_covered_files_swap:
                 check_frontend_test_coverage.check_coverage_changes()
-            self.assertEqual(
-                check_function_calls, expected_check_function_calls
-            )
+            self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_check_coverage_changes_error(self) -> None:
+
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
@@ -311,8 +307,12 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             ['/opensource/oppia/anotherfile.tsfile.ts'],
         )
 
-        check_function_calls = {'sys_exit_is_called': False}
-        expected_check_function_calls = {'sys_exit_is_called': False}
+        check_function_calls = {
+            'sys_exit_is_called': False
+        }
+        expected_check_function_calls = {
+            'sys_exit_is_called': False
+        }
 
         def mock_sys_exit(error_message: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['sys_exit_is_called'] = True
@@ -321,12 +321,10 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         with sys_exit_swap, self.exists_swap, self.open_file_swap:
             with self.print_swap, not_fully_covered_files_swap:
                 (
-                    check_frontend_test_coverage
-                    .check_not_fully_covered_filenames_list_is_sorted()
+                    check_frontend_test_coverage.
+                    check_not_fully_covered_filenames_list_is_sorted()
                 )
-                self.assertEqual(
-                    check_function_calls, expected_check_function_calls
-                )
+                self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_fully_covered_filenames_is_not_sorted(self) -> None:
         self.lcov_items_list = (
@@ -342,18 +340,15 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
-            [
-                '/opensource/oppia/file.ts',
-                '/opensource/oppia/anotherfile.ts'
-            ],
+            ['/opensource/oppia/file.ts', '/opensource/oppia/anotherfile.ts'],
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
             with not_fully_covered_files_swap, self.capture_logging() as logs:
                 with self.assertRaisesRegex(SystemExit, '1'):
                     (
-                        check_frontend_test_coverage
-                        .check_not_fully_covered_filenames_list_is_sorted()
+                        check_frontend_test_coverage.
+                        check_not_fully_covered_filenames_list_is_sorted()
                     )
                 self.assertEqual(
                     logs,
@@ -370,28 +365,28 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_check_if_file_should_be_checked_should_not_be_checked(self) -> None: # pylint: disable=line-too-long
+    def test_check_if_file_should_be_checked_should_not_be_checked(self) -> None:  # pylint: disable=line-too-long
         self.assertFalse(
             check_frontend_test_coverage.check_if_file_should_be_checked(
                 '/oppia/file.ts', ['/oppia/file2.ts']
             )
         )
 
-    def test_check_if_file_should_be_checked_with_no_files_to_check_should_be_checked(self) -> None: # pylint: disable=line-too-long
+    def test_check_if_file_should_be_checked_with_no_files_to_check_should_be_checked(self) -> None:  # pylint: disable=line-too-long
         self.assertTrue(
             check_frontend_test_coverage.check_if_file_should_be_checked(
                 '/oppia/file.ts', None
             )
         )
 
-    def test_check_if_file_should_be_checked_with_empty_files_to_check_should_not_be_checked(self) -> None: # pylint: disable=line-too-long
+    def test_check_if_file_should_be_checked_with_empty_files_to_check_should_not_be_checked(self) -> None:  # pylint: disable=line-too-long
         self.assertFalse(
             check_frontend_test_coverage.check_if_file_should_be_checked(
                 '/oppia/file.ts', []
             )
         )
 
-    def test_check_if_file_should_be_checked_with_empty_file_path_should_not_be_checked(self) -> None: # pylint: disable=line-too-long
+    def test_check_if_file_should_be_checked_with_empty_file_path_should_not_be_checked(self) -> None:  # pylint: disable=line-too-long
         self.assertFalse(
             check_frontend_test_coverage.check_if_file_should_be_checked(
                 '', ['/oppia/file.ts']
@@ -416,10 +411,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
-            [
-                '/opensource/oppia/file.ts',
-                '/opensource/oppia/file2.ts'
-            ],
+            ['/opensource/oppia/file.ts', '/opensource/oppia/file2.ts'],
         )
 
         with self.check_call_swap, self.exists_swap, self.open_file_swap:
@@ -430,8 +422,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                         '/opensource/oppia/file3.ts'
                     ])
                 self.assertEqual(
-                    logs,
-                    [
+                    logs, [
                         '\x1b[1m/opensource/oppia/file3.ts\x1b[0m seems to be '
                         'not completely tested. Make sure it\'s fully covered.'
                     ]
@@ -447,9 +438,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
-            [
-                '/opensource/oppia/file.ts'
-            ],
+            ['/opensource/oppia/file.ts'],
         )
         with self.check_call_swap, self.exists_swap, self.open_file_swap:
             with not_fully_covered_files_swap:

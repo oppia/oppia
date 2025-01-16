@@ -1,7 +1,9 @@
 from typing import Any, MutableMapping, Optional, Union, Collection
 from .utils import NamespacedClient
 
+
 class IndicesClient(NamespacedClient):
+
     def create(
         self,
         index: Any,
@@ -21,4 +23,5 @@ class IndicesClient(NamespacedClient):
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
         headers: Optional[MutableMapping[str, str]] = ...
-    ) -> Any: ...
+    ) -> Any:
+        ...

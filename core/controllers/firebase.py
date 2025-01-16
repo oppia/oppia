@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Firebase proxy controller."""
 
 from __future__ import annotations
@@ -25,22 +24,21 @@ from core.controllers import base
 import requests
 from typing import Any, Dict
 
-
 TIMEOUT_SECS = 60
 """Timeout in seconds for firebase requests."""
 
 FIREBASE_DOMAINS = {
     'oppiaserver-backup-migration.appspot.com':
         'https://oppiaserver-backup-migration.firebaseapp.com',
-    'www.oppiatestserver.org': 'https://oppiatestserver.firebaseapp.com',
-    'www.oppia.org': 'https://oppiaserver.firebaseapp.com'
+    'www.oppiatestserver.org':
+        'https://oppiatestserver.firebaseapp.com',
+    'www.oppia.org':
+        'https://oppiaserver.firebaseapp.com'
 }
 """A mapping of oppia domain to firebase domains used for authentication."""
 
 
-class FirebaseProxyPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class FirebaseProxyPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler to proxy auth requests to the firebase domain."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
@@ -51,12 +49,12 @@ class FirebaseProxyPage(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}, 'POST': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {},
+        'POST': {}
+    }
     RESPONSE_EXCLUDED_HEADERS = frozenset([
-        'content-encoding',
-        'content-length',
-        'transfer-encoding',
-        'connection'
+        'content-encoding', 'content-length', 'transfer-encoding', 'connection'
     ])
     """Headers to exclude from the packaged response."""
 
@@ -64,9 +62,7 @@ class FirebaseProxyPage(
         """Proxies all requests to the firebase app."""
         firebase_domain = FIREBASE_DOMAINS.get(self.request.domain)
         if firebase_domain is None:
-            raise KeyError(
-                f'No firebase domain found for {self.request.domain}.'
-            )
+            raise KeyError(f'No firebase domain found for {self.request.domain}.')
 
         data = json.loads(self.request.body) if self.request.body else None
         response = requests.request(

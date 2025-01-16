@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain object for the property of a model."""
 
 from __future__ import annotations
@@ -24,7 +23,7 @@ from core.platform import models
 from typing import Any, Callable, Iterator, Tuple, Type, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -36,10 +35,8 @@ datastore_services = models.Registry.import_datastore_services()
 # properties that are derived from datastore_services.Property. Thus
 # to generalize the type of properties that ModelProperty can accept,
 # we defined a type variable here.
-PropertyType = Union[
-    datastore_services.Property,
-    Callable[[base_models.BaseModel], str]
-]
+PropertyType = Union[datastore_services.Property, Callable[[base_models.BaseModel],
+                                                           str]]
 
 
 class ModelProperty:
@@ -48,9 +45,7 @@ class ModelProperty:
     __slots__ = ('_model_kind', '_property_name')
 
     def __init__(
-        self,
-        model_class: Type[base_models.BaseModel],
-        property_obj: PropertyType
+        self, model_class: Type[base_models.BaseModel], property_obj: PropertyType
     ) -> None:
         """Initializes a new ModelProperty instance.
 
@@ -77,10 +72,10 @@ class ModelProperty:
             property_name = 'id'
         elif not isinstance(property_obj, datastore_services.Property):
             raise TypeError('%r is not an NDB Property' % property_obj)
-        elif not any(
-                p is property_obj for p in model_class._properties.values()): # pylint: disable=protected-access
+        elif not any(p is property_obj for p in model_class._properties.values()):  # pylint: disable=protected-access
             raise ValueError(
-                '%r is not a property of %s' % (property_obj, self._model_kind))
+                '%r is not a property of %s' % (property_obj, self._model_kind)
+            )
         else:
             property_name = property_obj._name  # pylint: disable=protected-access
 
@@ -108,9 +103,7 @@ class ModelProperty:
     # of a model and that values can be of type string, list, integer and other
     # types too. So, that's why Iterator[Any] type is used as a yield type of
     # function.
-    def yield_value_from_model(
-        self, model: base_models.BaseModel
-    ) -> Iterator[Any]:
+    def yield_value_from_model(self, model: base_models.BaseModel) -> Iterator[Any]:
         """Yields the value(s) of the property from the given model.
 
         If the property is repeated, all values are yielded. Otherwise, a single
@@ -126,8 +119,7 @@ class ModelProperty:
             TypeError. When the argument is not a model.
         """
         if not isinstance(model, self._to_model_class()):
-            raise TypeError(
-                '%r is not an instance of %s' % (model, self._model_kind))
+            raise TypeError('%r is not an instance of %s' % (model, self._model_kind))
         value = job_utils.get_model_property(model, self._property_name)
         if self._is_repeated_property():
             for item in value:
@@ -162,16 +154,13 @@ class ModelProperty:
         # property class, while during runtime a Python property is considered
         # as instance of Python's inbuilt property class. So to split the
         # assertion in both the cases, we used `if MYPY:` clause here.
-        if MYPY: # pragma: no cover
+        if MYPY:  # pragma: no cover
             assert (
                 isinstance(property_obj, datastore_services.Property) and
                 callable(property_obj)
             )
         else:
-            assert isinstance(
-                property_obj,
-                (datastore_services.Property, property)
-            )
+            assert isinstance(property_obj, (datastore_services.Property, property))
 
         return property_obj
 
@@ -216,18 +205,17 @@ class ModelProperty:
     # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
-        return (
-            (self._model_kind, self._property_name) == (
-                other._model_kind, other._property_name) # pylint: disable=protected-access
-            if self.__class__ is other.__class__ else NotImplemented)
+        return ((self._model_kind,
+                 self._property_name) == (other._model_kind, other._property_name)  # pylint: disable=protected-access
+                if self.__class__ is other.__class__ else NotImplemented)
 
     # NOTE: Here we use type Any because the function could also return
     # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __ne__(self, other: Any) -> Any:
         return (
-            not (self == other)
-            if self.__class__ is other.__class__ else NotImplemented)
+            not (self == other) if self.__class__ is other.__class__ else NotImplemented
+        )
 
     def __hash__(self) -> int:
         return hash((self._model_kind, self._property_name))

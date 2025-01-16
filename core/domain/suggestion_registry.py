@@ -52,7 +52,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models, ) = models.Registry.import_models([models.Names.SUGGESTION])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class BaseSuggestionDict(TypedDict):
@@ -255,9 +255,11 @@ class BaseSuggestion:
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id)
                 )
-            if not utils.is_user_id_valid(self.final_reviewer_id,
-                                          allow_system_user_id=True,
-                                          allow_pseudonymous_id=True):
+            if not utils.is_user_id_valid(
+                self.final_reviewer_id,
+                allow_system_user_id=True,
+                allow_pseudonymous_id=True
+            ):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be in a valid user ID '
                     'format, received %s' % self.final_reviewer_id
@@ -276,8 +278,9 @@ class BaseSuggestion:
                 (suggestion_models.SCORE_CATEGORY_DELIMITER, self.score_category)
             )
 
-        if (len(self.score_category.split(suggestion_models.SCORE_CATEGORY_DELIMITER)
-                )) != 2:
+        if (
+            len(self.score_category.split(suggestion_models.SCORE_CATEGORY_DELIMITER))
+        ) != 2:
             raise utils.ValidationError(
                 'Expected score_category to be of the form'
                 ' score_type%sscore_sub_type, received %s' %
@@ -768,9 +771,12 @@ class SuggestionTranslateContent(BaseSuggestion):
         # Before calling this accept method we are already checking if user
         # with 'final_reviewer_id' exists or not.
         assert self.final_reviewer_id is not None
-        if (hasattr(self.change_cmd, 'data_format')
-                and translation_domain.TranslatableContentFormat.is_data_format_list(
-                    self.change_cmd.data_format)):
+        if (
+            hasattr(self.change_cmd, 'data_format') and
+            translation_domain.TranslatableContentFormat.is_data_format_list(
+                self.change_cmd.data_format
+            )
+        ):
             return
 
         self._copy_new_images_to_target_entity_storage()
@@ -935,8 +941,10 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not self.change_cmd.cmd:
             raise utils.ValidationError('Expected change_cmd to contain cmd')
 
-        if (self.change_cmd.cmd
-                != question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
+        if (
+            self.change_cmd.cmd
+            != question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION
+        ):
             raise utils.ValidationError(
                 'Expected cmd to be %s, obtained %s' % (
                     question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
@@ -1099,8 +1107,8 @@ class SuggestionAddQuestion(BaseSuggestion):
                 self.change_cmd.skill_id
             )
 
-        if ((self.change_cmd.skill_difficulty == change_cmd.skill_difficulty)
-                and (self.change_cmd.question_dict == change_cmd.question_dict)):
+        if ((self.change_cmd.skill_difficulty == change_cmd.skill_difficulty) and
+            (self.change_cmd.question_dict == change_cmd.question_dict)):
             raise utils.ValidationError(
                 'At least one of the new skill_difficulty or question_dict '
                 'should be changed.'
@@ -1205,7 +1213,8 @@ class CommunityContributionStats:
                 CommunityContributionStats object is invalid.
         """
         for language_code, reviewer_count in (
-                self.translation_reviewer_counts_by_lang_code.items()):
+            self.translation_reviewer_counts_by_lang_code.items()
+        ):
             # Translation languages are a part of audio languages.
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
@@ -1226,7 +1235,8 @@ class CommunityContributionStats:
                 )
 
         for language_code, suggestion_count in (
-                self.translation_suggestion_counts_by_lang_code.items()):
+            self.translation_suggestion_counts_by_lang_code.items()
+        ):
             # Translation languages are a part of audio languages.
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
@@ -1455,9 +1465,8 @@ class TranslationContributionStats:
             'submitted_translations_count': self.submitted_translations_count,
             'submitted_translation_word_count': (self.submitted_translation_word_count),
             'accepted_translations_count': self.accepted_translations_count,
-            'accepted_translations_without_reviewer_edits_count': (
-                self.accepted_translations_without_reviewer_edits_count
-            ),
+            'accepted_translations_without_reviewer_edits_count':
+                (self.accepted_translations_without_reviewer_edits_count),
             'accepted_translation_word_count': (self.accepted_translation_word_count),
             'rejected_translations_count': self.rejected_translations_count,
             'rejected_translation_word_count': (self.rejected_translation_word_count),
@@ -1481,9 +1490,8 @@ class TranslationContributionStats:
             'submitted_translations_count': self.submitted_translations_count,
             'submitted_translation_word_count': (self.submitted_translation_word_count),
             'accepted_translations_count': self.accepted_translations_count,
-            'accepted_translations_without_reviewer_edits_count': (
-                self.accepted_translations_without_reviewer_edits_count
-            ),
+            'accepted_translations_without_reviewer_edits_count':
+                (self.accepted_translations_without_reviewer_edits_count),
             'accepted_translation_word_count': (self.accepted_translation_word_count),
             'rejected_translations_count': self.rejected_translations_count,
             'rejected_translation_word_count': (self.rejected_translation_word_count),
@@ -1562,9 +1570,8 @@ class TranslationReviewStats:
             'reviewed_translation_word_count': (self.reviewed_translation_word_count),
             'accepted_translations_count': self.accepted_translations_count,
             'accepted_translation_word_count': (self.accepted_translation_word_count),
-            'accepted_translations_with_reviewer_edits_count': (
-                self.accepted_translations_with_reviewer_edits_count
-            ),
+            'accepted_translations_with_reviewer_edits_count':
+                (self.accepted_translations_with_reviewer_edits_count),
             'first_contribution_date': self.first_contribution_date,
             'last_contribution_date': self.last_contribution_date,
         }
@@ -1584,9 +1591,8 @@ class TranslationReviewStats:
             'reviewed_translation_word_count': (self.reviewed_translation_word_count),
             'accepted_translations_count': self.accepted_translations_count,
             'accepted_translation_word_count': (self.accepted_translation_word_count),
-            'accepted_translations_with_reviewer_edits_count': (
-                self.accepted_translations_with_reviewer_edits_count
-            ),
+            'accepted_translations_with_reviewer_edits_count':
+                (self.accepted_translations_with_reviewer_edits_count),
             'first_contribution_date': (self.first_contribution_date.strftime('%b %Y')),
             'last_contribution_date': (self.last_contribution_date.strftime('%b %Y'))
         }
@@ -1649,9 +1655,8 @@ class QuestionContributionStats:
             'topic_id': self.topic_id,
             'submitted_questions_count': self.submitted_questions_count,
             'accepted_questions_count': (self.accepted_questions_count),
-            'accepted_questions_without_reviewer_edits_count': (
-                self.accepted_questions_without_reviewer_edits_count
-            ),
+            'accepted_questions_without_reviewer_edits_count':
+                (self.accepted_questions_without_reviewer_edits_count),
             'first_contribution_date': (self.first_contribution_date),
             'last_contribution_date': self.last_contribution_date
         }
@@ -1668,9 +1673,8 @@ class QuestionContributionStats:
             'topic_id': self.topic_id,
             'submitted_questions_count': self.submitted_questions_count,
             'accepted_questions_count': (self.accepted_questions_count),
-            'accepted_questions_without_reviewer_edits_count': (
-                self.accepted_questions_without_reviewer_edits_count
-            ),
+            'accepted_questions_without_reviewer_edits_count':
+                (self.accepted_questions_without_reviewer_edits_count),
             'first_contribution_date': (self.first_contribution_date.strftime('%b %Y')),
             'last_contribution_date': (self.last_contribution_date.strftime('%b %Y'))
         }
@@ -1733,9 +1737,8 @@ class QuestionReviewStats:
             'topic_id': self.topic_id,
             'reviewed_questions_count': self.reviewed_questions_count,
             'accepted_questions_count': (self.accepted_questions_count),
-            'accepted_questions_with_reviewer_edits_count': (
-                self.accepted_questions_with_reviewer_edits_count
-            ),
+            'accepted_questions_with_reviewer_edits_count':
+                (self.accepted_questions_with_reviewer_edits_count),
             'first_contribution_date': (self.first_contribution_date),
             'last_contribution_date': self.last_contribution_date
         }
@@ -1752,9 +1755,8 @@ class QuestionReviewStats:
             'topic_id': self.topic_id,
             'reviewed_questions_count': self.reviewed_questions_count,
             'accepted_questions_count': (self.accepted_questions_count),
-            'accepted_questions_with_reviewer_edits_count': (
-                self.accepted_questions_with_reviewer_edits_count
-            ),
+            'accepted_questions_with_reviewer_edits_count':
+                (self.accepted_questions_with_reviewer_edits_count),
             'first_contribution_date': (self.first_contribution_date.strftime('%b %Y')),
             'last_contribution_date': (self.last_contribution_date.strftime('%b %Y'))
         }
@@ -1875,7 +1877,8 @@ class ContributorStatsSummary:
             domain object.
         """
         return {
-            'contributor_user_id': self.contributor_user_id,
+            'contributor_user_id':
+                self.contributor_user_id,
             'translation_contribution_stats': [
                 stats.to_dict() for stats in (self.translation_contribution_stats)
             ],
@@ -1990,26 +1993,31 @@ class TranslationSubmitterTotalContributionStats:
         contributor_name = user_services.get_username(self.contributor_id)
 
         return {
-            'language_code': self.language_code,
-            'contributor_name': contributor_name,
-            'topic_names': topic_name_by_topic_id,
-            'recent_performance': self.recent_performance,
-            'overall_accuracy': self.overall_accuracy,
-            'submitted_translations_count': self.submitted_translations_count,
+            'language_code':
+                self.language_code,
+            'contributor_name':
+                contributor_name,
+            'topic_names':
+                topic_name_by_topic_id,
+            'recent_performance':
+                self.recent_performance,
+            'overall_accuracy':
+                self.overall_accuracy,
+            'submitted_translations_count':
+                self.submitted_translations_count,
             'submitted_translation_word_count': (self.submitted_translation_word_count),
-            'accepted_translations_count': self.accepted_translations_count,
-            'accepted_translations_without_reviewer_edits_count': (
-                self.accepted_translations_without_reviewer_edits_count
-            ),
+            'accepted_translations_count':
+                self.accepted_translations_count,
+            'accepted_translations_without_reviewer_edits_count':
+                (self.accepted_translations_without_reviewer_edits_count),
             'accepted_translation_word_count': (self.accepted_translation_word_count),
-            'rejected_translations_count': self.rejected_translations_count,
+            'rejected_translations_count':
+                self.rejected_translations_count,
             'rejected_translation_word_count': (self.rejected_translation_word_count),
-            'first_contribution_date': (
-                self.first_contribution_date.strftime('%b %d, %Y')
-            ),
-            'last_contributed_in_days': utils.get_number_of_days_since_date(
-                self.last_contribution_date
-            )
+            'first_contribution_date':
+                (self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contributed_in_days':
+                utils.get_number_of_days_since_date(self.last_contribution_date)
         }
 
 
@@ -2071,22 +2079,25 @@ class TranslationReviewerTotalContributionStats:
         contributor_name = user_services.get_username(self.contributor_id)
 
         return {
-            'language_code': self.language_code,
-            'contributor_name': contributor_name,
-            'topic_names': topic_name_by_topic_id,
-            'reviewed_translations_count': self.reviewed_translations_count,
-            'accepted_translations_count': self.accepted_translations_count,
-            'accepted_translations_with_reviewer_edits_count': (
-                self.accepted_translations_with_reviewer_edits_count
-            ),
+            'language_code':
+                self.language_code,
+            'contributor_name':
+                contributor_name,
+            'topic_names':
+                topic_name_by_topic_id,
+            'reviewed_translations_count':
+                self.reviewed_translations_count,
+            'accepted_translations_count':
+                self.accepted_translations_count,
+            'accepted_translations_with_reviewer_edits_count':
+                (self.accepted_translations_with_reviewer_edits_count),
             'accepted_translation_word_count': (self.accepted_translation_word_count),
-            'rejected_translations_count': self.rejected_translations_count,
-            'first_contribution_date': (
-                self.first_contribution_date.strftime('%b %d, %Y')
-            ),
-            'last_contributed_in_days': utils.get_number_of_days_since_date(
-                self.last_contribution_date
-            )
+            'rejected_translations_count':
+                self.rejected_translations_count,
+            'first_contribution_date':
+                (self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contributed_in_days':
+                utils.get_number_of_days_since_date(self.last_contribution_date)
         }
 
 
@@ -2150,22 +2161,26 @@ class QuestionSubmitterTotalContributionStats:
         contributor_name = user_services.get_username(self.contributor_id)
 
         return {
-            'contributor_name': contributor_name,
-            'topic_names': topic_name_by_topic_id,
-            'recent_performance': self.recent_performance,
-            'overall_accuracy': self.overall_accuracy,
-            'submitted_questions_count': self.submitted_questions_count,
-            'accepted_questions_count': self.accepted_questions_count,
-            'accepted_questions_without_reviewer_edits_count': (
-                self.accepted_questions_without_reviewer_edits_count
-            ),
-            'rejected_questions_count': self.rejected_questions_count,
-            'first_contribution_date': (
-                self.first_contribution_date.strftime('%b %d, %Y')
-            ),
-            'last_contributed_in_days': utils.get_number_of_days_since_date(
-                self.last_contribution_date
-            )
+            'contributor_name':
+                contributor_name,
+            'topic_names':
+                topic_name_by_topic_id,
+            'recent_performance':
+                self.recent_performance,
+            'overall_accuracy':
+                self.overall_accuracy,
+            'submitted_questions_count':
+                self.submitted_questions_count,
+            'accepted_questions_count':
+                self.accepted_questions_count,
+            'accepted_questions_without_reviewer_edits_count':
+                (self.accepted_questions_without_reviewer_edits_count),
+            'rejected_questions_count':
+                self.rejected_questions_count,
+            'first_contribution_date':
+                (self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contributed_in_days':
+                utils.get_number_of_days_since_date(self.last_contribution_date)
         }
 
 
@@ -2222,18 +2237,20 @@ class QuestionReviewerTotalContributionStats:
         contributor_name = user_services.get_username(self.contributor_id)
 
         return {
-            'contributor_name': contributor_name,
-            'topic_names': topic_name_by_topic_id,
-            'reviewed_questions_count': self.reviewed_questions_count,
-            'accepted_questions_count': self.accepted_questions_count,
-            'accepted_questions_with_reviewer_edits_count': (
-                self.accepted_questions_with_reviewer_edits_count
-            ),
-            'rejected_questions_count': self.rejected_questions_count,
-            'first_contribution_date': (
-                self.first_contribution_date.strftime('%b %d, %Y')
-            ),
-            'last_contributed_in_days': utils.get_number_of_days_since_date(
-                self.last_contribution_date
-            )
+            'contributor_name':
+                contributor_name,
+            'topic_names':
+                topic_name_by_topic_id,
+            'reviewed_questions_count':
+                self.reviewed_questions_count,
+            'accepted_questions_count':
+                self.accepted_questions_count,
+            'accepted_questions_with_reviewer_edits_count':
+                (self.accepted_questions_with_reviewer_edits_count),
+            'rejected_questions_count':
+                self.rejected_questions_count,
+            'first_contribution_date':
+                (self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contributed_in_days':
+                utils.get_number_of_days_since_date(self.last_contribution_date)
         }

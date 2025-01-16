@@ -197,21 +197,17 @@ class AuthServicesTests(test_utils.GenericTestBase):
             )
 
     def test_associate_multi_auth_ids_with_user_ids_without_collisions(self) -> None:
-        auth_services.associate_multi_auth_ids_with_user_ids(
-            [
-                auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
-                auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
-                auth_domain.AuthIdUserIdPair('aid3', 'uid3')
-            ]
-        )
+        auth_services.associate_multi_auth_ids_with_user_ids([
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+            auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+            auth_domain.AuthIdUserIdPair('aid3', 'uid3')
+        ])
 
-        self.assertEqual(
-            [
-                auth_services.get_user_id_from_auth_id('aid1'),
-                auth_services.get_user_id_from_auth_id('aid2'),
-                auth_services.get_user_id_from_auth_id('aid3')
-            ], ['uid1', 'uid2', 'uid3']
-        )
+        self.assertEqual([
+            auth_services.get_user_id_from_auth_id('aid1'),
+            auth_services.get_user_id_from_auth_id('aid2'),
+            auth_services.get_user_id_from_auth_id('aid3')
+        ], ['uid1', 'uid2', 'uid3'])
 
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(self) -> None:
         auth_services.associate_auth_id_with_user_id(
@@ -219,13 +215,11 @@ class AuthServicesTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(Exception, 'already associated'):
-            auth_services.associate_multi_auth_ids_with_user_ids(
-                [
-                    auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
-                    auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
-                    auth_domain.AuthIdUserIdPair('aid3', 'uid3')
-                ]
-            )
+            auth_services.associate_multi_auth_ids_with_user_ids([
+                auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+                auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+                auth_domain.AuthIdUserIdPair('aid3', 'uid3')
+            ])
 
     def test_present_association_is_not_considered_to_be_deleted(self) -> None:
         auth_services.associate_auth_id_with_user_id(
@@ -271,14 +265,17 @@ class AuthServicesTests(test_utils.GenericTestBase):
         def mock_destroy_auth_session(_: webapp2.Response) -> None:
             auth_section.remove('established')
 
-        with self.swap(platform_auth_services, 'establish_auth_session',
-                       mock_establish_auth_session):
+        with self.swap(
+            platform_auth_services, 'establish_auth_session',
+            mock_establish_auth_session
+        ):
             auth_services.establish_auth_session(
                 webapp2.Request.blank('/'), webapp2.Response()
             )
             self.assertEqual(['established'], auth_section)
-        with self.swap(platform_auth_services, 'destroy_auth_session',
-                       mock_destroy_auth_session):
+        with self.swap(
+            platform_auth_services, 'destroy_auth_session', mock_destroy_auth_session
+        ):
             auth_services.destroy_auth_session(webapp2.Response())
             self.assertEqual([], auth_section)
 
@@ -291,12 +288,16 @@ class AuthServicesTests(test_utils.GenericTestBase):
         def mock_revoke_super_admin_privileges(uid: str) -> None:
             super_admin_privilage.remove(uid)
 
-        with self.swap(platform_auth_services, 'grant_super_admin_privileges',
-                       mock_grant_super_admin_privileges):
+        with self.swap(
+            platform_auth_services, 'grant_super_admin_privileges',
+            mock_grant_super_admin_privileges
+        ):
             auth_services.grant_super_admin_privileges('uid1')
             self.assertEqual(['uid1'], super_admin_privilage)
-        with self.swap(platform_auth_services, 'revoke_super_admin_privileges',
-                       mock_revoke_super_admin_privileges):
+        with self.swap(
+            platform_auth_services, 'revoke_super_admin_privileges',
+            mock_revoke_super_admin_privileges
+        ):
             auth_services.revoke_super_admin_privileges('uid1')
             self.assertEqual([], super_admin_privilage)
 

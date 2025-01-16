@@ -33,9 +33,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
-(app_feedback_report_models, ) = models.Registry.import_models(
-    [models.Names.APP_FEEDBACK_REPORT]
-)
+(app_feedback_report_models,) = models.Registry.import_models([
+    models.Names.APP_FEEDBACK_REPORT
+])
 
 USER_1_EMAIL = 'some@email.com'
 USER_1_USERNAME = 'username1'
@@ -169,15 +169,22 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_to_dict_android_report(self) -> None:
         expected_report_id = self.android_report_id
         expected_dict = {
-            'report_id': expected_report_id,
-            'schema_version': ANDROID_REPORT_INFO_SCHEMA_VERSION,
-            'platform': PLATFORM_ANDROID,
-            'submitted_on_timestamp': utils.get_human_readable_time_string(
-                utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP)
-            ),
-            'local_timezone_offset_hrs': 0,
-            'ticket_id': TICKET_ID,
-            'scrubbed_by': None,
+            'report_id':
+                expected_report_id,
+            'schema_version':
+                ANDROID_REPORT_INFO_SCHEMA_VERSION,
+            'platform':
+                PLATFORM_ANDROID,
+            'submitted_on_timestamp':
+                utils.get_human_readable_time_string(
+                    utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP)
+                ),
+            'local_timezone_offset_hrs':
+                0,
+            'ticket_id':
+                TICKET_ID,
+            'scrubbed_by':
+                None,
             'user_supplied_feedback': {
                 'report_type': REPORT_TYPE_SUGGESTION.value,
                 'category': CATEGORY_SUGGESTION_OTHER.value,
@@ -212,8 +219,9 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def test_report_web_platform_validation_fails(self) -> None:
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Domain objects for web reports have not been implemented yet.'):
+            NotImplementedError,
+            'Domain objects for web reports have not been implemented yet.'
+        ):
             self.web_report_obj.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -311,9 +319,10 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_report_type_from_string_with_invalid_string_raises_error(self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_report_type = 'invalid_report_type'
-        with self.assertRaisesRegex(utils.InvalidInputException,
-                                    'The given report type %s is invalid.' %
-                                    invalid_report_type):
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'The given report type %s is invalid.' % invalid_report_type
+        ):
             feedback_report.get_report_type_from_string(invalid_report_type)
 
     def test_get_category_from_string_returns_expected_category(self) -> None:
@@ -326,9 +335,10 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     def test_get_category_from_string_with_invalid_string_raises_error(self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_category = 'invalid_category'
-        with self.assertRaisesRegex(utils.InvalidInputException,
-                                    'The given category %s is invalid.' %
-                                    invalid_category):
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'The given category %s is invalid.' % invalid_category
+        ):
             feedback_report.get_category_from_string(invalid_category)
 
     def test_get_android_text_size_from_string_returns_expected_text_size(self) -> None:
@@ -344,9 +354,10 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     ) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_text_size = 'invalid_text_size'
-        with self.assertRaisesRegex(utils.InvalidInputException,
-                                    'The given Android app text size %s is invalid.' %
-                                    (invalid_text_size)):
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'The given Android app text size %s is invalid.' % (invalid_text_size)
+        ):
             feedback_report.get_android_text_size_from_string(invalid_text_size)
 
     def test_get_entry_point_from_json_returns_expected_entry_point_obj(self) -> None:
@@ -420,19 +431,22 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value
         )
 
-        with self.assertRaisesRegex(Exception,
-                                    'No story_id provided for LessonPlayerEntryPoint.'):
+        with self.assertRaisesRegex(
+            Exception, 'No story_id provided for LessonPlayerEntryPoint.'
+        ):
             entry_point_json['entry_point_story_id'] = None
             feedback_report.get_entry_point_from_json(entry_point_json)
 
-        with self.assertRaisesRegex(Exception,
-                                    'No topic_id provided for LessonPlayerEntryPoint.'):
+        with self.assertRaisesRegex(
+            Exception, 'No topic_id provided for LessonPlayerEntryPoint.'
+        ):
             entry_point_json['entry_point_story_id'] = 'story_id'
             entry_point_json['entry_point_topic_id'] = None
             feedback_report.get_entry_point_from_json(entry_point_json)
 
         with self.assertRaisesRegex(
-                Exception, 'No exploration_id provided for LessonPlayerEntryPoint.'):
+            Exception, 'No exploration_id provided for LessonPlayerEntryPoint.'
+        ):
             entry_point_json['entry_point_topic_id'] = 'topic_id'
             entry_point_json['entry_point_exploration_id'] = None
             feedback_report.get_entry_point_from_json(entry_point_json)
@@ -441,13 +455,15 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             app_feedback_report_constants.EntryPoint.REVISION_CARD.value
         )
 
-        with self.assertRaisesRegex(Exception,
-                                    'No topic_id provided for RevisionCardEntryPoint.'):
+        with self.assertRaisesRegex(
+            Exception, 'No topic_id provided for RevisionCardEntryPoint.'
+        ):
             entry_point_json['entry_point_topic_id'] = None
             feedback_report.get_entry_point_from_json(entry_point_json)
 
         with self.assertRaisesRegex(
-                Exception, 'No subtopic_id provided for RevisionCardEntryPoint.'):
+            Exception, 'No subtopic_id provided for RevisionCardEntryPoint.'
+        ):
             entry_point_json['entry_point_topic_id'] = 'topic_id'
             entry_point_json['entry_point_subtopic_id'] = None
             feedback_report.get_entry_point_from_json(entry_point_json)
@@ -457,10 +473,13 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_get_entry_point_from_json_with_invalid_json_raises_error(self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        invalid_json = {'entry_point_name': 'invalid_entry_point_name'}
-        with self.assertRaisesRegex(utils.InvalidInputException,
-                                    'The given entry point %s is invalid.' %
-                                    ('invalid_entry_point_name')):
+        invalid_json = {
+            'entry_point_name': 'invalid_entry_point_name'
+        }
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'The given entry point %s is invalid.' % ('invalid_entry_point_name')
+        ):
             feedback_report.get_entry_point_from_json(
                 invalid_json
             )  # type: ignore[arg-type]
@@ -481,9 +500,10 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
     ) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_network_type = 'invalid_text_size'
-        with self.assertRaisesRegex(utils.InvalidInputException,
-                                    'The given Android network type %s is invalid.' %
-                                    (invalid_network_type)):
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'The given Android network type %s is invalid.' % (invalid_network_type)
+        ):
             feedback_report.get_android_network_type_from_string(invalid_network_type)
 
     def _assert_validation_error(
@@ -588,9 +608,9 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
     def test_validation_invalid_selected_item_list_fails(self) -> None:
         self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
         self.user_supplied_feedback.category = CATEGORY_ISSUE_TOPICS
-        self.user_supplied_feedback.user_feedback_selected_items = (
-            [123]
-        )  # type: ignore[list-item]
+        self.user_supplied_feedback.user_feedback_selected_items = ([
+            123
+        ])  # type: ignore[list-item]
         self.user_supplied_feedback.user_feedback_other_text_input = ''
         self._assert_validation_error(
             self.user_supplied_feedback, 'Invalid option 123 selected by user.'
@@ -662,9 +682,10 @@ class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
 
     def test_validation_raises_not_implemented_error(self) -> None:
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Subclasses of DeviceSystemContext should implement domain '
-                'validation.'):
+            NotImplementedError,
+            'Subclasses of DeviceSystemContext should implement domain '
+            'validation.'
+        ):
             self.device_system_context.validate()
 
 
@@ -905,14 +926,16 @@ class EntryPointDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict_raises_exception(self) -> None:
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Subclasses of EntryPoint should implement their own dict'):
+            NotImplementedError,
+            'Subclasses of EntryPoint should implement their own dict'
+        ):
             self.entry_point.to_dict()
 
     def test_validation_raises_exception(self) -> None:
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Subclasses of EntryPoint should implement their own validation'):
+            NotImplementedError,
+            'Subclasses of EntryPoint should implement their own validation'
+        ):
             self.entry_point.validate()
 
 
@@ -924,9 +947,8 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         expected_dict = {
-            'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value
-            )  # pylint: disable=line-too-long
+            'entry_point_name':
+                (app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value)  # pylint: disable=line-too-long
         }
         self.assertDictEqual(expected_dict, self.entry_point.to_dict())
 
@@ -934,8 +956,9 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because we assign type None to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'No entry point name supplied.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No entry point name supplied.'
+        ):
             self.entry_point.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -943,16 +966,17 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validation_name_not_a_string_fails(self) -> None:
         self.entry_point.entry_point_name = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Entry point name must be a string,'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Entry point name must be a string,'
+        ):
             self.entry_point.validate()
 
     def test_validation_name_is_invalid_fails(self) -> None:
         self.entry_point.entry_point_name = 'invalid_entry_point_name'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected entry point name %s' % (
-                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value)):  # pylint: disable=line-too-long
+            utils.ValidationError,
+            'Expected entry point name %s' % (
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value)):  # pylint: disable=line-too-long
             self.entry_point.validate()
 
 
@@ -968,9 +992,8 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         expected_dict = {
-            'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value
-            ),
+            'entry_point_name':
+                (app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -1066,9 +1089,8 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         expected_dict = {
-            'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.REVISION_CARD.value
-            ),
+            'entry_point_name':
+                (app_feedback_report_constants.EntryPoint.REVISION_CARD.value),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -1141,8 +1163,9 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because we assign type None to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'No entry point name supplied.'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No entry point name supplied.'
+        ):
             self.entry_point.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -1150,15 +1173,17 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
     # inputs that we can normally catch by typing.
     def test_validation_name_not_a_string_fails(self) -> None:
         self.entry_point.entry_point_name = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Entry point name must be a string,'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Entry point name must be a string,'
+        ):
             self.entry_point.validate()
 
     def test_validation_name_is_invalid_fails(self) -> None:
         self.entry_point.entry_point_name = 'invalid_entry_point_name'
         with self.assertRaisesRegex(
-                utils.ValidationError, 'Expected entry point name %s' %
-            (app_feedback_report_constants.EntryPoint.CRASH.value)):
+            utils.ValidationError, 'Expected entry point name %s' %
+            (app_feedback_report_constants.EntryPoint.CRASH.value)
+        ):
             self.entry_point.validate()
 
 
@@ -1176,9 +1201,8 @@ class AppContextDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point': {
-                'entry_point_name': (
-                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value
-                ),  # pylint: disable=line-too-long
+                'entry_point_name':
+                    (app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value),  # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH
@@ -1187,8 +1211,9 @@ class AppContextDomainTests(test_utils.GenericTestBase):
 
     def test_validation_raises_exception(self) -> None:
         with self.assertRaisesRegex(
-                NotImplementedError,
-                'Subclasses of AppContext should implement their own validation'):
+            NotImplementedError,
+            'Subclasses of AppContext should implement their own validation'
+        ):
             self.app_context.validate()
 
 
@@ -1207,9 +1232,8 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point': {
-                'entry_point_name': (
-                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value
-                ),  # pylint: disable=line-too-long
+                'entry_point_name':
+                    (app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value),  # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -1401,9 +1425,8 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             'github_issue_repo_name': None,
             'github_issue_number': None,
             'archived': False,
-            'newest_report_creation_timestamp_isoformat': (
-                REPORT_SUBMITTED_TIMESTAMP.isoformat()
-            ),
+            'newest_report_creation_timestamp_isoformat':
+                (REPORT_SUBMITTED_TIMESTAMP.isoformat()),
             'reports': [self.android_report_id]
         }
         self.assertDictEqual(expected_dict, self.ticket_obj.to_dict())
@@ -1543,44 +1566,44 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 
         param_stats = {
             'platform': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {PLATFORM_ANDROID: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    PLATFORM_ANDROID: 1
+                })
             ),
             'report_type': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {REPORT_TYPE_SUGGESTION.value: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    REPORT_TYPE_SUGGESTION.value: 1
+                })
             ),
             'country_locale_code': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {COUNTRY_LOCALE_CODE_INDIA: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    COUNTRY_LOCALE_CODE_INDIA: 1
+                })
             ),
             'entry_point_name': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {ENTRY_POINT_NAVIGATION_DRAWER: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    ENTRY_POINT_NAVIGATION_DRAWER: 1
+                })
             ),
             'text_language_code': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {LANGUAGE_LOCALE_CODE_ENGLISH: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    LANGUAGE_LOCALE_CODE_ENGLISH: 1
+                })
             ),
             'audio_language_code': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {LANGUAGE_LOCALE_CODE_ENGLISH: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    LANGUAGE_LOCALE_CODE_ENGLISH: 1
+                })
             ),
             'android_sdk_version': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {str(ANDROID_SDK_VERSION): 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    str(ANDROID_SDK_VERSION): 1
+                })
             ),
             'version_name': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {ANDROID_PLATFORM_VERSION: 1}
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    ANDROID_PLATFORM_VERSION: 1
+                })
             )
         }
         self.stats_id = (
@@ -1673,8 +1696,10 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 
     def test_validation_invalid_daily_param_stats_fails(self) -> None:
         self.stats_obj.daily_param_stats = {
-            'invalid_stat_name': app_feedback_report_domain.
-            ReportStatsParameterValueCounts({'invalid_stats': 0}),
+            'invalid_stat_name':
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    'invalid_stats': 0
+                }),
         }
         self._assert_validation_error(
             self.stats_obj,
@@ -1688,11 +1713,9 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
     def test_validation_parameter_value_counts_objects_are_invalid_fails(self) -> None:
         self.stats_obj.daily_param_stats = {
             'report_type': (
-                app_feedback_report_domain.ReportStatsParameterValueCounts(
-                    {
-                        123: 1  # type: ignore[dict-item]
-                    }
-                )
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    123: 1  # type: ignore[dict-item]
+                })
             )
         }
         self._assert_validation_error(
@@ -1717,37 +1740,34 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
-        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
-            {
-                PLATFORM_ANDROID: 1,
-                PLATFORM_WEB: 1
-            }
-        )
-        expected_dict = {'android': 1, 'web': 1}
+        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts({
+            PLATFORM_ANDROID: 1,
+            PLATFORM_WEB: 1
+        })
+        expected_dict = {
+            'android': 1,
+            'web': 1
+        }
         self.assertDictEqual(expected_dict, counts_obj.to_dict())
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
     def test_validation_with_invalid_parameter_value_fails(self) -> None:
-        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
-            {
-                1: 1,  # type: ignore[dict-item]
-                # Here we use MyPy ignore because this wrong type is provided
-                # only for type checking.
-                2: 1  # type: ignore[dict-item]
-            }
-        )
+        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts({
+            1: 1,  # type: ignore[dict-item]
+            # Here we use MyPy ignore because this wrong type is provided
+            # only for type checking.
+            2: 1  # type: ignore[dict-item]
+        })
         self._assert_validation_error(
             counts_obj, 'The parameter value should be a string'
         )
 
     def test_validation_with_invalid_parameter_counts_fails(self) -> None:
-        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
-            {
-                'value_1': -1,
-            }
-        )
+        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts({
+            'value_1': -1,
+        })
         self._assert_validation_error(
             counts_obj, 'The parameter value count should be a non-negative '
             'int'

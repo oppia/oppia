@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Test for audit models."""
 
 from __future__ import annotations
@@ -25,12 +24,13 @@ from core.tests import test_utils
 from typing import Final
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import base_models
 
-(audit_models, base_models) = models.Registry.import_models(
-    [models.Names.AUDIT, models.Names.BASE_MODEL])
+(audit_models, base_models) = models.Registry.import_models([
+    models.Names.AUDIT, models.Names.BASE_MODEL
+])
 
 
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
@@ -57,7 +57,8 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             audit_models.RoleQueryAuditModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.KEEP
+        )
 
     def test_get_export_policy(self) -> None:
         sample_dict = {
@@ -70,23 +71,23 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            audit_models.RoleQueryAuditModel.get_export_policy(),
-            sample_dict)
+            audit_models.RoleQueryAuditModel.get_export_policy(), sample_dict
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            audit_models.RoleQueryAuditModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+            audit_models.RoleQueryAuditModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
 
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
-            audit_models.RoleQueryAuditModel
-            .has_reference_to_user_id(self.USER_ID)
+            audit_models.RoleQueryAuditModel.has_reference_to_user_id(self.USER_ID)
         )
         self.assertFalse(
-            audit_models.RoleQueryAuditModel
-            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+            audit_models.RoleQueryAuditModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
         )
 
     def test_get_model(self) -> None:
@@ -122,7 +123,8 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             audit_models.UsernameChangeAuditModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.KEEP
+        )
 
     def test_get_export_policy(self) -> None:
         sample_dict = {
@@ -134,23 +136,25 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            audit_models.UsernameChangeAuditModel.get_export_policy(),
-            sample_dict)
+            audit_models.UsernameChangeAuditModel.get_export_policy(), sample_dict
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            audit_models.UsernameChangeAuditModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+            audit_models.UsernameChangeAuditModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
 
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
-            audit_models.UsernameChangeAuditModel
-            .has_reference_to_user_id(self.COMMITTER_ID)
+            audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
+                self.COMMITTER_ID
+            )
         )
         self.assertFalse(
-            audit_models.UsernameChangeAuditModel
-            .has_reference_to_user_id(self.NONEXISTENT_COMMITTER_ID)
+            audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
+                self.NONEXISTENT_COMMITTER_ID
+            )
         )
 
     def test_get_model(self) -> None:

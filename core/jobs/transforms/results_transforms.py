@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides a transform to drain PCollection in case of an error."""
 
 from __future__ import annotations
@@ -36,7 +35,8 @@ class DrainResultsOnError(beam.PTransform):  # type: ignore[misc]
     # Here we use type Any because this method can accept any kind of
     # PCollection object to return the filtered migration results.
     def expand(
-        self, objects: beam.PCollection[result.Result[Tuple[str, Any], Tuple[str, Exception]]] # pylint: disable=line-too-long
+        self,
+        objects: beam.PCollection[result.Result[Tuple[str, Any], Tuple[str, Exception]]]  # pylint: disable=line-too-long
     ) -> beam.PCollection[result.Result[Tuple[str, Any], None]]:
         """Count error results in collection and flush the input
             in case of errors.
@@ -49,18 +49,16 @@ class DrainResultsOnError(beam.PTransform):  # type: ignore[misc]
         """
 
         error_check = (
-            objects
-            | 'Filter errors' >> beam.Filter(
-                lambda result_item: result_item.is_err())
-            | 'Count number of errors' >> beam.combiners.Count.Globally()
-            | 'Check if error count is zero' >> beam.Map(lambda x: x == 0)
+            objects |
+            'Filter errors' >> beam.Filter(lambda result_item: result_item.is_err()) |
+            'Count number of errors' >> beam.combiners.Count.Globally() |
+            'Check if error count is zero' >> beam.Map(lambda x: x == 0)
         )
 
         filtered_results = (
-            objects
-            | 'Remove all results in case of errors' >> beam.Filter(
+            objects | 'Remove all results in case of errors' >> beam.Filter(
                 lambda _, no_migration_error: bool(no_migration_error),
-                no_migration_error=beam.pvalue.AsSingleton(
-                    error_check))
+                no_migration_error=beam.pvalue.AsSingleton(error_check)
+            )
         )
         return filtered_results

@@ -105,8 +105,10 @@ class ActivityRights:
                 has owners, editors, voice artists or viewers specified.
         """
         if self.community_owned:
-            if (self.owner_ids or self.editor_ids or self.voice_artist_ids
-                    or self.viewer_ids):
+            if (
+                self.owner_ids or self.editor_ids or self.voice_artist_ids or
+                self.viewer_ids
+            ):
                 raise utils.ValidationError(
                     'Community-owned explorations should have no owners, '
                     'editors, voice artists or viewers specified.'
@@ -179,22 +181,22 @@ class ActivityRights:
             }
         else:
             return {
-                'cloned_from': self.cloned_from,
-                'status': self.status,
-                'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(
-                    self.owner_ids
-                ),
-                'editor_names': user_services.get_human_readable_user_ids(
-                    self.editor_ids
-                ),
-                'voice_artist_names': user_services.get_human_readable_user_ids(
-                    self.voice_artist_ids
-                ),
-                'viewer_names': user_services.get_human_readable_user_ids(
-                    self.viewer_ids
-                ),
-                'viewable_if_private': self.viewable_if_private,
+                'cloned_from':
+                    self.cloned_from,
+                'status':
+                    self.status,
+                'community_owned':
+                    False,
+                'owner_names':
+                    user_services.get_human_readable_user_ids(self.owner_ids),
+                'editor_names':
+                    user_services.get_human_readable_user_ids(self.editor_ids),
+                'voice_artist_names':
+                    user_services.get_human_readable_user_ids(self.voice_artist_ids),
+                'viewer_names':
+                    user_services.get_human_readable_user_ids(self.viewer_ids),
+                'viewable_if_private':
+                    self.viewable_if_private,
             }
 
     def is_owner(self, user_id: str) -> bool:
@@ -286,9 +288,9 @@ class ActivityRights:
             if self.status != ACTIVITY_STATUS_PRIVATE:
                 raise Exception('Public explorations can be viewed by anyone.')
 
-        for role, user_ids in zip(
-            [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
-            [self.owner_ids, self.editor_ids, self.viewer_ids, self.voice_artist_ids]):
+        for role, user_ids in zip([
+            ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST
+        ], [self.owner_ids, self.editor_ids, self.viewer_ids, self.voice_artist_ids]):
             if user_id in user_ids:
                 user_ids.remove(user_id)
                 old_role = role

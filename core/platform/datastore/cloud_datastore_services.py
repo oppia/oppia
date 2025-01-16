@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides a seam for datastore services."""
 
 from __future__ import annotations
@@ -25,16 +24,14 @@ from core.platform import models
 
 from google.cloud import ndb
 
-from typing import (
-    Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar)
+from typing import (Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar)
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import transaction_services
 
 transaction_services = models.Registry.import_transaction_services()
-
 
 Cursor = ndb.Cursor
 Model = ndb.Model
@@ -52,15 +49,15 @@ JsonProperty = ndb.JsonProperty
 StringProperty = ndb.StringProperty
 TextProperty = ndb.TextProperty
 
-TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model) # pylint: disable=invalid-name
+TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)  # pylint: disable=invalid-name
 MAX_GET_RETRIES = 3
 
 CLIENT = ndb.Client()
 
 
 def get_ndb_context(
-        namespace: Optional[str] = None,
-        global_cache: Optional[RedisCache] = None
+    namespace: Optional[str] = None,
+    global_cache: Optional[RedisCache] = None
 ) -> ContextManager[ndb.context.Context]:
     """Get the context of the Cloud NDB. This context needs to be entered in
     order to do any Cloud NDB operations.
@@ -113,8 +110,7 @@ def update_timestamps_multi(
             last_updated field of the model.
     """
     for entity in entities:
-        entity.update_timestamps(
-            update_last_updated_time=update_last_updated_time)
+        entity.update_timestamps(update_last_updated_time=update_last_updated_time)
 
 
 def put_multi(entities: Sequence[Model]) -> List[str]:
@@ -221,7 +217,7 @@ def make_cursor(urlsafe_cursor: Optional[str] = None) -> Cursor:
 
 
 def fetch_multiple_entities_by_ids_and_models(
-        ids_and_models: List[Tuple[str, List[str]]]
+    ids_and_models: List[Tuple[str, List[str]]]
 ) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]:
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
@@ -245,17 +241,17 @@ def fetch_multiple_entities_by_ids_and_models(
     for (model_name, entity_ids) in ids_and_models:
         # Add the keys to the list of keys whose entities we have to fetch.
         entity_keys = (
-            entity_keys +
-            [ndb.Key(model_name, entity_id) for entity_id in entity_ids])
+            entity_keys + [ndb.Key(model_name, entity_id) for entity_id in entity_ids]
+        )
 
     all_models: List[Optional[TYPE_MODEL_SUBCLASS]] = ndb.get_multi(entity_keys)
-    all_models_grouped_by_model_type: List[
-        List[Optional[TYPE_MODEL_SUBCLASS]]] = []
+    all_models_grouped_by_model_type: List[List[Optional[TYPE_MODEL_SUBCLASS]]] = []
 
     start_index = 0
     for (_, entity_ids) in ids_and_models:
         all_models_grouped_by_model_type.append(
-            all_models[start_index:start_index + len(entity_ids)])
+            all_models[start_index:start_index + len(entity_ids)]
+        )
         start_index = start_index + len(entity_ids)
 
     return all_models_grouped_by_model_type

@@ -58,7 +58,9 @@ class BeamJob:
                 name: str. The name of the class that implements the job's
                     logic.
         """
-        return {'name': self.name}
+        return {
+            'name': self.name
+        }
 
 
 class BeamJobRun:

@@ -71,8 +71,9 @@ class UserQueryTests(test_utils.GenericTestBase):
 
     def test_validate_query_with_invalid_user_id_submitter_id_raises(self) -> None:
         self.user_query.submitter_id = 'aaabbc'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected submitter ID to be a valid user ID'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected submitter ID to be a valid user ID'
+        ):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_status_raises(self) -> None:
@@ -83,8 +84,8 @@ class UserQueryTests(test_utils.GenericTestBase):
     def test_validate_query_with_non_user_id_values_in_user_ids_raises(self) -> None:
         self.user_query.user_ids = ['aaa']
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected user ID in user_ids to be a valid user ID'):
+            utils.ValidationError, 'Expected user ID in user_ids to be a valid user ID'
+        ):
             self.user_query.validate()
 
     def test_create_default_returns_correct_user_query(self) -> None:

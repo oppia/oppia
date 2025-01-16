@@ -39,9 +39,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
     from mypy_imports import user_models
 
-(stats_models, feedback_models, user_models) = models.Registry.import_models(
-    [models.Names.STATISTICS, models.Names.FEEDBACK, models.Names.USER]
-)
+(stats_models, feedback_models, user_models) = models.Registry.import_models([
+    models.Names.STATISTICS, models.Names.FEEDBACK, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -53,10 +53,14 @@ class MockNumbersModel(datastore_services.Model):
 class BaseEventHandlerTests(test_utils.GenericTestBase):
 
     def test_handle_event_raises_not_implemented_error(self) -> None:
-        with self.assertRaisesRegex(NotImplementedError, re.escape(
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
                 'Subclasses of BaseEventHandler should implement the '
                 '_handle_event() method, using explicit arguments '
-                '(no *args or **kwargs).')):
+                '(no *args or **kwargs).'
+            )
+        ):
             event_services.BaseEventHandler.record()
 
 
@@ -352,9 +356,9 @@ class EventHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(MockNumbersModel.query().count(), 0)
         TestEventHandler.record(2)
         self.assertEqual(MockNumbersModel.query().count(), 1)
-        self.assertEqual(
-            [numbers_model.number for numbers_model in MockNumbersModel.query()], [2]
-        )
+        self.assertEqual([
+            numbers_model.number for numbers_model in MockNumbersModel.query()
+        ], [2])
 
 
 class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
@@ -397,9 +401,11 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         event_services.StatsEventsHandler.record(
-            exp_id, exploration.version, {'state_stats_mapping': {
-                'Introduction': {}
-            }}
+            exp_id, exploration.version, {
+                'state_stats_mapping': {
+                    'Introduction': {}
+                }
+            }
         )
 
         all_models = stats_models.ExplorationStatsModel.get_all()
@@ -444,20 +450,18 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
         assert state_answers is not None
 
         self.assertEqual(
-            state_answers.get_submitted_answer_dict_list(), [
-                {
-                    'answer': 'answer_submitted',
-                    'time_spent_in_sec': 2.0,
-                    'answer_group_index': 1,
-                    'rule_spec_index': 1,
-                    'classification_categorization': category,
-                    'session_id': session_id,
-                    'interaction_id': 'TextInput',
-                    'params': {},
-                    'rule_spec_str': None,
-                    'answer_str': None,
-                }
-            ]
+            state_answers.get_submitted_answer_dict_list(), [{
+                'answer': 'answer_submitted',
+                'time_spent_in_sec': 2.0,
+                'answer_group_index': 1,
+                'rule_spec_index': 1,
+                'classification_categorization': category,
+                'session_id': session_id,
+                'interaction_id': 'TextInput',
+                'params': {},
+                'rule_spec_str': None,
+                'answer_str': None,
+            }]
         )
 
         all_models = (stats_models.AnswerSubmittedEventLogEntryModel.get_all())
@@ -484,14 +488,17 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
                 continue
 
             python_module = importlib.import_module(file_name)
-            for name, clazz in inspect.getmembers(python_module,
-                                                  predicate=inspect.isclass):
+            for name, clazz in inspect.getmembers(
+                python_module, predicate=inspect.isclass
+            ):
                 all_base_classes = [
                     base_class.__name__ for base_class in (inspect.getmro(clazz))
                 ]
                 # Check that it is a subclass of 'BaseEventHandler'.
-                if ('BaseEventHandler' in all_base_classes
-                        and name != 'BaseEventHandler'):
+                if (
+                    'BaseEventHandler' in all_base_classes and
+                    name != 'BaseEventHandler'
+                ):
                     # Event handler class should specify an event type.
                     self.assertIsNotNone(clazz.EVENT_TYPE)
 

@@ -165,8 +165,8 @@ def check_changes(filetype: str) -> bool:
 
     diff_output = subprocess.check_output(['git', 'diff', filepath])[:-1].split(b'\n')
     for line in diff_output:
-        if (line.startswith(b'-') or line.startswith(b'+')) and any(
-                key in line for key in keys_to_check):
+        if (line.startswith(b'-') or
+            line.startswith(b'+')) and any(key in line for key in keys_to_check):
             return False
     return True
 
@@ -215,8 +215,8 @@ def main(args: Optional[List[str]] = None) -> None:
     print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
     print('Running pre-commit check for package-lock.json ...')
-    if does_diff_include_package_lock_file() and (
-            does_current_folder_contain_have_package_lock_file()):
+    if does_diff_include_package_lock_file(
+    ) and (does_current_folder_contain_have_package_lock_file()):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
         print('-----------COMMIT ABORTED-----------')

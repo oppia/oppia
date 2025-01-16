@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the practice sessions page."""
 
 from __future__ import annotations
@@ -26,9 +25,7 @@ from core.domain import topic_fetchers
 from typing import Dict, List, TypedDict
 
 
-class PracticeSessionsPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class PracticeSessionsPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Renders the practice sessions page."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -62,18 +59,10 @@ class PracticeSessionsPage(
             unused_debug_mode: bool. Whether the app is running in debug mode.
         """
         if isinstance(exception, self.InvalidInputException):
-            (
-                _,
-                _,
-                classroom_url_fragment,
-                topic_url_fragment,
-                _,
-                _
-            ) = self.request.path.split('/')
+            (_, _, classroom_url_fragment, topic_url_fragment, _,
+             _) = self.request.path.split('/')
             self.redirect(
-                '/learn/%s/%s/practice' % (
-                    classroom_url_fragment, topic_url_fragment
-                )
+                '/learn/%s/%s/practice' % (classroom_url_fragment, topic_url_fragment)
             )
             return
         super().handle_exception(exception, unused_debug_mode)
@@ -88,10 +77,8 @@ class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
 
 
 class PracticeSessionsPageDataHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        PracticeSessionsPageDataHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str],
+                     PracticeSessionsPageDataHandlerNormalizedRequestDict]
 ):
     """Fetches relevant data for the practice sessions page."""
 
@@ -125,8 +112,7 @@ class PracticeSessionsPageDataHandler(
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        selected_subtopic_ids = (
-            self.normalized_request['selected_subtopic_ids'])
+        selected_subtopic_ids = (self.normalized_request['selected_subtopic_ids'])
 
         selected_skill_ids = []
         for subtopic in topic.subtopics:

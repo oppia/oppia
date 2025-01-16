@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Setup script for Oppia developers.
 
 This setup script does three things:
@@ -58,7 +57,8 @@ from scripts import install_python_prod_dependencies  # isort:skip   pylint: dis
 TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
 
 _PARSER: Final = argparse.ArgumentParser(
-    description='Installation script for Oppia third-party libraries.')
+    description='Installation script for Oppia third-party libraries.'
+)
 
 
 def make_google_module_importable_by_python(google_module_path: str) -> None:
@@ -72,13 +72,11 @@ def make_google_module_importable_by_python(google_module_path: str) -> None:
     Args:
         google_module_path: str. The path to the google module.
     """
-    print(
-        'Checking that all google library modules contain __init__.py files...')
+    print('Checking that all google library modules contain __init__.py files...')
     for path_list in os.walk(google_module_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with utils.open_file(
-                os.path.join(root_path, '__init__.py'), 'a'):
+            with utils.open_file(os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
                 pass
@@ -139,7 +137,8 @@ def install_node() -> None:
     if not os.path.exists(common.NODE_PATH):
         print(
             'Node package not found in Oppia tools directory. '
-            'Installing Node.js...')
+            'Installing Node.js...'
+        )
 
         outfile_name = 'node-download'
         if common.is_x64_architecture():
@@ -153,12 +152,12 @@ def install_node() -> None:
             node_file_name = 'node-v%s' % common.NODE_VERSION
 
         download_and_install_package(
-            'https://nodejs.org/dist/v%s/%s.tar.gz' % (
-                common.NODE_VERSION, node_file_name),
-            outfile_name)
+            'https://nodejs.org/dist/v%s/%s.tar.gz' %
+            (common.NODE_VERSION, node_file_name), outfile_name
+        )
         os.rename(
-            os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
-            common.NODE_PATH)
+            os.path.join(common.OPPIA_TOOLS_DIR, node_file_name), common.NODE_PATH
+        )
         if node_file_name == 'node-v%s' % common.NODE_VERSION:
             with common.CD(common.NODE_PATH):
                 subprocess.check_call(['./configure'])
@@ -170,16 +169,16 @@ def install_node() -> None:
 def install_yarn() -> None:
     """Download and install yarn to Oppia tools directory."""
     if not os.path.exists(common.YARN_PATH):
-        print(
-            'Yarn package not found in Oppia tools directory. '
-            'Installing yarn...')
+        print('Yarn package not found in Oppia tools directory. '
+              'Installing yarn...')
         print('Removing package-lock.json')
         clean.delete_file('package-lock.json')
 
         yarn_file_name = 'yarn-v%s.tar.gz' % common.YARN_VERSION
         download_and_install_package(
-            'https://github.com/yarnpkg/yarn/releases/download/v%s/%s'
-            % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
+            'https://github.com/yarnpkg/yarn/releases/download/v%s/%s' %
+            (common.YARN_VERSION, yarn_file_name), yarn_file_name
+        )
 
     print('Yarn is installed.')
 
@@ -196,16 +195,17 @@ def install_gcloud_sdk() -> None:
             # should also be updated.
             common.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-500.0.0-linux-x86_64.tar.gz',
-                'gcloud-sdk.tar.gz')
+                'google-cloud-sdk-500.0.0-linux-x86_64.tar.gz', 'gcloud-sdk.tar.gz'
+            )
         except Exception as e:
             print('Error downloading Google Cloud SDK. Exiting.')
             raise Exception('Error downloading Google Cloud SDK.') from e
 
         print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
-        tar.extractall(path=os.path.join(
-            common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/'))
+        tar.extractall(
+            path=os.path.join(common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/')
+        )
         tar.close()
 
         os.remove('gcloud-sdk.tar.gz')
@@ -215,10 +215,16 @@ def install_gcloud_sdk() -> None:
         # prompts with default values. In this case, that means accepting all
         # installations of gcloud packages.
         subprocess.run([
-            common.GCLOUD_PATH, 'components', 'install', 'beta',
-            'cloud-datastore-emulator', 'app-engine-python',
-            'app-engine-python-extras', '--quiet',
-        ], check=True)
+            common.GCLOUD_PATH,
+            'components',
+            'install',
+            'beta',
+            'cloud-datastore-emulator',
+            'app-engine-python',
+            'app-engine-python-extras',
+            '--quiet',
+        ],
+                       check=True)
 
         # Address the problem of multiple google paths confusing the python
         # interpreter. Namely, there are two modules named google/, one that is
@@ -228,20 +234,19 @@ def install_gcloud_sdk() -> None:
         # the Google Cloud SDK libraries that we need into the correct google
         # module directory in the 'third_party/python_libs' directory.
         print('Copying Google Cloud SDK modules to third_party/python_libs...')
-        correct_google_path = os.path.join(
-            common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        correct_google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         if not os.path.isdir(correct_google_path):
             os.mkdir(correct_google_path)
         if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
             shutil.copytree(
-                os.path.join(
-                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
-                os.path.join(correct_google_path, 'appengine'))
+                os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+                os.path.join(correct_google_path, 'appengine')
+            )
         if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
             shutil.copytree(
-                os.path.join(
-                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
-                os.path.join(correct_google_path, 'pyglib'))
+                os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+                os.path.join(correct_google_path, 'pyglib')
+            )
 
         # Populate all google modules with the correct __init__.py files if
         # they do not exist. This solves the bug mentioned below where
@@ -258,10 +263,7 @@ def install_gcloud_sdk() -> None:
 
 
 def download_and_untar_files(
-    source_url: str,
-    target_parent_dir: str,
-    tar_root_name: str,
-    target_root_name: str
+    source_url: str, target_parent_dir: str, tar_root_name: str, target_root_name: str
 ) -> None:
     """Downloads a tar file, untars it, and saves the result in a given dir.
 
@@ -281,20 +283,24 @@ def download_and_untar_files(
             renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print('Downloading and untarring file %s to %s ...' % (
-            tar_root_name, target_parent_dir))
+        print(
+            'Downloading and untarring file %s to %s ...' %
+            (tar_root_name, target_parent_dir)
+        )
         common.ensure_directory_exists(target_parent_dir)
 
         common.url_retrieve(source_url, TMP_UNZIP_PATH)
-        with contextlib.closing(tarfile.open(
-            name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
+        with contextlib.closing(
+            tarfile.open(name=TMP_UNZIP_PATH, mode='r:gz')
+        ) as tfile:
             tfile.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
 
         # Rename the target directory.
         os.rename(
             os.path.join(target_parent_dir, tar_root_name),
-            os.path.join(target_parent_dir, target_root_name))
+            os.path.join(target_parent_dir, target_root_name)
+        )
 
         print('Download of %s succeeded.' % tar_root_name)
 
@@ -320,30 +326,28 @@ def install_redis_cli() -> None:
     queried using either the Python redis library or the redis-cli interpreter.
     """
     try:
-        subprocess.call(
-            [common.REDIS_SERVER_PATH, '--version'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+        subprocess.call([common.REDIS_SERVER_PATH, '--version'],
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE)
         print('Redis-cli is already installed.')
     except OSError:
         # The redis-cli is not installed, run the script to install it.
         # NOTE: We do the installation here since we need to use make.
         print('Installing redis-cli...')
 
-        download_and_untar_files(
-            ('https://download.redis.io/releases/redis-%s.tar.gz') %
-            common.REDIS_CLI_VERSION,
-            common.OPPIA_TOOLS_DIR,
-            'redis-%s' % common.REDIS_CLI_VERSION,
-            'redis-cli-%s' % common.REDIS_CLI_VERSION)
+        download_and_untar_files(('https://download.redis.io/releases/redis-%s.tar.gz')
+                                 % common.REDIS_CLI_VERSION, common.OPPIA_TOOLS_DIR,
+                                 'redis-%s' % common.REDIS_CLI_VERSION,
+                                 'redis-cli-%s' % common.REDIS_CLI_VERSION)
 
         # Temporarily change the working directory to redis-cli-6.0.6 so we can
         # build the source code.
         with common.CD(
             os.path.join(
-                common.OPPIA_TOOLS_DIR,
-                'redis-cli-%s' % common.REDIS_CLI_VERSION)):
+                common.OPPIA_TOOLS_DIR, 'redis-cli-%s' % common.REDIS_CLI_VERSION
+            )
+        ):
             # Build the scripts necessary to start the redis server.
             # The make command only builds the C++ files in the src/ folder
             # without modifying anything outside of the oppia root directory.
@@ -353,10 +357,8 @@ def install_redis_cli() -> None:
             subprocess.call(['make'])
 
         # Make the scripts executable.
-        subprocess.call([
-            'chmod', '+x', common.REDIS_SERVER_PATH])
-        subprocess.call([
-            'chmod', '+x', common.REDIS_CLI_PATH])
+        subprocess.call(['chmod', '+x', common.REDIS_SERVER_PATH])
+        subprocess.call(['chmod', '+x', common.REDIS_CLI_PATH])
 
         print('Redis-cli installed successfully.')
 
@@ -372,7 +374,9 @@ def install_elasticsearch_dev_server() -> None:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             # Set the minimum heap size to 100 MB and maximum to 500 MB.
-            env={'ES_JAVA_OPTS': '-Xms100m -Xmx500m'}
+            env={
+                'ES_JAVA_OPTS': '-Xms100m -Xmx500m'
+            }
         )
         print('ElasticSearch is already installed.')
         return
@@ -382,12 +386,9 @@ def install_elasticsearch_dev_server() -> None:
     if common.is_mac_os() or common.is_linux_os():
         download_and_untar_files(
             'https://artifacts.elastic.co/downloads/elasticsearch/' +
-            'elasticsearch-%s-%s-x86_64.tar.gz' % (
-                common.ELASTICSEARCH_VERSION,
-                common.OS_NAME.lower()
-            ),
-            common.OPPIA_TOOLS_DIR,
-            'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
+            'elasticsearch-%s-%s-x86_64.tar.gz' %
+            (common.ELASTICSEARCH_VERSION, common.OS_NAME.lower()),
+            common.OPPIA_TOOLS_DIR, 'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
             'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
         )
 
@@ -403,13 +404,15 @@ def main() -> None:
 
     if feconf.OPPIA_IS_DOCKERIZED:
         make_google_module_importable_by_python(
-            google_module_path='/app/oppia/third_party/python_libs/google')
+            google_module_path='/app/oppia/third_party/python_libs/google'
+        )
         return
 
     if common.is_windows_os():
         raise Exception(
             'Installation of Oppia is not supported on Windows OS. Please use '
-            'the Windows Subsystem for Linux (WSL) instead.')
+            'the Windows Subsystem for Linux (WSL) instead.'
+        )
     common.require_cwd_to_be_oppia()
     test_python_version()
     clean_pyc_files()
@@ -425,8 +428,7 @@ def main() -> None:
     install_elasticsearch_dev_server()
 
     # Install pre-commit and pre-push scripts.
-    common.print_each_string_after_two_new_lines([
-        'Installing pre-commit hook for git'])
+    common.print_each_string_after_two_new_lines(['Installing pre-commit hook for git'])
     pre_commit_hook.main(args=['--install'])
     print('Installing pre-push hook for git')
     pre_push_hook.main(args=['--install'])
@@ -434,12 +436,14 @@ def main() -> None:
     # Install third-party libraries in third_party/ directory. Files in this
     # directory will be deployed to production.
     common.print_each_string_after_two_new_lines([
-        'Installing third-party Python and JS libs in third_party directory'])
+        'Installing third-party Python and JS libs in third_party directory'
+    ])
     common.create_readme(
         common.THIRD_PARTY_DIR,
         'This folder contains third-party libraries used in Oppia codebase.\n'
         'You can regenerate this folder by deleting it and then running '
-        'the start.py script.\n')
+        'the start.py script.\n'
+    )
     install_python_prod_dependencies.main()
     install_dependencies_json_packages.main()
 
@@ -451,7 +455,8 @@ def main() -> None:
     # Install third-party node modules in node_modules/ directory, to be used
     # when generating files in the build process.
     common.print_each_string_after_two_new_lines([
-        'Installing third-party Node modules in node_modules directory'])
+        'Installing third-party Node modules in node_modules directory'
+    ])
     pathlib.Path(common.NODE_MODULES_PATH).mkdir(exist_ok=True)
     common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
     common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
@@ -459,11 +464,12 @@ def main() -> None:
         common.NODE_MODULES_PATH,
         'This folder contains node utilities used in Oppia codebase.\n'
         'You can regenerate this folder by deleting it and then running '
-        'the start.py script.\n')
+        'the start.py script.\n'
+    )
     subprocess.check_call(['yarn', 'install', '--pure-lockfile'])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when this Python file is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

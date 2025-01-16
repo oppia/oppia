@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.batch_jobs.math_interactions_audit_jobs."""
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from core.platform import models
 from typing import Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
 
@@ -38,9 +37,8 @@ datastore_services = models.Registry.import_datastore_services()
 
 class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
-    ] = math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
+    JOB_CLASS: Type[math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
+                   ] = math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
 
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
@@ -60,55 +58,63 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             init_state_name='state',
             states_schema_version=48,
             states={
-                'init_state': state_domain.State.create_default_state(
-                    'state', 'content_0', 'default_outcome_1',
-                    is_initial_state=True
-                ).to_dict(),
-                'alg_state': state_domain.State.create_default_state(
-                    'state', 'content_2', 'default_outcome_3',
-                    is_initial_state=True
-                ).to_dict(),
-                'eq_state': state_domain.State.create_default_state(
-                    'state', 'content_4', 'default_outcome_5',
-                    is_initial_state=True
-                ).to_dict(),
-                'end_state': state_domain.State.create_default_state(
-                    'state', 'content_6', 'default_outcome_7',
-                    is_initial_state=True
-                ).to_dict(),
+                'init_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_0',
+                        'default_outcome_1',
+                        is_initial_state=True
+                    ).to_dict(),
+                'alg_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_2',
+                        'default_outcome_3',
+                        is_initial_state=True
+                    ).to_dict(),
+                'eq_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_4',
+                        'default_outcome_5',
+                        is_initial_state=True
+                    ).to_dict(),
+                'end_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_6',
+                        'default_outcome_7',
+                        is_initial_state=True
+                    ).to_dict(),
             },
             next_content_id_index=8
         )
         exp_model_1.states['alg_state']['interaction']['id'] = (
-            'AlgebraicExpressionInput')
-        exp_model_1.states['alg_state']['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [{
-                    'inputs': {
-                        'x': 'a + b'
-                    },
-                    'rule_type': 'IsEquivalentTo'
-                }, {
-                    'inputs': {
-                        'x': 'a - b'
-                    },
-                    'rule_type': 'ContainsSomeOf'
-                }]
-            }
-        ]
-        exp_model_1.states['eq_state']['interaction']['id'] = (
-            'MathEquationInput')
-        exp_model_1.states['eq_state']['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [{
-                    'inputs': {
-                        'x': 'x = y',
-                        'y': 'both'
-                    },
-                    'rule_type': 'MatchesExactlyWith'
-                }]
-            }
-        ]
+            'AlgebraicExpressionInput'
+        )
+        exp_model_1.states['alg_state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a + b'
+                },
+                'rule_type': 'IsEquivalentTo'
+            }, {
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }]
+        }]
+        exp_model_1.states['eq_state']['interaction']['id'] = ('MathEquationInput')
+        exp_model_1.states['eq_state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'x = y',
+                    'y': 'both'
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }]
+        }]
         exp_model_1.update_timestamps()
 
         exp_model_2 = self.create_model(
@@ -121,38 +127,46 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             init_state_name='state',
             states_schema_version=48,
             states={
-                'init_state': state_domain.State.create_default_state(
-                    'state', 'content_0', 'default_outcome_1',
-                    is_initial_state=True
-                ).to_dict(),
-                'num_state': state_domain.State.create_default_state(
-                    'state', 'content_2', 'default_outcome_3',
-                    is_initial_state=True
-                ).to_dict(),
-                'end_state': state_domain.State.create_default_state(
-                    'state', 'content_4', 'default_outcome_5',
-                    is_initial_state=True
-                ).to_dict()
+                'init_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_0',
+                        'default_outcome_1',
+                        is_initial_state=True
+                    ).to_dict(),
+                'num_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_2',
+                        'default_outcome_3',
+                        is_initial_state=True
+                    ).to_dict(),
+                'end_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_4',
+                        'default_outcome_5',
+                        is_initial_state=True
+                    ).to_dict()
             },
             next_content_id_index=6
         )
         exp_model_2.states['num_state']['interaction']['id'] = (
-            'NumericExpressionInput')
-        exp_model_2.states['num_state']['interaction']['answer_groups'] = [
-            {
-                'rule_specs': [{
-                    'inputs': {
-                        'x': '1.2 + 3'
-                    },
-                    'rule_type': 'MatchesExactlyWith'
-                }, {
-                    'inputs': {
-                        'x': '1 - 2'
-                    },
-                    'rule_type': 'OmitsSomeOf'
-                }]
-            }
-        ]
+            'NumericExpressionInput'
+        )
+        exp_model_2.states['num_state']['interaction']['answer_groups'] = [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }, {
+                'inputs': {
+                    'x': '1 - 2'
+                },
+                'rule_type': 'OmitsSomeOf'
+            }]
+        }]
         exp_model_2.update_timestamps()
 
         exp_model_3 = self.create_model(
@@ -165,18 +179,27 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             init_state_name='state',
             states_schema_version=48,
             states={
-                'init_state': state_domain.State.create_default_state(
-                    'state', 'content_0', 'default_outcome_1',
-                    is_initial_state=True
-                ).to_dict(),
-                'text_state': state_domain.State.create_default_state(
-                    'state', 'content_2', 'default_outcome_3',
-                    is_initial_state=True
-                ).to_dict(),
-                'end_state': state_domain.State.create_default_state(
-                    'state', 'content_4', 'default_outcome_5',
-                    is_initial_state=True
-                ).to_dict()
+                'init_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_0',
+                        'default_outcome_1',
+                        is_initial_state=True
+                    ).to_dict(),
+                'text_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_2',
+                        'default_outcome_3',
+                        is_initial_state=True
+                    ).to_dict(),
+                'end_state':
+                    state_domain.State.create_default_state(
+                        'state',
+                        'content_4',
+                        'default_outcome_5',
+                        is_initial_state=True
+                    ).to_dict()
             },
             next_content_id_index=6
         )
@@ -185,7 +208,9 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
         exp_model_3.states['text_state']['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'rule_type': 'CaseSensitiveEquals',
-                'inputs': {'x': ''}
+                'inputs': {
+                    'x': ''
+                }
             }]
         }]
         exp_model_3.update_timestamps()
@@ -200,9 +225,7 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
                 )
             ),
             job_run_result.JobRunResult(
-                stdout=(
-                    '(\'exp_1_id\', \'eq_state\', [\'MatchesExactlyWith\'])'
-                )
+                stdout=('(\'exp_1_id\', \'eq_state\', [\'MatchesExactlyWith\'])')
             ),
             job_run_result.JobRunResult(
                 stdout=(

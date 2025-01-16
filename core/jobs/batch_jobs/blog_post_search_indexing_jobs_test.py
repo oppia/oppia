@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.batch_jobs.blog_post_search_indexing_jobs."""
 
 from __future__ import annotations
@@ -44,9 +43,8 @@ StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
-        blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
-    ] = blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
+    JOB_CLASS: Type[blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
+                   ] = blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
 
     USER_ID_1: Final = 'id_1'
     USERNAME: Final = 'someUsername'
@@ -74,19 +72,15 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
-            expected_args=[
-                (
-                    [{
-                        'id': 'abcd',
-                        'title': 'title',
-                        'tags': ['tag1', 'tag2'],
-                        'rank': math.floor(
-                            utils.get_time_in_millisecs(
-                                blog_summary.published_on
-                            )),
-                    }],
-                    search_services.SEARCH_INDEX_BLOG_POSTS)
-            ]
+            expected_args=[([{
+                'id':
+                    'abcd',
+                'title':
+                    'title',
+                'tags': ['tag1', 'tag2'],
+                'rank':
+                    math.floor(utils.get_time_in_millisecs(blog_summary.published_on)),
+            }], search_services.SEARCH_INDEX_BLOG_POSTS)]
         )
 
         with add_docs_to_index_swap:
@@ -116,25 +110,21 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
-            expected_args=[
-                (
-                    [{
-                        'id': 'abcd%s' % i,
-                        'title': 'title',
-                        'tags': ['tag1', 'tag2'],
-                        'rank': math.floor(
-                            utils.get_time_in_millisecs(
-                                blog_summary.published_on
-                            )),
-                    }],
-                    search_services.SEARCH_INDEX_BLOG_POSTS
-                ) for i in range(5)
-            ]
+            expected_args=[([{
+                'id':
+                    'abcd%s' % i,
+                'title':
+                    'title',
+                'tags': ['tag1', 'tag2'],
+                'rank':
+                    math.floor(utils.get_time_in_millisecs(blog_summary.published_on)),
+            }], search_services.SEARCH_INDEX_BLOG_POSTS) for i in range(5)]
         )
 
         max_batch_size_swap = self.swap(
-            blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob,
-            'MAX_BATCH_SIZE', 1)
+            blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob, 'MAX_BATCH_SIZE',
+            1
+        )
 
         with add_docs_to_index_swap, max_batch_size_swap:
             self.assert_job_output_is([
@@ -158,8 +148,8 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         blog_summary.put()
 
         def add_docs_to_index_mock(
-                unused_documents: Dict[str, Union[int, str, List[str]]],
-                unused_index_name: str
+            unused_documents: Dict[str, Union[int, str, List[str]]],
+            unused_index_name: str
         ) -> None:
             raise platform_search_services.SearchException('search exception')
 
@@ -167,27 +157,20 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             add_docs_to_index_mock,
-            expected_args=[
-                (
-                    [{
-                        'id': 'abcd',
-                        'title': 'title',
-                        'tags': ['tag1', 'tag2'],
-                        'rank': math.floor(
-                            utils.get_time_in_millisecs(
-                                blog_summary.published_on
-                            )),
-                    }],
-                    search_services.SEARCH_INDEX_BLOG_POSTS
-                )
-            ]
+            expected_args=[([{
+                'id':
+                    'abcd',
+                'title':
+                    'title',
+                'tags': ['tag1', 'tag2'],
+                'rank':
+                    math.floor(utils.get_time_in_millisecs(blog_summary.published_on)),
+            }], search_services.SEARCH_INDEX_BLOG_POSTS)]
         )
 
         with add_docs_to_index_swap:
             self.assert_job_output_is([
-                job_run_result.JobRunResult.as_stderr(
-                    'ERROR: "search exception": 1'
-                )
+                job_run_result.JobRunResult.as_stderr('ERROR: "search exception": 1')
             ])
 
     def test_skips_deleted_model(self) -> None:
@@ -236,9 +219,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
-            expected_args=[(
-                [], search_services.SEARCH_INDEX_BLOG_POSTS
-            )]
+            expected_args=[([], search_services.SEARCH_INDEX_BLOG_POSTS)]
         )
 
         with add_docs_to_index_swap:

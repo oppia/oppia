@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for jobs.transforms.feedback_validation."""
 
 from __future__ import annotations
@@ -46,14 +45,12 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
         output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(
-                feedback_validation.ValidateEntityType())
+            self.pipeline | beam.Create([model]) |
+            beam.ParDo(feedback_validation.ValidateEntityType())
         )
-        self.assert_pcoll_equal(output, [
-            feedback_validation_errors.InvalidEntityTypeError(model)
-        ])
+        self.assert_pcoll_equal(
+            output, [feedback_validation_errors.InvalidEntityTypeError(model)]
+        )
 
     def test_model_with_valid_entity_type_raises_no_error(self) -> None:
         model = feedback_models.GeneralFeedbackThreadModel(
@@ -65,10 +62,8 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
             last_updated=self.NOW,
         )
         output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(
-                feedback_validation.ValidateEntityType())
+            self.pipeline | beam.Create([model]) |
+            beam.ParDo(feedback_validation.ValidateEntityType())
         )
         self.assert_pcoll_equal(output, [])
 
@@ -78,4 +73,6 @@ class RelationshipsOfTests(test_utils.TestBase):
     def test_feedback_analytics_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
-                'FeedbackAnalyticsModel', 'id'), ['ExplorationModel'])
+                'FeedbackAnalyticsModel', 'id'
+            ), ['ExplorationModel']
+        )

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the release coordinator page."""
 
 from __future__ import annotations
@@ -30,9 +29,7 @@ from core.domain import user_services
 from typing import Dict, List, TypedDict
 
 
-class MemoryCacheHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class MemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler for memory cache profile."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -70,10 +67,7 @@ class UserGroupHandlerNormalizePayloadDict(TypedDict):
 
 
 class UserGroupHandler(
-    base.BaseHandler[
-        UserGroupHandlerNormalizePayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[UserGroupHandlerNormalizePayloadDict, Dict[str, str]]
 ):
     """Handler for user groups."""
 
@@ -145,9 +139,10 @@ class UserGroupHandler(
         assert self.normalized_payload is not None
         name = self.normalized_payload['name']
         member_usernames = self.normalized_payload['member_usernames']
-        user_group = user_services.create_new_user_group(
-            name, member_usernames)
-        self.render_json({'user_group_dict': user_group.to_dict()})
+        user_group = user_services.create_new_user_group(name, member_usernames)
+        self.render_json({
+            'user_group_dict': user_group.to_dict()
+        })
 
     @acl_decorators.can_access_release_coordinator_page
     def put(self) -> None:
@@ -157,8 +152,7 @@ class UserGroupHandler(
         user_group_id = self.normalized_payload['user_group_id']
         name = self.normalized_payload['name']
         member_usernames = self.normalized_payload['member_usernames']
-        user_services.update_user_group(
-            user_group_id, name, member_usernames)
+        user_services.update_user_group(user_group_id, name, member_usernames)
         self.render_json(self.values)
 
     @acl_decorators.can_access_release_coordinator_page
@@ -183,8 +177,7 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
 
 
 class FeatureFlagsHandler(
-    base.BaseHandler[
-        FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
+    base.BaseHandler[FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler for feature-flags."""
 
@@ -196,9 +189,7 @@ class FeatureFlagsHandler(
             'action': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': [
-                        'update_feature_flag'
-                    ]
+                    'choices': ['update_feature_flag']
                 },
                 'default_value': None
             },
@@ -216,7 +207,8 @@ class FeatureFlagsHandler(
             },
             'rollout_percentage': {
                 'schema': {
-                    'type': 'int',
+                    'type':
+                        'int',
                     'validators': [{
                         'id': 'is_at_least',
                         'min_value': 0
@@ -276,12 +268,12 @@ class FeatureFlagsHandler(
                 )
 
             force_enable_for_all_users = self.normalized_payload.get(
-                'force_enable_for_all_users')
+                'force_enable_for_all_users'
+            )
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert force_enable_for_all_users is not None
-            rollout_percentage = self.normalized_payload.get(
-                'rollout_percentage')
+            rollout_percentage = self.normalized_payload.get('rollout_percentage')
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert rollout_percentage is not None
@@ -291,27 +283,26 @@ class FeatureFlagsHandler(
             assert user_group_ids is not None
             try:
                 feature_services.update_feature_flag(
-                    feature_flag_name,
-                    force_enable_for_all_users,
-                    rollout_percentage,
+                    feature_flag_name, force_enable_for_all_users, rollout_percentage,
                     user_group_ids
                 )
             except (
-                    utils.ValidationError,
-                    feature_services.FeatureFlagNotFoundException) as e:
+                utils.ValidationError, feature_services.FeatureFlagNotFoundException
+            ) as e:
                 raise self.InvalidInputException(e)
 
             logging.info(
                 '[RELEASE-COORDINATOR] %s updated feature %s with new values: '
                 'rollout_percentage - %d, force_enable_for_all_users - %s, '
                 'user_group_ids - %s.' % (
-                    self.user_id, feature_flag_name,
-                    rollout_percentage,
-                    force_enable_for_all_users,
-                    user_group_ids)
+                    self.user_id, feature_flag_name, rollout_percentage,
+                    force_enable_for_all_users, user_group_ids
                 )
+            )
             self.render_json(self.values)
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)
-            self.render_json({'error': str(e)})
+            self.render_json({
+                'error': str(e)
+            })
             raise e

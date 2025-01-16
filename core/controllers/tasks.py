@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for task queue handlers."""
 
 from __future__ import annotations
@@ -33,9 +32,7 @@ from core.domain import wipeout_service
 from typing import Callable, Dict
 
 
-class UnsentFeedbackEmailHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class UnsentFeedbackEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler task of sending emails of feedback messages."""
 
     @acl_decorators.can_perform_tasks_in_taskqueue
@@ -53,10 +50,10 @@ class UnsentFeedbackEmailHandler(
         messages: Dict[str, email_manager.FeedbackMessagesDict] = {}
         for reference in references:
             message = feedback_services.get_message(
-                reference.thread_id, reference.message_id)
+                reference.thread_id, reference.message_id
+            )
 
-            exploration = exp_fetchers.get_exploration_by_id(
-                reference.entity_id)
+            exploration = exp_fetchers.get_exploration_by_id(reference.entity_id)
 
             message_text = message.text
             if len(message_text) > 200:
@@ -72,7 +69,8 @@ class UnsentFeedbackEmailHandler(
 
         email_manager.send_feedback_message_email(user_id, messages)
         feedback_services.pop_feedback_message_references_transactional(
-            user_id, len(references))
+            user_id, len(references)
+        )
         self.render_json({})
 
 
@@ -129,10 +127,10 @@ class ContributorDashboardAchievementEmailHandler(
 
         email_info = suggestion_registry.ContributorMilestoneEmailInfo(
             contributor_user_id, contribution_type, contribution_sub_type,
-            language_code, rank_name)
+            language_code, rank_name
+        )
 
-        email_manager.send_mail_to_notify_contributor_ranking_achievement(
-            email_info)
+        email_manager.send_mail_to_notify_contributor_ranking_achievement(email_info)
         self.render_json({})
 
 
@@ -149,15 +147,16 @@ class InstantFeedbackMessageEmailHandler(
         reference_dict = payload['reference_dict']
 
         message = feedback_services.get_message(
-            reference_dict['thread_id'], reference_dict['message_id'])
-        exploration = exp_fetchers.get_exploration_by_id(
-            reference_dict['entity_id'])
+            reference_dict['thread_id'], reference_dict['message_id']
+        )
+        exploration = exp_fetchers.get_exploration_by_id(reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
 
         subject = 'New Oppia message in "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
-            user_id, message.author_id, message.text, subject,
-            exploration.title, reference_dict['entity_id'], thread.subject)
+            user_id, message.author_id, message.text, subject, exploration.title,
+            reference_dict['entity_id'], thread.subject
+        )
         self.render_json({})
 
 
@@ -178,22 +177,21 @@ class FeedbackThreadStatusChangeEmailHandler(
         new_status = payload['new_status']
 
         message = feedback_services.get_message(
-            reference_dict['thread_id'], reference_dict['message_id'])
-        exploration = exp_fetchers.get_exploration_by_id(
-            reference_dict['entity_id'])
+            reference_dict['thread_id'], reference_dict['message_id']
+        )
+        exploration = exp_fetchers.get_exploration_by_id(reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
 
         text = 'changed status from %s to %s' % (old_status, new_status)
         subject = 'Oppia thread status change: "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, text, subject, exploration.title,
-            reference_dict['entity_id'], thread.subject)
+            reference_dict['entity_id'], thread.subject
+        )
         self.render_json({})
 
 
-class FlagExplorationEmailHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class FlagExplorationEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles task of sending emails about flagged explorations
     to moderators.
     """
@@ -209,13 +207,12 @@ class FlagExplorationEmailHandler(
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
         email_manager.send_flag_exploration_email(
-            exploration.title, exploration_id, reporter_id, report_text)
+            exploration.title, exploration_id, reporter_id, report_text
+        )
         self.render_json({})
 
 
-class DeferredTasksHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """This task handler handles special tasks that make single asynchronous
     function calls. For more complex tasks that require a large number of
     function calls, the correct approach is to create a special url handler that
@@ -227,23 +224,21 @@ class DeferredTasksHandler(
     """
 
     DEFERRED_TASK_FUNCTIONS: Dict[str, Callable[..., None]] = {
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: (
-            exp_services.delete_explorations_from_user_models),
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: (
-            exp_services.delete_explorations_from_activities),
-        taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED: (
-            wipeout_service.delete_users_pending_to_be_deleted),
-        taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION: (
-            wipeout_service.check_completion_of_user_deletion),
-        taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: (
-            exp_services.regenerate_exploration_summary_with_new_contributor),
-        taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
-            stats_services.update_stats),
-        taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
-            question_services.untag_deleted_misconceptions),
-        taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: (
-            wipeout_service
-            .remove_user_from_activities_with_associated_rights_models)
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS:
+            (exp_services.delete_explorations_from_user_models),
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES:
+            (exp_services.delete_explorations_from_activities),
+        taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED:
+            (wipeout_service.delete_users_pending_to_be_deleted),
+        taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION:
+            (wipeout_service.check_completion_of_user_deletion),
+        taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY:
+            (exp_services.regenerate_exploration_summary_with_new_contributor),
+        taskqueue_services.FUNCTION_ID_UPDATE_STATS: (stats_services.update_stats),
+        taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS:
+            (question_services.untag_deleted_misconceptions),
+        taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS:
+            (wipeout_service.remove_user_from_activities_with_associated_rights_models)
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
@@ -262,12 +257,13 @@ class DeferredTasksHandler(
             raise Exception(
                 'This request cannot defer tasks because it does not contain a '
                 'function identifier attribute (fn_identifier). Deferred tasks '
-                'must contain a function_identifier in the payload.')
+                'must contain a function_identifier in the payload.'
+            )
         if payload['fn_identifier'] not in self.DEFERRED_TASK_FUNCTIONS:
             raise Exception(
-                'The function id, %s, is not valid.' % payload['fn_identifier'])
+                'The function id, %s, is not valid.' % payload['fn_identifier']
+            )
 
-        deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
-            payload['fn_identifier']]
+        deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[payload['fn_identifier']]
         deferred_task_function(*payload['args'], **payload['kwargs'])
         self.render_json({})

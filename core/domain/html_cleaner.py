@@ -361,7 +361,7 @@ def validate_rte_tags(
             )
 
         caption_value = utils.unescape_html(tag['caption-with-value']
-                                            )[1:-1].replace('\\"', '')
+                                           )[1:-1].replace('\\"', '')
         if len(caption_value.strip()) > 500:
             raise utils.ValidationError(
                 'Image tag \'caption-with-value\' attribute should not '
@@ -374,7 +374,7 @@ def validate_rte_tags(
             )
 
         filepath_value = utils.unescape_html(tag['filepath-with-value']
-                                             )[1:-1].replace('\\"', '')
+                                            )[1:-1].replace('\\"', '')
         if is_html_empty(filepath_value):
             raise utils.ValidationError(
                 'Image tag \'filepath-with-value\' attribute should not '
@@ -402,9 +402,10 @@ def validate_rte_tags(
                 'attribute.'
             )
 
-        if tag['autoplay-with-value'].strip() not in ('true', 'false', '\'true\'',
-                                                      '\'false\'', '\"true\"',
-                                                      '\"false\"', True, False):
+        if tag['autoplay-with-value'].strip() not in (
+            'true', 'false', '\'true\'', '\'false\'', '\"true\"', '\"false\"', True,
+            False
+        ):
             raise utils.ValidationError(
                 'Video tag \'autoplay-with-value\' attribute should be '
                 'a boolean value.'

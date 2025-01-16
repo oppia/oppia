@@ -49,9 +49,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
     from mypy_imports import user_models
 
-(user_models, topic_models, story_models) = models.Registry.import_models(
-    [models.Names.USER, models.Names.TOPIC, models.Names.STORY]
-)
+(user_models, topic_models, story_models) = models.Registry.import_models([
+    models.Names.USER, models.Names.TOPIC, models.Names.STORY
+])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -284,8 +284,10 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         completed_activities_model
     )
 
-    if (exp_id not in subscribed_exploration_ids
-            and exp_id not in activities_completed.exploration_ids):
+    if (
+        exp_id not in subscribed_exploration_ids and
+        exp_id not in activities_completed.exploration_ids
+    ):
         # Remove the exploration from the in progress and learner playlist
         # (if present) as it is now completed.
         remove_exp_from_incomplete_list(user_id, exp_id)
@@ -379,8 +381,10 @@ def mark_collection_as_completed(user_id: str, collection_id: str) -> None:
         completed_activities_model
     )
 
-    if (collection_id not in subscribed_collection_ids
-            and collection_id not in activities_completed.collection_ids):
+    if (
+        collection_id not in subscribed_collection_ids and
+        collection_id not in activities_completed.collection_ids
+    ):
         # Remove the collection from the in progress and learner playlist
         # (if present) as it is now completed.
         remove_collection_from_incomplete_list(user_id, collection_id)
@@ -427,8 +431,10 @@ def mark_exploration_as_incomplete(
         incomplete_activities_model
     )
 
-    if (exploration_id not in exploration_ids
-            and exploration_id not in subscribed_exploration_ids):
+    if (
+        exploration_id not in exploration_ids and
+        exploration_id not in subscribed_exploration_ids
+    ):
 
         if exploration_id not in incomplete_activities.exploration_ids:
             # Remove the exploration from the learner playlist (if present) as
@@ -480,8 +486,10 @@ def record_story_started(user_id: str, story_id: str) -> None:
         incomplete_activities_model
     )
 
-    if (story_id not in completed_story_ids
-            and story_id not in incomplete_activities.story_ids):
+    if (
+        story_id not in completed_story_ids and
+        story_id not in incomplete_activities.story_ids
+    ):
         incomplete_activities.add_story_id(story_id)
         _save_incomplete_activities(incomplete_activities)
 
@@ -511,8 +519,10 @@ def record_topic_started(user_id: str, topic_id: str) -> None:
         incomplete_activities_model
     )
 
-    if (topic_id not in learnt_topic_ids
-            and topic_id not in incomplete_activities.partially_learnt_topic_ids):
+    if (
+        topic_id not in learnt_topic_ids and
+        topic_id not in incomplete_activities.partially_learnt_topic_ids
+    ):
         incomplete_activities.add_partially_learnt_topic_id(topic_id)
         _save_incomplete_activities(incomplete_activities)
 
@@ -545,9 +555,11 @@ def mark_collection_as_incomplete(user_id: str, collection_id: str) -> None:
         incomplete_activities_model
     )
 
-    if (collection_id not in subscribed_collection_ids
-            and collection_id not in incomplete_activities.collection_ids
-            and collection_id not in collection_ids):
+    if (
+        collection_id not in subscribed_collection_ids and
+        collection_id not in incomplete_activities.collection_ids and
+        collection_id not in collection_ids
+    ):
         # Remove the collection from the learner playlist (if present) as it
         # is currently now being completed.
         learner_playlist_services.remove_collection_from_learner_playlist(
@@ -620,8 +632,10 @@ def add_collection_to_learner_playlist(
     belongs_to_subscribed_activities = False
     belongs_to_completed_or_incomplete_list = False
 
-    if (collection_id not in completed_collection_ids
-            and collection_id not in incomplete_collection_ids):
+    if (
+        collection_id not in completed_collection_ids and
+        collection_id not in incomplete_collection_ids
+    ):
 
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_collection_to_be_played_later(
@@ -670,8 +684,10 @@ def add_exp_to_learner_playlist(
     belongs_to_subscribed_activities = False
     belongs_to_completed_or_incomplete_list = False
 
-    if (exploration_id not in completed_exploration_ids
-            and exploration_id not in incomplete_exploration_ids):
+    if (
+        exploration_id not in completed_exploration_ids and
+        exploration_id not in incomplete_exploration_ids
+    ):
 
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_exploration_to_be_played_later(
@@ -1071,7 +1087,7 @@ def _get_filtered_completed_story_summaries(
             # we used assert here.
             assert story is not None
             if len(story_fetchers.get_completed_node_ids(user_id, story_id)
-                   ) != len(story_summary.node_titles):
+                  ) != len(story_summary.node_titles):
                 remove_story_from_completed_list(user_id, story_id)
                 record_story_started(user_id, story_id)
                 completed_to_incomplete_story_summaries.append(story_summary)
@@ -1699,41 +1715,45 @@ def get_displayable_story_summary_dicts(
     for index, story_summary in enumerate(story_summaries):
         story = stories[index]
         topic = topics[index]
-        summary_dicts.append(
-            {
-                'id': story_summary.id,
-                'title': story_summary.title,
-                'node_titles': story_summary.node_titles,
-                'thumbnail_filename': story_summary.thumbnail_filename,
-                'thumbnail_bg_color': story_summary.thumbnail_bg_color,
-                'description': story_summary.description,
-                'url_fragment': story_summary.url_fragment,
-                'story_is_published': (
-                    story_services.is_story_published_and_present_in_topic(story)
-                ),
-                'completed_node_titles': [
-                    node.title for node in (
-                        story_fetchers.
-                        get_completed_nodes_in_story(user_id, story_summary.id)
-                    )
-                ],
-                'all_node_dicts': [
-                    node.to_dict() for node in story.story_contents.nodes
-                ],
-                'topic_name': topic.name,
-                'topic_url_fragment': topic.url_fragment,
-                'classroom_url_fragment': (
-                    classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                        story.corresponding_topic_id
-                    )
-                ),
-                'classroom_name': (
-                    classroom_config_services.get_classroom_name_for_topic_id(
-                        story.corresponding_topic_id
-                    )
+        summary_dicts.append({
+            'id':
+                story_summary.id,
+            'title':
+                story_summary.title,
+            'node_titles':
+                story_summary.node_titles,
+            'thumbnail_filename':
+                story_summary.thumbnail_filename,
+            'thumbnail_bg_color':
+                story_summary.thumbnail_bg_color,
+            'description':
+                story_summary.description,
+            'url_fragment':
+                story_summary.url_fragment,
+            'story_is_published':
+                (story_services.is_story_published_and_present_in_topic(story)),
+            'completed_node_titles': [
+                node.title for node in (
+                    story_fetchers.
+                    get_completed_nodes_in_story(user_id, story_summary.id)
                 )
-            }
-        )
+            ],
+            'all_node_dicts': [node.to_dict() for node in story.story_contents.nodes],
+            'topic_name':
+                topic.name,
+            'topic_url_fragment':
+                topic.url_fragment,
+            'classroom_url_fragment': (
+                classroom_config_services.get_classroom_url_fragment_for_topic_id(
+                    story.corresponding_topic_id
+                )
+            ),
+            'classroom_name': (
+                classroom_config_services.get_classroom_name_for_topic_id(
+                    story.corresponding_topic_id
+                )
+            )
+        })
 
     return summary_dicts
 
@@ -1774,36 +1794,45 @@ def get_displayable_untracked_topic_summary_dicts(
         )
         summary_dict[classroom_config_services.get_classroom_url_fragment_for_topic_id(
             topic.id
-        )].append(
-            {
-                'id': topic.id,
-                'name': topic.name,
-                'description': topic.description,
-                'language_code': topic.language_code,
-                'version': topic.version,
-                'story_titles': topic_services.get_story_titles_in_topic(topic),
-                'total_published_node_count': untracked_topic_summaries[index].
-                total_published_node_count,
-                'thumbnail_filename': topic.thumbnail_filename,
-                'thumbnail_bg_color': topic.thumbnail_bg_color,
-                'canonical_story_summary_dict': (
-                    topic_fetchers.get_canonical_story_dicts(user_id, topic)
-                ),
-                'url_fragment': topic.url_fragment,
-                'classroom_name': (
-                    classroom_config_services.get_classroom_name_for_topic_id(topic.id)
-                ),
-                'classroom_url_fragment': (
-                    classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                        topic.id
-                    )
-                ),
-                'practice_tab_is_displayed': topic.practice_tab_is_displayed,
-                'degrees_of_mastery': degrees_of_mastery,
-                'skill_descriptions': skill_descriptions,
-                'subtopics': topic.get_all_subtopics()
-            }
-        )
+        )].append({
+            'id':
+                topic.id,
+            'name':
+                topic.name,
+            'description':
+                topic.description,
+            'language_code':
+                topic.language_code,
+            'version':
+                topic.version,
+            'story_titles':
+                topic_services.get_story_titles_in_topic(topic),
+            'total_published_node_count':
+                untracked_topic_summaries[index].total_published_node_count,
+            'thumbnail_filename':
+                topic.thumbnail_filename,
+            'thumbnail_bg_color':
+                topic.thumbnail_bg_color,
+            'canonical_story_summary_dict':
+                (topic_fetchers.get_canonical_story_dicts(user_id, topic)),
+            'url_fragment':
+                topic.url_fragment,
+            'classroom_name':
+                (classroom_config_services.get_classroom_name_for_topic_id(topic.id)),
+            'classroom_url_fragment': (
+                classroom_config_services.get_classroom_url_fragment_for_topic_id(
+                    topic.id
+                )
+            ),
+            'practice_tab_is_displayed':
+                topic.practice_tab_is_displayed,
+            'degrees_of_mastery':
+                degrees_of_mastery,
+            'skill_descriptions':
+                skill_descriptions,
+            'subtopics':
+                topic.get_all_subtopics()
+        })
 
     return summary_dict
 
@@ -1832,36 +1861,45 @@ def get_displayable_topic_summary_dicts(
         degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             user_id, all_skill_ids
         )
-        summary_dicts.append(
-            {
-                'id': topic.id,
-                'name': topic.name,
-                'description': topic.description,
-                'language_code': topic.language_code,
-                'version': topic.version,
-                'story_titles': topic_services.get_story_titles_in_topic(topic),
-                'total_published_node_count': topic_summaries[index].
-                total_published_node_count,
-                'thumbnail_filename': topic.thumbnail_filename,
-                'thumbnail_bg_color': topic.thumbnail_bg_color,
-                'canonical_story_summary_dict': (
-                    topic_fetchers.get_canonical_story_dicts(user_id, topic)
-                ),
-                'url_fragment': topic.url_fragment,
-                'classroom_name': (
-                    classroom_config_services.get_classroom_name_for_topic_id(topic.id)
-                ),
-                'classroom_url_fragment': (
-                    classroom_config_services.get_classroom_url_fragment_for_topic_id(
-                        topic.id
-                    )
-                ),
-                'practice_tab_is_displayed': topic.practice_tab_is_displayed,
-                'degrees_of_mastery': degrees_of_mastery,
-                'skill_descriptions': skill_descriptions,
-                'subtopics': topic.get_all_subtopics()
-            }
-        )
+        summary_dicts.append({
+            'id':
+                topic.id,
+            'name':
+                topic.name,
+            'description':
+                topic.description,
+            'language_code':
+                topic.language_code,
+            'version':
+                topic.version,
+            'story_titles':
+                topic_services.get_story_titles_in_topic(topic),
+            'total_published_node_count':
+                topic_summaries[index].total_published_node_count,
+            'thumbnail_filename':
+                topic.thumbnail_filename,
+            'thumbnail_bg_color':
+                topic.thumbnail_bg_color,
+            'canonical_story_summary_dict':
+                (topic_fetchers.get_canonical_story_dicts(user_id, topic)),
+            'url_fragment':
+                topic.url_fragment,
+            'classroom_name':
+                (classroom_config_services.get_classroom_name_for_topic_id(topic.id)),
+            'classroom_url_fragment': (
+                classroom_config_services.get_classroom_url_fragment_for_topic_id(
+                    topic.id
+                )
+            ),
+            'practice_tab_is_displayed':
+                topic.practice_tab_is_displayed,
+            'degrees_of_mastery':
+                degrees_of_mastery,
+            'skill_descriptions':
+                skill_descriptions,
+            'subtopics':
+                topic.get_all_subtopics()
+        })
 
     return summary_dicts
 
@@ -1882,32 +1920,37 @@ def get_collection_summary_dicts(
     """
     summary_dicts: List[DisplayableCollectionSummaryDict] = []
     for collection_summary in collection_summaries:
-        summary_dicts.append(
-            {
-                'id': collection_summary.id,
-                'title': collection_summary.title,
-                'category': collection_summary.category,
-                'objective': collection_summary.objective,
-                'language_code': collection_summary.language_code,
-                'last_updated_msec': utils.get_time_in_millisecs(
+        summary_dicts.append({
+            'id':
+                collection_summary.id,
+            'title':
+                collection_summary.title,
+            'category':
+                collection_summary.category,
+            'objective':
+                collection_summary.objective,
+            'language_code':
+                collection_summary.language_code,
+            'last_updated_msec':
+                utils.get_time_in_millisecs(
                     collection_summary.collection_model_last_updated
                 ),
-                'created_on': utils.get_time_in_millisecs(
+            'created_on':
+                utils.get_time_in_millisecs(
                     collection_summary.collection_model_created_on
                 ),
-                'status': collection_summary.status,
-                'node_count': collection_summary.node_count,
-                'community_owned': collection_summary.community_owned,
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        collection_summary.category
-                    )
-                ),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    collection_summary.category
-                ),
-            }
-        )
+            'status':
+                collection_summary.status,
+            'node_count':
+                collection_summary.node_count,
+            'community_owned':
+                collection_summary.community_owned,
+            'thumbnail_icon_url': (
+                utils.get_thumbnail_icon_url_for_category(collection_summary.category)
+            ),
+            'thumbnail_bg_color':
+                utils.get_hex_color_for_category(collection_summary.category),
+        })
 
     return summary_dicts
 
@@ -1927,13 +1970,11 @@ def get_learner_dashboard_activities(
         all activities in the learner dashboard.
     """
     learner_progress_models = (
-        datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [
-                ('CompletedActivitiesModel', [user_id]),
-                ('IncompleteActivitiesModel', [user_id]),
-                ('LearnerPlaylistModel', [user_id]), ('LearnerGoalsModel', [user_id])
-            ]
-        )
+        datastore_services.fetch_multiple_entities_by_ids_and_models([
+            ('CompletedActivitiesModel', [user_id]),
+            ('IncompleteActivitiesModel', [user_id]),
+            ('LearnerPlaylistModel', [user_id]), ('LearnerGoalsModel', [user_id])
+        ])
     )
 
     # If completed model is present.
@@ -2064,12 +2105,10 @@ def get_topics_and_stories_progress(
         )
     )
     activity_models = (
-        datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [
-                ('TopicSummaryModel', unique_topic_ids),
-                ('StorySummaryModel', completed_story_ids)
-            ]
-        )
+        datastore_services.fetch_multiple_entities_by_ids_and_models([
+            ('TopicSummaryModel', unique_topic_ids),
+            ('StorySummaryModel', completed_story_ids)
+        ])
     )
 
     topic_id_to_model_dict: Dict[str, topic_domain.TopicSummary] = {}
@@ -2095,41 +2134,26 @@ def get_topics_and_stories_progress(
         else:
             completed_story_summaries.append(None)
 
-    partially_learnt_topic_summaries = (
-        [
-            topic_id_to_model_dict[topic_id]
-            if topic_id in topic_id_to_model_dict else None
-            for topic_id in partially_learnt_topic_ids
-        ]
-    )
-    learnt_topic_summaries = (
-        [
-            topic_id_to_model_dict[topic_id]
-            if topic_id in topic_id_to_model_dict else None
-            for topic_id in learnt_topic_ids
-        ]
-    )
-    topics_to_learn_summaries = (
-        [
-            topic_id_to_model_dict[topic_id]
-            if topic_id in topic_id_to_model_dict else None
-            for topic_id in topic_ids_to_learn
-        ]
-    )
-    all_topic_summaries = (
-        [
-            topic_id_to_model_dict[topic_id]
-            if topic_id in topic_id_to_model_dict else None
-            for topic_id in all_topic_ids
-        ]
-    )
-    untracked_topic_summaries = (
-        [
-            topic_id_to_model_dict[topic_id]
-            if topic_id in topic_id_to_model_dict else None
-            for topic_id in untracked_topic_ids
-        ]
-    )
+    partially_learnt_topic_summaries = ([
+        topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict else None
+        for topic_id in partially_learnt_topic_ids
+    ])
+    learnt_topic_summaries = ([
+        topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict else None
+        for topic_id in learnt_topic_ids
+    ])
+    topics_to_learn_summaries = ([
+        topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict else None
+        for topic_id in topic_ids_to_learn
+    ])
+    all_topic_summaries = ([
+        topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict else None
+        for topic_id in all_topic_ids
+    ])
+    untracked_topic_summaries = ([
+        topic_id_to_model_dict[topic_id] if topic_id in topic_id_to_model_dict else None
+        for topic_id in untracked_topic_ids
+    ])
 
     (
         filtered_completed_story_summaries, nonexistent_completed_story_ids,
@@ -2255,9 +2279,9 @@ def get_collection_progress(
         )
     )
     activity_models = (
-        datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [('CollectionSummaryModel', unique_collection_ids)]
-        )
+        datastore_services.fetch_multiple_entities_by_ids_and_models([
+            ('CollectionSummaryModel', unique_collection_ids)
+        ])
     )
 
     collection_id_to_model_dict: Dict[str, collection_domain.CollectionSummary] = {}
@@ -2267,27 +2291,21 @@ def get_collection_progress(
                 model.id
             ] = (collection_services.get_collection_summary_from_model(model))
 
-    incomplete_collection_summaries = (
-        [
-            collection_id_to_model_dict[collection_id]
-            if collection_id in collection_id_to_model_dict else None
-            for collection_id in incomplete_collection_ids
-        ]
-    )
-    completed_collection_summaries = (
-        [
-            collection_id_to_model_dict[collection_id]
-            if collection_id in collection_id_to_model_dict else None
-            for collection_id in completed_collection_ids
-        ]
-    )
-    collection_playlist_summaries = (
-        [
-            collection_id_to_model_dict[collection_id]
-            if collection_id in collection_id_to_model_dict else None
-            for collection_id in collection_playlist_ids
-        ]
-    )
+    incomplete_collection_summaries = ([
+        collection_id_to_model_dict[collection_id]
+        if collection_id in collection_id_to_model_dict else None
+        for collection_id in incomplete_collection_ids
+    ])
+    completed_collection_summaries = ([
+        collection_id_to_model_dict[collection_id]
+        if collection_id in collection_id_to_model_dict else None
+        for collection_id in completed_collection_ids
+    ])
+    collection_playlist_summaries = ([
+        collection_id_to_model_dict[collection_id]
+        if collection_id in collection_id_to_model_dict else None
+        for collection_id in collection_playlist_ids
+    ])
 
     (
         filtered_completed_collection_summaries, nonexistent_completed_collection_ids,
@@ -2384,9 +2402,9 @@ def get_exploration_progress(
         )
     )
     activity_models = (
-        datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [('ExpSummaryModel', unique_exploration_ids)]
-        )
+        datastore_services.fetch_multiple_entities_by_ids_and_models([
+            ('ExpSummaryModel', unique_exploration_ids)
+        ])
     )
 
     exploration_id_to_model_dict: Dict[str, exp_domain.ExplorationSummary] = {}
@@ -2395,27 +2413,21 @@ def get_exploration_progress(
             exploration_id_to_model_dict[
                 model.id] = (exp_fetchers.get_exploration_summary_from_model(model))
 
-    incomplete_exp_summaries = (
-        [
-            exploration_id_to_model_dict[exp_id]
-            if exp_id in exploration_id_to_model_dict else None
-            for exp_id in incomplete_exploration_ids
-        ]
-    )
-    completed_exp_summaries = (
-        [
-            exploration_id_to_model_dict[exp_id]
-            if exp_id in exploration_id_to_model_dict else None
-            for exp_id in completed_exploration_ids
-        ]
-    )
-    exploration_playlist_summaries = (
-        [
-            exploration_id_to_model_dict[exp_id]
-            if exp_id in exploration_id_to_model_dict else None
-            for exp_id in exploration_playlist_ids
-        ]
-    )
+    incomplete_exp_summaries = ([
+        exploration_id_to_model_dict[exp_id]
+        if exp_id in exploration_id_to_model_dict else None
+        for exp_id in incomplete_exploration_ids
+    ])
+    completed_exp_summaries = ([
+        exploration_id_to_model_dict[exp_id]
+        if exp_id in exploration_id_to_model_dict else None
+        for exp_id in completed_exploration_ids
+    ])
+    exploration_playlist_summaries = ([
+        exploration_id_to_model_dict[exp_id]
+        if exp_id in exploration_id_to_model_dict else None
+        for exp_id in exploration_playlist_ids
+    ])
 
     filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = (
         _get_filtered_incomplete_exp_summaries(

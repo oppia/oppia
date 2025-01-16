@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from extensions.interactions import base
 
 
@@ -40,9 +39,7 @@ class CodeRepl(base.BaseInteraction):
         'description': 'Programming language',
         'schema': {
             'type': 'unicode',
-            'choices': [
-                'python',
-            ]
+            'choices': ['python',]
         },
         'default_value': 'python'
     }, {

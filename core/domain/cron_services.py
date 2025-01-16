@@ -30,12 +30,10 @@ if MYPY:  # pragma: no cover
     from mypy_imports import job_models
     from mypy_imports import user_models
 
-(base_models, beam_job_models, job_models, user_models) = models.Registry.import_models(
-    [
-        models.Names.BASE_MODEL, models.Names.BEAM_JOB, models.Names.JOB,
-        models.Names.USER
-    ]
-)
+(base_models, beam_job_models, job_models,
+ user_models) = models.Registry.import_models([
+     models.Names.BASE_MODEL, models.Names.BEAM_JOB, models.Names.JOB, models.Names.USER
+ ])
 datastore_services = models.Registry.import_datastore_services()
 
 # Only non-versioned models should be included in this list. Activities that

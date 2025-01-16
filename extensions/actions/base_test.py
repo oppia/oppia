@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the base action specification."""
 
 from __future__ import annotations
@@ -23,7 +22,7 @@ from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
 
 (stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
@@ -36,11 +35,11 @@ class ActionUnitTests(test_utils.GenericTestBase):
         """Test the standard properties of exploration start action."""
 
         action = action_registry.Registry.get_action_by_type(
-            stats_models.ACTION_TYPE_EXPLORATION_START)
+            stats_models.ACTION_TYPE_EXPLORATION_START
+        )
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(list(action_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(list(action_dict.keys()), ['customization_arg_specs'])
         self.assertEqual(
             action_dict['customization_arg_specs'], [{
                 'name': 'state_name',
@@ -49,17 +48,18 @@ class ActionUnitTests(test_utils.GenericTestBase):
                     'type': 'unicode',
                 },
                 'default_value': ''
-            }])
+            }]
+        )
 
     def test_action_properties_for_answer_submit(self) -> None:
         """Test the standard properties of answer submit action."""
 
         action = action_registry.Registry.get_action_by_type(
-            stats_models.ACTION_TYPE_ANSWER_SUBMIT)
+            stats_models.ACTION_TYPE_ANSWER_SUBMIT
+        )
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(list(action_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(list(action_dict.keys()), ['customization_arg_specs'])
         self.assertEqual(
             action_dict['customization_arg_specs'], [{
                 'name': 'state_name',
@@ -103,17 +103,18 @@ class ActionUnitTests(test_utils.GenericTestBase):
                     'type': 'int',
                 },
                 'default_value': 0
-            }])
+            }]
+        )
 
     def test_action_properties_for_exp_quit(self) -> None:
         """Test the standard properties of exploration quit action."""
 
         action = action_registry.Registry.get_action_by_type(
-            stats_models.ACTION_TYPE_EXPLORATION_QUIT)
+            stats_models.ACTION_TYPE_EXPLORATION_QUIT
+        )
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(list(action_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(list(action_dict.keys()), ['customization_arg_specs'])
         self.assertEqual(
             action_dict['customization_arg_specs'], [{
                 'name': 'state_name',
@@ -129,4 +130,5 @@ class ActionUnitTests(test_utils.GenericTestBase):
                     'type': 'int',
                 },
                 'default_value': 0
-            }])
+            }]
+        )

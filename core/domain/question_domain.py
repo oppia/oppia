@@ -94,39 +94,37 @@ class QuestionChange(change_domain.BaseChange):
         QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX
     ]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
-        {
-            'name': CMD_CREATE_NEW,
-            'required_attribute_names': [],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_QUESTION_PROPERTY,
-            'required_attribute_names': ['property_name', 'new_value', 'old_value'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': QUESTION_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
-            'required_attribute_names': ['question_dict', 'skill_id'],
-            'optional_attribute_names': ['topic_name'],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }
-    ]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_QUESTION_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': QUESTION_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+        'required_attribute_names': ['question_dict', 'skill_id'],
+        'optional_attribute_names': ['topic_name'],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }]
 
 
 class CreateNewQuestionCmd(QuestionChange):
@@ -236,18 +234,14 @@ class QuestionSuggestionChange(change_domain.BaseChange):
         skill_id, skill_difficulty)
     """
 
-    ALLOWED_COMMANDS = [
-        {
-            'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
-            'required_attribute_names': [
-                'question_dict', 'skill_id', 'skill_difficulty'
-            ],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }
-    ]
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+        'required_attribute_names': ['question_dict', 'skill_id', 'skill_difficulty'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }]
 
 
 class CreateNewFullySpecifiedQuestionSuggestionCmd(QuestionSuggestionChange):
@@ -360,15 +354,13 @@ class Question(translation_domain.BaseTranslatableObject):
         return {
             'id': self.id,
             'question_state_data': self.question_state_data.to_dict(),
-            'question_state_data_schema_version': (
-                self.question_state_data_schema_version
-            ),
+            'question_state_data_schema_version':
+                (self.question_state_data_schema_version),
             'language_code': self.language_code,
             'version': self.version,
             'linked_skill_ids': self.linked_skill_ids,
-            'inapplicable_skill_misconception_ids': (
-                self.inapplicable_skill_misconception_ids
-            ),
+            'inapplicable_skill_misconception_ids':
+                (self.inapplicable_skill_misconception_ids),
             'next_content_id_index': self.next_content_id_index,
         }
 
@@ -413,9 +405,9 @@ class Question(translation_domain.BaseTranslatableObject):
         # latest recorded_voiceovers. So, while accessing these discontinued
         # fields MyPy throws an error. Thus to avoid the error, we used ignore.
         question_state_dict['recorded_voiceovers'] = {
-            'voiceovers_mapping': (
-                question_state_dict.pop('content_ids_to_audio_translations')
-            )  # type: ignore[misc]
+            'voiceovers_mapping':
+                (question_state_dict.pop('content_ids_to_audio_translations')
+                )  # type: ignore[misc]
         }
         return question_state_dict
 
@@ -516,8 +508,12 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         if question_state_dict['interaction']['id'] == 'SetInput':
             customization_args = question_state_dict['interaction']['customization_args'
-                                                                    ]
-            customization_args.update({'buttonText': {'value': 'Add item'}})
+                                                                   ]
+            customization_args.update({
+                'buttonText': {
+                    'value': 'Add item'
+                }
+            })
 
         return question_state_dict
 
@@ -539,8 +535,12 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
             customization_args = question_state_dict['interaction']['customization_args'
-                                                                    ]
-            customization_args.update({'showChoicesInShuffledOrder': {'value': True}})
+                                                                   ]
+            customization_args.update({
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            })
 
         return question_state_dict
 
@@ -666,26 +666,26 @@ class Question(translation_domain.BaseTranslatableObject):
                     for answer_group in (new_answer_groups)
                 ]
                 content_ids_to_delete = set(old_answer_groups_feedback_keys
-                                            ) - set(new_answer_groups_feedback_keys)
+                                           ) - set(new_answer_groups_feedback_keys)
                 for content_id in content_ids_to_delete:
                     if content_id in question_state_dict['recorded_voiceovers'][
-                            'voiceovers_mapping']:
+                        'voiceovers_mapping']:
                         del question_state_dict['recorded_voiceovers'][
                             'voiceovers_mapping'][content_id]
                     if content_id in question_state_dict[
-                            # Here we use MyPy ignore because this is a
-                            # conversion function for old schema and the
-                            # StateDict doesn't have the writtent translation
-                            # property in the latest schema.
-                            'written_translations'
+                        # Here we use MyPy ignore because this is a
+                        # conversion function for old schema and the
+                        # StateDict doesn't have the writtent translation
+                        # property in the latest schema.
+                        'written_translations'
                     ]['translations_mapping']:  # type: ignore[misc]
                         # Here we use MyPy ignore because this is a
                         # conversion function for old schema and the
                         # StateDict doesn't have the writtent translation
                         # property in the latest schema.
                         del question_state_dict['written_translations'
-                                                ][  # type: ignore[misc]
-                                                    'translations_mapping'][content_id]
+                                               ][  # type: ignore[misc]
+                                                   'translations_mapping'][content_id]
 
                 question_state_dict['interaction']['id'] = new_interaction_id
                 question_state_dict['interaction']['answer_groups'] = (
@@ -703,7 +703,7 @@ class Question(translation_domain.BaseTranslatableObject):
                         'correct_answer']['ascii']
                     correct_answer = exp_domain.clean_math_expression(correct_answer)
                     question_state_dict['interaction']['solution']['correct_answer'
-                                                                   ] = correct_answer
+                                                                  ] = correct_answer
 
         return question_state_dict
 
@@ -826,13 +826,13 @@ class Question(translation_domain.BaseTranslatableObject):
             # list of html to list of SubtitledHtml. No interactions
             # were changed from html to SubtitledHtml.
             is_subtitled_unicode_spec = (
-                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
-                and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
             )
             is_subtitled_html_list_spec = (
-                schema['type'] == schema_utils.SCHEMA_TYPE_LIST
-                and schema['items']['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
-                and schema['items']['obj_type']
+                schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                schema['items']['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['items']['obj_type']
                 == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
             )
 
@@ -874,10 +874,12 @@ class Question(translation_domain.BaseTranslatableObject):
                     Dict[str, Dict[str, state_domain.SubtitledUnicodeDict]], ca_dict
                 )
 
-                updated_unicode_cust_arg_dict[ca_name] = {'value': new_value}
+                updated_unicode_cust_arg_dict[ca_name] = {
+                    'value': new_value
+                }
             elif is_subtitled_html_list_spec:
                 new_subtitled_html_list_value: (List[state_domain.SubtitledHtmlDict
-                                                     ]) = []
+                                                    ]) = []
 
                 # Here we use cast because in this _convert function we are
                 # converting older versions of customization arg dicts that
@@ -893,12 +895,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 if ca_name in ca_dict:
                     # Assign values to html fields.
                     for html in older_version_html_list_ca_dict[ca_name]['value']:
-                        new_subtitled_html_list_value.append(
-                            {
-                                'html': html,
-                                'content_id': ''
-                            }
-                        )
+                        new_subtitled_html_list_value.append({
+                            'html': html,
+                            'content_id': ''
+                        })
                 else:
                     # Default is a list of SubtitledHtml dict.
                     # Here we use cast because in this 'else' clause
@@ -939,7 +939,9 @@ class Question(translation_domain.BaseTranslatableObject):
                     state_domain.UnionOfCustomizationArgsDictValues,
                     ca_spec.default_value
                 )
-                ca_dict[ca_name] = {'value': ca_default_value}
+                ca_dict[ca_name] = {
+                    'value': ca_default_value
+                }
 
         (
             customization_args_util.validate_customization_args_and_values(
@@ -1003,8 +1005,9 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] in ('AlgebraicExpressionInput',
-                                                        'MathEquationInput'):
+        if question_state_dict['interaction']['id'] in (
+            'AlgebraicExpressionInput', 'MathEquationInput'
+        ):
             variables = set()
             for group in question_state_dict['interaction']['answer_groups']:
                 for rule_spec in group['rule_specs']:
@@ -1021,12 +1024,12 @@ class Question(translation_domain.BaseTranslatableObject):
                         variables.add(variable)
 
             customization_args = question_state_dict['interaction']['customization_args'
-                                                                    ]
-            customization_args.update(
-                {'customOskLetters': {
+                                                                   ]
+            customization_args.update({
+                'customOskLetters': {
                     'value': sorted(variables)
-                }}
-            )
+                }
+            })
 
         return question_state_dict
 
@@ -1048,24 +1051,20 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
             customization_args = question_state_dict['interaction']['customization_args'
-                                                                    ]
-            customization_args.update(
-                {
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': (
-                                'Type an expression here, using only numbers.'
-                            )
-                        }
+                                                                   ]
+            customization_args.update({
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ('Type an expression here, using only numbers.')
                     }
                 }
-            )
+            })
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
             question_state_dict['written_translations']['translations_mapping'
-                                                        ][  # type: ignore[misc]
-                                                            'ca_placeholder_0'] = {}
+                                                       ][  # type: ignore[misc]
+                                                           'ca_placeholder_0'] = {}
             question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
                 'ca_placeholder_0'] = {}
 
@@ -1091,7 +1090,7 @@ class Question(translation_domain.BaseTranslatableObject):
             for answer_group_dict in answer_group_dicts:
                 rule_type_to_inputs: Dict[str,
                                           Set[state_domain.AllowedRuleSpecInputTypes]
-                                          ] = collections.defaultdict(set)
+                                         ] = collections.defaultdict(set)
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     rule_type = rule_spec_dict['rule_type']
                     rule_inputs = rule_spec_dict['inputs']['x']
@@ -1184,9 +1183,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     # Convert to TranslatableSetOfNormalizedString.
                     if interaction_id == 'TextInput':
                         rule_spec_dict['inputs']['x'] = {
-                            'contentId': content_id,
-                            'normalizedStrSet': rule_spec_dict['inputs'][
-                                'x']  # type: ignore[dict-item]
+                            'contentId':
+                                content_id,
+                            'normalizedStrSet':
+                                rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
                     # Here we use MyPy ignore because the expected
                     # type for `rule_spec_dict['inputs']['x']` is
@@ -1197,9 +1197,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     elif interaction_id == 'SetInput':
                         # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
-                            'contentId': content_id,
-                            'unicodeStrSet': rule_spec_dict['inputs'][
-                                'x']  # type: ignore[dict-item]
+                            'contentId':
+                                content_id,
+                            'unicodeStrSet':
+                                rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains next_content_id_index property.
@@ -1479,12 +1480,16 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] in ['NumericExpressionInput',
-                                                        'AlgebraicExpressionInput',
-                                                        'MathEquationInput']:
+        if question_state_dict['interaction']['id'] in [
+            'NumericExpressionInput', 'AlgebraicExpressionInput', 'MathEquationInput'
+        ]:
             customization_args = question_state_dict['interaction']['customization_args'
-                                                                    ]
-            customization_args.update({'useFractionForDivision': {'value': True}})
+                                                                   ]
+            customization_args.update({
+                'useFractionForDivision': {
+                    'value': True
+                }
+            })
 
         return question_state_dict
 
@@ -1612,8 +1617,12 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         if question_state_dict['interaction']['id'] == 'NumericInput':
             customization_args = question_state_dict['interaction']['customization_args'
-                                                                    ]
-            customization_args.update({'requireNonnegativeInput': {'value': False}})
+                                                                   ]
+            customization_args.update({
+                'requireNonnegativeInput': {
+                    'value': False
+                }
+            })
         return question_state_dict
 
     @classmethod
@@ -1634,10 +1643,10 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'
-                                              ] in exp_domain.MATH_INTERACTION_TYPES:
+                                             ] in exp_domain.MATH_INTERACTION_TYPES:
             filtered_answer_groups = []
             for answer_group_dict in question_state_dict['interaction']['answer_groups'
-                                                                        ]:
+                                                                       ]:
                 filtered_rule_specs = []
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     rule_type = rule_spec_dict['rule_type']
@@ -1650,9 +1659,9 @@ class Question(translation_domain.BaseTranslatableObject):
 
             # Renaming cust arg.
         if question_state_dict['interaction'][
-                'id'] in exp_domain.ALGEBRAIC_MATH_INTERACTIONS:
+            'id'] in exp_domain.ALGEBRAIC_MATH_INTERACTIONS:
             customization_args = question_state_dict['interaction']['customization_args'
-                                                                    ]
+                                                                   ]
             customization_args['allowedVariables'] = copy.deepcopy(
                 customization_args['customOskLetters']
             )
@@ -1683,7 +1692,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         if question_state_dict['interaction']['default_outcome'] is not None:
             question_state_dict['interaction']['default_outcome']['dest_if_really_stuck'
-                                                                  ] = None
+                                                                 ] = None
 
         return question_state_dict
 
@@ -1744,8 +1753,12 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         if question_state_dict['interaction']['id'] == 'TextInput':
             customization_args = question_state_dict['interaction']['customization_args'
-                                                                    ]
-            customization_args.update({'catchMisspellings': {'value': False}})
+                                                                   ]
+            customization_args.update({
+                'catchMisspellings': {
+                    'value': False
+                }
+            })
         return question_state_dict
 
     @classmethod
@@ -1772,9 +1785,9 @@ class Question(translation_domain.BaseTranslatableObject):
         # dict doesn't contains written_translations property.
         del question_state_dict['written_translations']  # type: ignore[misc]
         states_dict, next_content_id_index = (
-            state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
-                {'question_state': question_state_dict}
-            )
+            state_domain.State.update_old_content_id_to_new_content_id_in_v54_states({
+                'question_state': question_state_dict
+            })
         )
 
         return states_dict['question_state'], next_content_id_index
@@ -1862,8 +1875,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 'linked_skill_ids is either null or an empty list'
             )
 
-        if not (isinstance(self.linked_skill_ids, list) and
-                (all(isinstance(elem, str) for elem in (self.linked_skill_ids)))):
+        if not (
+            isinstance(self.linked_skill_ids, list) and
+            (all(isinstance(elem, str) for elem in (self.linked_skill_ids)))
+        ):
             raise utils.ValidationError(
                 'Expected linked_skill_ids to be a list of strings, '
                 'received %s' % self.linked_skill_ids
@@ -1874,16 +1889,25 @@ class Question(translation_domain.BaseTranslatableObject):
         inapplicable_skill_misconception_ids_is_list = isinstance(
             self.inapplicable_skill_misconception_ids, list
         )
-        if not (inapplicable_skill_misconception_ids_is_list and
-                (all(isinstance(elem, str)
-                     for elem in (self.inapplicable_skill_misconception_ids)))):
+        if not (
+            inapplicable_skill_misconception_ids_is_list and (
+                all(
+                    isinstance(elem, str)
+                    for elem in (self.inapplicable_skill_misconception_ids)
+                )
+            )
+        ):
             raise utils.ValidationError(
                 'Expected inapplicable_skill_misconception_ids to be a list '
                 'of strings, received %s' % self.inapplicable_skill_misconception_ids
             )
 
-        if not (all(re.match(constants.VALID_SKILL_MISCONCEPTION_ID_REGEX, elem)
-                    for elem in self.inapplicable_skill_misconception_ids)):
+        if not (
+            all(
+                re.match(constants.VALID_SKILL_MISCONCEPTION_ID_REGEX, elem)
+                for elem in self.inapplicable_skill_misconception_ids
+            )
+        ):
             raise utils.ValidationError(
                 'Expected inapplicable_skill_misconception_ids to be a list '
                 'of strings of the format <skill_id>-<misconception_id>, '
@@ -1891,7 +1915,7 @@ class Question(translation_domain.BaseTranslatableObject):
             )
 
         if len(set(self.inapplicable_skill_misconception_ids)
-               ) != len(self.inapplicable_skill_misconception_ids):
+              ) != len(self.inapplicable_skill_misconception_ids):
             raise utils.ValidationError(
                 'inapplicable_skill_misconception_ids has duplicate values'
             )
@@ -1903,7 +1927,8 @@ class Question(translation_domain.BaseTranslatableObject):
             )
 
         if self.question_state_data_schema_version != (
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            feconf.CURRENT_STATE_SCHEMA_VERSION
+        ):
             raise utils.ValidationError(
                 'Expected question state schema version to be %s, received '
                 '%s' % (
@@ -1988,15 +2013,16 @@ class Question(translation_domain.BaseTranslatableObject):
         # None interactions are not allowed to contain questions, so if an
         # interaction have questions then it definitely have interaction_id.
         assert interaction.id is not None
-        if ((interaction.solution is None)
-                and (interaction_specs[interaction.id]['can_have_solution'])):
+        if ((interaction.solution is None) and
+            (interaction_specs[interaction.id]['can_have_solution'])):
             raise utils.ValidationError('Expected the question to have a solution')
         # Here the variable `tagged_skill_misconception_id_required`
         # represents that the tagged skill misconception id field is
         # required for it.
-        self.question_state_data.validate(
-            {}, False, tagged_skill_misconception_id_required=True, strict=True
-        )
+        self.question_state_data.validate({},
+                                          False,
+                                          tagged_skill_misconception_id_required=True,
+                                          strict=True)
         self.validate_translatable_contents(self.next_content_id_index)
 
     def validate(self) -> None:
@@ -2204,8 +2230,10 @@ class QuestionSummary:
                 self.last_updated
             )
 
-        if not (isinstance(self.misconception_ids, list) and
-                (all(isinstance(elem, str) for elem in (self.misconception_ids)))):
+        if not (
+            isinstance(self.misconception_ids, list) and
+            (all(isinstance(elem, str) for elem in (self.misconception_ids)))
+        ):
             raise utils.ValidationError(
                 'Expected misconception ids to be a list of '
                 'strings, received %s' % self.misconception_ids

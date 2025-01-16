@@ -39,7 +39,7 @@ if MYPY:  # pragma: no cover
 
 secrets_services = models.Registry.import_secrets_services()
 
-(translation_models, ) = models.Registry.import_models([models.Names.TRANSLATION])
+(translation_models,) = models.Registry.import_models([models.Names.TRANSLATION])
 
 
 class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
@@ -160,8 +160,8 @@ class AndroidBuildSecretTests(test_utils.GenericTestBase):
             'get_secret',
             lambda _: 'secret',
             expected_args=[
-                ('ANDROID_BUILD_SECRET', ),
-                ('ANDROID_BUILD_SECRET', ),
+                ('ANDROID_BUILD_SECRET',),
+                ('ANDROID_BUILD_SECRET',),
             ]
         )
 

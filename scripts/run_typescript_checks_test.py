@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for scripts/run_typescript_checks.py."""
 
 from __future__ import annotations
@@ -36,10 +35,12 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        process = subprocess.Popen(
-            ['test'], stdout=subprocess.PIPE, encoding='utf-8')
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE, encoding='utf-8')
+
         def mock_popen(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+            unused_cmd: str,
+            stdout: str,
+            encoding: str  # pylint: disable=unused-argument
         ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
@@ -52,100 +53,118 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         """
         with self.popen_swap:
             run_typescript_checks.compile_and_check_typescript(
-                run_typescript_checks.TSCONFIG_FILEPATH)
+                run_typescript_checks.TSCONFIG_FILEPATH
+            )
             out_dir = ''
-            with utils.open_file(
-                run_typescript_checks.TSCONFIG_FILEPATH, 'r') as f:
+            with utils.open_file(run_typescript_checks.TSCONFIG_FILEPATH, 'r') as f:
                 config_data = json.load(f)
-                out_dir = os.path.join(
-                    config_data['compilerOptions']['outDir'], '')
+                out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
             compiled_js_dir_swap = self.swap(
-                run_typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
+                run_typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR
+            )
             with compiled_js_dir_swap, self.assertRaisesRegex(
-                Exception,
-                'COMPILED_JS_DIR: %s does not match the output directory '
+                Exception, 'COMPILED_JS_DIR: %s does not match the output directory '
                 'in %s: %s' % (
-                    MOCK_COMPILED_JS_DIR,
-                      run_typescript_checks.TSCONFIG_FILEPATH,
-                    out_dir)):
+                    MOCK_COMPILED_JS_DIR, run_typescript_checks.TSCONFIG_FILEPATH,
+                    out_dir
+                )
+            ):
                 run_typescript_checks.compile_and_check_typescript(
-                    run_typescript_checks.TSCONFIG_FILEPATH)
+                    run_typescript_checks.TSCONFIG_FILEPATH
+                )
 
     def test_compiled_js_dir_is_deleted_before_compilation(self) -> None:
         """Test that compiled_js_dir is deleted before a fresh compilation."""
+
         def mock_validate_compiled_js_dir() -> None:
             pass
 
         compiled_js_dir_swap = self.swap(
-            run_typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
+            run_typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR
+        )
         validate_swap = self.swap(
             run_typescript_checks, 'validate_compiled_js_dir',
-            mock_validate_compiled_js_dir)
+            mock_validate_compiled_js_dir
+        )
         with self.popen_swap, compiled_js_dir_swap, validate_swap:
             if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
                 os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
 
             run_typescript_checks.compile_and_check_typescript(
-                run_typescript_checks.STRICT_TSCONFIG_FILEPATH)
-            self.assertFalse(
-                os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
+                run_typescript_checks.STRICT_TSCONFIG_FILEPATH
+            )
+            self.assertFalse(os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
     def test_compiled_js_dir_is_deleted_before_temp_compilation(self) -> None:
         """Test that compiled_js_dir is deleted before a fresh temp
         compilation.
         """
+
         def mock_validate_compiled_js_dir() -> None:
             pass
 
         compiled_js_dir_swap = self.swap(
-            run_typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
+            run_typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR
+        )
         validate_swap = self.swap(
             run_typescript_checks, 'validate_compiled_js_dir',
-            mock_validate_compiled_js_dir)
+            mock_validate_compiled_js_dir
+        )
         with self.popen_swap, compiled_js_dir_swap, validate_swap:
             if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
                 os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
 
             run_typescript_checks.compile_temp_strict_tsconfig(
-                run_typescript_checks.STRICT_TSCONFIG_FILEPATH, [])
-            self.assertFalse(
-                os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
+                run_typescript_checks.STRICT_TSCONFIG_FILEPATH, []
+            )
+            self.assertFalse(os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
     def test_no_error_for_valid_compilation_of_tsconfig(self) -> None:
         """Test that no error is produced if stdout is empty."""
         with self.popen_swap:
             run_typescript_checks.compile_and_check_typescript(
-                run_typescript_checks.TSCONFIG_FILEPATH)
+                run_typescript_checks.TSCONFIG_FILEPATH
+            )
 
     def test_no_error_for_valid_compilation_of_strict_tsconfig(self) -> None:
         """Test that no error is produced if stdout is empty."""
         with self.popen_swap:
             run_typescript_checks.compile_and_check_typescript(
-                run_typescript_checks.STRICT_TSCONFIG_FILEPATH)
+                run_typescript_checks.STRICT_TSCONFIG_FILEPATH
+            )
 
     def test_error_is_raised_for_invalid_compilation_of_tsconfig(self) -> None:
         """Test that error is produced if stdout is not empty."""
-        process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
+        process = subprocess.Popen(['echo', 'test'],
+                                   stdout=subprocess.PIPE,
+                                   encoding='utf-8')
+
         def mock_popen_for_errors(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+            unused_cmd: str,
+            stdout: str,
+            encoding: str  # pylint: disable=unused-argument
         ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_typescript_checks.compile_and_check_typescript(
-                    run_typescript_checks.TSCONFIG_FILEPATH)
+                    run_typescript_checks.TSCONFIG_FILEPATH
+                )
 
-    def test_error_is_raised_for_invalid_compilation_of_strict_tsconfig(
-            self) -> None:
+    def test_error_is_raised_for_invalid_compilation_of_strict_tsconfig(self) -> None:
         """Test that error is produced if stdout is not empty."""
-        empty_process = subprocess.Popen(
-            ['echo', ''], stdout=subprocess.PIPE, encoding='utf-8')
-        non_empty_process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
+        empty_process = subprocess.Popen(['echo', ''],
+                                         stdout=subprocess.PIPE,
+                                         encoding='utf-8')
+        non_empty_process = subprocess.Popen(['echo', 'test'],
+                                             stdout=subprocess.PIPE,
+                                             encoding='utf-8')
+
         def mock_popen_for_errors(
-            cmd_tokens: List[str], stdout: str, encoding: str  # pylint: disable=unused-argument
+            cmd_tokens: List[str],
+            stdout: str,
+            encoding: str  # pylint: disable=unused-argument
         ) -> subprocess.Popen[str]:
             if (
                 cmd_tokens == [
@@ -159,16 +178,20 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_typescript_checks.compile_and_check_typescript(
-                    run_typescript_checks.STRICT_TSCONFIG_FILEPATH)
+                    run_typescript_checks.STRICT_TSCONFIG_FILEPATH
+                )
 
     def test_error_is_raised_for_invalid_compilation_of_temp_strict_tsconfig(
-            self) -> None:
+        self
+    ) -> None:
         """Test that error is produced if stdout is not empty."""
+
         class MockOutput:
             """This class simulates a process stdout."""
 
             def __init__(self, call_counter: int = 0) -> None:
                 self.call_counter = call_counter
+
             def readline(self) -> str:
                 """This mocks the readline() method which reads and returns
                 a single line. It stops when it hits the EOF or an empty
@@ -187,8 +210,11 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
         class MockProcess:
             stdout = MockOutput()
+
         def mock_popen_for_errors(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+            unused_cmd: str,
+            stdout: str,
+            encoding: str  # pylint: disable=unused-argument
         ) -> MockProcess:  # pylint: disable=unsubscriptable-object
             return MockProcess()
 
@@ -202,24 +228,30 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
     def test_config_path_when_no_arg_is_used(self) -> None:
         """Test if the config path is correct when no arg is used."""
+
         def mock_compile_and_check_typescript(config_path: str) -> None:
-            self.assertEqual(
-                config_path, run_typescript_checks.TSCONFIG_FILEPATH)
+            self.assertEqual(config_path, run_typescript_checks.TSCONFIG_FILEPATH)
+
         compile_and_check_typescript_swap = self.swap(
             run_typescript_checks, 'compile_and_check_typescript',
-            mock_compile_and_check_typescript)
+            mock_compile_and_check_typescript
+        )
 
         with compile_and_check_typescript_swap:
             run_typescript_checks.main(args=[])
 
     def test_config_path_when_strict_checks_arg_is_used(self) -> None:
         """Test if the config path is correct when strict checks arg is used."""
+
         def mock_compile_and_check_typescript(config_path: str) -> None:
             self.assertEqual(
-                config_path, run_typescript_checks.STRICT_TSCONFIG_FILEPATH)
+                config_path, run_typescript_checks.STRICT_TSCONFIG_FILEPATH
+            )
+
         compile_and_check_typescript_swap = self.swap(
             run_typescript_checks, 'compile_and_check_typescript',
-            mock_compile_and_check_typescript)
+            mock_compile_and_check_typescript
+        )
 
         with compile_and_check_typescript_swap:
             run_typescript_checks.main(args=['--strict_checks'])

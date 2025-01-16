@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the blog homepage page."""
 
 from __future__ import annotations
@@ -39,13 +38,9 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the setup process for testing."""
         super().setUp()
-        self.signup(
-            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
-        self.blog_admin_id = (
-            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
-        self.add_user_role(
-            self.BLOG_ADMIN_USERNAME,
-            feconf.ROLE_ID_BLOG_ADMIN)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.blog_admin_id = (self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.add_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
         blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
         self.change_dict: blog_services.BlogPostChangeDict = {
@@ -59,17 +54,14 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
 
     def test_get_blog_homepage_data(self) -> None:
         self.login(self.user_email)
-        json_response = self.get_json(
-            '%s?offset=0' % (feconf.BLOG_HOMEPAGE_DATA_URL),
-            )
+        json_response = self.get_json('%s?offset=0' % (feconf.BLOG_HOMEPAGE_DATA_URL),)
         default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         self.assertEqual(default_tags, json_response['list_of_default_tags'])
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
             json_response['blog_post_summary_dicts'][0]['displayed_author_name']
         )
-        self.assertEqual(
-            len(json_response['blog_post_summary_dicts']), 1)
+        self.assertEqual(len(json_response['blog_post_summary_dicts']), 1)
         self.assertEqual(json_response['no_of_blog_post_summaries'], 1)
 
         blog_post_two = blog_services.create_new_blog_post(self.blog_admin_id)
@@ -81,64 +73,52 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         }
         blog_services.update_blog_post(blog_post_two.id, change_dict_two)
         blog_services.publish_blog_post(blog_post_two.id)
-        json_response = self.get_json(
-            '%s?offset=0' % feconf.BLOG_HOMEPAGE_DATA_URL)
-        self.assertEqual(
-            len(json_response['blog_post_summary_dicts']), 2)
+        json_response = self.get_json('%s?offset=0' % feconf.BLOG_HOMEPAGE_DATA_URL)
+        self.assertEqual(len(json_response['blog_post_summary_dicts']), 2)
         self.assertEqual(json_response['no_of_blog_post_summaries'], 2)
         self.assertTrue(
             json_response['blog_post_summary_dicts'][0]['published_on'] >
             json_response['blog_post_summary_dicts'][1]['published_on']
         )
         self.assertEqual(
-            json_response['blog_post_summary_dicts'][0]['title'],
-            'Sample Title Two'
+            json_response['blog_post_summary_dicts'][0]['title'], 'Sample Title Two'
         )
 
-        json_response = self.get_json(
-            '%s?offset=1' % feconf.BLOG_HOMEPAGE_DATA_URL
-        )
+        json_response = self.get_json('%s?offset=1' % feconf.BLOG_HOMEPAGE_DATA_URL)
+        self.assertEqual(len(json_response['blog_post_summary_dicts']), 1)
         self.assertEqual(
-            len(json_response['blog_post_summary_dicts']), 1)
-        self.assertEqual(
-            json_response['blog_post_summary_dicts'][0]['title'],
-            'Sample Title'
+            json_response['blog_post_summary_dicts'][0]['title'], 'Sample Title'
         )
         self.assertEqual(
             json_response['blog_post_summary_dicts'][0]['author_username'],
             self.BLOG_ADMIN_USERNAME
         )
         self.assertEqual(
-            json_response[
-                'blog_post_summary_dicts'][0]['displayed_author_name'],
+            json_response['blog_post_summary_dicts'][0]['displayed_author_name'],
             self.BLOG_ADMIN_USERNAME
         )
 
     def test_get_blog_homepage_data_with_author_account_deleted(self) -> None:
         blog_services.create_blog_author_details_model(self.blog_admin_id)
         blog_services.update_blog_author_details(
-            self.blog_admin_id, 'new author name', 'general user bio')
+            self.blog_admin_id, 'new author name', 'general user bio'
+        )
         # Deleting user setting model.
-        blog_admin_model = (
-            user_models.UserSettingsModel.get_by_id(self.blog_admin_id))
+        blog_admin_model = (user_models.UserSettingsModel.get_by_id(self.blog_admin_id))
         blog_admin_model.deleted = True
         blog_admin_model.update_timestamps()
         blog_admin_model.put()
 
         self.login(self.user_email)
-        json_response = self.get_json(
-            '%s?offset=0' % (feconf.BLOG_HOMEPAGE_DATA_URL),
-            )
-        self.assertEqual(
-            len(json_response['blog_post_summary_dicts']), 1)
+        json_response = self.get_json('%s?offset=0' % (feconf.BLOG_HOMEPAGE_DATA_URL),)
+        self.assertEqual(len(json_response['blog_post_summary_dicts']), 1)
         self.assertEqual(json_response['no_of_blog_post_summaries'], 1)
         self.assertEqual(
             json_response['blog_post_summary_dicts'][0]['author_username'],
             'author account deleted'
         )
         self.assertEqual(
-            json_response[
-                'blog_post_summary_dicts'][0]['displayed_author_name'],
+            json_response['blog_post_summary_dicts'][0]['displayed_author_name'],
             'new author name'
         )
 
@@ -153,16 +133,11 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the setup process for testing."""
         super().setUp()
-        self.signup(
-            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
-        self.blog_admin_id = (
-            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
-        self.add_user_role(
-            self.BLOG_ADMIN_USERNAME,
-            feconf.ROLE_ID_BLOG_ADMIN)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.blog_admin_id = (self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.add_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
-        self.blog_post_one = blog_services.create_new_blog_post(
-            self.blog_admin_id)
+        self.blog_post_one = blog_services.create_new_blog_post(self.blog_admin_id)
         self.change_dict: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title',
             'thumbnail_filename': 'thumbnail.svg',
@@ -173,27 +148,25 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         blog_services.publish_blog_post(self.blog_post_one.id)
         blog_services.create_blog_author_details_model(self.blog_admin_id)
         blog_services.update_blog_author_details(
-            self.blog_admin_id, 'new author name', 'general user bio')
+            self.blog_admin_id, 'new author name', 'general user bio'
+        )
 
     def test_get_post_page_data(self) -> None:
         self.login(self.user_email)
         blog_post = blog_services.get_blog_post_by_id(self.blog_post_one.id)
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post.url_fragment),
-            )
-        self.assertEqual(
-            'new author name',
-            json_response['blog_post_dict']['displayed_author_name']
         )
         self.assertEqual(
-            self.BLOG_ADMIN_USERNAME, json_response['author_username'])
+            'new author name', json_response['blog_post_dict']['displayed_author_name']
+        )
+        self.assertEqual(self.BLOG_ADMIN_USERNAME, json_response['author_username'])
         self.assertEqual(
-            '<p>Hello Bloggers</p>',
-            json_response['blog_post_dict']['content'])
+            '<p>Hello Bloggers</p>', json_response['blog_post_dict']['content']
+        )
         self.assertEqual(len(json_response['summary_dicts']), 0)
 
-        blog_post_two_id = (
-            blog_services.create_new_blog_post(self.blog_admin_id).id)
+        blog_post_two_id = (blog_services.create_new_blog_post(self.blog_admin_id).id)
         change_dict_two: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Two',
             'thumbnail_filename': 'thumbnail.svg',
@@ -204,52 +177,41 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         blog_services.publish_blog_post(blog_post_two_id)
         blog_post_two = blog_services.get_blog_post_by_id(blog_post_two_id)
         json_response = self.get_json(
-            '%s/%s' % (
-                feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
-            )
-        self.assertEqual(
-            'new author name',
-            json_response['blog_post_dict']['displayed_author_name']
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
         )
         self.assertEqual(
-            self.BLOG_ADMIN_USERNAME, json_response['author_username'])
+            'new author name', json_response['blog_post_dict']['displayed_author_name']
+        )
+        self.assertEqual(self.BLOG_ADMIN_USERNAME, json_response['author_username'])
         self.assertEqual(
-            '<p>Hello Blog</p>',
-            json_response['blog_post_dict']['content'])
+            '<p>Hello Blog</p>', json_response['blog_post_dict']['content']
+        )
         self.assertEqual(len(json_response['summary_dicts']), 1)
 
         # Deleting blog admin's user setting model.
-        blog_admin_model = (
-            user_models.UserSettingsModel.get_by_id(self.blog_admin_id))
+        blog_admin_model = (user_models.UserSettingsModel.get_by_id(self.blog_admin_id))
         blog_admin_model.deleted = True
         blog_admin_model.update_timestamps()
         blog_admin_model.put()
         json_response = self.get_json(
-            '%s/%s' % (
-                feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
-            )
-        self.assertEqual(
-            'new author name',
-            json_response['blog_post_dict']['displayed_author_name']
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
         )
         self.assertEqual(
-            'author account deleted', json_response['author_username'])
+            'new author name', json_response['blog_post_dict']['displayed_author_name']
+        )
+        self.assertEqual('author account deleted', json_response['author_username'])
         self.assertEqual(
-            '<p>Hello Blog</p>',
-            json_response['blog_post_dict']['content'])
+            '<p>Hello Blog</p>', json_response['blog_post_dict']['content']
+        )
         self.assertEqual(len(json_response['summary_dicts']), 1)
 
     def test_should_get_correct_recommendations_for_post_page(self) -> None:
-        self.signup(
-            self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(
-            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        blog_editor_id = (
-            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.add_user_role(self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        blog_editor_id = (self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
         blog_post = blog_services.get_blog_post_by_id(self.blog_post_one.id)
 
-        blog_post_two_id = (
-            blog_services.create_new_blog_post(self.blog_admin_id).id)
+        blog_post_two_id = (blog_services.create_new_blog_post(self.blog_admin_id).id)
         change_dict_two: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Two',
             'thumbnail_filename': 'thumbnail.svg',
@@ -259,8 +221,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         blog_services.update_blog_post(blog_post_two_id, change_dict_two)
         blog_services.publish_blog_post(blog_post_two_id)
 
-        blog_post_three_id = (
-            blog_services.create_new_blog_post(blog_editor_id).id)
+        blog_post_three_id = (blog_services.create_new_blog_post(blog_editor_id).id)
         change_dict_three: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Three',
             'thumbnail_filename': 'thumbnail_filename.svg',
@@ -271,8 +232,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         blog_services.publish_blog_post(blog_post_three_id)
         blog_post_three = blog_services.get_blog_post_by_id(blog_post_three_id)
 
-        blog_post_four_id = (
-            blog_services.create_new_blog_post(blog_editor_id).id)
+        blog_post_four_id = (blog_services.create_new_blog_post(blog_editor_id).id)
         change_dict_four: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title Four',
             'thumbnail_filename': 'thumbnail_filename.svg',
@@ -285,45 +245,31 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
 
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post.url_fragment),
-            )
+        )
         self.assertEqual(len(json_response['summary_dicts']), 2)
-        self.assertEqual(
-            json_response['summary_dicts'][0]['id'], blog_post_two_id)
-        self.assertEqual(
-            json_response['summary_dicts'][1]['id'], blog_post_four_id)
+        self.assertEqual(json_response['summary_dicts'][0]['id'], blog_post_two_id)
+        self.assertEqual(json_response['summary_dicts'][1]['id'], blog_post_four_id)
 
         json_response = self.get_json(
-            '%s/%s' % (
-                feconf.BLOG_HOMEPAGE_DATA_URL,
-                blog_post_four.url_fragment
-            ))
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_four.url_fragment)
+        )
         self.assertEqual(len(json_response['summary_dicts']), 2)
-        self.assertEqual(
-            json_response['summary_dicts'][0]['id'], blog_post_three_id)
-        self.assertEqual(
-            json_response['summary_dicts'][1]['id'], blog_post_two_id)
+        self.assertEqual(json_response['summary_dicts'][0]['id'], blog_post_three_id)
+        self.assertEqual(json_response['summary_dicts'][1]['id'], blog_post_two_id)
 
         json_response = self.get_json(
-            '%s/%s' % (
-                feconf.BLOG_HOMEPAGE_DATA_URL,
-                blog_post_three.url_fragment
-            ))
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_three.url_fragment)
+        )
         self.assertEqual(len(json_response['summary_dicts']), 2)
-        self.assertEqual(
-            json_response['summary_dicts'][0]['id'], blog_post_four_id)
-        self.assertEqual(
-            json_response['summary_dicts'][1]['id'], blog_post_two_id)
+        self.assertEqual(json_response['summary_dicts'][0]['id'], blog_post_four_id)
+        self.assertEqual(json_response['summary_dicts'][1]['id'], blog_post_two_id)
 
         json_response = self.get_json(
-            '%s/%s' % (
-                feconf.BLOG_HOMEPAGE_DATA_URL,
-                blog_post_three.url_fragment
-            ))
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_three.url_fragment)
+        )
         self.assertEqual(len(json_response['summary_dicts']), 2)
-        self.assertEqual(
-            json_response['summary_dicts'][0]['id'], blog_post_four_id)
-        self.assertEqual(
-            json_response['summary_dicts'][1]['id'], blog_post_two_id)
+        self.assertEqual(json_response['summary_dicts'][0]['id'], blog_post_four_id)
+        self.assertEqual(json_response['summary_dicts'][1]['id'], blog_post_two_id)
 
     def test_raise_exception_if_blog_post_does_not_exists(self) -> None:
         self.login(self.user_email)
@@ -337,22 +283,17 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             expected_status_int=404
         )
 
-    def test_raise_exception_if_blog_post_url_is_invalid(
-        self
-    ) -> None:
+    def test_raise_exception_if_blog_post_url_is_invalid(self) -> None:
         self.login(self.user_email)
         # Blog post URL fragment is exceeding max character limit.
         self.get_json(
-            '%s/%s' % (
-                feconf.BLOG_HOMEPAGE_DATA_URL,
-                'aa' * feconf.MAX_CHARS_IN_BLOG_POST_URL
-            ),
+            '%s/%s' %
+            (feconf.BLOG_HOMEPAGE_DATA_URL, 'aa' * feconf.MAX_CHARS_IN_BLOG_POST_URL),
             expected_status_int=400
         )
         # Blog post URL fragment fails minimum character validation.
         self.get_json(
-            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, 'aa'),
-            expected_status_int=400
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, 'aa'), expected_status_int=400
         )
 
 
@@ -366,12 +307,9 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the setup process for testing."""
         super().setUp()
-        self.signup(
-            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
-        self.blog_admin_id = (
-            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
-        self.add_user_role(
-            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.blog_admin_id = (self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.add_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
         self.blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
         self.change_dict: blog_services.BlogPostChangeDict = {
@@ -384,31 +322,30 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         blog_services.publish_blog_post(self.blog_post.id)
         blog_services.create_blog_author_details_model(self.blog_admin_id)
         blog_services.update_blog_author_details(
-            self.blog_admin_id, 'new author name', 'general user bio')
+            self.blog_admin_id, 'new author name', 'general user bio'
+        )
 
     def test_get_authors_page_data(self) -> None:
         self.login(self.user_email)
         json_response = self.get_json(
-            '%s/%s?offset=0' % (
-                feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX,
-                self.BLOG_ADMIN_USERNAME),
-            )
+            '%s/%s?offset=0' %
+            (feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX, self.BLOG_ADMIN_USERNAME),
+        )
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
-            json_response['summary_dicts'][0]['author_username'])
+            json_response['summary_dicts'][0]['author_username']
+        )
         self.assertEqual(
             'new author name',
             json_response['summary_dicts'][0]['displayed_author_name']
         )
-        self.assertEqual(
-            len(json_response['summary_dicts']), 1)
+        self.assertEqual(len(json_response['summary_dicts']), 1)
 
         blog_services.unpublish_blog_post(self.blog_post.id)
         json_response = self.get_json(
-            '%s/%s?offset=0' % (
-                feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX,
-                self.BLOG_ADMIN_USERNAME),
-            )
+            '%s/%s?offset=0' %
+            (feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX, self.BLOG_ADMIN_USERNAME),
+        )
         self.assertEqual(json_response['summary_dicts'], [])
 
     def test_invalid_author_username_raises_error(self) -> None:
@@ -465,7 +402,8 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             'tags': ['Math', 'Science']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_A[0], self.change_dict_1)
+            self.ids_of_blog_posts_by_user_A[0], self.change_dict_1
+        )
 
         self.change_dict_2: blog_services.BlogPostChangeDict = {
             'title': 'Welcome',
@@ -474,7 +412,8 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             'tags': ['Math', 'Social']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_A[1], self.change_dict_2)
+            self.ids_of_blog_posts_by_user_A[1], self.change_dict_2
+        )
 
         self.change_dict_3: blog_services.BlogPostChangeDict = {
             'title': 'New Lessons in Mathematics',
@@ -483,7 +422,8 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             'tags': ['Math', 'Oppia']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_B[0], self.change_dict_3)
+            self.ids_of_blog_posts_by_user_B[0], self.change_dict_3
+        )
 
         self.change_dict_4: blog_services.BlogPostChangeDict = {
             'title': 'Basic English Lessons',
@@ -492,7 +432,8 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             'tags': ['English', 'Oppia', 'Social']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_B[1], self.change_dict_4)
+            self.ids_of_blog_posts_by_user_B[1], self.change_dict_4
+        )
 
         for blog_id in self.all_blog_post_ids:
             blog_services.publish_blog_post(blog_id)
@@ -516,9 +457,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 2)
 
-    def test_library_handler_with_exceeding_query_limit_logs_error(
-        self
-    ) -> None:
+    def test_library_handler_with_exceeding_query_limit_logs_error(self) -> None:
         self.login(self.user_email)
         response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 4)
@@ -526,7 +465,8 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
 
         default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 2)
         max_cards_limit_swap = self.swap(
-            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2)
+            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2
+        )
         # Load the search results with an empty query.
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with default_query_limit_swap, max_cards_limit_swap:
@@ -534,12 +474,11 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
 
                 self.assertEqual(len(logs), 1)
                 self.assertEqual(
-                    logs[0],
-                    '2 blog post summaries were fetched to load the search'
+                    logs[0], '2 blog post summaries were fetched to load the search'
                     '/filter by result page. You may be running up against the '
-                    'default query limits.')
-                self.assertEqual(
-                    len(response_dict['blog_post_summaries_list']), 2)
+                    'default query limits.'
+                )
+                self.assertEqual(len(response_dict['blog_post_summaries_list']), 2)
                 self.assertEqual(response_dict['search_offset'], 2)
 
     def test_handler_with_given_query_and_tag(self) -> None:
@@ -548,7 +487,8 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             feconf.BLOG_SEARCH_DATA_URL, params={
                 'q': 'Welcome',
                 'tags': '("Science")'
-            })
+            }
+        )
 
         default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         self.assertEqual(default_tags, response_dict['list_of_default_tags'])

@@ -108,90 +108,86 @@ class CollectionChange(change_domain.BaseChange):
         COLLECTION_PROPERTY_TAGS
     ]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
-        {
-            'name': CMD_CREATE_NEW,
-            'required_attribute_names': ['category', 'title'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_COLLECTION_NODE,
-            'required_attribute_names': ['exploration_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_DELETE_COLLECTION_NODE,
-            'required_attribute_names': ['exploration_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_SWAP_COLLECTION_NODES,
-            'required_attribute_names': ['first_index', 'second_index'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_EDIT_COLLECTION_PROPERTY,
-            'required_attribute_names': ['property_name', 'new_value'],
-            'optional_attribute_names': ['old_value'],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': COLLECTION_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
-            'required_attribute_names': [
-                'exploration_id', 'property_name', 'new_value'
-            ],
-            'optional_attribute_names': ['old_value'],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_COLLECTION_SKILL,
-            'required_attribute_names': ['name'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_DELETE_COLLECTION_SKILL,
-            'required_attribute_names': ['skill_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_QUESTION_ID_TO_SKILL,
-            'required_attribute_names': ['question_id', 'skill_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
-            'required_attribute_names': ['question_id', 'skill_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }
-    ]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['category', 'title'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_COLLECTION_NODE,
+        'required_attribute_names': ['exploration_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_DELETE_COLLECTION_NODE,
+        'required_attribute_names': ['exploration_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_SWAP_COLLECTION_NODES,
+        'required_attribute_names': ['first_index', 'second_index'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_EDIT_COLLECTION_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value'],
+        'optional_attribute_names': ['old_value'],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': COLLECTION_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
+        'required_attribute_names': ['exploration_id', 'property_name', 'new_value'],
+        'optional_attribute_names': ['old_value'],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_COLLECTION_SKILL,
+        'required_attribute_names': ['name'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_DELETE_COLLECTION_SKILL,
+        'required_attribute_names': ['skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_QUESTION_ID_TO_SKILL,
+        'required_attribute_names': ['question_id', 'skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
+        'required_attribute_names': ['question_id', 'skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }]
 
 
 class CreateNewCollectionCmd(CollectionChange):
@@ -366,7 +362,9 @@ class CollectionNode:
             prerequisite_skill_ids, acquired_skill_ids) of CollectionNode
             instance.
         """
-        return {'exploration_id': self.exploration_id}
+        return {
+            'exploration_id': self.exploration_id
+        }
 
     @classmethod
     def from_dict(cls, node_dict: CollectionNodeDict) -> CollectionNode:
@@ -802,8 +800,9 @@ class Collection:
             raise utils.InvalidInputException(
                 'Invalid YAML file: no schema version specified.'
             )
-        if not (1 <= collection_schema_version <=
-                feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+        if not (
+            1 <= collection_schema_version <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION
+        ):
             raise Exception(
                 'Sorry, we can only process v1 to v%s collection YAML files at '
                 'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION
@@ -1015,8 +1014,10 @@ class Collection:
             Exception. The value of the key 'schema_version' in
                 versioned_collection_contents is not valid.
         """
-        if (versioned_collection_contents['schema_version'] + 1
-                > feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+        if (
+            versioned_collection_contents['schema_version'] + 1
+            > feconf.CURRENT_COLLECTION_SCHEMA_VERSION
+        ):
             raise Exception(
                 'Collection is version %d but current collection'
                 ' schema version is %d' % (
@@ -1315,8 +1316,10 @@ class Collection:
                     'received \'%s\'' % tag
                 )
 
-            if (tag[0] not in string.ascii_lowercase
-                    or tag[-1] not in string.ascii_lowercase):
+            if (
+                tag[0] not in string.ascii_lowercase or
+                tag[-1] not in string.ascii_lowercase
+            ):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
                     ' \'%s\'' % tag
@@ -1511,8 +1514,10 @@ class CollectionSummary:
                     'received \'%s\'' % tag
                 )
 
-            if (tag[0] not in string.ascii_lowercase
-                    or tag[-1] not in string.ascii_lowercase):
+            if (
+                tag[0] not in string.ascii_lowercase or
+                tag[-1] not in string.ascii_lowercase
+            ):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
                     '\'%s\'' % tag
@@ -1539,8 +1544,8 @@ class CollectionSummary:
             bool. Whether the given user may edit the collection.
         """
         return (
-            user_id in self.editor_ids or user_id in self.owner_ids
-            or self.community_owned
+            user_id in self.editor_ids or user_id in self.owner_ids or
+            self.community_owned
         )
 
     def is_private(self) -> bool:
@@ -1575,8 +1580,8 @@ class CollectionSummary:
             bool. Whether the given user has any role in the collection.
         """
         return (
-            user_id in self.owner_ids or user_id in self.editor_ids
-            or user_id in self.viewer_ids
+            user_id in self.owner_ids or user_id in self.editor_ids or
+            user_id in self.viewer_ids
         )
 
     def add_contribution_by_user(self, contributor_id: str) -> None:

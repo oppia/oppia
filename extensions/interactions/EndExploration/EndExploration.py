@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for EndExploration interaction."""
 
 from __future__ import annotations
@@ -38,7 +37,8 @@ class EndExploration(base.BaseInteraction):
     name: str = 'End Exploration'
     description: str = (
         'Ends the exploration, and suggests recommendations for explorations '
-        'to try next.')
+        'to try next.'
+    )
     display_mode: str = base.DISPLAY_MODE_INLINE
     is_terminal: bool = True
     _dependency_ids: List[str] = []
@@ -54,7 +54,8 @@ class EndExploration(base.BaseInteraction):
         'description': (
             'IDs of explorations to recommend to the learner (at most 3 are '
             'shown). The ID of an exploration is the string of characters '
-            'appearing after \'/explore/\' in the URL bar.'),
+            'appearing after \'/explore/\' in the URL bar.'
+        ),
         'schema': {
             'type': 'list',
             'items': {

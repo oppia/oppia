@@ -41,9 +41,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import search_services as gae_search_services
     from mypy_imports import user_models
 
-(collection_models, user_models) = models.Registry.import_models(
-    [models.Names.COLLECTION, models.Names.USER]
-)
+(collection_models, user_models) = models.Registry.import_models([
+    models.Names.COLLECTION, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
@@ -104,20 +104,22 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
 
         self.save_new_default_collection('A', self.owner_id, title='TitleA')
         self.assertEqual(
-            collection_services.get_collection_titles_and_categories(['A']),
-            {'A': {
-                'category': 'A category',
-                'title': 'TitleA'
-            }}
+            collection_services.get_collection_titles_and_categories(['A']), {
+                'A': {
+                    'category': 'A category',
+                    'title': 'TitleA'
+                }
+            }
         )
 
         self.save_new_default_collection('B', self.owner_id, title='TitleB')
         self.assertEqual(
-            collection_services.get_collection_titles_and_categories(['A']),
-            {'A': {
-                'category': 'A category',
-                'title': 'TitleA'
-            }}
+            collection_services.get_collection_titles_and_categories(['A']), {
+                'A': {
+                    'category': 'A category',
+                    'title': 'TitleA'
+                }
+            }
         )
         self.assertEqual(
             collection_services.get_collection_titles_and_categories(['A', 'B']), {
@@ -132,11 +134,12 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             }
         )
         self.assertEqual(
-            collection_services.get_collection_titles_and_categories(['A', 'C']),
-            {'A': {
-                'category': 'A category',
-                'title': 'TitleA'
-            }}
+            collection_services.get_collection_titles_and_categories(['A', 'C']), {
+                'A': {
+                    'category': 'A category',
+                    'title': 'TitleA'
+                }
+            }
         )
 
     def test_get_collection_from_model(self) -> None:
@@ -147,12 +150,13 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             category='category',
             title='title',
             objective='objective',
-            collection_contents={'nodes': {}},
+            collection_contents={
+                'nodes': {}
+            },
         )
 
         collection_model.commit(
-            self.owner_id, 'collection model created',
-            [{
+            self.owner_id, 'collection model created', [{
                 'cmd': 'create_new',
                 'title': 'title',
                 'category': 'category',
@@ -179,17 +183,15 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             schema_version=2,
             objective='objective',
             version=1,
-            nodes=[
-                {
-                    'exploration_id': 'exp_id1',
-                    'acquired_skills': ['11'],
-                    'prerequisite_skills': ['22'],
-                }, {
-                    'exploration_id': 'exp_id2',
-                    'acquired_skills': ['33'],
-                    'prerequisite_skills': ['44'],
-                }
-            ]
+            nodes=[{
+                'exploration_id': 'exp_id1',
+                'acquired_skills': ['11'],
+                'prerequisite_skills': ['22'],
+            }, {
+                'exploration_id': 'exp_id2',
+                'acquired_skills': ['33'],
+                'prerequisite_skills': ['44'],
+            }]
         )
 
         collection = (collection_services.get_collection_from_model(collection_model))
@@ -199,8 +201,12 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.objective, 'objective')
         self.assertEqual(collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
         self.assertEqual(collection.version, 1)
-        self.assertEqual(collection.nodes[0].to_dict(), {'exploration_id': 'exp_id1'})
-        self.assertEqual(collection.nodes[1].to_dict(), {'exploration_id': 'exp_id2'})
+        self.assertEqual(collection.nodes[0].to_dict(), {
+            'exploration_id': 'exp_id1'
+        })
+        self.assertEqual(collection.nodes[1].to_dict(), {
+            'exploration_id': 'exp_id2'
+        })
         self.assertEqual(
             collection.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION
         )
@@ -216,12 +222,13 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             title='title',
             schema_version=0,
             objective='objective',
-            collection_contents={'nodes': {}},
+            collection_contents={
+                'nodes': {}
+            },
         )
 
         collection_model.commit(
-            self.owner_id, 'collection model created',
-            [{
+            self.owner_id, 'collection model created', [{
                 'cmd': 'create_new',
                 'title': 'title',
                 'category': 'category',
@@ -229,29 +236,28 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         )
 
         with self.assertRaisesRegex(
-                Exception, 'Sorry, we can only process v1-v%d collection schemas at '
-                'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v1-v%d collection schemas at '
+            'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION
+        ):
             collection_services.get_collection_from_model(collection_model)
 
     def test_get_different_collections_by_version(self) -> None:
         self.save_new_valid_collection('collection_id', self.owner_id)
 
         collection_services.update_collection(
-            self.owner_id, 'collection_id', [
-                {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'objective',
-                    'new_value': 'Some new objective'
-                }, {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'Some new title'
-                }, {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'category',
-                    'new_value': 'Some new category'
-                }
-            ], 'Changed properties'
+            self.owner_id, 'collection_id', [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'objective',
+                'new_value': 'Some new objective'
+            }, {
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Some new title'
+            }, {
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'category',
+                'new_value': 'Some new category'
+            }], 'Changed properties'
         )
 
         collection = collection_services.get_collection_by_id(
@@ -294,9 +300,10 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         )
 
         with apply_change_list_swap, self.assertRaisesRegex(
-                Exception,
-                'Unexpected error: received an invalid change list when trying to '
-                'save collection'):
+            Exception,
+            'Unexpected error: received an invalid change list when trying to '
+            'save collection'
+        ):
             # Here we use MyPy ignore because the argument `change_list`
             # of update_collection method can only accept values of type
             # List[Dict[]], but here for testing purposes we are providing
@@ -313,16 +320,15 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         collection_model.version = 0
 
         with self.assertRaisesRegex(
-                Exception, 'Unexpected error: trying to update version 0 of collection '
-                'from version 1. Please reload the page and try again.'):
+            Exception, 'Unexpected error: trying to update version 0 of collection '
+            'from version 1. Please reload the page and try again.'
+        ):
             collection_services.update_collection(
-                self.owner_id, 'collection_id', [
-                    {
-                        'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                        'property_name': 'objective',
-                        'new_value': 'Some new objective'
-                    }
-                ], 'changed objective'
+                self.owner_id, 'collection_id', [{
+                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'Some new objective'
+                }], 'changed objective'
             )
 
     def test_get_multiple_collections_from_model_by_id(self) -> None:
@@ -333,12 +339,13 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             category='category 1',
             title='title 1',
             objective='objective 1',
-            collection_contents={'nodes': {}},
+            collection_contents={
+                'nodes': {}
+            },
         )
 
         collection_model.commit(
-            self.owner_id, 'collection model created',
-            [{
+            self.owner_id, 'collection model created', [{
                 'cmd': 'create_new',
                 'title': 'title 1',
                 'category': 'category 1',
@@ -352,21 +359,22 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             category='category 2',
             title='title 2',
             objective='objective 2',
-            collection_contents={'nodes': {}},
+            collection_contents={
+                'nodes': {}
+            },
         )
 
         collection_model.commit(
-            self.owner_id, 'collection model created',
-            [{
+            self.owner_id, 'collection model created', [{
                 'cmd': 'create_new',
                 'title': 'title 2',
                 'category': 'category 2',
             }]
         )
 
-        collections = collection_services.get_multiple_collections_by_id(
-            ['collection_id_1', 'collection_id_2']
-        )
+        collections = collection_services.get_multiple_collections_by_id([
+            'collection_id_1', 'collection_id_2'
+        ])
 
         self.assertEqual(len(collections), 2)
         self.assertEqual(collections['collection_id_1'].title, 'title 1')
@@ -379,10 +387,11 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
 
     def test_get_multiple_collections_by_id_with_invalid_collection_id(self) -> None:
         with self.assertRaisesRegex(
-                ValueError, 'Couldn\'t find collections with the following ids'):
-            collection_services.get_multiple_collections_by_id(
-                ['collection_id_1', 'collection_id_2']
-            )
+            ValueError, 'Couldn\'t find collections with the following ids'
+        ):
+            collection_services.get_multiple_collections_by_id([
+                'collection_id_1', 'collection_id_2'
+            ])
 
     def test_get_explorations_completed_in_collections(self) -> None:
         collection = self.save_new_valid_collection(
@@ -433,12 +442,10 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.save_new_valid_exploration('exp_id_2', self.owner_id)
 
         collection_services.update_collection(
-            self.owner_id, 'collection_id', [
-                {
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': 'exp_id_2'
-                }
-            ], 'Added new exploration'
+            self.owner_id, 'collection_id', [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': 'exp_id_2'
+            }], 'Added new exploration'
         )
 
         collection = collection_services.get_collection_by_id('collection_id')
@@ -447,13 +454,11 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.nodes[1].exploration_id, 'exp_id_2')
 
         collection_services.update_collection(
-            self.owner_id, 'collection_id', [
-                {
-                    'cmd': collection_domain.CMD_SWAP_COLLECTION_NODES,
-                    'first_index': 0,
-                    'second_index': 1
-                }
-            ], 'Swapped collection nodes'
+            self.owner_id, 'collection_id', [{
+                'cmd': collection_domain.CMD_SWAP_COLLECTION_NODES,
+                'first_index': 0,
+                'second_index': 1
+            }], 'Swapped collection nodes'
         )
 
         collection = collection_services.get_collection_by_id('collection_id')
@@ -473,7 +478,8 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.save_new_valid_collection('collection_id', self.owner_id)
 
         with self.assertRaisesRegex(
-                Exception, 'Command invalid command is not allowed'), logging_swap:
+            Exception, 'Command invalid command is not allowed'
+        ), logging_swap:
             collection_services.update_collection(
                 self.owner_id, 'collection_id', [{
                     'cmd': 'invalid command'
@@ -530,12 +536,10 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         for exp_id in [self.EXP_ID_1, self.EXP_ID_2]:
             self.save_new_valid_exploration(exp_id, self.owner_id)
             collection_services.update_collection(
-                self.owner_id, self.COL_ID_0, [
-                    {
-                        'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                        'exploration_id': exp_id
-                    }
-                ], 'Added new exploration'
+                self.owner_id, self.COL_ID_0, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': exp_id
+                }], 'Added new exploration'
             )
 
     def test_get_completed_exploration_ids(self) -> None:
@@ -591,7 +595,8 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
 
         # There should be an exception if the collection does not exist.
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id Fake not found'):
+            Exception, 'Entity for class CollectionModel with id Fake not found'
+        ):
             collection_services.get_next_exploration_id_to_complete_by_user(
                 self.owner_id, 'Fake'
             )
@@ -600,7 +605,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         # initial explorations should be suggested.
         self.assertEqual(
             collection_services.get_collection_by_id(self.COL_ID_0
-                                                     ).first_exploration_id,
+                                                    ).first_exploration_id,
             self.EXP_ID_0
         )
         self.assertEqual(
@@ -747,23 +752,23 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         rights_manager.publish_collection(self.owner, self.COL_ID_4)
 
         # Add the collections to the search index.
-        collection_services.index_collections_given_ids(
-            [self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3, self.COL_ID_4]
-        )
+        collection_services.index_collections_given_ids([
+            self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3, self.COL_ID_4
+        ])
 
     def _create_search_query(self, terms: List[str], categories: List[str]) -> str:
         """Returns the search query derived from terms and categories."""
         query = ' '.join(terms)
         if categories:
-            query += '%s)' % 'category=( OR '.join(
-                ['"%s"' % category for category in categories]
-            )
+            query += '%s)' % 'category=( OR '.join([
+                '"%s"' % category for category in categories
+            ])
         return query
 
     def test_get_collection_summaries_matching_ids(self) -> None:
-        summaries = collection_services.get_collection_summaries_matching_ids(
-            [self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, 'nonexistent']
-        )
+        summaries = collection_services.get_collection_summaries_matching_ids([
+            self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, 'nonexistent'
+        ])
         # Ruling out the possibility of None of individual elements of a list
         # for mypy type checking.
         assert summaries[0] is not None
@@ -788,8 +793,9 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     def test_publish_collection_raise_exception_for_invalid_collection_id(self) -> None:
         system_user = user_services.get_system_user()
         with self.assertRaisesRegex(
-                Exception, 'No collection summary model exists for the given id:'
-                ' Invalid_collection_id'):
+            Exception, 'No collection summary model exists for the given id:'
+            ' Invalid_collection_id'
+        ):
             with self.swap_to_always_return(rights_manager, 'publish_collection', True):
                 collection_services.publish_collection_and_update_user_profiles(
                     system_user, 'Invalid_collection_id'
@@ -798,7 +804,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     def test_get_collection_summaries_with_no_query(self) -> None:
         # An empty query should return all collections.
         (col_ids, search_cursor
-         ) = (collection_services.get_collection_ids_matching_query('', [], []))
+        ) = (collection_services.get_collection_ids_matching_query('', [], []))
         self.assertEqual(
             sorted(col_ids),
             [self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3, self.COL_ID_4]
@@ -892,7 +898,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
 
             # Page 1: 2 initial collections.
             (col_ids, search_offset
-             ) = (collection_services.get_collection_ids_matching_query('', [], []))
+            ) = (collection_services.get_collection_ids_matching_query('', [], []))
             self.assertEqual(len(col_ids), 2)
             self.assertIsNotNone(search_offset)
             found_col_ids += col_ids
@@ -944,8 +950,9 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.title, retrieved_collection.title)
 
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id fake_collection'
-                ' not found'):
+            Exception, 'Entity for class CollectionModel with id fake_collection'
+            ' not found'
+        ):
             collection_services.get_collection_by_id('fake_collection')
 
     def test_retrieval_of_multiple_collections(self) -> None:
@@ -970,8 +977,9 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertNotIn('doesnt_exist', result)
 
         with self.assertRaisesRegex(
-                Exception,
-                'Couldn\'t find collections with the following ids:\ndoesnt_exist'):
+            Exception,
+            'Couldn\'t find collections with the following ids:\ndoesnt_exist'
+        ):
             collection_services.get_multiple_collections_by_id(
                 collection_ids + ['doesnt_exist']
             )
@@ -985,8 +993,9 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collection(self.owner_id, self.COLLECTION_0_ID)
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id A_collection_0_id '
-                'not found'):
+            Exception, 'Entity for class CollectionModel with id A_collection_0_id '
+            'not found'
+        ):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
 
         # The deleted collection does not show up in any queries.
@@ -1052,12 +1061,14 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.owner_id, [self.COLLECTION_0_ID, self.COLLECTION_1_ID]
         )
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id A_collection_0_id '
-                'not found'):
+            Exception, 'Entity for class CollectionModel with id A_collection_0_id '
+            'not found'
+        ):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id A_collection_1_id '
-                'not found'):
+            Exception, 'Entity for class CollectionModel with id A_collection_1_id '
+            'not found'
+        ):
             collection_services.get_collection_by_id(self.COLLECTION_1_ID)
 
         # The deleted collections does not show up in any queries.
@@ -1151,8 +1162,9 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.owner_id, self.COLLECTION_0_ID, force_deletion=True
         )
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id A_collection_0_id'
-                ' not found'):
+            Exception, 'Entity for class CollectionModel with id A_collection_0_id'
+            ' not found'
+        ):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
 
         # The deleted collection does not show up in any queries.
@@ -1175,12 +1187,14 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             force_deletion=True
         )
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id A_collection_0_id'
-                ' not found'):
+            Exception, 'Entity for class CollectionModel with id A_collection_0_id'
+            ' not found'
+        ):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id A_collection_1_id '
-                'not found'):
+            Exception, 'Entity for class CollectionModel with id A_collection_1_id '
+            'not found'
+        ):
             collection_services.get_collection_by_id(self.COLLECTION_1_ID)
 
         # The deleted collections does not show up in any queries.
@@ -1212,8 +1226,9 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.owner_id, self.COLLECTION_0_ID, force_deletion=True
         )
         with self.assertRaisesRegex(
-                Exception, 'Entity for class CollectionModel with id A_collection_0_id '
-                'not found'):
+            Exception, 'Entity for class CollectionModel with id A_collection_0_id '
+            'not found'
+        ):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
 
         # The deleted collection summary does not show up in any queries.
@@ -1287,17 +1302,15 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # Change the collection's title and category properties.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': 'edit_collection_property',
-                    'property_name': 'title',
-                    'new_value': 'A new title'
-                }, {
-                    'cmd': 'edit_collection_property',
-                    'property_name': 'category',
-                    'new_value': 'A new category'
-                }
-            ], 'Change title and category'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'A new title'
+            }, {
+                'cmd': 'edit_collection_property',
+                'property_name': 'category',
+                'new_value': 'A new category'
+            }], 'Change title and category'
         )
 
         retrieved_collection_summary = (
@@ -1320,13 +1333,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # This should not give an error.
         collection_services.update_collection(
-            feconf.MIGRATION_BOT_USER_ID, self.COLLECTION_0_ID, [
-                {
-                    'cmd': 'edit_collection_property',
-                    'property_name': 'title',
-                    'new_value': 'New title'
-                }
-            ], 'Did migration.'
+            feconf.MIGRATION_BOT_USER_ID, self.COLLECTION_0_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Did migration.'
         )
 
         # Check that the version of the collection is incremented.
@@ -1343,13 +1354,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # This should not give an error.
         collection_services.update_collection(
-            feconf.MIGRATION_BOT_USER_ID, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
-                    'from_version': 2,
-                    'to_version': 3,
-                }
-            ], 'Did migration.'
+            feconf.MIGRATION_BOT_USER_ID, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+                'from_version': 2,
+                'to_version': 3,
+            }], 'Did migration.'
         )
 
         # Check that the version of the collection is incremented.
@@ -1429,12 +1438,10 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         new_exp_id = 'new_exploration_id'
         self.save_new_valid_exploration(new_exp_id, self.owner_id)
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': new_exp_id
-                }
-            ], 'Added new exploration'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': new_exp_id
+            }], 'Added new exploration'
         )
 
         # Verify the new exploration was added.
@@ -1444,15 +1451,14 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
     def test_add_node_with_non_existent_exploration(self) -> None:
         non_existent_exp_id = 'non_existent_exploration_id'
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected collection to only reference valid explorations'):
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations'
+        ):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_0_ID, [
-                    {
-                        'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                        'exploration_id': non_existent_exp_id
-                    }
-                ], 'Added non-existent exploration'
+                self.owner_id, self.COLLECTION_0_ID, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': non_existent_exp_id
+                }], 'Added non-existent exploration'
             )
 
     def test_add_node_with_private_exploration_in_public_collection(self) -> None:
@@ -1465,16 +1471,15 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertTrue(rights_manager.is_collection_public(self.COLLECTION_0_ID))
         self.assertTrue(rights_manager.is_exploration_private(private_exp_id))
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Cannot reference a private exploration within a public '
-                'collection'):
+            utils.ValidationError,
+            'Cannot reference a private exploration within a public '
+            'collection'
+        ):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_0_ID, [
-                    {
-                        'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                        'exploration_id': private_exp_id
-                    }
-                ], 'Added private exploration'
+                self.owner_id, self.COLLECTION_0_ID, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': private_exp_id
+                }], 'Added private exploration'
             )
 
     def test_add_node_with_public_exploration_in_private_collection(self) -> None:
@@ -1493,15 +1498,13 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # No exception should be raised for either insertion.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': public_exp_id
-                }, {
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': private_exp_id
-                }
-            ], 'Added public and private explorations'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': public_exp_id
+            }, {
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': private_exp_id
+            }], 'Added public and private explorations'
         )
 
     def test_delete_node(self) -> None:
@@ -1510,12 +1513,10 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.exploration_ids, [self.EXPLORATION_ID])
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
-                    'exploration_id': self.EXPLORATION_ID,
-                }
-            ], 'Deleted exploration'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
+                'exploration_id': self.EXPLORATION_ID,
+            }], 'Deleted exploration'
         )
 
         # Verify the exploration was deleted (the collection is now empty).
@@ -1529,13 +1530,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the title.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'Some new title'
-                }
-            ], 'Changed the title'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Some new title'
+            }], 'Changed the title'
         )
 
         # Verify the title is different.
@@ -1549,13 +1548,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the category.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'category',
-                    'new_value': 'Some new category'
-                }
-            ], 'Changed the category'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'category',
+                'new_value': 'Some new category'
+            }], 'Changed the category'
         )
 
         # Verify the category is different.
@@ -1569,13 +1566,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the objective.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'objective',
-                    'new_value': 'Some new objective'
-                }
-            ], 'Changed the objective'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'objective',
+                'new_value': 'Some new objective'
+            }], 'Changed the objective'
         )
 
         # Verify the objective is different.
@@ -1589,13 +1584,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the language code.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'language_code',
-                    'new_value': 'fi'
-                }
-            ], 'Changed the language to Finnish'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'fi'
+            }], 'Changed the language to Finnish'
         )
 
         # Verify the language is different.
@@ -1609,13 +1602,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the tags.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'tags',
-                    'new_value': ['test']
-                }
-            ], 'Add a new tag'
+            self.owner_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'tags',
+                'new_value': ['test']
+            }], 'Add a new tag'
         )
 
         # Verify that the tags are different.
@@ -1623,49 +1614,42 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.tags, ['test'])
 
         # Verify that error will be thrown when duplicate tags are introduced.
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected tags to be unique, but found duplicates'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected tags to be unique, but found duplicates'
+        ):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_0_ID, [
-                    {
-                        'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                        'property_name': 'tags',
-                        'new_value': ['duplicate', 'duplicate']
-                    }
-                ], 'Add a new tag'
+                self.owner_id, self.COLLECTION_0_ID, [{
+                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                    'property_name': 'tags',
+                    'new_value': ['duplicate', 'duplicate']
+                }], 'Add a new tag'
             )
 
 
 def _get_collection_change_list(property_name: str,
                                 new_value: str) -> List[Dict[str, str]]:
     """Generates a change list for a single collection property change."""
-    return [
-        {
-            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-            'property_name': property_name,
-            'new_value': new_value
-        }
-    ]
+    return [{
+        'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+        'property_name': property_name,
+        'new_value': new_value
+    }]
 
 
 def _get_added_exploration_change_list(exploration_id: str) -> List[Dict[str, str]]:
     """Generates a change list for adding an exploration to a collection."""
-    return [
-        {
-            'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-            'exploration_id': exploration_id
-        }
-    ]
+    return [{
+        'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+        'exploration_id': exploration_id
+    }]
 
 
 def _get_deleted_exploration_change_list(exploration_id: str) -> List[Dict[str, str]]:
     """Generates a change list for deleting an exploration from a collection."""
-    return [
-        {
-            'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
-            'exploration_id': exploration_id
-        }
-    ]
+    return [{
+        'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
+        'exploration_id': exploration_id
+    }]
 
 
 class CommitMessageHandlingTests(CollectionServicesUnitTests):
@@ -1692,9 +1676,9 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
         )
 
         self.assertEqual(
-            collection_services.get_collection_snapshots_metadata(
-                self.COLLECTION_0_ID
-            )[1]['commit_message'], 'A message'
+            collection_services.get_collection_snapshots_metadata(self.COLLECTION_0_ID
+                                                                 )[1]['commit_message'],
+            'A message'
         )
 
     def test_demand_commit_message(self) -> None:
@@ -1702,8 +1686,9 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
         rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
 
         with self.assertRaisesRegex(
-                ValueError, 'Collection is public so expected a commit message but '
-                'received none.'):
+            ValueError, 'Collection is public so expected a commit message but '
+            'received none.'
+        ):
             collection_services.update_collection(
                 self.owner_id, self.COLLECTION_0_ID,
                 _get_collection_change_list(
@@ -1755,21 +1740,17 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_snapshots_metadata(self.COLLECTION_0_ID)
         )
         self.assertEqual(len(snapshots_metadata), 1)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'A category',
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': ('New collection created with title \'A title\'.'),
-                'commit_type': 'create',
-                'version_number': 1
-            }, snapshots_metadata[0]
-        )
+        self.assertDictContainsSubset({
+            'commit_cmds': [{
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'A category',
+            }],
+            'committer_id': self.owner_id,
+            'commit_message': ('New collection created with title \'A title\'.'),
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Publish the collection and any explorations contained within it. This
@@ -1781,31 +1762,25 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_snapshots_metadata(self.COLLECTION_0_ID)
         )
         self.assertEqual(len(snapshots_metadata), 1)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'A category'
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': ('New collection created with title \'A title\'.'),
-                'commit_type': 'create',
-                'version_number': 1
-            }, snapshots_metadata[0]
-        )
+        self.assertDictContainsSubset({
+            'commit_cmds': [{
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'A category'
+            }],
+            'committer_id': self.owner_id,
+            'commit_message': ('New collection created with title \'A title\'.'),
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
         # Modify the collection. This affects the collection version history.
-        change_list = [
-            {
-                'cmd': 'edit_collection_property',
-                'property_name': 'title',
-                'new_value': 'First title'
-            }
-        ]
+        change_list = [{
+            'cmd': 'edit_collection_property',
+            'property_name': 'title',
+            'new_value': 'First title'
+        }]
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, change_list, 'Changed title.'
         )
@@ -1815,30 +1790,24 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         )
         self.assertEqual(len(snapshots_metadata), 2)
         self.assertIn('created_on_ms', snapshots_metadata[0])
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'A category'
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': ('New collection created with title \'A title\'.'),
-                'commit_type': 'create',
-                'version_number': 1
-            }, snapshots_metadata[0]
-        )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': change_list,
-                'committer_id': self.owner_id,
-                'commit_message': 'Changed title.',
-                'commit_type': 'edit',
-                'version_number': 2,
-            }, snapshots_metadata[1]
-        )
+        self.assertDictContainsSubset({
+            'commit_cmds': [{
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'A category'
+            }],
+            'committer_id': self.owner_id,
+            'commit_message': ('New collection created with title \'A title\'.'),
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'commit_cmds': change_list,
+            'committer_id': self.owner_id,
+            'commit_message': 'Changed title.',
+            'commit_type': 'edit',
+            'version_number': 2,
+        }, snapshots_metadata[1])
         self.assertLess(
             snapshots_metadata[0]['created_on_ms'],
             snapshots_metadata[1]['created_on_ms']
@@ -1851,13 +1820,11 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
                 _get_collection_change_list('title', ''))
 
         # Another person modifies the collection.
-        new_change_list = [
-            {
-                'cmd': 'edit_collection_property',
-                'property_name': 'title',
-                'new_value': 'New title'
-            }
-        ]
+        new_change_list = [{
+            'cmd': 'edit_collection_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        }]
         collection_services.update_collection(
             second_committer_id, self.COLLECTION_0_ID, new_change_list, 'Second commit.'
         )
@@ -1866,39 +1833,31 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_snapshots_metadata(self.COLLECTION_0_ID)
         )
         self.assertEqual(len(snapshots_metadata), 3)
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': [
-                    {
-                        'cmd': 'create_new',
-                        'title': 'A title',
-                        'category': 'A category'
-                    }
-                ],
-                'committer_id': self.owner_id,
-                'commit_message': ('New collection created with title \'A title\'.'),
-                'commit_type': 'create',
-                'version_number': 1
-            }, snapshots_metadata[0]
-        )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': change_list,
-                'committer_id': self.owner_id,
-                'commit_message': 'Changed title.',
-                'commit_type': 'edit',
-                'version_number': 2,
-            }, snapshots_metadata[1]
-        )
-        self.assertDictContainsSubset(
-            {
-                'commit_cmds': new_change_list,
-                'committer_id': second_committer_id,
-                'commit_message': 'Second commit.',
-                'commit_type': 'edit',
-                'version_number': 3,
-            }, snapshots_metadata[2]
-        )
+        self.assertDictContainsSubset({
+            'commit_cmds': [{
+                'cmd': 'create_new',
+                'title': 'A title',
+                'category': 'A category'
+            }],
+            'committer_id': self.owner_id,
+            'commit_message': ('New collection created with title \'A title\'.'),
+            'commit_type': 'create',
+            'version_number': 1
+        }, snapshots_metadata[0])
+        self.assertDictContainsSubset({
+            'commit_cmds': change_list,
+            'committer_id': self.owner_id,
+            'commit_message': 'Changed title.',
+            'commit_type': 'edit',
+            'version_number': 2,
+        }, snapshots_metadata[1])
+        self.assertDictContainsSubset({
+            'commit_cmds': new_change_list,
+            'committer_id': second_committer_id,
+            'commit_message': 'Second commit.',
+            'commit_type': 'edit',
+            'version_number': 3,
+        }, snapshots_metadata[2])
         self.assertLess(
             snapshots_metadata[1]['created_on_ms'],
             snapshots_metadata[2]['created_on_ms']
@@ -2081,13 +2040,11 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Have Albert create a collection.
         self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)
         # Have Bob edit the collection.
-        changelist_cmds = [
-            {
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Collection Bob title'
-            }
-        ]
+        changelist_cmds = [{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }]
         collection_services.update_collection(
             self.bob_id, self.COLLECTION_0_ID, changelist_cmds,
             'Changed title to Bob title.'
@@ -2124,14 +2081,14 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
     def test_contributor_summary(self) -> None:
         # Have Albert create a new collection. Version 1.
         self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)
-        self._check_contributors_summary(self.COLLECTION_0_ID, {self.albert_id: 1})
-        changelist_cmds = [
-            {
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Collection Bob title'
-            }
-        ]
+        self._check_contributors_summary(self.COLLECTION_0_ID, {
+            self.albert_id: 1
+        })
+        changelist_cmds = [{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }]
         # Have Bob update that collection. Version 2.
         collection_services.update_collection(
             self.bob_id, self.COLLECTION_0_ID, changelist_cmds, 'Changed title.'
@@ -2167,13 +2124,11 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
     def test_create_collection_summary_with_contributor_to_remove(self) -> None:
         self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)
         collection_services.update_collection(
-            self.bob_id, self.COLLECTION_0_ID, [
-                {
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'Collection Bob title'
-                }
-            ], 'Changed title.'
+            self.bob_id, self.COLLECTION_0_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Collection Bob title'
+            }], 'Changed title.'
         )
         collection_services.regenerate_collection_and_contributors_summaries(
             self.COLLECTION_0_ID
@@ -2191,7 +2146,9 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID
         )
 
-        self._check_contributors_summary(self.COLLECTION_0_ID, {self.albert_id: 1})
+        self._check_contributors_summary(self.COLLECTION_0_ID, {
+            self.albert_id: 1
+        })
 
     def test_raises_error_when_collection_provided_with_no_last_updated_data(
         self
@@ -2200,11 +2157,12 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         collection = collection_services.get_collection_by_id('test_id')
         collection.last_updated = None
 
-        with self.swap_to_always_return(collection_services, 'get_collection_by_id',
-                                        collection):
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_by_id', collection
+        ):
             with self.assertRaisesRegex(
-                    Exception,
-                    'No data available for when the collection was last_updated.'):
+                Exception, 'No data available for when the collection was last_updated.'
+            ):
                 collection_services.regenerate_collection_and_contributors_summaries(  # pylint: disable=line-too-long
                     'test_id'
                 )
@@ -2216,11 +2174,12 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         collection = collection_services.get_collection_by_id('test_id')
         collection.created_on = None
 
-        with self.swap_to_always_return(collection_services, 'get_collection_by_id',
-                                        collection):
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_by_id', collection
+        ):
             with self.assertRaisesRegex(
-                    Exception,
-                    'No data available for when the collection was created.'):
+                Exception, 'No data available for when the collection was created.'
+            ):
                 collection_services.regenerate_collection_and_contributors_summaries(  # pylint: disable=line-too-long
                     'test_id'
                 )
@@ -2244,8 +2203,7 @@ class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):
         self.assertEqual(collection.id, collection_id)
         self.assertEqual(collection_rights.id, collection_id)
 
-        (collection, collection_rights) = (
-            collection_services.get_collection_and_collection_rights_by_id('fake_id')
-        )
+        (collection, collection_rights
+        ) = (collection_services.get_collection_and_collection_rights_by_id('fake_id'))
         self.assertIsNone(collection)
         self.assertIsNone(collection_rights)

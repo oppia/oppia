@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Provides PTransforms for writing job results to the datastore."""
 
 from __future__ import annotations
@@ -40,7 +39,7 @@ datastore_services = models.Registry.import_datastore_services()
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class PutResults(beam.PTransform): # type: ignore[misc]
+class PutResults(beam.PTransform):  # type: ignore[misc]
     """Writes Job Results into the NDB datastore."""
 
     _MAX_RESULT_INSTANCES_PER_MODEL = 1000
@@ -75,19 +74,16 @@ class PutResults(beam.PTransform): # type: ignore[misc]
             | beam.WithKeys(None)  # pylint: disable=no-value-for-parameter
             # GroupIntoBatches() requires (key, value) pairs as input, so we
             # give everything None keys and then immediately discard them.
-            | beam.GroupIntoBatches(self._MAX_RESULT_INSTANCES_PER_MODEL)
-            | beam.Values() # pylint: disable=no-value-for-parameter
-            | beam.FlatMap(job_run_result.JobRunResult.accumulate)
-            | beam.Map(
+            | beam.GroupIntoBatches(self._MAX_RESULT_INSTANCES_PER_MODEL) |
+            beam.Values()  # pylint: disable=no-value-for-parameter
+            | beam.FlatMap(job_run_result.JobRunResult.accumulate) | beam.Map(
                 self.create_beam_job_run_result_model,
-                results.pipeline.options.namespace)
-            | ndb_io.PutModels()
+                results.pipeline.options.namespace
+            ) | ndb_io.PutModels()
         )
 
     def create_beam_job_run_result_model(
-            self,
-            result: job_run_result.JobRunResult,
-            namespace: Optional[str]
+        self, result: job_run_result.JobRunResult, namespace: Optional[str]
     ) -> beam_job_models.BeamJobRunResultModel:
         """Returns an NDB model for storing the given JobRunResult.
 
@@ -100,4 +96,5 @@ class PutResults(beam.PTransform): # type: ignore[misc]
         """
         with datastore_services.get_ndb_context(namespace=namespace):
             return beam_job_services.create_beam_job_run_result_model(
-                self.job_id, result.stdout, result.stderr)
+                self.job_id, result.stdout, result.stderr
+            )

@@ -34,7 +34,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
-(base_models, ) = models.Registry.import_models([models.Names.BASE_MODEL])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 def get_models_which_should_be_exported() -> List[Type[base_models.BaseModel]]:
@@ -56,8 +56,8 @@ def get_models_which_should_be_exported() -> List[Type[base_models.BaseModel]]:
     return [
         model_class for model_class in models.Registry.get_all_storage_model_classes()
         if model_class.get_model_association_to_user() !=
-        base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-        and not model_class.__name__ in exempt_base_classes
+        base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER and
+        not model_class.__name__ in exempt_base_classes
     ]
 
 
@@ -78,8 +78,9 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
         NotImplementedError. Takeout for profile users is not implemented.
     """
     user_settings = user_services.get_user_settings(user_id, strict=False)
-    if user_settings is not None and (feconf.ROLE_ID_MOBILE_LEARNER
-                                      in user_settings.roles):
+    if user_settings is not None and (
+        feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles
+    ):
         raise NotImplementedError('Takeout for profile users is not yet supported.')
     exported_data = {}
     models_to_export = get_models_which_should_be_exported()

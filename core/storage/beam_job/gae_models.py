@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Models for managing Apache Beam jobs."""
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ from core.platform import models
 from typing import Dict, Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -51,8 +50,10 @@ def _get_new_model_id(model_class: Type[base_models.BaseModel]) -> str:
         new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)
         if model_class.get(new_id, strict=False) is None:
             return new_id
-    raise RuntimeError('Failed to generate a unique ID after %d attempts' % (
-        _MAX_ID_GENERATION_ATTEMPTS))
+    raise RuntimeError(
+        'Failed to generate a unique ID after %d attempts' %
+        (_MAX_ID_GENERATION_ATTEMPTS)
+    )
 
 
 class BeamJobState(enum.Enum):
@@ -116,13 +117,14 @@ class BeamJobRunModel(base_models.BaseModel):
     # The ID of the dataflow job this model corresponds to. If the job is run
     # synchronously, then this value will be empty.
     # https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs#resource:-job
-    dataflow_job_id = (
-        datastore_services.StringProperty(required=False, indexed=True))
+    dataflow_job_id = (datastore_services.StringProperty(required=False, indexed=True))
     # The name of the job class that implements the job's logic.
     job_name = datastore_services.StringProperty(required=True, indexed=True)
     # The state of the job at the time the model was last updated.
     latest_job_state = datastore_services.StringProperty(
-        required=True, indexed=True, choices=[
+        required=True,
+        indexed=True,
+        choices=[
             BeamJobState.RUNNING.value,
             BeamJobState.PENDING.value,
             BeamJobState.STOPPED.value,
@@ -134,7 +136,8 @@ class BeamJobRunModel(base_models.BaseModel):
             BeamJobState.DONE.value,
             BeamJobState.FAILED.value,
             BeamJobState.UNKNOWN.value,
-        ])
+        ]
+    )
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with signature of super class's get_new_id() method.
@@ -162,19 +165,20 @@ class BeamJobRunModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(BeamJobRunModel, cls).get_export_policy(), **{
-            'dataflow_job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'job_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
+        return dict(
+            super(BeamJobRunModel, cls).get_export_policy(), **{
+                'dataflow_job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'job_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )
 
 
 class BeamJobRunResultModel(base_models.BaseModel):
@@ -219,16 +223,17 @@ class BeamJobRunResultModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(BeamJobRunResultModel, cls).get_export_policy(), **{
-            'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'stdout': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'stderr': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
+        return dict(
+            super(BeamJobRunResultModel, cls).get_export_policy(), **{
+                'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'stdout': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'stderr': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )

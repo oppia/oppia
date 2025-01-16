@@ -42,11 +42,12 @@ RTE_THUMBNAIL_HEIGHT_PX: Final = 16
 RTE_THUMBNAIL_WIDTH_PX: Final = 16
 
 # Here we use object because every type is inherited from object class.
-_COMPONENT_CONFIG_SCHEMA: List[Tuple[str, Type[object]]] = [
-    ('backend_id', str), ('category', str), ('description', str), ('frontend_id', str),
-    ('tooltip', str), ('icon_data_url', str), ('requires_fs', bool),
-    ('is_block_element', bool), ('customization_arg_specs', list)
-]
+_COMPONENT_CONFIG_SCHEMA: List[Tuple[str, Type[object]]
+                              ] = [('backend_id', str), ('category', str),
+                                   ('description', str), ('frontend_id', str),
+                                   ('tooltip', str), ('icon_data_url', str),
+                                   ('requires_fs', bool), ('is_block_element', bool),
+                                   ('customization_arg_specs', list)]
 
 
 class RteComponentUnitTests(test_utils.GenericTestBase):
@@ -68,12 +69,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         for ca_spec in customization_arg_specs:
             self.assertEqual(
                 set(ca_spec.keys()),
-                set(
-                    [
-                        'name', 'description', 'schema', 'default_value',
-                        'default_value_obtainable_from_highlight'
-                    ]
-                )
+                set([
+                    'name', 'description', 'schema', 'default_value',
+                    'default_value_obtainable_from_highlight'
+                ])
             )
 
             self.assertTrue(isinstance(ca_spec['name'], str))

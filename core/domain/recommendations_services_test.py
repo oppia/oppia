@@ -31,9 +31,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import recommendations_models
 
-(recommendations_models, ) = models.Registry.import_models(
-    [models.Names.RECOMMENDATIONS]
-)
+(recommendations_models,) = models.Registry.import_models([
+    models.Names.RECOMMENDATIONS
+])
 
 
 class TopicSimilarityUnitTests(test_utils.GenericTestBase):
@@ -122,8 +122,11 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                Exception, ('Length of topic similarities columns: 2 does not match '
-                            'length of topic list: 3.')):
+            Exception, (
+                'Length of topic similarities columns: 2 does not match '
+                'length of topic list: 3.'
+            )
+        ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
                 '1.0,0.2,0.1\n'
@@ -131,8 +134,11 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             )
 
         with self.assertRaisesRegex(
-                Exception, ('Length of topic similarities rows: 2 does not match '
-                            'length of topic list: 3.')):
+            Exception, (
+                'Length of topic similarities rows: 2 does not match '
+                'length of topic list: 3.'
+            )
+        ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
                 '1.0,0.2,0.1\n'
@@ -141,8 +147,8 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             )
 
         with self.assertRaisesRegex(
-                ValueError,
-                'Expected similarity to be between 0.0 and 1.0, received 800'):
+            ValueError, 'Expected similarity to be between 0.0 and 1.0, received 800'
+        ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
                 '1.0,0.2,0.1\n'
@@ -151,7 +157,8 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             )
 
         with self.assertRaisesRegex(
-                ValueError, 'Expected similarity to be a float, received string'):
+            ValueError, 'Expected similarity to be a float, received string'
+        ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
                 'string,0.2,0.1\n'
@@ -159,8 +166,9 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.1,0.8,1.0'
             )
 
-        with self.assertRaisesRegex(Exception,
-                                    'Topic Fake Topic not in list of known topics.'):
+        with self.assertRaisesRegex(
+            Exception, 'Topic Fake Topic not in list of known topics.'
+        ):
             recommendations_services.update_topic_similarities(
                 'Fake Topic,Biology,Chemistry\n'
                 'string,0.2,0.1\n'
@@ -168,8 +176,9 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.1,0.8,1.0'
             )
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected topic similarities to be symmetric.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected topic similarities to be symmetric.'
+        ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
                 '1.0,0.2,0.1\n'
@@ -335,9 +344,9 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(saved_recommendation_ids, [])
 
     def test_delete_recommendations_for_exploration(self) -> None:
-        recommendations_services.delete_explorations_from_recommendations(
-            ['exp_id_1', 'exp_id_2']
-        )
+        recommendations_services.delete_explorations_from_recommendations([
+            'exp_id_1', 'exp_id_2'
+        ])
         self.assertIsNone(
             recommendations_models.ExplorationRecommendationsModel.
             get_by_id('exp_id_1')
@@ -355,9 +364,9 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             'exp_id_2', ['exp_id_1', 'exp_id_3', 'exp_id_4']
         )
 
-        recommendations_services.delete_explorations_from_recommendations(
-            ['exp_id_3', 'exp_id_4']
-        )
+        recommendations_services.delete_explorations_from_recommendations([
+            'exp_id_3', 'exp_id_4'
+        ])
         recommendations_1 = (
             recommendations_models.ExplorationRecommendationsModel.
             get_by_id('exp_id_1')

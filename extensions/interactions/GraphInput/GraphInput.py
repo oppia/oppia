@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for GraphInput interaction."""
 
 from __future__ import annotations
@@ -37,9 +36,7 @@ class GraphInput(base.BaseInteraction):
     _dependency_ids: List[str] = []
     answer_type: str = 'Graph'
     instructions: str = 'I18N_INTERACTIONS_GRAPH_INPUT_INSTRUCTION'
-    narrow_instructions: str = (
-        'I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION'
-    )
+    narrow_instructions: str = ('I18N_INTERACTIONS_GRAPH_INPUT_NARROW_INSTRUCTION')
     needs_summary: bool = True
     can_have_solution: bool = True
     show_generic_submit_button: bool = True

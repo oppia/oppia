@@ -118,9 +118,8 @@ class FeatureFlag:
             'name': self._name,
             'description': self._feature_flag_spec.description,
             'feature_stage': self._feature_flag_spec.feature_stage.value,
-            'force_enable_for_all_users': (
-                self._feature_flag_config.force_enable_for_all_users
-            ),
+            'force_enable_for_all_users':
+                (self._feature_flag_config.force_enable_for_all_users),
             'rollout_percentage': self._feature_flag_config.rollout_percentage,
             'user_group_ids': self._feature_flag_config.user_group_ids,
             'last_updated': last_updated
@@ -137,21 +136,16 @@ class FeatureFlag:
         Returns:
             FeatureFlag. The corresponding FeatureFlag domain object.
         """
-        feature_flag_spec = FeatureFlagSpec.from_dict(
-            {
-                'description': feature_dict['description'],
-                'feature_stage': feature_dict['feature_stage']
-            }
-        )
-        feature_flag_config = FeatureFlagConfig.from_dict(
-            {
-                'force_enable_for_all_users': feature_dict['force_enable_for_all_users'
-                                                           ],
-                'rollout_percentage': feature_dict['rollout_percentage'],
-                'user_group_ids': feature_dict['user_group_ids'],
-                'last_updated': feature_dict['last_updated']
-            }
-        )
+        feature_flag_spec = FeatureFlagSpec.from_dict({
+            'description': feature_dict['description'],
+            'feature_stage': feature_dict['feature_stage']
+        })
+        feature_flag_config = FeatureFlagConfig.from_dict({
+            'force_enable_for_all_users': feature_dict['force_enable_for_all_users'],
+            'rollout_percentage': feature_dict['rollout_percentage'],
+            'user_group_ids': feature_dict['user_group_ids'],
+            'last_updated': feature_dict['last_updated']
+        })
 
         return cls(feature_dict['name'], feature_flag_spec, feature_flag_config)
 
@@ -337,8 +331,10 @@ class FeatureFlagConfig:
                 'Feature flag in %s stage cannot be updated '
                 'in %s environment.' % (feature_stage.value, server_mode.value)
             )
-        if (server_mode == ServerMode.PROD
-                and feature_stage in (ServerMode.DEV, ServerMode.TEST)):
+        if (
+            server_mode == ServerMode.PROD and
+            feature_stage in (ServerMode.DEV, ServerMode.TEST)
+        ):
             raise utils.ValidationError(
                 'Feature flag in %s stage cannot be updated '
                 'in %s environment.' % (feature_stage.value, server_mode.value)

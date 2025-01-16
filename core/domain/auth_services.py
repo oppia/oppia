@@ -311,8 +311,9 @@ def get_csrf_secret_value() -> str:
             id=CSRF_SECRET_INSTANCE_ID, oppia_csrf_secret=csrf_secret_value
         ).put()
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None,
-            {CSRF_SECRET_INSTANCE_ID: csrf_secret_value}
+            caching_services.CACHE_NAMESPACE_DEFAULT, None, {
+                CSRF_SECRET_INSTANCE_ID: csrf_secret_value
+            }
         )
         csrf_secret_model = auth_models.CsrfSecretModel.get(
             CSRF_SECRET_INSTANCE_ID, strict=False

@@ -13,13 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for AlgebraicExpressionInput.py"""
 
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.AlgebraicExpressionInput import AlgebraicExpressionInput # pylint: disable=unused-import, line-too-long # isort: skip
+from extensions.interactions.AlgebraicExpressionInput import AlgebraicExpressionInput  # pylint: disable=unused-import, line-too-long # isort: skip
 
 
 class AlgebraicExpressionInputTests(test_utils.GenericTestBase):

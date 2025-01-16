@@ -120,101 +120,99 @@ class SkillChange(change_domain.BaseChange):
         SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED
     ]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
-        {
-            'name': CMD_CREATE_NEW,
-            'required_attribute_names': [],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_SKILL_MISCONCEPTION,
-            'required_attribute_names': ['new_misconception_dict'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_DELETE_SKILL_MISCONCEPTION,
-            'required_attribute_names': ['misconception_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_PREREQUISITE_SKILL,
-            'required_attribute_names': ['skill_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_DELETE_PREREQUISITE_SKILL,
-            'required_attribute_names': ['skill_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_RUBRICS,
-            'required_attribute_names': ['difficulty', 'explanations'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-            'required_attribute_names': [
-                'misconception_id', 'property_name', 'new_value', 'old_value'
-            ],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': SKILL_MISCONCEPTIONS_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_SKILL_PROPERTY,
-            'required_attribute_names': ['property_name', 'new_value', 'old_value'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': SKILL_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
-            'required_attribute_names': ['property_name', 'new_value', 'old_value'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': SKILL_CONTENTS_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }
-    ]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_SKILL_MISCONCEPTION,
+        'required_attribute_names': ['new_misconception_dict'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_DELETE_SKILL_MISCONCEPTION,
+        'required_attribute_names': ['misconception_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_PREREQUISITE_SKILL,
+        'required_attribute_names': ['skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_DELETE_PREREQUISITE_SKILL,
+        'required_attribute_names': ['skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_RUBRICS,
+        'required_attribute_names': ['difficulty', 'explanations'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+        'required_attribute_names': [
+            'misconception_id', 'property_name', 'new_value', 'old_value'
+        ],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': SKILL_MISCONCEPTIONS_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_SKILL_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': SKILL_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': SKILL_CONTENTS_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }]
 
 
 class CreateNewSkillCmd(SkillChange):
@@ -597,7 +595,10 @@ class Rubric:
         Returns:
             dict. A dict, mapping all fields of Rubric instance.
         """
-        return {'difficulty': self.difficulty, 'explanations': self.explanations}
+        return {
+            'difficulty': self.difficulty,
+            'explanations': self.explanations
+        }
 
     @classmethod
     def from_dict(cls, rubric_dict: RubricDict) -> Rubric:
@@ -653,8 +654,10 @@ class Rubric:
                     'Explanation should be less than or equal to 300 chars, '
                     'received %d chars' % len(explanation)
                 )
-        if (self.difficulty == constants.SKILL_DIFFICULTIES[1]
-                and len(self.explanations) == 0):
+        if (
+            self.difficulty == constants.SKILL_DIFFICULTIES[1] and
+            len(self.explanations) == 0
+        ):
             raise utils.ValidationError(
                 'Expected at least one explanation in medium level rubrics'
             )
@@ -1019,8 +1022,10 @@ class Skill:
                 'Expected misconceptions schema version to be an integer, '
                 'received %s' % self.misconceptions_schema_version
             )
-        if (self.misconceptions_schema_version
-                != feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+        if (
+            self.misconceptions_schema_version
+            != feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+        ):
             raise utils.ValidationError(
                 'Expected misconceptions schema version to be %s, received %s' % (
                     feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -1044,8 +1049,10 @@ class Skill:
                 'Expected skill contents schema version to be an integer, '
                 'received %s' % self.skill_contents_schema_version
             )
-        if (self.skill_contents_schema_version
-                != feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+        if (
+            self.skill_contents_schema_version
+            != feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+        ):
             raise utils.ValidationError(
                 'Expected skill contents schema version to be %s, received %s' % (
                     feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
@@ -1143,8 +1150,9 @@ class Skill:
                 'Expected a value for superseding_skill_id when '
                 'all_questions_merged is True.'
             )
-        if (self.superseding_skill_id is not None
-                and self.all_questions_merged is None):
+        if (
+            self.superseding_skill_id is not None and self.all_questions_merged is None
+        ):
             raise utils.ValidationError(
                 'Expected a value for all_questions_merged when '
                 'superseding_skill_id is set.'
@@ -1270,7 +1278,7 @@ class Skill:
                 for misconception_dict in skill_dict['misconceptions']
             ], [Rubric.from_dict(rubric_dict) for rubric_dict in skill_dict['rubrics']],
             SkillContents.from_dict(skill_dict['skill_contents']
-                                    ), skill_dict['misconceptions_schema_version'],
+                                   ), skill_dict['misconceptions_schema_version'],
             skill_dict['rubric_schema_version'],
             skill_dict['skill_contents_schema_version'], skill_dict['language_code'],
             skill_version, skill_dict['next_misconception_id'],
@@ -1301,16 +1309,16 @@ class Skill:
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION
             ), [],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
                     explanation_content_id: {}
-                }}
-            ),
-            translation_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {
+                }
+            }),
+            translation_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
                     explanation_content_id: {}
-                }}
-            )
+                }
+            })
         )
         skill_contents.explanation.validate()
         return cls(
@@ -2076,18 +2084,22 @@ class SkillSummary:
             dict. A dict representing this SkillSummary object.
         """
         return {
-            'id': self.id,
-            'description': self.description,
-            'language_code': self.language_code,
-            'version': self.version,
-            'misconception_count': self.misconception_count,
-            'worked_examples_count': self.worked_examples_count,
-            'skill_model_created_on': utils.get_time_in_millisecs(
-                self.skill_model_created_on
-            ),
-            'skill_model_last_updated': utils.get_time_in_millisecs(
-                self.skill_model_last_updated
-            )
+            'id':
+                self.id,
+            'description':
+                self.description,
+            'language_code':
+                self.language_code,
+            'version':
+                self.version,
+            'misconception_count':
+                self.misconception_count,
+            'worked_examples_count':
+                self.worked_examples_count,
+            'skill_model_created_on':
+                utils.get_time_in_millisecs(self.skill_model_created_on),
+            'skill_model_last_updated':
+                utils.get_time_in_millisecs(self.skill_model_last_updated)
         }
 
 
@@ -2156,20 +2168,26 @@ class AugmentedSkillSummary:
             dict. A dict representing this AugmentedSkillSummary object.
         """
         return {
-            'id': self.id,
-            'description': self.description,
-            'language_code': self.language_code,
-            'version': self.version,
-            'misconception_count': self.misconception_count,
-            'worked_examples_count': self.worked_examples_count,
-            'topic_names': self.topic_names,
-            'classroom_names': self.classroom_names,
-            'skill_model_created_on': utils.get_time_in_millisecs(
-                self.skill_model_created_on
-            ),
-            'skill_model_last_updated': utils.get_time_in_millisecs(
-                self.skill_model_last_updated
-            )
+            'id':
+                self.id,
+            'description':
+                self.description,
+            'language_code':
+                self.language_code,
+            'version':
+                self.version,
+            'misconception_count':
+                self.misconception_count,
+            'worked_examples_count':
+                self.worked_examples_count,
+            'topic_names':
+                self.topic_names,
+            'classroom_names':
+                self.classroom_names,
+            'skill_model_created_on':
+                utils.get_time_in_millisecs(self.skill_model_created_on),
+            'skill_model_last_updated':
+                utils.get_time_in_millisecs(self.skill_model_last_updated)
         }
 
 
@@ -2429,7 +2447,10 @@ class ShortSkillSummary:
         Returns:
             dict. A dict representing this ShortSkillSummary object.
         """
-        return {'skill_id': self.skill_id, 'skill_description': self.skill_description}
+        return {
+            'skill_id': self.skill_id,
+            'skill_description': self.skill_description
+        }
 
     @classmethod
     def from_skill_summary(cls, skill_summary: SkillSummary) -> ShortSkillSummary:

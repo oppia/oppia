@@ -50,15 +50,15 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
         )
 
         self.assertItemsEqual(
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                ['CodeRepl', 'CodeRepl', 'CodeRepl']
-            ), ['skulpt', 'codemirror']
+            interaction_registry.Registry.get_deduplicated_dependency_ids([
+                'CodeRepl', 'CodeRepl', 'CodeRepl'
+            ]), ['skulpt', 'codemirror']
         )
 
         self.assertItemsEqual(
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                ['CodeRepl', 'AlgebraicExpressionInput']
-            ), ['skulpt', 'codemirror', 'guppy', 'nerdamer']
+            interaction_registry.Registry.get_deduplicated_dependency_ids([
+                'CodeRepl', 'AlgebraicExpressionInput'
+            ]), ['skulpt', 'codemirror', 'guppy', 'nerdamer']
         )
 
     def test_no_dependencies_in_non_exploration_pages(self) -> None:
@@ -81,20 +81,16 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_interaction_registry(self) -> None:
         """Do some sanity checks on the interaction registry."""
-        self.assertEqual(
-            {
-                type(i).__name__
-                for i in interaction_registry.Registry.get_all_interactions()
-            }, set(interaction_registry.Registry.get_all_interaction_ids())
-        )
+        self.assertEqual({
+            type(i).__name__
+            for i in interaction_registry.Registry.get_all_interactions()
+        }, set(interaction_registry.Registry.get_all_interaction_ids()))
 
         with self.swap(interaction_registry.Registry, '_interactions', {}):
-            self.assertEqual(
-                {
-                    type(i).__name__
-                    for i in interaction_registry.Registry.get_all_interactions()
-                }, set(interaction_registry.Registry.get_all_interaction_ids())
-            )
+            self.assertEqual({
+                type(i).__name__
+                for i in interaction_registry.Registry.get_all_interactions()
+            }, set(interaction_registry.Registry.get_all_interaction_ids()))
 
     def test_get_all_specs(self) -> None:
         """Test the get_all_specs() method."""
@@ -187,12 +183,12 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                 schema: dict. The customization argument schema.
             """
             is_subtitled_html_spec = (
-                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
-                and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
             )
             is_subtitled_unicode_spec = (
-                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
-                and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
             )
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
@@ -215,11 +211,13 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                 )
 
     def test_get_all_specs_for_state_schema_version_for_unsaved_version(self) -> None:
-        with self.assertRaisesRegex(IOError,
-                                    'No specs JSON file found for state schema'):
+        with self.assertRaisesRegex(
+            IOError, 'No specs JSON file found for state schema'
+        ):
             (interaction_registry.Registry.get_all_specs_for_state_schema_version(10))
 
     def test_get_interaction_by_id_raises_error_for_none_interaction_id(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'No interaction exists for the None interaction_id.'):
+            Exception, 'No interaction exists for the None interaction_id.'
+        ):
             interaction_registry.Registry.get_interaction_by_id(None)

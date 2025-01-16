@@ -135,73 +135,71 @@ class StoryChange(change_domain.BaseChange):
     # update_story_contents_property command.
     STORY_CONTENTS_PROPERTIES: List[str] = [INITIAL_NODE_ID, NODE]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
-        {
-            'name': CMD_UPDATE_STORY_PROPERTY,
-            'required_attribute_names': ['property_name', 'new_value', 'old_value'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': STORY_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_STORY_NODE_PROPERTY,
-            'required_attribute_names': [
-                'node_id', 'property_name', 'new_value', 'old_value'
-            ],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': STORY_NODE_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_STORY_CONTENTS_PROPERTY,
-            'required_attribute_names': ['property_name', 'new_value', 'old_value'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': STORY_CONTENTS_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_STORY_NODE,
-            'required_attribute_names': ['node_id', 'title'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_DELETE_STORY_NODE,
-            'required_attribute_names': ['node_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
-            'required_attribute_names': ['node_id', 'old_value', 'new_value'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_CREATE_NEW,
-            'required_attribute_names': ['title'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }
-    ]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
+        'name': CMD_UPDATE_STORY_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': STORY_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_STORY_NODE_PROPERTY,
+        'required_attribute_names': [
+            'node_id', 'property_name', 'new_value', 'old_value'
+        ],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': STORY_NODE_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_STORY_CONTENTS_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': STORY_CONTENTS_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_STORY_NODE,
+        'required_attribute_names': ['node_id', 'title'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_DELETE_STORY_NODE,
+        'required_attribute_names': ['node_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
+        'required_attribute_names': ['node_id', 'old_value', 'new_value'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['title'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }]
 
 
 class CreateNewStoryCmd(StoryChange):
@@ -681,17 +679,17 @@ class StoryNode:
         """
         planned_publication_date_msecs = (
             node_dict['planned_publication_date_msecs']
-            if 'planned_publication_date_msecs' in node_dict
-            and node_dict['planned_publication_date_msecs'] else None
+            if 'planned_publication_date_msecs' in node_dict and
+            node_dict['planned_publication_date_msecs'] else None
         )
         last_modified_msecs = (
-            node_dict['last_modified_msecs'] if 'last_modified_msecs' in node_dict
-            and node_dict['last_modified_msecs'] else None
+            node_dict['last_modified_msecs'] if 'last_modified_msecs' in node_dict and
+            node_dict['last_modified_msecs'] else None
         )
         first_publication_date_msecs = (
             node_dict['first_publication_date_msecs']
-            if 'first_publication_date_msecs' in node_dict
-            and node_dict['first_publication_date_msecs'] else None
+            if 'first_publication_date_msecs' in node_dict and
+            node_dict['first_publication_date_msecs'] else None
         )
         node = cls(
             node_dict['id'], node_dict['title'], node_dict['description'],
@@ -747,7 +745,8 @@ class StoryNode:
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
-                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)
+        ):
             raise utils.ValidationError(
                 'Chapter thumbnail background color %s is not supported.' %
                 (self.thumbnail_bg_color)
@@ -862,22 +861,25 @@ class StoryNode:
                     'Chapter status cannot be %s ' % self.status
                 )
 
-        if self.planned_publication_date_msecs and (not isinstance(
-                self.planned_publication_date_msecs, float)):
+        if self.planned_publication_date_msecs and (
+            not isinstance(self.planned_publication_date_msecs, float)
+        ):
             raise utils.ValidationError(
                 'Expected planned publication date to be milliseconds, '
                 'received %s' % self.planned_publication_date_msecs
             )
 
-        if self.last_modified_msecs and (not isinstance(self.last_modified_msecs,
-                                                        float)):
+        if self.last_modified_msecs and (
+            not isinstance(self.last_modified_msecs, float)
+        ):
             raise utils.ValidationError(
                 'Expected last modified to be milliseconds, '
                 'received %s' % self.last_modified_msecs
             )
 
-        if self.first_publication_date_msecs and (not isinstance(
-                self.first_publication_date_msecs, float)):
+        if self.first_publication_date_msecs and (
+            not isinstance(self.first_publication_date_msecs, float)
+        ):
             raise utils.ValidationError(
                 'Expected first publication date to be milliseconds, '
                 'received %s' % self.first_publication_date_msecs
@@ -905,10 +907,12 @@ class StoryNode:
         """
         current_time_msecs = utils.get_current_time_in_millisecs()
         planned_publication_date_msecs = self.planned_publication_date_msecs
-        if (self.status != constants.STORY_NODE_STATUS_PUBLISHED
-                and planned_publication_date_msecs is not None and current_time_msecs <
-                planned_publication_date_msecs < current_time_msecs +
-            (constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) * 24 * 3600 * 1000):
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            planned_publication_date_msecs is not None and
+            current_time_msecs < planned_publication_date_msecs < current_time_msecs +
+            (constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) * 24 * 3600 * 1000
+        ):
             return True
         return False
 
@@ -921,9 +925,11 @@ class StoryNode:
         """
         current_time_msecs = utils.get_current_time_in_millisecs()
         planned_publication_date_msecs = self.planned_publication_date_msecs
-        if (self.status != constants.STORY_NODE_STATUS_PUBLISHED
-                and planned_publication_date_msecs is not None
-                and current_time_msecs > planned_publication_date_msecs):
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            planned_publication_date_msecs is not None and
+            current_time_msecs > planned_publication_date_msecs
+        ):
             return True
         return False
 
@@ -995,8 +1001,10 @@ class StoryContents:
                 initial_node_is_present = True
             # Checks whether the number in the id of any node is greater than
             # the value of next_node_id.
-            if (StoryNode.get_number_from_node_id(node.id)
-                    >= StoryNode.get_number_from_node_id(self.next_node_id)):
+            if (
+                StoryNode.get_number_from_node_id(node.id)
+                >= StoryNode.get_number_from_node_id(self.next_node_id)
+            ):
                 raise utils.ValidationError(
                     'The node with id %s is out of bounds.' % node.id
                 )
@@ -1156,13 +1164,10 @@ class StoryContents:
         Returns:
             StoryContents. The corresponding StoryContents domain object.
         """
-        story_contents = cls(
-            [
-                StoryNode.from_dict(story_node_dict)
-                for story_node_dict in story_contents_dict['nodes']
-            ], story_contents_dict['initial_node_id'],
-            story_contents_dict['next_node_id']
-        )
+        story_contents = cls([
+            StoryNode.from_dict(story_node_dict)
+            for story_node_dict in story_contents_dict['nodes']
+        ], story_contents_dict['initial_node_id'], story_contents_dict['next_node_id'])
 
         return story_contents
 
@@ -1336,7 +1341,8 @@ class Story:
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
-                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)
+        ):
             raise utils.ValidationError(
                 'Story thumbnail background color %s is not supported.' %
                 (self.thumbnail_bg_color)
@@ -1358,8 +1364,10 @@ class Story:
                 'received %s' % self.story_contents_schema_version
             )
 
-        if (self.story_contents_schema_version
-                != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
+        if (
+            self.story_contents_schema_version
+            != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+        ):
             raise utils.ValidationError(
                 'Expected story contents schema version to be %s, '
                 'received %s' % (
@@ -1590,7 +1598,7 @@ class Story:
             story_dict['thumbnail_bg_color'], story_dict['thumbnail_size_in_bytes'],
             story_dict['description'], story_dict['notes'],
             StoryContents.from_dict(story_dict['story_contents']
-                                    ), story_dict['story_contents_schema_version'],
+                                   ), story_dict['story_contents_schema_version'],
             story_dict['language_code'], story_dict['corresponding_topic_id'],
             story_version, story_dict['url_fragment'], story_dict['meta_tag_content'],
             story_created_on, story_last_updated
@@ -2153,8 +2161,10 @@ class Story:
         if (self.story_contents.nodes[node_index].exploration_id == new_exploration_id):
             return
 
-        if (new_exploration_id is not None
-                and self._check_exploration_id_already_present(new_exploration_id)):
+        if (
+            new_exploration_id is not None and
+            self._check_exploration_id_already_present(new_exploration_id)
+        ):
             raise ValueError(
                 'A node with exploration id %s already exists.' % new_exploration_id
             )
@@ -2271,8 +2281,10 @@ class StorySummary:
 
         if self.thumbnail_filename is not None:
             utils.require_valid_thumbnail_filename(self.thumbnail_filename)
-        if (self.thumbnail_bg_color is not None and
-                not (Story.require_valid_thumbnail_bg_color(self.thumbnail_bg_color))):
+        if (
+            self.thumbnail_bg_color is not None and
+            not (Story.require_valid_thumbnail_bg_color(self.thumbnail_bg_color))
+        ):
             raise utils.ValidationError(
                 'Story thumbnail background color %s is not supported.' %
                 (self.thumbnail_bg_color)
@@ -2302,21 +2314,28 @@ class StorySummary:
             dict. A dict representing this StorySummary object.
         """
         return {
-            'id': self.id,
-            'title': self.title,
-            'description': self.description,
-            'language_code': self.language_code,
-            'version': self.version,
-            'node_titles': self.node_titles,
-            'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color,
-            'url_fragment': self.url_fragment,
-            'story_model_created_on': utils.get_time_in_millisecs(
-                self.story_model_created_on
-            ),
-            'story_model_last_updated': utils.get_time_in_millisecs(
-                self.story_model_last_updated
-            )
+            'id':
+                self.id,
+            'title':
+                self.title,
+            'description':
+                self.description,
+            'language_code':
+                self.language_code,
+            'version':
+                self.version,
+            'node_titles':
+                self.node_titles,
+            'thumbnail_filename':
+                self.thumbnail_filename,
+            'thumbnail_bg_color':
+                self.thumbnail_bg_color,
+            'url_fragment':
+                self.url_fragment,
+            'story_model_created_on':
+                utils.get_time_in_millisecs(self.story_model_created_on),
+            'story_model_last_updated':
+                utils.get_time_in_millisecs(self.story_model_last_updated)
         }
 
     def to_human_readable_dict(self) -> HumanReadableStorySummaryDict:

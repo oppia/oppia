@@ -57,7 +57,7 @@ if MYPY:  # pragma: no cover
 translate_services = models.Registry.import_translate_services()
 secrets_services = models.Registry.import_secrets_services()
 
-(translation_models, ) = models.Registry.import_models([models.Names.TRANSLATION])
+(translation_models,) = models.Registry.import_models([models.Names.TRANSLATION])
 
 
 def initialize_android_test_data() -> str:
@@ -149,8 +149,9 @@ def initialize_android_test_data() -> str:
     topic.update_page_title_fragment_for_web('page title for topic')
 
     # Save the dummy image to the filesystem to be used as thumbnail.
-    with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                         encoding=None) as f:
+    with utils.open_file(
+        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
+    ) as f:
         raw_image = f.read()
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
     fs.commit(
@@ -206,8 +207,9 @@ def initialize_android_test_data() -> str:
     story.update_node_exploration_id('%s%d' % (story_domain.NODE_ID_PREFIX, 1), exp_id)
 
     # Save the dummy image to the filesystem to be used as thumbnail.
-    with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                         encoding=None) as f:
+    with utils.open_file(
+        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
+    ) as f:
         raw_image = f.read()
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
     fs.commit(
@@ -235,14 +237,12 @@ def initialize_android_test_data() -> str:
     topic_services.save_new_topic(user_id, topic)
     subtopic_page_services.save_subtopic_page(
         user_id, subtopic_page, 'Added subtopic', [
-            topic_domain.TopicChange(
-                {
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title',
-                    'url_fragment': 'dummy-fragment'
-                }
-            )
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Dummy Subtopic Title',
+                'url_fragment': 'dummy-fragment'
+            })
         ]
     )
 
@@ -545,8 +545,9 @@ def _upload_thumbnail(structure_id: str, structure_type: str) -> None:
     """Uploads images to the local datastore to be fetched using the
     AssetDevHandler.
     """
-    with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                         encoding=None) as f:
+    with utils.open_file(
+        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
+    ) as f:
         image_content = f.read()
         fs_services.save_original_and_compressed_versions_of_image(
             'test_svg.svg', structure_type, structure_id, image_content, 'thumbnail',
@@ -576,24 +577,24 @@ def _create_dummy_question(
         is_initial_state=True
     )
     state.update_interaction_id('TextInput')
-    state.update_interaction_customization_args(
-        {
-            'placeholder': {
-                'value': {
-                    'content_id': content_id_generator.generate(
+    state.update_interaction_customization_args({
+        'placeholder': {
+            'value': {
+                'content_id':
+                    content_id_generator.generate(
                         translation_domain.ContentType.CUSTOMIZATION_ARG
                     ),
-                    'unicode_str': ''
-                }
-            },
-            'rows': {
-                'value': 1
-            },
-            'catchMisspellings': {
-                'value': False
+                'unicode_str':
+                    ''
             }
+        },
+        'rows': {
+            'value': 1
+        },
+        'catchMisspellings': {
+            'value': False
         }
-    )
+    })
 
     state.update_linked_skill_id(None)
     state.update_content(

@@ -65,15 +65,18 @@ def _migrate_story_contents_to_latest_schema(
             is supported at present.
     """
     story_contents_schema_version = versioned_story_contents['schema_version']
-    if not (1 <= story_contents_schema_version <=
-            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
+    if not (
+        1 <= story_contents_schema_version <=
+        feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+    ):
         raise Exception(
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
         )
 
-    while (story_contents_schema_version
-           < feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
+    while (
+        story_contents_schema_version < feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+    ):
         story_domain.Story.update_story_contents_from_model(
             versioned_story_contents, story_contents_schema_version, story_id
         )
@@ -100,8 +103,10 @@ def get_story_from_model(story_model: story_models.StoryModel) -> story_domain.S
     }
 
     # Migrate the story contents if it is not using the latest schema version.
-    if (story_model.story_contents_schema_version
-            != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
+    if (
+        story_model.story_contents_schema_version
+        != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+    ):
         _migrate_story_contents_to_latest_schema(
             versioned_story_contents, story_model.id
         )
@@ -144,7 +149,7 @@ def get_story_summary_from_model(
 
 
 @overload
-def get_story_by_id(story_id: str, ) -> story_domain.Story:
+def get_story_by_id(story_id: str,) -> story_domain.Story:
     ...
 
 
@@ -205,8 +210,9 @@ def get_story_by_id(story_id: str,
         if story_model:
             story = get_story_from_model(story_model)
             caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_STORY, sub_namespace,
-                {story_id: story}
+                caching_services.CACHE_NAMESPACE_STORY, sub_namespace, {
+                    story_id: story
+                }
             )
             return story
         else:
@@ -373,28 +379,40 @@ def get_learner_group_syllabus_story_summaries(
         for story_summary in get_story_summaries_by_ids(story_ids)
     ]
 
-    return [
-        {
-            'id': story.id,
-            'title': story.title,
-            'description': story.description,
-            'language_code': story.language_code,
-            'version': story.version,
-            'node_titles': summary_dict['node_titles'],
-            'thumbnail_filename': story.thumbnail_filename,
-            'thumbnail_bg_color': story.thumbnail_bg_color,
-            'url_fragment': story.url_fragment,
-            'story_model_created_on': summary_dict['story_model_created_on'],
-            'story_model_last_updated': summary_dict['story_model_last_updated'],
-            'story_is_published': True,
-            'completed_node_titles': [],
-            'all_node_dicts': [node.to_dict() for node in story.story_contents.nodes],
-            'topic_name': topic_id_to_topic_map[story.corresponding_topic_id].name,
-            'topic_url_fragment': topic_id_to_topic_map[story.corresponding_topic_id
-                                                        ].url_fragment,
-            'classroom_url_fragment': None
-        } for (story, summary_dict) in zip(all_stories, story_summaries_dicts)
-    ]
+    return [{
+        'id':
+            story.id,
+        'title':
+            story.title,
+        'description':
+            story.description,
+        'language_code':
+            story.language_code,
+        'version':
+            story.version,
+        'node_titles':
+            summary_dict['node_titles'],
+        'thumbnail_filename':
+            story.thumbnail_filename,
+        'thumbnail_bg_color':
+            story.thumbnail_bg_color,
+        'url_fragment':
+            story.url_fragment,
+        'story_model_created_on':
+            summary_dict['story_model_created_on'],
+        'story_model_last_updated':
+            summary_dict['story_model_last_updated'],
+        'story_is_published':
+            True,
+        'completed_node_titles': [],
+        'all_node_dicts': [node.to_dict() for node in story.story_contents.nodes],
+        'topic_name':
+            topic_id_to_topic_map[story.corresponding_topic_id].name,
+        'topic_url_fragment':
+            topic_id_to_topic_map[story.corresponding_topic_id].url_fragment,
+        'classroom_url_fragment':
+            None
+    } for (story, summary_dict) in zip(all_stories, story_summaries_dicts)]
 
 
 def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
@@ -417,12 +435,10 @@ def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
     num_of_nodes = min(len(progress_model.completed_node_ids), 3)
     story = get_story_by_id(story_id, strict=True)
     ordered_node_ids = ([node.id for node in story.story_contents.get_ordered_nodes()])
-    ordered_completed_node_ids = (
-        [
-            node_id for node_id in ordered_node_ids
-            if node_id in progress_model.completed_node_ids
-        ]
-    )
+    ordered_completed_node_ids = ([
+        node_id for node_id in ordered_node_ids
+        if node_id in progress_model.completed_node_ids
+    ])
     return ordered_completed_node_ids[-num_of_nodes:]
 
 
@@ -492,13 +508,11 @@ def get_user_progress_in_story_chapters(
                 visited_checkpoints = all_checkpoints.index(
                     most_recently_visited_checkpoint
                 ) + 1
-        all_chapters_progress.append(
-            {
-                'exploration_id': exp_id,
-                'visited_checkpoints_count': visited_checkpoints,
-                'total_checkpoints_count': len(all_checkpoints)
-            }
-        )
+        all_chapters_progress.append({
+            'exploration_id': exp_id,
+            'visited_checkpoints_count': visited_checkpoints,
+            'total_checkpoints_count': len(all_checkpoints)
+        })
 
     return all_chapters_progress
 
@@ -525,10 +539,14 @@ def get_multi_users_progress_in_stories(
     for topic in topics:
         topic_id_to_topic_map[topic.id] = topic
 
-    story_id_to_story_map = {story.id: story for story in all_valid_stories}
+    story_id_to_story_map = {
+        story.id: story for story in all_valid_stories
+    }
     valid_story_ids = [story.id for story in all_valid_stories]
     all_story_summaries = get_story_summaries_by_ids(valid_story_ids)
-    story_id_to_summary_map = {summary.id: summary for summary in all_story_summaries}
+    story_id_to_summary_map = {
+        summary.id: summary for summary in all_story_summaries
+    }
 
     # All poosible combinations of user_id and story_id for which progress
     # models are returned.
@@ -538,8 +556,7 @@ def get_multi_users_progress_in_stories(
     )
     all_users_stories_progress: Dict[
         str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]] = {
-            user_id: []
-            for user_id in user_ids
+            user_id: [] for user_id in user_ids
         }
     for i, (user_id, story_id) in enumerate(all_posssible_combinations):
         progress_model = progress_models[i]
@@ -553,30 +570,43 @@ def get_multi_users_progress_in_stories(
         ]
         topic = topic_id_to_topic_map[story.corresponding_topic_id]
         summary_dict = story_id_to_summary_map[story_id].to_dict()
-        all_users_stories_progress[user_id].append(
-            {
-                'id': summary_dict['id'],
-                'title': summary_dict['title'],
-                'description': summary_dict['description'],
-                'language_code': summary_dict['language_code'],
-                'version': summary_dict['version'],
-                'node_titles': summary_dict['node_titles'],
-                'thumbnail_filename': summary_dict['thumbnail_filename'],
-                'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
-                'url_fragment': summary_dict['url_fragment'],
-                'story_model_created_on': summary_dict['story_model_created_on'],
-                'story_model_last_updated': summary_dict['story_model_last_updated'],
-                'story_is_published': True,
-                'completed_node_titles': completed_node_titles,
-                'all_node_dicts': [
-                    node.to_dict() for node in story.story_contents.nodes
-                ],
-                'topic_name': topic.name,
-                'topic_url_fragment': topic.url_fragment,
-                'classroom_url_fragment': classroom_config_services.
-                get_classroom_url_fragment_for_topic_id(topic.id),
-            }
-        )
+        all_users_stories_progress[user_id].append({
+            'id':
+                summary_dict['id'],
+            'title':
+                summary_dict['title'],
+            'description':
+                summary_dict['description'],
+            'language_code':
+                summary_dict['language_code'],
+            'version':
+                summary_dict['version'],
+            'node_titles':
+                summary_dict['node_titles'],
+            'thumbnail_filename':
+                summary_dict['thumbnail_filename'],
+            'thumbnail_bg_color':
+                summary_dict['thumbnail_bg_color'],
+            'url_fragment':
+                summary_dict['url_fragment'],
+            'story_model_created_on':
+                summary_dict['story_model_created_on'],
+            'story_model_last_updated':
+                summary_dict['story_model_last_updated'],
+            'story_is_published':
+                True,
+            'completed_node_titles':
+                completed_node_titles,
+            'all_node_dicts': [node.to_dict() for node in story.story_contents.nodes],
+            'topic_name':
+                topic.name,
+            'topic_url_fragment':
+                topic.url_fragment,
+            'classroom_url_fragment':
+                classroom_config_services.get_classroom_url_fragment_for_topic_id(
+                    topic.id
+                ),
+        })
 
     return all_users_stories_progress
 
@@ -603,7 +633,10 @@ def get_pending_and_all_nodes_in_story(
         if node.id not in completed_node_ids:
             pending_nodes.append(node)
 
-    return {'all_nodes': story.story_contents.nodes, 'pending_nodes': pending_nodes}
+    return {
+        'all_nodes': story.story_contents.nodes,
+        'pending_nodes': pending_nodes
+    }
 
 
 def get_completed_node_ids(user_id: str, story_id: str) -> List[str]:

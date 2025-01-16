@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """This script checks if every backend file has an associated test file."""
 
 from __future__ import annotations
@@ -105,8 +104,9 @@ def main() -> None:
     for file in non_empty_files:
         if file not in FILES_WITHOUT_ASSOCIATED_TEST_FILES:
             errors += (
-                '\033[1m{}\033[0m needs an associated backend test file.\n'
-                .format(file))
+                '\033[1m{}\033[0m needs an associated backend test file.\n'.
+                format(file)
+            )
 
     if errors:
         print('-------------------------------------------')
@@ -123,5 +123,5 @@ def main() -> None:
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when check_backend_associated_test_file.py
 # is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Services for handling bulk email calls in DEV MODE."""
 
 from __future__ import annotations
@@ -31,14 +30,12 @@ def permanently_delete_user_from_list(user_email: str) -> None:
     """
     logging.info(
         'Email ID %s permanently deleted from bulk email provider\'s db. '
-        'Cannot access API, since this is a dev environment' % user_email)
+        'Cannot access API, since this is a dev environment' % user_email
+    )
 
 
 def add_or_update_user_status(
-    user_email: str,
-    unused_merge_fields: Dict[str, str],
-    unused_tag: str,
-    *,
+    user_email: str, unused_merge_fields: Dict[str, str], unused_tag: str, *,
     can_receive_email_updates: bool
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
@@ -60,5 +57,6 @@ def add_or_update_user_status(
     logging.info(
         'Updated status of email ID %s\'s bulk email preference in the service '
         'provider\'s db to %s. Cannot access API, since this is a dev '
-        'environment.' % (user_email, can_receive_email_updates))
+        'environment.' % (user_email, can_receive_email_updates)
+    )
     return True

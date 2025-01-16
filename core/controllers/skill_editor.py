@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the skill editor."""
 
 from __future__ import annotations
@@ -34,9 +33,7 @@ from core.domain import user_services
 from typing import Dict, List, Optional, TypedDict
 
 
-def _require_valid_version(
-    version_from_payload: int, skill_version: int
-) -> None:
+def _require_valid_version(version_from_payload: int, skill_version: int) -> None:
     """Check that the payload version matches the given skill
     version.
 
@@ -52,8 +49,9 @@ def _require_valid_version(
     if version_from_payload != skill_version:
         raise base.BaseHandler.InvalidInputException(
             'Trying to update version %s of skill from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (skill_version, version_from_payload))
+            'which is too old. Please reload the page and try again.' %
+            (skill_version, version_from_payload)
+        )
 
 
 def check_can_edit_skill_description(user: user_domain.UserActionsInfo) -> bool:
@@ -79,7 +77,8 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.ENTITY_ID_REGEX
@@ -87,7 +86,9 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id: str) -> None:
@@ -99,8 +100,7 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
-        can_edit_skill_description = check_can_edit_skill_description(
-            user_actions_info)
+        can_edit_skill_description = check_can_edit_skill_description(user_actions_info)
 
         self.values.update({
             'can_edit_skill_description': can_edit_skill_description,
@@ -121,9 +121,7 @@ class EditableSkillDataHandlerNormalizedPayloadDict(TypedDict):
 
 
 class EditableSkillDataHandler(
-    base.BaseHandler[
-        EditableSkillDataHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[EditableSkillDataHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """A data handler for skills which supports writing."""
 
@@ -131,7 +129,8 @@ class EditableSkillDataHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.ENTITY_ID_REGEX
@@ -184,7 +183,8 @@ class EditableSkillDataHandler(
 
         if skill is None:
             raise self.NotFoundException(
-                Exception('The skill with the given id doesn\'t exist.'))
+                Exception('The skill with the given id doesn\'t exist.')
+            )
 
         topics = topic_fetchers.get_all_topics()
         grouped_skill_summary_dicts = {}
@@ -207,9 +207,9 @@ class EditableSkillDataHandler(
                 assigned_skill_topic_data_dict[topic.name] = subtopic_name
 
             skill_summaries = skill_services.get_multi_skill_summaries(
-                skill_ids_in_topic)
-            skill_summary_dicts = [
-                summary.to_dict() for summary in skill_summaries]
+                skill_ids_in_topic
+            )
+            skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic.name] = skill_summary_dicts
 
         self.values.update({
@@ -238,22 +238,27 @@ class EditableSkillDataHandler(
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.NotFoundException(
-                Exception('The skill with the given id doesn\'t exist.'))
+                Exception('The skill with the given id doesn\'t exist.')
+            )
 
         version = self.normalized_payload['version']
         _require_valid_version(version, skill.version)
 
         commit_message = self.normalized_payload.get('commit_message')
-        if (commit_message is not None and
-                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
+        if (
+            commit_message is not None and
+            len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH
+        ):
             raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
+                'Commit messages must be at most %s characters long.' %
+                constants.MAX_COMMIT_MESSAGE_LENGTH
+            )
 
         change_list = self.normalized_payload['change_dicts']
         try:
             skill_services.update_skill(
-                self.user_id, skill_id, change_list, commit_message)
+                self.user_id, skill_id, change_list, commit_message
+            )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -280,7 +285,8 @@ class EditableSkillDataHandler(
         if skill_services.skill_has_associated_questions(skill_id):
             raise self.InvalidInputException(
                 'Please delete all questions associated with this skill '
-                'first.')
+                'first.'
+            )
 
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
         skill_services.delete_skill(self.user_id, skill_id)
@@ -302,7 +308,9 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids: str) -> None:
@@ -334,7 +342,9 @@ class FetchSkillsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -359,15 +369,21 @@ class SkillDescriptionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS = {
         'skill_description': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION  # pylint: disable=line-too-long
+                    'id':
+                        'has_length_at_most',
+                    'max_value':
+                        android_validation_constants.
+                        MAX_CHARS_IN_SKILL_DESCRIPTION  # pylint: disable=line-too-long
                 }]
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_create_skill
     def get(self, skill_description: str) -> None:
@@ -378,9 +394,8 @@ class SkillDescriptionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             skill_description: str. Skill description.
         """
         self.values.update({
-            'skill_description_exists': (
-                skill_services.does_skill_with_description_exist(
-                    skill_description))
+            'skill_description_exists':
+                (skill_services.does_skill_with_description_exist(skill_description))
         })
         self.render_json(self.values)
 
@@ -396,7 +411,8 @@ class DiagnosticTestSkillAssignmentHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.ENTITY_ID_REGEX
@@ -404,7 +420,9 @@ class DiagnosticTestSkillAssignmentHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id: str) -> None:
@@ -416,7 +434,8 @@ class DiagnosticTestSkillAssignmentHandler(
         """
         self.values.update({
             'topic_names': (
-                skill_services
-                .get_topic_names_with_given_skill_in_diagnostic_test(skill_id))
+                skill_services.
+                get_topic_names_with_given_skill_in_diagnostic_test(skill_id)
+            )
         })
         self.render_json(self.values)

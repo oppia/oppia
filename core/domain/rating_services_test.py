@@ -32,7 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models, ) = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class RatingServicesTests(test_utils.GenericTestBase):
@@ -200,8 +200,9 @@ class RatingServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(ValueError, 'Expected a rating 1-5, received 7'):
             rating_services.assign_rating_to_exploration(self.USER_ID_1, self.EXP_ID, 7)
 
-        with self.assertRaisesRegex(ValueError,
-                                    'Expected the rating to be an integer, received 2'):
+        with self.assertRaisesRegex(
+            ValueError, 'Expected the rating to be an integer, received 2'
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
@@ -210,7 +211,8 @@ class RatingServicesTests(test_utils.GenericTestBase):
             )  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(
-                ValueError, 'Expected the rating to be an integer, received aaa'):
+            ValueError, 'Expected the rating to be an integer, received aaa'
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
@@ -259,8 +261,10 @@ class RatingServicesTests(test_utils.GenericTestBase):
             exp_summary.ratings = {}
             return exp_summary
 
-        with self.swap(exp_fetchers, 'get_exploration_summary_by_id',
-                       _mock_get_exploration_summary_by_id):
+        with self.swap(
+            exp_fetchers, 'get_exploration_summary_by_id',
+            _mock_get_exploration_summary_by_id
+        ):
             exp_services.save_new_exploration(
                 'exp_id_a',
                 exp_domain.Exploration.create_default_exploration('exp_id_a')

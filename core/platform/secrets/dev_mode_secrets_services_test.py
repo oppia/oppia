@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # sizeations under the License.
-
 """Tests for the Python Cloud Secret services."""
 
 from __future__ import annotations
@@ -28,10 +27,13 @@ class DevModeSecretsServicesTests(test_utils.GenericTestBase):
     """Tests for the Python Cloud Secret services."""
 
     def test_get_secret_returns_existing_secret(self) -> None:
-        with self.swap(os, 'environ', {'SECRETS': '{"name": "secret"}'}):
-            self.assertEqual(
-                dev_mode_secrets_services.get_secret('name'), 'secret')
+        with self.swap(os, 'environ', {
+            'SECRETS': '{"name": "secret"}'
+        }):
+            self.assertEqual(dev_mode_secrets_services.get_secret('name'), 'secret')
 
     def test_get_secret_returns_none_when_secret_does_not_exist(self) -> None:
-        with self.swap(os, 'environ', {'SECRETS': '{"name": "secret"}'}):
+        with self.swap(os, 'environ', {
+            'SECRETS': '{"name": "secret"}'
+        }):
             self.assertIsNone(dev_mode_secrets_services.get_secret('name2'))

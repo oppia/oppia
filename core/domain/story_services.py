@@ -51,9 +51,9 @@ if MYPY:  # pragma: no cover
     exp_models,
     story_models,
     user_models,
-) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.STORY, models.Names.USER]
-)
+) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.STORY, models.Names.USER
+])
 
 
 def get_new_story_id() -> str:
@@ -110,12 +110,10 @@ def save_new_story(committer_id: str, story: story_domain.Story) -> None:
     commit_message = ('New story created with title \'%s\'.' % story.title)
     _create_story(
         committer_id, story, commit_message, [
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_CREATE_NEW,
-                    'title': story.title
-                }
-            )
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': story.title
+            })
         ]
     )
 
@@ -189,8 +187,9 @@ def apply_change_list(
                     story.update_node_title(
                         update_node_title_cmd.node_id, update_node_title_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
+                elif (
+                    change.property_name == story_domain.STORY_NODE_PROPERTY_DESCRIPTION
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateStoryNodePropertyDescriptionCmd.
                     update_node_description_cmd = cast(
@@ -200,8 +199,10 @@ def apply_change_list(
                         update_node_description_cmd.node_id,
                         update_node_description_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyThumbnailFilenameCmd.
@@ -212,8 +213,10 @@ def apply_change_list(
                         update_node_thumbnail_filename_cmd.node_id,
                         update_node_thumbnail_filename_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyThumbnailBGColorCmd.
@@ -224,8 +227,10 @@ def apply_change_list(
                         update_node_thumbnail_bg_color.node_id,
                         update_node_thumbnail_bg_color.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyAcquiredSkillIdsCmd.
@@ -236,8 +241,10 @@ def apply_change_list(
                         update_node_acquired_skill_ids_cmd.node_id,
                         update_node_acquired_skill_ids_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyPrerequisiteSkillIdsCmd.
@@ -249,8 +256,10 @@ def apply_change_list(
                         update_prerequisite_skill_ids_cmd.node_id,
                         update_prerequisite_skill_ids_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyDestinationNodeIdsCmd.
@@ -262,8 +271,10 @@ def apply_change_list(
                         update_node_destination_node_ids_cmd.node_id,
                         update_node_destination_node_ids_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyExplorationIdCmd.
@@ -285,8 +296,10 @@ def apply_change_list(
                         update_node_status_cmd.node_id, update_node_status_cmd.new_value
                     )
 
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyPlannedPublicationDateCmd.
@@ -298,8 +311,10 @@ def apply_change_list(
                         update_node_planned_publication_date_cmd.node_id,
                         update_node_planned_publication_date_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyLastModifiedCmd.
@@ -310,8 +325,10 @@ def apply_change_list(
                         update_node_last_modified_cmd.node_id,
                         update_node_last_modified_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyFirstPublicationDateCmd.
@@ -323,8 +340,10 @@ def apply_change_list(
                         update_node_first_publication_date_cmd.node_id,
                         update_node_first_publication_date_cmd.new_value
                     )
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON):
+                elif (
+                    change.property_name ==
+                    story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyUnpublishingReasonCmd.
@@ -342,29 +361,45 @@ def apply_change_list(
                 update_story_property_cmd = cast(
                     story_domain.UpdateStoryPropertyCmd, change
                 )
-                if (update_story_property_cmd.property_name ==
-                        story_domain.STORY_PROPERTY_TITLE):
+                if (
+                    update_story_property_cmd.property_name ==
+                    story_domain.STORY_PROPERTY_TITLE
+                ):
                     story.update_title(update_story_property_cmd.new_value)
-                elif (update_story_property_cmd.property_name ==
-                      story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
+                elif (
+                    update_story_property_cmd.property_name ==
+                    story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME
+                ):
                     story.update_thumbnail_filename(update_story_property_cmd.new_value)
-                elif (update_story_property_cmd.property_name ==
-                      story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
+                elif (
+                    update_story_property_cmd.property_name ==
+                    story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR
+                ):
                     story.update_thumbnail_bg_color(update_story_property_cmd.new_value)
-                elif (update_story_property_cmd.property_name ==
-                      story_domain.STORY_PROPERTY_DESCRIPTION):
+                elif (
+                    update_story_property_cmd.property_name ==
+                    story_domain.STORY_PROPERTY_DESCRIPTION
+                ):
                     story.update_description(update_story_property_cmd.new_value)
-                elif (update_story_property_cmd.property_name ==
-                      story_domain.STORY_PROPERTY_NOTES):
+                elif (
+                    update_story_property_cmd.property_name ==
+                    story_domain.STORY_PROPERTY_NOTES
+                ):
                     story.update_notes(update_story_property_cmd.new_value)
-                elif (update_story_property_cmd.property_name ==
-                      story_domain.STORY_PROPERTY_LANGUAGE_CODE):
+                elif (
+                    update_story_property_cmd.property_name ==
+                    story_domain.STORY_PROPERTY_LANGUAGE_CODE
+                ):
                     story.update_language_code(update_story_property_cmd.new_value)
-                elif (update_story_property_cmd.property_name ==
-                      story_domain.STORY_PROPERTY_URL_FRAGMENT):
+                elif (
+                    update_story_property_cmd.property_name ==
+                    story_domain.STORY_PROPERTY_URL_FRAGMENT
+                ):
                     story.update_url_fragment(update_story_property_cmd.new_value)
-                elif (update_story_property_cmd.property_name ==
-                      story_domain.STORY_PROPERTY_META_TAG_CONTENT):
+                elif (
+                    update_story_property_cmd.property_name ==
+                    story_domain.STORY_PROPERTY_META_TAG_CONTENT
+                ):
                     story.update_meta_tag_content(update_story_property_cmd.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name == story_domain.INITIAL_NODE_ID):
@@ -778,8 +813,10 @@ def update_story(
                 'with ID %s' % (context_model.id, context_model.story_id)
             )
 
-    if (old_story.url_fragment != new_story.url_fragment
-            and does_story_exist_with_url_fragment(new_story.url_fragment)):
+    if (
+        old_story.url_fragment != new_story.url_fragment and
+        does_story_exist_with_url_fragment(new_story.url_fragment)
+    ):
         raise utils.ValidationError('Story Url Fragment is not unique across the site.')
     _save_story(
         committer_id, new_story, commit_message, change_list, story_is_published
@@ -988,7 +1025,7 @@ def get_chapter_notifications_stories_list(
     """
     topic_models = topic_fetchers.get_all_topics()
     chapter_notifications_stories_list: List[story_domain.StoryPublicationTimeliness
-                                             ] = []
+                                            ] = []
     all_canonical_story_ids = []
     for topic_model in topic_models:
         canonical_story_ids = [

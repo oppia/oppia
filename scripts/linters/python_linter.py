@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Lint checks for Python files."""
 
 from __future__ import annotations
@@ -66,7 +65,8 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
         # Your code has been rated at 9.98/10 (previous run: 10.00/10, -0.02)
         # and one line with dashes(---).
         trimmed_lint_message = re.sub(
-            r'\n*-*\n*Your code has been rated.*\n*', '\n', lint_message)
+            r'\n*-*\n*Your code has been rated.*\n*', '\n', lint_message
+        )
 
         # Every pylint message has a message id inside the brackets
         # we are removing them here.
@@ -100,9 +100,10 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
             # the current batch of files ranges from 'start_index' to
             # 'end_index - 1'.
             current_batch_end_index = min(
-                current_batch_start_index + _batch_size, len(files_to_lint))
+                current_batch_start_index + _batch_size, len(files_to_lint)
+            )
             current_files_to_lint = files_to_lint[
-                current_batch_start_index: current_batch_end_index]
+                current_batch_start_index:current_batch_end_index]
 
             pylint_report = io.StringIO()
             pylinter = lint.Run(
@@ -115,18 +116,17 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
                 lint_message = pylint_report.getvalue()
                 full_error_messages.append(lint_message)
 
-                pylint_error_messages = (
-                    self.get_trimmed_error_output(lint_message))
+                pylint_error_messages = (self.get_trimmed_error_output(lint_message))
                 error_messages.append(pylint_error_messages)
                 errors_found = True
 
             with linter_utils.redirect_stdout(stdout):
                 # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
-                style_guide = pycodestyle.StyleGuide(
-                    config_file=config_pycodestyle)
+                style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
                 pycodestyle_report = style_guide.check_files(
-                    paths=current_files_to_lint)
+                    paths=current_files_to_lint
+                )
 
             if pycodestyle_report.get_count() != 0:
                 error_message = stdout.getvalue()
@@ -137,7 +137,8 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
             current_batch_start_index = current_batch_end_index
 
         return concurrent_task_utils.TaskResult(
-            name, errors_found, error_messages, full_error_messages)
+            name, errors_found, error_messages, full_error_messages
+        )
 
     def check_import_order(self) -> concurrent_task_utils.TaskResult:
         """This function is used to check that each file
@@ -164,11 +165,10 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
                 error_messages.append(error_message)
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, error_messages
+        )
 
-    def perform_all_lint_checks(
-        self
-    ) -> List[concurrent_task_utils.TaskResult]:
+    def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
 
@@ -180,21 +180,16 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
         if not self.all_filepaths:
             return [
                 concurrent_task_utils.TaskResult(
-                    'Python lint', False, [],
-                    ['There are no Python files to lint.'])]
+                    'Python lint', False, [], ['There are no Python files to lint.']
+                )
+            ]
 
-        batch_jobs_dir: str = (
-            os.path.join(os.getcwd(), 'core', 'jobs', 'batch_jobs')
-        )
-        jobs_registry: str = (
-            os.path.join(os.getcwd(), 'core', 'jobs', 'registry.py')
-        )
+        batch_jobs_dir: str = (os.path.join(os.getcwd(), 'core', 'jobs', 'batch_jobs'))
+        jobs_registry: str = (os.path.join(os.getcwd(), 'core', 'jobs', 'registry.py'))
 
         linter_stdout.append(self.lint_py_files())
         linter_stdout.append(self.check_import_order())
-        linter_stdout.append(check_jobs_imports(
-            batch_jobs_dir, jobs_registry)
-        )
+        linter_stdout.append(check_jobs_imports(batch_jobs_dir, jobs_registry))
 
         return linter_stdout
 
@@ -243,9 +238,7 @@ def check_jobs_imports(
         )
         error_messages.append(error_message)
     return concurrent_task_utils.TaskResult(
-        'Check jobs imports in jobs registry',
-        bool(missing_imports),
-        error_messages,
+        'Check jobs imports in jobs registry', bool(missing_imports), error_messages,
         error_messages
     )
 

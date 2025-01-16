@@ -47,12 +47,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (skill_models, user_models, question_models, topic_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.SKILL, models.Names.USER, models.Names.QUESTION,
-            models.Names.TOPIC
-        ]
-    )
+    models.Registry.import_models([
+        models.Names.SKILL, models.Names.USER, models.Names.QUESTION, models.Names.TOPIC
+    ])
 )
 
 
@@ -336,8 +333,10 @@ def _filter_skills_by_keywords(
     filtered_augmented_skill_summaries = []
 
     for augmented_skill_summary in augmented_skill_summaries:
-        if any((augmented_skill_summary.description.lower().find(keyword.lower()) != -1)
-               for keyword in keywords):
+        if any(
+            (augmented_skill_summary.description.lower().find(keyword.lower()) != -1)
+            for keyword in keywords
+        ):
             filtered_augmented_skill_summaries.append(augmented_skill_summary)
 
     return filtered_augmented_skill_summaries
@@ -529,56 +528,39 @@ def replace_skill_id_in_all_topics(
                     'and retry this operation.' % topic.name
                 )
             if old_skill_id in topic.uncategorized_skill_ids:
-                change_list.extend(
-                    [
-                        topic_domain.TopicChange(
-                            {
-                                'cmd': 'remove_uncategorized_skill_id',
-                                'uncategorized_skill_id': old_skill_id
-                            }
-                        ),
-                        topic_domain.TopicChange(
-                            {
-                                'cmd': 'add_uncategorized_skill_id',
-                                'new_uncategorized_skill_id': new_skill_id
-                            }
-                        )
-                    ]
-                )
+                change_list.extend([
+                    topic_domain.TopicChange({
+                        'cmd': 'remove_uncategorized_skill_id',
+                        'uncategorized_skill_id': old_skill_id
+                    }),
+                    topic_domain.TopicChange({
+                        'cmd': 'add_uncategorized_skill_id',
+                        'new_uncategorized_skill_id': new_skill_id
+                    })
+                ])
             for subtopic in topic.subtopics:
                 if old_skill_id in subtopic.skill_ids:
-                    change_list.extend(
-                        [
-                            topic_domain.TopicChange(
-                                {
-                                    'cmd': topic_domain.
-                                    CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
-                                    'subtopic_id': subtopic.id,
-                                    'skill_id': old_skill_id
-                                }
-                            ),
-                            topic_domain.TopicChange(
-                                {
-                                    'cmd': 'remove_uncategorized_skill_id',
-                                    'uncategorized_skill_id': old_skill_id
-                                }
-                            ),
-                            topic_domain.TopicChange(
-                                {
-                                    'cmd': 'add_uncategorized_skill_id',
-                                    'new_uncategorized_skill_id': new_skill_id
-                                }
-                            ),
-                            topic_domain.TopicChange(
-                                {
-                                    'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-                                    'old_subtopic_id': None,
-                                    'new_subtopic_id': subtopic.id,
-                                    'skill_id': new_skill_id
-                                }
-                            )
-                        ]
-                    )
+                    change_list.extend([
+                        topic_domain.TopicChange({
+                            'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+                            'subtopic_id': subtopic.id,
+                            'skill_id': old_skill_id
+                        }),
+                        topic_domain.TopicChange({
+                            'cmd': 'remove_uncategorized_skill_id',
+                            'uncategorized_skill_id': old_skill_id
+                        }),
+                        topic_domain.TopicChange({
+                            'cmd': 'add_uncategorized_skill_id',
+                            'new_uncategorized_skill_id': new_skill_id
+                        }),
+                        topic_domain.TopicChange({
+                            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                            'old_subtopic_id': None,
+                            'new_subtopic_id': subtopic.id,
+                            'skill_id': new_skill_id
+                        })
+                    ])
                     break
             topic_services.update_topic_and_subtopic_pages(
                 user_id, topic.id, change_list,
@@ -601,23 +583,19 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
             for subtopic in topic.subtopics:
                 if skill_id in subtopic.skill_ids:
                     change_list.append(
-                        topic_domain.TopicChange(
-                            {
-                                'cmd': 'remove_skill_id_from_subtopic',
-                                'subtopic_id': subtopic.id,
-                                'skill_id': skill_id
-                            }
-                        )
+                        topic_domain.TopicChange({
+                            'cmd': 'remove_skill_id_from_subtopic',
+                            'subtopic_id': subtopic.id,
+                            'skill_id': skill_id
+                        })
                     )
                     break
 
             change_list.append(
-                topic_domain.TopicChange(
-                    {
-                        'cmd': 'remove_uncategorized_skill_id',
-                        'uncategorized_skill_id': skill_id
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': 'remove_uncategorized_skill_id',
+                    'uncategorized_skill_id': skill_id
+                })
             )
             skill_name = get_skill_summary_by_id(skill_id).description
             topic_services.update_topic_and_subtopic_pages(
@@ -737,7 +715,9 @@ def save_new_skill(committer_id: str, skill: skill_domain.Skill) -> None:
     commit_message = 'New skill created.'
     _create_skill(
         committer_id, skill, commit_message,
-        [skill_domain.SkillChange({'cmd': skill_domain.CMD_CREATE_NEW})]
+        [skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })]
     )
 
 
@@ -767,7 +747,8 @@ def apply_change_list(
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
                 if (change.property_name == skill_domain.SKILL_PROPERTY_DESCRIPTION):
                     if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in (
-                            user.actions):
+                        user.actions
+                    ):
                         raise Exception(
                             'The user does not have enough rights to edit the '
                             'skill description.'
@@ -783,16 +764,19 @@ def apply_change_list(
                             skill.id, update_description_cmd.new_value
                         )
                     )
-                elif (change.property_name == skill_domain.SKILL_PROPERTY_LANGUAGE_CODE
-                      ):
+                elif (
+                    change.property_name == skill_domain.SKILL_PROPERTY_LANGUAGE_CODE
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateSkillPropertyLanguageCodeCmd.
                     update_language_code_cmd = cast(
                         skill_domain.UpdateSkillPropertyLanguageCodeCmd, change
                     )
                     skill.update_language_code(update_language_code_cmd.new_value)
-                elif (change.property_name ==
-                      skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
+                elif (
+                    change.property_name ==
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillPropertySupersedingSkillIdCmd.
@@ -802,8 +786,10 @@ def apply_change_list(
                     skill.update_superseding_skill_id(
                         update_superseding_skill_id_cmd.new_value
                     )
-                elif (change.property_name ==
-                      skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
+                elif (
+                    change.property_name ==
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillPropertyAllQuestionsMergedCmd.
@@ -814,8 +800,10 @@ def apply_change_list(
                         update_all_questions_merged_cmd.new_value
                     )
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
-                if (change.property_name ==
-                        skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
+                if (
+                    change.property_name ==
+                    skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION
+                ):
                     # Here we use cast because this 'if'
                     # condition forces change to have type
                     # UpdateSkillContentsPropertyExplanationCmd.
@@ -829,8 +817,10 @@ def apply_change_list(
                     )
                     explanation.validate()
                     skill.update_explanation(explanation)
-                elif (change.property_name ==
-                      skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
+                elif (
+                    change.property_name ==
+                    skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillContentsPropertyWorkedExamplesCmd.
@@ -883,8 +873,10 @@ def apply_change_list(
                     update_rubric_cmd.difficulty, update_rubric_cmd.explanations
                 )
             elif (change.cmd == skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
-                if (change.property_name ==
-                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
+                if (
+                    change.property_name ==
+                    skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME
+                ):
                     # Here we use cast because this 'if'
                     # condition forces change to have type
                     # UpdateSkillMisconceptionPropertyNameCmd.
@@ -895,8 +887,10 @@ def apply_change_list(
                         update_property_name_cmd.misconception_id,
                         update_property_name_cmd.new_value
                     )
-                elif (change.property_name ==
-                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
+                elif (
+                    change.property_name ==
+                    skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillMisconceptionPropertyNotesCmd.
@@ -907,8 +901,10 @@ def apply_change_list(
                         update_property_notes_cmd.misconception_id,
                         update_property_notes_cmd.new_value
                     )
-                elif (change.property_name ==
-                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
+                elif (
+                    change.property_name ==
+                    skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillMisconceptionPropertyFeedbackCmd.
@@ -935,10 +931,13 @@ def apply_change_list(
                     )
                 else:
                     raise Exception('Invalid change dict.')
-            elif (change.cmd in (
+            elif (
+                change.cmd in (
                     skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
                     skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,  # pylint: disable=line-too-long
-                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION)):
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION
+                )
+            ):
                 # Loading the skill model from the datastore into a
                 # skill domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -1100,9 +1099,10 @@ def delete_skill(
             still retained in the datastore. This last option is the preferred
             one.
     """
-    skill_models.SkillModel.delete_multi(
-        [skill_id], committer_id, '', force_deletion=force_deletion
-    )
+    skill_models.SkillModel.delete_multi([skill_id],
+                                         committer_id,
+                                         '',
+                                         force_deletion=force_deletion)
 
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.
@@ -1374,8 +1374,7 @@ def get_multi_users_skills_mastery(
 
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(model_ids)
     degrees_of_masteries: Dict[str, Dict[str, Optional[float]]] = {
-        user_id: {}
-        for user_id in user_ids
+        user_id: {} for user_id in user_ids
     }
     for i, (user_id, skill_id) in enumerate(all_combinations):
         skill_mastery_model = skill_mastery_models[i]
@@ -1416,8 +1415,8 @@ def get_sorted_skill_ids(degrees_of_mastery: Dict[str, Optional[float]]) -> List
         list. List of the initial skill id's based on the mastery level.
     """
     skill_dict_with_float_value = {
-        skill_id: degree
-        for skill_id, degree in degrees_of_mastery.items() if degree is not None
+        skill_id: degree for skill_id, degree in degrees_of_mastery.items()
+        if degree is not None
     }
 
     sort_fn: Callable[[str], float] = (
@@ -1478,9 +1477,8 @@ def get_untriaged_skill_summaries(
 
     for skill_summary in skill_summaries:
         skill_id = skill_summary.id
-        if (skill_id
-                not in skill_ids_assigned_to_some_topic) and (skill_id
-                                                              not in merged_skill_ids):
+        if (skill_id not in skill_ids_assigned_to_some_topic
+           ) and (skill_id not in merged_skill_ids):
             untriaged_skill_summaries.append(skill_summary)
 
     return untriaged_skill_summaries

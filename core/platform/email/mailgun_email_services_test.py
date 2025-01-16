@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the Mailgun API wrapper."""
 
 from __future__ import annotations
@@ -41,7 +40,8 @@ class EmailTests(test_utils.GenericTestBase):
         super().setUp()
         self.swapped_request = lambda *args: args
         self.swap_api_key_secrets_return_none = self.swap_to_always_return(
-            secrets_services, 'get_secret', None)
+            secrets_services, 'get_secret', None
+        )
         self.swap_api_key_secrets_return_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
@@ -72,11 +72,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         with self.swap_api_key_secrets_return_secret, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email,
-                recipient_emails,
-                subject,
-                plaintext_body,
-                html_body
+                sender_email, recipient_emails, subject, plaintext_body, html_body
             )
 
         expected_data = {
@@ -99,7 +95,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_file_attachments(
-            self, mock_post: mock.Mock) -> None:
+        self, mock_post: mock.Mock
+    ) -> None:
         mock_response = mock.Mock()
         mock_response.status_code = 200
         mock_post.return_value = mock_response
@@ -110,7 +107,10 @@ class EmailTests(test_utils.GenericTestBase):
         plaintext_body = 'This is a test email with an attachment.'
         html_body = 'Hi abc,<br> 😂'
         file_path = 'test_file.txt'
-        attachments = [{'filename': 'test_file.txt', 'path': file_path}]
+        attachments = [{
+            'filename': 'test_file.txt',
+            'path': file_path
+        }]
 
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write('This is a test file.')
@@ -143,7 +143,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_bcc_and_recipient(
-            self, mock_post: mock.Mock) -> None:
+        self, mock_post: mock.Mock
+    ) -> None:
         # Test sending email with single bcc and single recipient email.
         mock_response = mock.Mock()
         mock_response.status_code = 200
@@ -155,7 +156,11 @@ class EmailTests(test_utils.GenericTestBase):
         plaintext_body = 'plaintext_body 😂'
         html_body = 'Hi abc,<br> 😂'
         recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
-            'b@b.com': {'first': 'Bob', 'id': 1}}
+            'b@b.com': {
+                'first': 'Bob',
+                'id': 1
+            }
+        }
         bcc = ['c@example.com']
         reply_to = 'abc'
         attachments = None
@@ -164,14 +169,9 @@ class EmailTests(test_utils.GenericTestBase):
 
         with self.swap_api_key_secrets_return_secret, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email,
-                recipient_emails,
-                subject,
-                plaintext_body,
-                html_body,
-                bcc,
-                reply_to,
-                recipient_variables)
+                sender_email, recipient_emails, subject, plaintext_body, html_body, bcc,
+                reply_to, recipient_variables
+            )
 
         expected_data = {
             'from': sender_email,
@@ -195,7 +195,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_bcc_and_recipients(
-            self, mock_post: mock.Mock) -> None:
+        self, mock_post: mock.Mock
+    ) -> None:
         # Test sending email with single bcc, and multiple recipient emails
         # differentiated by recipient_variables ids.
         mock_response = mock.Mock()
@@ -208,7 +209,11 @@ class EmailTests(test_utils.GenericTestBase):
         plaintext_body = 'plaintext_body 😂'
         html_body = 'Hi abc,<br> 😂'
         recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
-            'b@example.com': {'first': 'Bob', 'id': 1}}
+            'b@example.com': {
+                'first': 'Bob',
+                'id': 1
+            }
+        }
         bcc = ['c@example.com', 'd@example.com']
         reply_to = 'abc'
         attachments = None
@@ -217,14 +222,8 @@ class EmailTests(test_utils.GenericTestBase):
 
         with self.swap_api_key_secrets_return_secret, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email,
-                recipient_emails,
-                subject,
-                plaintext_body,
-                html_body,
-                bcc,
-                reply_to,
-                recipient_variables
+                sender_email, recipient_emails, subject, plaintext_body, html_body, bcc,
+                reply_to, recipient_variables
             )
 
         expected_data = {
@@ -265,11 +264,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         with self.swap_api_key_secrets_return_secret, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email,
-                recipient_emails,
-                subject,
-                plaintext_body,
-                html_body
+                sender_email, recipient_emails, subject, plaintext_body, html_body
             )
 
         expected_data = {
@@ -312,23 +307,23 @@ class EmailTests(test_utils.GenericTestBase):
             Reply_to: None
             Recipient Variables:
                 Length: 0
-            """)
+            """
+        )
         mailgun_exception = self.assertRaisesRegex(
             Exception, (
                 'Mailgun API key is not available. Here is the email that '
-                'failed sending: %s' % msg_body)
+                'failed sending: %s' % msg_body
+            )
         )
         with self.swap_api_key_secrets_return_none, mailgun_exception:
             with self.capture_logging() as logs:
                 mailgun_email_services.send_email_to_recipients(
-                    'a@a.com',
-                    ['b@b.com', 'c@c.com', 'd@d.com'],
-                    'Hola 😂 - invitation to collaborate',
-                    'plaintext_body 😂',
-                    'Hi abc,<br> 😂')
+                    'a@a.com', ['b@b.com', 'c@c.com', 'd@d.com'],
+                    'Hola 😂 - invitation to collaborate', 'plaintext_body 😂',
+                    'Hi abc,<br> 😂'
+                )
                 self.assertIn(
-                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.',
-                    logs
+                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.', logs
                 )
 
     def test_mailgun_domain_name_not_set_raises_exception(self) -> None:
@@ -350,28 +345,27 @@ class EmailTests(test_utils.GenericTestBase):
             Reply_to: None
             Recipient Variables:
                 Length: 0
-            """)
+            """
+        )
         mailgun_exception = self.assertRaisesRegex(
             Exception, (
                 'Mailgun domain name is not set. Here is the email that '
-                'failed sending: %s' % msg_body)
+                'failed sending: %s' % msg_body
+            )
         )
         with self.swap_api_key_secrets_return_secret, mailgun_exception:
             with self.capture_logging() as logs:
                 mailgun_email_services.send_email_to_recipients(
-                    'a@a.com',
-                    ['b@b.com', 'c@c.com', 'd@d.com'],
-                    'Hola 😂 - invitation to collaborate',
-                    'plaintext_body 😂',
-                    'Hi abc,<br> 😂')
+                    'a@a.com', ['b@b.com', 'c@c.com', 'd@d.com'],
+                    'Hola 😂 - invitation to collaborate', 'plaintext_body 😂',
+                    'Hi abc,<br> 😂'
+                )
                 self.assertIn(
-                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.',
-                    logs
+                    'Cloud Secret Manager is not able to get MAILGUN_API_KEY.', logs
                 )
 
     @mock.patch('requests.post')
-    def test_invalid_status_code_returns_false(
-            self, mock_post: mock.Mock) -> None:
+    def test_invalid_status_code_returns_false(self, mock_post: mock.Mock) -> None:
         mock_response = mock.Mock()
         mock_response.status_code = 500
         mock_post.return_value = mock_response
@@ -387,11 +381,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         with self.swap_api_key_secrets_return_secret, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email,
-                recipient_emails,
-                subject,
-                plaintext_body,
-                html_body
+                sender_email, recipient_emails, subject, plaintext_body, html_body
             )
 
         expected_data = {

@@ -165,9 +165,12 @@ def tokenize(expression: str) -> List[Token]:
             # operation to be performed is multiplication and insert a '*' sign
             # to explicitly denote the operation. For eg. 'ab+x' would be
             # transformed into 'a*b+x'.
-            if ((token.category in _CLOSING_CATEGORIES or token.text in _CLOSING_PARENS)
-                    and (token_list[i + 1].category in _OPENING_CATEGORIES
-                         or token_list[i + 1].text in _OPENING_PARENS)):
+            if ((
+                token.category in _CLOSING_CATEGORIES or token.text in _CLOSING_PARENS
+            ) and (
+                token_list[i + 1].category in _OPENING_CATEGORIES or
+                token_list[i + 1].text in _OPENING_PARENS
+            )):
                 final_token_list.append(Token('*'))
 
     return final_token_list
@@ -434,7 +437,7 @@ class Parser:
         # Expression should not contain any invalid characters.
         for character in expression:
             if not bool(re.match(r'(\s|\d|\w|\.)', character)
-                        ) and (character not in _VALID_OPERATORS):
+                       ) and (character not in _VALID_OPERATORS):
                 raise Exception('Invalid character: %s.' % character)
 
         if not contains_balanced_brackets(expression):

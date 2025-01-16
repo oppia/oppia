@@ -151,168 +151,164 @@ class TopicChange(change_domain.BaseChange):
         subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES
     )
 
-    ALLOWED_COMMANDS = [
-        {
-            'name': CMD_CREATE_NEW,
-            'required_attribute_names': ['name'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_SUBTOPIC,
-            'required_attribute_names': ['title', 'subtopic_id', 'url_fragment'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_DELETE_SUBTOPIC,
-            'required_attribute_names': ['subtopic_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_CANONICAL_STORY,
-            'required_attribute_names': ['story_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_DELETE_CANONICAL_STORY,
-            'required_attribute_names': ['story_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_REARRANGE_CANONICAL_STORY,
-            'required_attribute_names': ['from_index', 'to_index'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_ADDITIONAL_STORY,
-            'required_attribute_names': ['story_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_DELETE_ADDITIONAL_STORY,
-            'required_attribute_names': ['story_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_PUBLISH_STORY,
-            'required_attribute_names': ['story_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UNPUBLISH_STORY,
-            'required_attribute_names': ['story_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
-            'required_attribute_names': ['new_uncategorized_skill_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
-            'required_attribute_names': ['uncategorized_skill_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'required_attribute_names': [
-                'old_subtopic_id', 'new_subtopic_id', 'skill_id'
-            ],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
-            'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_REARRANGE_SUBTOPIC,
-            'required_attribute_names': ['from_index', 'to_index'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
-            'required_attribute_names': ['subtopic_id', 'skill_id'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
-            'required_attribute_names': [
-                'subtopic_id', 'property_name', 'new_value', 'old_value'
-            ],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': SUBTOPIC_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-            'required_attribute_names': [
-                'property_name', 'new_value', 'old_value', 'subtopic_id'
-            ],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': SUBTOPIC_PAGE_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_UPDATE_TOPIC_PROPERTY,
-            'required_attribute_names': ['property_name', 'new_value', 'old_value'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {
-                'property_name': TOPIC_PROPERTIES
-            },
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }, {
-            'name': CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION,
-            'required_attribute_names': ['from_version', 'to_version'],
-            'optional_attribute_names': [],
-            'user_id_attribute_names': [],
-            'allowed_values': {},
-            'deprecated_values': {}
-        }
-    ]
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['name'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_SUBTOPIC,
+        'required_attribute_names': ['title', 'subtopic_id', 'url_fragment'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_DELETE_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_CANONICAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_DELETE_CANONICAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_REARRANGE_CANONICAL_STORY,
+        'required_attribute_names': ['from_index', 'to_index'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_ADDITIONAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_DELETE_ADDITIONAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_PUBLISH_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UNPUBLISH_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
+        'required_attribute_names': ['new_uncategorized_skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
+        'required_attribute_names': ['uncategorized_skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+        'required_attribute_names': ['old_subtopic_id', 'new_subtopic_id', 'skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_REARRANGE_SUBTOPIC,
+        'required_attribute_names': ['from_index', 'to_index'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id', 'skill_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
+        'required_attribute_names': [
+            'subtopic_id', 'property_name', 'new_value', 'old_value'
+        ],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': SUBTOPIC_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+        'required_attribute_names': [
+            'property_name', 'new_value', 'old_value', 'subtopic_id'
+        ],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': SUBTOPIC_PAGE_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_TOPIC_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'property_name': TOPIC_PROPERTIES
+        },
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }]
 
 
 class CreateNewTopicCmd(TopicChange):
@@ -883,7 +879,8 @@ class Subtopic:
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
-                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)
+        ):
             raise utils.ValidationError(
                 'Subtopic thumbnail background color %s is not supported.' %
                 (self.thumbnail_bg_color)
@@ -1504,7 +1501,8 @@ class Topic:
             self.page_title_fragment_for_web
         )
         if self.thumbnail_bg_color is not None and not (
-                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)
+        ):
             raise utils.ValidationError(
                 'Topic thumbnail background color %s is not supported.' %
                 (self.thumbnail_bg_color)
@@ -2089,8 +2087,10 @@ class Topic:
 
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        if (from_index >= len(self.subtopics[subtopic_index].skill_ids)
-                or from_index < 0):
+        if (
+            from_index >= len(self.subtopics[subtopic_index].skill_ids) or
+            from_index < 0
+        ):
             raise Exception('Expected from_index value to be with-in bounds.')
 
         if (to_index >= len(self.subtopics[subtopic_index].skill_ids) or to_index < 0):
@@ -2329,8 +2329,10 @@ class TopicSummary:
 
         if self.thumbnail_filename is not None:
             utils.require_valid_thumbnail_filename(self.thumbnail_filename)
-        if (self.thumbnail_bg_color is not None and
-                not (Topic.require_valid_thumbnail_bg_color(self.thumbnail_bg_color))):
+        if (
+            self.thumbnail_bg_color is not None and
+            not (Topic.require_valid_thumbnail_bg_color(self.thumbnail_bg_color))
+        ):
             raise utils.ValidationError(
                 'Topic thumbnail background color %s is not supported.' %
                 (self.thumbnail_bg_color)
@@ -2400,29 +2402,40 @@ class TopicSummary:
             dict. A dict representing this TopicSummary object.
         """
         return {
-            'id': self.id,
-            'name': self.name,
-            'url_fragment': self.url_fragment,
-            'language_code': self.language_code,
-            'description': self.description,
-            'version': self.version,
-            'canonical_story_count': self.canonical_story_count,
-            'additional_story_count': self.additional_story_count,
-            'uncategorized_skill_count': self.uncategorized_skill_count,
-            'subtopic_count': self.subtopic_count,
-            'total_skill_count': self.total_skill_count,
-            'total_published_node_count': self.total_published_node_count,
-            'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color,
-            'published_story_exploration_mapping': (
-                self.published_story_exploration_mapping
-            ),
-            'topic_model_created_on': utils.get_time_in_millisecs(
-                self.topic_model_created_on
-            ),
-            'topic_model_last_updated': utils.get_time_in_millisecs(
-                self.topic_model_last_updated
-            )
+            'id':
+                self.id,
+            'name':
+                self.name,
+            'url_fragment':
+                self.url_fragment,
+            'language_code':
+                self.language_code,
+            'description':
+                self.description,
+            'version':
+                self.version,
+            'canonical_story_count':
+                self.canonical_story_count,
+            'additional_story_count':
+                self.additional_story_count,
+            'uncategorized_skill_count':
+                self.uncategorized_skill_count,
+            'subtopic_count':
+                self.subtopic_count,
+            'total_skill_count':
+                self.total_skill_count,
+            'total_published_node_count':
+                self.total_published_node_count,
+            'thumbnail_filename':
+                self.thumbnail_filename,
+            'thumbnail_bg_color':
+                self.thumbnail_bg_color,
+            'published_story_exploration_mapping':
+                (self.published_story_exploration_mapping),
+            'topic_model_created_on':
+                utils.get_time_in_millisecs(self.topic_model_created_on),
+            'topic_model_last_updated':
+                utils.get_time_in_millisecs(self.topic_model_last_updated)
         }
 
 

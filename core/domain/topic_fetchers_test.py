@@ -31,7 +31,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models, ) = models.Registry.import_models([models.Names.TOPIC])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 class MockTopicObject(topic_domain.Topic):
@@ -60,14 +60,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         super().setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         changelist = [
-            topic_domain.TopicChange(
-                {
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'title': 'Title',
-                    'subtopic_id': 1,
-                    'url_fragment': 'sample-fragment'
-                }
-            )
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'title': 'Title',
+                'subtopic_id': 1,
+                'url_fragment': 'sample-fragment'
+            })
         ]
         self.save_new_topic(
             self.TOPIC_ID,
@@ -102,18 +100,17 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         )
 
         self.topic: Optional[topic_domain.Topic
-                             ] = (topic_fetchers.get_topic_by_id(self.TOPIC_ID))
+                            ] = (topic_fetchers.get_topic_by_id(self.TOPIC_ID))
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.set_topic_managers(
-            [user_services.get_username(self.user_id_a)], self.TOPIC_ID
-        )
+        self.set_topic_managers([user_services.get_username(self.user_id_a)],
+                                self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(self.user_id_admin)
 
     def test_get_topic_from_model(self) -> None:
         topic_model: Optional[topic_models.TopicModel
-                              ] = (topic_models.TopicModel.get(self.TOPIC_ID))
+                             ] = (topic_models.TopicModel.get(self.TOPIC_ID))
         # Ruling out the possibility of None for mypy type checking.
         assert topic_model is not None
         topic: topic_domain.Topic = (topic_fetchers.get_topic_from_model(topic_model))
@@ -129,8 +126,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_raises_error_if_wrong_name_is_used_to_get_topic_by_name(self) -> None:
         with self.assertRaisesRegex(
-                Exception,
-                'No Topic exists for the given topic name: wrong_topic_name'):
+            Exception, 'No Topic exists for the given topic name: wrong_topic_name'
+        ):
             topic_fetchers.get_topic_by_name('wrong_topic_name', strict=True)
 
     def test_get_topic_rights_is_none(self) -> None:
@@ -142,7 +139,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_by_url_fragment(self) -> None:
         topic: Optional[topic_domain.Topic
-                        ] = (topic_fetchers.get_topic_by_url_fragment('name-one'))
+                       ] = (topic_fetchers.get_topic_by_url_fragment('name-one'))
         # Ruling out the possibility of None for mypy type checking.
         assert topic is not None
         self.assertEqual(topic.url_fragment, 'name-one')
@@ -158,7 +155,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         topic_services.publish_story(self.TOPIC_ID, self.story_id_2, self.user_id_admin)
         topic: Optional[topic_domain.Topic
-                        ] = (topic_fetchers.get_topic_by_id(self.TOPIC_ID))
+                       ] = (topic_fetchers.get_topic_by_id(self.TOPIC_ID))
 
         # Ruling out the possibility of None for mypy type checking.
         assert topic is not None
@@ -213,13 +210,15 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_get_topic_from_model_with_invalid_schema_version(self) -> None:
         topic_services.create_new_topic_rights('topic_id', self.user_id_a)
-        commit_cmd = topic_domain.TopicChange(
-            {
-                'cmd': topic_domain.CMD_CREATE_NEW,
-                'name': 'name'
-            }
-        )
-        subtopic_dict = {'id': 1, 'title': 'subtopic_title', 'skill_ids': []}
+        commit_cmd = topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_CREATE_NEW,
+            'name': 'name'
+        })
+        subtopic_dict = {
+            'id': 1,
+            'title': 'subtopic_title',
+            'skill_ids': []
+        }
         model = topic_models.TopicModel(
             id='topic_id',
             name='name',
@@ -238,8 +237,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(self.user_id_a, 'topic model created', commit_cmd_dicts)
 
         with self.assertRaisesRegex(
-                Exception, 'Sorry, we can only process v1-v%d subtopic schemas at '
-                'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v1-v%d subtopic schemas at '
+            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION
+        ):
             topic_fetchers.get_topic_from_model(model)
 
         topic_services.create_new_topic_rights('topic_id_2', self.user_id_a)
@@ -261,20 +261,22 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(self.user_id_a, 'topic model created', commit_cmd_dicts)
 
         with self.assertRaisesRegex(
-                Exception,
-                'Sorry, we can only process v1-v%d story reference schemas at '
-                'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+            Exception, 'Sorry, we can only process v1-v%d story reference schemas at '
+            'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+        ):
             topic_fetchers.get_topic_from_model(model)
 
     def test_topic_model_migration_to_higher_version(self) -> None:
         topic_services.create_new_topic_rights('topic_id', self.user_id_a)
-        commit_cmd = topic_domain.TopicChange(
-            {
-                'cmd': topic_domain.CMD_CREATE_NEW,
-                'name': 'name'
-            }
-        )
-        subtopic_v1_dict = {'id': 1, 'title': 'subtopic_title', 'skill_ids': []}
+        commit_cmd = topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_CREATE_NEW,
+            'name': 'name'
+        })
+        subtopic_v1_dict = {
+            'id': 1,
+            'title': 'subtopic_title',
+            'skill_ids': []
+        }
         model = topic_models.TopicModel(
             id='topic_id',
             name='name 2',
@@ -304,7 +306,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         assert self.topic is not None
         expected_topic = self.topic.to_dict()
         topic: Optional[topic_domain.Topic
-                        ] = (topic_fetchers.get_topic_by_id(self.TOPIC_ID))
+                       ] = (topic_fetchers.get_topic_by_id(self.TOPIC_ID))
         # Ruling out the possibility of None for mypy type checking.
         assert topic is not None
         self.assertEqual(topic.to_dict(), expected_topic)
@@ -331,23 +333,21 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         )
 
         changelist = [
-            topic_domain.TopicChange(
-                {
-                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                    'property_name': topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE,
-                    'old_value': 'en',
-                    'new_value': 'bn'
-                }
-            )
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE,
+                'old_value': 'en',
+                'new_value': 'bn'
+            })
         ]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id, topic_id, changelist, 'Change language code'
         )
 
         topic_v0: Optional[topic_domain.Topic
-                           ] = (topic_fetchers.get_topic_by_id(topic_id, version=0))
+                          ] = (topic_fetchers.get_topic_by_id(topic_id, version=0))
         topic_v1: Optional[topic_domain.Topic
-                           ] = (topic_fetchers.get_topic_by_id(topic_id, version=1))
+                          ] = (topic_fetchers.get_topic_by_id(topic_id, version=1))
 
         # Ruling out the possibility of None for mypy type checking.
         assert topic_v0 is not None
@@ -360,7 +360,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         assert self.topic is not None
         expected_topic = self.topic.to_dict()
         topics: List[Optional[topic_domain.Topic]
-                     ] = (topic_fetchers.get_topics_by_ids([self.TOPIC_ID]))
+                    ] = (topic_fetchers.get_topics_by_ids([self.TOPIC_ID]))
         # Ruling out the possibility of None for mypy type checking.
         assert topics[0] is not None
         self.assertEqual(topics[0].to_dict(), expected_topic)
@@ -375,7 +375,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_raises_error_if_topics_fetched_with_invalid_ids_and_strict(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'No topic model exists for the topic_id: invalid_id'):
+            Exception, 'No topic model exists for the topic_id: invalid_id'
+        ):
             topic_fetchers.get_topics_by_ids(['invalid_id'], strict=True)
 
     def test_get_all_topic_rights_of_user(self) -> None:
@@ -432,24 +433,19 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         old_value: List[str] = []
         # Publish the topic.
         changelist = [
-            topic_domain.TopicChange(
-                {
-                    'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-                    'old_subtopic_id': None,
-                    'new_subtopic_id': self.subtopic_id,
-                    'skill_id': self.skill_id_1
-                }
-            ),
-            topic_domain.TopicChange(
-                {
-                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                    'property_name': (
-                        topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
-                    ),
-                    'old_value': old_value,
-                    'new_value': [self.skill_id_1]
-                }
-            )
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': self.subtopic_id,
+                'skill_id': self.skill_id_1
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name':
+                    (topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': old_value,
+                'new_value': [self.skill_id_1]
+            })
         ]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Updated subtopic skill ids.'
@@ -470,14 +466,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_skill_ids_assigned_to_some_topic(self) -> None:
         change_list = [
-            topic_domain.TopicChange(
-                {
-                    'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-                    'old_subtopic_id': None,
-                    'new_subtopic_id': 1,
-                    'skill_id': self.skill_id_1
-                }
-            )
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': 1,
+                'skill_id': self.skill_id_1
+            })
         ]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, change_list, 'Moved skill to subtopic.'
@@ -566,6 +560,6 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_raises_error_if_wrong_topic_rights_fetched_strictly(self) -> None:
         with self.assertRaisesRegex(
-                Exception,
-                'No topic_rights exists for the given topic_id: invalid_topic_id'):
+            Exception, 'No topic_rights exists for the given topic_id: invalid_topic_id'
+        ):
             topic_fetchers.get_multi_topic_rights(['invalid_topic_id'], strict=True)

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for MultipleChoiceInput interaction."""
 
 from __future__ import annotations
@@ -32,7 +31,8 @@ class MultipleChoiceInput(base.BaseInteraction):
 
     name: str = 'Multiple Choice'
     description: str = (
-        'Allows learners to select one of a list of multiple-choice options.')
+        'Allows learners to select one of a list of multiple-choice options.'
+    )
     display_mode: str = base.DISPLAY_MODE_INLINE
     _dependency_ids: List[str] = []
     answer_type: str = 'NonnegativeInt'
@@ -50,15 +50,12 @@ class MultipleChoiceInput(base.BaseInteraction):
         'description': 'Multiple Choice options',
         'schema': {
             'type': 'list',
-            'validators': [
-                {
-                    'id': 'has_length_at_least',
-                    'min_value': 1,
-                },
-                {
-                    'id': 'has_unique_subtitled_contents'
-                }
-            ],
+            'validators': [{
+                'id': 'has_length_at_least',
+                'min_value': 1,
+            }, {
+                'id': 'has_unique_subtitled_contents'
+            }],
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
@@ -68,8 +65,7 @@ class MultipleChoiceInput(base.BaseInteraction):
                 'replacement_ui_config': {
                     'html': {
                         'hide_complex_extensions': True,
-                        'placeholder': (
-                            'Enter an option for the learner to select'),
+                        'placeholder': ('Enter an option for the learner to select'),
                     }
                 }
             },
@@ -92,7 +88,10 @@ class MultipleChoiceInput(base.BaseInteraction):
 
     _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
         'id': 'SortedTiles',
-        'options': {'header': 'Top answers', 'use_percentages': True},
+        'options': {
+            'header': 'Top answers',
+            'use_percentages': True
+        },
         'calculation_id': 'AnswerFrequencies',
         'addressed_info_is_supported': True,
     }]

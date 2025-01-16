@@ -168,7 +168,7 @@ class Registry:
                 specs_from_json: Dict[
                     str, base.BaseInteractionDict] = (json.loads(spec_file_contents))
                 cls._state_schema_version_to_interaction_specs[state_schema_version
-                                                               ] = specs_from_json
+                                                              ] = specs_from_json
                 return cls._state_schema_version_to_interaction_specs[
                     state_schema_version]
             elif can_fetch_latest_specs:

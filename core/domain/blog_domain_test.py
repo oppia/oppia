@@ -28,7 +28,7 @@ from typing import List
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
-(blog_models, ) = models.Registry.import_models([models.Names.BLOG])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class BlogPostDomainUnitTests(test_utils.GenericTestBase):
@@ -692,11 +692,14 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         """Checks conversion of BlogAuthorDetails to dict."""
         assert self.author_details is not None
         expected_dict = {
-            'displayed_author_name': self.author_details.displayed_author_name,
-            'author_bio': self.author_details.author_bio,
-            'last_updated': utils.convert_naive_datetime_to_string(
-                self.author_details.last_updated
-            )
+            'displayed_author_name':
+                self.author_details.displayed_author_name,
+            'author_bio':
+                self.author_details.author_bio,
+            'last_updated':
+                utils.convert_naive_datetime_to_string(
+                    self.author_details.last_updated
+                )
         }
         self.assertEqual(self.author_details.to_dict(), expected_dict)
 
@@ -716,7 +719,8 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         assert self.author_details is not None
         self.author_details.displayed_author_name = 'Sample Name'
         self.author_details.author_bio = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Expected Author Bio to be a string,'
-                                    ' received %s' % self.author_details.author_bio):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected Author Bio to be a string,'
+            ' received %s' % self.author_details.author_bio
+        ):
             self.author_details.validate()

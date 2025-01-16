@@ -77,9 +77,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'next_subtopic_id': 1,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            'story_reference_schema_version': (
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
-            ),
+            'story_reference_schema_version':
+                (feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             'version': 0,
             'practice_tab_is_displayed': False,
             'meta_tag_content': '',
@@ -103,22 +102,21 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_get_all_subtopics(self) -> None:
         subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
-            subtopics, [
-                {
-                    'skill_ids': ['skill_id_1'],
-                    'id': 1,
-                    'thumbnail_filename': 'image.svg',
-                    'thumbnail_bg_color': '#FFFFFF',
-                    'thumbnail_size_in_bytes': 21131,
-                    'title': 'Title',
-                    'url_fragment': 'dummy-subtopic-url'
-                }
-            ]
+            subtopics, [{
+                'skill_ids': ['skill_id_1'],
+                'id': 1,
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': '#FFFFFF',
+                'thumbnail_size_in_bytes': 21131,
+                'title': 'Title',
+                'url_fragment': 'dummy-subtopic-url'
+            }]
         )
 
     def test_get_subtopic_index_fail_with_invalid_subtopic_id(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'The subtopic with id -2 does not exist.'):
+        with self.assertRaisesRegex(
+            Exception, 'The subtopic with id -2 does not exist.'
+        ):
             self.topic.get_subtopic_index(-2)
 
     def test_validation_story_id_with_invalid_data(self) -> None:
@@ -140,34 +138,40 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(canonical_story_ids, ['story_id', 'story_id_2'])
         with self.assertRaisesRegex(
-                Exception, 'The story_id story_id_5 is not present in the canonical'
-                ' story references list of the topic.'):
+            Exception, 'The story_id story_id_5 is not present in the canonical'
+            ' story references list of the topic.'
+        ):
             self.topic.delete_canonical_story('story_id_5')
 
     def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(self) -> None:
         self.topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference('story_id_1')
         ]
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_canonical_story(10, 0)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_canonical_story(-1, 0)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_canonical_story(0, 10)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_canonical_story(0, -1)
 
     def test_rearrange_canonical_story_fail_with_identical_index_values(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index and to_index values to be '
-                                    'different.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index and to_index values to be '
+            'different.'
+        ):
             self.topic.rearrange_canonical_story(1, 1)
 
     def test_rearrange_canonical_story(self) -> None:
@@ -201,26 +205,31 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(canonical_story_ids[2], 'story_id_3')
 
     def test_rearrange_skill_in_subtopic_fail_with_out_of_bound_indexes(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_skill_in_subtopic(1, 10, 1)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_skill_in_subtopic(1, -1, 0)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_skill_in_subtopic(1, 0, 10)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_skill_in_subtopic(1, 0, -10)
 
     def test_rearrange_skill_in_subtopic_fail_with_identical_index_values(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index and to_index values to be '
-                                    'different.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index and to_index values to be '
+            'different.'
+        ):
             self.topic.rearrange_skill_in_subtopic(1, 1, 1)
 
     def test_rearrange_skill_in_subtopic(self) -> None:
@@ -254,26 +263,31 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_ids[2], 'skill_id_3')
 
     def test_rearrange_subtopic_fail_with_out_of_bound_indexes(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_subtopic(10, 1)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_subtopic(-1, 0)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_subtopic(0, 10)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected to_index value to be with-in bounds.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected to_index value to be with-in bounds.'
+        ):
             self.topic.rearrange_subtopic(0, -10)
 
     def test_rearrange_subtopic_fail_with_identical_index_values(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'Expected from_index and to_index values to be '
-                                    'different.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected from_index and to_index values to be '
+            'different.'
+        ):
             self.topic.rearrange_subtopic(1, 1)
 
     def test_rearrange_subtopic(self) -> None:
@@ -330,9 +344,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(canonical_story_ids, ['story_id', 'story_id_1', 'story_id_2'])
-        with self.assertRaisesRegex(Exception,
-                                    'The story_id story_id_2 is already present in the '
-                                    'canonical story references list of the topic.'):
+        with self.assertRaisesRegex(
+            Exception, 'The story_id story_id_2 is already present in the '
+            'canonical story references list of the topic.'
+        ):
             self.topic.add_canonical_story('story_id_2')
 
     def test_delete_additional_story(self) -> None:
@@ -347,8 +362,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         additional_story_ids = self.topic.get_additional_story_ids()
         self.assertEqual(additional_story_ids, ['story_id', 'story_id_2'])
         with self.assertRaisesRegex(
-                Exception, 'The story_id story_id_5 is not present in the additional'
-                ' story references list of the topic.'):
+            Exception, 'The story_id story_id_5 is not present in the additional'
+            ' story references list of the topic.'
+        ):
             self.topic.delete_additional_story('story_id_5')
 
     def test_add_additional_story(self) -> None:
@@ -361,9 +377,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         additional_story_ids = self.topic.get_additional_story_ids()
         self.assertEqual(additional_story_ids, ['story_id', 'story_id_1', 'story_id_2'])
-        with self.assertRaisesRegex(Exception,
-                                    'The story_id story_id_2 is already present in the '
-                                    'additional story references list of the topic.'):
+        with self.assertRaisesRegex(
+            Exception, 'The story_id story_id_2 is already present in the '
+            'additional story references list of the topic.'
+        ):
             self.topic.add_additional_story('story_id_2')
 
     # Here we use MyPy ignore because we override the definition of the function
@@ -504,8 +521,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_topic_thumbnail_filename_in_strict_mode(self) -> None:
         self.topic.thumbnail_bg_color = None
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected thumbnail filename to be a string, received None.'):
+            utils.ValidationError,
+            'Expected thumbnail filename to be a string, received None.'
+        ):
             self.topic.validate(strict=True)
 
     def test_topic_thumbnail_bg_validation(self) -> None:
@@ -660,8 +678,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             )
         )
         with self.assertRaisesRegex(
-                Exception,
-                'The skill id skill_id_1 already exists in subtopic with id 1'):
+            Exception, 'The skill id skill_id_1 already exists in subtopic with id 1'
+        ):
             self.topic.add_uncategorized_skill_id('skill_id_1')
         self.topic.add_uncategorized_skill_id('skill_id_3')
         self.assertEqual(self.topic.uncategorized_skill_ids, ['skill_id_3'])
@@ -669,7 +687,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_remove_uncategorized_skill_id(self) -> None:
         self.topic.uncategorized_skill_ids = ['skill_id_5']
         with self.assertRaisesRegex(
-                Exception, 'The skill id skill_id_3 is not present in the topic'):
+            Exception, 'The skill id skill_id_3 is not present in the topic'
+        ):
             self.topic.remove_uncategorized_skill_id('skill_id_3')
         self.topic.remove_uncategorized_skill_id('skill_id_5')
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
@@ -686,7 +705,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.uncategorized_skill_ids = ['skill_id_1']
         self.topic.subtopics[0].skill_ids = ['skill_id_2']
         with self.assertRaisesRegex(
-                Exception, 'Skill id skill_id_3 is not an uncategorized skill id'):
+            Exception, 'Skill id skill_id_3 is not an uncategorized skill id'
+        ):
             self.topic.move_skill_id_to_subtopic(None, 1, 'skill_id_3')
 
     def test_get_subtopic_index(self) -> None:
@@ -703,7 +723,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_create_topic_rights_change_class_with_invalid_cmd(self) -> None:
         with self.assertRaisesRegex(Exception, 'Command invalid cmd is not allowed'):
-            topic_domain.TopicRightsChange({'cmd': 'invalid cmd'})
+            topic_domain.TopicRightsChange({
+                'cmd': 'invalid cmd'
+            })
 
     def test_cannot_create_topic_rights_change_class_with_invalid_changelist(
         self
@@ -712,9 +734,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.TopicRightsChange({})
 
     def test_create_new_topic_rights_change_class(self) -> None:
-        topic_rights = topic_domain.TopicRightsChange({'cmd': 'create_new'})
+        topic_rights = topic_domain.TopicRightsChange({
+            'cmd': 'create_new'
+        })
 
-        self.assertEqual(topic_rights.to_dict(), {'cmd': 'create_new'})
+        self.assertEqual(topic_rights.to_dict(), {
+            'cmd': 'create_new'
+        })
 
     def test_update_language_code(self) -> None:
         self.assertEqual(self.topic.language_code, 'en')
@@ -737,7 +763,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
         self.topic.uncategorized_skill_ids = ['skill_id1']
         with self.assertRaisesRegex(
-                Exception, 'The skill id skill_id1 is already an uncategorized skill.'):
+            Exception, 'The skill id skill_id1 is already an uncategorized skill.'
+        ):
             self.topic.add_uncategorized_skill_id('skill_id1')
 
     def test_update_subtopic_title(self) -> None:
@@ -774,8 +801,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
         with self.assertRaisesRegex(
-                Exception,
-                'Skill id skill_id_1 is already present in the target subtopic'):
+            Exception, 'Skill id skill_id_1 is already present in the target subtopic'
+        ):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
 
     def test_skill_id_not_present_old_subtopic(self) -> None:
@@ -792,8 +819,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
         with self.assertRaisesRegex(
-                Exception,
-                'Skill id skill_not_exist is not present in the given old subtopic'):
+            Exception,
+            'Skill id skill_not_exist is not present in the given old subtopic'
+        ):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_not_exist')
 
     def test_validate_topic_bad_story_reference(self) -> None:
@@ -805,12 +833,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference('story_id_2#'),
             topic_domain.StoryReference.create_default_story_reference('story_id_3')
         ]
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Invalid story ID: story_id_2#'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid story ID: story_id_2#'
+        ):
             self.topic.validate()
 
     def test_story_ref_to_dict(self) -> None:
-        test_story_dict = {'story_id': 'story_id_1', 'story_is_published': False}
+        test_story_dict = {
+            'story_id': 'story_id_1',
+            'story_is_published': False
+        }
         story_ref_obj = (
             topic_domain.StoryReference.create_default_story_reference('story_id_1')
         )
@@ -838,7 +870,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         skill_id = 'skill_id_123'
         topic = self.topic
         with self.assertRaisesRegex(
-                Exception, 'Skill id %s is not present in the old subtopic' % skill_id):
+            Exception, 'Skill id %s is not present in the old subtopic' % skill_id
+        ):
             topic.remove_skill_id_from_subtopic(1, skill_id)
 
     def test_update_subtopic_thumbnail(self) -> None:
@@ -901,9 +934,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.delete_subtopic(subtopic_id_to_delete)
         self.assertEqual(1, len(self.topic.subtopics))
         self.assertEqual([skill_id_moved], self.topic.uncategorized_skill_ids)
-        with self.assertRaisesRegex(Exception,
-                                    'The subtopic with id %s does not exist.' %
-                                    subtopic_id_to_delete):
+        with self.assertRaisesRegex(
+            Exception, 'The subtopic with id %s does not exist.' % subtopic_id_to_delete
+        ):
             self.topic.get_subtopic_index(1)
 
     def test_move_skill_id_from_subtopic_to_subtopic(self) -> None:
@@ -974,9 +1007,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         correct_new_subtopic_id = 2
         expected_subtopic_id = self.topic.next_subtopic_id
         with self.assertRaisesRegex(
-                Exception,
-                'The given new subtopic id %s is not equal to the expected next '
-                'subtopic id: %s' % (incorrect_new_subtopic_id, expected_subtopic_id)):
+            Exception, 'The given new subtopic id %s is not equal to the expected next '
+            'subtopic id: %s' % (incorrect_new_subtopic_id, expected_subtopic_id)
+        ):
             self.topic.add_subtopic(incorrect_new_subtopic_id, 'subtopic_3', 'url_frag')
         self.topic.add_subtopic(correct_new_subtopic_id, 'subtopic_title', 'url_frag')
         self.assertEqual(2, len(self.topic.subtopics))
@@ -1040,12 +1073,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         """Sets up the VersionendSubtopicsDict for the schema update tests."""
         topic.update_subtopic_title(1, 'abcdefghijklmnopqrstuvwxyz')
         subtopic_dict = topic.subtopics[topic.get_subtopic_index(1)].to_dict()
-        vers_subtopic_dict = topic_domain.VersionedSubtopicsDict(
-            {
-                'schema_version': current_schema,
-                'subtopics': [subtopic_dict]
-            }
-        )
+        vers_subtopic_dict = topic_domain.VersionedSubtopicsDict({
+            'schema_version': current_schema,
+            'subtopics': [subtopic_dict]
+        })
         topic.update_subtopics_from_model(vers_subtopic_dict, current_schema, topic.id)
         return vers_subtopic_dict
 
@@ -1095,12 +1126,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         schema_version = 1
         story_ref_dict = topic_domain.StoryReference(story_id,
                                                      story_published).to_dict()
-        vers_story_ref_dict = topic_domain.VersionedStoryReferencesDict(
-            {
-                'schema_version': 1,
-                'story_references': [story_ref_dict]
-            }
-        )
+        vers_story_ref_dict = topic_domain.VersionedStoryReferencesDict({
+            'schema_version': 1,
+            'story_references': [story_ref_dict]
+        })
         swap_topic_object = self.swap(topic_domain, 'Topic', self.MockTopicObject)
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2
@@ -1124,8 +1153,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_topic_id(self) -> None:
         topic_id = 'a'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Topic id %s is invalid' % topic_id):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Topic id %s is invalid' % topic_id
+        ):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
     def _setup_stories(self, topic: topic_domain.Topic) -> None:
@@ -1152,8 +1182,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_publish_story_not_exist(self) -> None:
         topic = self.topic
         self._setup_stories(topic)
-        with self.assertRaisesRegex(Exception,
-                                    'Story with given id doesn\'t exist in the topic'):
+        with self.assertRaisesRegex(
+            Exception, 'Story with given id doesn\'t exist in the topic'
+        ):
             topic.publish_story('story_id_110')
 
     def test_unpublish_story(self) -> None:
@@ -1181,9 +1212,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         ]
         self.topic.subtopics[0].url_fragment = 'abc'
         self.topic.subtopics[1].url_fragment = 'abc'
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Subtopic url fragments are not unique across '
-                                    'subtopics in the topic'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Subtopic url fragments are not unique across '
+            'subtopics in the topic'
+        ):
             self.topic.validate()
 
     def test_validate_no_story_references(self) -> None:
@@ -1200,8 +1232,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_unpublish_story_not_exist(self) -> None:
         topic = self.topic
         self._setup_stories(topic)
-        with self.assertRaisesRegex(Exception,
-                                    'Story with given id doesn\'t exist in the topic'):
+        with self.assertRaisesRegex(
+            Exception, 'Story with given id doesn\'t exist in the topic'
+        ):
             topic.unpublish_story('story_id_110')
 
     def test_topic_export_import_returns_original_object(self) -> None:
@@ -1299,93 +1332,96 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 class TopicChangeTests(test_utils.GenericTestBase):
 
     def test_topic_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
-            topic_domain.TopicChange({'invalid': 'data'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
+            topic_domain.TopicChange({
+                'invalid': 'data'
+            })
 
     def test_topic_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command invalid is not allowed'):
-            topic_domain.TopicChange({'cmd': 'invalid'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command invalid is not allowed'
+        ):
+            topic_domain.TopicChange({
+                'cmd': 'invalid'
+            })
 
     def test_topic_change_object_with_missing_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('The following required attributes are missing: '
-                                     'new_value, old_value')):
-            topic_domain.TopicChange(
-                {
-                    'cmd': 'update_topic_property',
-                    'property_name': 'name',
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('The following required attributes are missing: '
+             'new_value, old_value')
+        ):
+            topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+            })
 
     def test_topic_change_object_with_extra_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('The following extra attributes are present: invalid')):
-            topic_domain.TopicChange(
-                {
-                    'cmd': 'add_subtopic',
-                    'title': 'title',
-                    'subtopic_id': 'subtopic_id',
-                    'url_fragment': 'url-fragment',
-                    'invalid': 'invalid'
-                }
-            )
+            utils.ValidationError,
+            ('The following extra attributes are present: invalid')
+        ):
+            topic_domain.TopicChange({
+                'cmd': 'add_subtopic',
+                'title': 'title',
+                'subtopic_id': 'subtopic_id',
+                'url_fragment': 'url-fragment',
+                'invalid': 'invalid'
+            })
 
     def test_topic_change_object_with_invalid_topic_property(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for property_name in cmd update_topic_property: '
-             'invalid is not allowed')):
-            topic_domain.TopicChange(
-                {
-                    'cmd': 'update_topic_property',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
+            utils.ValidationError, (
+                'Value for property_name in cmd update_topic_property: '
+                'invalid is not allowed'
             )
+        ):
+            topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
     def test_topic_change_object_with_invalid_subtopic_property(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for property_name in cmd update_subtopic_property: '
-             'invalid is not allowed')):
-            topic_domain.TopicChange(
-                {
-                    'cmd': 'update_subtopic_property',
-                    'subtopic_id': 'subtopic_id',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
+            utils.ValidationError, (
+                'Value for property_name in cmd update_subtopic_property: '
+                'invalid is not allowed'
             )
+        ):
+            topic_domain.TopicChange({
+                'cmd': 'update_subtopic_property',
+                'subtopic_id': 'subtopic_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
     def test_topic_change_object_with_invalid_subtopic_page_property(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('Value for property_name in cmd update_subtopic_page_property: '
-             'invalid is not allowed')):
-            topic_domain.TopicChange(
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'subtopic_id': 'subtopic_id',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                }
+            utils.ValidationError, (
+                'Value for property_name in cmd update_subtopic_page_property: '
+                'invalid is not allowed'
             )
+        ):
+            topic_domain.TopicChange({
+                'cmd': 'update_subtopic_page_property',
+                'subtopic_id': 'subtopic_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
     def test_topic_change_object_with_add_subtopic(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'add_subtopic',
-                'subtopic_id': 'subtopic_id',
-                'title': 'title',
-                'url_fragment': 'url-fragment'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'add_subtopic',
+            'subtopic_id': 'subtopic_id',
+            'title': 'title',
+            'url_fragment': 'url-fragment'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'add_subtopic')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
@@ -1393,23 +1429,19 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.url_fragment, 'url-fragment')
 
     def test_topic_change_object_with_delete_subtopic(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'delete_subtopic',
-                'subtopic_id': 'subtopic_id'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'delete_subtopic',
+            'subtopic_id': 'subtopic_id'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'delete_subtopic')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
 
     def test_topic_change_object_with_add_uncategorized_skill_id(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'add_uncategorized_skill_id',
-                'new_uncategorized_skill_id': 'new_uncategorized_skill_id'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'add_uncategorized_skill_id',
+            'new_uncategorized_skill_id': 'new_uncategorized_skill_id'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'add_uncategorized_skill_id')
         self.assertEqual(
@@ -1417,12 +1449,10 @@ class TopicChangeTests(test_utils.GenericTestBase):
         )
 
     def test_topic_change_object_with_remove_uncategorized_skill_id(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'remove_uncategorized_skill_id',
-                'uncategorized_skill_id': 'uncategorized_skill_id'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'remove_uncategorized_skill_id',
+            'uncategorized_skill_id': 'uncategorized_skill_id'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'remove_uncategorized_skill_id')
         self.assertEqual(
@@ -1430,14 +1460,12 @@ class TopicChangeTests(test_utils.GenericTestBase):
         )
 
     def test_topic_change_object_with_move_skill_id_to_subtopic(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'move_skill_id_to_subtopic',
-                'skill_id': 'skill_id',
-                'old_subtopic_id': 'old_subtopic_id',
-                'new_subtopic_id': 'new_subtopic_id'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'move_skill_id_to_subtopic',
+            'skill_id': 'skill_id',
+            'old_subtopic_id': 'old_subtopic_id',
+            'new_subtopic_id': 'new_subtopic_id'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'move_skill_id_to_subtopic')
         self.assertEqual(topic_change_object.skill_id, 'skill_id')
@@ -1445,28 +1473,24 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.new_subtopic_id, 'new_subtopic_id')
 
     def test_topic_change_object_with_remove_skill_id_from_subtopic(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'remove_skill_id_from_subtopic',
-                'skill_id': 'skill_id',
-                'subtopic_id': 'subtopic_id'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'remove_skill_id_from_subtopic',
+            'skill_id': 'skill_id',
+            'subtopic_id': 'subtopic_id'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'remove_skill_id_from_subtopic')
         self.assertEqual(topic_change_object.skill_id, 'skill_id')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
 
     def test_topic_change_object_with_update_subtopic_property(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'update_subtopic_property',
-                'subtopic_id': 'subtopic_id',
-                'property_name': 'title',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'update_subtopic_property',
+            'subtopic_id': 'subtopic_id',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'update_subtopic_property')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
@@ -1475,15 +1499,13 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.old_value, 'old_value')
 
     def test_topic_change_object_with_update_subtopic_page_property(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'update_subtopic_page_property',
-                'subtopic_id': 'subtopic_id',
-                'property_name': 'page_contents_html',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'update_subtopic_page_property',
+            'subtopic_id': 'subtopic_id',
+            'property_name': 'page_contents_html',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'update_subtopic_page_property')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
@@ -1492,14 +1514,12 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.old_value, 'old_value')
 
     def test_topic_change_object_with_update_topic_property(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'update_topic_property',
-                'property_name': 'name',
-                'new_value': 'new_value',
-                'old_value': 'old_value'
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'update_topic_property',
+            'property_name': 'name',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
 
         self.assertEqual(topic_change_object.cmd, 'update_topic_property')
         self.assertEqual(topic_change_object.property_name, 'name')
@@ -1507,12 +1527,10 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.old_value, 'old_value')
 
     def test_topic_change_object_with_create_new(self) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'create_new',
-                'name': 'name',
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'create_new',
+            'name': 'name',
+        })
 
         self.assertEqual(topic_change_object.cmd, 'create_new')
         self.assertEqual(topic_change_object.name, 'name')
@@ -1520,13 +1538,11 @@ class TopicChangeTests(test_utils.GenericTestBase):
     def test_topic_change_object_with_migrate_subtopic_schema_to_latest_version(
         self
     ) -> None:
-        topic_change_object = topic_domain.TopicChange(
-            {
-                'cmd': 'migrate_subtopic_schema_to_latest_version',
-                'from_version': 'from_version',
-                'to_version': 'to_version',
-            }
-        )
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'migrate_subtopic_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
 
         self.assertEqual(
             topic_change_object.cmd, 'migrate_subtopic_schema_to_latest_version'
@@ -1535,7 +1551,10 @@ class TopicChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_change_object.to_version, 'to_version')
 
     def test_to_dict(self) -> None:
-        topic_change_dict = {'cmd': 'create_new', 'name': 'name'}
+        topic_change_dict = {
+            'cmd': 'create_new',
+            'name': 'name'
+        }
         topic_change_object = topic_domain.TopicChange(topic_change_dict)
         self.assertEqual(topic_change_object.to_dict(), topic_change_dict)
 
@@ -1543,66 +1562,69 @@ class TopicChangeTests(test_utils.GenericTestBase):
 class TopicRightsChangeTests(test_utils.GenericTestBase):
 
     def test_topic_rights_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Missing cmd key in change dict'):
-            topic_domain.TopicRightsChange({'invalid': 'data'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
+            topic_domain.TopicRightsChange({
+                'invalid': 'data'
+            })
 
     def test_topic_change_rights_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    'Command invalid is not allowed'):
-            topic_domain.TopicRightsChange({'cmd': 'invalid'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command invalid is not allowed'
+        ):
+            topic_domain.TopicRightsChange({
+                'cmd': 'invalid'
+            })
 
     def test_topic_rights_change_object_with_missing_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('The following required attributes are missing: '
-                                     'new_role, old_role')):
-            topic_domain.TopicRightsChange(
-                {
-                    'cmd': 'change_role',
-                    'assignee_id': 'assignee_id',
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('The following required attributes are missing: '
+             'new_role, old_role')
+        ):
+            topic_domain.TopicRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+            })
 
     def test_topic_rights_change_object_with_extra_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
-                utils.ValidationError,
-            ('The following extra attributes are present: invalid')):
-            topic_domain.TopicRightsChange(
-                {
-                    'cmd': 'publish_topic',
-                    'invalid': 'invalid'
-                }
-            )
+            utils.ValidationError,
+            ('The following extra attributes are present: invalid')
+        ):
+            topic_domain.TopicRightsChange({
+                'cmd': 'publish_topic',
+                'invalid': 'invalid'
+            })
 
     def test_topic_rights_change_object_with_invalid_role(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError,
-                                    ('Value for old_role in cmd change_role: '
-                                     'invalid is not allowed')):
-            topic_domain.TopicRightsChange(
-                {
-                    'cmd': 'change_role',
-                    'assignee_id': 'assignee_id',
-                    'old_role': 'invalid',
-                    'new_role': topic_domain.ROLE_MANAGER
-                }
-            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            ('Value for old_role in cmd change_role: '
+             'invalid is not allowed')
+        ):
+            topic_domain.TopicRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': 'invalid',
+                'new_role': topic_domain.ROLE_MANAGER
+            })
 
     def test_topic_rights_change_object_with_create_new(self) -> None:
-        topic_rights_change_object = topic_domain.TopicRightsChange(
-            {'cmd': 'create_new'}
-        )
+        topic_rights_change_object = topic_domain.TopicRightsChange({
+            'cmd': 'create_new'
+        })
 
         self.assertEqual(topic_rights_change_object.cmd, 'create_new')
 
     def test_topic_rights_change_object_with_change_role(self) -> None:
-        topic_rights_change_object = topic_domain.TopicRightsChange(
-            {
-                'cmd': 'change_role',
-                'assignee_id': 'assignee_id',
-                'old_role': topic_domain.ROLE_NONE,
-                'new_role': topic_domain.ROLE_MANAGER
-            }
-        )
+        topic_rights_change_object = topic_domain.TopicRightsChange({
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+            'old_role': topic_domain.ROLE_NONE,
+            'new_role': topic_domain.ROLE_MANAGER
+        })
 
         self.assertEqual(topic_rights_change_object.cmd, 'change_role')
         self.assertEqual(topic_rights_change_object.assignee_id, 'assignee_id')
@@ -1610,16 +1632,16 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
         self.assertEqual(topic_rights_change_object.new_role, topic_domain.ROLE_MANAGER)
 
     def test_topic_rights_change_object_with_publish_topic(self) -> None:
-        topic_rights_change_object = topic_domain.TopicRightsChange(
-            {'cmd': 'publish_topic'}
-        )
+        topic_rights_change_object = topic_domain.TopicRightsChange({
+            'cmd': 'publish_topic'
+        })
 
         self.assertEqual(topic_rights_change_object.cmd, 'publish_topic')
 
     def test_topic_rights_change_object_with_unpublish_topic(self) -> None:
-        topic_rights_change_object = topic_domain.TopicRightsChange(
-            {'cmd': 'unpublish_topic'}
-        )
+        topic_rights_change_object = topic_domain.TopicRightsChange({
+            'cmd': 'unpublish_topic'
+        })
 
         self.assertEqual(topic_rights_change_object.cmd, 'unpublish_topic')
 
@@ -1666,8 +1688,9 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description', 1, 1, 1, 1, 1, 1, 1,
-            'image.svg', '#C6DCDA', 'url-frag', {'story': ['exp']}, current_time,
-            current_time
+            'image.svg', '#C6DCDA', 'url-frag', {
+                'story': ['exp']
+            }, current_time, current_time
         )
 
     # Here we use MyPy ignore because we override the definition of the function

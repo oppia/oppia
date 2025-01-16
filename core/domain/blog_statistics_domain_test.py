@@ -31,9 +31,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
     from mypy_imports import blog_stats_models
 
-(blog_stats_models, blog_models) = models.Registry.import_models(
-    [models.Names.BLOG_STATISTICS, models.Names.BLOG]
-)
+(blog_stats_models, blog_models) = models.Registry.import_models([
+    models.Names.BLOG_STATISTICS, models.Names.BLOG
+])
 
 
 class AuthorBlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):

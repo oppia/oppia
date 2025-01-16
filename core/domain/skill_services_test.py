@@ -39,9 +39,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import question_models
     from mypy_imports import skill_models
 
-(skill_models, question_models) = models.Registry.import_models(
-    [models.Names.SKILL, models.Names.QUESTION]
-)
+(skill_models, question_models) = models.Registry.import_models([
+    models.Names.SKILL, models.Names.QUESTION
+])
 
 SuggestionChangeDictType = Dict[str, Union[str, Dict[str, Union[state_domain.StateDict,
                                                                 int, str, List[str]]],
@@ -63,20 +63,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
                     '1': {},
                     '2': {},
                     '3': {}
-                }}
-            ),
-            translation_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {
+                }
+            }),
+            translation_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
                     '1': {},
                     '2': {},
                     '3': {}
-                }}
-            )
+                }
+            })
         )
         misconceptions = [
             skill_domain.Misconception(
@@ -147,7 +147,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill.created_on = None
 
         with self.assertRaisesRegex(
-                Exception, 'No data available for when the skill was created.'):
+            Exception, 'No data available for when the skill was created.'
+        ):
             skill_services.compute_summary_of_skill(skill)
 
     def test_raises_error_when_the_skill_provided_with_no_last_updated_data(
@@ -157,7 +158,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill.last_updated = None
 
         with self.assertRaisesRegex(
-                Exception, 'No data available for when the skill was last_updated.'):
+            Exception, 'No data available for when the skill was last_updated.'
+        ):
             skill_services.compute_summary_of_skill(skill)
 
     def test_get_image_filenames_from_skill(self) -> None:
@@ -179,20 +181,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
         self.skill.skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', explanation_html), [example_1],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
                     '1': {},
                     '2': {},
                     '3': {}
-                }}
-            ),
-            translation_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {
+                }
+            }),
+            translation_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
                     '1': {},
                     '2': {},
                     '3': {}
-                }}
-            )
+                }
+            })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
         self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])
@@ -215,20 +217,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             )
         )
         self.save_new_skill(
@@ -238,20 +240,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             )
         )
 
@@ -260,7 +262,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_descriptions_of_skills(['skill_id_1', 'skill_id_2'])
         )
         self.assertEqual(deleted_skill_ids, ['skill_id_2'])
-        self.assertEqual(skill_descriptions, {'skill_id_1': 'Description 1'})
+        self.assertEqual(skill_descriptions, {
+            'skill_id_1': 'Description 1'
+        })
 
     def test_get_rubrics_of_linked_skills(self) -> None:
         example_1 = skill_domain.WorkedExample(
@@ -274,20 +278,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             ),
             rubrics=[
                 skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
@@ -302,20 +306,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                ),
-                translation_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {
+                    }
+                }),
+                translation_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
                         '1': {},
                         '2': {},
                         '3': {}
-                    }}
-                )
+                    }
+                })
             )
         )
 
@@ -529,7 +533,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1
         )
 
-        self.save_new_valid_classroom(topic_id_to_prerequisite_topic_ids={topic_id: []})
+        self.save_new_valid_classroom(
+            topic_id_to_prerequisite_topic_ids={
+                topic_id: []
+            }
+        )
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
@@ -590,7 +598,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1
         )
 
-        self.save_new_valid_classroom(topic_id_to_prerequisite_topic_ids={topic_id: []})
+        self.save_new_valid_classroom(
+            topic_id_to_prerequisite_topic_ids={
+                topic_id: []
+            }
+        )
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, None, 'math', [], None, None
@@ -719,17 +731,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1
         )
 
-        subtopic = topic_domain.Subtopic.from_dict(
-            {
-                'id': 1,
-                'title': 'subtopic1',
-                'skill_ids': [self.SKILL_ID],
-                'thumbnail_filename': None,
-                'thumbnail_bg_color': None,
-                'thumbnail_size_in_bytes': None,
-                'url_fragment': 'subtopic-one'
-            }
-        )
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [self.SKILL_ID],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+            'url_fragment': 'subtopic-one'
+        })
         self.save_new_topic(
             topic_id_1,
             self.USER_ID,
@@ -776,17 +786,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1
         )
 
-        subtopic = topic_domain.Subtopic.from_dict(
-            {
-                'id': 1,
-                'title': 'subtopic1',
-                'skill_ids': [self.SKILL_ID],
-                'thumbnail_filename': None,
-                'thumbnail_bg_color': None,
-                'thumbnail_size_in_bytes': None,
-                'url_fragment': 'subtopic-one'
-            }
-        )
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [self.SKILL_ID],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+            'url_fragment': 'subtopic-one'
+        })
         self.save_new_topic(
             topic_id_1,
             self.USER_ID,
@@ -824,17 +832,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1
         )
 
-        subtopic = topic_domain.Subtopic.from_dict(
-            {
-                'id': 1,
-                'title': 'subtopic1',
-                'skill_ids': [self.SKILL_ID],
-                'thumbnail_filename': None,
-                'thumbnail_bg_color': None,
-                'thumbnail_size_in_bytes': None,
-                'url_fragment': 'subtopic-one'
-            }
-        )
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [self.SKILL_ID],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+            'url_fragment': 'subtopic-one'
+        })
         self.save_new_topic(
             topic_id_1,
             self.USER_ID,
@@ -888,66 +894,51 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_skill(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
-                    'new_misconception_dict': {
-                        'id': self.skill.next_misconception_id,
-                        'name': 'test name',
-                        'notes': '<p>test notes</p>',
-                        'feedback': '<p>test feedback</p>',
-                        'must_be_addressed': True
-                    }
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
+                'new_misconception_dict': {
+                    'id': self.skill.next_misconception_id,
+                    'name': 'test name',
+                    'notes': '<p>test notes</p>',
+                    'feedback': '<p>test feedback</p>',
+                    'must_be_addressed': True
                 }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                    'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-                    'misconception_id': self.skill.next_misconception_id,
-                    'old_value': 'test name',
-                    'new_value': 'Name'
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                    'property_name': (
-                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED
-                    ),
-                    'misconception_id': self.skill.next_misconception_id,
-                    'old_value': True,
-                    'new_value': False
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
-                    'skill_id': 'skill_id_3'
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
-                    'skill_id': 'skill_id_1'
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_RUBRICS,
-                    'difficulty': constants.SKILL_DIFFICULTIES[0],
-                    'explanations': [
-                        '<p>New Explanation 1</p>', '<p>New Explanation 2</p>'
-                    ]
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_RUBRICS,
-                    'difficulty': constants.SKILL_DIFFICULTIES[1],
-                    'explanations': ['<p>Explanation</p>']
-                }
-            )
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
+                'misconception_id': self.skill.next_misconception_id,
+                'old_value': 'test name',
+                'new_value': 'Name'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name':
+                    (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED),
+                'misconception_id': self.skill.next_misconception_id,
+                'old_value': True,
+                'new_value': False
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
+                'skill_id': 'skill_id_3'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
+                'skill_id': 'skill_id_1'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'explanations': [
+                    '<p>New Explanation 1</p>', '<p>New Explanation 2</p>'
+                ]
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+                'difficulty': constants.SKILL_DIFFICULTIES[1],
+                'explanations': ['<p>Explanation</p>']
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist, 'Updated misconception name.'
@@ -968,22 +959,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_merge_skill(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': (skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-                    'old_value': '',
-                    'new_value': 'TestSkillId'
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': (skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
-                    'old_value': None,
-                    'new_value': False
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'old_value': None,
+                'new_value': False
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist, 'Merging skill.'
@@ -995,22 +982,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_set_merge_complete_for_skill(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': (skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-                    'old_value': None,
-                    'new_value': self.SKILL_ID
-                }
-            ),
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': (skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
-                    'old_value': False,
-                    'new_value': True
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': None,
+                'new_value': self.SKILL_ID
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'old_value': False,
+                'new_value': True
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist, 'Setting merge complete for skill.'
@@ -1023,14 +1006,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_ids = skill_services.get_merged_skill_ids()
         self.assertEqual(len(skill_ids), 0)
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': (skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-                    'old_value': '',
-                    'new_value': 'TestSkillId'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist, 'Merging skill.'
@@ -1049,9 +1030,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_delete_skill_marked_deleted(self) -> None:
-        skill_models.SkillModel.delete_multi(
-            [self.SKILL_ID], self.USER_ID, '', force_deletion=False
-        )
+        skill_models.SkillModel.delete_multi([self.SKILL_ID],
+                                             self.USER_ID,
+                                             '',
+                                             force_deletion=False)
         skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
         self.assertTrue(skill_model.deleted)
 
@@ -1082,13 +1064,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         suggestion_change: SuggestionChangeDictType = {
             'cmd': (question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator
-                ).to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
-                ),
+                'question_state_data':
+                    self._create_valid_question_data(
+                        'default_state', content_id_generator
+                    ).to_dict(),
+                'language_code':
+                    'en',
+                'question_state_data_schema_version':
+                    (feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1'],
                 'next_content_id_index': (content_id_generator.next_content_id_index)
@@ -1106,82 +1089,82 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_model, None)
 
         with self.assertRaisesRegex(
-                Exception, 'The suggestion with id %s has already been accepted/'
-                'rejected.' % suggestion.suggestion_id):
+            Exception, 'The suggestion with id %s has already been accepted/'
+            'rejected.' % suggestion.suggestion_id
+        ):
             suggestion_services.auto_reject_question_suggestions_for_skill_id(
                 self.SKILL_ID
             )
 
     def test_cannot_update_skill_with_no_commit_message(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
-                    'old_value': 'en',
-                    'new_value': 'bn'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
+                'old_value': 'en',
+                'new_value': 'bn'
+            })
         ]
 
-        with self.assertRaisesRegex(Exception,
-                                    'Expected a commit message, received none.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected a commit message, received none.'
+        ):
             skill_services.update_skill(self.USER_ID, self.SKILL_ID, changelist, '')
 
     def test_cannot_update_skill_with_empty_changelist(self) -> None:
         with self.assertRaisesRegex(
-                Exception,
-                'Unexpected error: received an invalid change list when trying to '
-                'save skill'):
+            Exception,
+            'Unexpected error: received an invalid change list when trying to '
+            'save skill'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, [], 'No changes made.'
             )
 
     def test_mismatch_of_skill_versions(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
-                    'old_value': 'en',
-                    'new_value': 'bn'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
+                'old_value': 'en',
+                'new_value': 'bn'
+            })
         ]
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
         skill_model.version = 0
 
         with self.assertRaisesRegex(
-                Exception, 'Unexpected error: trying to update version 0 of skill '
-                'from version 1. Please reload the page and try again.'):
+            Exception, 'Unexpected error: trying to update version 0 of skill '
+            'from version 1. Please reload the page and try again.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Change language code.'
             )
 
         skill_model.version = 2
         with self.assertRaisesRegex(
-                Exception,
-                'Trying to update version 2 of skill from version 1, which is too '
-                'old. Please reload the page and try again.'):
+            Exception,
+            'Trying to update version 2 of skill from version 1, which is too '
+            'old. Please reload the page and try again.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Change language code.'
             )
 
     def test_normal_user_cannot_update_skill_property(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
-                    'old_value': 'Description',
-                    'new_value': 'New description'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
+                'old_value': 'Description',
+                'new_value': 'New description'
+            })
         ]
 
-        with self.assertRaisesRegex(Exception,
-                                    'The user does not have enough rights to edit the '
-                                    'skill description.'):
+        with self.assertRaisesRegex(
+            Exception, 'The user does not have enough rights to edit the '
+            'skill description.'
+        ):
             skill_services.update_skill(
                 self.user_id_a, self.SKILL_ID, changelist, 'Change description.'
             )
@@ -1194,14 +1177,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.description, old_description)
 
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                    'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
-                    'old_value': old_description,
-                    'new_value': new_description
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
+                'old_value': old_description,
+                'new_value': new_description
+            })
         ]
         skill_services.update_skill(
             self.user_id_admin, self.SKILL_ID, changelist, 'Change description.'
@@ -1212,20 +1193,24 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_skill_explanation(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
-        old_explanation = {'content_id': '1', 'html': '<p>Explanation</p>'}
-        new_explanation = {'content_id': '1', 'html': '<p>New explanation</p>'}
+        old_explanation = {
+            'content_id': '1',
+            'html': '<p>Explanation</p>'
+        }
+        new_explanation = {
+            'content_id': '1',
+            'html': '<p>New explanation</p>'
+        }
 
         self.assertEqual(skill.skill_contents.explanation.to_dict(), old_explanation)
 
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
-                    'property_name': (skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION),
-                    'old_value': old_explanation,
-                    'new_value': new_explanation
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+                'property_name': (skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION),
+                'old_value': old_explanation,
+                'new_value': new_explanation
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist, 'Change explanation.'
@@ -1251,16 +1236,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
 
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
-                    'property_name': (
-                        skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES
-                    ),
-                    'old_value': [old_worked_example],
-                    'new_value': [new_worked_example]
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+                'property_name': (skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES),
+                'old_value': [old_worked_example],
+                'new_value': [new_worked_example]
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist, 'Change worked examples.'
@@ -1279,12 +1260,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
 
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
-                    'misconception_id': self.MISCONCEPTION_ID_1,
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': self.MISCONCEPTION_ID_1,
+            })
         ]
 
         skill_services.update_skill(
@@ -1310,15 +1289,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].notes, '<p>description</p>')
 
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                    'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES),
-                    'misconception_id': self.MISCONCEPTION_ID_1,
-                    'old_value': '<p>description</p>',
-                    'new_value': '<p>new description</p>'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES),
+                'misconception_id': self.MISCONCEPTION_ID_1,
+                'old_value': '<p>description</p>',
+                'new_value': '<p>new description</p>'
+            })
         ]
 
         skill_services.update_skill(
@@ -1338,17 +1315,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].feedback, '<p>default_feedback</p>')
 
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                    'property_name': (
-                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
-                    ),
-                    'misconception_id': self.MISCONCEPTION_ID_1,
-                    'old_value': '<p>default_feedback</p>',
-                    'new_value': '<p>new feedback</p>'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK),
+                'misconception_id': self.MISCONCEPTION_ID_1,
+                'old_value': '<p>default_feedback</p>',
+                'new_value': '<p>new feedback</p>'
+            })
         ]
 
         skill_services.update_skill(
@@ -1380,9 +1353,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-            [questionskilllink_model1, questionskilllink_model2]
-        )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links([
+            questionskilllink_model1, questionskilllink_model2
+        ])
 
         self.assertEqual(
             skill_services.skill_has_associated_questions(skill_id_1), True
@@ -1392,13 +1365,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         orig_skill_dict = (skill_fetchers.get_skill_by_id(self.SKILL_ID).to_dict())
 
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': (skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION),
-                    'from_version': 1,
-                    'to_version': 2,
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': (skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION),
+                'from_version': 1,
+                'to_version': 2,
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist, 'Update schema.'
@@ -1449,19 +1420,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_misconception_name_with_invalid_id(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                    'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-                    'misconception_id': 0,
-                    'old_value': 'test name',
-                    'new_value': 'Name'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
+                'misconception_id': 0,
+                'old_value': 'test name',
+                'new_value': 'Name'
+            })
         ]
 
-        with self.assertRaisesRegex(Exception,
-                                    'There is no misconception with the given id.'):
+        with self.assertRaisesRegex(
+            Exception, 'There is no misconception with the given id.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Updated misconception name.'
             )
@@ -1470,21 +1440,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                    'property_name': (
-                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED
-                    ),
-                    'misconception_id': 0,
-                    'old_value': False,
-                    'new_value': True
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name':
+                    (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED),
+                'misconception_id': 0,
+                'old_value': False,
+                'new_value': True
+            })
         ]
 
-        with self.assertRaisesRegex(Exception,
-                                    'There is no misconception with the given id.'):
+        with self.assertRaisesRegex(
+            Exception, 'There is no misconception with the given id.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception must_be_addressed.'
@@ -1492,103 +1460,95 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_add_already_existing_prerequisite_skill(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
-                    'skill_id': 'skill_id_1'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
+                'skill_id': 'skill_id_1'
+            })
         ]
-        with self.assertRaisesRegex(Exception,
-                                    'The skill is already a prerequisite skill.'):
+        with self.assertRaisesRegex(
+            Exception, 'The skill is already a prerequisite skill.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Added prereq skill.'
             )
 
     def test_cannot_delete_non_existent_prerequisite_skill(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
-                    'skill_id': 'skill_id_5'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
+                'skill_id': 'skill_id_5'
+            })
         ]
-        with self.assertRaisesRegex(Exception,
-                                    'The skill to remove is not a prerequisite skill.'):
+        with self.assertRaisesRegex(
+            Exception, 'The skill to remove is not a prerequisite skill.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Removed prereq skill.'
             )
 
     def test_cannot_add_rubric_with_invalid_difficulty(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_RUBRICS,
-                    'difficulty': 'invalid_difficulty',
-                    'explanations': ['<p>Explanation</p>']
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+                'difficulty': 'invalid_difficulty',
+                'explanations': ['<p>Explanation</p>']
+            })
         ]
 
-        with self.assertRaisesRegex(Exception,
-                                    'There is no rubric for the given difficulty.'):
+        with self.assertRaisesRegex(
+            Exception, 'There is no rubric for the given difficulty.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Added rubric.'
             )
 
     def test_cannot_delete_misconception_with_invalid_id(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
-                    'misconception_id': 0
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': 0
+            })
         ]
 
-        with self.assertRaisesRegex(Exception,
-                                    'There is no misconception with the given id.'):
+        with self.assertRaisesRegex(
+            Exception, 'There is no misconception with the given id.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Delete misconception'
             )
 
     def test_cannot_update_misconception_notes_with_invalid_id(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                    'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES),
-                    'misconception_id': 0,
-                    'old_value': 'description',
-                    'new_value': 'new description'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES),
+                'misconception_id': 0,
+                'old_value': 'description',
+                'new_value': 'new description'
+            })
         ]
 
-        with self.assertRaisesRegex(Exception,
-                                    'There is no misconception with the given id.'):
+        with self.assertRaisesRegex(
+            Exception, 'There is no misconception with the given id.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Updated misconception notes.'
             )
 
     def test_cannot_update_misconception_feedback_with_invalid_id(self) -> None:
         changelist = [
-            skill_domain.SkillChange(
-                {
-                    'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                    'property_name': (
-                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
-                    ),
-                    'misconception_id': 0,
-                    'old_value': 'default_feedback',
-                    'new_value': 'new feedback'
-                }
-            )
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK),
+                'misconception_id': 0,
+                'old_value': 'default_feedback',
+                'new_value': 'new feedback'
+            })
         ]
 
-        with self.assertRaisesRegex(Exception,
-                                    'There is no misconception with the given id.'):
+        with self.assertRaisesRegex(
+            Exception, 'There is no misconception with the given id.'
+        ):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception feedback.'
@@ -1651,18 +1611,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         expected_categorized_skills_dict = {
             'Topic Name': {
-                'uncategorized': [
-                    {
-                        'skill_id': linked_skill_id,
-                        'skill_description': 'Description 3',
-                    }
-                ],
-                'Subtopic Title': [
-                    {
-                        'skill_id': subtopic_skill_id,
-                        'skill_description': 'Subtopic Skill'
-                    }
-                ]
+                'uncategorized': [{
+                    'skill_id': linked_skill_id,
+                    'skill_description': 'Description 3',
+                }],
+                'Subtopic Title': [{
+                    'skill_id': subtopic_skill_id,
+                    'skill_description': 'Subtopic Skill'
+                }]
             }
         }
         categorized_skills = (
@@ -1766,7 +1722,10 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, [skill_id_4, skill_id_5]
         )
 
-        self.assertEqual(degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
+        self.assertEqual(degrees_of_mastery, {
+            skill_id_4: 0.3,
+            skill_id_5: 0.5
+        })
 
     def test_get_sorted_skill_ids(self) -> None:
         degrees_of_masteries = skill_services.get_multi_user_skill_mastery(
@@ -1820,7 +1779,9 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
 class SkillMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_skill_contents_to_latest_schema(self) -> None:
-        commit_cmd = skill_domain.SkillChange({'cmd': skill_domain.CMD_CREATE_NEW})
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
 
         html_content = (
@@ -1860,11 +1821,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(explanation_content_id, ''),
             [skill_domain.WorkedExample.from_dict(worked_example_dict_math)],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
                     explanation_content_id: {}
-                }}
-            ),
+                }
+            }),
             translation_domain.WrittenTranslations.from_dict(written_translations_dict)
         )
         skill_contents_dict = skill_contents.to_dict()
@@ -1911,7 +1872,9 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         )
 
     def test_migrate_misconceptions_to_latest_schema(self) -> None:
-        commit_cmd = skill_domain.SkillChange({'cmd': skill_domain.CMD_CREATE_NEW})
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
 
         html_content = (
@@ -1925,29 +1888,27 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION
             ), [],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
                     explanation_content_id: {}
-                }}
-            ),
-            translation_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {
+                }
+            }),
+            translation_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
                     explanation_content_id: {}
-                }}
-            )
+                }
+            })
         )
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
             language_code='en',
-            misconceptions=[
-                {
-                    'id': 1,
-                    'name': 'name',
-                    'notes': html_content,
-                    'feedback': html_content
-                }
-            ],
+            misconceptions=[{
+                'id': 1,
+                'name': 'name',
+                'notes': html_content,
+                'feedback': html_content
+            }],
             rubrics=[],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=2,
@@ -1972,7 +1933,9 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].feedback, html_content)
 
     def test_migrate_rubrics_to_latest_schema(self) -> None:
-        commit_cmd = skill_domain.SkillChange({'cmd': skill_domain.CMD_CREATE_NEW})
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
@@ -1984,16 +1947,16 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION
             ), [],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
                     explanation_content_id: {}
-                }}
-            ),
-            translation_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {
+                }
+            }),
+            translation_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
                     explanation_content_id: {}
-                }}
-            )
+                }
+            })
         )
 
         model = skill_models.SkillModel(
@@ -2001,18 +1964,16 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[],
-            rubrics=[
-                {
-                    'difficulty': 'Easy',
-                    'explanations': ['Easy explanation']
-                }, {
-                    'difficulty': 'Medium',
-                    'explanations': ['Medium explanation']
-                }, {
-                    'difficulty': 'Hard',
-                    'explanations': ['Hard explanation', html_content]
-                }
-            ],
+            rubrics=[{
+                'difficulty': 'Easy',
+                'explanations': ['Easy explanation']
+            }, {
+                'difficulty': 'Medium',
+                'explanations': ['Medium explanation']
+            }, {
+                'difficulty': 'Hard',
+                'explanations': ['Hard explanation', html_content]
+            }],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,

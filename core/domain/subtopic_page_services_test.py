@@ -37,9 +37,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import subtopic_models
 
-(base_models, subtopic_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.SUBTOPIC]
-)
+(base_models, subtopic_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.SUBTOPIC
+])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
@@ -68,14 +68,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Added subtopic', [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Sample',
-                        'url_fragment': 'sample-fragment'
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample',
+                    'url_fragment': 'sample-fragment'
+                })
             ]
         )
         self.subtopic_page_id = (
@@ -149,9 +147,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         expected_subtopic_pages = [self.subtopic_page.to_dict(), None]
         # Ruling out the possibility of None for mypy type checking.
         assert subtopic_pages[0] is not None
-        self.assertEqual(
-            [subtopic_pages[0].to_dict(), subtopic_pages[1]], expected_subtopic_pages
-        )
+        self.assertEqual([subtopic_pages[0].to_dict(), subtopic_pages[1]],
+                         expected_subtopic_pages)
         subtopic_ids = []
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids
@@ -192,27 +189,23 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             }
         }
         self.subtopic_page.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict(
-                {
-                    'html': '<p>hello world</p>',
-                    'content_id': 'content'
-                }
-            )
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>hello world</p>',
+                'content_id': 'content'
+            })
         )
         self.subtopic_page.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers)
         )
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents', [
-                subtopic_page_domain.SubtopicPageChange(
-                    {
-                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                        'subtopic_id': 1,
-                        'property_name': 'page_contents_html',
-                        'new_value': 'a',
-                        'old_value': 'b'
-                    }
-                )
+                subtopic_page_domain.SubtopicPageChange({
+                    'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                    'subtopic_id': 1,
+                    'property_name': 'page_contents_html',
+                    'new_value': 'a',
+                    'old_value': 'b'
+                })
             ]
         )
         subtopic_page_contents = (
@@ -234,18 +227,17 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         subtopic_page_services.save_subtopic_page(
             self.user_id, subtopic_page_1, 'Added subtopic', [
-                topic_domain.TopicChange(
-                    {
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Sample',
-                        'url_fragment': 'sample-fragment-one'
-                    }
-                )
+                topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample',
+                    'url_fragment': 'sample-fragment-one'
+                })
             ]
         )
         with self.assertRaisesRegex(
-                Exception, 'Unexpected error: received an invalid change list *'):
+            Exception, 'Unexpected error: received an invalid change list *'
+        ):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic', []
             )
@@ -260,30 +252,27 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Trying to update version *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic', [
-                    topic_domain.TopicChange(
-                        {
-                            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                            'subtopic_id': 1,
-                            'title': 'Sample',
-                            'url_fragment': 'fragment'
-                        }
-                    )
+                    topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Sample',
+                        'url_fragment': 'fragment'
+                    })
                 ]
             )
         subtopic_page_1.version = 3
         subtopic_page_model_1.version = 2
-        with self.assertRaisesRegex(Exception,
-                                    'Unexpected error: trying to update version *'):
+        with self.assertRaisesRegex(
+            Exception, 'Unexpected error: trying to update version *'
+        ):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic', [
-                    topic_domain.TopicChange(
-                        {
-                            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                            'subtopic_id': 1,
-                            'title': 'Sample',
-                            'url_fragment': 'sample-frag'
-                        }
-                    )
+                    topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Sample',
+                        'url_fragment': 'sample-frag'
+                    })
                 ]
             )
 
@@ -307,14 +296,20 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         subtopic_page_services.delete_subtopic_page(self.user_id, self.TOPIC_ID, 1)
         with self.assertRaisesRegex(
-                base_models.BaseModel.EntityNotFoundError,
-                re.escape('Entity for class SubtopicPageModel with id %s not found' %
-                          (subtopic_page_id))):
+            base_models.BaseModel.EntityNotFoundError,
+            re.escape(
+                'Entity for class SubtopicPageModel with id %s not found' %
+                (subtopic_page_id)
+            )
+        ):
             subtopic_models.SubtopicPageModel.get(subtopic_page_id)
         with self.assertRaisesRegex(
-                base_models.BaseModel.EntityNotFoundError,
-                re.escape('Entity for class SubtopicPageModel with id %s not found' %
-                          (subtopic_page_id))):
+            base_models.BaseModel.EntityNotFoundError,
+            re.escape(
+                'Entity for class SubtopicPageModel with id %s not found' %
+                (subtopic_page_id)
+            )
+        ):
             subtopic_page_services.delete_subtopic_page(self.user_id, self.TOPIC_ID, 1)
 
     def test_migrate_page_contents_from_v1_to_v2_schema(self) -> None:
@@ -540,9 +535,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_ids_from_subtopic_page_ids(self) -> None:
         topic_ids = (
-            subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
-                ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3']
-            )
+            subtopic_page_services.get_topic_ids_from_subtopic_page_ids([
+                'topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3'
+            ])
         )
 
         self.assertEqual(topic_ids, ['topic1', 'topic2'])
@@ -559,9 +554,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
         subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
         progress = (
-            subtopic_page_services.get_multi_users_subtopic_pages_progress(
-                [learner_id_1, learner_id_2], [subtopic_page_id]
-            )
+            subtopic_page_services.get_multi_users_subtopic_pages_progress([
+                learner_id_1, learner_id_2
+            ], [subtopic_page_id])
         )
 
         learner_1_progress = progress[learner_id_1]
@@ -578,24 +573,21 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_learner_group_syllabus_subtopic_page_summaries(self) -> None:
         subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
-        expected_summaries = [
-            {
-                'subtopic_id': 1,
-                'subtopic_title': 'Naming Numbers',
-                'parent_topic_id': self.TOPIC_ID_1,
-                'parent_topic_name': 'Place Values',
-                'thumbnail_filename': 'image.svg',
-                'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic']
-                [0],
-                'subtopic_mastery': None,
-                'parent_topic_url_fragment': 'abbrev',
-                'classroom_url_fragment': None
-            }
-        ]
+        expected_summaries = [{
+            'subtopic_id': 1,
+            'subtopic_title': 'Naming Numbers',
+            'parent_topic_id': self.TOPIC_ID_1,
+            'parent_topic_name': 'Place Values',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            'subtopic_mastery': None,
+            'parent_topic_url_fragment': 'abbrev',
+            'classroom_url_fragment': None
+        }]
         summaries = (
-            subtopic_page_services.get_learner_group_syllabus_subtopic_page_summaries(
-                [subtopic_page_id]
-            )
+            subtopic_page_services.get_learner_group_syllabus_subtopic_page_summaries([
+                subtopic_page_id
+            ])
         )
         self.assertEqual(summaries, expected_summaries)
 

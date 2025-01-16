@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects used within multiple extensions."""
 
 from __future__ import annotations
@@ -86,15 +85,9 @@ class CustomizationArgSubtitledHtmlDefaultDict(TypedDict):
     html: str
 
 
-AllowedDefaultValueTypes = Union[
-    str,
-    float,
-    GraphDict,
-    ImageAndRegionDict,
-    CustomizationArgSubtitledUnicodeDefaultDict,
-    List[CustomizationArgSubtitledHtmlDefaultDict],
-    None
-]
+AllowedDefaultValueTypes = Union[str, float, GraphDict, ImageAndRegionDict,
+                                 CustomizationArgSubtitledUnicodeDefaultDict,
+                                 List[CustomizationArgSubtitledHtmlDefaultDict], None]
 
 
 class CustomizationArgSpecsDict(TypedDict):
@@ -115,10 +108,7 @@ class CustomizationArgSpec:
     # dictionaries and values in schema dictionaries can be of type str, List,
     # Dict, nested Dict and other types too.
     def __init__(
-        self,
-        name: str,
-        description: str,
-        schema: Dict[str, Any],
+        self, name: str, description: str, schema: Dict[str, Any],
         default_value: AllowedDefaultValueTypes
     ) -> None:
         self.name = name

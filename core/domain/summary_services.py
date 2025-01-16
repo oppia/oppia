@@ -123,51 +123,53 @@ class LibraryIndexGroupDict(TypedDict):
 DisplayableSummaryDictsType = Union[DisplayableCollectionSummaryDict,
                                     DisplayableExplorationSummaryDict]
 
-_LIBRARY_INDEX_GROUPS: List[LibraryIndexGroupDict] = [
-    {
-        'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
-        'search_categories': [
-            'Mathematics',
-            'Algebra',
-            'Arithmetic',
-            'Calculus',
-            'Combinatorics',
-            'Geometry',
-            'Graph Theory',
-            'Logic',
-            'Probability',
-            'Statistics',
-            'Trigonometry',
-        ],
-    }, {
-        'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
-        'search_categories': ['Algorithms', 'Computing', 'Programming'],
-    }, {
-        'header_i18n_id': 'I18N_LIBRARY_GROUPS_SCIENCE',
-        'search_categories': [
-            'Astronomy',
-            'Biology',
-            'Chemistry',
-            'Engineering',
-            'Environment',
-            'Medicine',
-            'Physics',
-        ],
-    }, {
-        'header_i18n_id': 'I18N_LIBRARY_GROUPS_HUMANITIES',
-        'search_categories': ['Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'],
-    }, {
-        'header_i18n_id': 'I18N_LIBRARY_GROUPS_LANGUAGES',
-        'search_categories': [
-            'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
-        ],
-    }, {
-        'header_i18n_id': 'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
-        'search_categories': [
-            'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
-        ],
-    }
-]
+_LIBRARY_INDEX_GROUPS: List[LibraryIndexGroupDict] = [{
+    'header_i18n_id':
+        'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
+    'search_categories': [
+        'Mathematics',
+        'Algebra',
+        'Arithmetic',
+        'Calculus',
+        'Combinatorics',
+        'Geometry',
+        'Graph Theory',
+        'Logic',
+        'Probability',
+        'Statistics',
+        'Trigonometry',
+    ],
+}, {
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
+    'search_categories': ['Algorithms', 'Computing', 'Programming'],
+}, {
+    'header_i18n_id':
+        'I18N_LIBRARY_GROUPS_SCIENCE',
+    'search_categories': [
+        'Astronomy',
+        'Biology',
+        'Chemistry',
+        'Engineering',
+        'Environment',
+        'Medicine',
+        'Physics',
+    ],
+}, {
+    'header_i18n_id': 'I18N_LIBRARY_GROUPS_HUMANITIES',
+    'search_categories': ['Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'],
+}, {
+    'header_i18n_id':
+        'I18N_LIBRARY_GROUPS_LANGUAGES',
+    'search_categories': [
+        'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
+    ],
+}, {
+    'header_i18n_id':
+        'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
+    'search_categories': [
+        'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
+    ],
+}]
 
 
 def get_human_readable_contributors_summary(
@@ -196,8 +198,7 @@ def get_human_readable_contributors_summary(
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
-        }
-        for ind in range(len(contributor_ids))
+        } for ind in range(len(contributor_ids))
     }
 
 
@@ -307,7 +308,8 @@ def get_learner_collection_dict_by_id(
                     'that you do not have edit access to?)' % exploration_id
                 )
             if collection_is_public and rights_manager.is_exploration_private(
-                    exploration_id):
+                exploration_id
+            ):
                 raise utils.ValidationError(
                     'Cannot reference a private exploration within a public '
                     'collection, exploration ID: %s' % exploration_id
@@ -405,8 +407,8 @@ def get_exploration_metadata_dicts(
     )
 
     filtered_exploration_summaries = []
-    for (exploration_summary, exploration_rights) in (zip(exploration_summaries,
-                                                          exploration_rights_objects)):
+    for (exploration_summary, exploration_rights
+        ) in (zip(exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user.user_id is None:
@@ -467,8 +469,8 @@ def get_displayable_exp_summary_dicts_matching_ids(
     )
 
     filtered_exploration_summaries = []
-    for (exploration_summary, exploration_rights) in (zip(exploration_summaries,
-                                                          exploration_rights_objects)):
+    for (exploration_summary, exploration_rights
+        ) in (zip(exploration_summaries, exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user is None:
@@ -527,34 +529,47 @@ def get_displayable_exp_summary_dicts(
     for ind, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary:
             summary_dict: DisplayableExplorationSummaryDict = {
-                'id': exploration_summary.id,
-                'title': exploration_summary.title,
-                'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
-                'category': exploration_summary.category,
-                'created_on_msec': utils.get_time_in_millisecs(
-                    exploration_summary.exploration_model_created_on
-                ),
-                'objective': exploration_summary.objective,
-                'language_code': exploration_summary.language_code,
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    exploration_summary.exploration_model_last_updated
-                ),
+                'id':
+                    exploration_summary.id,
+                'title':
+                    exploration_summary.title,
+                'activity_type':
+                    constants.ACTIVITY_TYPE_EXPLORATION,
+                'category':
+                    exploration_summary.category,
+                'created_on_msec':
+                    utils.get_time_in_millisecs(
+                        exploration_summary.exploration_model_created_on
+                    ),
+                'objective':
+                    exploration_summary.objective,
+                'language_code':
+                    exploration_summary.language_code,
+                'last_updated_msec':
+                    utils.get_time_in_millisecs(
+                        exploration_summary.exploration_model_last_updated
+                    ),
                 'human_readable_contributors_summary': (
                     get_human_readable_contributors_summary(
                         exploration_summary.contributors_summary
                     )
                 ),
-                'status': exploration_summary.status,
-                'ratings': exploration_summary.ratings,
-                'community_owned': exploration_summary.community_owned,
-                'tags': exploration_summary.tags,
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    exploration_summary.category
-                ),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    exploration_summary.category
-                ),
-                'num_views': view_counts[ind],
+                'status':
+                    exploration_summary.status,
+                'ratings':
+                    exploration_summary.ratings,
+                'community_owned':
+                    exploration_summary.community_owned,
+                'tags':
+                    exploration_summary.tags,
+                'thumbnail_icon_url':
+                    utils.get_thumbnail_icon_url_for_category(
+                        exploration_summary.category
+                    ),
+                'thumbnail_bg_color':
+                    utils.get_hex_color_for_category(exploration_summary.category),
+                'num_views':
+                    view_counts[ind],
             }
 
             displayable_exp_summaries.append(summary_dict)
@@ -593,30 +608,37 @@ def _get_displayable_collection_summary_dicts(
     displayable_collection_summaries: List[DisplayableCollectionSummaryDict] = []
     for collection_summary in collection_summaries:
         if collection_summary and collection_summary.status != (
-                rights_domain.ACTIVITY_STATUS_PRIVATE):
-            displayable_collection_summaries.append(
-                {
-                    'id': collection_summary.id,
-                    'title': collection_summary.title,
-                    'category': collection_summary.category,
-                    'activity_type': constants.ACTIVITY_TYPE_COLLECTION,
-                    'objective': collection_summary.objective,
-                    'language_code': collection_summary.language_code,
-                    'tags': collection_summary.tags,
-                    'node_count': collection_summary.node_count,
-                    'last_updated_msec': utils.get_time_in_millisecs(
+            rights_domain.ACTIVITY_STATUS_PRIVATE
+        ):
+            displayable_collection_summaries.append({
+                'id':
+                    collection_summary.id,
+                'title':
+                    collection_summary.title,
+                'category':
+                    collection_summary.category,
+                'activity_type':
+                    constants.ACTIVITY_TYPE_COLLECTION,
+                'objective':
+                    collection_summary.objective,
+                'language_code':
+                    collection_summary.language_code,
+                'tags':
+                    collection_summary.tags,
+                'node_count':
+                    collection_summary.node_count,
+                'last_updated_msec':
+                    utils.get_time_in_millisecs(
                         collection_summary.collection_model_last_updated
                     ),
-                    'thumbnail_icon_url': (
-                        utils.get_thumbnail_icon_url_for_category(
-                            collection_summary.category
-                        )
-                    ),
-                    'thumbnail_bg_color': utils.get_hex_color_for_category(
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
                         collection_summary.category
                     )
-                }
-            )
+                ),
+                'thumbnail_bg_color':
+                    utils.get_hex_color_for_category(collection_summary.category)
+            })
     return displayable_collection_summaries
 
 
@@ -658,8 +680,7 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
         if summary is not None
     ]
     collection_summary_dicts = {
-        summary_dict['id']: summary_dict
-        for summary_dict in
+        summary_dict['id']: summary_dict for summary_dict in
         _get_displayable_collection_summary_dicts(collection_summaries)
     }
 
@@ -706,15 +727,13 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
         if not summary_dicts:
             continue
 
-        results.append(
-            {
-                'header_i18n_id': group['header_i18n_id'],
-                'categories': group['search_categories'],
-                'activity_summary_dicts': summary_dicts,
-                'has_full_results_page': True,
-                'full_results_url': None,
-            }
-        )
+        results.append({
+            'header_i18n_id': group['header_i18n_id'],
+            'categories': group['search_categories'],
+            'activity_summary_dicts': summary_dicts,
+            'has_full_results_page': True,
+            'full_results_url': None,
+        })
 
     return results
 
@@ -737,19 +756,21 @@ def require_activities_to_be_public(
         activity_references
     )
 
-    activity_summaries_by_type = [
-        {
-            'type': constants.ACTIVITY_TYPE_EXPLORATION,
-            'ids': exploration_ids,
-            'summaries': exp_fetchers.
-            get_exploration_summaries_matching_ids(exploration_ids),
-        }, {
-            'type': constants.ACTIVITY_TYPE_COLLECTION,
-            'ids': collection_ids,
-            'summaries': collection_services.
-            get_collection_summaries_matching_ids(collection_ids),
-        }
-    ]
+    activity_summaries_by_type = [{
+        'type':
+            constants.ACTIVITY_TYPE_EXPLORATION,
+        'ids':
+            exploration_ids,
+        'summaries':
+            exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids),
+    }, {
+        'type':
+            constants.ACTIVITY_TYPE_COLLECTION,
+        'ids':
+            collection_ids,
+        'summaries':
+            collection_services.get_collection_summaries_matching_ids(collection_ids),
+    }]
 
     for activities_info in activity_summaries_by_type:
         for index, summary in enumerate(activities_info['summaries']):
@@ -807,12 +828,10 @@ def get_featured_activity_summary_dicts(
 
     summary_dicts_by_id: Dict[str, Dict[str, DisplayableSummaryDictsType]] = {
         constants.ACTIVITY_TYPE_EXPLORATION: {
-            summary_dict['id']: summary_dict
-            for summary_dict in exp_summary_dicts
+            summary_dict['id']: summary_dict for summary_dict in exp_summary_dicts
         },
         constants.ACTIVITY_TYPE_COLLECTION: {
-            summary_dict['id']: summary_dict
-            for summary_dict in col_summary_dicts
+            summary_dict['id']: summary_dict for summary_dict in col_summary_dicts
         },
     }
 
@@ -859,9 +878,9 @@ def get_top_rated_exploration_summary_dicts(
     filtered_exp_summaries = [
         exp_summary
         for exp_summary in exp_services.get_top_rated_exploration_summaries(limit
-                                                                            ).values()
-        if exp_summary.language_code in language_codes
-        and sum(exp_summary.ratings.values()) > 0
+                                                                           ).values()
+        if exp_summary.language_code in language_codes and
+        sum(exp_summary.ratings.values()) > 0
     ]
 
     sort_fnc: Callable[[exp_domain.ExplorationSummary],

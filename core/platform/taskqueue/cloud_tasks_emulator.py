@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """An emulator that mocks the core.platform.taskqueue API. This emulator
 models the third party library, Google Cloud Tasks.
 
@@ -40,12 +39,12 @@ class Task:
     # Here we use type Any because the payload can accept Dict and
     # this Dict has no constraints on its values.
     def __init__(
-            self,
-            queue_name: str,
-            url: str,
-            payload: Optional[Dict[str, Any]] = None,
-            scheduled_for: Optional[float] = None,
-            task_name: Optional[str] = None
+        self,
+        queue_name: str,
+        url: str,
+        payload: Optional[Dict[str, Any]] = None,
+        scheduled_for: Optional[float] = None,
+        task_name: Optional[str] = None
     ) -> None:
         """Initialize a Task that can be executed by making a post request to
         the given url with the correct data payload.
@@ -91,9 +90,9 @@ class Emulator:
     # function that will handle the task execution. So, to allow every
     # function we used Callable[..., Any] type here.
     def __init__(
-            self,
-            task_handler: Callable[..., Any],
-            automatic_task_handling: bool = True
+        self,
+        task_handler: Callable[..., Any],
+        automatic_task_handling: bool = True
     ) -> None:
         """Initializes the emulator with an empty task queue and the correct
         task_handler callback.
@@ -133,9 +132,11 @@ class Emulator:
                         task = queue.pop(0)
             if task:
                 self._task_handler(
-                    url=task.url, payload=task.payload,
+                    url=task.url,
+                    payload=task.payload,
                     queue_name=task.queue_name,
-                    task_name=task.task_name)
+                    task_name=task.task_name
+                )
 
             time.sleep(0.01)
 
@@ -148,7 +149,9 @@ class Emulator:
         """
         new_thread = threading.Thread(
             target=self._process_queue,
-            name=('Thread-%s' % queue_name), args=[queue_name])
+            name=('Thread-%s' % queue_name),
+            args=[queue_name]
+        )
         new_thread.daemon = True
         self._queue_threads[queue_name] = new_thread
         new_thread.start()
@@ -162,9 +165,11 @@ class Emulator:
         """
         for task in task_list:
             self._task_handler(
-                url=task.url, payload=task.payload,
+                url=task.url,
+                payload=task.payload,
                 queue_name=task.queue_name,
-                task_name=task.task_name)
+                task_name=task.task_name
+            )
 
     def _total_enqueued_tasks(self) -> int:
         """Returns the total number of tasks across all of the queues in the
@@ -178,13 +183,13 @@ class Emulator:
     # Here we use type Any because the payload can accept Dict and
     # this Dict has no constraints on its values.
     def create_task(
-            self,
-            queue_name: str,
-            url: str,
-            payload: Optional[Dict[str, Any]] = None,
-            scheduled_for: Optional[datetime.datetime] = None,
-            task_name: Optional[str] = None,
-            retry: None = None  # pylint: disable=unused-argument
+        self,
+        queue_name: str,
+        url: str,
+        payload: Optional[Dict[str, Any]] = None,
+        scheduled_for: Optional[datetime.datetime] = None,
+        task_name: Optional[str] = None,
+        retry: None = None  # pylint: disable=unused-argument
     ) -> None:
         """Creates a Task in the corresponding queue that will be executed when
         the 'scheduled_for' time is reached. If the queue doesn't exist yet,
@@ -202,8 +207,8 @@ class Emulator:
                 the value and it is not used for anything.
         """
         scheduled_for_time = (
-            time.mktime(scheduled_for.timetuple())
-            if scheduled_for else time.time())
+            time.mktime(scheduled_for.timetuple()) if scheduled_for else time.time()
+        )
         with self._lock:
             if queue_name not in self._queues:
                 self._queues[queue_name] = []
@@ -211,8 +216,12 @@ class Emulator:
                     self._launch_queue_thread(queue_name)
             queue = self._queues[queue_name]
             task = Task(
-                queue_name, url, payload, scheduled_for=scheduled_for_time,
-                task_name=task_name)
+                queue_name,
+                url,
+                payload,
+                scheduled_for=scheduled_for_time,
+                task_name=task_name
+            )
             queue.append(task)
             # The key for sorting is defined separately because of a mypy bug.
             # A [no-any-return] is thrown if key is defined in the sort()
@@ -238,9 +247,7 @@ class Emulator:
         else:
             return self._total_enqueued_tasks()
 
-    def process_and_flush_tasks(
-            self, queue_name: Optional[str] = None
-    ) -> None:
+    def process_and_flush_tasks(self, queue_name: Optional[str] = None) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.

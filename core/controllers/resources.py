@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for Oppia resources (templates, images)."""
 
 from __future__ import annotations
@@ -42,20 +41,21 @@ class ValueGeneratorHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         'generator_id': {
             'schema': {
                 'type': 'basestring',
-                'choices': [
-                    'Copier', 'RandomSelector'
-                ]
+                'choices': ['Copier', 'RandomSelector']
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, generator_id: str) -> None:
         """Handles GET requests."""
         self.response.write(
-            value_generators_domain.Registry.get_generator_class_by_id(
-                generator_id).get_html_template())
+            value_generators_domain.Registry.get_generator_class_by_id(generator_id).
+            get_html_template()
+        )
 
 
 class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -66,11 +66,10 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     _SUPPORTED_TYPES = ['image', 'audio', 'thumbnail']
     _SUPPORTED_PAGE_CONTEXTS = [
         feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL,
-        feconf.ENTITY_TYPE_BLOG_POST,
-        feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
-        feconf.ENTITY_TYPE_QUESTION, feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
-        feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
-        feconf.ENTITY_TYPE_CLASSROOM
+        feconf.ENTITY_TYPE_BLOG_POST, feconf.ENTITY_TYPE_TOPIC,
+        feconf.ENTITY_TYPE_STORY, feconf.ENTITY_TYPE_QUESTION,
+        feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
+        feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS, feconf.ENTITY_TYPE_CLASSROOM
     ]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -94,7 +93,8 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         },
         'encoded_filename': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': r'[-\w]+[.]\w+'
@@ -102,14 +102,13 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(
-        self,
-        page_context: str,
-        page_identifier: str,
-        asset_type: str,
+        self, page_context: str, page_identifier: str, asset_type: str,
         encoded_filename: str
     ) -> None:
         """Returns an asset file.
@@ -142,8 +141,9 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
             content_type = (
-                'image/svg+xml' if file_format == 'svg' else '%s/%s' % (
-                    asset_type, file_format))
+                'image/svg+xml' if file_format == 'svg' else '%s/%s' %
+                (asset_type, file_format)
+            )
             self.response.headers['Content-Type'] = content_type
 
             fs = fs_services.GcsFileSystem(page_context, page_identifier)
@@ -154,8 +154,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             self.response.cache_control.max_age = 600
             self.response.body_file = io.BytesIO(raw)
         except Exception as e:
-            logging.exception(
-                'File not found: %s. %s' % (encoded_filename, e))
+            logging.exception('File not found: %s. %s' % (encoded_filename, e))
             raise self.NotFoundException
 
 
@@ -169,9 +168,7 @@ class PromoBarHandlerNormalizedPayloadDict(TypedDict):
 
 
 class PromoBarHandler(
-    base.BaseHandler[
-        PromoBarHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[PromoBarHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler for the promo-bar."""
 
@@ -202,11 +199,13 @@ class PromoBarHandler(
         """Retrieves the configuration values for a promotional bar."""
         self.render_json({
             'promo_bar_enabled': (
-                platform_parameter_services.get_platform_parameter_value(
-                    'promo_bar_enabled')),
+                platform_parameter_services.
+                get_platform_parameter_value('promo_bar_enabled')
+            ),
             'promo_bar_message': (
-                platform_parameter_services.get_platform_parameter_value(
-                    'promo_bar_message'))
+                platform_parameter_services.
+                get_platform_parameter_value('promo_bar_message')
+            )
         })
 
     @acl_decorators.can_access_release_coordinator_page
@@ -219,7 +218,8 @@ class PromoBarHandler(
 
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
-            '%s' % (self.user_id, promo_bar_message_value))
+            '%s' % (self.user_id, promo_bar_message_value)
+        )
 
         rules_for_promo_bar_enabled_value = [
             platform_parameter_domain.PlatformParameterRule.from_dict({
@@ -236,29 +236,29 @@ class PromoBarHandler(
 
         promo_bar_enabled_parameter = (
             registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value)
+                platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value
+            )
         )
 
         promo_bar_message_parameter = (
             registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value)
+                platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
+            )
         )
 
         registry.Registry.update_platform_parameter(
-            'promo_bar_enabled',
-            self.user_id,
+            'promo_bar_enabled', self.user_id,
             'Update promo_bar_enabled property from release '
-            'coordinator page.',
-            rules_for_promo_bar_enabled_value,
-            promo_bar_enabled_parameter.default_value)
+            'coordinator page.', rules_for_promo_bar_enabled_value,
+            promo_bar_enabled_parameter.default_value
+        )
 
         registry.Registry.update_platform_parameter(
-            'promo_bar_message',
-            self.user_id,
+            'promo_bar_message', self.user_id,
             'Update promo_bar_message property from release '
-            'coordinator page.',
-            rules_for_promo_bar_message_value,
-            promo_bar_message_parameter.default_value)
+            'coordinator page.', rules_for_promo_bar_message_value,
+            promo_bar_message_parameter.default_value
+        )
 
         self.render_json({})
 
@@ -268,7 +268,9 @@ class FaviconHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -281,7 +283,9 @@ class RobotsTxtHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -305,7 +309,9 @@ class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             }
         },
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, folder: str, filename: str) -> None:
@@ -317,4 +323,6 @@ class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """
         self.redirect(
             fs_services.get_static_asset_url(
-                'copyrighted-images/%s/%s' % (folder, filename)))
+                'copyrighted-images/%s/%s' % (folder, filename)
+            )
+        )

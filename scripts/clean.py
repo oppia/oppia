@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Deletes temporary and installed files."""
 
 from __future__ import annotations
@@ -27,7 +26,8 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 _PARSER = argparse.ArgumentParser(
     description="""
 Deletes temporary and installed files.
-""")
+"""
+)
 
 
 def delete_directory_tree(directory_path: str) -> None:
@@ -79,5 +79,5 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when clean.py is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

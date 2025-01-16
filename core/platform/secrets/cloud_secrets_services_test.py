@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # sizeations under the License.
-
 """Tests for the Python Cloud Secret services."""
 
 from __future__ import annotations
@@ -29,16 +28,14 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
 
     def test_get_secret_returns_existing_secret(self) -> None:
         with self.swap_to_always_return(
-            cloud_secrets_services.CLIENT,
-            'access_secret_version',
+            cloud_secrets_services.CLIENT, 'access_secret_version',
             types.SimpleNamespace(payload=types.SimpleNamespace(data=b'secre'))
         ):
             self.assertEqual(cloud_secrets_services.get_secret('name'), 'secre')
 
     def test_get_secret_returns_none_when_secret_does_not_exist(self) -> None:
         with self.swap_to_always_raise(
-            cloud_secrets_services.CLIENT,
-            'access_secret_version',
+            cloud_secrets_services.CLIENT, 'access_secret_version',
             Exception('Secret not found')
         ):
             self.assertIsNone(cloud_secrets_services.get_secret('name2'))

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for validating access."""
 
 from __future__ import annotations
@@ -46,9 +45,8 @@ class ClassroomAccessValidationHandlerNormalizedRequestDict(TypedDict):
 
 
 class ClassroomAccessValidationHandler(
-    base.BaseHandler[
-        Dict[str, str], ClassroomAccessValidationHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str],
+                     ClassroomAccessValidationHandlerNormalizedRequestDict]
 ):
     """Validates whether request made to /learn route.
     """
@@ -74,18 +72,18 @@ class ClassroomAccessValidationHandler(
             NotFoundException. The classroom cannot be found.
         """
         assert self.normalized_request is not None
-        classroom_url_fragment = self.normalized_request[
-            'classroom_url_fragment'
-        ]
+        classroom_url_fragment = self.normalized_request['classroom_url_fragment']
         classroom = classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment)
+            classroom_url_fragment
+        )
 
         if not classroom:
             raise self.NotFoundException
 
         if not classroom.is_published:
             if self.user_id is None or not user_services.is_curriculum_admin(
-                self.user_id):
+                self.user_id
+            ):
                 raise self.NotFoundException
 
 
@@ -126,7 +124,8 @@ class SubtopicViewerPageAccessValidationHandler(
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'subtopic_url_fragment': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
@@ -137,7 +136,9 @@ class SubtopicViewerPageAccessValidationHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, *args: str) -> None:
@@ -153,13 +154,15 @@ class CollectionViewerPageAccessValidationHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
-       'collection_id': {
-           'schema': {
-               'type': 'basestring'
-           }
-       }
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_play_collection
     def get(self, _: str) -> None:
@@ -178,7 +181,9 @@ class TopicViewerPageAccessValidationHandler(
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _: str) -> None:
@@ -194,7 +199,9 @@ class FacilitatorDashboardPageAccessValidationHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
@@ -204,9 +211,7 @@ class FacilitatorDashboardPageAccessValidationHandler(
             PageNotFoundException. The learner groups are not enabled.
         """
         assert self.user_id is not None
-        if not learner_group_services.is_learner_group_feature_enabled(
-            self.user_id
-        ):
+        if not learner_group_services.is_learner_group_feature_enabled(self.user_id):
             raise self.NotFoundException
 
 
@@ -229,9 +234,7 @@ class ManageOwnAccountValidationHandler(
         pass
 
 
-class ProfileExistsValidationHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class ProfileExistsValidationHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The world-viewable profile page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -243,7 +246,9 @@ class ProfileExistsValidationHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, username: str) -> None:
@@ -256,8 +261,7 @@ class ProfileExistsValidationHandler(
             NotFoundException. No user settings found for the given
                 username.
         """
-        user_settings = user_services.get_user_settings_from_username(
-            username)
+        user_settings = user_services.get_user_settings_from_username(username)
 
         if not user_settings:
             raise self.NotFoundException
@@ -271,14 +275,15 @@ class DiagnosticTestPlayerAccessValidationHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
         if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
-            user_id=self.user_id
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value, user_id=self.user_id
         ):
             raise self.NotFoundException
 
@@ -311,7 +316,8 @@ class ViewLearnerGroupPageAccessValidationHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'learner_group_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
@@ -336,13 +342,12 @@ class ViewLearnerGroupPageAccessValidationHandler(
                 group.
         """
         assert self.user_id is not None
-        if not learner_group_services.is_learner_group_feature_enabled(
-            self.user_id
-        ):
+        if not learner_group_services.is_learner_group_feature_enabled(self.user_id):
             raise self.NotFoundException
 
         is_valid_request = learner_group_services.is_user_learner(
-            self.user_id, learner_group_id)
+            self.user_id, learner_group_id
+        )
 
         if not is_valid_request:
             raise self.NotFoundException
@@ -360,9 +365,7 @@ class ExplorationPlayerPageNormalizedRequestDict(TypedDict):
 
 
 class ExplorationPlayerAccessValidationPage(
-    base.BaseHandler[
-        Dict[str, str], ExplorationPlayerPageNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], ExplorationPlayerPageNormalizedRequestDict]
 ):
     """Page describing a single exploration."""
 
@@ -375,7 +378,8 @@ class ExplorationPlayerAccessValidationPage(
         'GET': {
             'v': {
                 'schema': {
-                    'type': 'int',
+                    'type':
+                        'int',
                     'validators': [{
                         'id': 'is_at_least',
                         # Version must be greater than zero.
@@ -398,7 +402,8 @@ class ExplorationPlayerAccessValidationPage(
             },
             'collection_id': {
                 'schema': {
-                    'type': 'basestring',
+                    'type':
+                        'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
                         'regex_pattern': constants.ENTITY_ID_REGEX
@@ -451,9 +456,7 @@ class CreateLearnerGroupPageAccessValidationHandler(
             NotFoundException. The learner groups are not enabled.
         """
         assert self.user_id is not None
-        if not learner_group_services.is_learner_group_feature_enabled(
-            self.user_id
-        ):
+        if not learner_group_services.is_learner_group_feature_enabled(self.user_id):
             raise self.NotFoundException
 
 
@@ -467,7 +470,8 @@ class EditLearnerGroupPageAccessValidationHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'learner_group_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
@@ -492,13 +496,12 @@ class EditLearnerGroupPageAccessValidationHandler(
                 group.
         """
         assert self.user_id is not None
-        if not learner_group_services.is_learner_group_feature_enabled(
-            self.user_id
-        ):
+        if not learner_group_services.is_learner_group_feature_enabled(self.user_id):
             raise self.NotFoundException
 
         is_valid_request = learner_group_services.is_user_facilitator(
-            self.user_id, learner_group_id)
+            self.user_id, learner_group_id
+        )
 
         if not is_valid_request:
             raise self.NotFoundException
@@ -531,9 +534,8 @@ class BlogPostPageAccessValidationHandlerNormalizedRequestDict(TypedDict):
 
 
 class BlogPostPageAccessValidationHandler(
-    base.BaseHandler[
-        Dict[str, str], BlogPostPageAccessValidationHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str],
+                     BlogPostPageAccessValidationHandlerNormalizedRequestDict]
 ):
     """Validates whether request made to correct blog post route."""
 
@@ -558,10 +560,8 @@ class BlogPostPageAccessValidationHandler(
             NotFoundException. The blog post cannot be found.
         """
         assert self.normalized_request is not None
-        blog_post_url_fragment = self.normalized_request[
-            'blog_post_url_fragment']
-        blog_post = blog_services.get_blog_post_by_url_fragment(
-            blog_post_url_fragment)
+        blog_post_url_fragment = self.normalized_request['blog_post_url_fragment']
+        blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url_fragment)
 
         if not blog_post:
             raise self.NotFoundException
@@ -602,12 +602,11 @@ class BlogAuthorProfilePageAccessValidationHandler(
                 post author.
         """
         author_settings = (
-            user_services.get_user_settings_from_username(author_username))
+            user_services.get_user_settings_from_username(author_username)
+        )
 
         if author_settings is None:
-            raise self.NotFoundException(
-                'User with given username does not exist'
-            )
+            raise self.NotFoundException('User with given username does not exist')
 
         if not user_services.is_user_blog_post_author(author_settings.user_id):
             raise self.NotFoundException(
@@ -625,7 +624,8 @@ class SkillEditorPageAccessValidationHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.ENTITY_ID_REGEX
@@ -633,7 +633,9 @@ class SkillEditorPageAccessValidationHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id: str) -> None:
@@ -650,8 +652,7 @@ class SkillEditorPageAccessValidationHandler(
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
-            raise self.NotFoundException(
-                'The skill with the given id doesn\'t exist.')
+            raise self.NotFoundException('The skill with the given id doesn\'t exist.')
 
 
 class CollectionEditorAccessValidationPage(
@@ -666,7 +667,9 @@ class CollectionEditorAccessValidationPage(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_collection
     def get(self, _: str) -> None:
@@ -690,7 +693,9 @@ class StoryEditorAccessValidationHandlerPage(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_story
     def get(self, unused_story_id: str) -> None:
@@ -714,7 +719,9 @@ class ReviewTestsPageAccessValidationHandler(
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, _: str) -> None:

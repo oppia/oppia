@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for InteractiveMap interaction."""
 
 from __future__ import annotations
@@ -49,7 +48,8 @@ class InteractiveMap(base.BaseInteraction):
         'name': 'latitude',
         'description': 'Starting center latitude (-90 to 90)',
         'schema': {
-            'type': 'float',
+            'type':
+                'float',
             'validators': [{
                 'id': 'is_at_least',
                 'min_value': -90.0,
@@ -63,7 +63,8 @@ class InteractiveMap(base.BaseInteraction):
         'name': 'longitude',
         'description': 'Starting center longitude (-180 to 180)',
         'schema': {
-            'type': 'float',
+            'type':
+                'float',
             'validators': [{
                 'id': 'is_at_least',
                 'min_value': -180.0,

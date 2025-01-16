@@ -268,7 +268,7 @@ class ExplorationStats:
         state_stats_mapping_dict = {}
         for state_name in self.state_stats_mapping:
             state_stats_mapping_dict[state_name] = self.state_stats_mapping[state_name
-                                                                            ].to_dict()
+                                                                           ].to_dict()
 
         exploration_stats_dict: ExplorationStatsDict = {
             'exp_id': self.exp_id,
@@ -528,7 +528,7 @@ class StateStats:
             self.num_completions_v2 += other.num_completions
         else:
             raise TypeError(
-                '%s can not be aggregated from' % (other.__class__.__name__, )
+                '%s can not be aggregated from' % (other.__class__.__name__,)
             )
 
     def to_dict(self) -> Dict[str, int]:
@@ -792,8 +792,9 @@ class SessionStateStats:
             # Here we use MyPy ignore because MyPy does not recognize
             # that keys represented by the variable exp_stats_property
             # are string literals.
-            if not isinstance(aggregated_stats[exp_stats_property],
-                              int):  # type: ignore[misc]
+            if not isinstance(
+                aggregated_stats[exp_stats_property], int
+            ):  # type: ignore[misc]
                 raise utils.ValidationError(
                     'Expected %s to be an int, received %s' % (
                         exp_stats_property,
@@ -811,8 +812,9 @@ class SessionStateStats:
                         '%s not in state stats mapping of %s in aggregated '
                         'stats dict.' % (state_stats_property, state_name)
                     )
-                if not isinstance(state_stats_mapping[state_name][state_stats_property],
-                                  int):
+                if not isinstance(
+                    state_stats_mapping[state_name][state_stats_property], int
+                ):
                     state_stats = state_stats_mapping[state_name]
                     raise utils.ValidationError(
                         'Expected %s to be an int, received %s' %
@@ -1122,11 +1124,11 @@ class ExplorationIssue:
             #  https://docs.python.org/3.7/library/constants.html
             return NotImplemented
         return (
-            self.issue_type == other.issue_type
-            and self.issue_customization_args == other.issue_customization_args
-            and self.playthrough_ids == other.playthrough_ids
-            and self.schema_version == other.schema_version
-            and self.is_valid == other.is_valid
+            self.issue_type == other.issue_type and
+            self.issue_customization_args == other.issue_customization_args and
+            self.playthrough_ids == other.playthrough_ids and
+            self.schema_version == other.schema_version and
+            self.is_valid == other.is_valid
         )
 
     def to_dict(self) -> ExplorationIssueDict:
@@ -1419,8 +1421,10 @@ class StateAnswers:
                 )
 
             # Verify interaction_id is valid.
-            if (self.interaction_id
-                    not in interaction_registry.Registry.get_all_interaction_ids()):
+            if (
+                self.interaction_id
+                not in interaction_registry.Registry.get_all_interaction_ids()
+            ):
                 raise utils.ValidationError(
                     'Unknown interaction_id: %s' % self.interaction_id
                 )
@@ -1575,8 +1579,9 @@ class SubmittedAnswer:
                 str(self.answer_group_index)
             )
 
-        if self.rule_spec_index is not None and not (isinstance(self.rule_spec_index,
-                                                                int)):
+        if self.rule_spec_index is not None and not (
+            isinstance(self.rule_spec_index, int)
+        ):
             raise utils.ValidationError(
                 'Expected rule_spec_index to be an integer, received %s' %
                 str(self.rule_spec_index)
@@ -1600,8 +1605,9 @@ class SubmittedAnswer:
                 self.time_spent_in_sec
             )
 
-        if self.answer is None and (self.interaction_id
-                                    not in feconf.LINEAR_INTERACTION_IDS):
+        if self.answer is None and (
+            self.interaction_id not in feconf.LINEAR_INTERACTION_IDS
+        ):
             raise utils.ValidationError(
                 'SubmittedAnswers must have a provided answer except for '
                 'linear interactions'
@@ -1641,7 +1647,10 @@ class AnswerOccurrence:
                 'frequency': int. The number of occurrences of the answer.
             }
         """
-        return {'answer': self.answer, 'frequency': self.frequency}
+        return {
+            'answer': self.answer,
+            'frequency': self.frequency
+        }
 
     @classmethod
     def from_raw_type(
@@ -1722,12 +1731,10 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         Returns:
             AnswerFrequencyList. The domain object for answer occurrences list.
         """
-        return cls(
-            [
-                AnswerOccurrence.from_raw_type(answer_occurrence_dict)
-                for answer_occurrence_dict in answer_occurrence_list
-            ]
-        )
+        return cls([
+            AnswerOccurrence.from_raw_type(answer_occurrence_dict)
+            for answer_occurrence_dict in answer_occurrence_list
+        ])
 
 
 class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
@@ -1760,9 +1767,8 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
             }
         """
         return {
-            category: answer_frequency_list.to_raw_type()
-            for category, answer_frequency_list in
-            (self.categorized_answer_freq_lists.items())
+            category: answer_frequency_list.to_raw_type() for category,
+            answer_frequency_list in (self.categorized_answer_freq_lists.items())
         }
 
     @classmethod
@@ -1786,13 +1792,10 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
             CategorizedAnswerFrequencyLists. The domain object for categorized
             answer frequency dict.
         """
-        return cls(
-            {
-                category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
-                for category, answer_occurrence_list in
-                (categorized_frequency_dict.items())
-            }
-        )
+        return cls({
+            category: AnswerFrequencyList.from_raw_type(answer_occurrence_list) for
+            category, answer_occurrence_list in (categorized_frequency_dict.items())
+        })
 
 
 class StateAnswersCalcOutput:
@@ -1855,9 +1858,10 @@ class StateAnswersCalcOutput:
                 str(self.calculation_id)
             )
 
-        if (not isinstance(self.calculation_output, AnswerFrequencyList)
-                and not isinstance(self.calculation_output,
-                                   CategorizedAnswerFrequencyLists)):
+        if (
+            not isinstance(self.calculation_output, AnswerFrequencyList) and
+            not isinstance(self.calculation_output, CategorizedAnswerFrequencyLists)
+        ):
             raise utils.ValidationError(
                 'Expected calculation output to be one of AnswerFrequencyList '
                 'or CategorizedAnswerFrequencyLists, encountered: %s' %
@@ -1929,19 +1933,20 @@ class LearnerAnswerDetails:
             dict. A dict, mapping all fields of LearnerAnswerDetails instance.
         """
         return {
-            'state_reference': self.state_reference,
-            'entity_type': self.entity_type,
-            'interaction_id': self.interaction_id,
+            'state_reference':
+                self.state_reference,
+            'entity_type':
+                self.entity_type,
+            'interaction_id':
+                self.interaction_id,
             'learner_answer_info_list': [
                 learner_answer_info.to_dict()
                 for learner_answer_info in (self.learner_answer_info_list)
             ],
-            'accumulated_answer_info_json_size_bytes': (
-                self.accumulated_answer_info_json_size_bytes
-            ),
-            'learner_answer_info_schema_version': (
-                self.learner_answer_info_schema_version
-            )
+            'accumulated_answer_info_json_size_bytes':
+                (self.accumulated_answer_info_json_size_bytes),
+            'learner_answer_info_schema_version':
+                (self.learner_answer_info_schema_version)
         }
 
     @classmethod
@@ -2010,8 +2015,10 @@ class LearnerAnswerDetails:
                 str(self.interaction_id)
             )
 
-        if (self.interaction_id
-                not in interaction_registry.Registry.get_all_interaction_ids()):
+        if (
+            self.interaction_id
+            not in interaction_registry.Registry.get_all_interaction_ids()
+        ):
             raise utils.ValidationError(
                 'Unknown interaction_id: %s' % self.interaction_id
             )
@@ -2054,8 +2061,10 @@ class LearnerAnswerDetails:
         learner_answer_info_dict_size = (
             learner_answer_info.get_learner_answer_info_dict_size()
         )
-        if (self.accumulated_answer_info_json_size_bytes + learner_answer_info_dict_size
-                <= (MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE)):
+        if (
+            self.accumulated_answer_info_json_size_bytes + learner_answer_info_dict_size
+            <= (MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE)
+        ):
             self.learner_answer_info_list.append(learner_answer_info)
             self.accumulated_answer_info_json_size_bytes += (
                 learner_answer_info_dict_size

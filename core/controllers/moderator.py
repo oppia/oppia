@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the moderator page."""
 
 from __future__ import annotations
@@ -36,10 +35,7 @@ class FeaturedActivitiesHandlerNormalizedPayloadDict(TypedDict):
 
 
 class FeaturedActivitiesHandler(
-    base.BaseHandler[
-        FeaturedActivitiesHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[FeaturedActivitiesHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """The moderator page handler for featured activities."""
 
@@ -79,12 +75,14 @@ class FeaturedActivitiesHandler(
 
         try:
             summary_services.require_activities_to_be_public(
-                featured_activity_references)
+                featured_activity_references
+            )
         except Exception as e:
             raise self.InvalidInputException(e)
 
         activity_services.update_featured_activity_references(
-            featured_activity_references)
+            featured_activity_references
+        )
 
         self.render_json({})
 
@@ -94,12 +92,14 @@ class EmailDraftHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_send_moderator_emails
     def get(self) -> None:
         """Handles GET requests."""
         self.render_json({
-            'draft_email_body': (
-                email_manager.get_moderator_unpublish_exploration_email()),
+            'draft_email_body':
+                (email_manager.get_moderator_unpublish_exploration_email()),
         })

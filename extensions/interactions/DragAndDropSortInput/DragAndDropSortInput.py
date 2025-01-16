@@ -44,15 +44,12 @@ class DragAndDropSortInput(base.BaseInteraction):
         'description': 'Items for drag and drop',
         'schema': {
             'type': 'list',
-            'validators': [
-                {
-                    'id': 'has_length_at_least',
-                    'min_value': 2
-                },
-                {
-                    'id': 'has_unique_subtitled_contents'
-                }
-            ],
+            'validators': [{
+                'id': 'has_length_at_least',
+                'min_value': 2
+            }, {
+                'id': 'has_unique_subtitled_contents'
+            }],
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
@@ -61,9 +58,10 @@ class DragAndDropSortInput(base.BaseInteraction):
                 }],
                 'replacement_ui_config': {
                     'html': {
-                        'hide_complex_extensions': True,
-                        'placeholder': (
-                            'Enter an option for the learner to drag and drop.')
+                        'hide_complex_extensions':
+                            True,
+                        'placeholder':
+                            ('Enter an option for the learner to drag and drop.')
                     }
                 }
             },

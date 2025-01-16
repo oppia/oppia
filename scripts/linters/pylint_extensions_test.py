@@ -70,9 +70,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             node=node_no_newline_below_class_docstring
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
     def test_excessive_newline_below_class_docstring(self) -> None:
@@ -104,9 +102,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             node=node_excessive_newline_below_class_docstring
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
     def test_inline_comment_after_class_docstring(self) -> None:
@@ -138,9 +134,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             node=node_inline_comment_after_class_docstring
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
     def test_multiline_class_argument_with_incorrect_style(self) -> None:
@@ -171,9 +165,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             node=node_multiline_class_argument_with_incorrect_style
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
     def test_multiline_class_argument_with_correct_style(self) -> None:
@@ -222,9 +214,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_with_no_error_message
-        )
+        self.checker_test_object.checker.visit_classdef(node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -246,9 +236,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_class_with_no_docstring.file = filename
         node_class_with_no_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_class_with_no_docstring
-        )
+        self.checker_test_object.checker.visit_classdef(node_class_with_no_docstring)
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -308,9 +296,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             node=node_newline_before_docstring_with_incorrect_style
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
     def test_malformed_args_section(self) -> None:
@@ -329,9 +315,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='malformed-args-section', node=node_malformed_args_section
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_args_section
             )
@@ -349,13 +333,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='malformed-returns-section',
-            node=node_malformed_returns_section
+            msg_id='malformed-returns-section', node=node_malformed_returns_section
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_returns_section
             )
@@ -373,13 +354,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='malformed-yields-section',
-            node=node_malformed_yields_section
+            msg_id='malformed-yields-section', node=node_malformed_yields_section
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_yields_section
             )
@@ -397,13 +375,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='malformed-raises-section',
-            node=node_malformed_raises_section
+            msg_id='malformed-raises-section', node=node_malformed_raises_section
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_raises_section
             )
@@ -424,9 +399,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='malformed-args-argument', node=node_malformed_args_argument
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_args_argument
             )
@@ -511,9 +484,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='space-after-triple-quote', node=node_space_after_docstring
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_space_after_docstring
             )
@@ -527,16 +498,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         """
         )
         message = testutils.MessageTest(
-            msg_id='single-line-docstring-span-two-lines',
-            node=node_with_docstring
+            msg_id='single-line-docstring-span-two-lines', node=node_with_docstring
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
-            self.checker_test_object.checker.visit_functiondef(
-                node_with_docstring
-            )
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
+            self.checker_test_object.checker.visit_functiondef(node_with_docstring)
 
     def test_single_line_docstring_span_two_lines(self) -> None:
         node_single_line_docstring_span_two_lines = astroid.extract_node(
@@ -552,9 +518,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             node=node_single_line_docstring_span_two_lines
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_single_line_docstring_span_two_lines
             )
@@ -571,12 +535,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='no-period-used', node=node_no_period_at_end
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
-            self.checker_test_object.checker.visit_functiondef(
-                node_no_period_at_end
-            )
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
+            self.checker_test_object.checker.visit_functiondef(node_no_period_at_end)
 
     def test_empty_line_before_end_of_docstring(self) -> None:
         node_empty_line_before_end = astroid.extract_node(
@@ -592,9 +552,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='empty-line-before-end', node=node_empty_line_before_end
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_empty_line_before_end
             )
@@ -619,13 +577,9 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         with self.checker_test_object.assertAddsMessages(
-            no_period_at_end_message,
-            malformed_args_message,
-            ignore_position=True
+            no_period_at_end_message, malformed_args_message, ignore_position=True
         ):
-            self.checker_test_object.checker.visit_functiondef(
-                node_no_period_at_end
-            )
+            self.checker_test_object.checker.visit_functiondef(node_no_period_at_end)
 
     def test_no_newline_at_end_of_multi_line_docstring(self) -> None:
         node_no_newline_at_end = astroid.extract_node(
@@ -642,12 +596,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='no-newline-used-at-end', node=node_no_newline_at_end
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
-            self.checker_test_object.checker.visit_functiondef(
-                node_no_newline_at_end
-            )
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
+            self.checker_test_object.checker.visit_functiondef(node_no_newline_at_end)
 
     def test_no_newline_above_args(self) -> None:
         node_single_newline_above_args = astroid.extract_node(
@@ -660,13 +610,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='single-space-above-args',
-            node=node_single_newline_above_args
+            msg_id='single-space-above-args', node=node_single_newline_above_args
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_single_newline_above_args
             )
@@ -683,13 +630,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='single-space-above-raises',
-            node=node_single_newline_above_raises
+            msg_id='single-space-above-raises', node=node_single_newline_above_raises
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_single_newline_above_raises
             )
@@ -706,13 +650,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='single-space-above-returns',
-            node=node_with_no_space_above_return
+            msg_id='single-space-above-returns', node=node_with_no_space_above_return
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_with_no_space_above_return
             )
@@ -732,13 +673,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='single-space-above-raises',
-            node=node_newline_above_args_raises
+            msg_id='single-space-above-raises', node=node_newline_above_args_raises
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_newline_above_args_raises
             )
@@ -757,13 +695,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='single-space-above-returns',
-            node=node_newline_above_args_returns
+            msg_id='single-space-above-returns', node=node_newline_above_args_returns
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_newline_above_args_returns
             )
@@ -786,13 +721,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         message = testutils.MessageTest(
-            msg_id='single-space-above-raises',
-            node=node_newline_above_returns_raises
+            msg_id='single-space-above-raises', node=node_newline_above_returns_raises
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 node_newline_above_returns_raises
             )
@@ -837,9 +769,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             single_space_above_yields_message,
             ignore_position=True
         ):
-            self.checker_test_object.checker.visit_functiondef(
-                node_with_two_newline
-            )
+            self.checker_test_object.checker.visit_functiondef(node_with_two_newline)
 
     def test_return_in_comment(self) -> None:
         node_with_return_in_comment = astroid.extract_node(
@@ -872,9 +802,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_functiondef(
-                node_with_no_args
-            )
+            self.checker_test_object.checker.visit_functiondef(node_with_no_args)
 
     def test_well_placed_newline(self) -> None:
         node_with_no_error_message = astroid.extract_node(
@@ -921,9 +849,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             node=raises_invalid_indentation_node
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 raises_invalid_indentation_node
             )
@@ -943,9 +869,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='4-space-indentation-in-docstring',
             node=return_invalid_indentation_node
         )
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 return_invalid_indentation_node
             )
@@ -997,9 +921,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='4-space-indentation-in-docstring',
             node=invalid_return_description_indentation_node
         )
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_return_description_indentation_node
             )
@@ -1019,9 +941,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             msg_id='4-space-indentation-in-docstring',
             node=invalid_yield_description_indentation_node
         )
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_yield_description_indentation_node
             )
@@ -1044,13 +964,9 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         )
 
         with self.checker_test_object.assertAddsMessages(
-            malformed_raises_message,
-            malformed_raises_message,
-            ignore_position=True
+            malformed_raises_message, malformed_raises_message, ignore_position=True
         ):
-            self.checker_test_object.checker.visit_functiondef(
-                invalid_parameter_name
-            )
+            self.checker_test_object.checker.visit_functiondef(invalid_parameter_name)
 
     def test_well_formed_single_line_docstring(self) -> None:
         node_with_no_error_message = astroid.extract_node(
@@ -1293,9 +1209,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         """
         )
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_functiondef(
-                valid_free_form_node
-            )
+            self.checker_test_object.checker.visit_functiondef(valid_free_form_node)
 
         valid_indentation_node = astroid.extract_node(
             """
@@ -1315,9 +1229,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         """
         )
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_functiondef(
-                valid_indentation_node
-            )
+            self.checker_test_object.checker.visit_functiondef(valid_indentation_node)
 
         valid_indentation_with_kw_args_node = astroid.extract_node(
             """
@@ -1406,8 +1318,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
          )
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
-                msg_id='redundant-returns-doc',
-                node=missing_yield_type_func_node
+                msg_id='redundant-returns-doc', node=missing_yield_type_func_node
             ),
             ignore_position=True,
         ):
@@ -1419,8 +1330,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 msg_id='missing-yield-doc', node=missing_yield_type_func_node
             ),
             testutils.MessageTest(
-                msg_id='missing-yield-type-doc',
-                node=missing_yield_type_func_node
+                msg_id='missing-yield-type-doc', node=missing_yield_type_func_node
             ),
             ignore_position=True,
         ):
@@ -1428,9 +1338,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 missing_yield_type_yield_node
             )
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_return(
-                missing_yield_type_yield_node
-            )
+            self.checker_test_object.checker.visit_return(missing_yield_type_yield_node)
 
         (missing_return_type_func_node,
          missing_return_type_return_node) = astroid.extract_node(
@@ -1452,8 +1360,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
          )
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
-                msg_id='redundant-yields-doc',
-                node=missing_return_type_func_node
+                msg_id='redundant-yields-doc', node=missing_return_type_func_node
             ),
             ignore_position=True,
         ):
@@ -1465,8 +1372,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 msg_id='missing-return-doc', node=missing_return_type_func_node
             ),
             testutils.MessageTest(
-                msg_id='missing-return-type-doc',
-                node=missing_return_type_func_node
+                msg_id='missing-return-type-doc', node=missing_return_type_func_node
             ),
             ignore_position=True,
         ):
@@ -1517,9 +1423,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_raise(
-                missing_raise_type_raise_node
-            )
+            self.checker_test_object.checker.visit_raise(missing_raise_type_raise_node)
 
         valid_raise_node = astroid.extract_node(
             """
@@ -1668,9 +1572,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_functiondef(
-                missing_param_func_node
-            )
+            self.checker_test_object.checker.visit_functiondef(missing_param_func_node)
 
         missing_param_func_node = astroid.extract_node(
             """
@@ -1716,9 +1618,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_functiondef(
-                missing_param_func_node
-            )
+            self.checker_test_object.checker.visit_functiondef(missing_param_func_node)
 
         class_node, multiple_constructor_func_node = astroid.extract_node(
             """
@@ -1772,9 +1672,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         func_node = raise_node.frame()
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
-                msg_id='missing-raises-doc',
-                args=('RuntimeError',),
-                node=func_node
+                msg_id='missing-raises-doc', args=('RuntimeError',), node=func_node
             ),
             ignore_position=True,
         ):
@@ -1785,9 +1683,7 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
 
     def test_finds_import_from(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.ImportOnlyModulesChecker
-        )
+        checker_test_object.CHECKER_CLASS = (pylint_extensions.ImportOnlyModulesChecker)
         checker_test_object.setup_method()
         importfrom_node1 = astroid.extract_node(
             """
@@ -1858,9 +1754,7 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         self
     ) -> None:
         checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.ImportOnlyModulesChecker
-        )
+        checker_test_object.CHECKER_CLASS = (pylint_extensions.ImportOnlyModulesChecker)
         checker_test_object.setup_method()
         importfrom_node = astroid.extract_node(
             """
@@ -1912,9 +1806,7 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
 
     def test_finds_function_def(self) -> None:
         checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.FunctionArgsOrderChecker
-        )
+        checker_test_object.CHECKER_CLASS = (pylint_extensions.FunctionArgsOrderChecker)
         checker_test_object.setup_method()
         functiondef_node1 = astroid.extract_node(
             """
@@ -1968,22 +1860,20 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
         # The spaces are included on purpose so that we properly test
         # the input sanitization.
-        self.checker_test_object.checker.config.forbidden_imports = (
-            (
-                '*core.controllers*:\n'
-                '    import core.platform*   |  \n'
-                '    import core.storage*\n'
-            ), ('*core.domain*:import core.controllers*'),
-            ('   *core.storage*:import    core.domain*   '), (
-                '*core.domain.*_domain:\n'
-                '    from core.domain    import    *_service*   |\n'
-                '    from   core.domain import *_cleaner|\n'
-                '      from core.domain import *_registry |\n'
-                '    from core.domain import *_fetchers  |\n'
-                '    from core.domain import *_manager |\n'
-                '       from core.platform import   models'
-            )
-        )
+        self.checker_test_object.checker.config.forbidden_imports = ((
+            '*core.controllers*:\n'
+            '    import core.platform*   |  \n'
+            '    import core.storage*\n'
+        ), ('*core.domain*:import core.controllers*'
+           ), ('   *core.storage*:import    core.domain*   '), (
+               '*core.domain.*_domain:\n'
+               '    from core.domain    import    *_service*   |\n'
+               '    from   core.domain import *_cleaner|\n'
+               '      from core.domain import *_registry |\n'
+               '    from core.domain import *_fetchers  |\n'
+               '    from core.domain import *_manager |\n'
+               '       from core.platform import   models'
+           ))
         self.checker_test_object.checker.open()
 
     def test_forbid_domain_import_in_storage_module(self) -> None:
@@ -2028,9 +1918,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_importfrom(
-                node_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_err_importfrom)
 
     def test_allow_platform_from_import_in_storage_module(self) -> None:
         node_no_err_importfrom = astroid.extract_node(
@@ -2040,9 +1928,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         )
         node_no_err_importfrom.root().name = 'oppia.core.storage.topicl'
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_importfrom(
-                node_no_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
 
     def test_forbid_controllers_import_in_domain_module(self) -> None:
         node_err_import = astroid.extract_node(
@@ -2086,9 +1972,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_importfrom(
-                node_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_err_importfrom)
 
     def test_allow_platform_from_import_in_domain_module(self) -> None:
         node_no_err_importfrom = astroid.extract_node(
@@ -2098,9 +1982,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         )
         node_no_err_importfrom.root().name = 'oppia.core.domain'
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_importfrom(
-                node_no_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
 
     def test_forbid_service_import_in_domain_file(self) -> None:
         node_err_import = astroid.extract_node(
@@ -2144,9 +2026,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_importfrom(
-                node_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_err_importfrom)
 
     def test_allow_domain_file_from_import_in_domain_file(self) -> None:
         node_no_err_importfrom = astroid.extract_node(
@@ -2156,9 +2036,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         )
         node_no_err_importfrom.root().name = 'oppia.core.domain.story_domain'
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_importfrom(
-                node_no_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
 
     def test_forbid_platform_import_in_controllers_module(self) -> None:
         node_err_import = astroid.extract_node(
@@ -2219,9 +2097,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_importfrom(
-                node_no_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
 
     def test_forbid_storage_from_import_in_controllers_module(self) -> None:
         node_no_err_importfrom = astroid.extract_node(
@@ -2238,9 +2114,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_importfrom(
-                node_no_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
 
     def test_allow_domain_from_import_in_controllers_module(self) -> None:
         node_no_err_importfrom = astroid.extract_node(
@@ -2250,9 +2124,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         )
         node_no_err_importfrom.root().name = 'oppia.core.controllers.controller'
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_importfrom(
-                node_no_err_importfrom
-            )
+            self.checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
 
 
 class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
@@ -2360,9 +2232,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         node_function_with_type_ignore_only.file = filename
 
         message = testutils.MessageTest(
-            msg_id='mypy-ignore-used',
-            line=2,
-            node=node_function_with_type_ignore_only
+            msg_id='mypy-ignore-used', line=2, node=node_function_with_type_ignore_only
         )
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_module(
@@ -2484,9 +2354,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 ) #@
                 """
             )
-        node_with_multiple_prohibited_error_code_in_combined_form.file = (
-            filename
-        )
+        node_with_multiple_prohibited_error_code_in_combined_form.file = (filename)
 
         message = testutils.MessageTest(
             msg_id='prohibited-type-ignore-used',
@@ -2501,9 +2369,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
-    def test_extra_type_ignore_comment_used_in_a_module_raises_error(
-        self
-    ) -> None:
+    def test_extra_type_ignore_comment_used_in_a_module_raises_error(self) -> None:
         node_function_with_extra_comment = astroid.scoped_nodes.Module(
             name='test', doc='Custom test'
         )
@@ -2746,15 +2612,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             node=node_with_generic_type_ignore
         )
         message2 = testutils.MessageTest(
-            msg_id='redundant-type-comment',
-            line=2,
-            node=node_with_generic_type_ignore
+            msg_id='redundant-type-comment', line=2, node=node_with_generic_type_ignore
         )
 
         with self.checker_test_object.assertAddsMessages(message1, message2):
-            self.checker_test_object.checker.visit_module(
-                node_with_generic_type_ignore
-            )
+            self.checker_test_object.checker.visit_module(node_with_generic_type_ignore)
         temp_file.close()
 
         node_with_both_generic_and_non_generic_type_ignores = (
@@ -2814,9 +2676,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         node_with_ignore_having_todo.file = filename
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_ignore_having_todo
-            )
+            self.checker_test_object.checker.visit_module(node_with_ignore_having_todo)
         temp_file.close()
 
 
@@ -2830,13 +2690,9 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         )
         self.checker_test_object.setup_method()
 
-    def test_raises_error_if_exceptional_types_are_used_without_comment(
-        self
-    ) -> None:
+    def test_raises_error_if_exceptional_types_are_used_without_comment(self) -> None:
         # Checking for Any type.
-        node_with_any_type = astroid.scoped_nodes.Module(
-            name='test', doc='Custom test'
-        )
+        node_with_any_type = astroid.scoped_nodes.Module(name='test', doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
@@ -2901,9 +2757,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_module(node_with_cast_method)
         temp_file.close()
 
-    def test_raises_error_if_exceptional_types_are_combined_in_module(
-        self
-    ) -> None:
+    def test_raises_error_if_exceptional_types_are_combined_in_module(self) -> None:
         node_with_combined_types = astroid.scoped_nodes.Module(
             name='test', doc='Custom test'
         )
@@ -2943,12 +2797,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         message3 = testutils.MessageTest(
             msg_id='cast-func-used', line=18, node=node_with_combined_types
         )
-        with self.checker_test_object.assertAddsMessages(
-            message1, message3, message2
-        ):
-            self.checker_test_object.checker.visit_module(
-                node_with_combined_types
-            )
+        with self.checker_test_object.assertAddsMessages(message1, message3, message2):
+            self.checker_test_object.checker.visit_module(node_with_combined_types)
         temp_file.close()
 
     def test_raises_error_if_any_type_used_in_function_signature(self) -> None:
@@ -2971,9 +2821,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             msg_id='any-type-used', line=2, node=node_with_any_type_arg
         )
         with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_any_type_arg
-            )
+            self.checker_test_object.checker.visit_module(node_with_any_type_arg)
         temp_file.close()
 
         node_with_any_type_return = astroid.scoped_nodes.Module(
@@ -2995,9 +2843,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             msg_id='any-type-used', line=2, node=node_with_any_type_return
         )
         with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_any_type_return
-            )
+            self.checker_test_object.checker.visit_module(node_with_any_type_return)
         temp_file.close()
 
         node_with_any_type_return_and_args = astroid.scoped_nodes.Module(
@@ -3016,9 +2862,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         node_with_any_type_return_and_args.file = filename
 
         message = testutils.MessageTest(
-            msg_id='any-type-used',
-            line=2,
-            node=node_with_any_type_return_and_args
+            msg_id='any-type-used', line=2, node=node_with_any_type_return_and_args
         )
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_module(
@@ -3048,14 +2892,10 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         node_with_multiple_any_type_functions.file = filename
 
         message = testutils.MessageTest(
-            msg_id='any-type-used',
-            line=2,
-            node=node_with_multiple_any_type_functions
+            msg_id='any-type-used', line=2, node=node_with_multiple_any_type_functions
         )
         message2 = testutils.MessageTest(
-            msg_id='any-type-used',
-            line=8,
-            node=node_with_multiple_any_type_functions
+            msg_id='any-type-used', line=8, node=node_with_multiple_any_type_functions
         )
         with self.checker_test_object.assertAddsMessages(message, message2):
             self.checker_test_object.checker.visit_module(
@@ -3106,9 +2946,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
-    def test_exceptional_types_with_comments_should_not_raise_error(
-        self
-    ) -> None:
+    def test_exceptional_types_with_comments_should_not_raise_error(self) -> None:
         node_with_any_type_and_comment = astroid.scoped_nodes.Module(
             name='test', doc='Custom test'
         )
@@ -3291,9 +3129,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
-    def test_no_error_raised_if_objects_are_present_with_todo_comment(
-        self
-    ) -> None:
+    def test_no_error_raised_if_objects_are_present_with_todo_comment(self) -> None:
         node_with_object_and_todo_comment = astroid.scoped_nodes.Module(
             name='test', doc='Custom test'
         )
@@ -3351,9 +3187,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             pylint_utils.tokenize_module(node_invalid_punctuation)
         )
 
-        message = testutils.MessageTest(
-            msg_id='invalid-punctuation-used', line=2
-        )
+        message = testutils.MessageTest(msg_id='invalid-punctuation-used', line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -3401,9 +3235,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             pylint_utils.tokenize_module(node_no_capital_letter_at_beginning)
         )
 
-        message = testutils.MessageTest(
-            msg_id='no-capital-letter-at-beginning', line=3
-        )
+        message = testutils.MessageTest(msg_id='no-capital-letter-at-beginning', line=3)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -3440,25 +3272,20 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                """a = 1 + 2  # type: ignore[some-rule]
-                """
-            )
+            tmp.write("""a = 1 + 2  # type: ignore[some-rule]
+                """)
 
         node_inline_comment_with_allowed_pragma.file = filename
         node_inline_comment_with_allowed_pragma.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            pylint_utils.
-            tokenize_module(node_inline_comment_with_allowed_pragma)
+            pylint_utils.tokenize_module(node_inline_comment_with_allowed_pragma)
         )
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-    def test_inline_comment_with_multiple_allowed_pragmas_raises_no_error(
-        self
-    ) -> None:
+    def test_inline_comment_with_multiple_allowed_pragmas_raises_no_error(self) -> None:
         node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
             name='test', doc='Custom test'
         )
@@ -3475,8 +3302,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_allowed_pragma.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            pylint_utils.
-            tokenize_module(node_inline_comment_with_allowed_pragma)
+            pylint_utils.tokenize_module(node_inline_comment_with_allowed_pragma)
         )
 
         with self.checker_test_object.assertNoMessages():
@@ -3497,13 +3323,10 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_invalid_pragma.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            pylint_utils.
-            tokenize_module(node_inline_comment_with_invalid_pragma)
+            pylint_utils.tokenize_module(node_inline_comment_with_invalid_pragma)
         )
 
-        message = testutils.MessageTest(
-            msg_id='no-allowed-inline-pragma', line=1
-        )
+        message = testutils.MessageTest(msg_id='no-allowed-inline-pragma', line=1)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -3670,9 +3493,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
             node=node_no_empty_line_below_fileoverview
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
     def test_extra_empty_lines_below_fileoverview(self) -> None:
@@ -3706,14 +3527,10 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
             node=node_extra_empty_lines_below_fileoverview
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
-    def test_extra_empty_lines_below_fileoverview_with_unicode_characters(
-        self
-    ) -> None:
+    def test_extra_empty_lines_below_fileoverview_with_unicode_characters(self) -> None:
         node_extra_empty_lines_below_fileoverview = astroid.scoped_nodes.Module(
             name='test', doc='Custom test'
         )
@@ -3743,14 +3560,10 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
             node=node_extra_empty_lines_below_fileoverview
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
-    def test_no_empty_line_below_fileoverview_with_unicode_characters(
-        self
-    ) -> None:
+    def test_no_empty_line_below_fileoverview_with_unicode_characters(self) -> None:
         node_no_empty_line_below_fileoverview = astroid.scoped_nodes.Module(
             name='test', doc='Custom test'
         )
@@ -3779,9 +3592,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
             node=node_no_empty_line_below_fileoverview
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
     def test_single_new_line_below_file_overview(self) -> None:
@@ -3804,9 +3615,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_with_no_error_message.path = filename
         node_with_no_error_message.fromlineno = 2
 
-        self.checker_test_object.checker.visit_module(
-            node_with_no_error_message
-        )
+        self.checker_test_object.checker.visit_module(node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -3828,9 +3637,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_file_with_no_file_overview.file = filename
         node_file_with_no_file_overview.path = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_file_with_no_file_overview
-        )
+        self.checker_test_object.checker.visit_module(node_file_with_no_file_overview)
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -3851,18 +3658,14 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_file_overview_at_end_of_file.path = filename
         node_file_overview_at_end_of_file.fromlineno = 2
 
-        self.checker_test_object.checker.visit_module(
-            node_file_overview_at_end_of_file
-        )
+        self.checker_test_object.checker.visit_module(node_file_overview_at_end_of_file)
 
         message = testutils.MessageTest(
             msg_id='only-a-single-empty-line-should-be-provided',
             node=node_file_overview_at_end_of_file
         )
 
-        with self.checker_test_object.assertAddsMessages(
-            message, ignore_position=True
-        ):
+        with self.checker_test_object.assertAddsMessages(message, ignore_position=True):
             temp_file.close()
 
 
@@ -3930,8 +3733,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         node_enable_single_line_pragma_for_multiline.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            pylint_utils.
-            tokenize_module(node_enable_single_line_pragma_for_multiline)
+            pylint_utils.tokenize_module(node_enable_single_line_pragma_for_multiline)
         )
 
         message = testutils.MessageTest(msg_id='single-line-pragma', line=2)
@@ -4081,8 +3883,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         )
 
         with self.checker_test_object.assertAddsMessages(
-            if_message, elif_message, while_message, yield_message,
-            if_exp_message
+            if_message, elif_message, while_message, yield_message, if_exp_message
         ):
             temp_file.close()
 
@@ -4130,8 +3931,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         )
 
         with self.checker_test_object.assertAddsMessages(
-            if_message, elif_message, while_message, yield_message,
-            if_exp_message
+            if_message, elif_message, while_message, yield_message, if_exp_message
         ):
             temp_file.close()
 
@@ -4421,9 +4221,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
         )
         self.checker_test_object.setup_method()
 
-    def test_function_def_for_test_file_with_test_only_adds_no_msg(
-        self
-    ) -> None:
+    def test_function_def_for_test_file_with_test_only_adds_no_msg(self) -> None:
         def_node = astroid.extract_node(
             """
             def test_only_some_random_function(param1, param2):
@@ -4435,9 +4233,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
 
-    def test_function_def_for_test_file_without_test_only_adds_no_msg(
-        self
-    ) -> None:
+    def test_function_def_for_test_file_without_test_only_adds_no_msg(self) -> None:
         def_node = astroid.extract_node(
             """
             def some_random_function(param1, param2):
@@ -4449,9 +4245,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
 
-    def test_function_def_for_non_test_file_with_test_only_adds_msg(
-        self
-    ) -> None:
+    def test_function_def_for_non_test_file_with_test_only_adds_msg(self) -> None:
         def_node = astroid.extract_node(
             """
             def test_only_some_random_function(param1, param2):
@@ -4468,9 +4262,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_functiondef(def_node)
 
-    def test_function_def_for_non_test_file_without_test_only_adds_no_msg(
-        self
-    ) -> None:
+    def test_function_def_for_non_test_file_without_test_only_adds_no_msg(self) -> None:
         def_node = astroid.extract_node(
             """
             def some_random_function(param1, param2):
@@ -4513,9 +4305,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_classdef(
-                schemaless_class_node
-            )
+            self.checker_test_object.checker.visit_classdef(schemaless_class_node)
 
     def test_schema_handlers_without_url_path_args_raise_error(self) -> None:
 
@@ -4538,9 +4328,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_classdef(
-                schemaless_class_node
-            )
+            self.checker_test_object.checker.visit_classdef(schemaless_class_node)
 
     def test_handlers_with_valid_schema_do_not_raise_error(self) -> None:
 
@@ -4557,9 +4345,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         )
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_classdef(
-                schemaless_class_node
-            )
+            self.checker_test_object.checker.visit_classdef(schemaless_class_node)
 
     def test_list_of_non_schema_handlers_do_not_raise_errors(self) -> None:
         """Handler class name in list of
@@ -4580,13 +4366,9 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         )
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_classdef(
-                schemaless_class_node
-            )
+            self.checker_test_object.checker.visit_classdef(schemaless_class_node)
 
-    def test_schema_handler_with_basehandler_as_an_ancestor_raise_error(
-        self
-    ) -> None:
+    def test_schema_handler_with_basehandler_as_an_ancestor_raise_error(self) -> None:
         """Handlers which are child classes of BaseHandler must have schema
         defined locally in the class.
         """
@@ -4614,9 +4396,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_classdef(
-                schemaless_class_node
-            )
+            self.checker_test_object.checker.visit_classdef(schemaless_class_node)
 
     def test_wrong_data_type_in_url_path_args_schema_raise_error(self) -> None:
         """Checks whether the schemas in URL_PATH_ARGS_SCHEMAS must be of
@@ -4647,9 +4427,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_classdef(
-                schemaless_class_node
-            )
+            self.checker_test_object.checker.visit_classdef(schemaless_class_node)
 
     def test_wrong_data_type_in_handler_args_schema_raise_error(self) -> None:
         """Checks whether the schemas in URL_PATH_ARGS_SCHEMAS must be of
@@ -4680,9 +4458,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             ),
             ignore_position=True,
         ):
-            self.checker_test_object.checker.visit_classdef(
-                schemaless_class_node
-            )
+            self.checker_test_object.checker.visit_classdef(schemaless_class_node)
 
 
 class DisallowedImportsCheckerTests(unittest.TestCase):
@@ -4695,9 +4471,7 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
         )
         self.checker_test_object.setup_method()
 
-    def test_importing_text_from_typing_in_single_line_raises_error(
-        self
-    ) -> None:
+    def test_importing_text_from_typing_in_single_line_raises_error(self) -> None:
         node = astroid.extract_node("""from typing import Any, cast, Text""")
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -4708,9 +4482,7 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_importfrom(node)
 
-    def test_importing_text_from_typing_in_multi_line_raises_error(
-        self
-    ) -> None:
+    def test_importing_text_from_typing_in_multi_line_raises_error(self) -> None:
         node = astroid.extract_node(
             """
             from typing import (
@@ -4747,11 +4519,9 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_encourages_interpolation_when_joining_multiple_strings(self) -> None:  # pylint: disable=line-too-long
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             a = 'a' + 'b' #@
-            """
-        )
+            """)
 
         expression_node = node.value
 
@@ -4785,11 +4555,9 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_binop(expression_node)
 
     def test_does_not_encourage_string_interpolation_for_addition(self) -> None:  # pylint: disable=line-too-long
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
             total = 5 + 5 #@
-            """
-        )
+            """)
 
         expression_node = node.value
         with self.checker_test_object.assertNoMessages():

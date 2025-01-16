@@ -24,7 +24,12 @@ from core.tests import test_utils
 class TakeoutDataTests(test_utils.GenericTestBase):
 
     def test_that_domain_object_is_created_correctly(self) -> None:
-        user_data = {'model_name': {'property1': 'value1', 'property2': 'value2'}}
+        user_data = {
+            'model_name': {
+                'property1': 'value1',
+                'property2': 'value2'
+            }
+        }
         takeout_data = takeout_domain.TakeoutData(user_data, [])
         self.assertEqual(takeout_data.user_data, user_data)
         self.assertEqual(takeout_data.user_images, [])

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Helpers for the scripts.linters.run_lint_checks module.
 
 Do not use this module anywhere else in the code base!
@@ -71,9 +70,9 @@ def get_duplicates_from_list_of_strings(strings: List[str]) -> List[str]:
 
 
 @contextlib.contextmanager
-def temp_dir(
-    suffix: str = '', prefix: str = '', parent: Optional[str] = None
-) -> Iterator[str]:
+def temp_dir(suffix: str = '',
+             prefix: str = '',
+             parent: Optional[str] = None) -> Iterator[str]:
     """Creates a temporary directory which is only usable in a `with` context.
 
     Args:

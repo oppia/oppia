@@ -166,7 +166,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_kill_signal: bool. Whether the manager
                 should have sent a kill signal to the process.
         """
-        proc_pattern = r'[A-Za-z ]+\((name="[A-Za-z]+", )?pid=%d\)' % (pid, )
+        proc_pattern = r'[A-Za-z ]+\((name="[A-Za-z]+", )?pid=%d\)' % (pid,)
 
         expected_patterns = []
         if manager_should_have_sent_terminate_signal:
@@ -199,7 +199,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
+        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {
+            'shell': True
+        })])
 
     def test_passes_command_args_as_list_of_strings_when_shell_is_false(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -211,7 +213,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
+        self.assertEqual(popen_calls, [self.POPEN_CALL(['a', '1'], {
+            'shell': False
+        })])
 
     def test_filters_empty_strings_from_command_args_when_shell_is_true(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -223,7 +227,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
+        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {
+            'shell': True
+        })])
 
     def test_filters_empty_strings_from_command_args_when_shell_is_false(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -235,7 +241,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
+        self.assertEqual(popen_calls, [self.POPEN_CALL(['a', '1'], {
+            'shell': False
+        })])
 
     def test_killing_process_raises_exception(self) -> None:
         self.exit_stack.enter_context(self.swap_popen(unresponsive=True))
@@ -244,8 +252,9 @@ class ManagedProcessTests(test_utils.TestBase):
         proc = self.exit_stack.enter_context(
             servers.managed_process(['a'], timeout_secs=10)
         )
-        with self.assertRaisesRegex(Exception,
-                                    'Process .* exited unexpectedly with exit code 1'):
+        with self.assertRaisesRegex(
+            Exception, 'Process .* exited unexpectedly with exit code 1'
+        ):
             self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(
@@ -260,9 +269,7 @@ class ManagedProcessTests(test_utils.TestBase):
         logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(
-            servers.managed_process(
-                ['a'], timeout_secs=10, raise_on_nonzero_exit=False
-            )
+            servers.managed_process(['a'], timeout_secs=10, raise_on_nonzero_exit=False)
         )
         # Should not raise an exception.
         self.exit_stack.close()
@@ -298,8 +305,9 @@ class ManagedProcessTests(test_utils.TestBase):
             servers.managed_process(['a'], timeout_secs=10)
         )
         pids = [c.pid for c in proc.children()] + [proc.pid]
-        with self.assertRaisesRegex(Exception,
-                                    'Process .* exited unexpectedly with exit code 1'):
+        with self.assertRaisesRegex(
+            Exception, 'Process .* exited unexpectedly with exit code 1'
+        ):
             self.exit_stack.close()
 
         self.assertEqual(len(set(pids)), 4)
@@ -321,8 +329,9 @@ class ManagedProcessTests(test_utils.TestBase):
         time.sleep(1)
         proc.kill()
         proc.wait()
-        with self.assertRaisesRegex(Exception,
-                                    'Process .* exited unexpectedly with exit code 1'):
+        with self.assertRaisesRegex(
+            Exception, 'Process .* exited unexpectedly with exit code 1'
+        ):
             self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(
@@ -366,8 +375,9 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
         self.exit_stack.enter_context(servers.managed_process(['a', 'bc']))
-        with self.assertRaisesRegex(Exception,
-                                    'Process .* exited unexpectedly with exit code 1'):
+        with self.assertRaisesRegex(
+            Exception, 'Process .* exited unexpectedly with exit code 1'
+        ):
             self.exit_stack.close()
 
         self.assert_matches_regexps(
@@ -390,7 +400,9 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('firebase', popen_calls[0].program_args)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        self.assertEqual(popen_calls[0].kwargs, {
+            'shell': True
+        })
 
     def test_managed_cloud_datastore_emulator(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -408,7 +420,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('beta emulators datastore start', popen_calls[0].program_args)
         self.assertNotIn('--no-store-on-disk', popen_calls[0].program_args)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        self.assertEqual(popen_calls[0].kwargs, {
+            'shell': True
+        })
 
     def test_managed_cloud_datastore_emulator_creates_missing_data_dir(self) -> None:
         self.exit_stack.enter_context(self.swap_popen())
@@ -504,7 +518,9 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
     def test_start_server_removes_elasticsearch_data(self) -> None:
-        check_function_calls = {'shutil_rmtree_is_called': False}
+        check_function_calls = {
+            'shutil_rmtree_is_called': False
+        }
 
         old_os_path_exists = os.path.exists
 
@@ -560,7 +576,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 subprocess,
                 'check_call',
                 lambda _: 0,
-                expected_args=[([common.REDIS_CLI_PATH, 'shutdown', 'nosave'], )]
+                expected_args=[([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)]
             )
         )
         self.exit_stack.enter_context(
@@ -574,7 +590,9 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls[0].program_args,
             '%s %s' % (common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH)
         )
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        self.assertEqual(popen_calls[0].kwargs, {
+            'shell': True
+        })
 
         self.exit_stack.close()
 
@@ -609,7 +627,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 subprocess,
                 'check_call',
                 lambda _: 0,
-                expected_args=[([common.REDIS_CLI_PATH, 'shutdown', 'nosave'], )]
+                expected_args=[([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)]
             )
         )
 
@@ -621,7 +639,9 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls[0].program_args,
             '%s %s' % (common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH)
         )
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        self.assertEqual(popen_calls[0].kwargs, {
+            'shell': True
+        })
         self.assertEqual(mock_os_remove.times_called, 1)
 
     def test_managed_web_browser_on_linux_os(self) -> None:
@@ -662,9 +682,10 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Windows'))
 
         with self.assertRaisesRegex(
-                Exception,
-                'Unable to identify the Operating System and therefore, unable to '
-                'launch the web browser.'):
+            Exception,
+            'Unable to identify the Operating System and therefore, unable to '
+            'launch the web browser.'
+        ):
             self.exit_stack.enter_context(servers.create_managed_web_browser(123))
 
         self.assertEqual(len(popen_calls), 0)
@@ -688,7 +709,8 @@ class ManagedProcessTests(test_utils.TestBase):
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
         with self.assertRaisesRegex(
-                Exception, 'Process Portserver.* exited unexpectedly with exit code 1'):
+            Exception, 'Process Portserver.* exited unexpectedly with exit code 1'
+        ):
             self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -727,7 +749,8 @@ class ManagedProcessTests(test_utils.TestBase):
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
         with self.assertRaisesRegex(
-                Exception, 'Process Portserver.* exited unexpectedly with exit code 1'):
+            Exception, 'Process Portserver.* exited unexpectedly with exit code 1'
+        ):
             self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -762,7 +785,8 @@ class ManagedProcessTests(test_utils.TestBase):
         proc = self.exit_stack.enter_context(servers.managed_portserver())
         proc.unresponsive = True
         with self.assertRaisesRegex(
-                Exception, 'Process Portserver.* exited unexpectedly with exit code 1'):
+            Exception, 'Process Portserver.* exited unexpectedly with exit code 1'
+        ):
             self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -1198,7 +1222,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
 
         check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
         url_open_swap = self.swap_with_checks(
-            utils, 'url_open', mock_url_open, expected_args=[(expected_url, )]
+            utils, 'url_open', mock_url_open, expected_args=[(expected_url,)]
         )
 
         with check_output_swap, url_open_swap:

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the oppia root page."""
 
 from __future__ import annotations
@@ -37,16 +36,13 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Handles GET requests."""
         url = self.request.uri
         if 'explore' in url or 'embed' in url:
-            self.render_template(
-                'oppia-root.mainpage.html', iframe_restriction=None)
+            self.render_template('oppia-root.mainpage.html', iframe_restriction=None)
             return
 
         self.render_template('oppia-root.mainpage.html')
 
 
-class OppiaLightweightRootPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class OppiaLightweightRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Renders lightweight oppia root page (unified entry point) for all routes
     registered with angular router.
     """

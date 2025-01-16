@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for ItemSelectionInput interaction."""
 
 from __future__ import annotations
@@ -31,8 +30,7 @@ class ItemSelectionInput(base.BaseInteraction):
     """Interaction for item selection input."""
 
     name: str = 'Item Selection'
-    description: str = (
-        'Allows learners to select various options.')
+    description: str = ('Allows learners to select various options.')
     display_mode: str = base.DISPLAY_MODE_INLINE
     _dependency_ids: List[str] = []
     answer_type: str = 'SetOfTranslatableHtmlContentIds'

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Controllers for the subtopic viewer page."""
 
 from __future__ import annotations
@@ -26,9 +25,7 @@ from core.domain import topic_fetchers
 from typing import Dict
 
 
-class SubtopicPageDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.
     """
@@ -39,7 +36,8 @@ class SubtopicPageDataHandler(
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'subtopic_url_fragment': {
             'schema': {
-                'type': 'basestring',
+                'type':
+                    'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
                     'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
@@ -50,7 +48,9 @@ class SubtopicPageDataHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_name: str, subtopic_id: int) -> None:
@@ -80,7 +80,9 @@ class SubtopicPageDataHandler(
                 break
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
-                topic.id, subtopic_id))
+                topic.id, subtopic_id
+            )
+        )
         subtopic_page_contents_dict = subtopic_page_contents.to_dict()
 
         self.values.update({

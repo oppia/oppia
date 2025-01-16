@@ -77,17 +77,17 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'linked_skill_id': None,
                 'inapplicable_skill_misconception_ids': [],
                 'interaction': {
-                    'hints': [
-                        {
-                            'hint_content': {
-                                'content_id': 'hint_5',
-                                'html': '<p>This is a copyright character ©.</p>'
-                            }
+                    'hints': [{
+                        'hint_content': {
+                            'content_id': 'hint_5',
+                            'html': '<p>This is a copyright character ©.</p>'
                         }
-                    ],
+                    }],
                     'confirmed_unclassified_answers': [],
-                    'solution': None,
-                    'id': 'TextInput',
+                    'solution':
+                        None,
+                    'id':
+                        'TextInput',
                     'customization_args': {
                         'rows': {
                             'value': 1
@@ -114,35 +114,31 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                         },
                         'labelled_as_correct': False
                     },
-                    'answer_groups': [
-                        {
-                            'training_data': [],
-                            'outcome': {
-                                'param_changes': [],
-                                'refresher_exploration_id': None,
-                                'dest': 'Introduction',
-                                'dest_if_really_stuck': None,
-                                'missing_prerequisite_skill_id': None,
-                                'feedback': {
-                                    'content_id': 'feedback_4',
-                                    'html': '<p>This is great! ®®</p>'
-                                },
-                                'labelled_as_correct': False
+                    'answer_groups': [{
+                        'training_data': [],
+                        'outcome': {
+                            'param_changes': [],
+                            'refresher_exploration_id': None,
+                            'dest': 'Introduction',
+                            'dest_if_really_stuck': None,
+                            'missing_prerequisite_skill_id': None,
+                            'feedback': {
+                                'content_id': 'feedback_4',
+                                'html': '<p>This is great! ®®</p>'
                             },
-                            'rule_specs': [
-                                {
-                                    'rule_type': 'Contains',
-                                    'inputs': {
-                                        'x': {
-                                            'contentId': 'rule_input_6',
-                                            'normalizedStrSet': ['®®']
-                                        }
-                                    }
+                            'labelled_as_correct': False
+                        },
+                        'rule_specs': [{
+                            'rule_type': 'Contains',
+                            'inputs': {
+                                'x': {
+                                    'contentId': 'rule_input_6',
+                                    'normalizedStrSet': ['®®']
                                 }
-                            ],
-                            'tagged_skill_misconception_id': None
-                        }
-                    ]
+                            }
+                        }],
+                        'tagged_skill_misconception_id': None
+                    }]
                 }
             }
         },
@@ -202,7 +198,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         """Tests whether flushing the cache removes the elements in the
         cache.
         """
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {
+            'a': '1',
+            'b': '2',
+            'c': '3'
+        }
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping
         )
@@ -213,8 +213,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             )
         )
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, '0',
-            {exploration_id: default_exploration}
+            caching_services.CACHE_NAMESPACE_EXPLORATION, '0', {
+                exploration_id: default_exploration
+            }
         )
 
         self.assertEqual(
@@ -263,16 +264,17 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         # 'invalid' is not one of them. So, we don't have any overload function
         # for 'invalid' key but still we are passing 'invalid' to function which
         # causes MyPy to throw an error. Thus to avoid error, we used ignore.
-        with self.assertRaisesRegex(ValueError,
-                                    'Invalid namespace: %s.' % invalid_namespace):
+        with self.assertRaisesRegex(
+            ValueError, 'Invalid namespace: %s.' % invalid_namespace
+        ):
             caching_services.get_multi( # type: ignore[call-overload]
                 invalid_namespace, None,
                 ['a', 'b', 'c'])
 
         invalid_sub_namespace = 'sub:namespace'
-        with self.assertRaisesRegex(ValueError,
-                                    'Sub-namespace %s cannot contain \':\'.' %
-                                    invalid_sub_namespace):
+        with self.assertRaisesRegex(
+            ValueError, 'Sub-namespace %s cannot contain \':\'.' % invalid_sub_namespace
+        ):
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_DEFAULT, invalid_sub_namespace,
                 ['a', 'b', 'c']
@@ -317,8 +319,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             )
         )
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, '0',
-            {exploration_id: default_exploration}
+            caching_services.CACHE_NAMESPACE_EXPLORATION, '0', {
+                exploration_id: default_exploration
+            }
         )
 
         self.assertEqual(
@@ -345,7 +348,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         """Testing that querying the cache returns reasonable output for
         elements where only a subsection of the queried ids exist in the cache.
         """
-        key_value_mapping = {'a': '1', 'c': '3'}
+        key_value_mapping = {
+            'a': '1',
+            'c': '3'
+        }
         exploration_id = 'id'
         nonexistent_exploration_id = 'id2'
         default_exploration = (
@@ -373,8 +379,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, '0',
-            {exploration_id: default_exploration}
+            caching_services.CACHE_NAMESPACE_EXPLORATION, '0', {
+                exploration_id: default_exploration
+            }
         )
 
         caching_services.set_multi(
@@ -410,8 +417,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, '0',
-            {exploration_id: default_exploration}
+            caching_services.CACHE_NAMESPACE_EXPLORATION, '0', {
+                exploration_id: default_exploration
+            }
         )
 
         self.assertEqual(
@@ -435,8 +443,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, '1',
-            {exploration_id: default_exploration}
+            caching_services.CACHE_NAMESPACE_EXPLORATION, '1', {
+                exploration_id: default_exploration
+            }
         )
 
         existent_result = caching_services.get_multi(
@@ -448,7 +457,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_set_multi_returns_true_for_successful_insert_into_cache(self) -> None:
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {
+            'a': '1',
+            'b': '2',
+            'c': '3'
+        }
         cache_strings_response = caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping
         )
@@ -461,8 +474,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             )
         )
         cache_exploration_response = caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, '0',
-            {exploration_id: default_exploration}
+            caching_services.CACHE_NAMESPACE_EXPLORATION, '0', {
+                exploration_id: default_exploration
+            }
         )
         self.assertTrue(cache_exploration_response)
 
@@ -472,7 +486,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(cache_empty_list_response)
 
     def test_delete_multi_returns_true_when_all_ids_exist(self) -> None:
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {
+            'a': '1',
+            'b': '2',
+            'c': '3'
+        }
 
         self.assertFalse(
             caching_services.delete_multi(
@@ -491,8 +509,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             )
         )
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, '0',
-            {exploration_id: default_exploration}
+            caching_services.CACHE_NAMESPACE_EXPLORATION, '0', {
+                exploration_id: default_exploration
+            }
         )
 
         self.assertTrue(
@@ -529,7 +548,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     def test_delete_multi_returns_false_when_not_all_ids_exist(self) -> None:
         """Tests that deleting keys that don't exist returns False."""
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {
+            'a': '1',
+            'b': '2',
+            'c': '3'
+        }
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping
@@ -542,7 +565,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_delete_multi_returns_false_when_namespace_incorrect(self) -> None:
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {
+            'a': '1',
+            'b': '2',
+            'c': '3'
+        }
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping
@@ -555,7 +582,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_delete_multi_returns_false_when_sub_namespace_incorrect(self) -> None:
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        key_value_mapping = {
+            'a': '1',
+            'b': '2',
+            'c': '3'
+        }
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping
@@ -615,11 +646,13 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                     json.loads(self.json_encoded_string_representing_an_exploration)
                 )
 
-        with self.swap(memory_cache_services, 'set_multi',
-                       mock_memory_cache_services_set_multi):
+        with self.swap(
+            memory_cache_services, 'set_multi', mock_memory_cache_services_set_multi
+        ):
             caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION, '0',
-                {exploration_id: default_exploration}
+                caching_services.CACHE_NAMESPACE_EXPLORATION, '0', {
+                    exploration_id: default_exploration
+                }
             )
 
     def test_unicode_characters_are_set_and_get_correctly_in_default_namespace(
@@ -629,7 +662,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         strings, boolean, lists, and dicts) can be set to the cache without
         errors and retrieved from the cache without any alterations.
         """
-        key_value_mapping = {'a': '%#$', 'b': '\t', 'c': '😃😄'}
+        key_value_mapping = {
+            'a': '%#$',
+            'b': '\t',
+            'c': '😃😄'
+        }
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_DEFAULT, None, ['a', 'b', 'c']
@@ -671,8 +708,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, '0',
-            {exploration_id: default_exploration}
+            caching_services.CACHE_NAMESPACE_EXPLORATION, '0', {
+                exploration_id: default_exploration
+            }
         )
 
         exp_ids_to_explorations = caching_services.get_multi(
@@ -705,8 +743,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_COLLECTION, '0',
-            {collection_id: default_collection}
+            caching_services.CACHE_NAMESPACE_COLLECTION, '0', {
+                collection_id: default_collection
+            }
         )
 
         collections = caching_services.get_multi(
@@ -751,7 +790,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_SKILL, '0', {skill_id: default_skill}
+            caching_services.CACHE_NAMESPACE_SKILL, '0', {
+                skill_id: default_skill
+            }
         )
 
         skills = caching_services.get_multi(
@@ -781,7 +822,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_TOPIC, '0', {topic_id: default_topic}
+            caching_services.CACHE_NAMESPACE_TOPIC, '0', {
+                topic_id: default_topic
+            }
         )
 
         topics = caching_services.get_multi(
@@ -812,7 +855,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         )
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_STORY, '0', {story_id: default_story}
+            caching_services.CACHE_NAMESPACE_STORY, '0', {
+                story_id: default_story
+            }
         )
 
         stories = caching_services.get_multi(
@@ -836,32 +881,26 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             ), {}
         )
 
-        default_parameter = parameter_domain.PlatformParameter.from_dict(
-            {
-                'name': 'parameter_a 😍',
-                'description': '😍😍😍😍',
-                'data_type': 'bool',
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']]
-                            }
-                        ],
-                        'value_when_matched': True
-                    }
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
-                'default_value': False
-            }
-        )
+        default_parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a 😍',
+            'description': '😍😍😍😍',
+            'data_type': 'bool',
+            'rules': [{
+                'filters': [{
+                    'type': 'platform_type',
+                    'conditions': [['=', 'Backend']]
+                }],
+                'value_when_matched': True
+            }],
+            'rule_schema_version':
+                (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False
+        })
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, '0',
-            {platform_parameter_id: default_parameter}
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, '0', {
+                platform_parameter_id: default_parameter
+            }
         )
 
         platform_parameters = caching_services.get_multi(

@@ -37,8 +37,9 @@ from core.tests import test_utils
 from typing import Final
 
 
-class ExplorationDisplayableSummariesTest(exp_services_test.ExplorationServicesUnitTests
-                                          ):
+class ExplorationDisplayableSummariesTest(
+    exp_services_test.ExplorationServicesUnitTests
+):
     """Test functions for getting displayable exploration summary dicts."""
 
     ALBERT_EMAIL: Final = 'albert@example.com'
@@ -96,13 +97,11 @@ class ExplorationDisplayableSummariesTest(exp_services_test.ExplorationServicesU
 
         exp_services.update_exploration(
             self.bob_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 title'
+                })
             ], 'Changed title.'
         )
 
@@ -110,25 +109,21 @@ class ExplorationDisplayableSummariesTest(exp_services_test.ExplorationServicesU
 
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'Exploration 1 Albert title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 Albert title'
+                })
             ], 'Changed title to Albert1 title.'
         )
 
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_2, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'Exploration 2 Albert title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'Exploration 2 Albert title'
+                })
             ], 'Changed title to Albert2 title.'
         )
 
@@ -153,69 +148,66 @@ class ExplorationDisplayableSummariesTest(exp_services_test.ExplorationServicesU
         self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
         exp_services.update_exploration(
             self.user_d_id, self.EXP_ID_4, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'Exploration updated title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'Exploration updated title'
+                })
             ], 'Changed title once.'
         )
 
         exp_services.update_exploration(
             self.user_d_id, self.EXP_ID_4, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'Exploration updated title again'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'Exploration updated title again'
+                })
             ], 'Changed title twice.'
         )
 
         self.save_new_valid_exploration(self.EXP_ID_5, self.bob_id)
 
     def test_get_human_readable_contributors_summary(self) -> None:
-        contributors_summary = {self.albert_id: 10, self.bob_id: 13}
-        self.assertEqual(
-            {
-                self.ALBERT_NAME: {
-                    'num_commits': 10,
-                },
-                self.BOB_NAME: {
-                    'num_commits': 13,
-                }
+        contributors_summary = {
+            self.albert_id: 10,
+            self.bob_id: 13
+        }
+        self.assertEqual({
+            self.ALBERT_NAME: {
+                'num_commits': 10,
             },
-            summary_services.
-            get_human_readable_contributors_summary(contributors_summary)
-        )
+            self.BOB_NAME: {
+                'num_commits': 13,
+            }
+        }, summary_services.
+                         get_human_readable_contributors_summary(contributors_summary))
 
-        contributors_summary = {self.user_c_id: 1, self.user_d_id: 2}
-        self.assertEqual(
-            {
-                self.USER_C_NAME: {
-                    'num_commits': 1,
-                },
-                self.USER_D_NAME: {
-                    'num_commits': 2,
-                }
+        contributors_summary = {
+            self.user_c_id: 1,
+            self.user_d_id: 2
+        }
+        self.assertEqual({
+            self.USER_C_NAME: {
+                'num_commits': 1,
             },
-            summary_services.
-            get_human_readable_contributors_summary(contributors_summary)
-        )
+            self.USER_D_NAME: {
+                'num_commits': 2,
+            }
+        }, summary_services.
+                         get_human_readable_contributors_summary(contributors_summary))
 
     def test_get_human_readable_contributors_summary_with_deleted_user(self) -> None:
-        contributors_summary = {self.albert_id: 10}
+        contributors_summary = {
+            self.albert_id: 10
+        }
         user_services.mark_user_for_deletion(self.albert_id)
-        self.assertEqual(
-            {'[User being deleted]': {
+        self.assertEqual({
+            '[User being deleted]': {
                 'num_commits': 10
-            }},
-            summary_services.
-            get_human_readable_contributors_summary(contributors_summary)
-        )
+            }
+        }, summary_services.
+                         get_human_readable_contributors_summary(contributors_summary))
 
     def test_get_displayable_exp_summary_dicts_matching_ids(self) -> None:
         # A list of exp_id's are passed in:
@@ -226,9 +218,9 @@ class ExplorationDisplayableSummariesTest(exp_services_test.ExplorationServicesU
         # Should only return [EXP_ID_2].
 
         displayable_summaries = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]
-            )
+            summary_services.get_displayable_exp_summary_dicts_matching_ids([
+                self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5
+            ])
         )
         expected_summary = {
             'category': 'Algebra',
@@ -251,9 +243,9 @@ class ExplorationDisplayableSummariesTest(exp_services_test.ExplorationServicesU
         self
     ) -> None:
         displayable_summaries = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                ['invalid_exp_id']
-            )
+            summary_services.get_displayable_exp_summary_dicts_matching_ids([
+                'invalid_exp_id'
+            ])
         )
         self.assertEqual(displayable_summaries, [])
 
@@ -413,99 +405,85 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
         EXP_ID_2 is featured, so the call to get_featured_explorations() should
         only return [EXP_ID_2].
         """
-        activity_services.update_featured_activity_references(
-            [
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
-                )
-            ]
-        )
+        activity_services.update_featured_activity_references([
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
+            )
+        ])
 
         featured_activity_summaries = (
-            summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE]
-            )
+            summary_services.get_featured_activity_summary_dicts([
+                constants.DEFAULT_LANGUAGE_CODE
+            ])
         )
         self.assertEqual(len(featured_activity_summaries), 1)
-        self.assertDictContainsSubset(
-            {
-                'status': 'public',
-                'thumbnail_bg_color': '#cc4b00',
-                'community_owned': False,
-                'tags': [],
-                'thumbnail_icon_url': '/subjects/Algebra.svg',
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
-                'id': self.EXP_ID_2,
-                'category': 'Algebra',
-                'ratings': feconf.get_empty_ratings(),
-                'title': 'A title',
-                'num_views': 0,
-                'objective': 'An objective'
-            }, featured_activity_summaries[0]
-        )
+        self.assertDictContainsSubset({
+            'status': 'public',
+            'thumbnail_bg_color': '#cc4b00',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/subjects/Algebra.svg',
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+            'category': 'Algebra',
+            'ratings': feconf.get_empty_ratings(),
+            'title': 'A title',
+            'num_views': 0,
+            'objective': 'An objective'
+        }, featured_activity_summaries[0])
 
     def test_language_code_filter(self) -> None:
         """Note that both EXP_ID_1 is in Spanish and EXP_ID_2 is in English."""
-        activity_services.update_featured_activity_references(
-            [
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_1
-                ),
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
-                )
-            ]
-        )
+        activity_services.update_featured_activity_references([
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_1
+            ),
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
+            )
+        ])
 
         featured_activity_summaries = (
-            summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE]
-            )
+            summary_services.get_featured_activity_summary_dicts([
+                constants.DEFAULT_LANGUAGE_CODE
+            ])
         )
         self.assertEqual(len(featured_activity_summaries), 1)
-        self.assertDictContainsSubset(
-            {
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
-                'id': self.EXP_ID_2,
-            }, featured_activity_summaries[0]
-        )
+        self.assertDictContainsSubset({
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+        }, featured_activity_summaries[0])
 
         featured_activity_summaries = (
-            summary_services.get_featured_activity_summary_dicts(
-                [self.LANGUAGE_CODE_ES]
-            )
+            summary_services.get_featured_activity_summary_dicts([
+                self.LANGUAGE_CODE_ES
+            ])
         )
         self.assertEqual(len(featured_activity_summaries), 1)
-        self.assertDictContainsSubset(
-            {
-                'language_code': self.LANGUAGE_CODE_ES,
-                'id': self.EXP_ID_1,
-            }, featured_activity_summaries[0]
-        )
+        self.assertDictContainsSubset({
+            'language_code': self.LANGUAGE_CODE_ES,
+            'id': self.EXP_ID_1,
+        }, featured_activity_summaries[0])
 
         featured_activity_summaries = (
-            summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE, self.LANGUAGE_CODE_ES]
-            )
+            summary_services.get_featured_activity_summary_dicts([
+                constants.DEFAULT_LANGUAGE_CODE, self.LANGUAGE_CODE_ES
+            ])
         )
         self.assertEqual(len(featured_activity_summaries), 2)
-        self.assertDictContainsSubset(
-            {
-                'language_code': self.LANGUAGE_CODE_ES,
-                'id': self.EXP_ID_1,
-            }, featured_activity_summaries[0]
-        )
-        self.assertDictContainsSubset(
-            {
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
-                'id': self.EXP_ID_2,
-            }, featured_activity_summaries[1]
-        )
+        self.assertDictContainsSubset({
+            'language_code': self.LANGUAGE_CODE_ES,
+            'id': self.EXP_ID_1,
+        }, featured_activity_summaries[0])
+        self.assertDictContainsSubset({
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+        }, featured_activity_summaries[1])
 
         featured_activity_summaries = (
-            summary_services.get_featured_activity_summary_dicts(
-                ['nonexistent_language_code']
-            )
+            summary_services.get_featured_activity_summary_dicts([
+                'nonexistent_language_code'
+            ])
         )
         self.assertEqual(len(featured_activity_summaries), 0)
 
@@ -570,8 +548,9 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         )
 
     def test_raises_error_if_invalid_collection_id_provided(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'No collection exists for the given collection id'):
+        with self.assertRaisesRegex(
+            Exception, 'No collection exists for the given collection id'
+        ):
             summary_services.get_learner_collection_dict_by_id(
                 'Invalid_id', self.owner, strict=False
             )
@@ -587,9 +566,10 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected collection to only reference valid explorations, but '
-                'found an exploration with ID: exploration_id'):
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations, but '
+            'found an exploration with ID: exploration_id'
+        ):
             summary_services.get_learner_collection_dict_by_id(
                 self.COLLECTION_ID, self.owner
             )
@@ -598,20 +578,19 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [
-                {
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': self.EXP_ID
-                }
-            ], 'Added another creator\'s private exploration'
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID
+            }], 'Added another creator\'s private exploration'
         )
 
         # A collection cannot access someone else's private exploration.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Expected collection to only reference valid explorations, but '
-                'found an exploration with ID: exploration_id'):
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations, but '
+            'found an exploration with ID: exploration_id'
+        ):
             summary_services.get_learner_collection_dict_by_id(
                 self.COLLECTION_ID, self.owner
             )
@@ -636,9 +615,10 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         # A public collection referencing a private exploration is bad, however.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'Cannot reference a private exploration within a public '
-                'collection, exploration ID: exploration_id'):
+            utils.ValidationError,
+            'Cannot reference a private exploration within a public '
+            'collection, exploration ID: exploration_id'
+        ):
             summary_services.get_learner_collection_dict_by_id(
                 self.COLLECTION_ID, self.owner
             )
@@ -656,12 +636,10 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         )
         self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [
-                {
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': self.EXP_ID_1
-                }
-            ], 'Added another creator\'s private exploration'
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID_1
+            }], 'Added another creator\'s private exploration'
         )
 
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
@@ -780,10 +758,9 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
         rating_services.assign_rating_to_exploration(self.bob_id, self.EXP_ID_1, 1)
 
         top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE],
-                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE
-            )
+            summary_services.get_top_rated_exploration_summary_dicts([
+                constants.DEFAULT_LANGUAGE_CODE
+            ], feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE)
         )
         expected_summary = {
             'status': 'public',
@@ -827,10 +804,9 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
         rating_services.assign_rating_to_exploration(self.bob_id, self.EXP_ID_2, 5)
 
         top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE],
-                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE
-            )
+            summary_services.get_top_rated_exploration_summary_dicts([
+                constants.DEFAULT_LANGUAGE_CODE
+            ], feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE)
         )
 
         expected_summary = {
@@ -981,13 +957,11 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(test_utils.GenericTes
         # 'recently-published' status.
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': 'edit_exploration_property',
-                        'property_name': 'title',
-                        'new_value': 'New title'
-                    }
-                )
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })
             ], 'Changed title.'
         )
         self.process_and_flush_pending_tasks()
@@ -1020,21 +994,17 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
 
     def test_requiring_nonexistent_activities_be_public_raises_exception(self) -> None:
         with self.assertRaisesRegex(Exception, 'non-existent exploration'):
-            summary_services.require_activities_to_be_public(
-                [
-                    activity_domain.ActivityReference(
-                        constants.ACTIVITY_TYPE_EXPLORATION, 'fake'
-                    )
-                ]
-            )
+            summary_services.require_activities_to_be_public([
+                activity_domain.ActivityReference(
+                    constants.ACTIVITY_TYPE_EXPLORATION, 'fake'
+                )
+            ])
         with self.assertRaisesRegex(Exception, 'non-existent collection'):
-            summary_services.require_activities_to_be_public(
-                [
-                    activity_domain.ActivityReference(
-                        constants.ACTIVITY_TYPE_COLLECTION, 'fake'
-                    )
-                ]
-            )
+            summary_services.require_activities_to_be_public([
+                activity_domain.ActivityReference(
+                    constants.ACTIVITY_TYPE_COLLECTION, 'fake'
+                )
+            ])
 
     def test_requiring_private_activities_to_be_public_raises_exception(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
@@ -1044,21 +1014,17 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(Exception, 'private exploration'):
-            summary_services.require_activities_to_be_public(
-                [
-                    activity_domain.ActivityReference(
-                        constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0
-                    )
-                ]
-            )
+            summary_services.require_activities_to_be_public([
+                activity_domain.ActivityReference(
+                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0
+                )
+            ])
         with self.assertRaisesRegex(Exception, 'private collection'):
-            summary_services.require_activities_to_be_public(
-                [
-                    activity_domain.ActivityReference(
-                        constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2
-                    )
-                ]
-            )
+            summary_services.require_activities_to_be_public([
+                activity_domain.ActivityReference(
+                    constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2
+                )
+            ])
 
     def test_requiring_public_activities_to_be_public_succeeds(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
@@ -1070,16 +1036,14 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner, self.COL_ID_2)
 
         # There are no validation errors.
-        summary_services.require_activities_to_be_public(
-            [
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0
-                ),
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2
-                )
-            ]
-        )
+        summary_services.require_activities_to_be_public([
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0
+            ),
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2
+            )
+        ])
 
 
 class CollectionNodeMetadataDictsTest(exp_services_test.ExplorationServicesUnitTests):
@@ -1149,103 +1113,94 @@ class CollectionNodeMetadataDictsTest(exp_services_test.ExplorationServicesUnitT
         rights_manager.publish_exploration(self.albert, self.EXP_ID3)
         rights_manager.publish_exploration(self.bob, self.EXP_ID4)
 
-        exp_services.index_explorations_given_ids(
-            [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3, self.EXP_ID4]
-        )
+        exp_services.index_explorations_given_ids([
+            self.EXP_ID1, self.EXP_ID2, self.EXP_ID3, self.EXP_ID4
+        ])
 
     def test_get_exploration_metadata_dicts(self) -> None:
         metadata_dicts = (
-            summary_services.get_exploration_metadata_dicts(
-                [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert
-            )
+            summary_services.get_exploration_metadata_dicts([
+                self.EXP_ID1, self.EXP_ID2, self.EXP_ID3
+            ], self.albert)
         )
 
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID1,
-                'objective': 'An objective 1',
-                'title': 'Exploration 1 Albert title',
-            }, {
-                'id': self.EXP_ID2,
-                'objective': 'An objective 2',
-                'title': 'Exploration 2 Albert title',
-            }, {
-                'id': self.EXP_ID3,
-                'objective': 'An objective 3',
-                'title': 'Exploration 3 Albert title',
-            }
-        ]
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID1,
+            'objective': 'An objective 1',
+            'title': 'Exploration 1 Albert title',
+        }, {
+            'id': self.EXP_ID2,
+            'objective': 'An objective 2',
+            'title': 'Exploration 2 Albert title',
+        }, {
+            'id': self.EXP_ID3,
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
+        }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_get_exploration_metadata_dicts_with_invalid_exploration_id(self) -> None:
         metadata_dicts = (
-            summary_services.get_exploration_metadata_dicts(
-                ['invalid_exp_id'], self.albert
-            )
+            summary_services.get_exploration_metadata_dicts(['invalid_exp_id'],
+                                                            self.albert)
         )
 
         self.assertEqual(metadata_dicts, [])
 
     def test_private_exps_of_another_user_are_not_returned(self) -> None:
         metadata_dicts = (
-            summary_services.get_exploration_metadata_dicts(
-                [self.EXP_ID5, self.EXP_ID4], self.bob
-            )
+            summary_services.get_exploration_metadata_dicts([
+                self.EXP_ID5, self.EXP_ID4
+            ], self.bob)
         )
 
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID4,
-                'objective': 'An objective 4',
-                'title': 'Exploration 4 Bob title',
-            }
-        ]
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID4,
+            'objective': 'An objective 4',
+            'title': 'Exploration 4 Bob title',
+        }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_public_exps_of_another_user_are_returned(self) -> None:
         metadata_dicts = (
-            summary_services.get_exploration_metadata_dicts(
-                [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob
-            )
+            summary_services.get_exploration_metadata_dicts([
+                self.EXP_ID2, self.EXP_ID3, self.EXP_ID4
+            ], self.bob)
         )
 
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID2,
-                'objective': 'An objective 2',
-                'title': 'Exploration 2 Albert title',
-            }, {
-                'id': self.EXP_ID3,
-                'objective': 'An objective 3',
-                'title': 'Exploration 3 Albert title',
-            }, {
-                'id': self.EXP_ID4,
-                'objective': 'An objective 4',
-                'title': 'Exploration 4 Bob title',
-            }
-        ]
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID2,
+            'objective': 'An objective 2',
+            'title': 'Exploration 2 Albert title',
+        }, {
+            'id': self.EXP_ID3,
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
+        }, {
+            'id': self.EXP_ID4,
+            'objective': 'An objective 4',
+            'title': 'Exploration 4 Bob title',
+        }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_deleted_exps_are_not_returned(self) -> None:
         exp_services.delete_exploration(self.albert_id, self.EXP_ID2)
 
         metadata_dicts = (
-            summary_services.get_exploration_metadata_dicts(
-                [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob
-            )
+            summary_services.get_exploration_metadata_dicts([
+                self.EXP_ID2, self.EXP_ID3, self.EXP_ID4
+            ], self.bob)
         )
 
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID3,
-                'objective': 'An objective 3',
-                'title': 'Exploration 3 Albert title',
-            }, {
-                'id': self.EXP_ID4,
-                'objective': 'An objective 4',
-                'title': 'Exploration 4 Bob title',
-            }
-        ]
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID3,
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
+        }, {
+            'id': self.EXP_ID4,
+            'objective': 'An objective 4',
+            'title': 'Exploration 4 Bob title',
+        }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_exp_metadata_dicts_matching_query(self) -> None:
@@ -1255,56 +1210,49 @@ class CollectionNodeMetadataDictsTest(exp_services_test.ExplorationServicesUnitT
             )
         )
 
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID1,
-                'objective': 'An objective 1',
-                'title': 'Exploration 1 Albert title',
-            }
-        ]
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID1,
+            'objective': 'An objective 1',
+            'title': 'Exploration 1 Albert title',
+        }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_invalid_exp_ids(self) -> None:
         metadata_dicts = (
-            summary_services.get_exploration_metadata_dicts(
-                [self.EXP_ID3, self.INVALID_EXP_ID], self.albert
-            )
+            summary_services.get_exploration_metadata_dicts([
+                self.EXP_ID3, self.INVALID_EXP_ID
+            ], self.albert)
         )
 
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID3,
-                'objective': 'An objective 3',
-                'title': 'Exploration 3 Albert title',
-            }
-        ]
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID3,
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
+        }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_guest_can_fetch_public_exploration_metadata_dicts(self) -> None:
         new_guest_user = user_services.get_user_actions_info('mock_user')
-        metadata_dicts = summary_services.get_exploration_metadata_dicts(
-            [self.EXP_ID3, self.EXP_ID4], new_guest_user
-        )
+        metadata_dicts = summary_services.get_exploration_metadata_dicts([
+            self.EXP_ID3, self.EXP_ID4
+        ], new_guest_user)
 
-        expected_metadata_dicts = [
-            {
-                'id': self.EXP_ID3,
-                'objective': 'An objective 3',
-                'title': 'Exploration 3 Albert title',
-            }, {
-                'id': self.EXP_ID4,
-                'objective': 'An objective 4',
-                'title': 'Exploration 4 Bob title',
-            }
-        ]
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID3,
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
+        }, {
+            'id': self.EXP_ID4,
+            'objective': 'An objective 4',
+            'title': 'Exploration 4 Bob title',
+        }]
 
         self.assertEqual(metadata_dicts, expected_metadata_dicts)
 
     def test_guest_cannot_fetch_private_exploration_metadata_dicts(self) -> None:
         new_guest_user = user_services.get_user_actions_info(None)
         self.save_new_valid_exploration('exp_id', self.albert_id)
-        metadata_dicts = summary_services.get_exploration_metadata_dicts(
-            ['exp_id'], new_guest_user
-        )
+        metadata_dicts = summary_services.get_exploration_metadata_dicts(['exp_id'],
+                                                                         new_guest_user)
 
         self.assertEqual(metadata_dicts, [])

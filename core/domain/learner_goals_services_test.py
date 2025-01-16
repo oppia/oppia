@@ -32,7 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models, ) = models.Registry.import_models([models.Names.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 MAX_CURRENT_GOALS_COUNT: Final = feconf.MAX_CURRENT_GOALS_COUNT
 
@@ -198,8 +198,8 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-                Exception,
-                'The topic id Topic_id_1 is already present in the learner goals'):
+            Exception, 'The topic id Topic_id_1 is already present in the learner goals'
+        ):
             learner_progress_services.validate_and_add_topic_to_learn_goal(
                 self.viewer_id, self.TOPIC_ID_1
             )
@@ -261,8 +261,8 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
 
         # Removing the same topic raises error.
         with self.assertRaisesRegex(
-                Exception,
-                'The topic id Topic_id_1 is not present in LearnerGoalsModel'):
+            Exception, 'The topic id Topic_id_1 is not present in LearnerGoalsModel'
+        ):
             learner_goals_services.remove_topics_from_learn_goal(
                 self.viewer_id, [self.TOPIC_ID_1]
             )

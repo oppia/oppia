@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests interface for storage model switching."""
 
 from __future__ import annotations
@@ -43,7 +42,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_activity_models = (activity_models,)
         self.assertEqual(
             expected_activity_models,
-            self.registry_instance.import_models([models.Names.ACTIVITY]))
+            self.registry_instance.import_models([models.Names.ACTIVITY])
+        )
 
     def test_import_models_audit(self) -> None:
         """Tests import_models function with audit option."""
@@ -51,7 +51,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_audit_models = (audit_models,)
         self.assertEqual(
             expected_audit_models,
-            self.registry_instance.import_models([models.Names.AUDIT]))
+            self.registry_instance.import_models([models.Names.AUDIT])
+        )
 
     def test_import_models_auth_model(self) -> None:
         """Tests import_models function with auth option."""
@@ -59,7 +60,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_auth_models = (auth_models,)
         self.assertEqual(
             expected_auth_models,
-            self.registry_instance.import_models([models.Names.AUTH]))
+            self.registry_instance.import_models([models.Names.AUTH])
+        )
 
     def test_import_models_base_model(self) -> None:
         """Tests import_models function with base model option."""
@@ -67,7 +69,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_base_models = (base_models,)
         self.assertEqual(
             expected_base_models,
-            self.registry_instance.import_models([models.Names.BASE_MODEL]))
+            self.registry_instance.import_models([models.Names.BASE_MODEL])
+        )
 
     def test_import_models_blog_model(self) -> None:
         """Tests import_models function with blog post model option."""
@@ -75,7 +78,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_blog_models = (blog_models,)
         self.assertEqual(
             expected_blog_models,
-            self.registry_instance.import_models([models.Names.BLOG]))
+            self.registry_instance.import_models([models.Names.BLOG])
+        )
 
     def test_import_models_beam_job_model(self) -> None:
         """Tests import_models function with base model option."""
@@ -83,7 +87,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_beam_job_models = (beam_job_models,)
         self.assertEqual(
             expected_beam_job_models,
-            self.registry_instance.import_models([models.Names.BEAM_JOB]))
+            self.registry_instance.import_models([models.Names.BEAM_JOB])
+        )
 
     def test_import_models_collection(self) -> None:
         """Tests import_models function with collection option."""
@@ -91,7 +96,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_collection_models = (collection_models,)
         self.assertEqual(
             expected_collection_models,
-            self.registry_instance.import_models([models.Names.COLLECTION]))
+            self.registry_instance.import_models([models.Names.COLLECTION])
+        )
 
     def test_import_models_config(self) -> None:
         """Tests import_models function with config option."""
@@ -99,7 +105,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_config_models = (config_models,)
         self.assertEqual(
             expected_config_models,
-            self.registry_instance.import_models([models.Names.CONFIG]))
+            self.registry_instance.import_models([models.Names.CONFIG])
+        )
 
     def test_import_models_email(self) -> None:
         """Tests import_models function with email option."""
@@ -107,7 +114,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_email_models = (email_models,)
         self.assertEqual(
             expected_email_models,
-            self.registry_instance.import_models([models.Names.EMAIL]))
+            self.registry_instance.import_models([models.Names.EMAIL])
+        )
 
     def test_import_models_exploration(self) -> None:
         """Tests import_models function with exploration option."""
@@ -115,7 +123,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_exploration_models = (exp_models,)
         self.assertEqual(
             expected_exploration_models,
-            self.registry_instance.import_models([models.Names.EXPLORATION]))
+            self.registry_instance.import_models([models.Names.EXPLORATION])
+        )
 
     def test_import_models_feedback(self) -> None:
         """Tests import_models function with feedback option."""
@@ -123,16 +132,17 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_feedback_models = (feedback_models,)
         self.assertEqual(
             expected_feedback_models,
-            self.registry_instance.import_models([models.Names.FEEDBACK]))
+            self.registry_instance.import_models([models.Names.FEEDBACK])
+        )
 
     def test_import_models_learner_group(self) -> None:
         """Tests import_models function with learner group option."""
-        from core.storage.learner_group import (
-            gae_models as learner_group_models)
+        from core.storage.learner_group import (gae_models as learner_group_models)
         expected_learner_group_models = (learner_group_models,)
         self.assertEqual(
             expected_learner_group_models,
-            self.registry_instance.import_models([models.Names.LEARNER_GROUP]))
+            self.registry_instance.import_models([models.Names.LEARNER_GROUP])
+        )
 
     def test_import_models_job(self) -> None:
         """Tests import_models function with job option."""
@@ -140,7 +150,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_job_models = (job_models,)
         self.assertEqual(
             expected_job_models,
-            self.registry_instance.import_models([models.Names.JOB]))
+            self.registry_instance.import_models([models.Names.JOB])
+        )
 
     def test_import_models_question(self) -> None:
         """Tests import_models function with question option."""
@@ -148,7 +159,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_question_models = (question_models,)
         self.assertEqual(
             expected_question_models,
-            self.registry_instance.import_models([models.Names.QUESTION]))
+            self.registry_instance.import_models([models.Names.QUESTION])
+        )
 
     def test_import_models_recommendations(self) -> None:
         """Tests import_models function with recommendations option."""
@@ -156,8 +168,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_recommendations_models = (gae_models,)
         self.assertEqual(
             expected_recommendations_models,
-            self.registry_instance.import_models(
-                [models.Names.RECOMMENDATIONS]))
+            self.registry_instance.import_models([models.Names.RECOMMENDATIONS])
+        )
 
     def test_import_models_skill(self) -> None:
         """Tests import_models function with skill option."""
@@ -165,7 +177,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_skills_models = (skill_models,)
         self.assertEqual(
             expected_skills_models,
-            self.registry_instance.import_models([models.Names.SKILL]))
+            self.registry_instance.import_models([models.Names.SKILL])
+        )
 
     def test_import_models_statistics(self) -> None:
         """Tests import_models function with statistics option."""
@@ -173,7 +186,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_statistics_models = (statistics_models,)
         self.assertEqual(
             expected_statistics_models,
-            self.registry_instance.import_models([models.Names.STATISTICS]))
+            self.registry_instance.import_models([models.Names.STATISTICS])
+        )
 
     def test_import_models_story(self) -> None:
         """Tests import_models function with story option."""
@@ -181,7 +195,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_story_models = (story_models,)
         self.assertEqual(
             expected_story_models,
-            self.registry_instance.import_models([models.Names.STORY]))
+            self.registry_instance.import_models([models.Names.STORY])
+        )
 
     def test_import_models_suggestion(self) -> None:
         """Tests import_models function with suggestion option."""
@@ -189,7 +204,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_suggestion_models = (suggestion_models,)
         self.assertEqual(
             expected_suggestion_models,
-            self.registry_instance.import_models([models.Names.SUGGESTION]))
+            self.registry_instance.import_models([models.Names.SUGGESTION])
+        )
 
     def test_import_models_topic(self) -> None:
         """Tests import_models function with topic option."""
@@ -197,7 +213,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_topic_models = (topic_models,)
         self.assertEqual(
             expected_topic_models,
-            self.registry_instance.import_models([models.Names.TOPIC]))
+            self.registry_instance.import_models([models.Names.TOPIC])
+        )
 
     def test_import_models_user(self) -> None:
         """Tests import_models function with user option."""
@@ -205,7 +222,8 @@ class RegistryUnitTest(test_utils.TestBase):
         expected_user_models = (user_models,)
         self.assertEqual(
             expected_user_models,
-            self.registry_instance.import_models([models.Names.USER]))
+            self.registry_instance.import_models([models.Names.USER])
+        )
 
     def test_import_models_invalid(self) -> None:
         """Tests import_models function with an invalid option."""
@@ -213,13 +231,12 @@ class RegistryUnitTest(test_utils.TestBase):
             # Here we use MyPy ignore because list item 0 is a string.
             # expected type class names. This is done to test the function
             # with invalid model names.
-            self.registry_instance.import_models(['']) # type: ignore[list-item]
+            self.registry_instance.import_models([''])  # type: ignore[list-item]
 
     def test_get_storage_model_classes(self) -> None:
         """Tests get_all_storage_model_classes."""
         from core.storage.user import gae_models as user_models
-        classes = self.registry_instance.get_storage_model_classes(
-            [models.Names.USER])
+        classes = self.registry_instance.get_storage_model_classes([models.Names.USER])
         self.assertIn(user_models.UserSettingsModel, classes)
         self.assertIn(user_models.CompletedActivitiesModel, classes)
         self.assertIn(user_models.IncompleteActivitiesModel, classes)
@@ -251,64 +268,62 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import datastore services function."""
         from core.platform.datastore import cloud_datastore_services
         self.assertEqual(
-            self.registry_instance.import_datastore_services(),
-            cloud_datastore_services)
+            self.registry_instance.import_datastore_services(), cloud_datastore_services
+        )
 
     def test_errors_in_datastore_services_functions(self) -> None:
         """Tests datastore services functions errors."""
         from core.platform.datastore import cloud_datastore_services
         with self.assertRaisesRegex(
-            Exception, 'Model names should not be duplicated in input list.'):
-            cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
-                [('SampleModel', ['id_1', 'id_2']),
-                 ('SampleModel', ['id_3', 'id_4'])]
-            )
+            Exception, 'Model names should not be duplicated in input list.'
+        ):
+            cloud_datastore_services.fetch_multiple_entities_by_ids_and_models([
+                ('SampleModel', ['id_1', 'id_2']), ('SampleModel', ['id_3', 'id_4'])
+            ])
 
     def test_import_transaction_services(self) -> None:
         """Tests import transaction services function."""
         from core.platform.transactions import cloud_transaction_services
         self.assertEqual(
             self.registry_instance.import_transaction_services(),
-            cloud_transaction_services)
+            cloud_transaction_services
+        )
 
     def test_import_auth_services(self) -> None:
         """Tests import auth services function."""
         from core.platform.auth import firebase_auth_services
         self.assertIs(
-            self.registry_instance.import_auth_services(),
-            firebase_auth_services)
+            self.registry_instance.import_auth_services(), firebase_auth_services
+        )
 
     def test_import_app_identity_services(self) -> None:
         """Tests import app identity services function."""
         from core.platform.app_identity import gae_app_identity_services
         self.assertEqual(
             self.registry_instance.import_app_identity_services(),
-            gae_app_identity_services)
+            gae_app_identity_services
+        )
 
     def test_import_email_services_mailgun(self) -> None:
         """Tests import email services method for when email service provider is
         mailgun.
         """
         with self.swap(
-            feconf, 'EMAIL_SERVICE_PROVIDER',
-            feconf.EMAIL_SERVICE_PROVIDER_MAILGUN), (
-                self.swap(constants, 'DEV_MODE', False)):
+            feconf, 'EMAIL_SERVICE_PROVIDER', feconf.EMAIL_SERVICE_PROVIDER_MAILGUN
+        ), (self.swap(constants, 'DEV_MODE', False)):
             from core.platform.email import mailgun_email_services
             self.assertEqual(
-                mailgun_email_services,
-                self.registry_instance.import_email_services())
+                mailgun_email_services, self.registry_instance.import_email_services()
+            )
 
     def test_import_email_services_invalid(self) -> None:
         """Tests import email services method for when email service provider is
         an invalid option.
         """
-        with self.swap(
-            feconf, 'EMAIL_SERVICE_PROVIDER',
-            'invalid service provider'), (
-                self.swap(constants, 'DEV_MODE', False)):
+        with self.swap(feconf, 'EMAIL_SERVICE_PROVIDER', 'invalid service provider'
+                      ), (self.swap(constants, 'DEV_MODE', False)):
             with self.assertRaisesRegex(
-                Exception,
-                'Invalid email service provider: invalid service provider'
+                Exception, 'Invalid email service provider: invalid service provider'
             ):
                 self.registry_instance.import_email_services()
 
@@ -318,33 +333,33 @@ class RegistryUnitTest(test_utils.TestBase):
         """
         with self.swap(
             feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
-            feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP), (
-                self.swap(constants, 'EMULATOR_MODE', False)):
+            feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
+        ), (self.swap(constants, 'EMULATOR_MODE', False)):
             from core.platform.bulk_email import mailchimp_bulk_email_services
             self.assertEqual(
                 mailchimp_bulk_email_services,
-                self.registry_instance.import_bulk_email_services())
+                self.registry_instance.import_bulk_email_services()
+            )
 
     def test_import_bulk_email_services_invalid(self) -> None:
         """Tests import email services method for when email service provider is
         an invalid option.
         """
         with self.swap(
-            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
-            'invalid service provider'), (
-                self.swap(constants, 'EMULATOR_MODE', False)):
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER', 'invalid service provider'
+        ), (self.swap(constants, 'EMULATOR_MODE', False)):
             with self.assertRaisesRegex(
-                Exception,
-                'Invalid bulk email service provider: invalid service '
-                'provider'):
+                Exception, 'Invalid bulk email service provider: invalid service '
+                'provider'
+            ):
                 self.registry_instance.import_bulk_email_services()
 
     def test_import_cache_services(self) -> None:
         """Tests import cache services function."""
         from core.platform.cache import redis_cache_services
         self.assertEqual(
-            self.registry_instance.import_cache_services(),
-            redis_cache_services)
+            self.registry_instance.import_cache_services(), redis_cache_services
+        )
 
     def test_import_taskqueue_services(self) -> None:
         """Tests import taskqueue services function."""
@@ -361,12 +376,13 @@ class RegistryUnitTest(test_utils.TestBase):
                 cast(ModuleType, MockCloudTaskqueue)
             )
             self.assertEqual(
-                self.registry_instance.import_taskqueue_services(),
-                MockCloudTaskqueue)
+                self.registry_instance.import_taskqueue_services(), MockCloudTaskqueue
+            )
         from core.platform.taskqueue import dev_mode_taskqueue_services
         self.assertEqual(
             self.registry_instance.import_taskqueue_services(),
-            dev_mode_taskqueue_services)
+            dev_mode_taskqueue_services
+        )
 
     def test_import_cloud_translate_services(self) -> None:
         """Tests import cloud translate services function."""
@@ -374,19 +390,21 @@ class RegistryUnitTest(test_utils.TestBase):
             from core.platform.translate import cloud_translate_services
             self.assertEqual(
                 self.registry_instance.import_translate_services(),
-                cloud_translate_services)
+                cloud_translate_services
+            )
 
         from core.platform.translate import dev_mode_translate_services
         self.assertEqual(
             self.registry_instance.import_translate_services(),
-            dev_mode_translate_services)
+            dev_mode_translate_services
+        )
 
     def test_import_search_services(self) -> None:
         """Tests import search services function."""
         from core.platform.search import elastic_search_services
         self.assertEqual(
-            self.registry_instance.import_search_services(),
-            elastic_search_services)
+            self.registry_instance.import_search_services(), elastic_search_services
+        )
 
     def test_import_storage_services(self) -> None:
         """Tests import storage services function."""
@@ -404,21 +422,21 @@ class RegistryUnitTest(test_utils.TestBase):
                 cast(ModuleType, MockCloudStorage)
             )
             self.assertEqual(
-                self.registry_instance.import_storage_services(),
-                MockCloudStorage)
+                self.registry_instance.import_storage_services(), MockCloudStorage
+            )
 
         from core.platform.storage import dev_mode_storage_services
         self.assertEqual(
-            self.registry_instance.import_storage_services(),
-            dev_mode_storage_services)
+            self.registry_instance.import_storage_services(), dev_mode_storage_services
+        )
 
-    def test_import_models_not_implemented_has_not_implemented_error(
-            self
-    ) -> None:
+    def test_import_models_not_implemented_has_not_implemented_error(self) -> None:
         """Tests NotImplementedError of Platform."""
         with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'import_models() method is not overwritten in '
-                'derived classes')):
+                'derived classes'
+            )
+        ):
             models.Platform().import_models([models.Names.BASE_MODEL])

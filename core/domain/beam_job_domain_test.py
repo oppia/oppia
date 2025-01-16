@@ -35,7 +35,9 @@ class BeamJobTests(test_utils.TestBase):
 
     def test_to_dict(self) -> None:
         job = beam_job_domain.BeamJob(model_validation_jobs.AuditAllStorageModelsJob)
-        self.assertEqual(job.to_dict(), {'name': 'AuditAllStorageModelsJob'})
+        self.assertEqual(job.to_dict(), {
+            'name': 'AuditAllStorageModelsJob'
+        })
 
 
 class BeamJobRunTests(test_utils.TestBase):

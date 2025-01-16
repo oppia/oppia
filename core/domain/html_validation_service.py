@@ -425,7 +425,8 @@ def validate_rte_format(html_list: List[str], rte_format: str) -> Dict[str, List
 
         for collapsible in soup.findAll(name='oppia-noninteractive-collapsible'):
             if 'content-with-value' not in collapsible.attrs or (
-                    collapsible['content-with-value'] == ''):
+                collapsible['content-with-value'] == ''
+            ):
                 is_invalid = True
             else:
                 content_html = json.loads(
@@ -497,8 +498,8 @@ def validate_soup_for_rte(
         # Checking for parent-child relation that are not
         # allowed in RTE.
         parent = tag.parent.name
-        if (tag.name in allowed_tag_list) and (parent
-                                               not in allowed_parent_list[tag.name]):
+        if (tag.name
+            in allowed_tag_list) and (parent not in allowed_parent_list[tag.name]):
             if tag.name in err_dict:
                 err_dict[tag.name].append(parent)
             else:
@@ -584,8 +585,9 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
                 soup_for_tabs = bs4.BeautifulSoup(content_html, 'html.parser')
                 for component_name in simple_component_tag_names:
                     for component_tag in soup_for_tabs.findAll(name=component_name):
-                        for err_msg in validate_customization_args_in_tag(component_tag
-                                                                          ):
+                        for err_msg in validate_customization_args_in_tag(
+                            component_tag
+                        ):
                             yield err_msg
     except Exception as e:
         yield str(e)
@@ -642,9 +644,14 @@ def validate_math_content_attribute_in_html(html_string: str) -> List[Dict[str, 
             json.loads(utils.unescape_html(math_tag['math_content-with-value']))
         )
         try:
-            components.Math.validate({'math_content-with-value': math_content_dict})
+            components.Math.validate({
+                'math_content-with-value': math_content_dict
+            })
         except utils.ValidationError as e:
-            error_list.append({'invalid_tag': str(math_tag), 'error': str(e)})
+            error_list.append({
+                'invalid_tag': str(math_tag),
+                'error': str(e)
+            })
     return error_list
 
 
@@ -699,8 +706,8 @@ def get_invalid_svg_tags_and_attrs(
     for element in soup.find_all():
         if element.name.lower() in constants.SVG_ATTRS_ALLOWLIST:
             for attr in element.attrs:
-                if attr.lower() not in (
-                        constants.SVG_ATTRS_ALLOWLIST[element.name.lower()]):
+                if attr.lower(
+                ) not in (constants.SVG_ATTRS_ALLOWLIST[element.name.lower()]):
                     invalid_attrs.append('%s:%s' % (element.name, attr))
         else:
             invalid_elements.append(element.name)

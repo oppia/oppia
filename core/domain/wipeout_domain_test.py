@@ -52,10 +52,12 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
                 self.user_id_a, 'username', 'a@example.com'
             )
         )
-        pending_deletion_request.pseudonymizable_entity_mappings = {'wrong_key': {}}
+        pending_deletion_request.pseudonymizable_entity_mappings = {
+            'wrong_key': {}
+        }
         with self.assertRaisesRegex(
-                utils.ValidationError,
-                'pseudonymizable_entity_mappings contain wrong key'):
+            utils.ValidationError, 'pseudonymizable_entity_mappings contain wrong key'
+        ):
             pending_deletion_request.validate()
 
     def test_validate_succeeds_for_empty_pseudonymizable_entity_mappings(self) -> None:
@@ -79,6 +81,8 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
             )
         )
         valid_key = feconf.ValidModelNames.ACTIVITY.value
-        pending_deletion_request.pseudonymizable_entity_mappings = {valid_key: {}}
+        pending_deletion_request.pseudonymizable_entity_mappings = {
+            valid_key: {}
+        }
         # No exception should be raised when the key is valid.
         pending_deletion_request.validate()

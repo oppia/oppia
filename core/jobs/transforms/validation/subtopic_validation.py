@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Beam DoFns and PTransforms to provide validation of subtopic models."""
 
 from __future__ import annotations
@@ -27,18 +26,16 @@ from core.platform import models
 from typing import Optional, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import subtopic_models
 
 (subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
-@validation_decorators.AuditsExisting(
-    subtopic_models.SubtopicPageSnapshotMetadataModel)
+@validation_decorators.AuditsExisting(subtopic_models.SubtopicPageSnapshotMetadataModel)
 class ValidateSubtopicPageSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
-        subtopic_models.SubtopicPageSnapshotMetadataModel
-    ]
+        subtopic_models.SubtopicPageSnapshotMetadataModel]
 ):
     """Overrides _get_change_domain_class for SubtopicPageSnapshotMetadataModel.
     """
@@ -59,12 +56,10 @@ class ValidateSubtopicPageSnapshotMetadataModel(
         return subtopic_page_domain.SubtopicPageChange
 
 
-@validation_decorators.AuditsExisting(
-    subtopic_models.SubtopicPageCommitLogEntryModel)
+@validation_decorators.AuditsExisting(subtopic_models.SubtopicPageCommitLogEntryModel)
 class ValidateSubtopicPageCommitLogEntryModel(
     base_validation.BaseValidateCommitCmdsSchema[
-        subtopic_models.SubtopicPageCommitLogEntryModel
-    ]
+        subtopic_models.SubtopicPageCommitLogEntryModel]
 ):
     """Overrides _get_change_domain_class for SubtopicPageCommitLogEntryModel.
     """

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for TextInput interaction."""
 
 from __future__ import annotations
@@ -64,7 +63,8 @@ class TextInput(base.BaseInteraction):
         'name': 'rows',
         'description': 'Height (in rows)',
         'schema': {
-            'type': 'int',
+            'type':
+                'int',
             'validators': [{
                 'id': 'is_at_least',
                 'min_value': 1,
@@ -86,22 +86,25 @@ class TextInput(base.BaseInteraction):
         'default_value': False,
     }]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top answers',
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Table with answer counts for top N answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
         },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }, {
-        # Table with answer counts for top N unresolved answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top unresolved answers',
-        },
-        'calculation_id': 'TopNUnresolvedAnswersByFrequency',
-        'addressed_info_is_supported': True,
-    }]
+        {
+            # Table with answer counts for top N unresolved answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top unresolved answers',
+            },
+            'calculation_id': 'TopNUnresolvedAnswersByFrequency',
+            'addressed_info_is_supported': True,
+        }
+    ]

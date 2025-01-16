@@ -34,7 +34,9 @@ if MYPY:  # pragma: no cover
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
 
-CHANGE_LIST_SAVE: List[Dict[str, str]] = [{'cmd': 'save'}]
+CHANGE_LIST_SAVE: List[Dict[str, str]] = [{
+    'cmd': 'save'
+}]
 
 ALLOWED_ENTITY_NAMES: List[str] = [
     feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_BLOG_POST,
@@ -77,8 +79,10 @@ class GeneralFileSystem:
         Raises:
             ValidationError. When parameters passed in are invalid.
         """
-        if (entity_name not in ALLOWED_ENTITY_NAMES
-                and entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS):
+        if (
+            entity_name not in ALLOWED_ENTITY_NAMES and
+            entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS
+        ):
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name
             )

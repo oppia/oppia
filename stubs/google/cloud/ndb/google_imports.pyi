@@ -9,6 +9,9 @@ from typing import Any
 
 GOOGLE_PACKAGE_PATH: Any
 
-def set_appengine_imports() -> None: ...
+
+def set_appengine_imports() -> None:
+    ...
+
 
 normal_environment: bool

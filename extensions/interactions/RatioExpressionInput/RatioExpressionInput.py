@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Python configuration for RatioExpressionInput interaction."""
 
 from __future__ import annotations
@@ -56,9 +55,11 @@ class RatioExpressionInput(base.BaseInteraction):
         'description': (
             'The number of elements that the answer must have.'
             ' If set to 0, a ratio of any length will be accepted.'
-            ' The number of elements should not be greater than 10.'),
+            ' The number of elements should not be greater than 10.'
+        ),
         'schema': {
-            'type': 'int',
+            'type':
+                'int',
             'validators': [{
                 'id': 'is_at_least',
                 'min_value': 0,

@@ -205,15 +205,18 @@ def is_feature_flag_enabled(
 
     current_server = feature_flag_domain.get_server_mode()
 
-    if (current_server == feature_flag_domain.ServerMode.TEST
-            and feature_flag.feature_flag_spec.feature_stage
-            == feature_flag_domain.ServerMode.DEV):
+    if (
+        current_server == feature_flag_domain.ServerMode.TEST and
+        feature_flag.feature_flag_spec.feature_stage
+        == feature_flag_domain.ServerMode.DEV
+    ):
         return False
 
-    if (current_server == feature_flag_domain.ServerMode.PROD
-            and feature_flag.feature_flag_spec.feature_stage
-            in (feature_flag_domain.ServerMode.DEV,
-                feature_flag_domain.ServerMode.TEST)):
+    if (
+        current_server == feature_flag_domain.ServerMode.PROD and
+        feature_flag.feature_flag_spec.feature_stage
+        in (feature_flag_domain.ServerMode.DEV, feature_flag_domain.ServerMode.TEST)
+    ):
         return False
 
     if feature_flag.feature_flag_config.force_enable_for_all_users:

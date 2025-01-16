@@ -41,9 +41,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import user_models
 
-(exp_models, user_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.USER]
-)
+(exp_models, user_models) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.USER
+])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -78,8 +78,10 @@ def _migrate_states_schema(
     """
     states_schema_version = versioned_exploration_states['states_schema_version']
 
-    if not (feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION <= states_schema_version <=
-            feconf.CURRENT_STATE_SCHEMA_VERSION):
+    if not (
+        feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION <= states_schema_version <=
+        feconf.CURRENT_STATE_SCHEMA_VERSION
+    ):
         raise Exception(
             'Sorry, we can only process v%d-v%d exploration state schemas at '
             'present.' % (
@@ -152,8 +154,10 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
         exp_id, version_numbers
     )
     for index, exploration_model in enumerate(exploration_models):
-        if (exploration_model.states_schema_version
-                != feconf.CURRENT_STATE_SCHEMA_VERSION):
+        if (
+            exploration_model.states_schema_version
+            != feconf.CURRENT_STATE_SCHEMA_VERSION
+        ):
             raise Exception(
                 'Exploration(id=%s, version=%s, states_schema_version=%s) '
                 'does not match the latest schema version %s' % (
@@ -213,8 +217,10 @@ def get_exploration_from_model(
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
-    if (run_conversion and exploration_model.states_schema_version
-            != feconf.CURRENT_STATE_SCHEMA_VERSION):
+    if (
+        run_conversion and
+        exploration_model.states_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION
+    ):
         next_content_id_index = _migrate_states_schema(
             versioned_exploration_states, init_state_name, language_code
         )
@@ -383,7 +389,7 @@ def get_exploration_summaries_subscribed_to(
 
 
 @overload
-def get_exploration_by_id(exploration_id: str, ) -> exp_domain.Exploration:
+def get_exploration_by_id(exploration_id: str,) -> exp_domain.Exploration:
     ...
 
 
@@ -446,8 +452,9 @@ def get_exploration_by_id(
         if exploration_model:
             exploration = get_exploration_from_model(exploration_model)
             caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION, sub_namespace,
-                {exploration_id: exploration}
+                caching_services.CACHE_NAMESPACE_EXPLORATION, sub_namespace, {
+                    exploration_id: exploration
+                }
             )
             return exploration
         else:
@@ -456,7 +463,7 @@ def get_exploration_by_id(
 
 def get_multiple_explorations_by_id(exp_ids: List[str],
                                     strict: bool = True
-                                    ) -> Dict[str, exp_domain.Exploration]:
+                                   ) -> Dict[str, exp_domain.Exploration]:
     """Returns a dict of domain objects representing explorations with the
     given ids as keys. If an exp_id is not present, it is not included in the
     return dict.
@@ -509,8 +516,7 @@ def get_multiple_explorations_by_id(exp_ids: List[str],
         )
 
     cache_update = {
-        eid: results
-        for eid, results in db_results_dict.items() if results is not None
+        eid: results for eid, results in db_results_dict.items() if results is not None
     }
 
     if cache_update:

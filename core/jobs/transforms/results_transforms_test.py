@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for core.jobs.transforms.results_transforms."""
 
 from __future__ import annotations
@@ -29,40 +28,35 @@ class DrainResultsOnErrorTests(job_test_utils.PipelinedTestBase):
 
     def test_error_results_returns_empty_collection(self) -> None:
         transform_result = (
-            self.pipeline
-            | beam.Create(
-                [result.Ok(('id_1', None)),
+            self.pipeline | beam.Create([
+                result.Ok(('id_1', None)),
                 result.Ok(('id_2', None)),
-                result.Err(('id_3', None))]
-            )
-            | results_transforms.DrainResultsOnError()
+                result.Err(('id_3', None))
+            ]) | results_transforms.DrainResultsOnError()
         )
 
         self.assert_pcoll_empty(transform_result)
 
     def test_ok_results_returns_unchanged_collection(self) -> None:
         transform_result = (
-            self.pipeline
-            | beam.Create(
-                [result.Ok(('id_1', None)),
+            self.pipeline | beam.Create([
+                result.Ok(('id_1', None)),
                 result.Ok(('id_2', None)),
-                result.Ok(('id_3', None))]
-            )
-            | results_transforms.DrainResultsOnError()
+                result.Ok(('id_3', None))
+            ]) | results_transforms.DrainResultsOnError()
         )
 
         self.assert_pcoll_equal(
-            transform_result,
-            [result.Ok(('id_1', None)),
-            result.Ok(('id_2', None)),
-            result.Ok(('id_3', None))]
+            transform_result, [
+                result.Ok(('id_1', None)),
+                result.Ok(('id_2', None)),
+                result.Ok(('id_3', None))
+            ]
         )
 
     def test_zero_objects_correctly_outputs(self) -> None:
         transform_result = (
-            self.pipeline
-            | beam.Create([])
-            | results_transforms.DrainResultsOnError()
+            self.pipeline | beam.Create([]) | results_transforms.DrainResultsOnError()
         )
 
         self.assert_pcoll_empty(transform_result)

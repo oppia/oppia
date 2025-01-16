@@ -46,16 +46,23 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         )
         sorted_tiles_instance = sorted_tiles('AnswerFrequencies', {}, True)
 
-        with self.assertRaisesRegex(Exception, re.escape(
+        with self.assertRaisesRegex(
+            Exception,
+            re.escape(
                 'For visualization SortedTiles, expected option names '
-                '[\'header\', \'use_percentages\']; received names []')):
+                '[\'header\', \'use_percentages\']; received names []'
+            )
+        ):
             sorted_tiles_instance.validate()
 
     def test_visualization_class_with_invalid_option_value(self) -> None:
         sorted_tiles = visualization_registry.Registry.get_visualization_class(
             'SortedTiles'
         )
-        option_names = {'header': 'Pretty Tiles!', 'use_percentages': 'invalid_value'}
+        option_names = {
+            'header': 'Pretty Tiles!',
+            'use_percentages': 'invalid_value'
+        }
         sorted_tiles_instance = sorted_tiles('AnswerFrequencies', option_names, True)
 
         with self.assertRaisesRegex(Exception, 'Expected bool, received invalid_value'):
@@ -70,14 +77,18 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         sorted_tiles = visualization_registry.Registry.get_visualization_class(
             'SortedTiles'
         )
-        option_names = {'header': 'Pretty Tiles!', 'use_percentages': True}
+        option_names = {
+            'header': 'Pretty Tiles!',
+            'use_percentages': True
+        }
         sorted_tiles_instance = sorted_tiles(
             'AnswerFrequencies', option_names, 'invalid_value'
         )  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(
-                Exception, 'For visualization SortedTiles, expected a bool value for '
-                'addressed_info_is_supported; received invalid_value'):
+            Exception, 'For visualization SortedTiles, expected a bool value for '
+            'addressed_info_is_supported; received invalid_value'
+        ):
             sorted_tiles_instance.validate()
 
     def test_get_all_visualization_ids(self) -> None:
@@ -101,8 +112,9 @@ class VisualizationsNameTests(test_utils.GenericTestBase):
 
         for file_name in all_python_files:
             python_module = importlib.import_module(file_name)
-            for name, clazz in inspect.getmembers(python_module,
-                                                  predicate=inspect.isclass):
+            for name, clazz in inspect.getmembers(
+                python_module, predicate=inspect.isclass
+            ):
                 all_base_classes = [
                     base_class.__name__ for base_class in (inspect.getmro(clazz))
                 ]

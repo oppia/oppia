@@ -34,7 +34,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models, ) = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
@@ -86,9 +86,10 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_get_exploration_rights_for_nonexistent_exploration(self) -> None:
         non_exp_id = 'this_exp_does_not_exist_id'
 
-        with self.assertRaisesRegex(Exception,
-                                    'Entity for class ExplorationRightsModel with id '
-                                    'this_exp_does_not_exist_id not found'):
+        with self.assertRaisesRegex(
+            Exception, 'Entity for class ExplorationRightsModel with id '
+            'this_exp_does_not_exist_id not found'
+        ):
             rights_manager.get_exploration_rights(non_exp_id)
 
         self.assertIsNone(
@@ -335,8 +336,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         )
 
     def test_get_activity_rights_raise_error_for_invalid_activity_type(self) -> None:
-        with self.assertRaisesRegex(Exception,
-                                    'Cannot get activity rights for unknown activity'):
+        with self.assertRaisesRegex(
+            Exception, 'Cannot get activity rights for unknown activity'
+        ):
             rights_manager._get_activity_rights('invalid_type', self.user_id_a)  # pylint: disable=protected-access
 
     def test_inviting_playtester_to_exploration(self) -> None:
@@ -781,7 +783,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(
-                Exception, 'Could not assign voice artist to private activity.'):
+            Exception, 'Could not assign voice artist to private activity.'
+        ):
             rights_manager.assign_role_for_exploration(
                 self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
                 rights_domain.ROLE_VOICE_ARTIST
@@ -861,8 +864,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Public explorations can be viewed by anyone.'):
+        with self.assertRaisesRegex(
+            Exception, 'Public explorations can be viewed by anyone.'
+        ):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_VIEWER
             )
@@ -883,7 +887,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(
-                Exception, 'No activity_rights exists for the given activity_id'):
+            Exception, 'No activity_rights exists for the given activity_id'
+        ):
             rights_manager.deassign_role_for_exploration(
                 self.user_b, 'abcdefg', self.user_id_a
             )
@@ -1020,16 +1025,18 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_guest_user_cannot_assign_roles_for_exploration(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
-        with self.assertRaisesRegex(Exception,
-                                    'Guest user is not allowed to assign roles.'):
+        with self.assertRaisesRegex(
+            Exception, 'Guest user is not allowed to assign roles.'
+        ):
             rights_manager.assign_role_for_exploration(
                 guest_user, 'exp_id', 'assignee_id', rights_domain.ROLE_VIEWER
             )
 
     def test_guest_user_cannot_deassign_roles_for_exploration(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
-        with self.assertRaisesRegex(Exception,
-                                    'Guest user is not allowed to deassign roles.'):
+        with self.assertRaisesRegex(
+            Exception, 'Guest user is not allowed to deassign roles.'
+        ):
             rights_manager.deassign_role_for_exploration(
                 guest_user, 'exp_id', 'assignee_id'
             )
@@ -1037,27 +1044,29 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_guest_user_cannot_release_ownership_of_exploration(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(
-                Exception,
-                'Guest user is not allowed to release ownership of activity.'):
+            Exception, 'Guest user is not allowed to release ownership of activity.'
+        ):
             rights_manager.release_ownership_of_exploration(guest_user, 'exp_id')
 
     def test_guest_user_cannot_publish_exploration_activities(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
-        with self.assertRaisesRegex(Exception,
-                                    'Guest user is not allowed to publish activities.'):
+        with self.assertRaisesRegex(
+            Exception, 'Guest user is not allowed to publish activities.'
+        ):
             rights_manager.publish_exploration(guest_user, 'exp_id')
 
     def test_guest_user_cannot_unpublish_exploration_activities(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(
-                Exception, 'Guest user is not allowed to unpublish activities.'):
+            Exception, 'Guest user is not allowed to unpublish activities.'
+        ):
             rights_manager.unpublish_exploration(guest_user, 'exp_id')
 
     def test_guest_user_cannot_set_viewability_of_exploration(self) -> None:
         guest_user = user_services.get_user_actions_info(None)
         with self.assertRaisesRegex(
-                Exception,
-                'Guest user is not allowed to set viewability of exploration.'):
+            Exception, 'Guest user is not allowed to set viewability of exploration.'
+        ):
             rights_manager.set_private_viewability_of_exploration(
                 guest_user, 'exp_id', False
             )
@@ -1121,9 +1130,10 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_get_collection_rights_for_nonexistent_collection(self) -> None:
         non_col_id = 'this_collection_does_not_exist_id'
 
-        with self.assertRaisesRegex(Exception,
-                                    'Entity for class CollectionRightsModel with id '
-                                    'this_collection_does_not_exist_id not found'):
+        with self.assertRaisesRegex(
+            Exception, 'Entity for class CollectionRightsModel with id '
+            'this_collection_does_not_exist_id not found'
+        ):
             rights_manager.get_collection_rights(non_col_id)
 
         self.assertIsNone(
@@ -1174,9 +1184,10 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b, rights_domain.ROLE_EDITOR
         )
 
-        self.assertListEqual(
-            ['A'], rights_manager.get_collection_owner_names(self.COLLECTION_ID)
-        )
+        self.assertListEqual(['A'],
+                             rights_manager.get_collection_owner_names(
+                                 self.COLLECTION_ID
+                             ))
         collection_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
 
         self.assertTrue(collection_rights.is_owner(self.user_id_a))
@@ -1187,9 +1198,10 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_newly_created_collection(self) -> None:
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
-        self.assertListEqual(
-            ['A'], rights_manager.get_collection_owner_names(self.COLLECTION_ID)
-        )
+        self.assertListEqual(['A'],
+                             rights_manager.get_collection_owner_names(
+                                 self.COLLECTION_ID
+                             ))
         collection_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
 
         self.assertTrue(
@@ -1420,8 +1432,9 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
 
-        with self.assertRaisesRegex(Exception,
-                                    'Public collections can be viewed by anyone.'):
+        with self.assertRaisesRegex(
+            Exception, 'Public collections can be viewed by anyone.'
+        ):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
                 rights_domain.ROLE_VIEWER
@@ -1458,9 +1471,10 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         )
 
         # Ensure User A is the only user in the owner names list.
-        self.assertListEqual(
-            ['A'], rights_manager.get_collection_owner_names(self.COLLECTION_ID)
-        )
+        self.assertListEqual(['A'],
+                             rights_manager.get_collection_owner_names(
+                                 self.COLLECTION_ID
+                             ))
         collection_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
 
         # Ensure User B is now an editor of the collection.

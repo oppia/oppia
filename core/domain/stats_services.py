@@ -466,8 +466,10 @@ def _get_corresponding_exp_issue(
             # NOTE TO DEVELOPERS: When identifying_arg is 'state_names', the
             # ordering of the list is important (i.e. [a, b, c] is different
             # from [b, c, a]).
-            if (issue_customization_args[identifying_arg] ==
-                    playthrough.issue_customization_args[identifying_arg]):
+            if (
+                issue_customization_args[identifying_arg] ==
+                playthrough.issue_customization_args[identifying_arg]
+            ):
                 return issue
     issue = stats_domain.ExplorationIssue(
         playthrough.issue_type,
@@ -828,10 +830,10 @@ def get_exploration_stats_from_model(
         ExplorationStats. The domain object for exploration statistics.
     """
     new_state_stats_mapping = {
-        state_name: stats_domain.StateStats.from_dict(
-            exploration_stats_model.state_stats_mapping[state_name]
-        )
-        for state_name in exploration_stats_model.state_stats_mapping
+        state_name:
+            stats_domain.StateStats.from_dict(
+                exploration_stats_model.state_stats_mapping[state_name]
+            ) for state_name in exploration_stats_model.state_stats_mapping
     }
     return stats_domain.ExplorationStats(
         exploration_stats_model.exp_id, exploration_stats_model.exp_version,
@@ -1125,12 +1127,10 @@ def get_state_answers(exploration_id: str, exploration_version: int,
     )
     if state_answers_models:
         main_state_answers_model = state_answers_models[0]
-        submitted_answer_dict_list = itertools.chain.from_iterable(
-            [
-                state_answers_model.submitted_answer_list
-                for state_answers_model in state_answers_models
-            ]
-        )
+        submitted_answer_dict_list = itertools.chain.from_iterable([
+            state_answers_model.submitted_answer_list
+            for state_answers_model in state_answers_models
+        ])
         return stats_domain.StateAnswers(
             exploration_id,
             exploration_version,
@@ -1328,12 +1328,10 @@ def save_learner_answer_details(
             learner_answer_details.entity_type, learner_answer_details.state_reference
         )
         if learner_answer_details_model.id == instance_id:
-            learner_answer_details_model.learner_answer_info_list = (
-                [
-                    learner_answer_info.to_dict() for learner_answer_info in
-                    learner_answer_details.learner_answer_info_list
-                ]
-            )
+            learner_answer_details_model.learner_answer_info_list = ([
+                learner_answer_info.to_dict() for learner_answer_info in
+                learner_answer_details.learner_answer_info_list
+            ])
             learner_answer_details_model.learner_answer_info_schema_version = (
                 learner_answer_details.learner_answer_info_schema_version
             )

@@ -169,15 +169,24 @@ class TaskEntry:
         """
 
         return {
-            'entity_type': self.entity_type,
-            'entity_id': self.entity_id,
-            'entity_version': self.entity_version,
-            'task_type': self.task_type,
-            'target_type': self.target_type,
-            'target_id': self.target_id,
-            'issue_description': self.issue_description,
-            'status': self.status,
-            'resolver_username': None,
+            'entity_type':
+                self.entity_type,
+            'entity_id':
+                self.entity_id,
+            'entity_version':
+                self.entity_version,
+            'task_type':
+                self.task_type,
+            'target_type':
+                self.target_type,
+            'target_id':
+                self.target_id,
+            'issue_description':
+                self.issue_description,
+            'status':
+                self.status,
+            'resolver_username':
+                None,
             'resolved_on_msecs': (
                 None if not self.resolved_on else
                 utils.get_time_in_millisecs(self.resolved_on)

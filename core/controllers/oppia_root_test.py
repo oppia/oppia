@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the oppia root page."""
 
 from __future__ import annotations
@@ -27,10 +26,12 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
         for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
             if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
                 response = self.get_html_response(
-                    '/%s' % page['ROUTE'], expected_status_int=200)
+                    '/%s' % page['ROUTE'], expected_status_int=200
+                )
                 if 'LIGHTWEIGHT' in page:
                     response.mustcontain(
-                        '<lightweight-oppia-root></lightweight-oppia-root>')
+                        '<lightweight-oppia-root></lightweight-oppia-root>'
+                    )
                 else:
                     response.mustcontain('<oppia-root></oppia-root>')
 

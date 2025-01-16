@@ -34,7 +34,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import improvements_models
 
-(improvements_models, ) = (models.Registry.import_models([models.Names.IMPROVEMENTS]))
+(improvements_models,) = (models.Registry.import_models([models.Names.IMPROVEMENTS]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -55,7 +55,7 @@ def _yield_all_tasks_ordered_by_status(
     model_class = improvements_models.ExplorationStatsTaskEntryModel
     results: Sequence[improvements_models.ExplorationStatsTaskEntryModel] = []
     query = model_class.query(model_class.composite_entity_id == composite_entity_id
-                              ).order(model_class.status)
+                             ).order(model_class.status)
     cursor, more = (None, True)
     while more:
         results, cursor, more = query.fetch_page(
@@ -162,10 +162,8 @@ def fetch_exploration_task_history_page(
         feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor
     )
     # The urlsafe returns bytes and we need to decode them to string.
-    return (
-        [get_task_entry_from_model(model) for model in results],
-        cursor.urlsafe().decode('utf-8') if cursor else None, more
-    )
+    return ([get_task_entry_from_model(model) for model in results],
+            cursor.urlsafe().decode('utf-8') if cursor else None, more)
 
 
 def put_tasks(
@@ -184,9 +182,9 @@ def put_tasks(
         update_last_updated_time: bool. Whether to update the last_updated field
             of the task models.
     """
-    task_models = improvements_models.ExplorationStatsTaskEntryModel.get_multi(
-        [t.task_id for t in tasks]
-    )
+    task_models = improvements_models.ExplorationStatsTaskEntryModel.get_multi([
+        t.task_id for t in tasks
+    ])
     models_to_put = []
     for task, model in zip(tasks, task_models):
         if model is None:

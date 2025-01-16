@@ -60,28 +60,21 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def _create_example_parameter_with_name(self, name: str) -> None:
         """Creates and returns an example parameter with the given name."""
-        registry.Registry.init_platform_parameter_from_dict(
-            {
-                'name': name,
-                'description': 'for test',
-                'data_type': DataTypes.STRING.value,
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']]
-                            }
-                        ],
-                        'value_when_matched': '222'
-                    }
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
-                'default_value': '111'
-            }
-        )
+        registry.Registry.init_platform_parameter_from_dict({
+            'name': name,
+            'description': 'for test',
+            'data_type': DataTypes.STRING.value,
+            'rules': [{
+                'filters': [{
+                    'type': 'platform_type',
+                    'conditions': [['=', 'Backend']]
+                }],
+                'value_when_matched': '222'
+            }],
+            'rule_schema_version':
+                (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111'
+        })
 
     def _create_dummy_platform_parameter(
         self, data_types: DataTypes
@@ -117,8 +110,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_create_platform_parameter_with_the_same_name_failure(self) -> None:
         param_name = 'parameter_a'
         self._create_example_parameter_with_name(param_name)
-        with self.assertRaisesRegex(Exception, 'Parameter with name %s already exists' %
-                                    param_name):
+        with self.assertRaisesRegex(
+            Exception, 'Parameter with name %s already exists' % param_name
+        ):
             self._create_example_parameter_with_name(param_name)
 
     def test_default_value_of_bool_platform_parameter(self) -> None:
@@ -174,17 +168,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
         registry.Registry.update_platform_parameter(
             parameter_name, feconf.SYSTEM_COMMITTER_ID, 'commit message', [
-                parameter_domain.PlatformParameterRule.from_dict(
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']]
-                            }
-                        ],
-                        'value_when_matched': 'updated'
-                    }
-                )
+                parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [{
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']]
+                    }],
+                    'value_when_matched': 'updated'
+                })
             ], 'default'
         )
         parameter_updated = registry.Registry.get_platform_parameter(parameter_name)
@@ -199,17 +189,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
         registry.Registry.update_platform_parameter(
             parameter_name, feconf.SYSTEM_COMMITTER_ID, 'commit message', [
-                parameter_domain.PlatformParameterRule.from_dict(
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']]
-                            }
-                        ],
-                        'value_when_matched': 'updated'
-                    }
-                )
+                parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [{
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']]
+                    }],
+                    'value_when_matched': 'updated'
+                })
             ], 'default'
         )
         self.assertIsNone(
@@ -226,17 +212,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(utils.ValidationError, 'Expected string'):
             registry.Registry.update_platform_parameter(
                 parameter_name, feconf.SYSTEM_COMMITTER_ID, 'commit message', [
-                    parameter_domain.PlatformParameterRule.from_dict(
-                        {
-                            'filters': [
-                                {
-                                    'type': 'platform_type',
-                                    'conditions': [['=', 'Backend']]
-                                }
-                            ],
-                            'value_when_matched': True
-                        }
-                    )
+                    parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [{
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
+                        }],
+                        'value_when_matched': True
+                    })
                 ], 'default'
             )
 
@@ -249,17 +231,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
         registry.Registry.update_platform_parameter(
             parameter_name, feconf.SYSTEM_COMMITTER_ID, 'commit message', [
-                parameter_domain.PlatformParameterRule.from_dict(
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Backend']]
-                            }
-                        ],
-                        'value_when_matched': 'updated'
-                    }
-                )
+                parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [{
+                        'type': 'platform_type',
+                        'conditions': [['=', 'Backend']]
+                    }],
+                    'value_when_matched': 'updated'
+                })
             ], 'default'
         )
 
@@ -295,38 +273,32 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             model_instance.rules = [rule.to_dict() for rule in param.rules]
             model_instance.default_value = None
             model_instance.commit(
-                committer_id, commit_message, [
-                    {
-                        'cmd': (
-                            parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
-                        ),
-                        'new_rules': new_rule_dicts,
-                        'default_value': None
-                    }
-                ]
+                committer_id, commit_message, [{
+                    'cmd': (parameter_domain.PlatformParameterChange.CMD_EDIT_RULES),
+                    'new_rules': new_rule_dicts,
+                    'default_value': None
+                }]
             )
 
             caching_services.delete_multi(
                 caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name]
             )
 
-        with self.swap(registry.Registry, 'update_platform_parameter',
-                       _mock_update_platform_parameter):
+        with self.swap(
+            registry.Registry, 'update_platform_parameter',
+            _mock_update_platform_parameter
+        ):
             parameter_name = 'parameter_b'
             self._create_example_parameter_with_name(parameter_name)
             registry.Registry.update_platform_parameter(
                 parameter_name, feconf.SYSTEM_COMMITTER_ID, 'commit message', [
-                    parameter_domain.PlatformParameterRule.from_dict(
-                        {
-                            'filters': [
-                                {
-                                    'type': 'platform_type',
-                                    'conditions': [['=', 'Backend']]
-                                }
-                            ],
-                            'value_when_matched': 'updated'
-                        }
-                    )
+                    parameter_domain.PlatformParameterRule.from_dict({
+                        'filters': [{
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
+                        }],
+                        'value_when_matched': 'updated'
+                    })
                 ], 'default'
             )
 
@@ -348,40 +320,30 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'server_mode': FeatureStages.DEV,
             },
         )
-        registry.Registry.init_platform_parameter_from_dict(
-            {
-                'name': 'parameter_a',
-                'description': 'for test',
-                'data_type': DataTypes.STRING.value,
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'platform_type',
-                                'conditions': [['=', 'Web']]
-                            }
-                        ],
-                        'value_when_matched': '222'
-                    }
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
-                'default_value': '333'
-            }
-        )
-        registry.Registry.init_platform_parameter_from_dict(
-            {
-                'name': 'parameter_b',
-                'description': 'for test',
-                'data_type': DataTypes.BOOL.value,
-                'rules': [],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-                ),
-                'default_value': False
-            }
-        )
+        registry.Registry.init_platform_parameter_from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': DataTypes.STRING.value,
+            'rules': [{
+                'filters': [{
+                    'type': 'platform_type',
+                    'conditions': [['=', 'Web']]
+                }],
+                'value_when_matched': '222'
+            }],
+            'rule_schema_version':
+                (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333'
+        })
+        registry.Registry.init_platform_parameter_from_dict({
+            'name': 'parameter_b',
+            'description': 'for test',
+            'data_type': DataTypes.BOOL.value,
+            'rules': [],
+            'rule_schema_version':
+                (feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False
+        })
 
         self.assertDictEqual(
             registry.Registry.evaluate_all_platform_parameters(context), {

@@ -53,12 +53,10 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (auth_models, user_models, audit_models, suggestion_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.AUTH, models.Names.USER, models.Names.AUDIT,
-            models.Names.SUGGESTION
-        ]
-    )
+    models.Registry.import_models([
+        models.Names.AUTH, models.Names.USER, models.Names.AUDIT,
+        models.Names.SUGGESTION
+    ])
 )
 
 bulk_email_services = models.Registry.import_bulk_email_services()
@@ -206,8 +204,7 @@ def get_multi_user_ids_from_usernames(usernames: List[str],
     )
 
     username_to_user_id_map = {
-        model.normalized_username: model.id
-        for model in found_models
+        model.normalized_username: model.id for model in found_models
     }
     user_ids = []
     for username in normalized_usernames:
@@ -376,7 +373,9 @@ def fetch_gravatar(user_email: str) -> str:
     try:
         response = requests.get(
             gravatar_url,
-            headers={b'Content-Type': b'image/png'},
+            headers={
+                b'Content-Type': b'image/png'
+            },
             allow_redirects=False,
             timeout=TIMEOUT_SECS
         )
@@ -459,7 +458,7 @@ def get_user_settings_by_auth_id(
 
 def get_user_settings_by_auth_id(auth_id: str,
                                  strict: bool = False
-                                 ) -> Optional[user_domain.UserSettings]:
+                                ) -> Optional[user_domain.UserSettings]:
     """Return the user settings for a single user.
 
     Args:
@@ -495,7 +494,7 @@ def get_all_user_groups() -> List[user_domain.UserGroup]:
         List[user_domain.UserGroup]. List of all user groups.
     """
     user_group_models: List[user_models.UserGroupModel
-                            ] = list(user_models.UserGroupModel.get_all())
+                           ] = list(user_models.UserGroupModel.get_all())
     user_groups_list = []
     for user_group_model in user_group_models:
         member_usernames: List[str] = []
@@ -711,7 +710,8 @@ def get_users_contribution_rights(
 
     users_contribution_rights = []
     for index, user_contribution_rights_model in enumerate(
-            user_contribution_rights_models):
+        user_contribution_rights_models
+    ):
         user_contribution_rights = _create_user_contribution_rights_from_model(
             user_contribution_rights_model
         )
@@ -800,8 +800,8 @@ def _update_user_contribution_rights(
         user_contribution_rights: UserContributionRights. The updated
             UserContributionRights object of the user.
     """
-    if user_contribution_rights.can_review_at_least_one_item() or (
-            user_contribution_rights.can_submit_at_least_one_item()):
+    if user_contribution_rights.can_review_at_least_one_item(
+    ) or (user_contribution_rights.can_submit_at_least_one_item()):
         _save_user_contribution_rights(user_contribution_rights)
     else:
         remove_contribution_reviewer(user_contribution_rights.id)
@@ -844,10 +844,12 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
 
     # Update question reviewer counts.
     if past_user_contribution_rights.can_review_questions and not (
-            future_user_contribution_rights.can_review_questions):
+        future_user_contribution_rights.can_review_questions
+    ):
         stats_model.question_reviewer_count -= 1
     if not past_user_contribution_rights.can_review_questions and (
-            future_user_contribution_rights.can_review_questions):
+        future_user_contribution_rights.can_review_questions
+    ):
         stats_model.question_reviewer_count += 1
 
     # Update translation reviewer counts.
@@ -1066,8 +1068,8 @@ def has_fully_registered_account(user_id: str) -> bool:
         return False
 
     return bool(
-        user_settings.username and user_settings.last_agreed_to_terms
-        and (user_settings.last_agreed_to_terms >= feconf.TERMS_PAGE_LAST_UPDATED_UTC)
+        user_settings.username and user_settings.last_agreed_to_terms and
+        (user_settings.last_agreed_to_terms >= feconf.TERMS_PAGE_LAST_UPDATED_UTC)
     )
 
 
@@ -1089,8 +1091,9 @@ def get_all_profiles_auth_details_by_parent_user_id(
     Raises:
         Exception. Parent user with the given parent_user_id not found.
     """
-    if auth_models.UserAuthDetailsModel.has_reference_to_user_id(parent_user_id
-                                                                 ) is False:
+    if auth_models.UserAuthDetailsModel.has_reference_to_user_id(
+        parent_user_id
+    ) is False:
         raise Exception('Parent user not found.')
 
     return [
@@ -1245,8 +1248,9 @@ def update_multiple_users_data(
     user_settings_list_with_none = get_users_settings(user_ids, strict=False)
     user_settings_list = []
     user_auth_details_list = get_multiple_user_auth_details(user_ids)
-    for modifiable_user_data, user_settings in zip(modifiable_user_data_list,
-                                                   user_settings_list_with_none):
+    for modifiable_user_data, user_settings in zip(
+        modifiable_user_data_list, user_settings_list_with_none
+    ):
         user_id = modifiable_user_data.user_id
         if user_id is None:
             raise Exception('Missing user ID.')
@@ -1273,8 +1277,9 @@ def _save_existing_users_settings(
         user_ids, include_deleted=True
     )
     user_settings_models = []
-    for user_model, user_settings in zip(user_settings_models_with_none,
-                                         user_settings_list):
+    for user_model, user_settings in zip(
+        user_settings_models_with_none, user_settings_list
+    ):
         # Ruling out the possibility of None for mypy type checking.
         assert user_model is not None
         user_settings.validate()
@@ -1300,8 +1305,9 @@ def _save_existing_users_auth_details(
         user_ids, include_deleted=True
     )
     user_auth_models = []
-    for user_auth_details_model, user_auth_details in zip(user_auth_models_with_none,
-                                                          user_auth_details_list):
+    for user_auth_details_model, user_auth_details in zip(
+        user_auth_models_with_none, user_auth_details_list
+    ):
         # Ruling out the possibility of None for mypy type checking.
         assert user_auth_details_model is not None
         user_auth_details.validate()
@@ -1380,7 +1386,7 @@ def get_auth_details_by_user_id(
 
 def get_auth_details_by_user_id(user_id: str,
                                 strict: bool = False
-                                ) -> Optional[auth_domain.UserAuthDetails]:
+                               ) -> Optional[auth_domain.UserAuthDetails]:
     """Return the user auth details for a single user.
 
     Args:
@@ -1728,7 +1734,9 @@ def add_user_to_mailing_list(email: str, tag: str, name: Optional[str] = None) -
     Returns:
         bool. Whether the operation was successful or not.
     """
-    merge_fields = {'NAME': name} if name is not None else {}
+    merge_fields = {
+        'NAME': name
+    } if name is not None else {}
     return bulk_email_services.add_or_update_user_status(
         email, merge_fields, tag, can_receive_email_updates=True
     )
@@ -1985,7 +1993,7 @@ def get_user_contributions(
 
 def get_user_contributions(user_id: str,
                            strict: bool = False
-                           ) -> Optional[user_domain.UserContributions]:
+                          ) -> Optional[user_domain.UserContributions]:
     """Gets domain object representing the contributions for the given user_id.
 
     Args:
@@ -2205,7 +2213,7 @@ def get_weekly_dashboard_stats(user_id: str) -> List[Dict[str, DashboardStatsDic
         # should be removed. Currently, these ndb properties are annotated with
         # Any return type. Once we have proper return type we can remove this.
         weekly_creator_stats_list: List[Dict[str, DashboardStatsDict]
-                                        ] = model.weekly_creator_stats_list
+                                       ] = model.weekly_creator_stats_list
         return weekly_creator_stats_list
     else:
         return []
@@ -2532,8 +2540,10 @@ def get_contributor_usernames(category: str,
             'translation' or 'voiceover'.
     """
     user_ids = []
-    if (category in (constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION, )
-            and language_code is None):
+    if (
+        category in (constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,) and
+        language_code is None
+    ):
         raise Exception(
             'The language_code cannot be None if review category is'
             ' \'translation\' or \'voiceover\'.'
@@ -2594,7 +2604,9 @@ def create_login_url(return_url: str) -> str:
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-    return '/login?%s' % urllib.parse.urlencode({'return_url': return_url})
+    return '/login?%s' % urllib.parse.urlencode({
+        'return_url': return_url
+    })
 
 
 def mark_user_banned(user_id: str) -> None:
@@ -2684,8 +2696,10 @@ def get_checkpoints_in_order(
         if current_state_name not in visited_state_names:
             visited_state_names.append(current_state_name)
             current_state = states[current_state_name]
-            if (current_state.card_is_checkpoint
-                    and current_state_name not in checkpoint_state_names):
+            if (
+                current_state.card_is_checkpoint and
+                current_state_name not in checkpoint_state_names
+            ):
                 checkpoint_state_names.append(current_state_name)
             for answer_group in current_state.interaction.answer_groups:
                 if answer_group.outcome.dest is None:
@@ -2942,8 +2956,10 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
 
     # If the most recently reached checkpoint doesn't exist in current
     # exploration.
-    if (most_recently_reached_checkpoint_in_current_exploration
-            != exp_user_model.most_recently_reached_checkpoint_state_name):
+    if (
+        most_recently_reached_checkpoint_in_current_exploration
+        != exp_user_model.most_recently_reached_checkpoint_state_name
+    ):
         exp_user_model.most_recently_reached_checkpoint_state_name = (
             most_recently_reached_checkpoint_in_current_exploration
         )
@@ -2955,8 +2971,10 @@ def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
 
     # If the furthest reached checkpoint doesn't exist in current
     # exploration.
-    if (furthest_reached_checkpoint_in_current_exploration
-            != exp_user_model.furthest_reached_checkpoint_state_name):
+    if (
+        furthest_reached_checkpoint_in_current_exploration
+        != exp_user_model.furthest_reached_checkpoint_state_name
+    ):
         exp_user_model.furthest_reached_checkpoint_state_name = (
             furthest_reached_checkpoint_in_current_exploration
         )
@@ -3006,8 +3024,9 @@ def assign_coordinator(
     if committer_id is None:
         raise Exception('Guest user is not allowed to assign roles to a user.')
 
-    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY
-            not in committer.actions):
+    if (
+        role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in committer.actions
+    ):
         logging.error(
             'User %s tried to allow user %s to be a coordinator of language %s '
             'but was refused permission.' %
@@ -3066,8 +3085,9 @@ def deassign_coordinator(
     language_rights = suggestion_models.TranslationCoordinatorsModel.get(
         language_id, strict=False
     )
-    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY
-            not in committer.actions):
+    if (
+        role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in committer.actions
+    ):
         logging.error(
             'User %s tried to allow user %s to be a coordinator of language %s '
             'but was refused permission.' %

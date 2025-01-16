@@ -206,8 +206,14 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_clean_pyc_files_removes_pyc_files(self) -> None:
-        check_file_removals = {'root/file1.js': False, 'root/file2.pyc': False}
-        expected_check_file_removals = {'root/file1.js': False, 'root/file2.pyc': True}
+        check_file_removals = {
+            'root/file1.js': False,
+            'root/file2.pyc': False
+        }
+        expected_check_file_removals = {
+            'root/file1.js': False,
+            'root/file2.pyc': True
+        }
 
         def mock_walk(unused_path: str) -> List[Tuple[str, List[str], List[str]]]:
             return [('root', ['dir1'], ['file1.js', 'file2.pyc'])]
@@ -288,8 +294,9 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
             check_function_calls['subprocess_call_is_called'] = True
             # The first subprocess.call() needs to throw an
             # exception so that the script can execute the installation pathway.
-            if unused_cmd_tokens == ['%s/bin/elasticsearch' % common.ES_PATH,
-                                     '--version']:
+            if unused_cmd_tokens == [
+                '%s/bin/elasticsearch' % common.ES_PATH, '--version'
+            ]:
                 raise OSError('elasticsearch: command not found')
 
             return Ret()
@@ -323,8 +330,9 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
         def mock_call(unused_cmd_tokens: List[str], *_args: str, **_kwargs: str) -> Ret:
             # The first subprocess.call() needs to throw an
             # exception so that the script can execute the installation pathway.
-            if unused_cmd_tokens == ['%s/bin/elasticsearch' % common.ES_PATH,
-                                     '--version']:
+            if unused_cmd_tokens == [
+                '%s/bin/elasticsearch' % common.ES_PATH, '--version'
+            ]:
                 raise OSError('elasticsearch: command not found')
 
             return Ret()
@@ -445,7 +453,8 @@ class SetupTests(test_utils.GenericTestBase):
             sys, 'version_info', version_info(major=3, minor=4, micro=12)
         )
         with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
-                Exception, 'No suitable python version found.'):
+            Exception, 'No suitable python version found.'
+        ):
             install_third_party_libs.test_python_version()
         self.assertEqual(print_arr, [])
 
@@ -519,7 +528,8 @@ class SetupTests(test_utils.GenericTestBase):
         print_swap = self.swap(builtins, 'print', mock_print)
         with self.test_py_swap, getcwd_swap, print_swap:
             with self.assertRaisesRegex(
-                    Exception, 'Please run this script from the oppia/ directory.'):
+                Exception, 'Please run this script from the oppia/ directory.'
+            ):
                 install_third_party_libs.main()
         self.assertFalse(
             'WARNING   This script should be run from the oppia/ '
@@ -531,7 +541,8 @@ class SetupTests(test_utils.GenericTestBase):
 
         with os_name_swap:
             with self.assertRaisesRegex(
-                    Exception, 'Installation of Oppia is not supported on Windows OS.'):
+                Exception, 'Installation of Oppia is not supported on Windows OS.'
+            ):
                 install_third_party_libs.main()
 
     def test_package_install_with_darwin_x64(self) -> None:
@@ -628,7 +639,7 @@ class SetupTests(test_utils.GenericTestBase):
         with self.test_py_swap, os_name_swap:
             with self.rename_swap, self.exists_false_swap:
                 with self.assertRaisesRegex(
-                        Exception, 'System\'s Operating System is not compatible.'
+                    Exception, 'System\'s Operating System is not compatible.'
                 ), self.is_x64_architecture_true_swap:
                     install_third_party_libs.main()
 
@@ -754,8 +765,9 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
 
         with self.remove_swap, self.makedirs_swap:
             with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with self.assertRaisesRegex(Exception,
-                                            'Error downloading Google Cloud SDK.'):
+                with self.assertRaisesRegex(
+                    Exception, 'Error downloading Google Cloud SDK.'
+                ):
                     install_third_party_libs.install_gcloud_sdk()
         self.assertEqual(self.check_function_calls, self.expected_check_function_calls)
         self.assertTrue(

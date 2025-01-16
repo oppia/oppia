@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Beam DoFns and PTransforms to provide validation of config models."""
 
 from __future__ import annotations
@@ -33,18 +32,19 @@ if MYPY:  # pragma: no cover
 
 
 @validation_decorators.AuditsExisting(
-    config_models.PlatformParameterSnapshotMetadataModel)
+    config_models.PlatformParameterSnapshotMetadataModel
+)
 class ValidatePlatformParameterSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
-        config_models.PlatformParameterSnapshotMetadataModel
-    ]
+        config_models.PlatformParameterSnapshotMetadataModel]
 ):
     """Overrides _get_change_domain_class for
     PlatformParameterSnapshotMetadataModel.
     """
 
     def _get_change_domain_class(
-        self, input_model: config_models.PlatformParameterSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        input_model: config_models.PlatformParameterSnapshotMetadataModel  # pylint: disable=unused-argument
     ) -> Type[parameter_domain.PlatformParameterChange]:
         """Returns a change domain class.
 

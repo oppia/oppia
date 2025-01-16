@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for methods in the dev_mode_taskqueue_services."""
 
 from __future__ import annotations
@@ -32,14 +31,12 @@ from typing import Any, Dict, Optional
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for dev_mode_taskqueue_services."""
 
-    def test_creating_dev_mode_task_will_create_the_correct_post_request(
-            self
-    ) -> None:
+    def test_creating_dev_mode_task_will_create_the_correct_post_request(self) -> None:
         correct_queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_payload = {
-            'fn_identifier': (
-                taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
+            'fn_identifier':
+                (taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
             'args': [['1', '2', '3']],
             'kwargs': {}
         }
@@ -50,11 +47,11 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         # dev_mode_taskqueue_services.CLIENT.create_task. and in 'create_task'
         # payload is defined as Dict[str, Any].
         def mock_create_task(
-                queue_name: str,
-                url: str,
-                payload: Dict[str, Any],
-                scheduled_for: Optional[datetime.datetime] = None, # pylint: disable=unused-argument
-                task_name: Optional[str] = None,
+            queue_name: str,
+            url: str,
+            payload: Dict[str, Any],
+            scheduled_for: Optional[datetime.datetime] = None,  # pylint: disable=unused-argument
+            task_name: Optional[str] = None,
         ) -> None:
             self.assertEqual(queue_name, correct_queue_name)
             self.assertEqual(url, dummy_url)
@@ -62,19 +59,23 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             self.assertEqual(task_name, correct_task_name)
 
         swap_create_task = self.swap(
-            dev_mode_taskqueue_services.CLIENT, 'create_task', mock_create_task)
+            dev_mode_taskqueue_services.CLIENT, 'create_task', mock_create_task
+        )
         with swap_create_task:
             dev_mode_taskqueue_services.create_http_task(
-                correct_queue_name, dummy_url, correct_payload,
-                task_name=correct_task_name)
+                correct_queue_name,
+                dummy_url,
+                correct_payload,
+                task_name=correct_task_name
+            )
 
     def test_task_handler_will_create_the_correct_post_request(self) -> None:
         queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
         correct_payload = {
-            'fn_identifier': (
-                taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
+            'fn_identifier':
+                (taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
             'args': [['1', '2', '3']],
             'kwargs': {}
         }
@@ -89,19 +90,15 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'X-AppEngine-Fake-Is-Admin': '1',
             'method': 'POST'
         }
+
         # Here we use type Any because this function mocks requests.post
         # function where the type of JSON has been defined as Any, hence using
         # Dict[str, Any] here.
         # https://github.com/python/typeshed/blob/5e0fc4607323a4657b587bf70e3c26becf1c88d0/stubs/requests/requests/api.pyi#L78
         def mock_post(
-                url: str,
-                json: Dict[str, Any],
-                headers: Dict[str, str],
-                timeout: int
+            url: str, json: Dict[str, Any], headers: Dict[str, str], timeout: int
         ) -> None:
-            self.assertEqual(
-                url, 'http://localhost:%s%s' % (
-                    correct_port, dummy_url))
+            self.assertEqual(url, 'http://localhost:%s%s' % (correct_port, dummy_url))
             self.assertEqual(json, correct_payload)
             self.assertEqual(headers, correct_headers)
             self.assertEqual(timeout, feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS)
