@@ -35,9 +35,12 @@ export class TranslationLanguageService {
   private activeLanguageAccentCode!: string;
   private allAudioLanguageCodes: string[] =
     this.languageUtilService.getAllVoiceoverLanguageCodes();
+  private cloudSupportedLanguageAccentCodes!: string[];
 
   private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
   private _activeLanguageAccentChangedEventEmitter = new EventEmitter<void>();
+  private _cloudSupportedLanguageAccentChangedEventEmitter =
+    new EventEmitter<void>();
 
   constructor(
     private languageUtilService: LanguageUtilService,
@@ -92,12 +95,29 @@ export class TranslationLanguageService {
     this._activeLanguageAccentChangedEventEmitter.emit();
   }
 
+  isAutogenerationSupportedForActiveLanguageAccent(): boolean {
+    return this.cloudSupportedLanguageAccentCodes.includes(
+      this.activeLanguageAccentCode
+    );
+  }
+
+  setCloudSupportedLanguageAccentCodes(
+    cloudSupportedLanguageAccentCodes: string[]
+  ) {
+    this.cloudSupportedLanguageAccentCodes = cloudSupportedLanguageAccentCodes;
+    this._cloudSupportedLanguageAccentChangedEventEmitter.emit();
+  }
+
   get onActiveLanguageChanged(): EventEmitter<void> {
     return this._activeLanguageChangedEventEmitter;
   }
 
   get onActiveLanguageAccentChanged(): EventEmitter<void> {
     return this._activeLanguageAccentChangedEventEmitter;
+  }
+
+  get onCloudSupportedLanguageAccentChanged(): EventEmitter<void> {
+    return this._cloudSupportedLanguageAccentChangedEventEmitter;
   }
 }
 

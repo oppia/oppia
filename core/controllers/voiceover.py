@@ -20,6 +20,7 @@ from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import voiceover_services
+from core.domain import voiceover_regeneration_services
 
 from typing import Dict, TypedDict
 
@@ -42,10 +43,16 @@ class VoiceoverAdminDataHandler(
 
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers())
+
+        cloud_supported_language_accent_codes = (
+            voiceover_services.get_cloud_supported_language_accent_codes())
+
         self.values.update({
             'language_accent_master_list':
                 language_accent_master_list,
-            'language_codes_mapping': language_codes_mapping
+            'language_codes_mapping': language_codes_mapping,
+            'cloud_supported_language_accent_codes':
+                cloud_supported_language_accent_codes
         })
         self.render_json(self.values)
 
@@ -272,4 +279,56 @@ class EntityVoiceoversBulkHandler(
         self.values.update({
             'entity_voiceovers_list': entity_voiceovers_dicts
         })
+        self.render_json(self.values)
+
+
+class RegenerateAutomaticVoiceoverHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'content_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'language_accent_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.open_access
+    def put(self) -> None:
+        """Updates voice artist data from the voiceover admin page."""
+        assert self.normalized_payload is not None
+        exploration_id = self.normalized_payload['exploration_id']
+        state_name = self.normalized_payload['state_name']
+        content_id = self.normalized_payload['content_id']
+        language_accent_code = self.normalized_payload['language_accent_code']
+
+        generated_voiceover_dict = (
+            voiceover_regeneration_services.
+            regenerate_voiceover_for_exploration_content(
+                exploration_id, state_name, content_id, language_accent_code)
+        )
+
+        self.values.update({
+            'voiceover_dict': generated_voiceover_dict
+        })
+
         self.render_json(self.values)

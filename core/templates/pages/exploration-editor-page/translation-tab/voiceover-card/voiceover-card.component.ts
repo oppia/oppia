@@ -16,7 +16,13 @@
  * @fileoverview Component for the voiceovers in the Exploration editor page.
  */
 
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  AfterViewChecked,
+} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
@@ -35,14 +41,19 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
-import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
+import {
+  LanguageAccentToDescription,
+  VoiceoverBackendApiService,
+  TokensWithDurationType,
+} from 'domain/voiceover/voiceover-backend-api.service';
 import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 @Component({
   selector: 'oppia-voiceover-card',
   templateUrl: './voiceover-card.component.html',
 })
-export class VoiceoverCardComponent implements OnInit {
+export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   @ViewChild('visualized') visualized!: ElementRef<Element>;
   directiveSubscriptions = new Subscription();
 
@@ -55,9 +66,12 @@ export class VoiceoverCardComponent implements OnInit {
   unsupportedLanguageCode = false;
 
   manualVoiceover!: Voiceover | undefined;
+  automaticVoiceover!: Voiceover | undefined;
   manualVoiceoverDuration: number = 0;
+  automaticVoiceoverDuration: number = 0;
   currentVoiceoverDuration: number = 0;
-  voiceoverProgress: number = 0;
+  manualVoiceoverProgress: number = 0;
+  automaticVoiceoverProgress: number = 0;
 
   activeContentId!: string;
   languageCode!: string;
@@ -66,9 +80,14 @@ export class VoiceoverCardComponent implements OnInit {
   availableLanguageAccentCodesToDescriptions: LanguageAccentToDescription = {};
   supportedLanguageAccentCodesToDescriptions: LanguageAccentToDescription = {};
   supportedLanguageAccentCodesLength: number = 0;
+  isActiveLanguageAccentSupportsAutoVoiceovers: boolean = false;
 
   languageAccentDescription!: string;
   activeEntityVoiceoversInstance!: EntityVoiceovers;
+
+  isAutomaticVoiceoverGenerating: boolean = false;
+  isGenerateAutomaticVoiceoverOptionEnabled = false;
+  automaticVoiceoverSentenceTokenWithDurations: TokensWithDurationType[];
 
   constructor(
     private audioPlayerService: AudioPlayerService,
@@ -82,11 +101,12 @@ export class VoiceoverCardComponent implements OnInit {
     private localStorageService: LocalStorageService,
     private entityVoiceoversService: EntityVoiceoversService,
     private translationStatusService: TranslationStatusService,
-    private graphDataService: GraphDataService
+    private graphDataService: GraphDataService,
+    private stateEditorService: StateEditorService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService
   ) {}
 
   ngOnInit(): void {
-    this.pageIsLoaded = true;
     this.languageAccentCodesAreLoaded = true;
     this.languageAccentCode =
       this.localStorageService.getLastSelectedLanguageAccentCode() as string;
@@ -115,6 +135,17 @@ export class VoiceoverCardComponent implements OnInit {
         }
       )
     );
+
+    this.directiveSubscriptions.add(
+      this.translationLanguageService.onCloudSupportedLanguageAccentChanged.subscribe(
+        () => {
+          this.pageIsLoaded = true;
+          let newLanguageAccentCode =
+            this.localStorageService.getLastSelectedLanguageAccentCode() as string;
+          this.updateLanguageAccentCode(newLanguageAccentCode);
+        }
+      )
+    );
     this.voiceoversAreLoaded =
       Object.keys(
         this.entityVoiceoversService.languageAccentCodeToEntityVoiceovers
@@ -133,12 +164,18 @@ export class VoiceoverCardComponent implements OnInit {
         this.currentVoiceoverDuration =
           this.audioPlayerService.getCurrentTime();
 
-        this.voiceoverProgress = Math.round(
+        this.manualVoiceoverProgress = Math.round(
           (this.currentVoiceoverDuration / this.manualVoiceoverDuration) * 100
         );
+
+        this.automaticVoiceoverProgress = Math.round(
+          (this.currentVoiceoverDuration / this.automaticVoiceoverDuration) *
+            100
+        );
       } else if (!this.audioPlayerService.isTrackLoaded()) {
-        this.voiceoverProgress = 0;
+        this.automaticVoiceoverProgress = 0;
         this.currentVoiceoverDuration = 0;
+        this.manualVoiceoverProgress = 0;
       }
     }, 1000);
     this.updateActiveContent();
@@ -234,7 +271,7 @@ export class VoiceoverCardComponent implements OnInit {
       ) as EntityVoiceovers;
 
     this.currentVoiceoverDuration = 0;
-    this.voiceoverProgress = 0;
+    this.manualVoiceoverProgress = 0;
     this.audioIsLoaded = false;
     this.audioPlayerService.clear();
     this.manualVoiceover = undefined;
@@ -274,6 +311,11 @@ export class VoiceoverCardComponent implements OnInit {
     this.localStorageService.setLastSelectedLanguageAccentCode(
       languageAccentCode
     );
+
+    if (this.pageIsLoaded) {
+      this.isActiveLanguageAccentSupportsAutoVoiceovers =
+        this.translationLanguageService.isAutogenerationSupportedForActiveLanguageAccent();
+    }
 
     this.setActiveContentManualVoiceover();
     this.updateStatusGraph();
@@ -412,6 +454,34 @@ export class VoiceoverCardComponent implements OnInit {
         this.alertsService.clearWarnings();
       }
     );
+  }
+
+  ngAfterViewChecked() {
+    if (
+      this.changeListService.explorationChangeList.length >= 0 &&
+      this.changeListService.isOnlyVoiceoverChangeListPresent()
+    ) {
+      this.isGenerateAutomaticVoiceoverOptionEnabled = true;
+    } else {
+      this.isGenerateAutomaticVoiceoverOptionEnabled = false;
+    }
+  }
+
+  generateVoiceover() {
+    this.isAutomaticVoiceoverGenerating = true;
+
+    this.voiceoverBackendApiService
+      .generateAutotmaticVoiceoverAsync(
+        this.contextService.getExplorationId(),
+        this.stateEditorService.getActiveStateName(),
+        this.activeContentId,
+        this.languageAccentCode
+      )
+      .then(voiceover => {
+        this.automaticVoiceover = voiceover;
+        this.automaticVoiceoverDuration = Math.round(voiceover.durationSecs);
+        this.isAutomaticVoiceoverGenerating = false;
+      });
   }
 
   generateNewFilename(): string {

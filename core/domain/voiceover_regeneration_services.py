@@ -21,10 +21,15 @@ from __future__ import annotations
 import html
 import io
 import json
+import uuid
 
 from core import feconf
+from core import utils
 from core.domain import fs_services
 from core.platform import models
+from core.domain import exp_fetchers
+from core.domain import state_domain
+
 
 import bs4
 from mutagen import mp3
@@ -157,6 +162,7 @@ def synthesize_voiceover_for_html_string(
             feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER
         )
     )
+    cached_model = None
 
     if cached_model is not None:
         if cached_model.plaintext == parsed_text:
@@ -181,7 +187,8 @@ def synthesize_voiceover_for_html_string(
     tempbuffer.seek(0)
     audio = mp3.MP3(tempbuffer)
     tempbuffer.close()
-    mimetype = audio.mime[0]
+
+    mimetype = "audio/mpeg"
     # For a strange, unknown reason, the audio variable must be
     # deleted before opening cloud storage. If not, cloud storage
     # throws a very mysterious error that entails a mutagen
@@ -211,3 +218,47 @@ def synthesize_voiceover_for_html_string(
         new_cached_model.put()
 
     return audio_offset_list
+
+
+def generate_new_voiceover_filename(content_id, language_accent_code):
+    random_string_for_filename = utils.convert_to_hash(uuid.uuid4().hex, 10)
+    return '%s-%s-%s' % (
+        content_id,
+        language_accent_code,
+        random_string_for_filename
+    )
+
+
+def regenerate_voiceover_for_exploration_content(
+    exploration_id: str,
+    state_name: str,
+    content_id: str,
+    language_accent_code: str
+):
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    content_html = exploration.get_content_html(state_name, content_id)
+    voiceover_filename = generate_new_voiceover_filename(
+        content_id, language_accent_code)
+
+    sentence_tokens_with_durations = synthesize_voiceover_for_html_string(
+        exploration_id, content_html, language_accent_code, voiceover_filename)
+
+    fs = fs_services.GcsFileSystem(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+
+    binary_audio_data = fs.get('%s/%s' % ('audio', voiceover_filename))
+
+    tempbuffer = io.BytesIO()
+    tempbuffer.write(binary_audio_data)
+    tempbuffer.seek(0)
+    audio = mp3.MP3(tempbuffer)
+
+    # Fetch the audio file duration from the Mutagen metadata.
+    duration_secs = audio.info.length
+
+    # Get the size of the audio file in bytes.
+    audio_size_bytes = tempbuffer.getbuffer().nbytes
+
+    voiceover_dict = state_domain.Voiceover(
+        voiceover_filename, audio_size_bytes, False, duration_secs).to_dict()
+    return voiceover_dict

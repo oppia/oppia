@@ -324,6 +324,14 @@ export class TranslatorOverviewComponent implements OnInit {
         this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
           this.updateLanguageAccentCodesDropdownOptions();
         });
+
+        let cloudSupportedLanguageAccentCodes = Object.keys(
+          this.languageCodesMapping[this.languageCode]
+        ).filter(key => this.languageCodesMapping[this.languageCode][key]);
+
+        this.translationLanguageService.setCloudSupportedLanguageAccentCodes(
+          cloudSupportedLanguageAccentCodes
+        );
       });
   }
 

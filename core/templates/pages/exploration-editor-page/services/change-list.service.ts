@@ -345,6 +345,15 @@ export class ChangeListService {
     return angular.copy(this.explorationChangeList);
   }
 
+  isOnlyVoiceoverChangeListPresent(): boolean {
+    for (let change of this.explorationChangeList) {
+      if (change.cmd != 'update_voiceovers') {
+        return false;
+      }
+    }
+    return true;
+  }
+
   getTranslationChangeList(): ExplorationChange[] {
     return angular.copy(
       this.explorationChangeList.filter(change => {
