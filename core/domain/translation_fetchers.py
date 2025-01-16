@@ -22,7 +22,7 @@ from core import feconf
 from core.domain import translation_domain
 from core.platform import models
 
-from typing import List, Optional
+from typing import List, Optional, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -31,6 +31,15 @@ if MYPY: # pragma: no cover
 
 (translation_models,) = models.Registry.import_models([
     models.Names.TRANSLATION])
+
+
+class EntityTranslationReferenceDict(TypedDict):
+    """Dictionary representing the reference to an entity translation model."""
+
+    entity_type: feconf.TranslatableEntityType
+    entity_id: str
+    entity_version: int
+    language_code: str
 
 
 def get_translation_from_model(
@@ -166,3 +175,16 @@ def get_entity_translation(
     return translation_domain.EntityTranslation.create_empty(
         entity_type, entity_id, language_code, entity_version=entity_version
     )
+
+
+def get_multiple_entity_translations(
+    entity_references: List[EntityTranslationReferenceDict]
+) -> List[Optional[translation_domain.EntityTranslation]]:
+    entity_translation_models = (
+        translation_models.EntityTranslationsModel.get_model_multi(
+            entity_references)
+    )
+    return [
+        _get_entity_translation_from_model(entity_translation_model)
+        for entity_translation_model in entity_translation_models
+        if entity_translation_model is not None else None]

@@ -39,12 +39,6 @@ from core.domain import translation_fetchers
 
 from typing import Dict, List, Optional, TypedDict, Union
 
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import question_models
-
-(question_models) = models.Registry.import_models([models.Names.QUESTION])
-
 
 class InitializeAndroidTestDataHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
@@ -187,86 +181,41 @@ class AndroidActivityHandler(base.BaseHandler[
                 'Entries in activities_data should be unique'
             )
 
-        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            for activity_data in activities_data:
-                exploration = exp_fetchers.get_exploration_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        exploration.to_dict() if exploration is not None
-                        else None)
-                })
-        elif activity_type == constants.ACTIVITY_TYPE_STORY:
-            for activity_data in activities_data:
-                story = story_fetchers.get_story_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        story.to_dict() if story is not None else None)
-                })
-        elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-            for activity_data in activities_data:
-                skill = skill_fetchers.get_skill_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        skill.to_dict() if skill is not None else None)
-                })
-        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-            for activity_data in activities_data:
-                topic_id, subtopic_page_id = activity_data['id'].split('-')
-                subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-                    topic_id,
-                    int(subtopic_page_id),
-                    strict=False,
-                    version=activity_data.get('version')
-                )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        subtopic_page.to_dict() if subtopic_page is not None
-                        else None)
-                })
-        elif activity_type == 'question':
-            for activity_data in activities_data:
-                question = question_fetchers.get_question_by_id(
-                    [activity_data['id']],
-                    strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        question.to_dict() if question is not None else None)
-                })
+        if activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
+            split_ids_versions = [
+                (activity_data['id'].split('-'), activity_data.get('version'))
+                for activity_data in activities_data]
+            reference_ids_versions = [
+                (topic_id, int(subtopic_index), version)
+                for ((topic_id, subtopic_index), version) in split_ids_versions]
+            subtopic_pages = (
+                subtopic_page_services.get_subtopic_pages_with_ids_and_versions(
+                    reference_ids_versions)
+            activities.append({
+                'id': activity_data['id'],
+                'version': activity_data.get('version'),
+                'payload': (
+                    subtopic_page.to_dict()
+                    if subtopic_page is not None else None)
+                for (activity_data, subtopic_page) in zip(
+                    activities_data, subtopic_pages)
+            })
         elif activity_type == 'question_skill_link':
             for activity_data in activities_data:
-                question_skill_link_models = (
-                    question_models.QuestionSkillLinkModel
-                    .get_question_skill_links_by_skill_ids(
-                        1000, [activity_data['id']], 0))
-                question_ids = set(
-                    [question_skill_link.question_id
-                    for question_skill_link in question_skill_link_models])
-                activities.append({
-                    'id': activity_data['id'],
-                    'payload': {
-                        'question_ids': question_ids
-                    }
-                })
+                if activity_data.get('version') is not None:
+                    raise self.InvalidInputException(
+                        'Version cannot be specified for question_skill_link')
+            skill_ids = [
+                activity_data['id'] for activity_data in activities_data]
+            question_ids_by_skill_id = (
+                question_fetchers.get_question_ids_by_skill_ids(skill_ids))
+            activities.append({
+                'id': skill_id,
+                'payload': {
+                    'question_ids': question_ids
+                }
+                for (skill_id, question_ids) in question_ids_by_skill_id.items()
+            })
         elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
             for activity_data in activities_data:
                 if activity_data.get('version') is not None:
@@ -281,8 +230,6 @@ class AndroidActivityHandler(base.BaseHandler[
                         classroom.to_dict() if classroom is not None else None)
                 })
         elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS:
-            entity_type = feconf.TranslatableEntityType(
-                feconf.ENTITY_TYPE_EXPLORATION)
             for activity_data in activities_data:
                 version = activity_data.get('version')
                 language_code = activity_data.get('language_code')
@@ -291,32 +238,63 @@ class AndroidActivityHandler(base.BaseHandler[
                         'Version and language code must be specified '
                         'for translation'
                     )
-                translation = translation_fetchers.get_entity_translation(
-                    entity_type,
-                    activity_data['id'],
-                    version,
-                    language_code
-                )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': version,
-                    'language_code': language_code,
-                    'payload': (
-                        translation.to_dict()['translations']
-                        if translation is not None
-                        else None)
-                })
+            translation_references = [{
+                'entity_type': feconf.TranslatableEntityType(
+                    feconf.ENTITY_TYPE_EXPLORATION),
+                'entity_id': activity_data['id'],
+                'entity_version': activity_data['version'],
+                'language_code': activity_data['language_code'],
+            }]
+            translations = (
+                translation_fetchers.get_multiple_entity_translations(
+                    translation_references))
+            activities.append({
+                'id': activity_data['id'],
+                'version': activity_data['version'],
+                'language_code': activity_data['language_code'],
+                'payload': (
+                    translation.to_dict()['translations']
+                    if translation is not None else None)
+                for (activity_data, translation) in zip(
+                    activities_data, translations)
+            })
         else:
-            for activity_data in activities_data:
-                topic = topic_fetchers.get_topic_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        topic.to_dict() if topic is not None else None)
-                })
+            # Otherwise it's a standard versioned activity that requires a
+            # simpler fetch-and-retrieve method.
+            if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+                fetched_versioned_activities = (
+                    exp_fetchers.get_multiple_explorations_by_ids_and_version(
+                        [(activity_data['id'], activity_data.get('version'))
+                        for activity_data in activities_data]))
+            elif activity_type == constants.ACTIVITY_TYPE_STORY:
+                fetched_versioned_activities = (
+                    story_fetchers.get_multiple_stories_by_ids_and_version(
+                        [(activity_data['id'], activity_data.get('version'))
+                        for activity_data in activities_data]))
+            elif activity_type == constants.ACTIVITY_TYPE_SKILL:
+                fetched_versioned_activities = (
+                    skill_fetchers.get_multiple_skills_by_ids_and_version(
+                        [(activity_data['id'], activity_data.get('version'))
+                        for activity_data in activities_data]))
+            elif activity_type == 'question':
+                fetched_versioned_activities = (
+                    question_fetchers.get_multiple_questions_by_ids_and_version(
+                        [(activity_data['id'], activity_data.get('version'))
+                        for activity_data in activities_data]))
+            else:
+                fetched_versioned_activities = (
+                    topic_fetchers.get_multiple_topics_by_ids_and_version(
+                        [(activity_data['id'], activity_data.get('version'))
+                        for activity_data in activities_data]))
+
+            activities.append({
+                'id': activity_data['id'],
+                'version': activity_data.get('version'),
+                'payload': (
+                    versioned_activity.to_dict()
+                    if versioned_activity is not None else None)
+                for (activity_data, versioned_activity) in zip(
+                    activities_data, fetched_versioned_activities)
+            })
 
         self.render_json(activities)

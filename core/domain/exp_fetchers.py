@@ -509,6 +509,16 @@ def get_multiple_explorations_by_id(
     return result
 
 
+def get_multiple_explorations_by_ids_and_version(
+    exp_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[exp_domain.Exploration]]:
+    exp_models = exp_models.ExplorationModel.get_version_multi(
+        exp_ids_and_versions)
+    return [get_exploration_from_model(exp_model)
+        for exp_model in exp_models
+        if exp_model is not None else None]
+
+
 def get_exploration_summaries_where_user_has_role(
     user_id: str
 ) -> List[exp_domain.ExplorationSummary]:

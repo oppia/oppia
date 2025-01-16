@@ -220,6 +220,16 @@ def get_story_by_id(
             return None
 
 
+def get_multiple_stories_by_ids_and_version(
+    story_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[story_domain.Story]]:
+    story_models = story_models.StoryModel.get_version_multi(
+        story_ids_and_versions)
+    return [get_story_from_model(story_model)
+        for story_model in story_models
+        if story_model is not None else None]
+
+
 def get_story_by_url_fragment(
     url_fragment: str
 ) -> Optional[story_domain.Story]:

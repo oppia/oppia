@@ -300,6 +300,16 @@ def get_topics_by_ids(
     return topics
 
 
+def get_multiple_topics_by_ids_and_version(
+    topic_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[topic_domain.Topic]]:
+    topic_models = topic_models.TopicModel.get_version_multi(
+        topic_ids_and_versions)
+    return [get_topic_from_model(topic_model)
+        for topic_model in topic_models
+        if topic_model is not None else None]
+
+
 @overload
 def get_topic_by_name(
     topic_name: str, *, strict: Literal[True] = ...

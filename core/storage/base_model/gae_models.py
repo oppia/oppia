@@ -914,7 +914,9 @@ class VersionedModel(BaseModel):
     # So, to allow every Dict/TypedDict type we used Any here.
     def _reconstitute(
         self: SELF_VERSIONED_MODEL,
-        snapshot_dict: Dict[str, Any]
+        snapshot_dict: Dict[str, Any],
+        created_on: datetime.datetime,
+        last_updated: datetime.datetime
     ) -> SELF_VERSIONED_MODEL:
         """Populates the model instance with the snapshot.
 
@@ -927,6 +929,17 @@ class VersionedModel(BaseModel):
             with the the snapshot.
         """
         self.populate(**snapshot_dict)
+
+        # TODO(sll): The 'created_on' and 'last_updated' values here will be
+        # slightly different from the values the entity model would have had,
+        # since they correspond to the corresponding fields for the snapshot
+        # content model instead. Figure out whether this is a problem or not,
+        # and whether we need to record the contents of those fields in the
+        # actual entity model (in which case we also need a way to deal with
+        # old snapshots that don't have this information).
+        self.created_on = created_on
+        self.last_updated = last_updated
+
         return self
 
     def _reconstitute_from_snapshot_id(
@@ -944,18 +957,10 @@ class VersionedModel(BaseModel):
         """
         assert self.SNAPSHOT_CONTENT_CLASS is not None
         snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
-        snapshot_dict = snapshot_model.content
-        reconstituted_model = self._reconstitute(snapshot_dict)
-        # TODO(sll): The 'created_on' and 'last_updated' values here will be
-        # slightly different from the values the entity model would have had,
-        # since they correspond to the corresponding fields for the snapshot
-        # content model instead. Figure out whether this is a problem or not,
-        # and whether we need to record the contents of those fields in the
-        # actual entity model (in which case we also need a way to deal with
-        # old snapshots that don't have this information).
-        reconstituted_model.created_on = snapshot_model.created_on
-        reconstituted_model.last_updated = snapshot_model.last_updated
-        return reconstituted_model
+        return self._reconstitute(
+            snapshot_model.content,
+            snapshot_model.created_on,
+            snapshot_model.last_updated)
 
     @classmethod
     def get_snapshot_id(cls, instance_id: str, version_number: int) -> str:
@@ -1497,6 +1502,46 @@ class VersionedModel(BaseModel):
             raise e
 
     @classmethod
+    def get_version_multi(
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_ids_versions: List[Tuple[str, Optional[int]]]
+    ) -> List[Optional[SELF_VERSIONED_MODEL]]:
+        entity_ids = set([entity_id for (entity_id, _) in entity_ids_versions])
+        current_version_models = cls.get_multi(
+            entity_ids, include_deleted=False)
+        for current_version_model in current_version_models:
+            current_version_model._require_not_marked_deleted()  # pylint: disable=protected-access
+        latest_versions_by_id = {
+            current_version_model.id: current_version_model.version
+            for current_version_model in current_version_models}
+
+        # The assumption is that every instance of cls uses the same
+        # SNAPSHOT_CONTENT_CLASS, so only one fake instance is needed to fetch
+        # that class for a get_multi() operation.
+        temp_model = cls(id='', version_number=0)
+        assert temp_model.SNAPSHOT_CONTENT_CLASS is not None
+        snapshot_ids = [
+            cls.get_snapshot_id(
+                entity_id,
+                version_number
+                if version_number else latest_versions_by_id[entity_id])
+            for (entity_id, version_number) in entity_ids_versions]
+        shapshot_models = temp_model.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
+
+        # Note that this does a bit of extra work for fetching the latest model
+        # (i.e. it's reconstituting it even though it was technically already
+        # fetched in the earlier check for deletion). The code is simpler this
+        # way even if it's slightly less performant for those cases.
+        return [
+            cls(id=entity_id, version=version_number)._reconstitute(
+                snapshot_model.content,
+                snapshot_model.created_on,
+                snapshot_model.last_updated)
+            for ((entity_id, version_number), snapshot_model) in zip(
+                entity_ids_versions, snapshot_models)
+        ]
+
+    @classmethod
     def get_multi_versions(
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
@@ -1543,11 +1588,10 @@ class VersionedModel(BaseModel):
             if snapshot_model is None:
                 raise ValueError(
                     'At least one version number is invalid.')
-            snapshot_dict = snapshot_model.content
             reconstituted_model = cls(id=entity_id)._reconstitute(  # pylint: disable=protected-access
-                snapshot_dict)
-            reconstituted_model.created_on = snapshot_model.created_on
-            reconstituted_model.last_updated = snapshot_model.last_updated
+                snapshot_model.content,
+                snapshot_model.created_on,
+                snapshot_model.last_updated)
 
             instances.append(reconstituted_model)
         return instances

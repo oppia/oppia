@@ -134,6 +134,31 @@ def get_questions_by_ids(
     return questions
 
 
+def get_multiple_questions_by_ids_and_version(
+    question_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[question_domain.Question]]:
+    question_models = question_models.QuestionModel.get_version_multi(
+        question_ids_and_versions)
+    return [
+        get_question_from_model(question_model)
+        for question_model in question_models
+        if question_model is not None else None]
+
+
+def get_question_ids_by_skill_ids(skill_ids: List[str]) -> Dict[str, List[str]]:
+    question_skill_link_models = (
+        question_models.QuestionSkillLinkModel
+        .get_question_skill_links_by_skill_ids(
+            question_count=1000, skill_ids=skill_ids, offset=0))
+    return [
+        set(
+            [link_model.question_id
+            for link_model in link_model
+            if link_model.skill_id == skill_id])
+        for skill_id in skill_ids
+    ]
+
+
 def get_question_from_model(
     question_model: question_models.QuestionModel
 ) -> question_domain.Question:

@@ -36,6 +36,15 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
+class EntityTranslationReferenceDict(TypedDict):
+    """Dictionary representing the reference to an entity translation model."""
+
+    entity_type: feconf.TranslatableEntityType
+    entity_id: str
+    entity_version: int
+    language_code: str
+
+
 class EntityTranslationsModel(base_models.BaseModel):
     """Model for storing entity translations."""
 
@@ -130,6 +139,21 @@ class EntityTranslationsModel(base_models.BaseModel):
         model_id = cls._generate_id(
             entity_type, entity_id, entity_version, language_code)
         return cls.get_by_id(model_id)
+
+    @classmethod
+    def get_model_multi(
+        cls,
+        entity_configs: List[EntityTranslationReferenceDict]
+    ) -> List[Optional[EntityTranslationsModel]]:
+        model_ids = [
+            cls._generate_id(
+                reference.entity_type,
+                reference.entity_id,
+                reference.entity_version,
+                reference.language_code)
+            for reference in entity_configs
+        ]
+        return cls.get_multi(model_ids)
 
     @classmethod
     def get_all_for_entity(

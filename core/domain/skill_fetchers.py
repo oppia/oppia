@@ -133,6 +133,16 @@ def get_skill_by_id(
             return None
 
 
+def get_multiple_skills_by_ids_and_version(
+    skill_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[skill_domain.Skill]]:
+    skill_models = skill_models.SkillModel.get_version_multi(
+        skill_ids_and_versions)
+    return [get_skill_from_model(skill_model)
+        for skill_model in skill_models
+        if skill_model is not None else None]
+
+
 def get_skill_from_model(
     skill_model: skill_models.SkillModel
 ) -> skill_domain.Skill:

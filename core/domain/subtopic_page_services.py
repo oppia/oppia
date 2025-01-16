@@ -207,6 +207,23 @@ def get_subtopic_pages_with_ids(
     return subtopic_pages
 
 
+def get_subtopic_pages_with_ids_and_versions(
+    topic_ids_subtopic_idxs_and_versions: List[Tuple[str, int, Optional[int]]]
+) -> List[Optional[subtopic_page_domain.SubtopicPage]]:
+    subtopic_page_ids_and_versions = [
+        (subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+            topic_id, subtopic_id), version)
+        for (topic_id, subtopic_index, version) in (
+            topic_ids_subtopic_idxs_and_versions)
+    ]
+    subtopic_page_models = subtopic_models.SubtopicPageModel.get_version_multi(
+        subtopic_page_ids_and_versions)
+    return [
+        get_subtopic_page_from_model(subtopic_page_model)
+        for subtopic_page_model in subtopic_page_models
+        if subtopic_page_model is not None else None]
+
+
 @overload
 def get_subtopic_page_contents_by_id(
     topic_id: str, subtopic_id: int
