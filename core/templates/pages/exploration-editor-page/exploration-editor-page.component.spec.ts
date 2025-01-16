@@ -140,6 +140,7 @@ describe('Exploration editor page component', () => {
   let mockInitExplorationPageEmitter = new EventEmitter<void>();
   let isLocationSetToNonStateEditorTabSpy;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let urlInterpolationService: UrlInterpolationService;
 
   let explorationId = 'exp1';
   let explorationData = {
@@ -295,12 +296,12 @@ describe('Exploration editor page component', () => {
         ParamChangesObjectFactory,
         ParamSpecsObjectFactory,
         RouterService,
+        UrlInterpolationService,
         SiteAnalyticsService,
         StateEditorRefreshService,
         StateEditorService,
         StateTopAnswersStatsBackendApiService,
         UserExplorationPermissionsService,
-        UrlInterpolationService,
         FocusManagerService,
         {
           provide: NgbModal,
@@ -342,7 +343,7 @@ describe('Exploration editor page component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationEditorPageComponent);
     component = fixture.componentInstance;
-
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
