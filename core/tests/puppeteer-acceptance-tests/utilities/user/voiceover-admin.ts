@@ -108,7 +108,6 @@ export class VoiceoverAdmin extends BaseUser {
     try {
       await this.page.waitForSelector(dropdownToggleIcon, {
         visible: true,
-        timeout: 5000,
       });
       await this.clickOn(dropdownToggleIcon);
       showMessage('Editor navigation closed successfully.');

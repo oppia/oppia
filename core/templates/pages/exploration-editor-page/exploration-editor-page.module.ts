@@ -90,91 +90,93 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
-import {ExplorationSaveService} from './services/exploration-save.service';
-import {ExplorationObjectiveService} from './services/exploration-objective.service';
-import {ExplorationTitleService} from './services/exploration-title.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {RouterService} from './services/router.service';
-import {ExplorationCategoryService} from './services/exploration-category.service';
-import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
-import {ExplorationStatesService} from './services/exploration-states.service';
-import {EntityTranslationsService} from 'services/entity-translations.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {TranslationLanguageService} from './translation-tab/services/translation-language.service';
-import {ChangeListService} from './services/change-list.service';
-import {LanguageUtilService} from 'domain/utilities/language-util.service';
-import {ContextService} from 'services/context.service';
-import {ComputeGraphService} from 'services/compute-graph.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
-import {GraphDataService} from './services/graph-data.service';
-import {ExplorationInitStateNameService} from './services/exploration-init-state-name.service';
-import {ExplorationWarningsService} from './services/exploration-warnings.service';
-import {ParameterMetadataService} from './services/parameter-metadata.service';
-import {ExplorationDataService} from './services/exploration-data.service';
-import {LoaderService} from 'services/loader.service';
-import {InternetConnectivityService} from 'services/internet-connectivity.service';
+
+// Services used by the exploration editor page.
 import {AlertsService} from 'services/alerts.service';
-import {LocalStorageService} from 'services/local-storage.service';
-import {ExplorationDataBackendApiService} from './services/exploration-data-backend-api.service';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ExplorationPropertyService} from './services/exploration-property.service';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
+import {ChangeListService} from './services/change-list.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {ContextService} from 'services/context.service';
+import {EditorFirstTimeEventsService} from './services/editor-first-time-events.service';
 import {EditabilityService} from 'services/editability.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {EventBusService} from 'app-events/event-bus.service';
+import {ExplorationAutomaticTextToSpeechService} from './services/exploration-automatic-text-to-speech.service';
+import {ExplorationCategoryService} from './services/exploration-category.service';
+import {ExplorationDataBackendApiService} from './services/exploration-data-backend-api.service';
+import {ExplorationDataService} from './services/exploration-data.service';
+import {ExplorationEditsAllowedBackendApiService} from './services/exploration-edits-allowed-backend-api.service';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {ExplorationInitStateNameService} from './services/exploration-init-state-name.service';
+import {ExplorationLanguageCodeService} from './services/exploration-language-code.service';
+import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
+import {ExplorationObjectiveService} from './services/exploration-objective.service';
+import {ExplorationParamChangesService} from './services/exploration-param-changes.service';
+import {ExplorationParamSpecsService} from './services/exploration-param-specs.service';
+import {ExplorationPropertyService} from './services/exploration-property.service';
+import {ExplorationRightsBackendApiService} from './services/exploration-rights-backend-api.service';
+import {ExplorationRightsService} from './services/exploration-rights.service';
+import {ExplorationSaveService} from './services/exploration-save.service';
+import {ExplorationStatesService} from './services/exploration-states.service';
+import {ExplorationTagsService} from './services/exploration-tags.service';
+import {ExplorationTitleService} from './services/exploration-title.service';
+import {ExplorationWarningsService} from './services/exploration-warnings.service';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {GraphDataService} from './services/graph-data.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {InteractionDetailsCacheService} from './editor-tab/services/interaction-details-cache.service';
+import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {LoaderService} from 'services/loader.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {ParameterMetadataService} from './services/parameter-metadata.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PopulateRuleContentIdsService} from './services/populate-rule-content-ids.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ResponsesService} from './editor-tab/services/responses.service';
+import {RouterService} from './services/router.service';
+import {RteHelperService} from 'services/rte-helper.service';
+import {SettingTabBackendApiService} from './services/setting-tab-backend-api.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {SolutionValidityService} from './editor-tab/services/solution-validity.service';
+import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
+import {StateEditorRefreshService} from './services/state-editor-refresh.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateHintsService} from 'components/state-editor/state-editor-properties-services/state-hints.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateLinkedSkillIdService} from 'components/state-editor/state-editor-properties-services/state-skill.service';
 import {StateNameService} from 'components/state-editor/state-editor-properties-services/state-name.service';
 import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import {StateSolicitAnswerDetailsService} from 'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
-import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {StateTutorialFirstTimeService} from './services/state-tutorial-first-time.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {UserExplorationPermissionsService} from './services/user-exploration-permissions.service';
-import {ExplorationFeaturesService} from 'services/exploration-features.service';
-import {StateEditorRefreshService} from './services/state-editor-refresh.service';
-import {VersionHistoryService} from './services/version-history.service';
-import {VersionHistoryBackendApiService} from './services/version-history-backend-api.service';
-import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
-import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
-import {SolutionValidityService} from './editor-tab/services/solution-validity.service';
-import {ValidatorsService} from 'services/validators.service';
-import {ExplorationAutomaticTextToSpeechService} from './services/exploration-automatic-text-to-speech.service';
-import {UserService} from 'services/user.service';
-import {ExplorationEditsAllowedBackendApiService} from './services/exploration-edits-allowed-backend-api.service';
-import {ExplorationLanguageCodeService} from './services/exploration-language-code.service';
-import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ExplorationParamChangesService} from './services/exploration-param-changes.service';
-import {ExplorationParamSpecsService} from './services/exploration-param-specs.service';
-import {ExplorationRightsService} from './services/exploration-rights.service';
-import {ExplorationTagsService} from './services/exploration-tags.service';
-import {SettingTabBackendApiService} from './services/setting-tab-backend-api.service';
-import {UserEmailPreferencesService} from './services/user-email-preferences.service';
-import {ExplorationRightsBackendApiService} from './services/exploration-rights-backend-api.service';
-import {EventBusService} from 'app-events/event-bus.service';
-import {PopulateRuleContentIdsService} from './services/populate-rule-content-ids.service';
-import {EditorFirstTimeEventsService} from './services/editor-first-time-events.service';
-import {ExternalRteSaveService} from 'services/external-rte-save.service';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ImageLocalStorageService} from 'services/image-local-storage.service';
-import {ImageUploadHelperService} from 'services/image-upload-helper.service';
-import {RteHelperService} from 'services/rte-helper.service';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {TranslationLanguageService} from './translation-tab/services/translation-language.service';
 import {TranslationStatusService} from './translation-tab/services/translation-status.service';
 import {TranslationTabActiveModeService} from './translation-tab/services/translation-tab-active-mode.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UserEmailPreferencesService} from './services/user-email-preferences.service';
+import {UserExplorationPermissionsService} from './services/user-exploration-permissions.service';
+import {UserService} from 'services/user.service';
+import {ValidatorsService} from 'services/validators.service';
+import {VersionHistoryBackendApiService} from './services/version-history-backend-api.service';
+import {VersionHistoryService} from './services/version-history.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -311,95 +313,93 @@ import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voi
     ExplorationEditorPageRootComponent,
   ],
   providers: [
-    ExplorationSaveService,
-    ExplorationObjectiveService,
-    ExplorationTitleService,
-    FocusManagerService,
-    RouterService,
-    ExplorationCategoryService,
-    AutosaveInfoModalsService,
-    ExplorationStatesService,
-    EntityTranslationsService,
-    PlatformFeatureService,
-    StateInteractionIdService,
-    StateEditorService,
-    TranslationLanguageService,
-    ChangeListService,
-    LanguageUtilService,
-    ContextService,
-    ComputeGraphService,
-    StatesObjectFactory,
-    GraphDataService,
-    ExplorationInitStateNameService,
-    ExplorationWarningsService,
-    ParameterMetadataService,
-    ChangeListService,
-    ExplorationDataService,
-    LoaderService,
-    InternetConnectivityService,
     AlertsService,
-    LoggerService,
+    AnswerClassificationService,
+    AssetsBackendApiService,
+    AutosaveInfoModalsService,
     ChangeListService,
-    LocalStorageService,
-    ExplorationDataBackendApiService,
-    ReadOnlyExplorationBackendApiService,
-    EditableExplorationBackendApiService,
-    ExplorationPropertyService,
+    ComputeGraphService,
+    ContextService,
+    EditorFirstTimeEventsService,
     EditabilityService,
+    EditableExplorationBackendApiService,
+    EntityTranslationsService,
+    EntityVoiceoversService,
+    EventBusService,
+    ExplorationAutomaticTextToSpeechService,
+    ExplorationCategoryService,
+    ExplorationDataBackendApiService,
+    ExplorationDataService,
+    ExplorationEditsAllowedBackendApiService,
+    ExplorationFeaturesService,
     ExplorationHtmlFormatterService,
+    ExplorationInitStateNameService,
+    ExplorationLanguageCodeService,
+    ExplorationMetadataObjectFactory,
+    ExplorationNextContentIdIndexService,
+    ExplorationObjectiveService,
+    ExplorationParamChangesService,
+    ExplorationParamSpecsService,
+    ExplorationPropertyService,
+    ExplorationRightsBackendApiService,
+    ExplorationRightsService,
+    ExplorationSaveService,
+    ExplorationStatesService,
+    ExplorationTagsService,
+    ExplorationTitleService,
+    ExplorationWarningsService,
+    ExternalRteSaveService,
+    FocusManagerService,
+    GenerateContentIdService,
+    GraphDataService,
+    ImageLocalStorageService,
+    ImageUploadHelperService,
     InteractionDetailsCacheService,
+    InteractionRulesRegistryService,
+    InternetConnectivityService,
+    JoyrideService,
+    LanguageUtilService,
+    LoaderService,
+    LocalStorageService,
+    LoggerService,
+    ParameterMetadataService,
+    PlatformFeatureService,
+    PopulateRuleContentIdsService,
+    ReadOnlyExplorationBackendApiService,
     ResponsesService,
+    RouterService,
+    RteHelperService,
+    SettingTabBackendApiService,
+    SiteAnalyticsService,
+    SkillBackendApiService,
+    SolutionValidityService,
+    StateCardIsCheckpointService,
     StateContentService,
     StateCustomizationArgsService,
-    GenerateContentIdService,
-    StateSolutionService,
-    UrlInterpolationService,
-    WindowDimensionsService,
-    StateCardIsCheckpointService,
+    StateEditorRefreshService,
+    StateEditorService,
     StateHintsService,
+    StateInteractionIdService,
     StateLinkedSkillIdService,
     StateNameService,
     StateParamChangesService,
     StateSolicitAnswerDetailsService,
-    ExplorationNextContentIdIndexService,
+    StateSolutionService,
     StateTutorialFirstTimeService,
-    SiteAnalyticsService,
-    UserExplorationPermissionsService,
-    ExplorationFeaturesService,
-    StateEditorRefreshService,
-    JoyrideService,
-    VersionHistoryService,
-    VersionHistoryBackendApiService,
-    SkillBackendApiService,
-    AnswerClassificationService,
-    InteractionRulesRegistryService,
-    SolutionValidityService,
-    ValidatorsService,
-    ExplorationAutomaticTextToSpeechService,
-    UserService,
-    ExplorationEditsAllowedBackendApiService,
-    ExplorationLanguageCodeService,
-    ExplorationMetadataObjectFactory,
-    ExplorationParamChangesService,
-    ExplorationParamSpecsService,
-    ExplorationRightsService,
-    ExplorationTagsService,
-    SettingTabBackendApiService,
-    UserEmailPreferencesService,
-    ExplorationRightsBackendApiService,
-    EventBusService,
-    PopulateRuleContentIdsService,
-    EditorFirstTimeEventsService,
-    ExternalRteSaveService,
-    AssetsBackendApiService,
-    ImageLocalStorageService,
-    ImageUploadHelperService,
-    RteHelperService,
-    EntityVoiceoversService,
+    StatesObjectFactory,
+    TranslationLanguageService,
     TranslationStatusService,
     TranslationTabActiveModeService,
+    UrlInterpolationService,
+    UserEmailPreferencesService,
+    UserExplorationPermissionsService,
+    UserService,
+    ValidatorsService,
+    VersionHistoryBackendApiService,
+    VersionHistoryService,
     VoiceoverBackendApiService,
     VoiceoverPlayerService,
+    WindowDimensionsService,
   ],
 })
 export class ExplorationEditorPageModule {}

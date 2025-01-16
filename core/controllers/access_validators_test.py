@@ -1050,8 +1050,7 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/can_access_story_editor_page/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id
-            ), expected_status_int=302
-    )
+            ), expected_status_int=302)
 
     def test_access_story_editor_page_with_curriculum_admin(
             self) -> None:

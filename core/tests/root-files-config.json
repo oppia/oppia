@@ -59,8 +59,6 @@
     "core/templates/AppSpec.ts",
     "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts",
-    "core/templates/pages/exploration-editor-page/ckeditor_dependency.html",
-    "extensions/interactions/dependency_html.html",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
   ],

@@ -1150,6 +1150,10 @@ export class ExplorationEditor extends BaseUser {
         });
     } else {
       await this.clickOn(addAnotherResponseButton);
+      // The waitForNetworkIdle method waits for the response
+      // save request to get executed, the Add response modal
+      // to fully appear and all the fields in it to become
+      // clickable before moving on to next steps.
       await this.waitForNetworkIdle();
     }
   }
