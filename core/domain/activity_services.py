@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Commands for operating on lists of activity references."""
 
 from __future__ import annotations
@@ -28,14 +27,13 @@ from core.platform import models
 from typing import List, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import activity_models
 
-(activity_models,) = models.Registry.import_models([models.Names.ACTIVITY])
+(activity_models, ) = models.Registry.import_models([models.Names.ACTIVITY])
 
 
-def get_featured_activity_references(
-) -> List[activity_domain.ActivityReference]:
+def get_featured_activity_references() -> List[activity_domain.ActivityReference]:
     """Gets a list of ActivityReference domain models.
 
     Returns:
@@ -44,11 +42,14 @@ def get_featured_activity_references(
     """
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
-            feconf.ACTIVITY_REFERENCE_LIST_FEATURED))
+            feconf.ACTIVITY_REFERENCE_LIST_FEATURED
+        )
+    )
 
     return [
         activity_domain.ActivityReference(reference['type'], reference['id'])
-        for reference in featured_model_instance.activity_references]
+        for reference in featured_model_instance.activity_references
+    ]
 
 
 def update_featured_activity_references(
@@ -69,16 +70,19 @@ def update_featured_activity_references(
         activity_reference.validate()
 
     activity_hashes = [
-        reference.get_hash() for reference in featured_activity_references]
+        reference.get_hash() for reference in featured_activity_references
+    ]
     if len(activity_hashes) != len(set(activity_hashes)):
-        raise Exception(
-            'The activity reference list should not have duplicates.')
+        raise Exception('The activity reference list should not have duplicates.')
 
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
-            feconf.ACTIVITY_REFERENCE_LIST_FEATURED))
+            feconf.ACTIVITY_REFERENCE_LIST_FEATURED
+        )
+    )
     featured_model_instance.activity_references = [
-        reference.to_dict() for reference in featured_activity_references]
+        reference.to_dict() for reference in featured_activity_references
+    ]
     featured_model_instance.update_timestamps()
     featured_model_instance.put()
 
@@ -94,9 +98,7 @@ def remove_featured_activity(activity_type: str, activity_id: str) -> None:
     remove_featured_activities(activity_type, [activity_id])
 
 
-def remove_featured_activities(
-    activity_type: str, activity_ids: list[str]
-) -> None:
+def remove_featured_activities(activity_type: str, activity_ids: list[str]) -> None:
     """Removes the specified activity references from the list of featured
     activity references.
 
@@ -119,8 +121,9 @@ def remove_featured_activities(
         # deleted, so we log a message.
         for activity_id in activity_references_ids_found:
             logging.info(
-                'The %s with id %s was removed from the featured list.' % (
-                    activity_type, activity_id))
+                'The %s with id %s was removed from the featured list.' %
+                (activity_type, activity_id)
+            )
         update_featured_activity_references(new_activity_references)
 
 
@@ -153,6 +156,7 @@ def split_by_type(
         else:
             raise Exception(
                 'Invalid activity reference: (%s, %s)' %
-                (activity_reference.type, activity_reference.id))
+                (activity_reference.type, activity_reference.id)
+            )
 
     return exploration_ids, collection_ids

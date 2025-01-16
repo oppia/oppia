@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects relating to blog post statistics."""
 
 from __future__ import annotations
@@ -30,12 +29,9 @@ class BlogPostViewsAggregatedStats:
     """Domain object representing blog post views aggregated stats model."""
 
     def __init__(
-        self,
-        blog_post_id: str,
-        views_by_hour: Dict[str, Dict[str, int]],
+        self, blog_post_id: str, views_by_hour: Dict[str, Dict[str, int]],
         views_by_date: Dict[str, Dict[str, int]],
-        views_by_month: Dict[str, Dict[str, int]],
-        created_on: datetime.datetime
+        views_by_month: Dict[str, Dict[str, int]], created_on: datetime.datetime
     ) -> None:
         """Constructs an BlogPostViewsAggregatedStats domain object.
 
@@ -73,23 +69,20 @@ class BlogPostViewsAggregatedStats:
 
         if not isinstance(self.blog_post_id, str):
             raise utils.ValidationError(
-                'Blog Post ID must be a string, but got %r' % self.blog_post_id)
+                'Blog Post ID must be a string, but got %r' % self.blog_post_id
+            )
 
         if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
-            raise utils.ValidationError(
-                'Blog ID %s is invalid' % self.blog_post_id)
+            raise utils.ValidationError('Blog ID %s is invalid' % self.blog_post_id)
 
 
 class BlogPostReadsAggregatedStats:
     """Domain object representing blog post reads aggregated stats model."""
 
     def __init__(
-        self,
-        blog_post_id: str,
-        reads_by_hour: Dict[str, Dict[str, int]],
+        self, blog_post_id: str, reads_by_hour: Dict[str, Dict[str, int]],
         reads_by_date: Dict[str, Dict[str, int]],
-        reads_by_month: Dict[str, Dict[str, int]],
-        created_on: datetime.datetime
+        reads_by_month: Dict[str, Dict[str, int]], created_on: datetime.datetime
     ) -> None:
         """Constructs an BlogPostReadsAggregatedStats domain object.
 
@@ -127,11 +120,11 @@ class BlogPostReadsAggregatedStats:
 
         if not isinstance(self.blog_post_id, str):
             raise utils.ValidationError(
-                'Blog Post ID must be a string, but got %r' % self.blog_post_id)
+                'Blog Post ID must be a string, but got %r' % self.blog_post_id
+            )
 
         if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
-            raise utils.ValidationError(
-                'Blog ID %s is invalid' % self.blog_post_id)
+            raise utils.ValidationError('Blog ID %s is invalid' % self.blog_post_id)
 
 
 class BlogPostReadingTime:
@@ -205,11 +198,13 @@ class BlogPostReadingTime:
 
         if not isinstance(self.blog_post_id, str):
             raise utils.ValidationError(
-                'Blog Post ID must be a string, but got %r' % self.blog_post_id)
+                'Blog Post ID must be a string, but got %r' % self.blog_post_id
+            )
 
         if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
-                'Blog Post ID %s is invalid' % self.blog_post_id)
+                'Blog Post ID %s is invalid' % self.blog_post_id
+            )
 
 
 class AuthorBlogPostViewsAggregatedStats:
@@ -218,12 +213,9 @@ class AuthorBlogPostViewsAggregatedStats:
     """
 
     def __init__(
-        self,
-        author_id: str,
-        views_by_hour: Dict[str, Dict[str, int]],
+        self, author_id: str, views_by_hour: Dict[str, Dict[str, int]],
         views_by_date: Dict[str, Dict[str, int]],
-        views_by_month: Dict[str, Dict[str, int]],
-        created_on: datetime.datetime
+        views_by_month: Dict[str, Dict[str, int]], created_on: datetime.datetime
     ) -> None:
         """Constructs an AuthorBlogPostViewsAggregatedStats domain object.
 
@@ -262,11 +254,13 @@ class AuthorBlogPostViewsAggregatedStats:
 
         if not isinstance(self.author_id, str):
             raise utils.ValidationError(
-                'Author ID must be a string, but got %r' % self.author_id)
+                'Author ID must be a string, but got %r' % self.author_id
+            )
 
         if not utils.is_user_id_valid(self.author_id):
             raise utils.ValidationError(
-                'author_id=%r has the wrong format' % self.author_id)
+                'author_id=%r has the wrong format' % self.author_id
+            )
 
 
 class AuthorBlogPostReadsAggregatedStats:
@@ -275,12 +269,9 @@ class AuthorBlogPostReadsAggregatedStats:
     """
 
     def __init__(
-        self,
-        author_id: str,
-        reads_by_hour: Dict[str, Dict[str, int]],
+        self, author_id: str, reads_by_hour: Dict[str, Dict[str, int]],
         reads_by_date: Dict[str, Dict[str, int]],
-        reads_by_month: Dict[str, Dict[str, int]],
-        created_on: datetime.datetime
+        reads_by_month: Dict[str, Dict[str, int]], created_on: datetime.datetime
     ) -> None:
         """Constructs an AuthorBlogPostReadsAggregatedStats domain object.
 
@@ -319,11 +310,13 @@ class AuthorBlogPostReadsAggregatedStats:
 
         if not isinstance(self.author_id, str):
             raise utils.ValidationError(
-                'Author ID must be a string, but got %r' % self.author_id)
+                'Author ID must be a string, but got %r' % self.author_id
+            )
 
         if not utils.is_user_id_valid(self.author_id):
             raise utils.ValidationError(
-                'author_id=%r has the wrong format' % self.author_id)
+                'author_id=%r has the wrong format' % self.author_id
+            )
 
 
 class AuthorBlogPostsReadingTime:
@@ -397,8 +390,10 @@ class AuthorBlogPostsReadingTime:
 
         if not isinstance(self.author_id, str):
             raise utils.ValidationError(
-                'Author ID must be a string, but got %r' % self.author_id)
+                'Author ID must be a string, but got %r' % self.author_id
+            )
 
         if not utils.is_user_id_valid(self.author_id):
             raise utils.ValidationError(
-                'author_id=%r has the wrong format' % self.author_id)
+                'author_id=%r has the wrong format' % self.author_id
+            )

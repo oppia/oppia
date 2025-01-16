@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Functions for retrieving voiceovers."""
 
 from __future__ import annotations
@@ -35,12 +34,10 @@ from core.platform import models
 from typing import Dict, List, Sequence, cast
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import voiceover_models
 
-(voiceover_models,) = models.Registry.import_models([
-    models.Names.VOICEOVER])
-
+(voiceover_models, ) = models.Registry.import_models([models.Names.VOICEOVER])
 
 MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST = 5
 
@@ -59,21 +56,20 @@ def _get_entity_voiceovers_from_model(
         EntityVoiceovers. An instance of EntityVoiceovers object, created from
         its model.
     """
-    entity_voiceovers = voiceover_domain.EntityVoiceovers.from_dict({
-        'entity_id': entity_voiceovers_model.entity_id,
-        'entity_type': entity_voiceovers_model.entity_type,
-        'entity_version': entity_voiceovers_model.entity_version,
-        'language_accent_code': entity_voiceovers_model.language_accent_code,
-        'voiceovers_mapping': entity_voiceovers_model.voiceovers_mapping
-    })
+    entity_voiceovers = voiceover_domain.EntityVoiceovers.from_dict(
+        {
+            'entity_id': entity_voiceovers_model.entity_id,
+            'entity_type': entity_voiceovers_model.entity_type,
+            'entity_version': entity_voiceovers_model.entity_version,
+            'language_accent_code': entity_voiceovers_model.language_accent_code,
+            'voiceovers_mapping': entity_voiceovers_model.voiceovers_mapping
+        }
+    )
     return entity_voiceovers
 
 
 def get_voiceovers_for_given_language_accent_code(
-    entity_type: str,
-    entity_id: str,
-    entity_version: int,
-    language_accent_code: str
+    entity_type: str, entity_id: str, entity_version: int, language_accent_code: str
 ) -> voiceover_domain.EntityVoiceovers:
     """Returns a unique entity voiceovers domain object.
 
@@ -88,16 +84,18 @@ def get_voiceovers_for_given_language_accent_code(
     """
     entity_voiceovers_model = (
         voiceover_models.EntityVoiceoversModel.get_model(
-            entity_type, entity_id, entity_version, language_accent_code))
+            entity_type, entity_id, entity_version, language_accent_code
+        )
+    )
 
     if entity_voiceovers_model:
-        return _get_entity_voiceovers_from_model(
-            entity_voiceovers_model)
+        return _get_entity_voiceovers_from_model(entity_voiceovers_model)
     return voiceover_domain.EntityVoiceovers.create_empty(
         entity_type=entity_type,
         entity_id=entity_id,
         entity_version=entity_version,
-        language_accent_code=language_accent_code)
+        language_accent_code=language_accent_code
+    )
 
 
 def get_entity_voiceovers_for_given_exploration(
@@ -121,12 +119,14 @@ def get_entity_voiceovers_for_given_exploration(
     entity_voiceovers_models = (
         voiceover_models.EntityVoiceoversModel.
         get_entity_voiceovers_for_given_exploration(
-            entity_id, entity_type, entity_version)
+            entity_id, entity_type, entity_version
+        )
     )
 
     for model_instance in entity_voiceovers_models:
         entity_voiceovers_objects.append(
-            _get_entity_voiceovers_from_model(model_instance))
+            _get_entity_voiceovers_from_model(model_instance)
+        )
     return entity_voiceovers_objects
 
 
@@ -151,20 +151,18 @@ def fetch_entity_voiceovers_by_language_code(
         instances for the specified exploration data.
     """
     entity_voiceovers_for_exp = get_entity_voiceovers_for_given_exploration(
-        entity_id, entity_type, entity_version)
+        entity_id, entity_type, entity_version
+    )
 
     language_codes_mapping = get_all_language_accent_codes_for_voiceovers()
 
-    supported_language_accent_codes = (
-        language_codes_mapping.get(language_code, {}))
+    supported_language_accent_codes = (language_codes_mapping.get(language_code, {}))
 
     entity_voiceovers_list = []
 
     for entity_voiceovers in entity_voiceovers_for_exp:
-        if (
-            entity_voiceovers.language_accent_code not in
-            supported_language_accent_codes
-        ):
+        if (entity_voiceovers.language_accent_code
+                not in supported_language_accent_codes):
             continue
         if not bool(entity_voiceovers.voiceovers_mapping):
             continue
@@ -199,17 +197,17 @@ def compute_voiceover_related_change(
     entity_type = 'exploration'
 
     entity_voiceovers_objects = get_entity_voiceovers_for_given_exploration(
-        entity_id, entity_type, entity_version)
+        entity_id, entity_type, entity_version
+    )
 
     for entity_voiceovers in entity_voiceovers_objects:
         entity_voiceovers_id = generate_id_method(
-            entity_voiceovers.entity_type,
-            entity_voiceovers.entity_id,
-            entity_voiceovers.entity_version,
-            entity_voiceovers.language_accent_code
+            entity_voiceovers.entity_type, entity_voiceovers.entity_id,
+            entity_voiceovers.entity_version, entity_voiceovers.language_accent_code
         )
         entity_voiceover_id_to_entity_voiceovers[entity_voiceovers_id] = (
-            entity_voiceovers)
+            entity_voiceovers
+        )
 
     for change in voiceover_changes:
         # Here we use cast because this forces change to have type
@@ -219,41 +217,41 @@ def compute_voiceover_related_change(
         language_accent_code = voiceover_change.language_accent_code
 
         entity_voiceover_id = generate_id_method(
-            entity_type, entity_id, entity_version, language_accent_code)
+            entity_type, entity_id, entity_version, language_accent_code
+        )
 
         empty_entity_voiceovers = (
             voiceover_domain.EntityVoiceovers.create_empty(
-                entity_id, entity_type, entity_version, language_accent_code)
+                entity_id, entity_type, entity_version, language_accent_code
+            )
         )
 
         entity_voiceovers = (
             entity_voiceover_id_to_entity_voiceovers.get(
-                entity_voiceover_id, empty_entity_voiceovers)
+                entity_voiceover_id, empty_entity_voiceovers
+            )
         )
 
         if content_id not in entity_voiceovers.voiceovers_mapping:
             manual_voiceover_dict: state_domain.VoiceoverDict = (
-                voiceover_change.voiceovers['manual'])
-            manual_voiceover = state_domain.Voiceover.from_dict(
-                manual_voiceover_dict)
+                voiceover_change.voiceovers['manual']
+            )
+            manual_voiceover = state_domain.Voiceover.from_dict(manual_voiceover_dict)
 
             entity_voiceovers.add_new_content_id_without_voiceovers(content_id)
             entity_voiceovers.add_voiceover(
-                content_id,
-                feconf.VoiceoverType.MANUAL,
-                manual_voiceover
+                content_id, feconf.VoiceoverType.MANUAL, manual_voiceover
             )
         else:
             if 'manual' not in voiceover_change.voiceovers:
                 entity_voiceovers.remove_voiceover(
-                    content_id,
-                    feconf.VoiceoverType.MANUAL
+                    content_id, feconf.VoiceoverType.MANUAL
                 )
             else:
-                manual_voiceover_dict = (
-                    voiceover_change.voiceovers['manual'])
+                manual_voiceover_dict = (voiceover_change.voiceovers['manual'])
                 manual_voiceover = state_domain.Voiceover.from_dict(
-                    manual_voiceover_dict)
+                    manual_voiceover_dict
+                )
 
                 entity_voiceovers.voiceovers_mapping[content_id][
                     feconf.VoiceoverType.MANUAL] = manual_voiceover
@@ -261,7 +259,8 @@ def compute_voiceover_related_change(
         entity_voiceovers.validate()
 
         entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
-            entity_voiceovers)
+            entity_voiceovers
+        )
 
     for entity_voiceovers in entity_voiceover_id_to_entity_voiceovers.values():
         entity_voiceovers_dict = entity_voiceovers.to_dict()
@@ -281,8 +280,7 @@ def compute_voiceover_related_change(
 # NOTE TO DEVELOPERS: The method is not ready for use since the corresponding
 # model does not contain any data yet. Issue #19590 tracks the changes required
 # in order to use this function.
-def get_all_language_accent_codes_for_voiceovers(
-) -> Dict[str, Dict[str, bool]]:
+def get_all_language_accent_codes_for_voiceovers() -> Dict[str, Dict[str, bool]]:
     """Returns all language-accent codes which are supported by
     Oppia's voiceovers.
 
@@ -296,14 +294,16 @@ def get_all_language_accent_codes_for_voiceovers(
 
     voiceover_autogeneration_policy_model = (
         voiceover_models.VoiceoverAutogenerationPolicyModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
+        )
     )
     language_codes_mapping: Dict[str, Dict[str, bool]] = {}
     if voiceover_autogeneration_policy_model is None:
         return language_codes_mapping
 
     language_codes_mapping = (
-        voiceover_autogeneration_policy_model.language_codes_mapping)
+        voiceover_autogeneration_policy_model.language_codes_mapping
+    )
     return language_codes_mapping
 
 
@@ -317,15 +317,15 @@ def is_voiceover_autogeneration_using_cloud_service_enabled() -> bool:
     """
     voiceover_autogeneration_policy_model = (
         voiceover_models.VoiceoverAutogenerationPolicyModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
+        )
     )
 
     autogenerated_voiceovers_are_enabled: bool = False
 
     if voiceover_autogeneration_policy_model is not None:
         autogenerated_voiceovers_are_enabled = (
-            voiceover_autogeneration_policy_model.
-            autogenerated_voiceovers_are_enabled
+            voiceover_autogeneration_policy_model.autogenerated_voiceovers_are_enabled
         )
     return autogenerated_voiceovers_are_enabled
 
@@ -343,16 +343,14 @@ def update_admin_config_for_voiceover_autogeneration(
     """
     voiceover_autogeneration_policy_model = (
         voiceover_models.VoiceoverAutogenerationPolicyModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False))
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
+        )
+    )
 
     assert voiceover_autogeneration_policy_model is not None
 
-    (
-        voiceover_autogeneration_policy_model.
-        autogenerated_voiceovers_are_enabled
-    ) = (
-        autogenerated_voiceovers_are_enabled
-    )
+    (voiceover_autogeneration_policy_model.autogenerated_voiceovers_are_enabled
+     ) = (autogenerated_voiceovers_are_enabled)
 
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
@@ -382,8 +380,8 @@ def create_entity_voiceovers_model(
 
     entity_voiceovers_model = (
         voiceover_models.EntityVoiceoversModel.create_new(
-            entity_type, entity_id, entity_version,
-            language_accent_code, voiceovers_mapping
+            entity_type, entity_id, entity_version, language_accent_code,
+            voiceovers_mapping
         )
     )
     entity_voiceovers_model.update_timestamps()
@@ -406,17 +404,20 @@ def save_language_accent_support(
     """
     retrieved_voiceover_autogeneration_policy_model = (
         voiceover_models.VoiceoverAutogenerationPolicyModel.get(
-            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
+        )
     )
     voiceover_autogeneration_policy_model = (
         retrieved_voiceover_autogeneration_policy_model
-        if retrieved_voiceover_autogeneration_policy_model is not None
-        else voiceover_models.VoiceoverAutogenerationPolicyModel(
-            id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID)
+        if retrieved_voiceover_autogeneration_policy_model is not None else
+        voiceover_models.VoiceoverAutogenerationPolicyModel(
+            id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID
+        )
     )
 
     voiceover_autogeneration_policy_model.language_codes_mapping = (
-        language_codes_mapping)
+        language_codes_mapping
+    )
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
 
@@ -433,10 +434,10 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
         voiceovers (manual and auto).
     """
     file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json')
+        feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
+    )
     with utils.open_file(file_path, 'r') as f:
-        language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
-            f.read())
+        language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(f.read())
         return language_accent_master_list
 
 
@@ -453,10 +454,12 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         voice type.
     """
     file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json')
+        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
+    )
     with utils.open_file(file_path, 'r') as f:
-        autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
-            json.loads(f.read()))
+        autogeneratable_language_accent_list: Dict[str,
+                                                   Dict[str,
+                                                        str]] = (json.loads(f.read()))
         return autogeneratable_language_accent_list
 
 
@@ -473,50 +476,42 @@ def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
     all_voice_artist_to_language_mapping: Dict[str, Dict[str, str]] = {}
 
     voice_artist_metadata_models: Sequence[
-        voiceover_models.VoiceArtistMetadataModel] = (
-            voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+        voiceover_models.VoiceArtistMetadataModel
+    ] = (voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
 
     exploration_voice_artist_link_models: Sequence[
-        voiceover_models.ExplorationVoiceArtistsLinkModel] = (
-            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
-        )
+        voiceover_models.ExplorationVoiceArtistsLinkModel
+    ] = (voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
 
     for voice_artist_metadata_model in voice_artist_metadata_models:
         voice_artist_id = voice_artist_metadata_model.id
-        language_code_to_accent = (
-            voice_artist_metadata_model.language_code_to_accent)
+        language_code_to_accent = (voice_artist_metadata_model.language_code_to_accent)
 
-        voice_artist_id_to_language_mapping[voice_artist_id] = (
-            language_code_to_accent
-        )
+        voice_artist_id_to_language_mapping[voice_artist_id] = (language_code_to_accent)
 
     for exp_voice_artist_model in exploration_voice_artist_link_models:
         content_id_to_voiceovers_mapping = (
-            exp_voice_artist_model.content_id_to_voiceovers_mapping)
+            exp_voice_artist_model.content_id_to_voiceovers_mapping
+        )
 
-        for lang_voiceover_mapping_tuple in (
-                content_id_to_voiceovers_mapping.values()):
+        for lang_voiceover_mapping_tuple in (content_id_to_voiceovers_mapping.values()):
 
-            for lang_code, voiceover_tuple in (
-                    lang_voiceover_mapping_tuple.items()):
+            for lang_code, voiceover_tuple in (lang_voiceover_mapping_tuple.items()):
 
                 voice_artist_id = voiceover_tuple[0]
 
                 accent_type = ''
-                if (
-                    voice_artist_id in voice_artist_id_to_language_mapping and
-                    lang_code in voice_artist_id_to_language_mapping[
-                        voice_artist_id]
-                ):
+                if (voice_artist_id in voice_artist_id_to_language_mapping and lang_code
+                        in voice_artist_id_to_language_mapping[voice_artist_id]):
                     accent_type = (
-                        voice_artist_id_to_language_mapping[
-                            voice_artist_id][lang_code])
+                        voice_artist_id_to_language_mapping[voice_artist_id][lang_code]
+                    )
 
                 if voice_artist_id not in all_voice_artist_to_language_mapping:
                     all_voice_artist_to_language_mapping[voice_artist_id] = {}
 
-                all_voice_artist_to_language_mapping[
-                    voice_artist_id][lang_code] = accent_type
+                all_voice_artist_to_language_mapping[voice_artist_id][lang_code
+                                                                      ] = accent_type
 
     return all_voice_artist_to_language_mapping
 
@@ -532,19 +527,17 @@ def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
     voice_artist_id_to_voice_artist_name: Dict[str, str] = {}
 
     exploration_voice_artist_link_models: Sequence[
-        voiceover_models.ExplorationVoiceArtistsLinkModel] = (
-            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
-        )
+        voiceover_models.ExplorationVoiceArtistsLinkModel
+    ] = (voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
 
     for exp_voice_artist_model in exploration_voice_artist_link_models:
         content_id_to_voiceovers_mapping = (
-            exp_voice_artist_model.content_id_to_voiceovers_mapping)
+            exp_voice_artist_model.content_id_to_voiceovers_mapping
+        )
 
-        for lang_voiceover_mapping_tuple in (
-                content_id_to_voiceovers_mapping.values()):
+        for lang_voiceover_mapping_tuple in (content_id_to_voiceovers_mapping.values()):
 
-            for voiceover_tuple in (
-                    lang_voiceover_mapping_tuple.values()):
+            for voiceover_tuple in (lang_voiceover_mapping_tuple.values()):
 
                 voice_artist_id = voiceover_tuple[0]
 
@@ -554,14 +547,14 @@ def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
                 voice_artist_name = user_services.get_username(voice_artist_id)
 
                 voice_artist_id_to_voice_artist_name[voice_artist_id] = (
-                    voice_artist_name)
+                    voice_artist_name
+                )
 
     return voice_artist_id_to_voice_artist_name
 
 
-def get_voiceover_filenames(
-    voice_artist_id: str, language_code: str
-) -> Dict[str, List[str]]:
+def get_voiceover_filenames(voice_artist_id: str,
+                            language_code: str) -> Dict[str, List[str]]:
     """The function returns a dictionary where each exploration ID corresponds
     to a list of filenames. These exploration IDs represent the explorations
     in which a specified voice artist has contributed voiceovers. The list of
@@ -584,15 +577,14 @@ def get_voiceover_filenames(
     contributed_voiceovers: List[state_domain.VoiceoverDict] = []
 
     exp_voice_artist_link_models: Sequence[
-        voiceover_models.ExplorationVoiceArtistsLinkModel] = (
-            voiceover_models.ExplorationVoiceArtistsLinkModel.
-            get_all().fetch()
-        )
+        voiceover_models.ExplorationVoiceArtistsLinkModel
+    ] = (voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
 
     for exp_voice_artist_model in exp_voice_artist_link_models:
         exploration_id = exp_voice_artist_model.id
         content_id_to_voiceovers_mapping = (
-            exp_voice_artist_model.content_id_to_voiceovers_mapping)
+            exp_voice_artist_model.content_id_to_voiceovers_mapping
+        )
 
         for lang_code_to_voiceover_mapping in (
                 content_id_to_voiceovers_mapping.values()):
@@ -620,10 +612,7 @@ def get_voiceover_filenames(
     k = lambda voiceover: voiceover['duration_secs']
     contributed_voiceovers.sort(key=k, reverse=True)
 
-    if (
-        len(contributed_voiceovers) >
-        MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST
-    ):
+    if (len(contributed_voiceovers) > MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST):
         # According to the product specifications, up to five sample voiceovers
         # will be provided to voiceover administrators to assist them in
         # identifying the particular accent needed for the given voiceover in a
@@ -641,8 +630,7 @@ def get_voiceover_filenames(
 
 
 def update_voice_artist_metadata(
-    voice_artist_id: str,
-    language_code_to_accent: Dict[str, str]
+    voice_artist_id: str, language_code_to_accent: Dict[str, str]
 ) -> None:
     """The method updates or creates metadata for a voice artist in the
     VoiceArtistMetadataModel.
@@ -655,15 +643,15 @@ def update_voice_artist_metadata(
             corresponding value.
     """
     voice_artist_metadata_model = (
-        voiceover_models.VoiceArtistMetadataModel.get(
-            voice_artist_id, strict=False))
+        voiceover_models.VoiceArtistMetadataModel.get(voice_artist_id, strict=False)
+    )
 
     if voice_artist_metadata_model is None:
         voiceover_models.VoiceArtistMetadataModel.create_model(
-            voice_artist_id, language_code_to_accent)
+            voice_artist_id, language_code_to_accent
+        )
     else:
-        voice_artist_metadata_model.language_code_to_accent = (
-            language_code_to_accent)
+        voice_artist_metadata_model.language_code_to_accent = (language_code_to_accent)
         voice_artist_metadata_model.update_timestamps()
         voice_artist_metadata_model.put()
 
@@ -682,32 +670,29 @@ def update_voice_artist_language_mapping(
         language_accent_code: str. The updated language accent code.
     """
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel.get(
-        voice_artist_id, strict=False)
+        voice_artist_id, strict=False
+    )
     language_code_to_accent = {}
 
     if voice_artist_metadata_model is None:
         voice_artist_metadata_model = (
             create_voice_artist_metadata_model_instance(
-                voice_artist_id=voice_artist_id,
-                language_code_to_accent={}
+                voice_artist_id=voice_artist_id, language_code_to_accent={}
             )
         )
     else:
-        language_code_to_accent = (
-            voice_artist_metadata_model.language_code_to_accent)
+        language_code_to_accent = (voice_artist_metadata_model.language_code_to_accent)
 
     language_code_to_accent[language_code] = language_accent_code
 
-    voice_artist_metadata_model.language_code_to_accent = (
-        language_code_to_accent)
+    voice_artist_metadata_model.language_code_to_accent = (language_code_to_accent)
 
     voice_artist_metadata_model.update_timestamps()
     voice_artist_metadata_model.put()
 
 
 def create_voice_artist_metadata_model_instance(
-    voice_artist_id: str,
-    language_code_to_accent: Dict[str, str]
+    voice_artist_id: str, language_code_to_accent: Dict[str, str]
 ) -> voiceover_models.VoiceArtistMetadataModel:
     """Creates a VoiceArtistMetadataModel instance.
 
@@ -724,17 +709,17 @@ def create_voice_artist_metadata_model_instance(
         provided voiceovers.
     """
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
-        id=voice_artist_id,
-        language_code_to_accent=language_code_to_accent)
+        id=voice_artist_id, language_code_to_accent=language_code_to_accent
+    )
     voice_artist_metadata_model.update_timestamps()
 
     return voice_artist_metadata_model
 
 
 def create_exploration_voice_artists_link_model_instance(
-    exploration_id: str,
-    content_id_to_voiceovers_mapping: (
-        voiceover_domain.ContentIdToVoiceoverMappingType)
+    exploration_id: str, content_id_to_voiceovers_mapping: (
+        voiceover_domain.ContentIdToVoiceoverMappingType
+    )
 ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
     """Instantiates an ExplorationVoiceArtistsLinkModel, establishing a link
     between the latest content IDs within an exploration and the corresponding
@@ -768,10 +753,8 @@ def create_exploration_voice_artists_link_model_instance(
 
 
 def update_exploration_voice_artist_link_model(
-    user_id: str,
-    change_list: Sequence[exp_domain.ExplorationChange],
-    old_exploration: exp_domain.Exploration,
-    updated_exploration: exp_domain.Exploration
+    user_id: str, change_list: Sequence[exp_domain.ExplorationChange],
+    old_exploration: exp_domain.Exploration, updated_exploration: exp_domain.Exploration
 ) -> None:
     """Create or update a voice artist link model following modifications to
     the recorded voiceover property in an exploration's state.
@@ -787,18 +770,14 @@ def update_exploration_voice_artist_link_model(
     """
 
     if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.
-            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value,
+            feature_flag_list.FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value,
             None):
         return
 
     is_voiceover_changes_made: bool = False
     for change in change_list:
-        if (
-            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-            change.property_name == (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS)
-        ):
+        if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and change.property_name
+                == (exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS)):
             is_voiceover_changes_made = True
             break
 
@@ -814,15 +793,18 @@ def update_exploration_voice_artist_link_model(
 
     exp_voice_artist_link_model = (
         voiceover_models.ExplorationVoiceArtistsLinkModel.get(
-            updated_exploration.id, strict=False))
+            updated_exploration.id, strict=False
+        )
+    )
 
     content_id_to_voiceovers_mapping: (
-        voiceover_domain.ContentIdToVoiceoverMappingType) = (
-            collections.defaultdict(dict))
+        voiceover_domain.ContentIdToVoiceoverMappingType
+    ) = (collections.defaultdict(dict))
 
     if exp_voice_artist_link_model is not None:
         content_id_to_voiceovers_mapping.update(
-            exp_voice_artist_link_model.content_id_to_voiceovers_mapping)
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
 
     for state in updated_exploration.states.values():
         voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
@@ -833,19 +815,20 @@ def update_exploration_voice_artist_link_model(
                 if filename in old_filenames:
                     continue
                 content_id_to_voiceovers_mapping[content_id][lang_code] = (
-                    user_id, voiceover_dict.to_dict())
+                    user_id, voiceover_dict.to_dict()
+                )
 
     if exp_voice_artist_link_model is None:
         exp_voice_artist_link_model = (
             create_exploration_voice_artists_link_model_instance(
                 exploration_id=updated_exploration.id,
-                content_id_to_voiceovers_mapping=(
-                    content_id_to_voiceovers_mapping)
+                content_id_to_voiceovers_mapping=(content_id_to_voiceovers_mapping)
             )
         )
     else:
         exp_voice_artist_link_model.content_id_to_voiceovers_mapping = (
-            content_id_to_voiceovers_mapping)
+            content_id_to_voiceovers_mapping
+        )
 
     exp_voice_artist_link_model.update_timestamps()
     exp_voice_artist_link_model.put()

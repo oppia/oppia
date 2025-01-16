@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for core.domain.beam_job_domain."""
 
 from __future__ import annotations
@@ -31,13 +30,11 @@ class BeamJobTests(test_utils.TestBase):
     NOW = datetime.datetime.utcnow()
 
     def test_usage(self) -> None:
-        job = beam_job_domain.BeamJob(
-            model_validation_jobs.AuditAllStorageModelsJob)
+        job = beam_job_domain.BeamJob(model_validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.name, 'AuditAllStorageModelsJob')
 
     def test_to_dict(self) -> None:
-        job = beam_job_domain.BeamJob(
-            model_validation_jobs.AuditAllStorageModelsJob)
+        job = beam_job_domain.BeamJob(model_validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.to_dict(), {'name': 'AuditAllStorageModelsJob'})
 
 
@@ -47,7 +44,8 @@ class BeamJobRunTests(test_utils.TestBase):
 
     def test_usage(self) -> None:
         run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True)
+            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True
+        )
 
         self.assertEqual(run.job_id, '123')
         self.assertEqual(run.job_name, 'FooJob')
@@ -58,16 +56,19 @@ class BeamJobRunTests(test_utils.TestBase):
 
     def test_to_dict(self) -> None:
         run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True)
+            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True
+        )
 
-        self.assertEqual(run.to_dict(), {
-            'job_id': '123',
-            'job_name': 'FooJob',
-            'job_state': 'RUNNING',
-            'job_started_on_msecs': utils.get_time_in_millisecs(self.NOW),
-            'job_updated_on_msecs': utils.get_time_in_millisecs(self.NOW),
-            'job_is_synchronous': True,
-        })
+        self.assertEqual(
+            run.to_dict(), {
+                'job_id': '123',
+                'job_name': 'FooJob',
+                'job_state': 'RUNNING',
+                'job_started_on_msecs': utils.get_time_in_millisecs(self.NOW),
+                'job_updated_on_msecs': utils.get_time_in_millisecs(self.NOW),
+                'job_is_synchronous': True,
+            }
+        )
 
 
 class AggregateBeamJobRunResultTests(test_utils.TestBase):

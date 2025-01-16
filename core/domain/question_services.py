@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Services for questions data model."""
 
 from __future__ import annotations
@@ -33,21 +32,20 @@ from core.platform import models
 from typing import Dict, List, Literal, Optional, Tuple, Union, cast, overload
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import question_models
     from mypy_imports import skill_models
     from mypy_imports import transaction_services
 
 (question_models, skill_models) = models.Registry.import_models(
-    [models.Names.QUESTION, models.Names.SKILL])
+    [models.Names.QUESTION, models.Names.SKILL]
+)
 
 transaction_services = models.Registry.import_transaction_services()
 
 
 def create_new_question(
-    committer_id: str,
-    question: question_domain.Question,
-    commit_message: str
+    committer_id: str, question: question_domain.Question, commit_message: str
 ) -> None:
     """Creates a new question.
 
@@ -64,22 +62,25 @@ def create_new_question(
         version=question.version,
         linked_skill_ids=question.linked_skill_ids,
         question_state_data_schema_version=(
-            question.question_state_data_schema_version),
+            question.question_state_data_schema_version
+        ),
         inapplicable_skill_misconception_ids=(
-            question.inapplicable_skill_misconception_ids),
+            question.inapplicable_skill_misconception_ids
+        ),
         next_content_id_index=question.next_content_id_index
     )
     model.commit(
-        committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
+        committer_id, commit_message, [{
+            'cmd': question_domain.CMD_CREATE_NEW
+        }]
+    )
     question.version += 1
     create_question_summary(question.id)
     opportunity_services.increment_question_counts(question.linked_skill_ids, 1)
 
 
 def link_multiple_skills_for_question(
-    user_id: str,
-    question_id: str,
-    skill_ids: List[str],
+    user_id: str, question_id: str, skill_ids: List[str],
     skill_difficulties: List[float]
 ) -> None:
     """Links multiple skill IDs to a question. To do that, it creates multiple
@@ -101,30 +102,31 @@ def link_multiple_skills_for_question(
     if len(skill_ids) != len(skill_difficulties):
         raise Exception(
             'Skill difficulties and skill ids should match. The lengths of the '
-            'two lists are different.')
+            'two lists are different.'
+        )
     question = get_question_by_id(question_id)
 
     new_question_skill_link_models = []
     for index, skill_id in enumerate(skill_ids):
         new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
-                question_id, skill_id, skill_difficulties[index]))
+                question_id, skill_id, skill_difficulties[index]
+            )
+        )
 
     new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
     new_linked_skill_ids.extend(skill_ids)
 
     _update_linked_skill_ids_of_question(
-        user_id, question_id, list(set(new_linked_skill_ids)),
-        question.linked_skill_ids)
+        user_id, question_id, list(set(new_linked_skill_ids)), question.linked_skill_ids
+    )
     question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-        new_question_skill_link_models)
+        new_question_skill_link_models
+    )
 
 
 def create_new_question_skill_link(
-    user_id: str,
-    question_id: str,
-    skill_id: str,
-    skill_difficulty: float
+    user_id: str, question_id: str, skill_id: str, skill_difficulty: float
 ) -> None:
     """Creates a new QuestionSkillLink model and adds the skill id
     to the linked skill ids for the Question model.
@@ -138,7 +140,8 @@ def create_new_question_skill_link(
     question = get_question_by_id(question_id)
 
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
-        question_id, skill_id, skill_difficulty)
+        question_id, skill_id, skill_difficulty
+    )
     question_skill_link_model.update_timestamps()
     question_skill_link_model.put()
 
@@ -146,14 +149,12 @@ def create_new_question_skill_link(
         new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
         new_linked_skill_ids.append(skill_id)
         _update_linked_skill_ids_of_question(
-            user_id, question_id, new_linked_skill_ids,
-            question.linked_skill_ids)
+            user_id, question_id, new_linked_skill_ids, question.linked_skill_ids
+        )
 
 
 def update_question_skill_link_difficulty(
-    question_id: str,
-    skill_id: str,
-    new_difficulty: float
+    question_id: str, skill_id: str, new_difficulty: float
 ) -> None:
     """Updates the difficulty value of question skill link.
 
@@ -166,10 +167,11 @@ def update_question_skill_link_difficulty(
         Exception. Given question and skill are not linked.
     """
     question_skill_link_id = (
-        question_models.QuestionSkillLinkModel.get_model_id(
-            question_id, skill_id))
+        question_models.QuestionSkillLinkModel.get_model_id(question_id, skill_id)
+    )
     question_skill_link_model = question_models.QuestionSkillLinkModel.get(
-        question_skill_link_id, strict=False)
+        question_skill_link_id, strict=False
+    )
 
     if question_skill_link_model is None:
         raise Exception('The given question and skill are not linked.')
@@ -179,9 +181,7 @@ def update_question_skill_link_difficulty(
 
 
 def _update_linked_skill_ids_of_question(
-    user_id: str,
-    question_id: str,
-    new_linked_skill_ids: List[str],
+    user_id: str, question_id: str, new_linked_skill_ids: List[str],
     old_linked_skill_ids: List[str]
 ) -> None:
     """Updates the question linked_skill ids in the Question model.
@@ -200,17 +200,16 @@ def _update_linked_skill_ids_of_question(
         'old_value': old_linked_skill_ids
     }
     change_list = [question_domain.QuestionChange(change_dict)]
-    update_question(
-        user_id, question_id, change_list, 'Updated linked skill ids')
+    update_question(user_id, question_id, change_list, 'Updated linked skill ids')
     (
-        opportunity_services
-        .update_skill_opportunities_on_question_linked_skills_change(
-            old_linked_skill_ids, new_linked_skill_ids))
+        opportunity_services.
+        update_skill_opportunities_on_question_linked_skills_change(
+            old_linked_skill_ids, new_linked_skill_ids
+        )
+    )
 
 
-def delete_question_skill_link(
-    user_id: str, question_id: str, skill_id: str
-) -> None:
+def delete_question_skill_link(user_id: str, question_id: str, skill_id: str) -> None:
     """Deleted a QuestionSkillLink model and removes the linked skill id
     from the Question model of question_id.
 
@@ -224,15 +223,16 @@ def delete_question_skill_link(
     new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
     new_linked_skill_ids.remove(skill_id)
     question_skill_link_id = (
-        question_models.QuestionSkillLinkModel.get_model_id(
-            question_id, skill_id))
+        question_models.QuestionSkillLinkModel.get_model_id(question_id, skill_id)
+    )
     question_skill_link_model = question_models.QuestionSkillLinkModel.get(
-        question_skill_link_id)
+        question_skill_link_id
+    )
 
     if new_linked_skill_ids:
         _update_linked_skill_ids_of_question(
-            user_id, question_id,
-            new_linked_skill_ids, question.linked_skill_ids)
+            user_id, question_id, new_linked_skill_ids, question.linked_skill_ids
+        )
     else:
         delete_question(user_id, question_id)
 
@@ -251,16 +251,14 @@ def get_total_question_count_for_skill_ids(skill_ids: List[str]) -> int:
     """
     question_skill_link_model = question_models.QuestionSkillLinkModel
     question_count = (
-        question_skill_link_model.get_total_question_count_for_skill_ids(
-            skill_ids))
+        question_skill_link_model.get_total_question_count_for_skill_ids(skill_ids)
+    )
 
     return question_count
 
 
 def get_questions_by_skill_ids(
-    total_question_count: int,
-    skill_ids: List[str],
-    require_medium_difficulty: bool
+    total_question_count: int, skill_ids: List[str], require_medium_difficulty: bool
 ) -> List[question_domain.Question]:
     """Returns constant number of questions linked to each given skill id.
 
@@ -290,7 +288,8 @@ def get_questions_by_skill_ids(
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
         raise Exception(
             'Question count is too high, please limit the question count to '
-            '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+            '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME
+        )
 
     if require_medium_difficulty:
         question_skill_link_models = (
@@ -302,7 +301,9 @@ def get_questions_by_skill_ids(
         question_skill_link_models = (
             question_models.QuestionSkillLinkModel.
             get_question_skill_links_equidistributed_by_skill(
-                total_question_count, skill_ids))
+                total_question_count, skill_ids
+            )
+        )
 
     question_ids = [model.question_id for model in question_skill_link_models]
     questions_with_none = question_fetchers.get_questions_by_ids(question_ids)
@@ -324,9 +325,7 @@ def get_new_question_id() -> str:
     return question_models.QuestionModel.get_new_id('')
 
 
-def add_question(
-    committer_id: str, question: question_domain.Question
-) -> None:
+def add_question(committer_id: str, question: question_domain.Question) -> None:
     """Saves a new question.
 
     Args:
@@ -360,17 +359,20 @@ def delete_question(
         question_model = question_models.QuestionModel.get_by_id(question_id)
         if question_model is not None:
             opportunity_services.increment_question_counts(
-                question_model.linked_skill_ids, -1)
+                question_model.linked_skill_ids, -1
+            )
         question_models.QuestionModel.delete_multi(
-            [question_id], committer_id,
+            [question_id],
+            committer_id,
             feconf.COMMIT_MESSAGE_QUESTION_DELETED,
-            force_deletion=force_deletion)
+            force_deletion=force_deletion
+        )
 
-    delete_question_model_transactional(
-        question_id, committer_id, force_deletion)
+    delete_question_model_transactional(question_id, committer_id, force_deletion)
 
     question_summary_model = (
-        question_models.QuestionSummaryModel.get(question_id, strict=False))
+        question_models.QuestionSummaryModel.get(question_id, strict=False)
+    )
     if question_summary_model is not None:
         question_summary_model.delete()
 
@@ -392,32 +394,31 @@ def get_question_skill_link_from_model(
     """
 
     return question_domain.QuestionSkillLink(
-        question_skill_link_model.question_id,
-        question_skill_link_model.skill_id, skill_description,
-        question_skill_link_model.skill_difficulty)
+        question_skill_link_model.question_id, question_skill_link_model.skill_id,
+        skill_description, question_skill_link_model.skill_difficulty
+    )
 
 
 @overload
-def get_question_by_id(
-    question_id: str
-) -> question_domain.Question: ...
+def get_question_by_id(question_id: str) -> question_domain.Question:
+    ...
 
 
 @overload
 def get_question_by_id(
     question_id: str, *, strict: Literal[True]
-) -> question_domain.Question: ...
+) -> question_domain.Question:
+    ...
 
 
 @overload
-def get_question_by_id(
-    question_id: str, *, strict: Literal[False]
-) -> Optional[question_domain.Question]: ...
+def get_question_by_id(question_id: str, *,
+                       strict: Literal[False]) -> Optional[question_domain.Question]:
+    ...
 
 
-def get_question_by_id(
-    question_id: str, strict: bool = True
-) -> Optional[question_domain.Question]:
+def get_question_by_id(question_id: str,
+                       strict: bool = True) -> Optional[question_domain.Question]:
     """Returns a domain object representing a question.
 
     Args:
@@ -429,8 +430,7 @@ def get_question_by_id(
         Question or None. The domain object representing a question with the
         given id, or None if it does not exist.
     """
-    question_model = question_models.QuestionModel.get(
-        question_id, strict=strict)
+    question_model = question_models.QuestionModel.get(question_id, strict=strict)
     if question_model:
         question = question_fetchers.get_question_from_model(question_model)
         return question
@@ -455,10 +455,9 @@ def get_question_skill_links_of_skill(
     """
 
     question_skill_links = [
-        get_question_skill_link_from_model(
-            model, skill_description) for model in
-        question_models.QuestionSkillLinkModel.get_models_by_skill_id(
-            skill_id)]
+        get_question_skill_link_from_model(model, skill_description) for model in
+        question_models.QuestionSkillLinkModel.get_models_by_skill_id(skill_id)
+    ]
     return question_skill_links
 
 
@@ -488,10 +487,11 @@ def replace_skill_id_for_all_questions(
         new_skill_id: str. ID of the superseding skill.
     """
     old_question_skill_link_models = (
-        question_models.QuestionSkillLinkModel.get_models_by_skill_id(
-            curr_skill_id))
+        question_models.QuestionSkillLinkModel.get_models_by_skill_id(curr_skill_id)
+    )
     old_question_skill_links = get_question_skill_links_of_skill(
-        curr_skill_id, curr_skill_description)
+        curr_skill_id, curr_skill_description
+    )
     new_question_skill_link_models = []
     question_ids = set()
     for question_skill_link in old_question_skill_links:
@@ -499,12 +499,15 @@ def replace_skill_id_for_all_questions(
         new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
                 question_skill_link.question_id, new_skill_id,
-                question_skill_link.skill_difficulty)
+                question_skill_link.skill_difficulty
             )
+        )
     question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
-        list(old_question_skill_link_models))
+        list(old_question_skill_link_models)
+    )
     question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-        new_question_skill_link_models)
+        new_question_skill_link_models
+    )
 
     old_questions = question_models.QuestionModel.get_multi(list(question_ids))
     new_questions = []
@@ -520,10 +523,8 @@ def replace_skill_id_for_all_questions(
 
 def get_displayable_question_skill_link_details(
     question_count: int, skill_ids: List[str], offset: int
-) -> Tuple[
-    List[Optional[question_domain.QuestionSummary]],
-    List[question_domain.MergedQuestionSkillLink]
-]:
+) -> Tuple[List[Optional[question_domain.QuestionSummary]],
+           List[question_domain.MergedQuestionSkillLink]]:
     """Returns the list of question summaries and corresponding skill
     descriptions linked to all the skills given by skill_ids.
 
@@ -548,11 +549,13 @@ def get_displayable_question_skill_link_details(
     if len(skill_ids) > 3:
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
-            'time is not supported currently.')
+            'time is not supported currently.'
+        )
     question_skill_link_models = (
-        question_models.QuestionSkillLinkModel.
-        get_question_skill_links_by_skill_ids(
-            question_count, skill_ids, offset))
+        question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids(
+            question_count, skill_ids, offset
+        )
+    )
 
     # Deduplicate question_ids and group skill_descriptions that are linked to
     # the same question.
@@ -566,8 +569,7 @@ def get_displayable_question_skill_link_details(
             grouped_difficulties.append([question_skill_link.skill_difficulty])
         else:
             grouped_skill_ids[-1].append(question_skill_link.skill_id)
-            grouped_difficulties[-1].append(
-                question_skill_link.skill_difficulty)
+            grouped_difficulties[-1].append(question_skill_link.skill_difficulty)
 
     merged_question_skill_links = []
     for ind, skill_ids_list in enumerate(grouped_skill_ids):
@@ -576,7 +578,9 @@ def get_displayable_question_skill_link_details(
             question_domain.MergedQuestionSkillLink(
                 question_ids[ind], skill_ids_list,
                 [skill.description if skill else None for skill in skills],
-                grouped_difficulties[ind]))
+                grouped_difficulties[ind]
+            )
+        )
 
     question_summaries = get_question_summaries_by_ids(question_ids)
     return (question_summaries, merged_question_skill_links)
@@ -595,12 +599,14 @@ def get_question_summaries_by_ids(
         question summaries with the given ids or None when the id is not valid.
     """
     question_summary_model_list = (
-        question_models.QuestionSummaryModel.get_multi(question_ids))
+        question_models.QuestionSummaryModel.get_multi(question_ids)
+    )
     question_summaries: List[Optional[question_domain.QuestionSummary]] = []
     for question_summary_model in question_summary_model_list:
         if question_summary_model is not None:
             question_summaries.append(
-                get_question_summary_from_model(question_summary_model))
+                get_question_summary_from_model(question_summary_model)
+            )
         else:
             question_summaries.append(None)
     return question_summaries
@@ -625,7 +631,8 @@ def apply_change_list(
     """
     question = get_question_by_id(question_id)
     question_property_inapplicable_skill_misconception_ids = (
-        question_domain.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS)
+        question_domain.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
+    )
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
@@ -634,12 +641,9 @@ def apply_change_list(
                     # Here we use cast because this 'if' condition forces
                     # change to have type UpdateQuestionPropertyLanguageCodeCmd.
                     update_language_code_cmd = cast(
-                        question_domain.UpdateQuestionPropertyLanguageCodeCmd,
-                        change
+                        question_domain.UpdateQuestionPropertyLanguageCodeCmd, change
                     )
-                    question.update_language_code(
-                        update_language_code_cmd.new_value
-                    )
+                    question.update_language_code(update_language_code_cmd.new_value)
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
                     # Here we use cast because this 'elif'
@@ -659,8 +663,7 @@ def apply_change_list(
                     # condition forces change to have type
                     # UpdateQuestionPropertyLinkedSkillIdsCmd.
                     update_linked_skill_ids_cmd = cast(
-                        question_domain.UpdateQuestionPropertyLinkedSkillIdsCmd,
-                        change
+                        question_domain.UpdateQuestionPropertyLinkedSkillIdsCmd, change
                     )
                     question.update_linked_skill_ids(
                         update_linked_skill_ids_cmd.new_value
@@ -675,15 +678,15 @@ def apply_change_list(
                         change
                     )
                     question.update_inapplicable_skill_misconception_ids(
-                        update_skill_misconception_ids_cmd.new_value)
+                        update_skill_misconception_ids_cmd.new_value
+                    )
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX):
                     # Here we use cast because this 'if' condition forces
                     # change to have type
                     # UpdateQuestionPropertyNextContentIdIndexCmd.
                     cmd = cast(
-                        question_domain
-                        .UpdateQuestionPropertyNextContentIdIndexCmd,
+                        question_domain.UpdateQuestionPropertyNextContentIdIndexCmd,
                         change
                     )
                     question.update_next_content_id_index(cmd.new_value)
@@ -692,17 +695,14 @@ def apply_change_list(
 
     except Exception as e:
         logging.error(
-            '%s %s %s %s' % (
-                e.__class__.__name__, e, question_id, change_list)
+            '%s %s %s %s' % (e.__class__.__name__, e, question_id, change_list)
         )
         raise e
 
 
 def _save_question(
-    committer_id: str,
-    question: question_domain.Question,
-    change_list: List[question_domain.QuestionChange],
-    commit_message: str
+    committer_id: str, question: question_domain.Question,
+    change_list: List[question_domain.QuestionChange], commit_message: str
 ) -> None:
     """Validates a question and commits it to persistent storage. If
     successful, increments the version number of the incoming question domain
@@ -724,17 +724,20 @@ def _save_question(
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
-            'save question %s: %s' % (question.id, change_list))
+            'save question %s: %s' % (question.id, change_list)
+        )
 
     question.validate()
     question_model = question_models.QuestionModel.get(question.id)
     question_model.question_state_data = question.question_state_data.to_dict()
     question_model.language_code = question.language_code
     question_model.question_state_data_schema_version = (
-        question.question_state_data_schema_version)
+        question.question_state_data_schema_version
+    )
     question_model.linked_skill_ids = question.linked_skill_ids
     question_model.inapplicable_skill_misconception_ids = (
-        question.inapplicable_skill_misconception_ids)
+        question.inapplicable_skill_misconception_ids
+    )
     question_model.next_content_id_index = question.next_content_id_index
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
@@ -768,21 +771,21 @@ def update_question(
             differs.
     """
     if not commit_message:
-        raise ValueError(
-            'Expected a commit message, received none.')
+        raise ValueError('Expected a commit message, received none.')
     updated_question = apply_change_list(question_id, change_list)
     if (version is not None) and (version < updated_question.version):
         raise Exception(
             'Unexpected error: trying to update version %s of question '
-            'from version %s. Please reload the page and try again.'
-            % (version, updated_question.version))
+            'from version %s. Please reload the page and try again.' %
+            (version, updated_question.version)
+        )
     if (version is not None) and (version > updated_question.version):
         raise Exception(
             'Trying to update version %s of question from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (version, updated_question.version))
-    _save_question(
-        committer_id, updated_question, change_list, commit_message)
+            'which is too old. Please reload the page and try again.' %
+            (version, updated_question.version)
+        )
+    _save_question(committer_id, updated_question, change_list, commit_message)
     create_question_summary(question_id)
 
 
@@ -818,31 +821,24 @@ def compute_summary_of_question(
     answer_groups = question.question_state_data.interaction.answer_groups
     misconception_ids = []
     for answer_group in answer_groups:
-        misconception_id = answer_group.to_dict()[
-            'tagged_skill_misconception_id'
-        ]
+        misconception_id = answer_group.to_dict()['tagged_skill_misconception_id']
         if misconception_id is not None:
             misconception_ids.append(misconception_id)
     misconception_ids.extend(question.inapplicable_skill_misconception_ids)
     interaction_id = question.question_state_data.interaction.id
     if interaction_id is None:
-        raise Exception(
-            'No interaction_id found for the given question.'
-        )
+        raise Exception('No interaction_id found for the given question.')
 
     if question.created_on is None or question.last_updated is None:
-        raise Exception(
-            'No data available for when the question was last_updated on.'
-        )
+        raise Exception('No data available for when the question was last_updated on.')
     question_summary = question_domain.QuestionSummary(
         question.id, question_content, misconception_ids, interaction_id,
-        question.created_on, question.last_updated, question.version)
+        question.created_on, question.last_updated, question.version
+    )
     return question_summary
 
 
-def save_question_summary(
-    question_summary: question_domain.QuestionSummary
-) -> None:
+def save_question_summary(question_summary: question_domain.QuestionSummary) -> None:
     """Save a question summary domain object as a QuestionSummaryModel
     entity in the datastore.
 
@@ -879,10 +875,8 @@ def get_question_summary_from_model(
         summary model.
     """
     return question_domain.QuestionSummary(
-        question_summary_model.id,
-        question_summary_model.question_content,
-        question_summary_model.misconception_ids,
-        question_summary_model.interaction_id,
+        question_summary_model.id, question_summary_model.question_content,
+        question_summary_model.misconception_ids, question_summary_model.interaction_id,
         question_summary_model.question_model_created_on,
         question_summary_model.question_model_last_updated,
         question_summary_model.version
@@ -908,9 +902,7 @@ def get_interaction_id_for_question(question_id: str) -> Optional[str]:
 
 
 def untag_deleted_misconceptions(
-    committer_id: str,
-    skill_id: str,
-    skill_description: str,
+    committer_id: str, skill_id: str, skill_description: str,
     deleted_skill_misconception_ids: List[str]
 ) -> None:
     """Untags deleted misconceptions from questions belonging
@@ -925,7 +917,8 @@ def untag_deleted_misconceptions(
             <skill_id>-<misconception_id>.
     """
     question_skill_links = get_question_skill_links_of_skill(
-        skill_id, skill_description)
+        skill_id, skill_description
+    )
     question_ids = [model.question_id for model in question_skill_links]
     questions_with_none = question_fetchers.get_questions_by_ids(question_ids)
     for question in questions_with_none:
@@ -933,46 +926,58 @@ def untag_deleted_misconceptions(
         assert question is not None
         change_list = []
         inapplicable_skill_misconception_ids = (
-            question.inapplicable_skill_misconception_ids)
+            question.inapplicable_skill_misconception_ids
+        )
         deleted_inapplicable_skill_misconception_ids = (
             list(
-                set(deleted_skill_misconception_ids) &
-                set(inapplicable_skill_misconception_ids)))
+                set(deleted_skill_misconception_ids)
+                & set(inapplicable_skill_misconception_ids)
+            )
+        )
         if deleted_inapplicable_skill_misconception_ids:
             new_inapplicable_skill_misconception_ids = (
                 utils.compute_list_difference(
                     question.inapplicable_skill_misconception_ids,
-                    deleted_inapplicable_skill_misconception_ids))
-            change_list.append(question_domain.QuestionChange({
-                'cmd': 'update_question_property',
-                'property_name': 'inapplicable_skill_misconception_ids',
-                'new_value': new_inapplicable_skill_misconception_ids,
-                'old_value': question.inapplicable_skill_misconception_ids
-            }))
+                    deleted_inapplicable_skill_misconception_ids
+                )
+            )
+            change_list.append(
+                question_domain.QuestionChange(
+                    {
+                        'cmd': 'update_question_property',
+                        'property_name': 'inapplicable_skill_misconception_ids',
+                        'new_value': new_inapplicable_skill_misconception_ids,
+                        'old_value': question.inapplicable_skill_misconception_ids
+                    }
+                )
+            )
         old_question_state_data_dict = question.question_state_data.to_dict()
-        answer_groups = (
-            list(question.question_state_data.interaction.answer_groups))
+        answer_groups = (list(question.question_state_data.interaction.answer_groups))
         for answer_group in answer_groups:
             tagged_skill_misconception_id = (
-                answer_group.to_dict()['tagged_skill_misconception_id'])
-            if (tagged_skill_misconception_id
-                    in deleted_skill_misconception_ids):
+                answer_group.to_dict()['tagged_skill_misconception_id']
+            )
+            if (tagged_skill_misconception_id in deleted_skill_misconception_ids):
                 answer_group.tagged_skill_misconception_id = None
         question.question_state_data.interaction.answer_groups = answer_groups
-        change_list.append(question_domain.QuestionChange({
-            'cmd': 'update_question_property',
-            'property_name': 'question_state_data',
-            'new_value': question.question_state_data.to_dict(),
-            'old_value': old_question_state_data_dict
-        }))
+        change_list.append(
+            question_domain.QuestionChange(
+                {
+                    'cmd': 'update_question_property',
+                    'property_name': 'question_state_data',
+                    'new_value': question.question_state_data.to_dict(),
+                    'old_value': old_question_state_data_dict
+                }
+            )
+        )
         update_question(
             committer_id, question.id, change_list,
-            'Untagged deleted skill misconception ids.')
+            'Untagged deleted skill misconception ids.'
+        )
 
 
 def populate_question_model_fields(
-    question_model: question_models.QuestionModel,
-    question: question_domain.Question
+    question_model: question_models.QuestionModel, question: question_domain.Question
 ) -> question_models.QuestionModel:
     """Populate question model with the data from question object.
 
@@ -984,16 +989,16 @@ def populate_question_model_fields(
     Returns:
         QuestionModel. Populated model.
     """
-    question_model.question_state_data = (
-        question.question_state_data.to_dict()
-    )
+    question_model.question_state_data = (question.question_state_data.to_dict())
     question_model.question_state_data_schema_version = (
-        question.question_state_data_schema_version)
+        question.question_state_data_schema_version
+    )
     question_model.next_content_id_index = question.next_content_id_index
     question_model.language_code = question.language_code
     question_model.linked_skill_ids = question.linked_skill_ids
     question_model.inapplicable_skill_misconception_ids = (
-        question.inapplicable_skill_misconception_ids)
+        question.inapplicable_skill_misconception_ids
+    )
 
     return question_model
 
@@ -1014,10 +1019,8 @@ def populate_question_summary_model_fields(
         QuestionSummaryModel. Populated model.
     """
     question_summary_dict = {
-        'question_model_last_updated': (
-            question_summary.last_updated),
-        'question_model_created_on': (
-            question_summary.created_on),
+        'question_model_last_updated': (question_summary.last_updated),
+        'question_model_created_on': (question_summary.created_on),
         'question_content': question_summary.question_content,
         'interaction_id': question_summary.interaction_id,
         'version': question_summary.version,
@@ -1029,6 +1032,7 @@ def populate_question_summary_model_fields(
     else:
         question_summary_dict['id'] = question_summary.id
         question_summary_model = question_models.QuestionSummaryModel(
-            **question_summary_dict)
+            **question_summary_dict
+        )
 
     return question_summary_model

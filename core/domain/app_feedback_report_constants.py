@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Constants used for app feedback reporting."""
 
 from __future__ import annotations
@@ -23,12 +22,12 @@ import enum
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
-(app_feedback_report_models,) = models.Registry.import_models(
-    [models.Names.APP_FEEDBACK_REPORT])
-
+(app_feedback_report_models, ) = models.Registry.import_models(
+    [models.Names.APP_FEEDBACK_REPORT]
+)
 
 PLATFORM_CHOICE_ANDROID = app_feedback_report_models.PLATFORM_CHOICE_ANDROID
 PLATFORM_CHOICE_WEB = app_feedback_report_models.PLATFORM_CHOICE_WEB
@@ -39,7 +38,8 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 # reports.
 ALL_ANDROID_REPORTS_STATS_TICKET_ID = 'all_android_reports_stats_ticket_id'
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
-    app_feedback_report_models.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID)
+    app_feedback_report_models.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+)
 
 MAXIMUM_TICKET_NAME_LENGTH = 100
 MINIMUM_ANDROID_SDK_VERSION = 2
@@ -124,48 +124,47 @@ class AndroidNetworkType(enum.Enum):
 FilterFieldNames = app_feedback_report_models.FilterFieldNames
 
 ANDROID_ENTRY_POINT = [
-    EntryPoint.NAVIGATION_DRAWER, EntryPoint.LESSON_PLAYER,
-    EntryPoint.REVISION_CARD, EntryPoint.CRASH]
-ALLOWED_REPORT_TYPES = [
-    ReportType.SUGGESTION, ReportType.ISSUE, ReportType.CRASH]
+    EntryPoint.NAVIGATION_DRAWER, EntryPoint.LESSON_PLAYER, EntryPoint.REVISION_CARD,
+    EntryPoint.CRASH
+]
+ALLOWED_REPORT_TYPES = [ReportType.SUGGESTION, ReportType.ISSUE, ReportType.CRASH]
 ALLOWED_CATEGORIES = [
     Category.FEATURE_SUGGESTION, Category.LANGUAGE_SUGGESTION,
     Category.OTHER_SUGGESTION, Category.LANGUAGE_GENERAL_ISSUE,
-    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE,
-    Category.TOPICS_ISSUE, Category.PROFILE_ISSUE, Category.OTHER_ISSUE,
-    Category.LESSON_PLAYER_CRASH, Category.PRACTICE_QUESTIONS_CRASH,
-    Category.OPTIONS_PAGE_CRASH, Category.PROFILE_PAGE_CRASH,
-    Category.OTHER_CRASH]
+    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE, Category.TOPICS_ISSUE,
+    Category.PROFILE_ISSUE, Category.OTHER_ISSUE, Category.LESSON_PLAYER_CRASH,
+    Category.PRACTICE_QUESTIONS_CRASH, Category.OPTIONS_PAGE_CRASH,
+    Category.PROFILE_PAGE_CRASH, Category.OTHER_CRASH
+]
 ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
     Category.FEATURE_SUGGESTION, Category.LANGUAGE_SUGGESTION,
-    Category.OTHER_SUGGESTION, Category.OTHER_ISSUE,
-    Category.LESSON_PLAYER_CRASH, Category.PRACTICE_QUESTIONS_CRASH,
-    Category.OPTIONS_PAGE_CRASH, Category.PROFILE_PAGE_CRASH,
-    Category.OTHER_CRASH]
+    Category.OTHER_SUGGESTION, Category.OTHER_ISSUE, Category.LESSON_PLAYER_CRASH,
+    Category.PRACTICE_QUESTIONS_CRASH, Category.OPTIONS_PAGE_CRASH,
+    Category.PROFILE_PAGE_CRASH, Category.OTHER_CRASH
+]
 ALLOWED_SELECTION_ITEMS_CATEGORIES = [
-    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE,
-    Category.TOPICS_ISSUE, Category.PROFILE_ISSUE]
+    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE, Category.TOPICS_ISSUE,
+    Category.PROFILE_ISSUE
+]
 ALLOWED_STATS_PARAMETERS = [
-    StatsParameterNames.PLATFORM,
-    StatsParameterNames.REPORT_TYPE,
-    StatsParameterNames.COUNTRY_LOCALE_CODE,
-    StatsParameterNames.ENTRY_POINT_NAME,
-    StatsParameterNames.TEXT_LANGUAGE_CODE,
-    StatsParameterNames.AUDIO_LANGUAGE_CODE,
-    StatsParameterNames.ANDROID_SDK_VERSION,
-    StatsParameterNames.VERSION_NAME]
+    StatsParameterNames.PLATFORM, StatsParameterNames.REPORT_TYPE,
+    StatsParameterNames.COUNTRY_LOCALE_CODE, StatsParameterNames.ENTRY_POINT_NAME,
+    StatsParameterNames.TEXT_LANGUAGE_CODE, StatsParameterNames.AUDIO_LANGUAGE_CODE,
+    StatsParameterNames.ANDROID_SDK_VERSION, StatsParameterNames.VERSION_NAME
+]
 ALLOWED_FILTERS = [
     FilterFieldNames.REPORT_TYPE, FilterFieldNames.PLATFORM,
     FilterFieldNames.ENTRY_POINT, FilterFieldNames.SUBMITTED_ON,
-    FilterFieldNames.ANDROID_DEVICE_MODEL,
-    FilterFieldNames.ANDROID_SDK_VERSION,
-    FilterFieldNames.TEXT_LANGUAGE_CODE,
-    FilterFieldNames.AUDIO_LANGUAGE_CODE, FilterFieldNames.PLATFORM_VERSION,
-    FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE]
+    FilterFieldNames.ANDROID_DEVICE_MODEL, FilterFieldNames.ANDROID_SDK_VERSION,
+    FilterFieldNames.TEXT_LANGUAGE_CODE, FilterFieldNames.AUDIO_LANGUAGE_CODE,
+    FilterFieldNames.PLATFORM_VERSION,
+    FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE
+]
 ALLOWED_ANDROID_NETWORK_TYPES = [
-    AndroidNetworkType.WIFI, AndroidNetworkType.CELLULAR,
-    AndroidNetworkType.NONE]
+    AndroidNetworkType.WIFI, AndroidNetworkType.CELLULAR, AndroidNetworkType.NONE
+]
 ALLOWED_ANDROID_TEXT_SIZES = [
     AndroidTextSize.TEXT_SIZE_UNSPECIFIED, AndroidTextSize.SMALL_TEXT_SIZE,
     AndroidTextSize.MEDIUM_TEXT_SIZE, AndroidTextSize.LARGE_TEXT_SIZE,
-    AndroidTextSize.EXTRA_LARGE_TEXT_SIZE]
+    AndroidTextSize.EXTRA_LARGE_TEXT_SIZE
+]

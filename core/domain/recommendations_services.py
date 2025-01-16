@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """System for computing recommendations for explorations and users."""
 
 from __future__ import annotations
@@ -31,12 +30,12 @@ from core.platform import models
 from typing import Dict, Final, List, Sequence, cast
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import recommendations_models
 
-(recommendations_models,) = models.Registry.import_models([
-    models.Names.RECOMMENDATIONS
-])
+(recommendations_models, ) = models.Registry.import_models(
+    [models.Names.RECOMMENDATIONS]
+)
 
 
 # pylint: disable=line-too-long, single-line-pragma
@@ -70,39 +69,16 @@ DEFAULT_TOPIC_SIMILARITIES_STRING: Final = (
 0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.2,0.1,0.1,0.1,0.5,0.3,0.4,0.6,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.3,0.1,0.4,1.0,0.2,0.1,0.3
 0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.2,0.1,0.1,0.1,0.2,0.6,0.1,0.1,0.3,0.1,0.1,0.1,0.1,0.3,0.1,0.2,0.1,0.1,0.2,1.0,0.3,0.3
 0.1,0.1,0.6,0.5,0.3,0.6,0.7,0.2,0.5,0.3,0.2,0.4,0.2,0.1,0.2,0.4,0.8,0.1,0.1,0.3,0.4,0.6,0.4,0.5,0.1,0.1,0.3,1.0,0.3
-0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0""")
+0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0"""
+)
 # pylint: enable=line-too-long, single-line-pragma
 
 RECOMMENDATION_CATEGORIES: Final = [
-    'Architecture',
-    'Art',
-    'Biology',
-    'Business',
-    'Chemistry',
-    'Computing',
-    'Economics',
-    'Education',
-    'Engineering',
-    'Environment',
-    'Geography',
-    'Government',
-    'Hobbies',
-    'Languages',
-    'Law',
-    'Life Skills',
-    'Mathematics',
-    'Medicine',
-    'Music',
-    'Philosophy',
-    'Physics',
-    'Programming',
-    'Psychology',
-    'Puzzles',
-    'Reading',
-    'Religion',
-    'Sport',
-    'Statistics',
-    'Welcome'
+    'Architecture', 'Art', 'Biology', 'Business', 'Chemistry', 'Computing', 'Economics',
+    'Education', 'Engineering', 'Environment', 'Geography', 'Government', 'Hobbies',
+    'Languages', 'Law', 'Life Skills', 'Mathematics', 'Medicine', 'Music', 'Philosophy',
+    'Physics', 'Programming', 'Psychology', 'Puzzles', 'Reading', 'Religion', 'Sport',
+    'Statistics', 'Welcome'
 ]
 
 
@@ -113,7 +89,9 @@ def get_topic_similarities_dict() -> Dict[str, Dict[str, float]]:
 
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
-            recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
+            recommendations_models.TOPIC_SIMILARITIES_ID, strict=False
+        )
+    )
     if topic_similarities_entity is None:
         topic_similarities_entity = create_default_topic_similarities()
 
@@ -122,8 +100,7 @@ def get_topic_similarities_dict() -> Dict[str, Dict[str, float]]:
     # returns the values of type Dict[str, Dict[str, float]. So to narrow down
     # the type from Dict[str, Any], we used cast here.
     return cast(
-        Dict[str, Dict[str, float]],
-        json.loads(topic_similarities_entity.content)
+        Dict[str, Dict[str, float]], json.loads(topic_similarities_entity.content)
     )
 
 
@@ -136,11 +113,12 @@ def save_topic_similarities(
 
     retrieved_topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
-            recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
+            recommendations_models.TOPIC_SIMILARITIES_ID, strict=False
+        )
+    )
     topic_similarities_entity = (
-        retrieved_topic_similarities_entity
-        if retrieved_topic_similarities_entity is not None
-        else recommendations_models.TopicSimilaritiesModel(
+        retrieved_topic_similarities_entity if retrieved_topic_similarities_entity
+        is not None else recommendations_models.TopicSimilaritiesModel(
             id=recommendations_models.TOPIC_SIMILARITIES_ID
         )
     )
@@ -162,7 +140,8 @@ def create_default_topic_similarities(
     """
 
     topic_similarities_dict: Dict[str, Dict[str, float]] = {
-        topic: {} for topic in RECOMMENDATION_CATEGORIES
+        topic: {}
+        for topic in RECOMMENDATION_CATEGORIES
     }
     raw_data = DEFAULT_TOPIC_SIMILARITIES_STRING.splitlines()
     data = list(csv.reader(raw_data))
@@ -171,7 +150,8 @@ def create_default_topic_similarities(
     for row_ind, topic_1 in enumerate(topics_list):
         for col_ind, topic_2 in enumerate(topics_list):
             topic_similarities_dict[topic_1][topic_2] = float(
-                topic_similarities_values[row_ind][col_ind])
+                topic_similarities_values[row_ind][col_ind]
+            )
 
     return save_topic_similarities(topic_similarities_dict)
 
@@ -184,10 +164,7 @@ def get_topic_similarity(topic_1: str, topic_2: str) -> float:
     the topics are the same.
     """
 
-    if (
-            topic_1 in RECOMMENDATION_CATEGORIES and
-            topic_2 in RECOMMENDATION_CATEGORIES
-    ):
+    if (topic_1 in RECOMMENDATION_CATEGORIES and topic_2 in RECOMMENDATION_CATEGORIES):
         topic_similarities = get_topic_similarities_dict()
         return topic_similarities[topic_1][topic_2]
     else:
@@ -210,8 +187,9 @@ def get_topic_similarities_as_csv() -> str:
 
     topic_similarities = get_topic_similarities_dict()
     for topic in RECOMMENDATION_CATEGORIES:
-        topic_similarities_row = [value for _, value in sorted(
-            topic_similarities[topic].items())]
+        topic_similarities_row = [
+            value for _, value in sorted(topic_similarities[topic].items())
+        ]
         writer.writerow(topic_similarities_row)
 
     return output.getvalue()
@@ -237,8 +215,9 @@ def validate_topic_similarities(csv_data: str) -> None:
     if len(topic_similarities_values) != topics_length:
         raise Exception(
             'Length of topic similarities columns: %s '
-            'does not match length of topic list: %s.' % (
-                len(topic_similarities_values), topics_length))
+            'does not match length of topic list: %s.' %
+            (len(topic_similarities_values), topics_length)
+        )
 
     for topic in topics_list:
         if topic not in RECOMMENDATION_CATEGORIES:
@@ -248,8 +227,9 @@ def validate_topic_similarities(csv_data: str) -> None:
         if len(topic_similarities_values[index]) != topics_length:
             raise Exception(
                 'Length of topic similarities rows: %s '
-                'does not match length of topic list: %s.' % (
-                    len(topic_similarities_values[index]), topics_length))
+                'does not match length of topic list: %s.' %
+                (len(topic_similarities_values[index]), topics_length)
+            )
 
     for row_ind in range(topics_length):
         for col_ind in range(topics_length):
@@ -258,19 +238,21 @@ def validate_topic_similarities(csv_data: str) -> None:
                 float(similarity_value)
             except ValueError as e:
                 raise ValueError(
-                    'Expected similarity to be a float, received %s' % (
-                        similarity_value)) from e
+                    'Expected similarity to be a float, received %s' %
+                    (similarity_value)
+                ) from e
 
             similarity = float(similarity_value)
             if similarity < 0.0 or similarity > 1.0:
                 raise ValueError(
                     'Expected similarity to be between 0.0 and '
-                    '1.0, received %s' % similarity)
+                    '1.0, received %s' % similarity
+                )
 
     for row_ind in range(topics_length):
         for col_ind in range(topics_length):
-            if (topic_similarities_values[row_ind][col_ind] !=
-                    topic_similarities_values[col_ind][row_ind]):
+            if (topic_similarities_values[row_ind][col_ind]
+                    != topic_similarities_values[col_ind][row_ind]):
                 raise Exception('Expected topic similarities to be symmetric.')
 
 
@@ -298,7 +280,8 @@ def update_topic_similarities(csv_data: str) -> None:
     for row_ind, topic_1 in enumerate(topics_list):
         for col_ind, topic_2 in enumerate(topics_list):
             topic_similarities_dict[topic_1][topic_2] = float(
-                topic_similarities_values[row_ind][col_ind])
+                topic_similarities_values[row_ind][col_ind]
+            )
 
     save_topic_similarities(topic_similarities_dict)
 
@@ -340,15 +323,13 @@ def get_item_similarity(
     similarity_score += 5.0 * topic_similarity_score
     if reference_exp_summary.owner_ids == compared_exp_summary.owner_ids:
         similarity_score += 1.0
-    if (
-            reference_exp_summary.language_code ==
-            compared_exp_summary.language_code
-    ):
+    if (reference_exp_summary.language_code == compared_exp_summary.language_code):
         similarity_score += 2.0
 
     time_now = datetime.datetime.utcnow()
     time_delta_days = int(
-        (time_now - compared_exp_summary.exploration_model_last_updated).days)
+        (time_now - compared_exp_summary.exploration_model_last_updated).days
+    )
     if time_delta_days <= 7:
         similarity_score += 1.0
 
@@ -369,7 +350,8 @@ def set_exploration_recommendations(
     """
 
     recommendations_models.ExplorationRecommendationsModel(
-        id=exp_id, recommended_exploration_ids=new_recommendations).put()
+        id=exp_id, recommended_exploration_ids=new_recommendations
+    ).put()
 
 
 def get_exploration_recommendations(exp_id: str) -> List[str]:
@@ -386,7 +368,9 @@ def get_exploration_recommendations(exp_id: str) -> List[str]:
 
     recommendations_model = (
         recommendations_models.ExplorationRecommendationsModel.get(
-            exp_id, strict=False))
+            exp_id, strict=False
+        )
+    )
     if recommendations_model is None:
         return []
     else:
@@ -409,11 +393,11 @@ def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
         exp_ids: list(str). List of exploration IDs for which to delete
             the recommendations.
     """
-    recs_model_class = (
-        recommendations_models.ExplorationRecommendationsModel)
+    recs_model_class = (recommendations_models.ExplorationRecommendationsModel)
     recommendation_models = recs_model_class.get_multi(exp_ids)
     existing_recommendation_models = [
-        model for model in recommendation_models if model is not None]
+        model for model in recommendation_models if model is not None
+    ]
     recs_model_class.delete_multi(existing_recommendation_models)
 
     # We use dictionary here since we do not want to have duplicate models. This
@@ -428,8 +412,7 @@ def delete_explorations_from_recommendations(exp_ids: List[str]) -> None:
             recs_model_class.recommended_exploration_ids == exp_id
         ).fetch()
         for recommending_model in recommending_models:
-            all_recommending_models[recommending_model.id] = (
-                recommending_model)
+            all_recommending_models[recommending_model.id] = (recommending_model)
 
     for recommending_model in all_recommending_models.values():
         for exp_id in exp_ids:

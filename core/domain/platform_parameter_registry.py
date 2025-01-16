@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Registry for platform parameters."""
 
 from __future__ import annotations
@@ -27,12 +26,13 @@ from core.platform import models
 from typing import Dict, List, Optional, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import config_models
     from mypy_imports import suggestion_models
 
 (config_models, suggestion_models) = models.Registry.import_models(
-    [models.Names.CONFIG, models.Names.SUGGESTION])
+    [models.Names.CONFIG, models.Names.SUGGESTION]
+)
 
 ParamName = platform_parameter_list.ParamName
 
@@ -40,21 +40,17 @@ ParamName = platform_parameter_list.ParamName
 class Registry:
     """Registry of all platform parameters."""
 
-    DEFAULT_VALUE_BY_TYPE_DICT: Dict[
-        platform_parameter_domain.DataTypes,
-        Union[bool, str, int, float]
-    ] = {
-        platform_parameter_domain.DataTypes.BOOL: False,
-        platform_parameter_domain.DataTypes.NUMBER: 0,
-        platform_parameter_domain.DataTypes.STRING: '',
-    }
+    DEFAULT_VALUE_BY_TYPE_DICT: Dict[platform_parameter_domain.DataTypes, Union[
+        bool, str, int, float]] = {
+            platform_parameter_domain.DataTypes.BOOL: False,
+            platform_parameter_domain.DataTypes.NUMBER: 0,
+            platform_parameter_domain.DataTypes.STRING: '',
+        }
 
     # The keys of parameter_registry are the property names, and the values
     # are PlatformParameter instances with initial settings defined in this
     # file.
-    parameter_registry: Dict[
-        str, platform_parameter_domain.PlatformParameter
-    ] = {}
+    parameter_registry: Dict[str, platform_parameter_domain.PlatformParameter] = {}
 
     @classmethod
     def create_platform_parameter(
@@ -89,8 +85,9 @@ class Registry:
                 for data_type_enum in cls.DEFAULT_VALUE_BY_TYPE_DICT
             ]
             raise Exception(
-                'Unsupported data type \'%s\', must be one of'' %s.' % (
-                    data_type.value, allowed_data_types))
+                'Unsupported data type \'%s\', must be one of'
+                ' %s.' % (data_type.value, allowed_data_types)
+            )
 
         param_dict: platform_parameter_domain.PlatformParameterDict = {
             'name': name.value,
@@ -98,16 +95,15 @@ class Registry:
             'data_type': data_type.value,
             'rules': [],
             'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
             'default_value': default
         }
         return cls.init_platform_parameter_from_dict(param_dict)
 
     @classmethod
     def init_platform_parameter(
-        cls,
-        name: str,
-        instance: platform_parameter_domain.PlatformParameter
+        cls, name: str, instance: platform_parameter_domain.PlatformParameter
     ) -> None:
         """Initializes parameter_registry with keys as the parameter names and
         values as instances of the specified parameter.
@@ -140,8 +136,7 @@ class Registry:
         Raises:
             Exception. The given name of the platform parameter doesn't exist.
         """
-        parameter_from_cache = cls.load_platform_parameter_from_memcache(
-            name)
+        parameter_from_cache = cls.load_platform_parameter_from_memcache(name)
         if parameter_from_cache is not None:
             return parameter_from_cache
 
@@ -154,18 +149,15 @@ class Registry:
             raise Exception('Platform parameter not found: %s.' % name)
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
-            {
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, {
                 name: parameter,
-            })
+            }
+        )
         return parameter
 
     @classmethod
     def update_platform_parameter(
-        cls,
-        name: str,
-        committer_id: str,
-        commit_message: str,
+        cls, name: str, committer_id: str, commit_message: str,
         new_rules: List[platform_parameter_domain.PlatformParameterRule],
         default_value: platform_parameter_domain.PlatformDataTypes
     ) -> None:
@@ -200,19 +192,20 @@ class Registry:
         model_instance.rules = [rule.to_dict() for rule in param.rules]
         model_instance.default_value = default_value
         model_instance.commit(
-            committer_id,
-            commit_message,
-            [{
-                'cmd': (
-                    platform_parameter_domain
-                    .PlatformParameterChange.CMD_EDIT_RULES),
-                'new_rules': new_rule_dicts,
-                'default_value': default_value
-            }]
+            committer_id, commit_message, [
+                {
+                    'cmd': (
+                        platform_parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
+                    ),
+                    'new_rules': new_rule_dicts,
+                    'default_value': default_value
+                }
+            ]
         )
 
         caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name])
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None, [name]
+        )
 
     @classmethod
     def get_all_platform_parameter_names(cls) -> List[str]:
@@ -225,8 +218,7 @@ class Registry:
 
     @classmethod
     def evaluate_all_platform_parameters(
-        cls,
-        context: platform_parameter_domain.EvaluationContext
+        cls, context: platform_parameter_domain.EvaluationContext
     ) -> Dict[str, Union[str, bool, int, float]]:
         """Evaluate all platform parameters with the given context.
 
@@ -245,8 +237,7 @@ class Registry:
 
     @classmethod
     def init_platform_parameter_from_dict(
-        cls,
-        parameter_dict: platform_parameter_domain.PlatformParameterDict
+        cls, parameter_dict: platform_parameter_domain.PlatformParameterDict
     ) -> platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter using the given
         dict representation of a platform parameter.
@@ -259,7 +250,8 @@ class Registry:
             PlatformParameter. The created platform parameter.
         """
         parameter = platform_parameter_domain.PlatformParameter.from_dict(
-            parameter_dict)
+            parameter_dict
+        )
 
         cls.init_platform_parameter(parameter.name, parameter)
 
@@ -278,8 +270,7 @@ class Registry:
             PlatformParameter|None. The loaded instance, None if it's not found
             in storage.
         """
-        parameter_model = config_models.PlatformParameterModel.get(
-            name, strict=False)
+        parameter_model = config_models.PlatformParameterModel.get(name, strict=False)
 
         if parameter_model:
             param_with_init_settings = cls.parameter_registry[name]
@@ -287,14 +278,16 @@ class Registry:
                 default_value = param_with_init_settings.default_value
             else:
                 default_value = parameter_model.default_value
-            return platform_parameter_domain.PlatformParameter.from_dict({
-                'name': param_with_init_settings.name,
-                'description': param_with_init_settings.description,
-                'data_type': param_with_init_settings.data_type,
-                'rules': parameter_model.rules,
-                'rule_schema_version': parameter_model.rule_schema_version,
-                'default_value': default_value
-            })
+            return platform_parameter_domain.PlatformParameter.from_dict(
+                {
+                    'name': param_with_init_settings.name,
+                    'description': param_with_init_settings.description,
+                    'data_type': param_with_init_settings.data_type,
+                    'rules': parameter_model.rules,
+                    'rule_schema_version': parameter_model.rule_schema_version,
+                    'default_value': default_value
+                }
+            )
         else:
             return None
 
@@ -318,8 +311,7 @@ class Registry:
 
     @classmethod
     def _to_platform_parameter_model(
-        cls,
-        param: platform_parameter_domain.PlatformParameter
+        cls, param: platform_parameter_domain.PlatformParameter
     ) -> config_models.PlatformParameterModel:
         """Returns the platform parameter model corresponding to the given
         domain object.
@@ -331,11 +323,11 @@ class Registry:
             PlatformParameterModel. The corresponding storage model.
         """
         model_instance = config_models.PlatformParameterModel.get(
-            param.name, strict=False)
+            param.name, strict=False
+        )
         if model_instance is None:
             model_instance = config_models.PlatformParameterModel.create(
-                param.name,
-                [rule.to_dict() for rule in param.rules],
+                param.name, [rule.to_dict() for rule in param.rules],
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
                 default_value=param.default_value
             )
@@ -344,8 +336,7 @@ class Registry:
 
 # Platform parameters should all be defined below.
 Registry.create_platform_parameter(
-    ParamName.DUMMY_PARAMETER,
-    'This is a dummy platform parameter.',
+    ParamName.DUMMY_PARAMETER, 'This is a dummy platform parameter.',
     platform_parameter_domain.DataTypes.STRING
 )
 
@@ -358,7 +349,8 @@ Registry.create_platform_parameter(
     platform_parameter_domain.DataTypes.STRING,
     default=(
         'I\'m writing to inform you that I have unpublished the above '
-        'exploration.')
+        'exploration.'
+    )
 )
 
 Registry.create_platform_parameter(
@@ -369,15 +361,13 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamName.EMAIL_FOOTER,
-    'The footer to append to all outgoing emails. (This should '
+    ParamName.EMAIL_FOOTER, 'The footer to append to all outgoing emails. (This should '
     'be written in HTML and include an unsubscribe link.)',
     platform_parameter_domain.DataTypes.STRING,
     default=(
         'You can change your email preferences via the '
-        '<a href="%s%s">Preferences</a> page.' % (
-            feconf.OPPIA_SITE_URL,
-            feconf.PREFERENCES_URL)
+        '<a href="%s%s">Preferences</a> page.' %
+        (feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL)
     )
 )
 
@@ -456,29 +446,24 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
-    (
+    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, (
         'Enable sending admins email notifications if there are Contributor '
         'Dashboard suggestions that have been waiting for a review for more '
-        'than %s days. The default value is false.' % (
-            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
-    ),
-    platform_parameter_domain.DataTypes.BOOL
+        'than %s days. The default value is false.' %
+        (suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
+    ), platform_parameter_domain.DataTypes.BOOL
 )
 
 Registry.create_platform_parameter(
-    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
-    (
+    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, (
         'Enable sending admins email notifications if Contributor Dashboard '
         'reviewers are needed in specific suggestion types. The default value '
         'is false.'
-    ),
-    platform_parameter_domain.DataTypes.BOOL
+    ), platform_parameter_domain.DataTypes.BOOL
 )
 
 Registry.create_platform_parameter(
-    ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
-    (
+    ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, (
         'The maximum number of Contributor Dashboard suggestions per reviewer.'
         'If the number of suggestions per reviewer surpasses this maximum, '
         'for any given suggestion type on the dashboard, the admins are '
@@ -500,8 +485,7 @@ Registry.create_platform_parameter(
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
 # address cannot be sent. If True then emails can be sent to any user.
 Registry.create_platform_parameter(
-    ParamName.SERVER_CAN_SEND_EMAILS,
-    (
+    ParamName.SERVER_CAN_SEND_EMAILS, (
         'Whether the application can send emails.'
         'Change this value to True for production environments using the '
         'platform parameter dashboard.'

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain object for a parameters of a query."""
 
 from __future__ import annotations
@@ -29,7 +28,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+(user_models, ) = models.Registry.import_models([models.Names.USER])
 
 
 def _get_user_query_from_model(
@@ -44,8 +43,7 @@ def _get_user_query_from_model(
         UserQuery. User query domain object.
     """
     attributes = {
-        predicate['backend_attr']: getattr(
-            user_query_model, predicate['backend_attr'])
+        predicate['backend_attr']: getattr(user_query_model, predicate['backend_attr'])
         for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     }
     user_query_params = user_query_domain.UserQueryParams(**attributes)
@@ -65,18 +63,21 @@ def _get_user_query_from_model(
 @overload
 def get_user_query(
     query_id: str, *, strict: Literal[True] = ...
-) -> user_query_domain.UserQuery: ...
+) -> user_query_domain.UserQuery:
+    ...
 
 
 @overload
 def get_user_query(
-    query_id: str, *, strict: Literal[False] = ...
-) -> Optional[user_query_domain.UserQuery]: ...
-
-
-def get_user_query(
-    query_id: str, strict: bool = False
+    query_id: str,
+    *,
+    strict: Literal[False] = ...
 ) -> Optional[user_query_domain.UserQuery]:
+    ...
+
+
+def get_user_query(query_id: str,
+                   strict: bool = False) -> Optional[user_query_domain.UserQuery]:
     """Gets the user query with some ID.
 
     Args:
@@ -88,10 +89,7 @@ def get_user_query(
         there is no user query model.
     """
     user_query_model = user_models.UserQueryModel.get(query_id, strict=strict)
-    return (
-        _get_user_query_from_model(user_query_model)
-        if user_query_model else None
-    )
+    return (_get_user_query_from_model(user_query_model) if user_query_model else None)
 
 
 def get_recent_user_queries(
@@ -110,11 +108,11 @@ def get_recent_user_queries(
         queries.
     """
     user_query_models, next_cursor, _ = user_models.UserQueryModel.fetch_page(
-        num_queries_to_fetch, cursor)
+        num_queries_to_fetch, cursor
+    )
 
     return (
-        [_get_user_query_from_model(model) for model in user_query_models],
-        next_cursor
+        [_get_user_query_from_model(model) for model in user_query_models], next_cursor
     )
 
 
@@ -138,8 +136,7 @@ def _save_user_query(user_query: user_query_domain.UserQuery) -> str:
     }
     user_query_dict.update(dict(user_query.params._asdict()))
 
-    user_query_model = (
-        user_models.UserQueryModel.get(user_query.id, strict=False))
+    user_query_model = (user_models.UserQueryModel.get(user_query.id, strict=False))
     if user_query_model is not None:
         user_query_model.populate(**user_query_dict)
     else:
@@ -152,9 +149,7 @@ def _save_user_query(user_query: user_query_domain.UserQuery) -> str:
     return user_query_model.id
 
 
-def save_new_user_query(
-    submitter_id: str, query_params: Dict[str, int]
-) -> str:
+def save_new_user_query(submitter_id: str, query_params: Dict[str, int]) -> str:
     """Saves a new user query.
 
     Args:
@@ -168,7 +163,9 @@ def save_new_user_query(
     user_query_params = user_query_domain.UserQueryParams(**query_params)
     user_query = (
         user_query_domain.UserQuery.create_default(
-            query_id, user_query_params, submitter_id))
+            query_id, user_query_params, submitter_id
+        )
+    )
     return _save_user_query(user_query)
 
 
@@ -184,10 +181,7 @@ def archive_user_query(user_query_id: str) -> None:
 
 
 def send_email_to_qualified_users(
-    query_id: str,
-    email_subject: str,
-    email_body: str,
-    email_intent: str,
+    query_id: str, email_subject: str, email_body: str, email_intent: str,
     max_recipients: Optional[int]
 ) -> None:
     """Send email to maximum 'max_recipients' qualified users.
@@ -206,8 +200,7 @@ def send_email_to_qualified_users(
         recipient_ids = recipient_ids[:max_recipients]
 
     bulk_email_model_id = email_manager.send_user_query_email(
-        user_query.submitter_id, recipient_ids, email_subject,
-        email_body, email_intent
+        user_query.submitter_id, recipient_ids, email_subject, email_body, email_intent
     )
 
     user_query.archive(sent_email_model_id=bulk_email_model_id)
@@ -216,13 +209,14 @@ def send_email_to_qualified_users(
     # Store BulkEmailModel in UserBulkEmailsModel of each recipient.
     for recipient_id in recipient_ids:
         recipient_bulk_email_model = (
-            user_models.UserBulkEmailsModel.get(recipient_id, strict=False))
+            user_models.UserBulkEmailsModel.get(recipient_id, strict=False)
+        )
 
         if recipient_bulk_email_model is None:
             recipient_bulk_email_model = user_models.UserBulkEmailsModel(
-                id=recipient_id, sent_email_model_ids=[])
+                id=recipient_id, sent_email_model_ids=[]
+            )
 
-        recipient_bulk_email_model.sent_email_model_ids.append(
-            bulk_email_model_id)
+        recipient_bulk_email_model.sent_email_model_ids.append(bulk_email_model_id)
         recipient_bulk_email_model.update_timestamps()
         recipient_bulk_email_model.put()

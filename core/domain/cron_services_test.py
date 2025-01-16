@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for the cron_services."""
 
 from __future__ import annotations
@@ -27,7 +26,7 @@ MYPY = False
 if MYPY:
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+(user_models, ) = models.Registry.import_models([models.Names.USER])
 
 
 class CronServicesTests(test_utils.GenericTestBase):
@@ -54,17 +53,16 @@ class CronServicesTests(test_utils.GenericTestBase):
             last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
             deleted=True
         )
-        completed_activities_model.update_timestamps(
-            update_last_updated_time=False)
+        completed_activities_model.update_timestamps(update_last_updated_time=False)
         completed_activities_model.put()
 
         self.assertIsNotNone(
-            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id)
+        )
 
         cron_services.delete_models_marked_as_deleted()
 
-        self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
+        self.assertIsNone(user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
 
     def test_mark_outdated_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)

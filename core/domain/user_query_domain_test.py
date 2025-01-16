@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the domain objects relating to the user queries."""
 
 from __future__ import annotations
@@ -37,11 +36,10 @@ class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
         is similar to the one we get during runtime from assets/constants.ts.
         """
 
-        attribute_names_predefined = list(
-            user_query_domain.UserQueryParams._fields)
+        attribute_names_predefined = list(user_query_domain.UserQueryParams._fields)
         attribute_names = [
-            predicate['backend_attr'] for predicate
-            in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+            predicate['backend_attr']
+            for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
         ]
 
         attribute_names_predefined.sort()
@@ -71,45 +69,35 @@ class UserQueryTests(test_utils.GenericTestBase):
         )
         self.user_query.validate()
 
-    def test_validate_query_with_invalid_user_id_submitter_id_raises(
-        self
-    ) -> None:
+    def test_validate_query_with_invalid_user_id_submitter_id_raises(self) -> None:
         self.user_query.submitter_id = 'aaabbc'
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected submitter ID to be a valid user ID'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError,
+                                    'Expected submitter ID to be a valid user ID'):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_status_raises(self) -> None:
         self.user_query.status = 'a'
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid status: a'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid status: a'):
             self.user_query.validate()
 
-    def test_validate_query_with_non_user_id_values_in_user_ids_raises(
-        self
-    ) -> None:
+    def test_validate_query_with_non_user_id_values_in_user_ids_raises(self) -> None:
         self.user_query.user_ids = ['aaa']
         with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected user ID in user_ids to be a valid user ID'
-        ):
+                utils.ValidationError,
+                'Expected user ID in user_ids to be a valid user ID'):
             self.user_query.validate()
 
     def test_create_default_returns_correct_user_query(self) -> None:
         default_user_query = user_query_domain.UserQuery.create_default(
-            'id', self.user_query_params, self.user_id)
+            'id', self.user_query_params, self.user_id
+        )
         self.assertEqual(default_user_query.params, self.user_query_params)
         self.assertEqual(default_user_query.submitter_id, self.user_id)
-        self.assertEqual(
-            default_user_query.status, feconf.USER_QUERY_STATUS_PROCESSING)
+        self.assertEqual(default_user_query.status, feconf.USER_QUERY_STATUS_PROCESSING)
         self.assertEqual(default_user_query.user_ids, [])
 
     def test_archive_returns_correct_dict(self) -> None:
         self.user_query.archive(sent_email_model_id='sent_email_model_id')
-        self.assertEqual(
-            self.user_query.sent_email_model_id, 'sent_email_model_id')
-        self.assertEqual(
-            self.user_query.status, feconf.USER_QUERY_STATUS_ARCHIVED)
+        self.assertEqual(self.user_query.sent_email_model_id, 'sent_email_model_id')
+        self.assertEqual(self.user_query.status, feconf.USER_QUERY_STATUS_ARCHIVED)
         self.assertTrue(self.user_query.deleted)

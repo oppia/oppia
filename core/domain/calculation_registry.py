@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Registry for calculations."""
 
 from __future__ import annotations
@@ -37,13 +36,13 @@ class Registry:
         cls._calculations_dict.clear()
 
         # Add new visualization instances to the registry.
-        for name, clazz in inspect.getmembers(
-                models, predicate=inspect.isclass):
+        for name, clazz in inspect.getmembers(models, predicate=inspect.isclass):
             if name.endswith('_test') or name == 'BaseCalculation':
                 continue
 
             ancestor_names = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
             if 'BaseCalculation' in ancestor_names:
                 cls._calculations_dict[clazz.__name__] = clazz
 
@@ -51,48 +50,51 @@ class Registry:
     @classmethod
     def get_calculation_by_id(
         cls, calculation_id: Literal['AnswerFrequencies']
-    ) -> models.AnswerFrequencies: ...
+    ) -> models.AnswerFrequencies:
+        ...
 
     @overload
     @classmethod
     def get_calculation_by_id(
         cls, calculation_id: Literal['Top5AnswerFrequencies']
-    ) -> models.Top5AnswerFrequencies: ...
+    ) -> models.Top5AnswerFrequencies:
+        ...
 
     @overload
     @classmethod
     def get_calculation_by_id(
         cls, calculation_id: Literal['Top10AnswerFrequencies']
-    ) -> models.Top10AnswerFrequencies: ...
+    ) -> models.Top10AnswerFrequencies:
+        ...
 
     @overload
     @classmethod
     def get_calculation_by_id(
         cls, calculation_id: Literal['FrequencyCommonlySubmittedElements']
-    ) -> models.FrequencyCommonlySubmittedElements: ...
+    ) -> models.FrequencyCommonlySubmittedElements:
+        ...
 
     @overload
     @classmethod
     def get_calculation_by_id(
         cls, calculation_id: Literal['TopAnswersByCategorization']
-    ) -> models.TopAnswersByCategorization: ...
+    ) -> models.TopAnswersByCategorization:
+        ...
 
     @overload
     @classmethod
     def get_calculation_by_id(
         cls, calculation_id: Literal['TopNUnresolvedAnswersByFrequency']
-    ) -> models.TopNUnresolvedAnswersByFrequency: ...
+    ) -> models.TopNUnresolvedAnswersByFrequency:
+        ...
 
     @overload
     @classmethod
-    def get_calculation_by_id(
-        cls, calculation_id: str
-    ) -> models.BaseCalculation: ...
+    def get_calculation_by_id(cls, calculation_id: str) -> models.BaseCalculation:
+        ...
 
     @classmethod
-    def get_calculation_by_id(
-        cls, calculation_id: str
-    ) -> models.BaseCalculation:
+    def get_calculation_by_id(cls, calculation_id: str) -> models.BaseCalculation:
         """Gets a calculation instance by its id (which is also its class name).
 
         Refreshes once if the class is not found; subsequently, throws an
@@ -101,6 +103,5 @@ class Registry:
         if calculation_id not in cls._calculations_dict:
             cls._refresh_registry()
         if calculation_id not in cls._calculations_dict:
-            raise TypeError(
-                '\'%s\' is not a valid calculation id.' % calculation_id)
+            raise TypeError('\'%s\' is not a valid calculation id.' % calculation_id)
         return cls._calculations_dict[calculation_id]()

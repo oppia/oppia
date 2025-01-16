@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for classroom_domain.py"""
 
 from __future__ import annotations
@@ -26,7 +25,8 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def test_that_domain_object_is_created_correctly(self) -> None:
         classroom_data = classroom_domain.Classroom(
-            'exp', 'exp/', [], 'general details', 'general intro')
+            'exp', 'exp/', [], 'general details', 'general intro'
+        )
         self.assertEqual(classroom_data.name, 'exp')
         self.assertEqual(classroom_data.url_fragment, 'exp/')
         self.assertEqual(classroom_data.topic_ids, [])
@@ -35,10 +35,10 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict_returns_correct_dict(self) -> None:
         classroom_data = classroom_domain.Classroom(
-            'exp', 'exp/', [], 'general details', 'general intro')
+            'exp', 'exp/', [], 'general details', 'general intro'
+        )
         self.assertEqual(
-            classroom_data.to_dict(),
-            {
+            classroom_data.to_dict(), {
                 'name': classroom_data.name,
                 'url_fragment': classroom_data.url_fragment,
                 'topic_ids': classroom_data.topic_ids,

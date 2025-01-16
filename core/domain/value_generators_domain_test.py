@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for core.domain.value_generators_domain."""
 
 from __future__ import annotations
@@ -35,30 +34,25 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         when it isn't found.
         """
         generator_id = 'aajfejaekj'
-        with self.assertRaisesRegex(
-            KeyError, generator_id
-        ):
-            value_generators_domain.Registry.get_generator_class_by_id(
-                generator_id
-            )
+        with self.assertRaisesRegex(KeyError, generator_id):
+            value_generators_domain.Registry.get_generator_class_by_id(generator_id)
 
     def test_value_generator_registry(self) -> None:
         copier_id = 'Copier'
 
-        copier = value_generators_domain.Registry.get_generator_class_by_id(
-            copier_id)
+        copier = value_generators_domain.Registry.get_generator_class_by_id(copier_id)
         self.assertEqual(copier().id, copier_id)
 
         all_generator_classes = (
-            value_generators_domain.Registry.get_all_generator_classes())
+            value_generators_domain.Registry.get_all_generator_classes()
+        )
         self.assertEqual(len(all_generator_classes), 2)
 
     def test_generate_value_of_base_value_generator_raises_error(self) -> None:
         base_generator = value_generators_domain.BaseValueGenerator()
         with self.assertRaisesRegex(
-            NotImplementedError,
-            re.escape(
-                'generate_value() method has not yet been implemented')):
+                NotImplementedError,
+                re.escape('generate_value() method has not yet been implemented')):
             base_generator.generate_value()
 
     def test_registry_template_random_selector_contents(self) -> None:
@@ -70,9 +64,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         class_object = value_generators_domain.Registry()
         self.assertEqual(
             contents_registry,
-            class_object.get_generator_class_by_id(
-                'RandomSelector'
-            ).get_html_template()
+            class_object.get_generator_class_by_id('RandomSelector').get_html_template()
         )
 
     def test_registry_template_copier_contents(self) -> None:
@@ -85,9 +77,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         class_object = value_generators_domain.Registry()
         self.assertEqual(
             contents_registry,
-            class_object.get_generator_class_by_id(
-                'Copier'
-            ).get_html_template()
+            class_object.get_generator_class_by_id('Copier').get_html_template()
         )
 
     def test_get_value_generator_classes_not_subclass(self) -> None:
@@ -109,9 +99,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         module = importlib.import_module(
             'extensions.value_generators.models.generators'
         )
-        expected_generators = {
-            'RandomSelector': type(generators.RandomSelector())
-        }
+        expected_generators = {'RandomSelector': type(generators.RandomSelector())}
         with self.swap(module, 'Copier', MockCopier):
             value_generators = (
                 value_generators_domain.Registry.get_all_generator_classes()
@@ -129,16 +117,17 @@ class ValueGeneratorNameTests(test_utils.GenericTestBase):
 
         for file_name in all_python_files:
             python_module = importlib.import_module(file_name)
-            for name, clazz in inspect.getmembers(
-                    python_module, predicate=inspect.isclass):
-                all_base_classes = [base_class.__name__ for base_class in
-                                    (inspect.getmro(clazz))]
+            for name, clazz in inspect.getmembers(python_module,
+                                                  predicate=inspect.isclass):
+                all_base_classes = [
+                    base_class.__name__ for base_class in (inspect.getmro(clazz))
+                ]
                 # Check that it is a subclass of 'BaseValueGenerator'.
                 if 'BaseValueGenerator' in all_base_classes:
                     all_value_generators.append(name)
 
-        expected_value_generators = ['BaseValueGenerator', 'Copier',
-                                     'RandomSelector']
+        expected_value_generators = ['BaseValueGenerator', 'Copier', 'RandomSelector']
 
         self.assertEqual(
-            sorted(all_value_generators), sorted(expected_value_generators))
+            sorted(all_value_generators), sorted(expected_value_generators)
+        )

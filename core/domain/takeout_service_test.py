@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for core.domain.takeout_service."""
 
 from __future__ import annotations
@@ -40,7 +39,7 @@ from core.tests import test_utils
 from typing import Any, Dict, Final, List, Optional, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
     from mypy_imports import auth_models
     from mypy_imports import base_models
@@ -61,44 +60,21 @@ if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
 
 (
-    app_feedback_report_models,
-    auth_models,
-    base_models,
-    blog_models,
-    collection_models,
-    config_models,
-    exploration_models,
-    feedback_models,
-    improvements_models,
-    learner_group_models,
-    question_models,
-    skill_models,
-    story_models,
-    subtopic_models,
-    suggestion_models,
-    topic_models,
-    user_models,
+    app_feedback_report_models, auth_models, base_models, blog_models,
+    collection_models, config_models, exploration_models, feedback_models,
+    improvements_models, learner_group_models, question_models, skill_models,
+    story_models, subtopic_models, suggestion_models, topic_models, user_models,
     voiceover_models
-) = models.Registry.import_models([
-    models.Names.APP_FEEDBACK_REPORT,
-    models.Names.AUTH,
-    models.Names.BASE_MODEL,
-    models.Names.BLOG,
-    models.Names.COLLECTION,
-    models.Names.CONFIG,
-    models.Names.EXPLORATION,
-    models.Names.FEEDBACK,
-    models.Names.IMPROVEMENTS,
-    models.Names.LEARNER_GROUP,
-    models.Names.QUESTION,
-    models.Names.SKILL,
-    models.Names.STORY,
-    models.Names.SUBTOPIC,
-    models.Names.SUGGESTION,
-    models.Names.TOPIC,
-    models.Names.USER,
-    models.Names.VOICEOVER
-])
+) = models.Registry.import_models(
+    [
+        models.Names.APP_FEEDBACK_REPORT, models.Names.AUTH, models.Names.BASE_MODEL,
+        models.Names.BLOG, models.Names.COLLECTION, models.Names.CONFIG,
+        models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.IMPROVEMENTS,
+        models.Names.LEARNER_GROUP, models.Names.QUESTION, models.Names.SKILL,
+        models.Names.STORY, models.Names.SUBTOPIC, models.Names.SUGGESTION,
+        models.Names.TOPIC, models.Names.USER, models.Names.VOICEOVER
+    ]
+)
 
 
 class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
@@ -154,16 +130,20 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         # Setup for UserSkillModel.
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
-                self.USER_ID_1, self.SKILL_ID_3),
+                self.USER_ID_1, self.SKILL_ID_3
+            ),
             user_id=self.USER_ID_1,
             skill_id=self.SKILL_ID_3,
-            degree_of_mastery=self.DEGREE_OF_MASTERY_2).put()
+            degree_of_mastery=self.DEGREE_OF_MASTERY_2
+        ).put()
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
-                self.PROFILE_ID_1, self.SKILL_ID_1),
+                self.PROFILE_ID_1, self.SKILL_ID_1
+            ),
             user_id=self.PROFILE_ID_1,
             skill_id=self.SKILL_ID_1,
-            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+            degree_of_mastery=self.DEGREE_OF_MASTERY
+        ).put()
 
         # Setup for CompletedActivitiesModel.
         user_models.CompletedActivitiesModel(
@@ -171,13 +151,15 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             exploration_ids=self.EXPLORATION_IDS_2,
             collection_ids=self.COLLECTION_IDS_2,
             story_ids=self.STORY_IDS_2,
-            learnt_topic_ids=self.TOPIC_IDS_2).put()
+            learnt_topic_ids=self.TOPIC_IDS_2
+        ).put()
         user_models.CompletedActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS,
             story_ids=self.STORY_IDS,
-            learnt_topic_ids=self.TOPIC_IDS).put()
+            learnt_topic_ids=self.TOPIC_IDS
+        ).put()
 
         # Setup for IncompleteACtivitiesModel.
         user_models.IncompleteActivitiesModel(
@@ -185,39 +167,45 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS,
             story_ids=self.STORY_IDS_2,
-            partially_learnt_topic_ids=self.TOPIC_IDS).put()
+            partially_learnt_topic_ids=self.TOPIC_IDS
+        ).put()
 
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.PROFILE_ID_1, self.EXPLORATION_IDS[0]),
-            user_id=self.PROFILE_ID_1, exploration_id=self.EXPLORATION_IDS[0],
+            user_id=self.PROFILE_ID_1,
+            exploration_id=self.EXPLORATION_IDS[0],
             last_played_exp_version=self.EXP_VERSION,
-            last_played_state_name=self.STATE_NAME).put()
+            last_played_state_name=self.STATE_NAME
+        ).put()
 
         # Setup for LearnerGoalsModel.
         user_models.LearnerGoalsModel(
-            id=self.PROFILE_ID_1,
-            topic_ids_to_learn=self.TOPIC_IDS).put()
+            id=self.PROFILE_ID_1, topic_ids_to_learn=self.TOPIC_IDS
+        ).put()
 
         # Setup for LearnerPlaylistModel.
         user_models.LearnerPlaylistModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS
+        ).put()
 
         # Setup for CollectionProgressModel.
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.PROFILE_ID_1, self.COLLECTION_IDS[0]),
             user_id=self.PROFILE_ID_1,
             collection_id=self.COLLECTION_IDS[0],
-            completed_explorations=self.EXPLORATION_IDS).put()
+            completed_explorations=self.EXPLORATION_IDS
+        ).put()
 
         # Setup for StoryProgressModel.
         user_models.StoryProgressModel(
             id='%s.%s' % (self.PROFILE_ID_1, self.STORY_ID_1),
             user_id=self.PROFILE_ID_1,
             story_id=self.STORY_ID_1,
-            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+            completed_node_ids=self.COMPLETED_NODE_IDS_1
+        ).put()
 
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
@@ -232,7 +220,8 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             last_logged_in=self.GENERIC_DATE,
             last_created_an_exploration=self.GENERIC_DATE,
             last_edited_an_exploration=self.GENERIC_DATE,
-            default_dashboard='learner', creator_dashboard_display_pref='card',
+            default_dashboard='learner',
+            creator_dashboard_display_pref='card',
             user_bio=self.GENERIC_USER_BIO,
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=1,
@@ -253,7 +242,8 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             last_logged_in=self.GENERIC_DATE,
             last_created_an_exploration=None,
             last_edited_an_exploration=None,
-            default_dashboard='learner', creator_dashboard_display_pref='card',
+            default_dashboard='learner',
+            creator_dashboard_display_pref='card',
             user_bio=self.GENERIC_USER_BIO,
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=None,
@@ -266,14 +256,10 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
     def set_up_trivial(self) -> None:
         """Setup for trivial test of export_data functionality."""
         user_models.UserSettingsModel(
-            id=self.USER_ID_1,
-            email=self.USER_1_EMAIL,
-            roles=[self.USER_1_ROLE]
+            id=self.USER_ID_1, email=self.USER_1_EMAIL, roles=[self.USER_1_ROLE]
         ).put()
         user_models.UserSettingsModel(
-            id=self.PROFILE_ID_1,
-            email=self.USER_1_EMAIL,
-            roles=[self.PROFILE_1_ROLE]
+            id=self.PROFILE_ID_1, email=self.USER_1_EMAIL, roles=[self.PROFILE_1_ROLE]
         ).put()
 
     def test_export_data_for_profile_user_trivial_raises_error(self) -> None:
@@ -327,8 +313,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'average_ratings': 4.00,
                 'total_plays': 5
             }
-        },
-        {
+        }, {
             ('2019-05-28'): {
                 'average_ratings': 4.95,
                 'total_plays': 10
@@ -378,21 +363,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     GENERIC_MODEL_ID: Final = 'model-id-1'
     COMMIT_TYPE: Final = 'create'
     COMMIT_MESSAGE: Final = 'This is a commit.'
-    COMMIT_CMDS: Final = [
-        {'cmd': 'some_command'},
-        {'cmd2': 'another_command'}
-    ]
+    COMMIT_CMDS: Final = [{'cmd': 'some_command'}, {'cmd2': 'another_command'}]
     PLATFORM_ANDROID: Final = 'android'
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
-    REPORT_SUBMITTED_TIMESTAMP: Final = (
-        datetime.datetime.fromtimestamp(1615151836)
-    )
+    REPORT_SUBMITTED_TIMESTAMP: Final = (datetime.datetime.fromtimestamp(1615151836))
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
-    TICKET_CREATION_TIMESTAMP: Final = (
-        datetime.datetime.fromtimestamp(1616173836)
-    )
+    TICKET_CREATION_TIMESTAMP: Final = (datetime.datetime.fromtimestamp(1616173836))
     TICKET_ID: Final = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234'
+    )
     REPORT_TYPE_SUGGESTION: Final = 'suggestion'
     CATEGORY_OTHER: Final = 'other'
     PLATFORM_VERSION: Final = '0.1-alpha-abcdef1234'
@@ -402,9 +381,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ENTRY_POINT_NAVIGATION_DRAWER: Final = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH: Final = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH: Final = 'en'
-    ANDROID_REPORT_INFO: Dict[
-        str, Union[str, List[str], int, bool, Dict[str, str]]
-    ] = {
+    ANDROID_REPORT_INFO: Dict[str, Union[str, List[str], int, bool, Dict[str, str]]] = {
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
         'logcat_logs': ['logcat1', 'logcat2'],
@@ -450,8 +427,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ]
     FIRST_CONTRIBUTION_DATE: Final = datetime.datetime(2021, 5, 20)
     LAST_CONTRIBUTION_DATE: Final = datetime.datetime(2022, 5, 20)
-    PROFILE_PICTURE_DATA_PNG: Final = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D' # pylint: disable=line-too-long
-    PROFILE_PICTURE_DATA_WEBP: Final = 'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA' # pylint: disable=line-too-long
+    PROFILE_PICTURE_DATA_PNG: Final = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D'  # pylint: disable=line-too-long
+    PROFILE_PICTURE_DATA_WEBP: Final = 'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA'  # pylint: disable=line-too-long
 
     def set_up_non_trivial(self) -> None:
         """Set up all models for use in testing.
@@ -492,22 +469,28 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Setup for UserSkillModel.
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
-                self.USER_ID_1, self.SKILL_ID_1),
+                self.USER_ID_1, self.SKILL_ID_1
+            ),
             user_id=self.USER_ID_1,
             skill_id=self.SKILL_ID_1,
-            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+            degree_of_mastery=self.DEGREE_OF_MASTERY
+        ).put()
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
-                self.USER_ID_1, self.SKILL_ID_2),
+                self.USER_ID_1, self.SKILL_ID_2
+            ),
             user_id=self.USER_ID_1,
             skill_id=self.SKILL_ID_2,
-            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+            degree_of_mastery=self.DEGREE_OF_MASTERY
+        ).put()
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
-                self.PROFILE_ID_1, self.SKILL_ID_3),
+                self.PROFILE_ID_1, self.SKILL_ID_3
+            ),
             user_id=self.PROFILE_ID_1,
             skill_id=self.SKILL_ID_3,
-            degree_of_mastery=self.DEGREE_OF_MASTERY_2).put()
+            degree_of_mastery=self.DEGREE_OF_MASTERY_2
+        ).put()
 
         # Setup for UserSubscriptionsModel.
         for creator_id in self.CREATOR_IDS:
@@ -518,34 +501,45 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             ).put()
 
         user_models.UserSubscriptionsModel(
-            id=self.USER_ID_1, creator_ids=self.CREATOR_IDS,
+            id=self.USER_ID_1,
+            creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             exploration_ids=self.EXPLORATION_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
-            last_checked=self.GENERIC_DATE).put()
+            last_checked=self.GENERIC_DATE
+        ).put()
 
         # Setup for UserContributionsModel.
         self.save_new_valid_exploration(
-            self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End')
+            self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End'
+        )
 
         exp_services.update_exploration(
-            self.USER_ID_1, self.EXPLORATION_IDS[0],
-            [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-            })], 'Test edit')
+            self.USER_ID_1, self.EXPLORATION_IDS[0], [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': 'edit_exploration_property',
+                        'property_name': 'objective',
+                        'new_value': 'the objective'
+                    }
+                )
+            ], 'Test edit'
+        )
 
         # Setup for ExplorationUserDataModel.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]),
             user_id=self.USER_ID_1,
-            exploration_id=self.EXPLORATION_IDS[0], rating=2,
+            exploration_id=self.EXPLORATION_IDS[0],
+            rating=2,
             rated_on=self.GENERIC_DATE,
-            draft_change_list={'new_content': {}},
+            draft_change_list={
+                'new_content': {}
+            },
             draft_change_list_last_updated=self.GENERIC_DATE,
             draft_change_list_exp_version=3,
-            draft_change_list_id=1).put()
+            draft_change_list_id=1
+        ).put()
 
         # Setup for CompletedActivitiesModel.
         user_models.CompletedActivitiesModel(
@@ -553,13 +547,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS,
             story_ids=self.STORY_IDS,
-            learnt_topic_ids=self.TOPIC_IDS).put()
+            learnt_topic_ids=self.TOPIC_IDS
+        ).put()
         user_models.CompletedActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS_2,
             collection_ids=self.COLLECTION_IDS_2,
             story_ids=self.STORY_IDS_2,
-            learnt_topic_ids=self.TOPIC_IDS_2).put()
+            learnt_topic_ids=self.TOPIC_IDS_2
+        ).put()
 
         # Setup for IncompleteACtivitiesModel.
         user_models.IncompleteActivitiesModel(
@@ -567,56 +563,65 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             exploration_ids=self.EXPLORATION_IDS,
             collection_ids=self.COLLECTION_IDS,
             story_ids=self.STORY_IDS,
-            partially_learnt_topic_ids=self.TOPIC_IDS).put()
+            partially_learnt_topic_ids=self.TOPIC_IDS
+        ).put()
 
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_ID_1, self.EXPLORATION_IDS[0]),
-            user_id=self.USER_ID_1, exploration_id=self.EXPLORATION_IDS[0],
+            user_id=self.USER_ID_1,
+            exploration_id=self.EXPLORATION_IDS[0],
             last_played_exp_version=self.EXP_VERSION,
-            last_played_state_name=self.STATE_NAME).put()
+            last_played_state_name=self.STATE_NAME
+        ).put()
 
         # Setup for LearnerGoalsModel.
         user_models.LearnerGoalsModel(
-            id=self.USER_ID_1,
-            topic_ids_to_learn=self.TOPIC_IDS).put()
+            id=self.USER_ID_1, topic_ids_to_learn=self.TOPIC_IDS
+        ).put()
         user_models.LearnerGoalsModel(
-            id=self.PROFILE_ID_1,
-            topic_ids_to_learn=self.TOPIC_IDS_2).put()
+            id=self.PROFILE_ID_1, topic_ids_to_learn=self.TOPIC_IDS_2
+        ).put()
 
         # Setup for LearnerPlaylistModel.
         user_models.LearnerPlaylistModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS
+        ).put()
         user_models.LearnerPlaylistModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS_2,
-            collection_ids=self.COLLECTION_IDS_2).put()
+            collection_ids=self.COLLECTION_IDS_2
+        ).put()
 
         # Setup for CollectionProgressModel.
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.COLLECTION_IDS[0]),
             user_id=self.USER_ID_1,
             collection_id=self.COLLECTION_IDS[0],
-            completed_explorations=self.EXPLORATION_IDS).put()
+            completed_explorations=self.EXPLORATION_IDS
+        ).put()
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.PROFILE_ID_1, self.COLLECTION_IDS_2[0]),
             user_id=self.PROFILE_ID_1,
             collection_id=self.COLLECTION_IDS_2[0],
-            completed_explorations=self.EXPLORATION_IDS_2).put()
+            completed_explorations=self.EXPLORATION_IDS_2
+        ).put()
 
         # Setup for StoryProgressModel.
         user_models.StoryProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.STORY_ID_1),
             user_id=self.USER_ID_1,
             story_id=self.STORY_ID_1,
-            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+            completed_node_ids=self.COMPLETED_NODE_IDS_1
+        ).put()
         user_models.StoryProgressModel(
             id='%s.%s' % (self.PROFILE_ID_1, self.STORY_ID_2),
             user_id=self.PROFILE_ID_1,
             story_id=self.STORY_ID_2,
-            completed_node_ids=self.COMPLETED_NODE_IDS_2).put()
+            completed_node_ids=self.COMPLETED_NODE_IDS_2
+        ).put()
 
         # Setup for CollectionRightsModel.
         collection_models.CollectionRightsModel(
@@ -631,34 +636,34 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new collection right',
-            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+            [{
+                'cmd': rights_domain.CMD_CREATE_NEW
+            }]
+        )
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
-            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            self.EXPLORATION_IDS[0], 1,
-            suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
-            'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
-            'exploration.exp1.thread_1', None)
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXPLORATION_IDS[0], 1, suggestion_models.STATUS_IN_REVIEW,
+            self.USER_ID_1, 'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
+            'exploration.exp1.thread_1', None
+        )
 
         # Setup for TopicRightsModel.
         topic_models.TopicRightsModel(
-            id=self.TOPIC_ID_1,
-            manager_ids=[self.USER_ID_1],
-            topic_is_published=True
+            id=self.TOPIC_ID_1, manager_ids=[self.USER_ID_1], topic_is_published=True
         ).commit(
-            'committer_id',
-            'New topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+            'committer_id', 'New topic rights', [{
+                'cmd': topic_domain.CMD_CREATE_NEW
+            }]
+        )
         topic_models.TopicRightsModel(
-            id=self.TOPIC_ID_2,
-            manager_ids=[self.USER_ID_1],
-            topic_is_published=True
+            id=self.TOPIC_ID_2, manager_ids=[self.USER_ID_1], topic_is_published=True
         ).commit(
-            'committer_id',
-            'New topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+            'committer_id', 'New topic rights', [{
+                'cmd': topic_domain.CMD_CREATE_NEW
+            }]
+        )
 
         # Setup for ExplorationRightsModel.
         exploration_models.ExplorationRightsModel(
@@ -673,7 +678,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new exploration right',
-            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+            [{
+                'cmd': rights_domain.CMD_CREATE_NEW
+            }]
+        )
 
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
@@ -688,7 +696,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_logged_in=self.GENERIC_DATE,
             last_created_an_exploration=self.GENERIC_DATE,
             last_edited_an_exploration=self.GENERIC_DATE,
-            default_dashboard='learner', creator_dashboard_display_pref='card',
+            default_dashboard='learner',
+            creator_dashboard_display_pref='card',
             user_bio=self.GENERIC_USER_BIO,
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=1,
@@ -710,7 +719,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_logged_in=self.GENERIC_DATE,
             last_created_an_exploration=None,
             last_edited_an_exploration=None,
-            default_dashboard='learner', creator_dashboard_display_pref='card',
+            default_dashboard='learner',
+            creator_dashboard_display_pref='card',
             user_bio=self.GENERIC_USER_BIO,
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=None,
@@ -725,16 +735,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             contributor_user_id=self.USER_ID_1,
             topic_id=self.TOPIC_ID_1,
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            submitted_translation_word_count=(self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
             accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
+            ),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT),
+            rejected_translation_word_count=(self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES
         )
 
@@ -743,13 +751,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             reviewer_user_id=self.USER_ID_1,
             topic_id=self.TOPIC_ID_1,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
-            reviewed_translation_word_count=(
-                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            reviewed_translation_word_count=(self.REVIEWED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
             accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+            ),
+            accepted_translation_word_count=(self.ACCEPTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -760,7 +767,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
+            ),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -771,7 +779,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
+            ),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -819,14 +828,16 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
             contributor_id=self.USER_ID_1,
             topic_ids_with_question_submissions=(
-                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
+                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS
+            ),
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
             submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
+            ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
@@ -841,34 +852,31 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
             contributor_id=self.USER_ID_1,
-            topic_ids_with_question_reviews=(
-                self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+            topic_ids_with_question_reviews=(self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
+            ),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
         suggestion_models.TranslationCoordinatorsModel(
-            id='es',
-            coordinator_ids=[self.USER_ID_1],
-            coordinators_count=2
+            id='es', coordinator_ids=[self.USER_ID_1], coordinators_count=2
         ).put()
 
         suggestion_models.TranslationCoordinatorsModel(
-            id='hi',
-            coordinator_ids=[self.USER_ID_1],
-            coordinators_count=2
+            id='hi', coordinator_ids=[self.USER_ID_1], coordinators_count=2
         ).put()
 
         user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
-            can_review_questions=True).put()
+            can_review_questions=True
+        ).put()
 
         user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_ID_1),
@@ -886,55 +894,73 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
 
         collection_models.CollectionRightsSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
         collection_models.CollectionSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
         skill_models.SkillSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
         subtopic_models.SubtopicPageSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
         topic_models.TopicRightsSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
         topic_models.TopicSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
         story_models.StorySnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
         question_models.QuestionSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
         exploration_models.ExplorationRightsSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
@@ -952,8 +978,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
 
         config_models.PlatformParameterSnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
@@ -965,14 +993,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             subscription_notifications=False
         ).put()
         auth_models.UserAuthDetailsModel(
-            id=self.USER_ID_1,
-            parent_user_id=self.PROFILE_ID_1
+            id=self.USER_ID_1, parent_user_id=self.PROFILE_ID_1
         ).put()
 
-        language_code_to_accent: Dict[str, str] = {
-            'en': 'en-US',
-            'hi': 'hi-IN'
-        }
+        language_code_to_accent: Dict[str, str] = {'en': 'en-US', 'hi': 'hi-IN'}
         # Setup for VoiceArtistMetadataModel.
         voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=self.USER_ID_1,
@@ -982,21 +1006,20 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Set-up for AppFeedbackReportModel scrubbed by user.
         report_id = '%s.%s.%s' % (
             self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
-            'randomInteger123')
+            'randomInteger123'
+        )
         app_feedback_report_models.AppFeedbackReportModel(
             id=report_id,
             platform=self.PLATFORM_ANDROID,
             scrubbed_by=None,
-            ticket_id='%s.%s.%s' % (
-                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
-                '16CharString1234'),
+            ticket_id='%s.%s.%s' %
+            ('random_hash', self.TICKET_CREATION_TIMESTAMP.second, '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            android_device_country_locale_code=(
-                self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+            android_device_country_locale_code=(self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
             entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -1004,11 +1027,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
             android_report_info_schema_version=(
-                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION
+            )
         ).put()
         report_entity = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                report_id))
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(report_id)
+        )
         report_entity.scrubbed_by = self.USER_ID_1
         report_entity.update_timestamps()
         report_entity.put()
@@ -1081,23 +1105,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     def set_up_trivial(self) -> None:
         """Setup for trivial test of export_data functionality."""
         user_models.UserSettingsModel(
-            id=self.USER_ID_1,
-            email=self.USER_1_EMAIL,
-            roles=[self.USER_1_ROLE]
+            id=self.USER_ID_1, email=self.USER_1_EMAIL, roles=[self.USER_1_ROLE]
         ).put()
         user_models.UserSettingsModel(
-            id=self.PROFILE_ID_1,
-            email=self.USER_1_EMAIL,
-            roles=[self.PROFILE_1_ROLE]
+            id=self.PROFILE_ID_1, email=self.USER_1_EMAIL, roles=[self.PROFILE_1_ROLE]
         ).put()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
     def test_export_nonexistent_full_user_raises_error(self) -> None:
         """Setup for nonexistent user test of export_data functionality."""
         with self.assertRaisesRegex(
-            user_models.UserSettingsModel.EntityNotFoundError,
-            'Entity for class UserSettingsModel with id fake_user_id '
-            'not found'):
+                user_models.UserSettingsModel.EntityNotFoundError,
+                'Entity for class UserSettingsModel with id fake_user_id '
+                'not found'):
             takeout_service.export_data_for_user('fake_user_id')
 
     def test_export_data_for_full_user_trivial_is_correct(self) -> None:
@@ -1121,13 +1141,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'viewable_exploration_ids': [],
             'voiced_exploration_ids': []
         }
-        exploration_data: Dict[
-            str,
-            Dict[str, Union[str, int, Dict[str, str]]]
-        ] = {}
-        general_feedback_message_data: Dict[
-            str, Dict[str, Union[int, str]]
-        ] = {}
+        exploration_data: Dict[str, Dict[str, Union[str, int, Dict[str, str]]]] = {}
+        general_feedback_message_data: Dict[str, Dict[str, Union[int, str]]] = {}
         general_feedback_thread_data: Dict[str, Dict[str, Union[int, str]]] = {}
         general_feedback_thread_user_data: Dict[str, Dict[str, List[int]]] = {}
         general_suggestion_data: Dict[str, Dict[str, Union[int, str]]] = {}
@@ -1176,16 +1191,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'resolution_msecs': [],
             'statuses': []
         }
-        topic_rights_data: Dict[str, List[str]] = {
-            'managed_topic_ids': []
-        }
+        topic_rights_data: Dict[str, List[str]] = {'managed_topic_ids': []}
 
-        expected_contrib_proficiency_data: Dict[
-            str, Dict[str, Union[int, bool]]
-        ] = {}
-        expected_contribution_rights_data: Dict[
-            str, Union[bool, List[str]]
-        ] = {}
+        expected_contrib_proficiency_data: Dict[str, Dict[str, Union[int, bool]]] = {}
+        expected_contribution_rights_data: Dict[str, Union[bool, List[str]]] = {}
 
         expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {}
         expected_collection_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1194,48 +1203,35 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_subtopic_page_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_topic_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_topic_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_translation_contribution_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_translation_review_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_question_contribution_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_question_review_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_translation_submitter_total_contribution_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_translation_reviewer_total_contribution_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_question_submitter_total_contribution_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_question_reviewer_total_contribution_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
+        expected_translation_contribution_stats: Dict[str, Dict[str, Dict[str,
+                                                                          str]]] = {}
+        expected_translation_review_stats: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_question_contribution_stats: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_question_review_stats: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_translation_submitter_total_contribution_stats: Dict[str, Dict[
+            str, Dict[str, str]]] = {}
+        expected_translation_reviewer_total_contribution_stats: Dict[str, Dict[
+            str, Dict[str, str]]] = {}
+        expected_question_submitter_total_contribution_stats: Dict[str,
+                                                                   Dict[str,
+                                                                        Dict[str,
+                                                                             str]]] = {}
+        expected_question_reviewer_total_contribution_stats: Dict[str,
+                                                                  Dict[str,
+                                                                       Dict[str,
+                                                                            str]]] = {}
         expected_translation_coordinator_stats: Dict[str, List[str]] = {
             'coordinated_language_ids': []
         }
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_exploration_rights_sm: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
+        expected_exploration_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_exploration_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_platform_parameter_sm: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
+        expected_platform_parameter_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_user_auth_details: Dict[str, str] = {}
         expected_user_email_preferences: Dict[str, str] = {}
         expected_blog_post_data: Dict[str, Union[str, float, List[str]]] = {}
-        expected_blog_post_rights: Dict[str, List[str]] = {
-            'editable_blog_post_ids': []
-        }
+        expected_blog_post_rights: Dict[str, List[str]] = {'editable_blog_post_ids': []}
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
@@ -1269,59 +1265,41 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'collection_progress': collection_progress_data,
             'story_progress': story_progress_data,
             'general_feedback_thread': general_feedback_thread_data,
-            'general_feedback_thread_user':
-                general_feedback_thread_user_data,
+            'general_feedback_thread_user': general_feedback_thread_user_data,
             'general_feedback_message': general_feedback_message_data,
             'collection_rights': collection_rights_data,
             'general_suggestion': general_suggestion_data,
             'exploration_rights': exploration_rights_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
-            'collection_rights_snapshot_metadata':
-                expected_collection_rights_sm,
-            'collection_snapshot_metadata':
-                expected_collection_sm,
-            'skill_snapshot_metadata':
-                expected_skill_sm,
-            'subtopic_page_snapshot_metadata':
-                expected_subtopic_page_sm,
-            'topic_rights_snapshot_metadata':
-                expected_topic_rights_sm,
+            'collection_rights_snapshot_metadata': expected_collection_rights_sm,
+            'collection_snapshot_metadata': expected_collection_sm,
+            'skill_snapshot_metadata': expected_skill_sm,
+            'subtopic_page_snapshot_metadata': expected_subtopic_page_sm,
+            'topic_rights_snapshot_metadata': expected_topic_rights_sm,
             'topic_snapshot_metadata': expected_topic_sm,
-            'translation_contribution_stats':
-                expected_translation_contribution_stats,
-            'translation_review_stats':
-                expected_translation_review_stats,
-            'question_contribution_stats':
-                expected_question_contribution_stats,
-            'question_review_stats':
-                expected_question_review_stats,
-            'translation_submitter_total_contribution_stats':
-                expected_translation_submitter_total_contribution_stats,
-            'translation_reviewer_total_contribution_stats':
-                expected_translation_reviewer_total_contribution_stats,
-            'question_submitter_total_contribution_stats':
-                expected_question_submitter_total_contribution_stats,
-            'question_reviewer_total_contribution_stats':
-                expected_question_reviewer_total_contribution_stats,
+            'translation_contribution_stats': expected_translation_contribution_stats,
+            'translation_review_stats': expected_translation_review_stats,
+            'question_contribution_stats': expected_question_contribution_stats,
+            'question_review_stats': expected_question_review_stats,
+            'translation_submitter_total_contribution_stats': expected_translation_submitter_total_contribution_stats,
+            'translation_reviewer_total_contribution_stats': expected_translation_reviewer_total_contribution_stats,
+            'question_submitter_total_contribution_stats': expected_question_submitter_total_contribution_stats,
+            'question_reviewer_total_contribution_stats': expected_question_reviewer_total_contribution_stats,
             'pinned_opportunity': expected_pinned_opportunities_data,
-            'translation_coordinators':
-                expected_translation_coordinator_stats,
+            'translation_coordinators': expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'exploration_rights_snapshot_metadata':
-                expected_exploration_rights_sm,
+            'exploration_rights_snapshot_metadata': expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
-            'platform_parameter_snapshot_metadata':
-                expected_platform_parameter_sm,
+            'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
             'user_auth_details': expected_user_auth_details,
             'user_email_preferences': expected_user_email_preferences,
             'voice_artist_metadata': expected_voice_artist_data
         }
 
         # Perform export and compare.
-        user_takeout_object = takeout_service.export_data_for_user(
-            self.USER_ID_1)
+        user_takeout_object = takeout_service.export_data_for_user(self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
         self.assertEqual(expected_user_data, observed_data)
@@ -1331,9 +1309,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_images: List[takeout_domain.TakeoutImage] = []
         self.assertEqual(expected_images, observed_images)
 
-    def test_export_data_for_full_user_when_user_id_is_leaked_fails(
-        self
-    ) -> None:
+    def test_export_data_for_full_user_when_user_id_is_leaked_fails(self) -> None:
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
@@ -1347,8 +1323,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     '[TAKEOUT] User ID (uid_abcdefghijabcdefghijabcdefghijab) '
                     'found in the JSON generated for UserSettingsModel and '
                     'user with ID user_1'
-                ],
-                log_messages
+                ], log_messages
             )
 
     def test_export_data_when_user_settings_is_none(self) -> None:
@@ -1360,10 +1335,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
 
         with self.swap(
-            user_services, 'get_user_settings', lambda _, strict: None # pylint: disable=unused-argument
+                user_services,
+                'get_user_settings',
+                lambda _, strict: None  # pylint: disable=unused-argument
         ):
-            user_takeout_object = takeout_service.export_data_for_user(
-                self.USER_ID_1)
+            user_takeout_object = takeout_service.export_data_for_user(self.USER_ID_1)
             observed_images = user_takeout_object.user_images
             expected_images: List[takeout_domain.TakeoutImage] = []
             self.assertEqual(expected_images, observed_images)
@@ -1390,26 +1366,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         feedback_thread_model.put()
 
         thread_id = feedback_services.create_thread(
-            self.THREAD_ENTITY_TYPE,
-            self.THREAD_ENTITY_ID,
-            self.USER_ID_1,
-            self.THREAD_SUBJECT,
-            self.MESSAGE_TEXT
+            self.THREAD_ENTITY_TYPE, self.THREAD_ENTITY_ID, self.USER_ID_1,
+            self.THREAD_SUBJECT, self.MESSAGE_TEXT
         )
         feedback_services.create_message(
-            thread_id,
-            self.USER_ID_1,
-            self.THREAD_STATUS,
-            self.THREAD_SUBJECT,
+            thread_id, self.USER_ID_1, self.THREAD_STATUS, self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
 
         # Retrieve all models for export.
         all_models = [
-            clazz
-            for clazz in test_utils.get_storage_model_classes()
-            if (not clazz.__name__ in
-                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
+            clazz for clazz in test_utils.get_storage_model_classes() if
+            (not clazz.__name__ in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
 
         for model in all_models:
@@ -1418,19 +1386,16 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             num_takeout_keys = 0
             for field_export_policy in export_policy.values():
                 if (field_export_policy ==
-                        base_models
-                        .EXPORT_POLICY
-                        .EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
+                        base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
                     num_takeout_keys += 1
 
             if (export_method ==
-                    base_models.MODEL_ASSOCIATION_TO_USER
-                    .MULTIPLE_INSTANCES_PER_USER):
+                    base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
                 # If the id is used as a Takeout key, then we should not
                 # have any fields exported as the key for the Takeout.
                 self.assertEqual(
-                    num_takeout_keys,
-                    0 if model.ID_IS_USED_AS_TAKEOUT_KEY else 1)
+                    num_takeout_keys, 0 if model.ID_IS_USED_AS_TAKEOUT_KEY else 1
+                )
             else:
                 self.assertEqual(num_takeout_keys, 0)
 
@@ -1455,26 +1420,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         feedback_thread_model.put()
 
         thread_id = feedback_services.create_thread(
-            self.THREAD_ENTITY_TYPE,
-            self.THREAD_ENTITY_ID,
-            self.USER_ID_1,
-            self.THREAD_SUBJECT,
-            self.MESSAGE_TEXT
+            self.THREAD_ENTITY_TYPE, self.THREAD_ENTITY_ID, self.USER_ID_1,
+            self.THREAD_SUBJECT, self.MESSAGE_TEXT
         )
         feedback_services.create_message(
-            thread_id,
-            self.USER_ID_1,
-            self.THREAD_STATUS,
-            self.THREAD_SUBJECT,
+            thread_id, self.USER_ID_1, self.THREAD_STATUS, self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
 
         # Retrieve all models for export.
         all_models = [
-            clazz
-            for clazz in test_utils.get_storage_model_classes()
-            if (not clazz.__name__ in
-                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
+            clazz for clazz in test_utils.get_storage_model_classes() if
+            (not clazz.__name__ in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
 
         # Iterate over models and test export policies.
@@ -1484,23 +1441,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             renamed_export_keys = model.get_field_names_for_takeout()
             exported_field_names = []
             field_used_as_key_for_takeout_dict = None
-            for field_name in model._properties: # pylint: disable=protected-access
-                if (export_policy[field_name] ==
-                        base_models.EXPORT_POLICY.EXPORTED):
+            for field_name in model._properties:  # pylint: disable=protected-access
+                if (export_policy[field_name] == base_models.EXPORT_POLICY.EXPORTED):
                     if field_name in renamed_export_keys:
-                        exported_field_names.append(
-                            renamed_export_keys[field_name]
-                        )
+                        exported_field_names.append(renamed_export_keys[field_name])
                     else:
                         exported_field_names.append(field_name)
                 elif (export_policy[field_name] ==
-                      base_models
-                      .EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
+                      base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
                     field_used_as_key_for_takeout_dict = field_name
 
             if (export_method ==
-                    base_models
-                    .MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
+                    base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
                 self.assertEqual(len(exported_field_names), 0)
             elif (export_method ==
                   base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER):
@@ -1509,35 +1461,32 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     sorted([str(key) for key in exported_data.keys()]),
                     sorted(exported_field_names)
                 )
-            elif (export_method ==
-                  base_models
-                  .MODEL_ASSOCIATION_TO_USER
-                  .ONE_INSTANCE_SHARED_ACROSS_USERS):
+            elif (export_method == base_models.MODEL_ASSOCIATION_TO_USER.
+                  ONE_INSTANCE_SHARED_ACROSS_USERS):
                 # Here we use MyPy ignore because model is of
                 # BaseModel type and BaseModel does not contain
                 # get_field_name_mapping_to_takeout_keys attribute,
                 # so because of this MyPy throws an error. Thus to
                 # avoid the error, we used ignore here.
                 self.assertIsNotNone(
-                    model.get_field_name_mapping_to_takeout_keys)  # type: ignore[attr-defined]
+                    model.get_field_name_mapping_to_takeout_keys
+                )  # type: ignore[attr-defined]
                 exported_data = model.export_data(self.USER_ID_1)
                 # Here we use MyPy ignore because model is of
                 # BaseModel type and BaseModel does not contain
                 # get_field_name_mapping_to_takeout_keys(), so
                 # because of this MyPy throws an error. Thus to
                 # avoid the error, we used ignore here.
-                field_mapping = model.get_field_name_mapping_to_takeout_keys()  # type: ignore[attr-defined]
+                field_mapping = model.get_field_name_mapping_to_takeout_keys(
+                )  # type: ignore[attr-defined]
                 self.assertEqual(
-                    sorted(exported_field_names),
-                    sorted(field_mapping.keys())
+                    sorted(exported_field_names), sorted(field_mapping.keys())
                 )
                 self.assertEqual(
-                    sorted(exported_data.keys()),
-                    sorted(field_mapping.values())
+                    sorted(exported_data.keys()), sorted(field_mapping.values())
                 )
             elif (export_method ==
-                  base_models
-                  .MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
+                  base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
                 exported_data = model.export_data(self.USER_ID_1)
                 for model_id in exported_data.keys():
                     # If we are using a field as a Takeout key.
@@ -1545,14 +1494,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         # Ensure that we export the field.
                         self.assertEqual(
                             model_id,
-                            getattr(
-                                model,
-                                field_used_as_key_for_takeout_dict)
+                            getattr(model, field_used_as_key_for_takeout_dict)
                         )
                     self.assertEqual(
-                        sorted([
-                            str(key)
-                            for key in exported_data[model_id].keys()]),
+                        sorted([str(key) for key in exported_data[model_id].keys()]),
                         sorted(exported_field_names)
                     )
 
@@ -1575,9 +1520,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         feedback_thread_model.put()
 
         user_group_model = user_models.UserGroupModel(
-            id='user_group_model',
-            name='user_group_name',
-            user_ids=[self.USER_ID_1]
+            id='user_group_model', name='user_group_name', user_ids=[self.USER_ID_1]
         )
         user_group_model.put()
 
@@ -1620,14 +1563,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
                 'rated_on_msec': self.GENERIC_EPOCH,
-                'draft_change_list': {'new_content': {}},
+                'draft_change_list': {
+                    'new_content': {}
+                },
                 'draft_change_list_last_updated_msec': self.GENERIC_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
-                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
+                ),
                 'mute_feedback_notifications': (
-                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
+                )
             }
         }
         expected_completed_activities_data = {
@@ -1648,9 +1595,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'state_name': self.STATE_NAME
             }
         }
-        expected_learner_goals_data = {
-            'topic_ids_to_learn': self.TOPIC_IDS
-        }
+        expected_learner_goals_data = {'topic_ids_to_learn': self.TOPIC_IDS}
         expected_learner_playlist_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS,
             'playlist_collection_ids': self.COLLECTION_IDS
@@ -1658,21 +1603,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_collection_progress_data = {
             self.COLLECTION_IDS[0]: self.EXPLORATION_IDS
         }
-        expected_story_progress_data = {
-            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
-        }
+        expected_story_progress_data = {self.STORY_ID_1: self.COMPLETED_NODE_IDS_1}
         thread_id = feedback_services.create_thread(
-            self.THREAD_ENTITY_TYPE,
-            self.THREAD_ENTITY_ID,
-            self.USER_ID_1,
-            self.THREAD_SUBJECT,
-            self.MESSAGE_TEXT
+            self.THREAD_ENTITY_TYPE, self.THREAD_ENTITY_ID, self.USER_ID_1,
+            self.THREAD_SUBJECT, self.MESSAGE_TEXT
         )
         feedback_services.create_message(
-            thread_id,
-            self.USER_ID_1,
-            self.THREAD_STATUS,
-            self.THREAD_SUBJECT,
+            thread_id, self.USER_ID_1, self.THREAD_STATUS, self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
         expected_general_feedback_thread_data = {
@@ -1685,7 +1622,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'summary': self.THREAD_SUMMARY,
                 'message_count': self.THREAD_MESSAGE_COUNT,
                 'last_updated_msec': utils.get_time_in_millisecs(
-                    feedback_thread_model.last_updated)
+                    feedback_thread_model.last_updated
+                )
             },
             thread_id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
@@ -1696,9 +1634,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'summary': None,
                 'message_count': 2,
                 'last_updated_msec': utils.get_time_in_millisecs(
-                    feedback_models.
-                    GeneralFeedbackThreadModel.
-                    get_by_id(thread_id).last_updated)
+                    feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id
+                                                                         ).last_updated
+                )
             }
         }
         expected_general_feedback_thread_user_data = {
@@ -1725,18 +1663,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_collection_rights_data = {
-            'owned_collection_ids': (
-                [self.COLLECTION_IDS[0]]),
-            'editable_collection_ids': (
-                [self.COLLECTION_IDS[0]]),
-            'voiced_collection_ids': (
-                [self.COLLECTION_IDS[0]]),
+            'owned_collection_ids': ([self.COLLECTION_IDS[0]]),
+            'editable_collection_ids': ([self.COLLECTION_IDS[0]]),
+            'voiced_collection_ids': ([self.COLLECTION_IDS[0]]),
             'viewable_collection_ids': [self.COLLECTION_IDS[0]]
         }
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
-                'suggestion_type': (
-                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'suggestion_type': (feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
@@ -1745,12 +1679,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_exploration_rights_data = {
-            'owned_exploration_ids': (
-                [self.EXPLORATION_IDS[0]]),
-            'editable_exploration_ids': (
-                [self.EXPLORATION_IDS[0]]),
-            'voiced_exploration_ids': (
-                [self.EXPLORATION_IDS[0]]),
+            'owned_exploration_ids': ([self.EXPLORATION_IDS[0]]),
+            'editable_exploration_ids': ([self.EXPLORATION_IDS[0]]),
+            'voiced_exploration_ids': ([self.EXPLORATION_IDS[0]]),
             'viewable_exploration_ids': [self.EXPLORATION_IDS[0]]
         }
         expected_user_settings_data = {
@@ -1780,16 +1711,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'collection_ids': self.COLLECTION_IDS,
             'exploration_ids': self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
-                                           [thread_id],
+            [thread_id],
             'last_checked_msec': self.GENERIC_EPOCH
         }
 
         expected_task_entry_data = {
             'task_ids_resolved_by_user': [self.GENERIC_MODEL_ID]
         }
-        expected_topic_data = {
-            'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
-        }
+        expected_topic_data = {'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]}
 
         expected_contribution_rights_data = {
             'can_review_translation_for_language_codes': ['hi', 'en'],
@@ -1868,8 +1797,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_exploration_sm = {
             'exp_1-1': {
                 'commit_type': 'create',
-                'commit_message':
-                    'New exploration created with title \'A title\'.'
+                'commit_message': 'New exploration created with title \'A title\'.'
             },
             'exp_1-2': {
                 'commit_type': 'edit',
@@ -1887,34 +1815,29 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_user_auth_details: Dict[str, str] = {}
         expected_app_feedback_report = {
             '%s.%s.%s' % (
-                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
-                'randomInteger123'): {
-                    'scrubbed_by': self.USER_ID_1,
-                    'ticket_id': self.TICKET_ID,
-                    'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
-                    'local_timezone_offset_hrs': 0,
-                    'report_type': self.REPORT_TYPE_SUGGESTION,
-                    'category': self.CATEGORY_OTHER,
-                    'platform_version': self.PLATFORM_VERSION}}
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second, 'randomInteger123'
+            ): {
+                'scrubbed_by': self.USER_ID_1,
+                'ticket_id': self.TICKET_ID,
+                'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+                'local_timezone_offset_hrs': 0,
+                'report_type': self.REPORT_TYPE_SUGGESTION,
+                'category': self.CATEGORY_OTHER,
+                'platform_version': self.PLATFORM_VERSION
+            }
+        }
         expected_blog_post_data = {
             'content': 'content sample',
             'title': 'sample title',
-            'published_on': utils.get_time_in_millisecs(
-                blog_post_model.published_on),
+            'published_on': utils.get_time_in_millisecs(blog_post_model.published_on),
             'url_fragment': 'sample-url-fragment',
             'tags': ['tag', 'one'],
             'thumbnail_filename': 'thumbnail'
         }
         expected_blog_post_rights = {
-            'editable_blog_post_ids': [
-                self.BLOG_POST_ID_1,
-                self.BLOG_POST_ID_2
-            ],
+            'editable_blog_post_ids': [self.BLOG_POST_ID_1, self.BLOG_POST_ID_2],
         }
-        expected_blog_author_details = {
-            'author_name': 'test name',
-            'author_bio': ''
-        }
+        expected_blog_author_details = {'author_name': 'test name', 'author_bio': ''}
         expected_learner_group_data = {
             'title': 'sample title',
             'description': 'sample description',
@@ -1934,186 +1857,159 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         expected_translation_contribution_stats_data = {
             '%s.%s.%s' % (
-                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
-                self.TOPIC_ID_1): {
-                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                    'topic_id': self.TOPIC_ID_1,
-                    'submitted_translations_count': (
-                        self.SUBMITTED_TRANSLATIONS_COUNT),
-                    'submitted_translation_word_count': (
-                        self.SUBMITTED_TRANSLATION_WORD_COUNT),
-                    'accepted_translations_count': (
-                        self.ACCEPTED_TRANSLATIONS_COUNT),
-                    'accepted_translations_without_reviewer_edits_count': (
-                        self
-                        .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-                    'accepted_translation_word_count': (
-                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
-                    'rejected_translations_count': (
-                        self.REJECTED_TRANSLATIONS_COUNT),
-                    'rejected_translation_word_count': (
-                        self.REJECTED_TRANSLATION_WORD_COUNT),
-                    'contribution_dates': [
-                        date.isoformat() for date in self.CONTRIBUTION_DATES]
-                }
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1, self.TOPIC_ID_1
+            ): {
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_id': self.TOPIC_ID_1,
+                'submitted_translations_count': (self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (
+                    self.SUBMITTED_TRANSLATION_WORD_COUNT
+                ),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
+                ),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT
+                ),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (
+                    self.REJECTED_TRANSLATION_WORD_COUNT
+                ),
+                'contribution_dates': [
+                    date.isoformat() for date in self.CONTRIBUTION_DATES
+                ]
+            }
         }
         expected_translation_review_stats_data = {
             '%s.%s.%s' % (
-                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
-                self.TOPIC_ID_1): {
-                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                    'topic_id': self.TOPIC_ID_1,
-                    'reviewed_translations_count': (
-                        self.REVIEWED_TRANSLATIONS_COUNT),
-                    'reviewed_translation_word_count': (
-                        self.REVIEWED_TRANSLATION_WORD_COUNT),
-                    'accepted_translations_count': (
-                        self.ACCEPTED_TRANSLATIONS_COUNT),
-                    'accepted_translations_with_reviewer_edits_count': (
-                        self
-                        .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
-                    'accepted_translation_word_count': (
-                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
-                    'first_contribution_date': (
-                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
-                    'last_contribution_date': (
-                        self.LAST_CONTRIBUTION_DATE.isoformat())
-                }
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1, self.TOPIC_ID_1
+            ): {
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_id': self.TOPIC_ID_1,
+                'reviewed_translations_count': (self.REVIEWED_TRANSLATIONS_COUNT),
+                'reviewed_translation_word_count': (
+                    self.REVIEWED_TRANSLATION_WORD_COUNT
+                ),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+                ),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT
+                ),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
         }
         expected_question_contribution_stats_data = {
-            '%s.%s' % (
-                self.USER_ID_1, self.TOPIC_ID_1): {
-                    'topic_id': self.TOPIC_ID_1,
-                    'submitted_questions_count': (
-                        self.SUBMITTED_QUESTIONS_COUNT),
-                    'accepted_questions_count': (
-                        self.ACCEPTED_QUESTIONS_COUNT),
-                    'accepted_questions_without_reviewer_edits_count': (
-                        self
-                        .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-                    'first_contribution_date': (
-                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
-                    'last_contribution_date': (
-                        self.LAST_CONTRIBUTION_DATE.isoformat())
-                }
+            '%s.%s' % (self.USER_ID_1, self.TOPIC_ID_1): {
+                'topic_id': self.TOPIC_ID_1,
+                'submitted_questions_count': (self.SUBMITTED_QUESTIONS_COUNT),
+                'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_without_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
+                ),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
         }
         expected_question_review_stats_data = {
-            '%s.%s' % (
-                self.USER_ID_1, self.TOPIC_ID_1): {
-                    'topic_id': self.TOPIC_ID_1,
-                    'reviewed_questions_count': (
-                        self.REVIEWED_QUESTIONS_COUNT),
-                    'accepted_questions_count': (
-                        self.ACCEPTED_QUESTIONS_COUNT),
-                    'accepted_questions_with_reviewer_edits_count': (
-                        self
-                        .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-                    'first_contribution_date': (
-                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
-                    'last_contribution_date': (
-                        self.LAST_CONTRIBUTION_DATE.isoformat())
-                }
+            '%s.%s' % (self.USER_ID_1, self.TOPIC_ID_1): {
+                'topic_id': self.TOPIC_ID_1,
+                'reviewed_questions_count': (self.REVIEWED_QUESTIONS_COUNT),
+                'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_with_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
+                ),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
         }
         expected_translation_submitter_total_contribution_stats_data = {
-            '%s.%s' % (
-                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
-                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                    'topic_ids_with_translation_submissions': (
-                        self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
-                    'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
-                    'recent_performance': self.RECENT_PERFORMANCE,
-                    'overall_accuracy': self.OVERALL_ACCURACY,
-                    'submitted_translations_count': (
-                        self.SUBMITTED_TRANSLATIONS_COUNT),
-                    'submitted_translation_word_count': (
-                        self.SUBMITTED_TRANSLATION_WORD_COUNT),
-                    'accepted_translations_count': (
-                        self.ACCEPTED_TRANSLATIONS_COUNT),
-                    'accepted_translations_without_reviewer_edits_count': (
-                        self
-                        .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-                    'accepted_translation_word_count': (
-                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
-                    'rejected_translations_count': (
-                        self.REJECTED_TRANSLATIONS_COUNT),
-                    'rejected_translation_word_count': (
-                        self.REJECTED_TRANSLATION_WORD_COUNT),
-                    'first_contribution_date': (
-                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
-                    'last_contribution_date': (
-                        self.LAST_CONTRIBUTION_DATE.isoformat())
-                }
+            '%s.%s' % (self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids_with_translation_submissions': (
+                    self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS
+                ),
+                'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+                'recent_performance': self.RECENT_PERFORMANCE,
+                'overall_accuracy': self.OVERALL_ACCURACY,
+                'submitted_translations_count': (self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (
+                    self.SUBMITTED_TRANSLATION_WORD_COUNT
+                ),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
+                ),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT
+                ),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (
+                    self.REJECTED_TRANSLATION_WORD_COUNT
+                ),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
         }
         expected_translation_reviewer_total_contribution_stats_data = {
-            '%s.%s' % (
-                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
-                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                    'topic_ids_with_translation_reviews': (
-                        self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
-                    'reviewed_translations_count': (
-                        self.REVIEWED_TRANSLATIONS_COUNT),
-                    'accepted_translations_count': (
-                        self.ACCEPTED_TRANSLATIONS_COUNT),
-                    'accepted_translations_with_reviewer_edits_count': (
-                        self
-                        .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
-                    'accepted_translation_word_count': (
-                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
-                    'rejected_translations_count': (
-                        self.REJECTED_TRANSLATIONS_COUNT),
-                    'first_contribution_date': (
-                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
-                    'last_contribution_date': (
-                        self.LAST_CONTRIBUTION_DATE.isoformat())
-                }
+            '%s.%s' % (self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids_with_translation_reviews': (
+                    self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS
+                ),
+                'reviewed_translations_count': (self.REVIEWED_TRANSLATIONS_COUNT),
+                'accepted_translations_count': (self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+                ),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT
+                ),
+                'rejected_translations_count': (self.REJECTED_TRANSLATIONS_COUNT),
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
         }
         expected_question_submitter_total_contribution_stats_data = {
-            '%s' % (
-                self.USER_ID_1): {
-                    'topic_ids_with_question_submissions': (
-                        self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
-                    'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
-                    'recent_performance': self.RECENT_PERFORMANCE,
-                    'overall_accuracy': self.OVERALL_ACCURACY,
-                    'submitted_questions_count': (
-                        self.SUBMITTED_QUESTIONS_COUNT),
-                    'accepted_questions_count': (
-                        self.ACCEPTED_QUESTIONS_COUNT),
-                    'accepted_questions_without_reviewer_edits_count': (
-                        self
-                        .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-                    'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
-                    'first_contribution_date': (
-                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
-                    'last_contribution_date': (
-                        self.LAST_CONTRIBUTION_DATE.isoformat())
-                }
+            '%s' % (self.USER_ID_1): {
+                'topic_ids_with_question_submissions': (
+                    self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS
+                ),
+                'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+                'recent_performance': self.RECENT_PERFORMANCE,
+                'overall_accuracy': self.OVERALL_ACCURACY,
+                'submitted_questions_count': (self.SUBMITTED_QUESTIONS_COUNT),
+                'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_without_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
+                ),
+                'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
         }
         expected_question_reviewer_total_contribution_stats_data = {
-            '%s' % (
-                self.USER_ID_1): {
-                    'topic_ids_with_question_reviews': (
-                        self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
-                    'reviewed_questions_count': (
-                        self.REVIEWED_QUESTIONS_COUNT),
-                    'accepted_questions_count': (
-                        self.ACCEPTED_QUESTIONS_COUNT),
-                    'accepted_questions_with_reviewer_edits_count': (
-                        self
-                        .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-                    'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
-                    'first_contribution_date': (
-                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
-                    'last_contribution_date': (
-                        self.LAST_CONTRIBUTION_DATE.isoformat())
-                }
+            '%s' % (self.USER_ID_1): {
+                'topic_ids_with_question_reviews': (
+                    self.TOPIC_IDS_WITH_QUESTION_REVIEWS
+                ),
+                'reviewed_questions_count': (self.REVIEWED_QUESTIONS_COUNT),
+                'accepted_questions_count': (self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_with_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
+                ),
+                'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
+                'first_contribution_date': (self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
         }
         expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {
-            '%s_%s' % (
-                self.SUGGESTION_LANGUAGE_CODE,
-                self.TOPIC_ID_1): {
-                    'opportunity_id': self.EXPLORATION_IDS[0],
-                }
+            '%s_%s' % (self.SUGGESTION_LANGUAGE_CODE, self.TOPIC_ID_1): {
+                'opportunity_id': self.EXPLORATION_IDS[0],
+            }
         }
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
@@ -2141,55 +2037,35 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'topic_rights': expected_topic_data,
             'collection_progress': expected_collection_progress_data,
             'story_progress': expected_story_progress_data,
-            'general_feedback_thread':
-                expected_general_feedback_thread_data,
-            'general_feedback_thread_user':
-                expected_general_feedback_thread_user_data,
-            'general_feedback_message':
-                expected_general_feedback_message_data,
-            'collection_rights':
-                expected_collection_rights_data,
+            'general_feedback_thread': expected_general_feedback_thread_data,
+            'general_feedback_thread_user': expected_general_feedback_thread_user_data,
+            'general_feedback_message': expected_general_feedback_message_data,
+            'collection_rights': expected_collection_rights_data,
             'general_suggestion': expected_general_suggestion_data,
             'exploration_rights': expected_exploration_rights_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
-            'collection_rights_snapshot_metadata':
-                expected_collection_rights_sm,
-            'collection_snapshot_metadata':
-                expected_collection_sm,
-            'skill_snapshot_metadata':
-                expected_skill_sm,
-            'subtopic_page_snapshot_metadata':
-                expected_subtopic_page_sm,
-            'topic_rights_snapshot_metadata':
-                expected_topic_rights_sm,
+            'collection_rights_snapshot_metadata': expected_collection_rights_sm,
+            'collection_snapshot_metadata': expected_collection_sm,
+            'skill_snapshot_metadata': expected_skill_sm,
+            'subtopic_page_snapshot_metadata': expected_subtopic_page_sm,
+            'topic_rights_snapshot_metadata': expected_topic_rights_sm,
             'topic_snapshot_metadata': expected_topic_sm,
-            'translation_contribution_stats':
-                expected_translation_contribution_stats_data,
-            'translation_review_stats':
-                expected_translation_review_stats_data,
-            'question_contribution_stats':
-                expected_question_contribution_stats_data,
-            'question_review_stats':
-                expected_question_review_stats_data,
-            'translation_submitter_total_contribution_stats':
-                expected_translation_submitter_total_contribution_stats_data,
-            'translation_reviewer_total_contribution_stats':
-                expected_translation_reviewer_total_contribution_stats_data,
-            'question_submitter_total_contribution_stats':
-                expected_question_submitter_total_contribution_stats_data,
-            'question_reviewer_total_contribution_stats':
-                expected_question_reviewer_total_contribution_stats_data,
-            'translation_coordinators':
-                expected_translation_coordinator_stats_data,
+            'translation_contribution_stats': expected_translation_contribution_stats_data,
+            'translation_review_stats': expected_translation_review_stats_data,
+            'question_contribution_stats': expected_question_contribution_stats_data,
+            'question_review_stats': expected_question_review_stats_data,
+            'translation_submitter_total_contribution_stats': expected_translation_submitter_total_contribution_stats_data,
+            'translation_reviewer_total_contribution_stats': expected_translation_reviewer_total_contribution_stats_data,
+            'question_submitter_total_contribution_stats': expected_question_submitter_total_contribution_stats_data,
+            'question_reviewer_total_contribution_stats': expected_question_reviewer_total_contribution_stats_data,
+            'translation_coordinators': expected_translation_coordinator_stats_data,
             'pinned_opportunity': expected_pinned_opportunities_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'exploration_rights_snapshot_metadata':
-                expected_exploration_rights_sm,
+            'exploration_rights_snapshot_metadata': expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
-            'platform_parameter_snapshot_metadata':
-                expected_platform_parameter_sm,
+            'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
             'user_email_preferences': expected_user_email_preferences,
             'user_auth_details': expected_user_auth_details,
             'app_feedback_report': expected_app_feedback_report,
@@ -2199,49 +2075,38 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'voice_artist_metadata': expected_language_code_to_accent
         }
 
-        with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
-            'rb',
-            encoding=None
-        ) as f:
+        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
+                             'rb', encoding=None) as f:
             raw_image_png = f.read()
-        with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
-            'rb',
-            encoding=None
-        ) as f:
+        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
+                             'rb', encoding=None) as f:
             raw_image_webp = f.read()
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
         fs.commit('profile_picture.png', raw_image_png, mimetype='image/png')
         fs.commit('profile_picture.webp', raw_image_webp, mimetype='image/webp')
 
-        user_takeout_object = takeout_service.export_data_for_user(
-            self.USER_ID_1)
+        user_takeout_object = takeout_service.export_data_for_user(self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
         self.assertItemsEqual(observed_data, expected_user_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_user_data)
-        self.assertItemsEqual(
-            json.loads(observed_json), json.loads(expected_json))
+        self.assertItemsEqual(json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(
-                self.PROFILE_PICTURE_DATA_PNG,
-                'user_settings_profile_picture.png'),
+                self.PROFILE_PICTURE_DATA_PNG, 'user_settings_profile_picture.png'
+            ),
             takeout_domain.TakeoutImage(
-                self.PROFILE_PICTURE_DATA_WEBP,
-                'user_settings_profile_picture.webp')
+                self.PROFILE_PICTURE_DATA_WEBP, 'user_settings_profile_picture.webp'
+            )
         ]
         self.assertEqual(len(expected_images), len(observed_images))
         for i, expected_image in enumerate(expected_images):
             self.assertEqual(
-                expected_image.b64_image_data,
-                observed_images[i].b64_image_data
+                expected_image.b64_image_data, observed_images[i].b64_image_data
             )
             self.assertEqual(
-                expected_image.image_export_path,
-                observed_images[i].image_export_path
+                expected_image.image_export_path, observed_images[i].image_export_path
             )
 
     def test_export_for_full_user_does_not_export_profile_data(self) -> None:
@@ -2271,9 +2136,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'display_alias': self.GENERIC_DISPLAY_ALIAS_2
         }
-        user_skill_data = {
-            self.SKILL_ID_3: self.DEGREE_OF_MASTERY_2
-        }
+        user_skill_data = {self.SKILL_ID_3: self.DEGREE_OF_MASTERY_2}
         completed_activities_data = {
             'completed_exploration_ids': self.EXPLORATION_IDS_2,
             'completed_collection_ids': self.COLLECTION_IDS_2,
@@ -2287,12 +2150,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'playlist_exploration_ids': self.EXPLORATION_IDS_2,
             'playlist_collection_ids': self.COLLECTION_IDS_2
         }
-        collection_progress_data = {
-            self.COLLECTION_IDS_2[0]: self.EXPLORATION_IDS_2
-        }
-        story_progress_data = {
-            self.STORY_ID_2: self.COMPLETED_NODE_IDS_2
-        }
+        collection_progress_data = {self.COLLECTION_IDS_2[0]: self.EXPLORATION_IDS_2}
+        story_progress_data = {self.STORY_ID_2: self.COMPLETED_NODE_IDS_2}
         profile_user_data = {
             'user_settings': profile_user_settings_data,
             'user_skill_mastery': user_skill_data,
@@ -2305,25 +2164,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'story_progress': story_progress_data,
         }
 
-        with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
-            'rb',
-            encoding=None
-        ) as f:
+        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
+                             'rb', encoding=None) as f:
             raw_image_png = f.read()
-        with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
-            'rb',
-            encoding=None
-        ) as f:
+        with utils.open_file(os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
+                             'rb', encoding=None) as f:
             raw_image_webp = f.read()
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, self.GENERIC_USERNAME)
         fs.commit('profile_picture.png', raw_image_png, mimetype='image/png')
         fs.commit('profile_picture.webp', raw_image_webp, mimetype='image/webp')
 
-        user_takeout_object = takeout_service.export_data_for_user(
-            self.USER_ID_1)
+        user_takeout_object = takeout_service.export_data_for_user(self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         for key, value in profile_user_data.items():
             self.assertNotEqual(value, observed_data[key])

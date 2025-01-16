@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Registry for translatable objects."""
 
 from __future__ import annotations
@@ -41,9 +40,8 @@ class Registry:
     """Registry of all translatable objects."""
 
     # Dict mapping object class names to their classes.
-    _translatable_objects_dict: Dict[
-        TranslatableObjectNames, TranslatableObjectClasses
-    ] = {}
+    _translatable_objects_dict: Dict[TranslatableObjectNames,
+                                     TranslatableObjectClasses] = {}
 
     @classmethod
     def _refresh_registry(cls) -> None:
@@ -53,13 +51,13 @@ class Registry:
         cls._translatable_objects_dict.clear()
 
         # Add new object instances to the registry.
-        for name, clazz in inspect.getmembers(
-                objects, predicate=inspect.isclass):
+        for name, clazz in inspect.getmembers(objects, predicate=inspect.isclass):
             if name.endswith('_test') or name.startswith('Base'):
                 continue
 
             ancestor_names = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
             # Some classes, such as TranslatableHtmlContentId, are not
             # subclasses of BaseTranslatableObject, despite starting with the
             # string 'Translatable'. So we need to do verification based on the
@@ -81,25 +79,29 @@ class Registry:
     @classmethod
     def get_object_class(
         cls, obj_type: Literal['TranslatableHtml']
-    ) -> Type[objects.TranslatableHtml]: ...
+    ) -> Type[objects.TranslatableHtml]:
+        ...
 
     @overload
     @classmethod
     def get_object_class(
         cls, obj_type: Literal['TranslatableUnicodeString']
-    ) -> Type[objects.TranslatableUnicodeString]: ...
+    ) -> Type[objects.TranslatableUnicodeString]:
+        ...
 
     @overload
     @classmethod
     def get_object_class(
         cls, obj_type: Literal['TranslatableSetOfUnicodeString']
-    ) -> Type[objects.TranslatableSetOfUnicodeString]: ...
+    ) -> Type[objects.TranslatableSetOfUnicodeString]:
+        ...
 
     @overload
     @classmethod
     def get_object_class(
         cls, obj_type: Literal['TranslatableSetOfNormalizedString']
-    ) -> Type[objects.TranslatableSetOfNormalizedString]: ...
+    ) -> Type[objects.TranslatableSetOfNormalizedString]:
+        ...
 
     @classmethod
     def get_object_class(
@@ -126,5 +128,6 @@ class Registry:
             cls._refresh_registry()
         if obj_type not in cls._translatable_objects_dict:
             raise TypeError(
-                '\'%s\' is not a valid translatable object class.' % obj_type)
+                '\'%s\' is not a valid translatable object class.' % obj_type
+            )
         return cls._translatable_objects_dict[obj_type]

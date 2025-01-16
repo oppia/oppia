@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Service functions related to Oppia improvement tasks."""
 
 from __future__ import annotations
@@ -31,13 +30,11 @@ from core.platform import models
 from typing import Dict, Iterator, List, Optional, Sequence, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import improvements_models
 
-(improvements_models,) = (
-    models.Registry.import_models([models.Names.IMPROVEMENTS])
-)
+(improvements_models, ) = (models.Registry.import_models([models.Names.IMPROVEMENTS]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -57,9 +54,8 @@ def _yield_all_tasks_ordered_by_status(
     """
     model_class = improvements_models.ExplorationStatsTaskEntryModel
     results: Sequence[improvements_models.ExplorationStatsTaskEntryModel] = []
-    query = model_class.query(
-        model_class.composite_entity_id == composite_entity_id
-    ).order(model_class.status)
+    query = model_class.query(model_class.composite_entity_id == composite_entity_id
+                              ).order(model_class.status)
     cursor, more = (None, True)
     while more:
         results, cursor, more = query.fetch_page(
@@ -86,7 +82,8 @@ def get_task_entry_from_model(
         task_entry_model.entity_version, task_entry_model.task_type,
         task_entry_model.target_type, task_entry_model.target_id,
         task_entry_model.issue_description, task_entry_model.status,
-        task_entry_model.resolver_id, task_entry_model.resolved_on)
+        task_entry_model.resolver_id, task_entry_model.resolved_on
+    )
 
 
 def fetch_exploration_tasks(
@@ -108,16 +105,14 @@ def fetch_exploration_tasks(
                 tasks.
     """
     composite_entity_id = (
-        improvements_models.ExplorationStatsTaskEntryModel
-        .generate_composite_entity_id(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
-            exploration.id,
-            exploration.version
+        improvements_models.ExplorationStatsTaskEntryModel.generate_composite_entity_id(
+            constants.TASK_ENTITY_TYPE_EXPLORATION, exploration.id, exploration.version
         )
     )
     tasks_grouped_by_status = itertools.groupby(
         _yield_all_tasks_ordered_by_status(composite_entity_id),
-        operator.attrgetter('status'))
+        operator.attrgetter('status')
+    )
 
     open_tasks: List[improvements_domain.TaskEntry] = []
     resolved_task_types_by_state_name = collections.defaultdict(list)
@@ -126,8 +121,7 @@ def fetch_exploration_tasks(
             open_tasks.extend(tasks)
         elif status_group == constants.TASK_STATUS_RESOLVED:
             for t in tasks:
-                resolved_task_types_by_state_name[t.target_id].append(
-                    t.task_type)
+                resolved_task_types_by_state_name[t.target_id].append(t.task_type)
     return open_tasks, dict(resolved_task_types_by_state_name)
 
 
@@ -164,16 +158,13 @@ def fetch_exploration_task_history_page(
         model_class.entity_type == constants.TASK_ENTITY_TYPE_EXPLORATION,
         model_class.entity_id == exploration.id,
         model_class.status == constants.TASK_STATUS_RESOLVED
-    ).order(
-        -model_class.resolved_on
-    ).fetch_page(
+    ).order(-model_class.resolved_on).fetch_page(
         feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor
     )
     # The urlsafe returns bytes and we need to decode them to string.
     return (
         [get_task_entry_from_model(model) for model in results],
-        cursor.urlsafe().decode('utf-8') if cursor else None,
-        more
+        cursor.urlsafe().decode('utf-8') if cursor else None, more
     )
 
 
@@ -194,7 +185,8 @@ def put_tasks(
             of the task models.
     """
     task_models = improvements_models.ExplorationStatsTaskEntryModel.get_multi(
-        [t.task_id for t in tasks])
+        [t.task_id for t in tasks]
+    )
     models_to_put = []
     for task, model in zip(tasks, task_models):
         if model is None:
@@ -211,11 +203,14 @@ def put_tasks(
                     issue_description=task.issue_description,
                     status=task.status,
                     resolver_id=task.resolver_id,
-                    resolved_on=task.resolved_on))
+                    resolved_on=task.resolved_on
+                )
+            )
         elif apply_changes_to_model(task, model):
             models_to_put.append(model)
     improvements_models.ExplorationStatsTaskEntryModel.update_timestamps_multi(
-        models_to_put, update_last_updated_time=update_last_updated_time)
+        models_to_put, update_last_updated_time=update_last_updated_time
+    )
     improvements_models.ExplorationStatsTaskEntryModel.put_multi(models_to_put)
 
 

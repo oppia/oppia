@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Service functions relating to cron controllers."""
 
 from __future__ import annotations
@@ -31,13 +30,12 @@ if MYPY:  # pragma: no cover
     from mypy_imports import job_models
     from mypy_imports import user_models
 
-(
-    base_models, beam_job_models,
-    job_models, user_models
-) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.BEAM_JOB,
-    models.Names.JOB, models.Names.USER
-])
+(base_models, beam_job_models, job_models, user_models) = models.Registry.import_models(
+    [
+        models.Names.BASE_MODEL, models.Names.BEAM_JOB, models.Names.JOB,
+        models.Names.USER
+    ]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 # Only non-versioned models should be included in this list. Activities that
@@ -56,7 +54,8 @@ def delete_models_marked_as_deleted() -> None:
     """
     date_now = datetime.datetime.utcnow()
     date_before_which_to_hard_delete = (
-        date_now - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+        date_now - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
+    )
     for model_class in models.Registry.get_all_storage_model_classes():
         deleted_models: Sequence[base_models.BaseModel] = model_class.query(
             model_class.deleted == True  # pylint: disable=singleton-comparison
@@ -70,7 +69,8 @@ def delete_models_marked_as_deleted() -> None:
                 model.id for model in models_to_hard_delete
             ]
             model_class.delete_multi(
-                model_ids_to_hard_delete, '', '', force_deletion=True)
+                model_ids_to_hard_delete, '', '', force_deletion=True
+            )
         else:
             model_class.delete_multi(models_to_hard_delete)
 
@@ -82,7 +82,8 @@ def mark_outdated_models_as_deleted() -> None:
     models_to_mark_as_deleted: List[base_models.BaseModel] = []
     for model_class, period_to_keep in MODEL_CLASSES_TO_MARK_AS_DELETED.items():
         date_before_which_to_mark_as_deleted = (
-            datetime.datetime.utcnow() - period_to_keep)
+            datetime.datetime.utcnow() - period_to_keep
+        )
         models_to_mark_as_deleted.extend(
             model_class.query(
                 model_class.last_updated < date_before_which_to_mark_as_deleted

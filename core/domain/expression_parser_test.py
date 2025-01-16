@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for expression_parser.py."""
 
 from __future__ import annotations
@@ -35,14 +34,17 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.contains_balanced_brackets('[a/ 2]'))
         self.assertTrue(expression_parser.contains_balanced_brackets(' {a/2} '))
         self.assertTrue(expression_parser.contains_balanced_brackets('([a]/2)'))
-        self.assertTrue(expression_parser.contains_balanced_brackets(
-            '[(a/{ 2 })]'))
-        self.assertTrue(expression_parser.contains_balanced_brackets(
-            '(([{}]{})( ){[ ]})'))
-        self.assertTrue(expression_parser.contains_balanced_brackets(
-            '[[ [((()))[[[[[]{}]]{}]]()]] ]'))
-        self.assertTrue(expression_parser.contains_balanced_brackets(
-            '{( 2x^2 ) ^ [ 3/2 ]} / 4'))
+        self.assertTrue(expression_parser.contains_balanced_brackets('[(a/{ 2 })]'))
+        self.assertTrue(
+            expression_parser.contains_balanced_brackets('(([{}]{})( ){[ ]})')
+        )
+        self.assertTrue(
+            expression_parser.
+            contains_balanced_brackets('[[ [((()))[[[[[]{}]]{}]]()]] ]')
+        )
+        self.assertTrue(
+            expression_parser.contains_balanced_brackets('{( 2x^2 ) ^ [ 3/2 ]} / 4')
+        )
 
         self.assertFalse(expression_parser.contains_balanced_brackets('(a/2'))
         self.assertFalse(expression_parser.contains_balanced_brackets('a/2]'))
@@ -55,32 +57,23 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
 
     def test_contains_at_least_one_variable(self) -> None:
         """Tests for contains_at_least_one_variable method."""
-        self.assertTrue(
-            expression_parser.contains_at_least_one_variable('a^2.3'))
-        self.assertTrue(
-            expression_parser.contains_at_least_one_variable('abs(alpha)'))
-        self.assertTrue(
-            expression_parser.contains_at_least_one_variable('alpha/gamma'))
-        self.assertTrue(
-            expression_parser.contains_at_least_one_variable('A + 2/3'))
+        self.assertTrue(expression_parser.contains_at_least_one_variable('a^2.3'))
+        self.assertTrue(expression_parser.contains_at_least_one_variable('abs(alpha)'))
+        self.assertTrue(expression_parser.contains_at_least_one_variable('alpha/gamma'))
+        self.assertTrue(expression_parser.contains_at_least_one_variable('A + 2/3'))
         # The following tests might seem as invalid but the individual letters
         # will be joined via '*' during tokenization which makes them valid.
+        self.assertTrue(expression_parser.contains_at_least_one_variable('Alpha'))
+        self.assertTrue(expression_parser.contains_at_least_one_variable('invalid + 2'))
         self.assertTrue(
-            expression_parser.contains_at_least_one_variable('Alpha'))
-        self.assertTrue(
-            expression_parser.contains_at_least_one_variable('invalid + 2'))
-        self.assertTrue(
-            expression_parser.contains_at_least_one_variable('alpha + bet/22'))
+            expression_parser.contains_at_least_one_variable('alpha + bet/22')
+        )
 
-        self.assertFalse(
-            expression_parser.contains_at_least_one_variable('1 + 2'))
-        self.assertFalse(
-            expression_parser.contains_at_least_one_variable('1^2^3/4'))
+        self.assertFalse(expression_parser.contains_at_least_one_variable('1 + 2'))
+        self.assertFalse(expression_parser.contains_at_least_one_variable('1^2^3/4'))
         self.assertFalse(expression_parser.contains_at_least_one_variable('1'))
-        self.assertFalse(
-            expression_parser.contains_at_least_one_variable('sqrt(4/4)'))
-        self.assertFalse(
-            expression_parser.contains_at_least_one_variable('tan(30)'))
+        self.assertFalse(expression_parser.contains_at_least_one_variable('sqrt(4/4)'))
+        self.assertFalse(expression_parser.contains_at_least_one_variable('tan(30)'))
 
         with self.assertRaisesRegex(Exception, 'Invalid bracket pairing.'):
             expression_parser.contains_at_least_one_variable('1 +2)')
@@ -89,160 +82,132 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Invalid character: !.'):
             expression_parser.contains_at_least_one_variable('4! 2')
         with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
-            expression_parser.contains_at_least_one_variable(
-                'alpha + bet/22.3.4')
+            expression_parser.contains_at_least_one_variable('alpha + bet/22.3.4')
 
     def test_tokenize(self) -> None:
         """Tests for tokenize method."""
         expression = 'a+b'
         expected_output = ['a', '+', 'b']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '53.4 - 6/alpha'
         expected_output = ['53.4', '-', '6', '/', 'alpha']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'a^0.5 + (-zeta)'
         expected_output = ['a', '^', '0.5', '+', '(', '-', 'zeta', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'sqrt(3/[-A])'
         expected_output = ['sqrt', '(', '3', '/', '(', '-', 'A', ')', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'abs(sqrt(3)) * 4/ 2^ 3            '
         expected_output = [
-            'abs', '(', 'sqrt', '(', '3', ')', ')', '*', '4', '/', '2',
-            '^', '3']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+            'abs', '(', 'sqrt', '(', '3', ')', ')', '*', '4', '/', '2', '^', '3'
+        ]
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = ''
         expected_output = []
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '3.4^4.3/0.0005 * {9}'
         expected_output = ['3.4', '^', '4.3', '/', '0.0005', '*', '(', '9', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'ab'
         expected_output = ['a', '*', 'b']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'a**bc'
         expected_output = ['a', '*', '*', 'b', '*', 'c']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'Alpha'
         expected_output = ['A', '*', 'l', '*', 'p', '*', 'h', '*', 'a']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'alpha'
         expected_output = ['alpha']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'alphax'
         expected_output = ['alpha', '*', 'x']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'xalpha'
         expected_output = ['x', '*', 'alpha']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '2.2gamma/23'
         expected_output = ['2.2', '*', 'gamma', '/', '23']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '2pir^2/2'
         expected_output = ['2', '*', 'pi', '*', 'r', '^', '2', '/', '2']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'sigmaepsilon'
         expected_output = ['sigma', '*', 'epsilon']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'sqrt(epsilonpsi-2abeta)'
         expected_output = [
-            'sqrt', '(', 'epsilon', '*', 'psi', '-', '2', '*', 'a', '*',
-            'beta', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+            'sqrt', '(', 'epsilon', '*', 'psi', '-', '2', '*', 'a', '*', 'beta', ')'
+        ]
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'alphasqrt(3/4)'
         expected_output = ['alpha', '*', 'sqrt', '(', '3', '/', '4', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'tan(theta)cos(theta)'
-        expected_output = [
-            'tan', '(', 'theta', ')', '*', 'cos', '(',
-            'theta', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        expected_output = ['tan', '(', 'theta', ')', '*', 'cos', '(', 'theta', ')']
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = '(a+b)(a-b)'
-        expected_output = [
-            '(', 'a', '+', 'b', ')', '*',
-            '(', 'a', '-', 'b', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        expected_output = ['(', 'a', '+', 'b', ')', '*', '(', 'a', '-', 'b', ')']
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'xsqrt(2)x'
-        expected_output = [
-            'x', '*', 'sqrt', '(', '2', ')', '*', 'x']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+        expected_output = ['x', '*', 'sqrt', '(', '2', ')', '*', 'x']
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'sin(pi)(a - x^2alpha)'
         expected_output = [
-            'sin', '(', 'pi', ')', '*', '(', 'a', '-', 'x', '^',
-            '2', '*', 'alpha', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+            'sin', '(', 'pi', ')', '*', '(', 'a', '-', 'x', '^', '2', '*', 'alpha', ')'
+        ]
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         expression = 'cosh(3a45theta) + sin(x(theta))'
         expected_output = [
-            'cosh', '(', '3', '*', 'a', '*', '45', '*', 'theta', ')',
-            '+', 'sin', '(', 'x', '*', '(', 'theta', ')', ')']
-        actual_output = map(
-            lambda x: x.text, expression_parser.tokenize(expression))
+            'cosh', '(', '3', '*', 'a', '*', '45', '*', 'theta', ')', '+', 'sin', '(',
+            'x', '*', '(', 'theta', ')', ')'
+        ]
+        actual_output = map(lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
         with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
@@ -261,33 +226,34 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
     def test_get_variables(self) -> None:
         """Tests for get_variables method."""
         self.assertItemsEqual(expression_parser.get_variables('a^2.3'), ['a'])
+        self.assertItemsEqual(expression_parser.get_variables('abs(alpha)'), ['alpha'])
         self.assertItemsEqual(
-            expression_parser.get_variables('abs(alpha)'), ['alpha'])
-        self.assertItemsEqual(
-            expression_parser.get_variables('alpha/gamma'), ['alpha', 'gamma'])
+            expression_parser.get_variables('alpha/gamma'), ['alpha', 'gamma']
+        )
         self.assertEqual(expression_parser.get_variables('A + 2/3'), ['A'])
         self.assertItemsEqual(
             expression_parser.get_variables('alphabetagamma'),
-            ['alpha', 'beta', 'gamma'])
+            ['alpha', 'beta', 'gamma']
+        )
         self.assertItemsEqual(
-            expression_parser.get_variables('betalphaa'),
-            ['a', 'p', 'beta', 'l', 'h'])
+            expression_parser.get_variables('betalphaa'), ['a', 'p', 'beta', 'l', 'h']
+        )
+        self.assertItemsEqual(expression_parser.get_variables('a+a*a/aa^a-a'), ['a'])
         self.assertItemsEqual(
-            expression_parser.get_variables('a+a*a/aa^a-a'), ['a'])
-        self.assertItemsEqual(expression_parser.get_variables(
-            'sqrt(3+x^y)/abs(gamma)'), ['y', 'x', 'gamma'])
+            expression_parser.get_variables('sqrt(3+x^y)/abs(gamma)'),
+            ['y', 'x', 'gamma']
+        )
+        self.assertItemsEqual(expression_parser.get_variables('a=3+4'), ['a'])
         self.assertItemsEqual(
-            expression_parser.get_variables('a=3+4'), ['a'])
-        self.assertItemsEqual(expression_parser.get_variables(
-            '(a-2)^beta = alpha/gamma'), ['a', 'alpha', 'beta', 'gamma'])
+            expression_parser.get_variables('(a-2)^beta = alpha/gamma'),
+            ['a', 'alpha', 'beta', 'gamma']
+        )
+        self.assertItemsEqual(expression_parser.get_variables('4=abs(-4)'), [])
         self.assertItemsEqual(
-            expression_parser.get_variables('4=abs(-4)'), [])
-        self.assertItemsEqual(
-            expression_parser.get_variables('a^pi + e/2'), ['a', 'pi', 'e'])
-        self.assertItemsEqual(
-            expression_parser.get_variables('pi-3.14e'), ['pi', 'e'])
-        self.assertItemsEqual(
-            expression_parser.get_variables('epi'), ['pi', 'e'])
+            expression_parser.get_variables('a^pi + e/2'), ['a', 'pi', 'e']
+        )
+        self.assertItemsEqual(expression_parser.get_variables('pi-3.14e'), ['pi', 'e'])
+        self.assertItemsEqual(expression_parser.get_variables('epi'), ['pi', 'e'])
 
 
 class TokenUnitTests(test_utils.GenericTestBase):
@@ -308,14 +274,12 @@ class TokenUnitTests(test_utils.GenericTestBase):
         """Tests for is_identifier method."""
         self.assertEqual(expression_parser.Token('a').category, 'identifier')
         self.assertEqual(expression_parser.Token('a').category, 'identifier')
-        self.assertEqual(
-            expression_parser.Token('alpha').category, 'identifier')
+        self.assertEqual(expression_parser.Token('alpha').category, 'identifier')
         self.assertEqual(expression_parser.Token('A').category, 'identifier')
 
         with self.assertRaisesRegex(Exception, 'Invalid token: al.'):
             expression_parser.Token('al')
-        self.assertNotEqual(
-            expression_parser.Token('5').category, 'identifier')
+        self.assertNotEqual(expression_parser.Token('5').category, 'identifier')
 
     def test_is_number(self) -> None:
         """Tests for is_number method."""
@@ -357,14 +321,12 @@ class ParserUnitTests(test_utils.GenericTestBase):
         """
         root_node = expression_parser.Parser().parse('a + b - 2')
         # Root node {-}.
-        self.assertIsInstance(
-            root_node, expression_parser.SubtractionOperatorNode)
+        self.assertIsInstance(root_node, expression_parser.SubtractionOperatorNode)
         self.assertEqual(len(root_node.children), 2)
 
         left_child_1, right_child_1 = root_node.children
         # Left child 1 {+}.
-        self.assertIsInstance(
-            left_child_1, expression_parser.AdditionOperatorNode)
+        self.assertIsInstance(left_child_1, expression_parser.AdditionOperatorNode)
         self.assertEqual(len(left_child_1.children), 2)
         # Right child 1 {2}.
         assert isinstance(right_child_1, expression_parser.NumberNode)
@@ -395,14 +357,12 @@ class ParserUnitTests(test_utils.GenericTestBase):
         """
         root_node = expression_parser.Parser().parse('a / b * 2')
         # Root node {*}.
-        assert isinstance(
-            root_node, expression_parser.MultiplicationOperatorNode)
+        assert isinstance(root_node, expression_parser.MultiplicationOperatorNode)
         self.assertEqual(len(root_node.children), 2)
 
         left_child_1, right_child_1 = root_node.children
         # Left child 1 {/}.
-        assert isinstance(
-            left_child_1, expression_parser.DivisionOperatorNode)
+        assert isinstance(left_child_1, expression_parser.DivisionOperatorNode)
         self.assertEqual(len(left_child_1.children), 2)
         # Right child 1 {2}.
         assert isinstance(right_child_1, expression_parser.NumberNode)
@@ -443,8 +403,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(left_child_1.token.text, 'a')
         self.assertEqual(len(left_child_1.children), 0)
         # Right child 1 {^}.
-        assert isinstance(
-            right_child_1, expression_parser.PowerOperatorNode)
+        assert isinstance(right_child_1, expression_parser.PowerOperatorNode)
         self.assertEqual(len(right_child_1.children), 2)
 
         left_child_2, right_child_2 = right_child_1.children
@@ -477,8 +436,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
 
         child_1 = root_node.children[0]
         # Child 1 {*}.
-        assert isinstance(
-            child_1, expression_parser.MultiplicationOperatorNode)
+        assert isinstance(child_1, expression_parser.MultiplicationOperatorNode)
         self.assertEqual(len(child_1.children), 2)
 
         left_child_2, right_child_2 = child_1.children
@@ -503,35 +461,26 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_valid_expression('2x + 3/2'))
         self.assertTrue(expression_parser.is_valid_expression('alpha + bet/2'))
         self.assertTrue(expression_parser.is_valid_expression('Alpha/2'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '42 - [5/a] (4)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'a + sqrt(beta/gamma)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'cos(theta/2^epsilon)'))
+        self.assertTrue(expression_parser.is_valid_expression('42 - [5/a] (4)'))
+        self.assertTrue(expression_parser.is_valid_expression('a + sqrt(beta/gamma)'))
+        self.assertTrue(expression_parser.is_valid_expression('cos(theta/2^epsilon)'))
         self.assertTrue(expression_parser.is_valid_expression('a+{-b/22}'))
         self.assertTrue(expression_parser.is_valid_expression('abs(a^2 + b^2)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'sin(theta)^2 + cos(theta)^2'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('sin(theta)^2 + cos(theta)^2')
+        )
         self.assertTrue(expression_parser.is_valid_expression('(2*pi*r^2)/2'))
         self.assertTrue(expression_parser.is_valid_expression('1 + (2*a)'))
         self.assertTrue(expression_parser.is_valid_expression('(a+ b) '))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '{a+(beta - gamma)}'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '(a) / ((b)/(c))'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '{a+(b-[c])-(beta^4)}'))
+        self.assertTrue(expression_parser.is_valid_expression('{a+(beta - gamma)}'))
+        self.assertTrue(expression_parser.is_valid_expression('(a) / ((b)/(c))'))
+        self.assertTrue(expression_parser.is_valid_expression('{a+(b-[c])-(beta^4)}'))
         self.assertTrue(expression_parser.is_valid_expression('alpha + (-3)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'alpha^(3.9/beta*gamma)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '{a-(-3)/(2-(-b)^4)}^2'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'a+(-3)/alpha + gamma^2'))
+        self.assertTrue(expression_parser.is_valid_expression('alpha^(3.9/beta*gamma)'))
+        self.assertTrue(expression_parser.is_valid_expression('{a-(-3)/(2-(-b)^4)}^2'))
+        self.assertTrue(expression_parser.is_valid_expression('a+(-3)/alpha + gamma^2'))
         self.assertTrue(expression_parser.is_valid_expression('(x+y) * (x-y)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '(a+ b)^2 - (c+d) ^ 3'))
+        self.assertTrue(expression_parser.is_valid_expression('(a+ b)^2 - (c+d) ^ 3'))
 
         self.assertTrue(expression_parser.is_valid_expression('3+2'))
         self.assertTrue(expression_parser.is_valid_expression('---+34'))
@@ -539,23 +488,21 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_valid_expression('3+2^3'))
         self.assertTrue(expression_parser.is_valid_expression('(5-2^[6+3])'))
         self.assertTrue(expression_parser.is_valid_expression('(-5)^(-1)/2'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '2*10^3 + 3*10^2'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '{55 - 2/(-3)^100 + [5-4]}'))
+        self.assertTrue(expression_parser.is_valid_expression('2*10^3 + 3*10^2'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('{55 - 2/(-3)^100 + [5-4]}')
+        )
         self.assertTrue(expression_parser.is_valid_expression('(3^2) - (4^2)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '(1+2+3)/(1-2-3)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '24.6 + 3^(-1/2)'))
+        self.assertTrue(expression_parser.is_valid_expression('(1+2+3)/(1-2-3)'))
+        self.assertTrue(expression_parser.is_valid_expression('24.6 + 3^(-1/2)'))
         self.assertTrue(expression_parser.is_valid_expression('1^1^1^1^1^1^1'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            '1000 + 200 + 30 + 4'))
+        self.assertTrue(expression_parser.is_valid_expression('1000 + 200 + 30 + 4'))
         self.assertTrue(expression_parser.is_valid_expression('(1.01)^39'))
         self.assertTrue(expression_parser.is_valid_expression('506/(2-3)^(-3)'))
         self.assertTrue(expression_parser.is_valid_expression('sqrt(-1)'))
-        self.assertTrue(expression_parser.is_valid_expression(
-            'sqrt(-abs(-1))^2/abs(5)'))
+        self.assertTrue(
+            expression_parser.is_valid_expression('sqrt(-abs(-1))^2/abs(5)')
+        )
         self.assertFalse(expression_parser.is_valid_expression('a+b/'))
         self.assertFalse(expression_parser.is_valid_expression('|x|'))
         self.assertFalse(expression_parser.is_valid_expression('||'))
@@ -563,11 +510,9 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.is_valid_expression('a^2.'))
         self.assertFalse(expression_parser.is_valid_expression('(352+)-3*x'))
         self.assertFalse(expression_parser.is_valid_expression('(a-2^34-)'))
-        self.assertFalse(expression_parser.is_valid_expression(
-            '(25 + 3.4.3*a)'))
+        self.assertFalse(expression_parser.is_valid_expression('(25 + 3.4.3*a)'))
         self.assertFalse(expression_parser.is_valid_expression('sqrt(abs)'))
-        self.assertFalse(expression_parser.is_valid_expression(
-            'alpha + bet/2.3.4'))
+        self.assertFalse(expression_parser.is_valid_expression('alpha + bet/2.3.4'))
         self.assertFalse(expression_parser.is_valid_expression('a_b'))
         self.assertFalse(expression_parser.is_valid_expression('!/'))
         self.assertFalse(expression_parser.is_valid_expression('a~b'))
@@ -587,10 +532,8 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.is_valid_expression('192.168.1 + 3'))
         self.assertFalse(expression_parser.is_valid_expression('{1 - 2 (/3}'))
         self.assertFalse(expression_parser.is_valid_expression('[5^(3-2])'))
-        self.assertFalse(expression_parser.is_valid_expression(
-            '55.02//3.5-(-a)'))
-        self.assertFalse(expression_parser.is_valid_expression(
-            'alpha + beta-^1'))
+        self.assertFalse(expression_parser.is_valid_expression('55.02//3.5-(-a)'))
+        self.assertFalse(expression_parser.is_valid_expression('alpha + beta-^1'))
         self.assertFalse(expression_parser.is_valid_expression('(3+2]'))
         self.assertFalse(expression_parser.is_valid_expression('3!2'))
         self.assertFalse(expression_parser.is_valid_expression('3~2'))

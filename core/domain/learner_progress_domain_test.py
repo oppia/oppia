@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for learner progress domain objects."""
 
 from __future__ import annotations
@@ -29,20 +28,16 @@ class LearnerProgressInTopicsAndStoriesUnitTests(test_utils.GenericTestBase):
         """Tests init method."""
         user_learner_progress = (
             learner_progress_domain.LearnerProgressInTopicsAndStories(
-                [], [], [], [], [], [], [], []))
+                [], [], [], [], [], [], [], []
+            )
+        )
 
-        self.assertEqual(
-            user_learner_progress.partially_learnt_topic_summaries, [])
-        self.assertEqual(
-            user_learner_progress.completed_story_summaries, [])
-        self.assertEqual(
-            user_learner_progress.learnt_topic_summaries, [])
-        self.assertEqual(
-            user_learner_progress.topics_to_learn_summaries, [])
-        self.assertEqual(
-            user_learner_progress.all_topic_summaries, [])
-        self.assertEqual(
-            user_learner_progress.untracked_topic_summaries, [])
+        self.assertEqual(user_learner_progress.partially_learnt_topic_summaries, [])
+        self.assertEqual(user_learner_progress.completed_story_summaries, [])
+        self.assertEqual(user_learner_progress.learnt_topic_summaries, [])
+        self.assertEqual(user_learner_progress.topics_to_learn_summaries, [])
+        self.assertEqual(user_learner_progress.all_topic_summaries, [])
+        self.assertEqual(user_learner_progress.untracked_topic_summaries, [])
 
 
 class LearnerProgressInCollectionsUnitTests(test_utils.GenericTestBase):
@@ -51,15 +46,12 @@ class LearnerProgressInCollectionsUnitTests(test_utils.GenericTestBase):
     def test_initialization(self) -> None:
         """Tests init method."""
         user_learner_progress = (
-            learner_progress_domain.LearnerProgressInCollections(
-                [], [], [], []))
+            learner_progress_domain.LearnerProgressInCollections([], [], [], [])
+        )
 
-        self.assertEqual(
-            user_learner_progress.incomplete_collection_summaries, [])
-        self.assertEqual(
-            user_learner_progress.completed_collection_summaries, [])
-        self.assertEqual(
-            user_learner_progress.collection_playlist_summaries, [])
+        self.assertEqual(user_learner_progress.incomplete_collection_summaries, [])
+        self.assertEqual(user_learner_progress.completed_collection_summaries, [])
+        self.assertEqual(user_learner_progress.collection_playlist_summaries, [])
 
 
 class LearnerProgressInExplorationsUnitTests(test_utils.GenericTestBase):
@@ -68,14 +60,12 @@ class LearnerProgressInExplorationsUnitTests(test_utils.GenericTestBase):
     def test_initialization(self) -> None:
         """Tests init method."""
         user_learner_progress = (
-            learner_progress_domain.LearnerProgressInExplorations(
-                [], [], []))
+            learner_progress_domain.LearnerProgressInExplorations([], [], [])
+        )
 
-        self.assertEqual(
-            user_learner_progress.incomplete_exp_summaries, [])
+        self.assertEqual(user_learner_progress.incomplete_exp_summaries, [])
         self.assertEqual(user_learner_progress.completed_exp_summaries, [])
-        self.assertEqual(
-            user_learner_progress.exploration_playlist_summaries, [])
+        self.assertEqual(user_learner_progress.exploration_playlist_summaries, [])
 
 
 class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
@@ -97,43 +87,33 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
 
         observed_activity_ids_in_learner_dashboard = (
             learner_progress_domain.ActivityIdsInLearnerDashboard(
-                completed_exp_ids,
-                completed_coll_ids,
-                completed_story_ids,
-                learnt_topic_ids,
-                incomplete_exp_ids,
-                incomplete_coll_ids,
-                partially_learnt_topic_ids,
-                topic_ids_to_learn,
-                all_topic_ids,
-                untracked_topic_ids,
-                exploration_playlist_ids,
-                collection_playlist_ids))
+                completed_exp_ids, completed_coll_ids, completed_story_ids,
+                learnt_topic_ids, incomplete_exp_ids, incomplete_coll_ids,
+                partially_learnt_topic_ids, topic_ids_to_learn, all_topic_ids,
+                untracked_topic_ids, exploration_playlist_ids, collection_playlist_ids
+            )
+        )
         to_dict_result = observed_activity_ids_in_learner_dashboard.to_dict()
 
+        self.assertEqual(to_dict_result['completed_exploration_ids'], completed_exp_ids)
+        self.assertEqual(to_dict_result['completed_collection_ids'], completed_coll_ids)
+        self.assertEqual(to_dict_result['completed_story_ids'], completed_story_ids)
+        self.assertEqual(to_dict_result['learnt_topic_ids'], learnt_topic_ids)
         self.assertEqual(
-            to_dict_result['completed_exploration_ids'], completed_exp_ids)
+            to_dict_result['incomplete_exploration_ids'], incomplete_exp_ids
+        )
         self.assertEqual(
-            to_dict_result['completed_collection_ids'], completed_coll_ids)
+            to_dict_result['incomplete_collection_ids'], incomplete_coll_ids
+        )
         self.assertEqual(
-            to_dict_result['completed_story_ids'], completed_story_ids)
+            to_dict_result['partially_learnt_topic_ids'], partially_learnt_topic_ids
+        )
+        self.assertEqual(to_dict_result['topic_ids_to_learn'], topic_ids_to_learn)
+        self.assertEqual(to_dict_result['all_topic_ids'], all_topic_ids)
+        self.assertEqual(to_dict_result['untracked_topic_ids'], untracked_topic_ids)
         self.assertEqual(
-            to_dict_result['learnt_topic_ids'], learnt_topic_ids)
+            to_dict_result['exploration_playlist_ids'], exploration_playlist_ids
+        )
         self.assertEqual(
-            to_dict_result['incomplete_exploration_ids'], incomplete_exp_ids)
-        self.assertEqual(
-            to_dict_result['incomplete_collection_ids'], incomplete_coll_ids)
-        self.assertEqual(
-            to_dict_result['partially_learnt_topic_ids'],
-            partially_learnt_topic_ids)
-        self.assertEqual(
-            to_dict_result['topic_ids_to_learn'], topic_ids_to_learn)
-        self.assertEqual(
-            to_dict_result['all_topic_ids'], all_topic_ids)
-        self.assertEqual(
-            to_dict_result['untracked_topic_ids'], untracked_topic_ids)
-        self.assertEqual(
-            to_dict_result['exploration_playlist_ids'],
-            exploration_playlist_ids)
-        self.assertEqual(
-            to_dict_result['collection_playlist_ids'], collection_playlist_ids)
+            to_dict_result['collection_playlist_ids'], collection_playlist_ids
+        )

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects related to voiceovers."""
 
 from __future__ import annotations
@@ -34,13 +33,13 @@ class EntityVoiceoversDict(TypedDict):
     entity_type: str
     entity_version: int
     language_accent_code: str
-    voiceovers_mapping: Dict[str, Dict[
-        feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]]
+    voiceovers_mapping: Dict[str, Dict[feconf.VoiceoverType.value,
+                                       Optional[state_domain.VoiceoverDict]]]
 
 
-ContentIdToVoiceoverMappingType = Dict[
-    str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
-]
+ContentIdToVoiceoverMappingType = Dict[str, Dict[str,
+                                                 Tuple[str,
+                                                       state_domain.VoiceoverDict]]]
 
 
 class EntityVoiceovers:
@@ -52,13 +51,10 @@ class EntityVoiceovers:
     """
 
     def __init__(
-        self,
-        entity_id: str,
-        entity_type: str,
-        entity_version: int,
+        self, entity_id: str, entity_type: str, entity_version: int,
         language_accent_code: str,
-        voiceovers_mapping: Dict[str, Dict[
-            feconf.VoiceoverType, Optional[state_domain.Voiceover]]]
+        voiceovers_mapping: Dict[str, Dict[feconf.VoiceoverType,
+                                           Optional[state_domain.Voiceover]]]
     ) -> None:
         """Constructs an EntityVoiceovers domain object.
 
@@ -86,19 +82,17 @@ class EntityVoiceovers:
             EntityVoiceovers object.
         """
         content_id_to_voiceovers_dict: Dict[str, Dict[
-            feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]
-        ] = {}
+            feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]] = {}
 
         for content_id, voiceover_type_to_voiceover in (
                 self.voiceovers_mapping.items()):
             content_id_to_voiceovers_dict[content_id] = {}
             for voiceover_type in feconf.VoiceoverType:
                 voiceover = voiceover_type_to_voiceover[voiceover_type]
-                voiceover_dict = (
-                    None if voiceover is None else voiceover.to_dict())
+                voiceover_dict = (None if voiceover is None else voiceover.to_dict())
 
-                content_id_to_voiceovers_dict[content_id][
-                    voiceover_type.value] = voiceover_dict
+                content_id_to_voiceovers_dict[content_id][voiceover_type.value
+                                                          ] = voiceover_dict
         return {
             'entity_id': self.entity_id,
             'entity_type': self.entity_type,
@@ -121,69 +115,67 @@ class EntityVoiceovers:
             EntityVoiceovers. The EntityVoiceovers instance created using the
             given dict.
         """
-        content_id_to_voiceovers: Dict[str, Dict[
-            feconf.VoiceoverType, Optional[state_domain.Voiceover]]] = {}
+        content_id_to_voiceovers: Dict[str, Dict[feconf.VoiceoverType,
+                                                 Optional[state_domain.Voiceover]]] = {}
         for content_id, voiceover_type_to_voiceover_dict in (
                 entity_voiceovers_dict['voiceovers_mapping'].items()):
             content_id_to_voiceovers[content_id] = {}
             for voiceover_type in feconf.VoiceoverType:
-                voiceover_dict = voiceover_type_to_voiceover_dict[
-                    voiceover_type.value]
+                voiceover_dict = voiceover_type_to_voiceover_dict[voiceover_type.value]
                 voiceover = (
-                    None if voiceover_dict is None
-                    else state_domain.Voiceover.from_dict(voiceover_dict))
+                    None if voiceover_dict is None else
+                    state_domain.Voiceover.from_dict(voiceover_dict)
+                )
 
-                content_id_to_voiceovers[content_id][
-                    voiceover_type] = voiceover
+                content_id_to_voiceovers[content_id][voiceover_type] = voiceover
 
         return cls(
-            entity_voiceovers_dict['entity_id'],
-            entity_voiceovers_dict['entity_type'],
+            entity_voiceovers_dict['entity_id'], entity_voiceovers_dict['entity_type'],
             entity_voiceovers_dict['entity_version'],
-            entity_voiceovers_dict['language_accent_code'],
-            content_id_to_voiceovers
+            entity_voiceovers_dict['language_accent_code'], content_id_to_voiceovers
         )
 
     def validate(self) -> None:
         """Validates the EntityVoiceovers object."""
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
-                'entity_type must be a string, received %s' % self.entity_type)
+                'entity_type must be a string, received %s' % self.entity_type
+            )
         if not isinstance(self.entity_id, str):
             raise utils.ValidationError(
-                'entity_id must be a string, received %s' % self.entity_id)
+                'entity_id must be a string, received %s' % self.entity_id
+            )
         if not isinstance(self.entity_version, int):
             raise utils.ValidationError(
-                'entity_version must be an int, received %s' %
-                self.entity_version)
+                'entity_version must be an int, received %s' % self.entity_version
+            )
         if not isinstance(self.language_accent_code, str):
             raise utils.ValidationError(
                 'language_accent_code must be a string, received %s' %
-                self.language_accent_code)
-        if not bool(re.match(
-                feconf.LANGUAGE_ACCENT_CODE_REGEX, self.language_accent_code)):
+                self.language_accent_code
+            )
+        if not bool(re.match(feconf.LANGUAGE_ACCENT_CODE_REGEX,
+                             self.language_accent_code)):
             raise utils.ValidationError(
                 'language_accent_code must be formatted as '
-                '{{language}}-{{accent}}, received %s' %
-                self.language_accent_code)
+                '{{language}}-{{accent}}, received %s' % self.language_accent_code
+            )
         for content_id, voiceover_type_to_voiceover in (
                 self.voiceovers_mapping.items()):
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
-                    'content_id must be a string, received %s' % content_id)
-            for voiceover_type, voiceover in (
-                    voiceover_type_to_voiceover.items()):
+                    'content_id must be a string, received %s' % content_id
+                )
+            for voiceover_type, voiceover in (voiceover_type_to_voiceover.items()):
                 if not isinstance(voiceover_type, feconf.VoiceoverType):
                     raise utils.ValidationError(
                         'voiceover type must be VoiceoverType, received %s' %
-                        voiceover_type)
+                        voiceover_type
+                    )
                 if voiceover is not None:
                     voiceover.validate()
 
-    def add_new_content_id_without_voiceovers(
-        self,
-        content_id: str
-    ) -> None:
+    def add_new_content_id_without_voiceovers(self, content_id: str) -> None:
         """Adds a new content ID for which manual and automatic voiceovers
         can be added. Initially, both voiceover fields will be empty (None),
         and they will later be populated with their respective values using the
@@ -199,9 +191,7 @@ class EntityVoiceovers:
         }
 
     def add_voiceover(
-        self,
-        content_id: str,
-        voiceover_type: feconf.VoiceoverType,
+        self, content_id: str, voiceover_type: feconf.VoiceoverType,
         voiceovers_mapping: state_domain.Voiceover
     ) -> None:
         """Adds voiceover to the entity voiceover instance.
@@ -217,9 +207,7 @@ class EntityVoiceovers:
         self.voiceovers_mapping[content_id][voiceover_type] = voiceovers_mapping
 
     def remove_voiceover(
-        self,
-        content_id: str,
-        voiceover_type: feconf.VoiceoverType
+        self, content_id: str, voiceover_type: feconf.VoiceoverType
     ) -> None:
         """Removes voiceover from the entity voiceover instance.
 
@@ -247,18 +235,13 @@ class EntityVoiceovers:
             automatic voiceovers are empty or not.
         """
         return (
-            self.voiceovers_mapping[content_id][
-                feconf.VoiceoverType.MANUAL] is None and
-            self.voiceovers_mapping[content_id][
-                feconf.VoiceoverType.AUTO] is None
+            self.voiceovers_mapping[content_id][feconf.VoiceoverType.MANUAL] is None
+            and self.voiceovers_mapping[content_id][feconf.VoiceoverType.AUTO] is None
         )
 
     @classmethod
     def create_empty(
-        cls,
-        entity_id: str,
-        entity_type: str,
-        entity_version: int,
+        cls, entity_id: str, entity_type: str, entity_version: int,
         language_accent_code: str
     ) -> EntityVoiceovers:
         """Creates a new, empty EntityVoiceovers object."""
@@ -267,4 +250,5 @@ class EntityVoiceovers:
             entity_type=entity_type,
             entity_version=entity_version,
             language_accent_code=language_accent_code,
-            voiceovers_mapping={})
+            voiceovers_mapping={}
+        )

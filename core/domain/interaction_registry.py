@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Registry for interactions."""
 
 from __future__ import annotations
@@ -29,7 +28,7 @@ from core import feconf
 from typing import Dict, List, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from extensions.interactions import base
 
 
@@ -47,11 +46,14 @@ class Registry:
     @classmethod
     def get_all_interaction_ids(cls) -> List[str]:
         """Get a list of all interaction ids."""
-        return list(set(itertools.chain.from_iterable(
-            interaction_category['interaction_ids']
-            for interaction_category
-            in constants.constants.ALLOWED_INTERACTION_CATEGORIES
-        )))
+        return list(
+            set(
+                itertools.chain.from_iterable(
+                    interaction_category['interaction_ids'] for interaction_category in
+                    constants.constants.ALLOWED_INTERACTION_CATEGORIES
+                )
+            )
+        )
 
     @classmethod
     def _refresh(cls) -> None:
@@ -68,9 +70,7 @@ class Registry:
             module = importlib.import_module('.'.join(module_path_parts))
             clazz = getattr(module, interaction_id)
 
-            ancestor_names = [
-                base_class.__name__ for base_class in clazz.__bases__
-            ]
+            ancestor_names = [base_class.__name__ for base_class in clazz.__bases__]
             if 'BaseInteraction' in ancestor_names:
                 cls._interactions[clazz.__name__] = clazz()
 
@@ -100,17 +100,13 @@ class Registry:
             Exception. No interaction exists for the None interaction_id.
         """
         if interaction_id is None:
-            raise Exception(
-                'No interaction exists for the None interaction_id.'
-            )
+            raise Exception('No interaction exists for the None interaction_id.')
         if interaction_id not in cls._interactions:
             cls._refresh()
         return cls._interactions[interaction_id]
 
     @classmethod
-    def get_deduplicated_dependency_ids(
-        cls, interaction_ids: List[str]
-    ) -> List[str]:
+    def get_deduplicated_dependency_ids(cls, interaction_ids: List[str]) -> List[str]:
         """Return a list of dependency ids for the given interactions.
 
         Each entry of the resulting list is unique. The list is sorted in no
@@ -155,11 +151,9 @@ class Registry:
             OSError. No interaction specs json file found for the given state
                 schema version.
         """
-        if (state_schema_version not in
-                cls._state_schema_version_to_interaction_specs):
+        if (state_schema_version not in cls._state_schema_version_to_interaction_specs):
             spec_file_path = os.path.join(
-                'interactions',
-                'legacy_interaction_specs_by_state_version',
+                'interactions', 'legacy_interaction_specs_by_state_version',
                 'interaction_specs_state_v%i.json' % state_schema_version
             )
             spec_file_contents: Optional[str]
@@ -171,11 +165,10 @@ class Registry:
                 spec_file_contents = None
 
             if spec_file_contents:
-                specs_from_json: Dict[str, base.BaseInteractionDict] = (
-                    json.loads(spec_file_contents)
-                )
-                cls._state_schema_version_to_interaction_specs[
-                    state_schema_version] = specs_from_json
+                specs_from_json: Dict[
+                    str, base.BaseInteractionDict] = (json.loads(spec_file_contents))
+                cls._state_schema_version_to_interaction_specs[state_schema_version
+                                                               ] = specs_from_json
                 return cls._state_schema_version_to_interaction_specs[
                     state_schema_version]
             elif can_fetch_latest_specs:
@@ -183,7 +176,7 @@ class Registry:
             else:
                 raise IOError(
                     'No specs JSON file found for state schema v%i' %
-                    state_schema_version)
+                    state_schema_version
+                )
 
-        return cls._state_schema_version_to_interaction_specs[
-            state_schema_version]
+        return cls._state_schema_version_to_interaction_specs[state_schema_version]

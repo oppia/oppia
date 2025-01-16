@@ -13,13 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Unit tests for app_feedback_report_constants.py"""
 
 from __future__ import annotations
 from core.tests import test_utils
 
-from core.domain import app_feedback_report_constants   # pylint: disable=unused-import # isort: skip
+from core.domain import app_feedback_report_constants  # pylint: disable=unused-import # isort: skip
 
 
 class AppFeedbackReportConstantsTests(test_utils.GenericTestBase):

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects for a collection and its constituents.
 
 Domain objects capture domain-specific logic and are agnostic of how the
@@ -42,8 +41,7 @@ COLLECTION_PROPERTY_CATEGORY: Final = 'category'
 COLLECTION_PROPERTY_OBJECTIVE: Final = 'objective'
 COLLECTION_PROPERTY_LANGUAGE_CODE: Final = 'language_code'
 COLLECTION_PROPERTY_TAGS: Final = 'tags'
-COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS: Final = (
-    'prerequisite_skill_ids')
+COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS: Final = ('prerequisite_skill_ids')
 COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS: Final = 'acquired_skill_ids'
 # These node properties have been deprecated.
 COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS: Final = 'prerequisite_skills'
@@ -107,87 +105,93 @@ class CollectionChange(change_domain.BaseChange):
     COLLECTION_PROPERTIES: List[str] = [
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
         COLLECTION_PROPERTY_OBJECTIVE, COLLECTION_PROPERTY_LANGUAGE_CODE,
-        COLLECTION_PROPERTY_TAGS]
+        COLLECTION_PROPERTY_TAGS
+    ]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': ['category', 'title'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_COLLECTION_NODE,
-        'required_attribute_names': ['exploration_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_COLLECTION_NODE,
-        'required_attribute_names': ['exploration_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_SWAP_COLLECTION_NODES,
-        'required_attribute_names': ['first_index', 'second_index'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_EDIT_COLLECTION_PROPERTY,
-        'required_attribute_names': ['property_name', 'new_value'],
-        'optional_attribute_names': ['old_value'],
-        'user_id_attribute_names': [],
-        'allowed_values': {'property_name': COLLECTION_PROPERTIES},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
-        'required_attribute_names': [
-            'exploration_id', 'property_name', 'new_value'],
-        'optional_attribute_names': ['old_value'],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
-        'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_COLLECTION_SKILL,
-        'required_attribute_names': ['name'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_COLLECTION_SKILL,
-        'required_attribute_names': ['skill_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_QUESTION_ID_TO_SKILL,
-        'required_attribute_names': ['question_id', 'skill_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
-        'required_attribute_names': ['question_id', 'skill_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
+        {
+            'name': CMD_CREATE_NEW,
+            'required_attribute_names': ['category', 'title'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_ADD_COLLECTION_NODE,
+            'required_attribute_names': ['exploration_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_DELETE_COLLECTION_NODE,
+            'required_attribute_names': ['exploration_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_SWAP_COLLECTION_NODES,
+            'required_attribute_names': ['first_index', 'second_index'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_EDIT_COLLECTION_PROPERTY,
+            'required_attribute_names': ['property_name', 'new_value'],
+            'optional_attribute_names': ['old_value'],
+            'user_id_attribute_names': [],
+            'allowed_values': {
+                'property_name': COLLECTION_PROPERTIES
+            },
+            'deprecated_values': {}
+        }, {
+            'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
+            'required_attribute_names': [
+                'exploration_id', 'property_name', 'new_value'
+            ],
+            'optional_attribute_names': ['old_value'],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+            'required_attribute_names': ['from_version', 'to_version'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_ADD_COLLECTION_SKILL,
+            'required_attribute_names': ['name'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_DELETE_COLLECTION_SKILL,
+            'required_attribute_names': ['skill_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_ADD_QUESTION_ID_TO_SKILL,
+            'required_attribute_names': ['question_id', 'skill_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
+            'required_attribute_names': ['question_id', 'skill_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }
+    ]
 
 
 class CreateNewCollectionCmd(CollectionChange):
@@ -362,14 +366,10 @@ class CollectionNode:
             prerequisite_skill_ids, acquired_skill_ids) of CollectionNode
             instance.
         """
-        return {
-            'exploration_id': self.exploration_id
-        }
+        return {'exploration_id': self.exploration_id}
 
     @classmethod
-    def from_dict(
-        cls, node_dict: CollectionNodeDict
-    ) -> CollectionNode:
+    def from_dict(cls, node_dict: CollectionNodeDict) -> CollectionNode:
         """Return a CollectionNode domain object from a dict.
 
         Args:
@@ -390,7 +390,8 @@ class CollectionNode:
         if not isinstance(self.exploration_id, str):
             raise utils.ValidationError(
                 'Expected exploration ID to be a string, received %s' %
-                self.exploration_id)
+                self.exploration_id
+            )
 
     @classmethod
     def create_default_node(cls, exploration_id: str) -> CollectionNode:
@@ -509,9 +510,7 @@ class Collection:
             'language_code': self.language_code,
             'tags': self.tags,
             'schema_version': self.schema_version,
-            'nodes': [
-                node.to_dict() for node in self.nodes
-            ]
+            'nodes': [node.to_dict() for node in self.nodes]
         }
 
     @classmethod
@@ -539,7 +538,8 @@ class Collection:
         """
         return cls(
             collection_id, title, category, objective, language_code, [],
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0
+        )
 
     @classmethod
     def from_dict(
@@ -567,12 +567,11 @@ class Collection:
             collection_dict['id'], collection_dict['title'],
             collection_dict['category'], collection_dict['objective'],
             collection_dict['language_code'], collection_dict['tags'],
-            collection_dict['schema_version'],
-            [
+            collection_dict['schema_version'], [
                 CollectionNode.from_dict(node_dict)
                 for node_dict in collection_dict['nodes']
-            ], collection_version,
-            collection_created_on, collection_last_updated)
+            ], collection_version, collection_created_on, collection_last_updated
+        )
 
         return collection
 
@@ -592,17 +591,20 @@ class Collection:
 
         created_on = (
             utils.convert_string_to_naive_datetime_object(
-                collection_dict['created_on'])
-            if 'created_on' in collection_dict else None)
+                collection_dict['created_on']
+            ) if 'created_on' in collection_dict else None
+        )
         last_updated = (
             utils.convert_string_to_naive_datetime_object(
-                collection_dict['last_updated'])
-            if 'last_updated' in collection_dict else None)
+                collection_dict['last_updated']
+            ) if 'last_updated' in collection_dict else None
+        )
         collection = cls.from_dict(
             collection_dict,
             collection_version=collection_dict['version'],
             collection_created_on=created_on,
-            collection_last_updated=last_updated)
+            collection_last_updated=last_updated
+        )
 
         return collection
 
@@ -620,7 +622,8 @@ class Collection:
         # properties of domain object. That's why we are explicitly changing
         # the type of collection_dict here, which causes MyPy to throw an error.
         # Thus, to silence the error, we added an ignore here.
-        collection_dict: SerializableCollectionDict = self.to_dict() # type: ignore[assignment]
+        collection_dict: SerializableCollectionDict = self.to_dict(
+        )  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
         # parameter.
@@ -633,11 +636,13 @@ class Collection:
 
         if self.created_on:
             collection_dict['created_on'] = (
-                utils.convert_naive_datetime_to_string(self.created_on))
+                utils.convert_naive_datetime_to_string(self.created_on)
+            )
 
         if self.last_updated:
             collection_dict['last_updated'] = (
-                utils.convert_naive_datetime_to_string(self.last_updated))
+                utils.convert_naive_datetime_to_string(self.last_updated)
+            )
 
         return json.dumps(collection_dict)
 
@@ -657,7 +662,7 @@ class Collection:
         # not compatible with dict comprehensions.
         # Reference:
         # https://mypy-play.net/?mypy=latest&python=3.10&flags=strict%2Cdisallow-any-expr&gist=3b3315d29c3269b172f29d39052591d7
-        del collection_dict['id'] # type: ignore[misc]
+        del collection_dict['id']  # type: ignore[misc]
 
         return utils.yaml_from_dict(collection_dict)
 
@@ -712,13 +717,13 @@ class Collection:
         _convert_collection_contents_v3_dict_to_v4_dict.
         """
         new_collection_dict = (
-            cls._convert_collection_contents_v3_dict_to_v4_dict(
-                collection_dict))
+            cls._convert_collection_contents_v3_dict_to_v4_dict(collection_dict)
+        )
         # Here we use MyPy ignore because CollectionDict is defined to match
         # the current version of Collection domain object and here in _convert_*
         # functions, we can ignore some MyPy errors as we work with the previous
         # versions of the domain objects.
-        collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
+        collection_dict['skills'] = new_collection_dict['skills']  # type: ignore[misc]
         # Here we use MyPy ignore because 'next_skill_id' key is
         # deprecated from the latest domain object and while accessing
         # this key MyPy throws an error.
@@ -739,8 +744,7 @@ class Collection:
 
         This changes the field name of next_skill_id to next_skill_index.
         """
-        cls._convert_collection_contents_v4_dict_to_v5_dict(
-            collection_dict)
+        cls._convert_collection_contents_v4_dict_to_v5_dict(collection_dict)
 
         collection_dict['schema_version'] = 5
         return collection_dict
@@ -757,18 +761,16 @@ class Collection:
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
-        del collection_dict['skills'] # type: ignore[misc]
+        del collection_dict['skills']  # type: ignore[misc]
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
-        del collection_dict['next_skill_index'] # type: ignore[misc]
+        del collection_dict['next_skill_index']  # type: ignore[misc]
 
         collection_dict['schema_version'] = 6
         return collection_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(
-        cls, yaml_content: str
-    ) -> CollectionDict:
+    def _migrate_to_latest_yaml_version(cls, yaml_content: str) -> CollectionDict:
         """Return the YAML content of the collection in the latest schema
         format.
 
@@ -788,39 +790,37 @@ class Collection:
         try:
             # Here we use cast because here we are narrowing down the type from
             # Dict[str, Any] to CollectionDict.
-            collection_dict = cast(
-                CollectionDict, utils.dict_from_yaml(yaml_content)
-            )
+            collection_dict = cast(CollectionDict, utils.dict_from_yaml(yaml_content))
         except utils.InvalidInputException as e:
             raise utils.InvalidInputException(
                 'Please ensure that you are uploading a YAML text file, not '
-                'a zip file. The YAML parser returned the following error: %s'
-                % e)
+                'a zip file. The YAML parser returned the following error: %s' % e
+            )
 
         collection_schema_version = collection_dict.get('schema_version')
         if collection_schema_version is None:
             raise utils.InvalidInputException(
-                'Invalid YAML file: no schema version specified.')
-        if not (1 <= collection_schema_version
-                <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+                'Invalid YAML file: no schema version specified.'
+            )
+        if not (1 <= collection_schema_version <=
+                feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             raise Exception(
                 'Sorry, we can only process v1 to v%s collection YAML files at '
-                'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+                'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION
+            )
 
-        while (collection_schema_version <
-               feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+        while (collection_schema_version < feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             conversion_fn = getattr(
-                cls, '_convert_v%s_dict_to_v%s_dict' % (
-                    collection_schema_version, collection_schema_version + 1))
+                cls, '_convert_v%s_dict_to_v%s_dict' %
+                (collection_schema_version, collection_schema_version + 1)
+            )
             collection_dict = conversion_fn(collection_dict)
             collection_schema_version += 1
 
         return collection_dict
 
     @classmethod
-    def from_yaml(
-        cls, collection_id: str, yaml_content: str
-    ) -> Collection:
+    def from_yaml(cls, collection_id: str, yaml_content: str) -> Collection:
         """Converts a YAML string to a Collection domain object.
 
         Args:
@@ -892,11 +892,11 @@ class Collection:
             # to match the current version of CollectionNode domain object
             # and here in _convert_* functions, we can ignore some MyPy errors
             # as we work with the previous versions of the domain objects.
-            skill_names.update(node['acquired_skills']) # type: ignore[misc]
+            skill_names.update(node['acquired_skills'])  # type: ignore[misc]
             # Here we use MyPy ignore because 'prerequisite_skills' key is
             # deprecated from the latest domain object and while accessing
             # this key MyPy throw an error.
-            skill_names.update(node['prerequisite_skills']) # type: ignore[misc]
+            skill_names.update(node['prerequisite_skills'])  # type: ignore[misc]
         skill_names_to_ids = {
             name: '%s%s' % (_SKILL_ID_PREFIX, str(index))
             for index, name in enumerate(sorted(skill_names))
@@ -931,7 +931,7 @@ class Collection:
         # Here we use MyPy ignore because 'next_skill_id' key is
         # deprecated from the latest domain object and while accessing
         # this key MyPy throw an error.
-        collection_contents['next_skill_id'] = len(skill_names) # type: ignore[misc]
+        collection_contents['next_skill_id'] = len(skill_names)  # type: ignore[misc]
 
         return collection_contents
 
@@ -954,15 +954,17 @@ class Collection:
         # Here we use MyPy ignore because 'next_skill_index' key is
         # deprecated from the latest domain object and while accessing
         # this key MyPy throw an error.
-        collection_contents['next_skill_index'] = collection_contents[ # type: ignore[misc]
+        collection_contents[
+            'next_skill_index'
+        ] = collection_contents[  # type: ignore[misc]
             # Here we use MyPy ignore because 'next_skill_id' key is
             # deprecated from the latest domain object and while accessing
             # this key MyPy throw an error.
-            'next_skill_id'] # type: ignore[misc]
+            'next_skill_id']  # type: ignore[misc]
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
-        del collection_contents['next_skill_id'] # type: ignore[misc]
+        del collection_contents['next_skill_id']  # type: ignore[misc]
 
         return collection_contents
 
@@ -984,10 +986,10 @@ class Collection:
         for node in collection_contents['nodes']:
             # Here we use MyPy ignore because MyPy doesn't allow key deletion
             # from TypedDict.
-            del node['prerequisite_skill_ids'] # type: ignore[misc]
+            del node['prerequisite_skill_ids']  # type: ignore[misc]
             # Here we use MyPy ignore because MyPy doesn't allow key deletion
             # from TypedDict.
-            del node['acquired_skill_ids'] # type: ignore[misc]
+            del node['acquired_skill_ids']  # type: ignore[misc]
 
         return collection_contents
 
@@ -1013,22 +1015,25 @@ class Collection:
             Exception. The value of the key 'schema_version' in
                 versioned_collection_contents is not valid.
         """
-        if (versioned_collection_contents['schema_version'] + 1 >
-                feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+        if (versioned_collection_contents['schema_version'] + 1
+                > feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             raise Exception(
                 'Collection is version %d but current collection'
                 ' schema version is %d' % (
                     versioned_collection_contents['schema_version'],
-                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
+                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION
+                )
+            )
 
-        versioned_collection_contents['schema_version'] = (
-            current_version + 1)
+        versioned_collection_contents['schema_version'] = (current_version + 1)
 
         conversion_fn = getattr(
-            cls, '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
-                current_version, current_version + 1))
+            cls, '_convert_collection_contents_v%s_dict_to_v%s_dict' %
+            (current_version, current_version + 1)
+        )
         versioned_collection_contents['collection_contents'] = conversion_fn(
-            versioned_collection_contents['collection_contents'])
+            versioned_collection_contents['collection_contents']
+        )
 
     @property
     def exploration_ids(self) -> List[str]:
@@ -1055,9 +1060,7 @@ class Collection:
         else:
             return None
 
-    def get_next_exploration_id(
-        self, completed_exp_ids: List[str]
-    ) -> Optional[str]:
+    def get_next_exploration_id(self, completed_exp_ids: List[str]) -> Optional[str]:
         """Returns the first exploration id in the collection that has not yet
            been completed by the learner, or if the collection is completed,
            returns None.
@@ -1204,13 +1207,11 @@ class Collection:
         """
         if self.get_node(exploration_id) is not None:
             raise ValueError(
-                'Exploration is already part of this collection: %s' %
-                exploration_id)
+                'Exploration is already part of this collection: %s' % exploration_id
+            )
         self.nodes.append(CollectionNode.create_default_node(exploration_id))
 
-    def swap_nodes(
-        self, first_index: int, second_index: int
-    ) -> None:
+    def swap_nodes(self, first_index: int, second_index: int) -> None:
         """Swaps the values of 2 nodes in the collection.
 
         Args:
@@ -1221,9 +1222,7 @@ class Collection:
             ValueError. Both indices are the same number.
         """
         if first_index == second_index:
-            raise ValueError(
-                'Both indices point to the same collection node.'
-            )
+            raise ValueError('Both indices point to the same collection node.')
         temp = self.nodes[first_index]
         self.nodes[first_index] = self.nodes[second_index]
         self.nodes[second_index] = temp
@@ -1241,8 +1240,8 @@ class Collection:
         node_index = self._find_node(exploration_id)
         if node_index is None:
             raise ValueError(
-                'Exploration is not part of this collection: %s' %
-                exploration_id)
+                'Exploration is not part of this collection: %s' % exploration_id
+            )
         del self.nodes[node_index]
 
     def validate(self, strict: bool = True) -> None:
@@ -1258,47 +1257,54 @@ class Collection:
 
         if not isinstance(self.title, str):
             raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title)
-        utils.require_valid_name(
-            self.title, 'the collection title', allow_empty=True)
+                'Expected title to be a string, received %s' % self.title
+            )
+        utils.require_valid_name(self.title, 'the collection title', allow_empty=True)
 
         if not isinstance(self.category, str):
             raise utils.ValidationError(
-                'Expected category to be a string, received %s'
-                % self.category)
+                'Expected category to be a string, received %s' % self.category
+            )
         utils.require_valid_name(
-            self.category, 'the collection category', allow_empty=True)
+            self.category, 'the collection category', allow_empty=True
+        )
 
         if not isinstance(self.objective, str):
             raise utils.ValidationError(
-                'Expected objective to be a string, received %s' %
-                self.objective)
+                'Expected objective to be a string, received %s' % self.objective
+            )
 
         if not isinstance(self.language_code, str):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
-                self.language_code)
+                self.language_code
+            )
 
         if not self.language_code:
             raise utils.ValidationError(
-                'A language must be specified (in the \'Settings\' tab).')
+                'A language must be specified (in the \'Settings\' tab).'
+            )
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code)
+                'Invalid language code: %s' % self.language_code
+            )
 
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
-                'Expected tags to be a list, received %s' % self.tags)
+                'Expected tags to be a list, received %s' % self.tags
+            )
 
         if len(set(self.tags)) < len(self.tags):
             raise utils.ValidationError(
-                'Expected tags to be unique, but found duplicates')
+                'Expected tags to be unique, but found duplicates'
+            )
 
         for tag in self.tags:
             if not isinstance(tag, str):
                 raise utils.ValidationError(
-                    'Expected each tag to be a string, received \'%s\'' % tag)
+                    'Expected each tag to be a string, received \'%s\'' % tag
+                )
 
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
@@ -1306,39 +1312,45 @@ class Collection:
             if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
-                    'received \'%s\'' % tag)
+                    'received \'%s\'' % tag
+                )
 
-            if (tag[0] not in string.ascii_lowercase or
-                    tag[-1] not in string.ascii_lowercase):
+            if (tag[0] not in string.ascii_lowercase
+                    or tag[-1] not in string.ascii_lowercase):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
-                    ' \'%s\'' % tag)
+                    ' \'%s\'' % tag
+                )
 
             if re.search(r'\s\s+', tag):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
-                    'received \'%s\'' % tag)
+                    'received \'%s\'' % tag
+                )
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s' %
-                self.schema_version)
+                self.schema_version
+            )
 
         if self.schema_version != feconf.CURRENT_COLLECTION_SCHEMA_VERSION:
             raise utils.ValidationError(
-                'Expected schema version to be %s, received %s' % (
-                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
-                    self.schema_version))
+                'Expected schema version to be %s, received %s' %
+                (feconf.CURRENT_COLLECTION_SCHEMA_VERSION, self.schema_version)
+            )
 
         if not isinstance(self.nodes, list):
             raise utils.ValidationError(
-                'Expected nodes to be a list, received %s' % self.nodes)
+                'Expected nodes to be a list, received %s' % self.nodes
+            )
 
         all_exp_ids = self.exploration_ids
         if len(set(all_exp_ids)) != len(all_exp_ids):
             raise utils.ValidationError(
                 'There are explorations referenced in the collection more '
-                'than once.')
+                'than once.'
+            )
 
         # Validate all collection nodes.
         for node in self.nodes:
@@ -1347,20 +1359,24 @@ class Collection:
         if strict:
             if not self.title:
                 raise utils.ValidationError(
-                    'A title must be specified for the collection.')
+                    'A title must be specified for the collection.'
+                )
 
             if not self.objective:
                 raise utils.ValidationError(
-                    'An objective must be specified for the collection.')
+                    'An objective must be specified for the collection.'
+                )
 
             if not self.category:
                 raise utils.ValidationError(
-                    'A category must be specified for the collection.')
+                    'A category must be specified for the collection.'
+                )
 
             if not self.nodes:
                 raise utils.ValidationError(
                     'Expected to have at least 1 exploration in the '
-                    'collection.')
+                    'collection.'
+                )
 
 
 class CollectionSummaryDict(TypedDict):
@@ -1388,23 +1404,11 @@ class CollectionSummary:
     """Domain object for an Oppia collection summary."""
 
     def __init__(
-        self,
-        collection_id: str,
-        title: str,
-        category: str,
-        objective: str,
-        language_code: str,
-        tags: List[str],
-        status: str,
-        community_owned: bool,
-        owner_ids: List[str],
-        editor_ids: List[str],
-        viewer_ids: List[str],
-        contributor_ids: List[str],
-        contributors_summary: Dict[str, int],
-        version: int,
-        node_count: int,
-        collection_model_created_on: datetime.datetime,
+        self, collection_id: str, title: str, category: str, objective: str,
+        language_code: str, tags: List[str], status: str, community_owned: bool,
+        owner_ids: List[str], editor_ids: List[str], viewer_ids: List[str],
+        contributor_ids: List[str], contributors_summary: Dict[str, int], version: int,
+        node_count: int, collection_model_created_on: datetime.datetime,
         collection_model_last_updated: datetime.datetime
     ) -> None:
         """Constructs a CollectionSummary domain object.
@@ -1485,15 +1489,16 @@ class CollectionSummary:
             ValidationError. One or more attributes of the CollectionSummary
                 are invalid.
         """
-        utils.require_valid_name(
-            self.title, 'the collection title', allow_empty=True)
+        utils.require_valid_name(self.title, 'the collection title', allow_empty=True)
 
         utils.require_valid_name(
-            self.category, 'the collection category', allow_empty=True)
+            self.category, 'the collection category', allow_empty=True
+        )
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code)
+                'Invalid language code: %s' % self.language_code
+            )
 
         for tag in self.tags:
 
@@ -1503,22 +1508,26 @@ class CollectionSummary:
             if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
-                    'received \'%s\'' % tag)
+                    'received \'%s\'' % tag
+                )
 
-            if (tag[0] not in string.ascii_lowercase or
-                    tag[-1] not in string.ascii_lowercase):
+            if (tag[0] not in string.ascii_lowercase
+                    or tag[-1] not in string.ascii_lowercase):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
-                    '\'%s\'' % tag)
+                    '\'%s\'' % tag
+                )
 
             if re.search(r'\s\s+', tag):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
-                    'received \'%s\'' % tag)
+                    'received \'%s\'' % tag
+                )
 
         if len(set(self.tags)) < len(self.tags):
             raise utils.ValidationError(
-                'Expected tags to be unique, but found duplicates')
+                'Expected tags to be unique, but found duplicates'
+            )
 
     def is_editable_by(self, user_id: str) -> bool:
         """Checks if a given user may edit the collection.
@@ -1530,8 +1539,7 @@ class CollectionSummary:
             bool. Whether the given user may edit the collection.
         """
         return (
-            user_id in self.editor_ids
-            or user_id in self.owner_ids
+            user_id in self.editor_ids or user_id in self.owner_ids
             or self.community_owned
         )
 
@@ -1567,9 +1575,8 @@ class CollectionSummary:
             bool. Whether the given user has any role in the collection.
         """
         return (
-            user_id in self.owner_ids or
-            user_id in self.editor_ids or
-            user_id in self.viewer_ids
+            user_id in self.owner_ids or user_id in self.editor_ids
+            or user_id in self.viewer_ids
         )
 
     def add_contribution_by_user(self, contributor_id: str) -> None:
@@ -1581,6 +1588,7 @@ class CollectionSummary:
         # We don't want to record the contributions of system users.
         if contributor_id not in constants.SYSTEM_USER_IDS:
             self.contributors_summary[contributor_id] = (
-                self.contributors_summary.get(contributor_id, 0) + 1)
+                self.contributors_summary.get(contributor_id, 0) + 1
+            )
 
         self.contributor_ids = list(self.contributors_summary.keys())

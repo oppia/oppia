@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects for rights for various user actions."""
 
 from __future__ import annotations
@@ -106,19 +105,22 @@ class ActivityRights:
                 has owners, editors, voice artists or viewers specified.
         """
         if self.community_owned:
-            if (self.owner_ids or self.editor_ids or self.voice_artist_ids or
-                    self.viewer_ids):
+            if (self.owner_ids or self.editor_ids or self.voice_artist_ids
+                    or self.viewer_ids):
                 raise utils.ValidationError(
                     'Community-owned explorations should have no owners, '
-                    'editors, voice artists or viewers specified.')
+                    'editors, voice artists or viewers specified.'
+                )
 
         if self.community_owned and self.status == ACTIVITY_STATUS_PRIVATE:
             raise utils.ValidationError(
-                'Community-owned explorations cannot be private.')
+                'Community-owned explorations cannot be private.'
+            )
 
         if self.status != ACTIVITY_STATUS_PRIVATE and self.viewer_ids:
             raise utils.ValidationError(
-                'Public explorations should have no viewers specified.')
+                'Public explorations should have no viewers specified.'
+            )
 
         owner_editor = set(self.owner_ids) & set(self.editor_ids)
         owner_voice_artist = set(self.owner_ids) & set(self.voice_artist_ids)
@@ -128,32 +130,34 @@ class ActivityRights:
         voice_artist_viewer = set(self.voice_artist_ids) & set(self.viewer_ids)
         if owner_editor:
             raise utils.ValidationError(
-                'A user cannot be both an owner and an editor: %s' %
-                owner_editor)
+                'A user cannot be both an owner and an editor: %s' % owner_editor
+            )
         if owner_voice_artist:
             raise utils.ValidationError(
                 'A user cannot be both an owner and a voice artist: %s' %
-                owner_voice_artist)
+                owner_voice_artist
+            )
         if owner_viewer:
             raise utils.ValidationError(
-                'A user cannot be both an owner and a viewer: %s' %
-                owner_viewer)
+                'A user cannot be both an owner and a viewer: %s' % owner_viewer
+            )
         if editor_voice_artist:
             raise utils.ValidationError(
                 'A user cannot be both an editor and a voice artist: %s' %
-                editor_voice_artist)
+                editor_voice_artist
+            )
         if editor_viewer:
             raise utils.ValidationError(
-                'A user cannot be both an editor and a viewer: %s' %
-                editor_viewer)
+                'A user cannot be both an editor and a viewer: %s' % editor_viewer
+            )
         if voice_artist_viewer:
             raise utils.ValidationError(
                 'A user cannot be both a voice artist and a viewer: %s' %
-                voice_artist_viewer)
+                voice_artist_viewer
+            )
 
         if not self.community_owned and len(self.owner_ids) == 0:
-            raise utils.ValidationError(
-                'Activity should have atleast one owner.')
+            raise utils.ValidationError('Activity should have atleast one owner.')
 
     def to_dict(self) -> ActivityRightsDict:
         """Returns a dict suitable for use by the frontend.
@@ -179,13 +183,17 @@ class ActivityRights:
                 'status': self.status,
                 'community_owned': False,
                 'owner_names': user_services.get_human_readable_user_ids(
-                    self.owner_ids),
+                    self.owner_ids
+                ),
                 'editor_names': user_services.get_human_readable_user_ids(
-                    self.editor_ids),
+                    self.editor_ids
+                ),
                 'voice_artist_names': user_services.get_human_readable_user_ids(
-                    self.voice_artist_ids),
+                    self.voice_artist_ids
+                ),
                 'viewer_names': user_services.get_human_readable_user_ids(
-                    self.viewer_ids),
+                    self.viewer_ids
+                ),
                 'viewable_if_private': self.viewable_if_private,
             }
 
@@ -276,13 +284,11 @@ class ActivityRights:
         old_role = ROLE_NONE
         if new_role == ROLE_VIEWER:
             if self.status != ACTIVITY_STATUS_PRIVATE:
-                raise Exception(
-                    'Public explorations can be viewed by anyone.')
+                raise Exception('Public explorations can be viewed by anyone.')
 
         for role, user_ids in zip(
-                [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
-                [self.owner_ids, self.editor_ids, self.viewer_ids,
-                 self.voice_artist_ids]):
+            [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
+            [self.owner_ids, self.editor_ids, self.viewer_ids, self.voice_artist_ids]):
             if user_id in user_ids:
                 user_ids.remove(user_id)
                 old_role = role
@@ -292,20 +298,16 @@ class ActivityRights:
 
         if old_role == new_role:
             if old_role == ROLE_OWNER:
-                raise Exception(
-                    'This user already owns this exploration.')
+                raise Exception('This user already owns this exploration.')
 
             if old_role == ROLE_EDITOR:
-                raise Exception(
-                    'This user already can edit this exploration.')
+                raise Exception('This user already can edit this exploration.')
 
             if old_role == ROLE_VOICE_ARTIST:
-                raise Exception(
-                    'This user already can voiceover this exploration.')
+                raise Exception('This user already can voiceover this exploration.')
 
             if old_role == ROLE_VIEWER:
-                raise Exception(
-                    'This user already can view this exploration.')
+                raise Exception('This user already can view this exploration.')
 
         return old_role
 

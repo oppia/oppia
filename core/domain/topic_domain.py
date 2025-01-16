@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.]
-
 """Domain objects for topics, and related models."""
 
 from __future__ import annotations
@@ -37,7 +36,7 @@ from typing import Dict, List, Literal, Optional, TypedDict
 # functions in Topic class. This import should be removed
 # once the schema migration functions are moved outside the
 # domain file.
-from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
+from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -90,9 +89,11 @@ CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
 CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 
 CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = (
-    'migrate_subtopic_schema_to_latest_version')
+    'migrate_subtopic_schema_to_latest_version'
+)
 CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION = (
-    'migrate_story_reference_schema_to_latest_version')
+    'migrate_story_reference_schema_to_latest_version'
+)
 
 
 class TopicChange(change_domain.BaseChange):
@@ -122,7 +123,8 @@ class TopicChange(change_domain.BaseChange):
     # The allowed list of topic properties which can be used in
     # update_topic_property command.
     TOPIC_PROPERTIES: List[str] = [
-        TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_ABBREVIATED_NAME,
+        TOPIC_PROPERTY_NAME,
+        TOPIC_PROPERTY_ABBREVIATED_NAME,
         TOPIC_PROPERTY_DESCRIPTION,
         TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
@@ -139,168 +141,178 @@ class TopicChange(change_domain.BaseChange):
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
     SUBTOPIC_PROPERTIES: List[str] = [
-        SUBTOPIC_PROPERTY_TITLE,
-        SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
-        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
-        SUBTOPIC_PROPERTY_URL_FRAGMENT
+        SUBTOPIC_PROPERTY_TITLE, SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
+        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR, SUBTOPIC_PROPERTY_URL_FRAGMENT
     ]
 
     # The allowed list of subtopic page properties which can be used in
     # update_subtopic_page_property command.
     SUBTOPIC_PAGE_PROPERTIES: List[str] = (
-        subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES)
+        subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES
+    )
 
-    ALLOWED_COMMANDS = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': ['name'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_SUBTOPIC,
-        'required_attribute_names': ['title', 'subtopic_id', 'url_fragment'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_SUBTOPIC,
-        'required_attribute_names': ['subtopic_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_CANONICAL_STORY,
-        'required_attribute_names': ['story_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_CANONICAL_STORY,
-        'required_attribute_names': ['story_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REARRANGE_CANONICAL_STORY,
-        'required_attribute_names': ['from_index', 'to_index'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_ADDITIONAL_STORY,
-        'required_attribute_names': ['story_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_ADDITIONAL_STORY,
-        'required_attribute_names': ['story_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_PUBLISH_STORY,
-        'required_attribute_names': ['story_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_UNPUBLISH_STORY,
-        'required_attribute_names': ['story_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
-        'required_attribute_names': ['new_uncategorized_skill_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
-        'required_attribute_names': ['uncategorized_skill_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-        'required_attribute_names': [
-            'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
-        'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REARRANGE_SUBTOPIC,
-        'required_attribute_names': ['from_index', 'to_index'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
-        'required_attribute_names': ['subtopic_id', 'skill_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
-        'required_attribute_names': [
-            'subtopic_id', 'property_name', 'new_value', 'old_value'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {'property_name': SUBTOPIC_PROPERTIES},
-        'deprecated_values': {}
-    }, {
-        'name': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-        'required_attribute_names': [
-            'property_name', 'new_value', 'old_value', 'subtopic_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_UPDATE_TOPIC_PROPERTY,
-        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {'property_name': TOPIC_PROPERTIES},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
-        'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION,
-        'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }]
+    ALLOWED_COMMANDS = [
+        {
+            'name': CMD_CREATE_NEW,
+            'required_attribute_names': ['name'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_ADD_SUBTOPIC,
+            'required_attribute_names': ['title', 'subtopic_id', 'url_fragment'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_DELETE_SUBTOPIC,
+            'required_attribute_names': ['subtopic_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_ADD_CANONICAL_STORY,
+            'required_attribute_names': ['story_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_DELETE_CANONICAL_STORY,
+            'required_attribute_names': ['story_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_REARRANGE_CANONICAL_STORY,
+            'required_attribute_names': ['from_index', 'to_index'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_ADD_ADDITIONAL_STORY,
+            'required_attribute_names': ['story_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_DELETE_ADDITIONAL_STORY,
+            'required_attribute_names': ['story_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_PUBLISH_STORY,
+            'required_attribute_names': ['story_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_UNPUBLISH_STORY,
+            'required_attribute_names': ['story_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
+            'required_attribute_names': ['new_uncategorized_skill_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
+            'required_attribute_names': ['uncategorized_skill_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'required_attribute_names': [
+                'old_subtopic_id', 'new_subtopic_id', 'skill_id'
+            ],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
+            'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_REARRANGE_SUBTOPIC,
+            'required_attribute_names': ['from_index', 'to_index'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+            'required_attribute_names': ['subtopic_id', 'skill_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'required_attribute_names': [
+                'subtopic_id', 'property_name', 'new_value', 'old_value'
+            ],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {
+                'property_name': SUBTOPIC_PROPERTIES
+            },
+            'deprecated_values': {}
+        }, {
+            'name': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'required_attribute_names': [
+                'property_name', 'new_value', 'old_value', 'subtopic_id'
+            ],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {
+                'property_name': SUBTOPIC_PAGE_PROPERTIES
+            },
+            'deprecated_values': {}
+        }, {
+            'name': CMD_UPDATE_TOPIC_PROPERTY,
+            'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {
+                'property_name': TOPIC_PROPERTIES
+            },
+            'deprecated_values': {}
+        }, {
+            'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
+            'required_attribute_names': ['from_version', 'to_version'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }, {
+            'name': CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION,
+            'required_attribute_names': ['from_version', 'to_version'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
+        }
+    ]
 
 
 class CreateNewTopicCmd(TopicChange):
@@ -683,9 +695,7 @@ class StoryReferenceDict(TypedDict):
 class StoryReference:
     """Domain object for a Story reference."""
 
-    def __init__(
-        self, story_id: str, story_is_published: bool
-    ) -> None:
+    def __init__(self, story_id: str, story_is_published: bool) -> None:
         """Constructs a StoryReference domain object.
 
         Args:
@@ -707,9 +717,7 @@ class StoryReference:
         }
 
     @classmethod
-    def from_dict(
-        cls, story_reference_dict: StoryReferenceDict
-    ) -> StoryReference:
+    def from_dict(cls, story_reference_dict: StoryReferenceDict) -> StoryReference:
         """Returns a StoryReference domain object from a dict.
 
         Args:
@@ -720,8 +728,8 @@ class StoryReference:
             StoryReference. The corresponding StoryReference domain object.
         """
         story_reference = cls(
-            story_reference_dict['story_id'],
-            story_reference_dict['story_is_published'])
+            story_reference_dict['story_id'], story_reference_dict['story_is_published']
+        )
         return story_reference
 
     @classmethod
@@ -745,8 +753,7 @@ class StoryReference:
                 invalid.
         """
         if not bool(re.match(constants.ENTITY_ID_REGEX, self.story_id)):
-            raise utils.ValidationError(
-                'Invalid story ID: %s' % self.story_id)
+            raise utils.ValidationError('Invalid story ID: %s' % self.story_id)
 
 
 class SubtopicDict(TypedDict):
@@ -765,14 +772,9 @@ class Subtopic:
     """Domain object for a Subtopic."""
 
     def __init__(
-        self,
-        subtopic_id: int,
-        title: str,
-        skill_ids: List[str],
-        thumbnail_filename: Optional[str],
-        thumbnail_bg_color: Optional[str],
-        thumbnail_size_in_bytes: Optional[int],
-        url_fragment: str
+        self, subtopic_id: int, title: str, skill_ids: List[str],
+        thumbnail_filename: Optional[str], thumbnail_bg_color: Optional[str],
+        thumbnail_size_in_bytes: Optional[int], url_fragment: str
     ) -> None:
         """Constructs a Subtopic domain object.
 
@@ -824,19 +826,15 @@ class Subtopic:
             Subtopic. The corresponding Subtopic domain object.
         """
         subtopic = cls(
-            subtopic_dict['id'], subtopic_dict['title'],
-            subtopic_dict['skill_ids'], subtopic_dict['thumbnail_filename'],
-            subtopic_dict['thumbnail_bg_color'],
-            subtopic_dict['thumbnail_size_in_bytes'],
-            subtopic_dict['url_fragment'])
+            subtopic_dict['id'], subtopic_dict['title'], subtopic_dict['skill_ids'],
+            subtopic_dict['thumbnail_filename'], subtopic_dict['thumbnail_bg_color'],
+            subtopic_dict['thumbnail_size_in_bytes'], subtopic_dict['url_fragment']
+        )
         return subtopic
 
     @classmethod
     def create_default_subtopic(
-        cls,
-        subtopic_id: int,
-        title: str,
-        url_frag: str
+        cls, subtopic_id: int, title: str, url_frag: str
     ) -> Subtopic:
         """Creates a Subtopic object with default values.
 
@@ -873,8 +871,7 @@ class Subtopic:
         Returns:
             bool. Whether the thumbnail background color is valid or not.
         """
-        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'subtopic']
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic']
 
     def validate(self) -> None:
         """Validates various properties of the Subtopic object.
@@ -888,46 +885,51 @@ class Subtopic:
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
             raise utils.ValidationError(
-                'Subtopic thumbnail background color %s is not supported.' % (
-                    self.thumbnail_bg_color))
+                'Subtopic thumbnail background color %s is not supported.' %
+                (self.thumbnail_bg_color)
+            )
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
-            raise utils.ValidationError(
-                'Subtopic thumbnail image is not provided.')
+            raise utils.ValidationError('Subtopic thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
-                'Subtopic thumbnail background color is not specified.')
-        if self.thumbnail_filename is not None and (
-                self.thumbnail_size_in_bytes == 0):
+                'Subtopic thumbnail background color is not specified.'
+            )
+        if self.thumbnail_filename is not None and (self.thumbnail_size_in_bytes == 0):
             raise utils.ValidationError(
-                'Subtopic thumbnail size in bytes cannot be zero.')
+                'Subtopic thumbnail size in bytes cannot be zero.'
+            )
 
         title_limit = android_validation_constants.MAX_CHARS_IN_SUBTOPIC_TITLE
         if len(self.title) > title_limit:
             raise utils.ValidationError(
                 'Expected subtopic title to be less than %d characters, '
-                'received %s' % (title_limit, self.title))
+                'received %s' % (title_limit, self.title)
+            )
 
         url_fragment_limit = (
-            android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+            android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+        )
         regex = android_validation_constants.SUBTOPIC_URL_FRAGMENT_REGEXP
         if len(self.url_fragment) > url_fragment_limit:
             raise utils.ValidationError(
                 'Expected subtopic url fragment to be less '
-                'than or equal to %d characters, received %s'
-                % (url_fragment_limit, self.url_fragment))
+                'than or equal to %d characters, received %s' %
+                (url_fragment_limit, self.url_fragment)
+            )
 
         if len(self.url_fragment) > 0:
             if not bool(re.match(regex, self.url_fragment)):
                 raise utils.ValidationError(
-                    'Invalid url fragment: %s' % self.url_fragment)
+                    'Invalid url fragment: %s' % self.url_fragment
+                )
         else:
             raise utils.ValidationError(
                 'Expected subtopic url fragment to be non '
-                'empty')
+                'empty'
+            )
 
         if len(self.skill_ids) > len(set(self.skill_ids)):
-            raise utils.ValidationError(
-                'Expected all skill ids to be distinct.')
+            raise utils.ValidationError('Expected all skill ids to be distinct.')
 
 
 class TopicDict(TypedDict, total=False):
@@ -1085,23 +1087,18 @@ class Topic:
             'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'description': self.description,
             'canonical_story_references': [
-                reference.to_dict()
-                for reference in self.canonical_story_references
+                reference.to_dict() for reference in self.canonical_story_references
             ],
             'additional_story_references': [
-                reference.to_dict()
-                for reference in self.additional_story_references
+                reference.to_dict() for reference in self.additional_story_references
             ],
             'uncategorized_skill_ids': self.uncategorized_skill_ids,
-            'subtopics': [
-                subtopic.to_dict() for subtopic in self.subtopics
-            ],
+            'subtopics': [subtopic.to_dict() for subtopic in self.subtopics],
             'subtopic_schema_version': self.subtopic_schema_version,
             'next_subtopic_id': self.next_subtopic_id,
             'language_code': self.language_code,
             'version': self.version,
-            'story_reference_schema_version': (
-                self.story_reference_schema_version),
+            'story_reference_schema_version': (self.story_reference_schema_version),
             'meta_tag_content': self.meta_tag_content,
             'practice_tab_is_displayed': self.practice_tab_is_displayed,
             'page_title_fragment_for_web': self.page_title_fragment_for_web,
@@ -1128,11 +1125,13 @@ class Topic:
 
         if self.created_on:
             topic_dict['created_on'] = utils.convert_naive_datetime_to_string(
-                self.created_on)
+                self.created_on
+            )
 
         if self.last_updated:
             topic_dict['last_updated'] = utils.convert_naive_datetime_to_string(
-                self.last_updated)
+                self.last_updated
+            )
 
         return json.dumps(topic_dict)
 
@@ -1159,35 +1158,26 @@ class Topic:
             Topic. The corresponding Topic domain object.
         """
         topic = cls(
-            topic_dict['id'], topic_dict['name'],
-            topic_dict['abbreviated_name'],
-            topic_dict['url_fragment'],
-            topic_dict['thumbnail_filename'],
-            topic_dict['thumbnail_bg_color'],
-            topic_dict['thumbnail_size_in_bytes'], topic_dict['description'],
-            [
+            topic_dict['id'], topic_dict['name'], topic_dict['abbreviated_name'],
+            topic_dict['url_fragment'], topic_dict['thumbnail_filename'],
+            topic_dict['thumbnail_bg_color'], topic_dict['thumbnail_size_in_bytes'],
+            topic_dict['description'], [
                 StoryReference.from_dict(reference_dict)
                 for reference_dict in topic_dict['canonical_story_references']
-            ],
-            [
+            ], [
                 StoryReference.from_dict(reference_dict)
                 for reference_dict in topic_dict['additional_story_references']
-            ],
-            topic_dict['uncategorized_skill_ids'],
-            [
+            ], topic_dict['uncategorized_skill_ids'], [
                 Subtopic.from_dict(subtopic_dict)
                 for subtopic_dict in topic_dict['subtopics']
-            ],
-            topic_dict['subtopic_schema_version'],
-            topic_dict['next_subtopic_id'],
+            ], topic_dict['subtopic_schema_version'], topic_dict['next_subtopic_id'],
             topic_dict['language_code'], topic_version,
             topic_dict['story_reference_schema_version'],
-            topic_dict['meta_tag_content'],
-            topic_dict['practice_tab_is_displayed'],
+            topic_dict['meta_tag_content'], topic_dict['practice_tab_is_displayed'],
             topic_dict['page_title_fragment_for_web'],
-            topic_dict['skill_ids_for_diagnostic_test'],
-            topic_created_on,
-            topic_last_updated)
+            topic_dict['skill_ids_for_diagnostic_test'], topic_created_on,
+            topic_last_updated
+        )
 
         return topic
 
@@ -1206,18 +1196,19 @@ class Topic:
         topic_dict = json.loads(json_string)
 
         created_on = (
-            utils.convert_string_to_naive_datetime_object(
-                topic_dict['created_on'])
-            if 'created_on' in topic_dict else None)
+            utils.convert_string_to_naive_datetime_object(topic_dict['created_on'])
+            if 'created_on' in topic_dict else None
+        )
         last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                topic_dict['last_updated'])
-            if 'last_updated' in topic_dict else None)
+            utils.convert_string_to_naive_datetime_object(topic_dict['last_updated'])
+            if 'last_updated' in topic_dict else None
+        )
         topic = cls.from_dict(
             topic_dict,
             topic_version=topic_dict['version'],
             topic_created_on=created_on,
-            topic_last_updated=last_updated)
+            topic_last_updated=last_updated
+        )
         return topic
 
     @classmethod
@@ -1243,8 +1234,9 @@ class Topic:
         name_limit = android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
         if len(name) > name_limit:
             raise utils.ValidationError(
-                'Topic name should be at most %d characters, received %s.'
-                % (name_limit, name))
+                'Topic name should be at most %d characters, received %s.' %
+                (name_limit, name)
+            )
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
@@ -1255,7 +1247,8 @@ class Topic:
         """
         utils.require_valid_url_fragment(
             url_fragment, 'Topic URL Fragment',
-            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
+            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        )
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename: str) -> None:
@@ -1279,8 +1272,7 @@ class Topic:
         Returns:
             bool. Whether the thumbnail background color is valid or not.
         """
-        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic']
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS['topic']
 
     def get_all_skill_ids(self) -> List[str]:
         """Returns all the ids of all the skills present in the topic.
@@ -1328,10 +1320,8 @@ class Topic:
                 return
         raise Exception('Story with given id doesn\'t exist in the topic')
 
-    def get_canonical_story_ids(
-        self,
-        include_only_published: bool = False
-    ) -> List[str]:
+    def get_canonical_story_ids(self,
+                                include_only_published: bool = False) -> List[str]:
         """Returns a list of canonical story ids that are part of the topic.
 
         Args:
@@ -1354,12 +1344,10 @@ class Topic:
         Returns:
             list(StoryReference). The list of StoryReference objects in topic.
         """
-        return (
-            self.canonical_story_references + self.additional_story_references)
+        return (self.canonical_story_references + self.additional_story_references)
 
-    def get_additional_story_ids(
-        self, include_only_published: bool = False
-    ) -> List[str]:
+    def get_additional_story_ids(self,
+                                 include_only_published: bool = False) -> List[str]:
         """Returns a list of additional story ids that are part of the topic.
 
         Args:
@@ -1403,7 +1391,8 @@ class Topic:
         if not deleted:
             raise Exception(
                 'The story_id %s is not present in the canonical '
-                'story references list of the topic.' % story_id)
+                'story references list of the topic.' % story_id
+            )
 
     def rearrange_canonical_story(self, from_index: int, to_index: int) -> None:
         """Rearranges or moves a canonical story to another position.
@@ -1417,22 +1406,21 @@ class Topic:
             Exception. Invalid input.
         """
         if from_index == to_index:
-            raise Exception(
-                'Expected from_index and to_index values to be different.')
+            raise Exception('Expected from_index and to_index values to be different.')
 
-        if (from_index >= len(self.canonical_story_references) or
-                from_index < 0):
+        if (from_index >= len(self.canonical_story_references) or from_index < 0):
             raise Exception('Expected from_index value to be with-in bounds.')
 
-        if (to_index >= len(self.canonical_story_references) or
-                to_index < 0):
+        if (to_index >= len(self.canonical_story_references) or to_index < 0):
             raise Exception('Expected to_index value to be with-in bounds.')
 
         canonical_story_reference_to_move = copy.deepcopy(
-            self.canonical_story_references[from_index])
+            self.canonical_story_references[from_index]
+        )
         del self.canonical_story_references[from_index]
         self.canonical_story_references.insert(
-            to_index, canonical_story_reference_to_move)
+            to_index, canonical_story_reference_to_move
+        )
 
     def add_canonical_story(self, story_id: str) -> None:
         """Adds a story to the canonical_story_references list.
@@ -1448,7 +1436,8 @@ class Topic:
         if story_id in canonical_story_ids:
             raise Exception(
                 'The story_id %s is already present in the canonical '
-                'story references list of the topic.' % story_id)
+                'story references list of the topic.' % story_id
+            )
         self.canonical_story_references.append(
             StoryReference.create_default_story_reference(story_id)
         )
@@ -1467,7 +1456,8 @@ class Topic:
         if story_id in additional_story_ids:
             raise Exception(
                 'The story_id %s is already present in the additional '
-                'story references list of the topic.' % story_id)
+                'story references list of the topic.' % story_id
+            )
         self.additional_story_references.append(
             StoryReference.create_default_story_reference(story_id)
         )
@@ -1491,7 +1481,8 @@ class Topic:
         if not deleted:
             raise Exception(
                 'The story_id %s is not present in the additional '
-                'story references list of the topic.' % story_id)
+                'story references list of the topic.' % story_id
+            )
 
     def validate(self, strict: bool = False) -> None:
         """Validates all properties of this topic and its constituents.
@@ -1510,109 +1501,118 @@ class Topic:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
         utils.require_valid_meta_tag_content(self.meta_tag_content)
         utils.require_valid_page_title_fragment_for_web(
-            self.page_title_fragment_for_web)
+            self.page_title_fragment_for_web
+        )
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
             raise utils.ValidationError(
-                'Topic thumbnail background color %s is not supported.' % (
-                    self.thumbnail_bg_color))
+                'Topic thumbnail background color %s is not supported.' %
+                (self.thumbnail_bg_color)
+            )
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
-            raise utils.ValidationError(
-                'Topic thumbnail image is not provided.')
+            raise utils.ValidationError('Topic thumbnail image is not provided.')
         if self.canonical_story_references:
             for reference in self.canonical_story_references:
                 if not isinstance(reference.story_is_published, bool):
                     raise utils.ValidationError(
-                        'story_is_published value should be boolean type')
+                        'story_is_published value should be boolean type'
+                    )
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
-                'Topic thumbnail background color is not specified.')
+                'Topic thumbnail background color is not specified.'
+            )
         if strict:
             if not isinstance(self.thumbnail_filename, str):
                 raise utils.ValidationError(
-                    'Expected thumbnail filename to be a string, received %s.'
-                    % self.thumbnail_filename)
+                    'Expected thumbnail filename to be a string, received %s.' %
+                    self.thumbnail_filename
+                )
 
         description_limit = (
-            android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION)
+            android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION
+        )
         if len(self.description) > description_limit:
             raise utils.ValidationError(
                 'Topic description should be at most %d characters, '
-                'received %s.' % (description_limit, self.description))
+                'received %s.' % (description_limit, self.description)
+            )
 
-        if (self.subtopic_schema_version !=
-                feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+        if (self.subtopic_schema_version != feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             raise utils.ValidationError(
-                'Expected subtopic schema version to be %s, received %s'
-                % (
-                    feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-                    self.subtopic_schema_version))
+                'Expected subtopic schema version to be %s, received %s' %
+                (feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, self.subtopic_schema_version)
+            )
 
         for subtopic in self.subtopics:
             subtopic.validate()
             if subtopic.id >= self.next_subtopic_id:
                 raise utils.ValidationError(
                     'The id for subtopic %s is greater than or equal to '
-                    'next_subtopic_id %s'
-                    % (subtopic.id, self.next_subtopic_id))
+                    'next_subtopic_id %s' % (subtopic.id, self.next_subtopic_id)
+                )
             if strict:
                 if not subtopic.skill_ids:
                     raise utils.ValidationError(
                         'Subtopic with title %s does not have any skills '
-                        'linked.' % subtopic.title)
+                        'linked.' % subtopic.title
+                    )
 
         all_skill_ids = self.get_all_skill_ids()
         skill_ids_for_diagnostic_that_are_not_in_topic = (
-            set(self.skill_ids_for_diagnostic_test) -
-            set(all_skill_ids))
+            set(self.skill_ids_for_diagnostic_test) - set(all_skill_ids)
+        )
         if len(skill_ids_for_diagnostic_that_are_not_in_topic) > 0:
             raise utils.ValidationError(
                 'The skill_ids %s are selected for the diagnostic test but they'
                 ' are not associated with the topic.' %
-                skill_ids_for_diagnostic_that_are_not_in_topic)
+                skill_ids_for_diagnostic_that_are_not_in_topic
+            )
 
         if strict:
             if len(self.subtopics) == 0:
-                raise utils.ValidationError(
-                    'Topic should have at least 1 subtopic.')
+                raise utils.ValidationError('Topic should have at least 1 subtopic.')
 
         if not self.are_subtopic_url_fragments_unique():
             raise utils.ValidationError(
                 'Subtopic url fragments are not unique across '
-                'subtopics in the topic')
+                'subtopics in the topic'
+            )
 
-        if (
-            strict and
-            len(self.skill_ids_for_diagnostic_test) == 0
-        ):
+        if (strict and len(self.skill_ids_for_diagnostic_test) == 0):
             raise utils.ValidationError(
-                'The skill_ids_for_diagnostic_test field should not be empty.')
+                'The skill_ids_for_diagnostic_test field should not be empty.'
+            )
 
         if len(self.skill_ids_for_diagnostic_test) > 3:
             raise utils.ValidationError(
                 'The skill_ids_for_diagnostic_test field should contain at '
-                'most 3 skill_ids.')
+                'most 3 skill_ids.'
+            )
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code)
+                'Invalid language code: %s' % self.language_code
+            )
 
         canonical_story_ids = self.get_canonical_story_ids()
         if len(canonical_story_ids) > len(set(canonical_story_ids)):
             raise utils.ValidationError(
-                'Expected all canonical story ids to be distinct.')
+                'Expected all canonical story ids to be distinct.'
+            )
 
         additional_story_ids = self.get_additional_story_ids()
         if len(additional_story_ids) > len(set(additional_story_ids)):
             raise utils.ValidationError(
-                'Expected all additional story ids to be distinct.')
+                'Expected all additional story ids to be distinct.'
+            )
 
         for story_id in additional_story_ids:
             if story_id in canonical_story_ids:
                 raise utils.ValidationError(
                     'Expected additional story ids list and canonical story '
                     'ids list to be mutually exclusive. The story_id %s is '
-                    'present in both lists' % story_id)
+                    'present in both lists' % story_id
+                )
 
         all_story_references = self.get_all_story_references()
         for reference in all_story_references:
@@ -1638,12 +1638,12 @@ class Topic:
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name, name, url_fragment, None, None, None,
-            description, [], [], [], [],
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
+            topic_id, name, name, url_fragment, None, None, None, description, [], [],
+            [], [], feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
-            False, page_title_frag, [])
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, page_title_frag,
+            []
+        )
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(
@@ -1663,9 +1663,11 @@ class Topic:
         """
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
+            constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename']
+        )
         subtopic_dict['thumbnail_size_in_bytes'] = (
-            len(fs.get(filepath)) if fs.isfile(filepath) else None)
+            len(fs.get(filepath)) if fs.isfile(filepath) else None
+        )
 
         return subtopic_dict
 
@@ -1685,7 +1687,8 @@ class Topic:
         """
         subtopic_title = re.sub('[^a-z]+', '', subtopic_dict['title'])
         subtopic_dict['url_fragment'] = (
-            subtopic_title[:constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT])
+            subtopic_title[:constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]
+        )
         return subtopic_dict
 
     @classmethod
@@ -1708,9 +1711,7 @@ class Topic:
 
     @classmethod
     def update_subtopics_from_model(
-        cls,
-        versioned_subtopics: VersionedSubtopicsDict,
-        current_version: int,
+        cls, versioned_subtopics: VersionedSubtopicsDict, current_version: int,
         topic_id: str
     ) -> None:
         """Converts the subtopics blob contained in the given
@@ -1731,8 +1732,9 @@ class Topic:
         versioned_subtopics['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
-            cls, '_convert_subtopic_v%s_dict_to_v%s_dict' % (
-                current_version, current_version + 1))
+            cls, '_convert_subtopic_v%s_dict_to_v%s_dict' %
+            (current_version, current_version + 1)
+        )
 
         if current_version == 3:
             conversion_fn = functools.partial(conversion_fn, topic_id)
@@ -1745,8 +1747,7 @@ class Topic:
 
     @classmethod
     def update_story_references_from_model(
-        cls,
-        versioned_story_references: VersionedStoryReferencesDict,
+        cls, versioned_story_references: VersionedStoryReferencesDict,
         current_version: int
     ) -> None:
         """Converts the story_references blob contained in the given
@@ -1766,15 +1767,15 @@ class Topic:
         versioned_story_references['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
-            cls, '_convert_story_reference_v%s_dict_to_v%s_dict' % (
-                current_version, current_version + 1))
+            cls, '_convert_story_reference_v%s_dict_to_v%s_dict' %
+            (current_version, current_version + 1)
+        )
 
         updated_story_references = []
         for reference in versioned_story_references['story_references']:
             updated_story_references.append(conversion_fn(reference))
 
-        versioned_story_references['story_references'] = (
-            updated_story_references)
+        versioned_story_references['story_references'] = (updated_story_references)
 
     def update_name(self, new_name: str) -> None:
         """Updates the name of a topic object.
@@ -1820,9 +1821,7 @@ class Topic:
         self.thumbnail_filename = new_thumbnail_filename
         self.thumbnail_size_in_bytes = new_thumbnail_size
 
-    def update_thumbnail_bg_color(
-        self, new_thumbnail_bg_color: Optional[str]
-    ) -> None:
+    def update_thumbnail_bg_color(self, new_thumbnail_bg_color: Optional[str]) -> None:
         """Updates the thumbnail background color of a topic object.
 
         Args:
@@ -1891,9 +1890,7 @@ class Topic:
         """
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
-    def add_uncategorized_skill_id(
-        self, new_uncategorized_skill_id: str
-    ) -> None:
+    def add_uncategorized_skill_id(self, new_uncategorized_skill_id: str) -> None:
         """Updates the skill id list of a topic object.
 
         Args:
@@ -1906,19 +1903,19 @@ class Topic:
         for subtopic in self.subtopics:
             if new_uncategorized_skill_id in subtopic.skill_ids:
                 raise Exception(
-                    'The skill id %s already exists in subtopic with id %s.'
-                    % (new_uncategorized_skill_id, subtopic.id))
+                    'The skill id %s already exists in subtopic with id %s.' %
+                    (new_uncategorized_skill_id, subtopic.id)
+                )
 
         if new_uncategorized_skill_id in self.uncategorized_skill_ids:
             raise Exception(
-                'The skill id %s is already an uncategorized skill.'
-                % new_uncategorized_skill_id)
+                'The skill id %s is already an uncategorized skill.' %
+                new_uncategorized_skill_id
+            )
 
         self.uncategorized_skill_ids.append(new_uncategorized_skill_id)
 
-    def remove_uncategorized_skill_id(
-        self, uncategorized_skill_id: str
-    ) -> None:
+    def remove_uncategorized_skill_id(self, uncategorized_skill_id: str) -> None:
         """Updates the skill id list of a topic object.
 
         Args:
@@ -1931,8 +1928,8 @@ class Topic:
         """
         if uncategorized_skill_id not in self.uncategorized_skill_ids:
             raise Exception(
-                'The skill id %s is not present in the topic.'
-                % uncategorized_skill_id)
+                'The skill id %s is not present in the topic.' % uncategorized_skill_id
+            )
 
         if uncategorized_skill_id in self.skill_ids_for_diagnostic_test:
             self.skill_ids_for_diagnostic_test.remove(uncategorized_skill_id)
@@ -1968,15 +1965,9 @@ class Topic:
         for ind, subtopic in enumerate(self.subtopics):
             if subtopic.id == subtopic_id:
                 return ind
-        raise Exception(
-            'The subtopic with id %s does not exist.' % subtopic_id)
+        raise Exception('The subtopic with id %s does not exist.' % subtopic_id)
 
-    def add_subtopic(
-        self,
-        new_subtopic_id: int,
-        title: str,
-        url_frag: str
-    ) -> None:
+    def add_subtopic(self, new_subtopic_id: int, title: str, url_frag: str) -> None:
         """Adds a subtopic with the given id and title.
 
         Args:
@@ -1991,11 +1982,12 @@ class Topic:
         if self.next_subtopic_id != new_subtopic_id:
             raise Exception(
                 'The given new subtopic id %s is not equal to the expected '
-                'next subtopic id: %s'
-                % (new_subtopic_id, self.next_subtopic_id))
+                'next subtopic id: %s' % (new_subtopic_id, self.next_subtopic_id)
+            )
         self.next_subtopic_id = self.next_subtopic_id + 1
         self.subtopics.append(
-            Subtopic.create_default_subtopic(new_subtopic_id, title, url_frag))
+            Subtopic.create_default_subtopic(new_subtopic_id, title, url_frag)
+        )
 
     def delete_subtopic(self, subtopic_id: int) -> None:
         """Deletes the subtopic with the given id and adds all its skills to
@@ -2026,10 +2018,7 @@ class Topic:
         self.subtopics[subtopic_index].title = new_title
 
     def update_subtopic_thumbnail_filename_and_size(
-        self,
-        subtopic_id: int,
-        new_thumbnail_filename: str,
-        new_thumbnail_size: int
+        self, subtopic_id: int, new_thumbnail_filename: str, new_thumbnail_size: int
     ) -> None:
         """Updates the thumbnail filename and file size property
          of the new subtopic.
@@ -2044,10 +2033,8 @@ class Topic:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        self.subtopics[subtopic_index].thumbnail_filename = (
-            new_thumbnail_filename)
-        self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
-            new_thumbnail_size)
+        self.subtopics[subtopic_index].thumbnail_filename = (new_thumbnail_filename)
+        self.subtopics[subtopic_index].thumbnail_size_in_bytes = (new_thumbnail_size)
 
     def update_subtopic_url_fragment(
         self, subtopic_id: int, new_url_fragment: str
@@ -2064,7 +2051,8 @@ class Topic:
         subtopic_index = self.get_subtopic_index(subtopic_id)
         utils.require_valid_url_fragment(
             new_url_fragment, 'Subtopic Url Fragment',
-            constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+            constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+        )
         self.subtopics[subtopic_index].url_fragment = new_url_fragment
 
     def update_subtopic_thumbnail_bg_color(
@@ -2081,8 +2069,7 @@ class Topic:
             Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
-        self.subtopics[subtopic_index].thumbnail_bg_color = (
-            new_thumbnail_bg_color)
+        self.subtopics[subtopic_index].thumbnail_bg_color = (new_thumbnail_bg_color)
 
     def rearrange_skill_in_subtopic(
         self, subtopic_id: int, from_index: int, to_index: int
@@ -2098,24 +2085,22 @@ class Topic:
             Exception. Invalid input.
         """
         if from_index == to_index:
-            raise Exception(
-                'Expected from_index and to_index values to be different.')
+            raise Exception('Expected from_index and to_index values to be different.')
 
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        if (from_index >= len(self.subtopics[subtopic_index].skill_ids) or
-                from_index < 0):
+        if (from_index >= len(self.subtopics[subtopic_index].skill_ids)
+                or from_index < 0):
             raise Exception('Expected from_index value to be with-in bounds.')
 
-        if (to_index >= len(self.subtopics[subtopic_index].skill_ids) or
-                to_index < 0):
+        if (to_index >= len(self.subtopics[subtopic_index].skill_ids) or to_index < 0):
             raise Exception('Expected to_index value to be with-in bounds.')
 
         skill_to_move = copy.deepcopy(
-            self.subtopics[subtopic_index].skill_ids[from_index])
+            self.subtopics[subtopic_index].skill_ids[from_index]
+        )
         del self.subtopics[subtopic_index].skill_ids[from_index]
-        self.subtopics[subtopic_index].skill_ids.insert(
-            to_index, skill_to_move)
+        self.subtopics[subtopic_index].skill_ids.insert(to_index, skill_to_move)
 
     def rearrange_subtopic(self, from_index: int, to_index: int) -> None:
         """Rearranges the subtopic in the topic.
@@ -2128,8 +2113,7 @@ class Topic:
             Exception. Invalid input.
         """
         if from_index == to_index:
-            raise Exception(
-                'Expected from_index and to_index values to be different.')
+            raise Exception('Expected from_index and to_index values to be different.')
 
         if from_index >= len(self.subtopics) or from_index < 0:
             raise Exception('Expected from_index value to be with-in bounds.')
@@ -2137,16 +2121,12 @@ class Topic:
         if to_index >= len(self.subtopics) or to_index < 0:
             raise Exception('Expected to_index value to be with-in bounds.')
 
-        skill_to_move = copy.deepcopy(
-            self.subtopics[from_index])
+        skill_to_move = copy.deepcopy(self.subtopics[from_index])
         del self.subtopics[from_index]
         self.subtopics.insert(to_index, skill_to_move)
 
     def move_skill_id_to_subtopic(
-        self,
-        old_subtopic_id: Optional[int],
-        new_subtopic_id: int,
-        skill_id: str
+        self, old_subtopic_id: Optional[int], new_subtopic_id: int, skill_id: str
     ) -> None:
         """Moves the skill_id to a new subtopic or to uncategorized skill ids.
 
@@ -2168,18 +2148,19 @@ class Topic:
             old_subtopic_index = self.get_subtopic_index(old_subtopic_id)
             if skill_id not in self.subtopics[old_subtopic_index].skill_ids:
                 raise Exception(
-                    'Skill id %s is not present in the given old subtopic'
-                    % skill_id)
+                    'Skill id %s is not present in the given old subtopic' % skill_id
+                )
         else:
             if skill_id not in self.uncategorized_skill_ids:
                 raise Exception(
-                    'Skill id %s is not an uncategorized skill id.' % skill_id)
+                    'Skill id %s is not an uncategorized skill id.' % skill_id
+                )
 
         new_subtopic_index = self.get_subtopic_index(new_subtopic_id)
         if skill_id in self.subtopics[new_subtopic_index].skill_ids:
             raise Exception(
-                'Skill id %s is already present in the target subtopic'
-                % skill_id)
+                'Skill id %s is already present in the target subtopic' % skill_id
+            )
 
         if old_subtopic_id is None:
             self.uncategorized_skill_ids.remove(skill_id)
@@ -2188,9 +2169,7 @@ class Topic:
 
         self.subtopics[new_subtopic_index].skill_ids.append(skill_id)
 
-    def remove_skill_id_from_subtopic(
-        self, subtopic_id: int, skill_id: str
-    ) -> None:
+    def remove_skill_id_from_subtopic(self, subtopic_id: int, skill_id: str) -> None:
         """Removes the skill_id from a subtopic and adds it to
         uncategorized skill ids.
 
@@ -2207,9 +2186,7 @@ class Topic:
 
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if skill_id not in self.subtopics[subtopic_index].skill_ids:
-            raise Exception(
-                'Skill id %s is not present in the old subtopic'
-                % skill_id)
+            raise Exception('Skill id %s is not present in the old subtopic' % skill_id)
 
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
@@ -2221,8 +2198,7 @@ class Topic:
         Returns:
             bool. Whether the subtopic url fragments are unique in the topic.
         """
-        url_fragments_list = [
-            subtopic.url_fragment for subtopic in self.subtopics]
+        url_fragments_list = [subtopic.url_fragment for subtopic in self.subtopics]
         url_fragments_set = set(url_fragments_list)
         return len(url_fragments_list) == len(url_fragments_set)
 
@@ -2265,23 +2241,12 @@ class TopicSummary:
     """Domain object for Topic Summary."""
 
     def __init__(
-        self,
-        topic_id: str,
-        name: str,
-        canonical_name: str,
-        language_code: str,
-        description: str,
-        version: int,
-        canonical_story_count: int,
-        additional_story_count: int,
-        uncategorized_skill_count: int,
-        subtopic_count: int,
-        total_skill_count: int,
-        total_published_node_count: int,
-        thumbnail_filename: Optional[str],
-        thumbnail_bg_color: Optional[str],
-        url_fragment: str,
-        published_story_exploration_mapping: Dict[str, List[str]],
+        self, topic_id: str, name: str, canonical_name: str, language_code: str,
+        description: str, version: int, canonical_story_count: int,
+        additional_story_count: int, uncategorized_skill_count: int,
+        subtopic_count: int, total_skill_count: int, total_published_node_count: int,
+        thumbnail_filename: Optional[str], thumbnail_bg_color: Optional[str],
+        url_fragment: str, published_story_exploration_mapping: Dict[str, List[str]],
         topic_model_created_on: datetime.datetime,
         topic_model_last_updated: datetime.datetime
     ) -> None:
@@ -2337,8 +2302,7 @@ class TopicSummary:
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
         self.url_fragment = url_fragment
-        self.published_story_exploration_mapping = (
-            published_story_exploration_mapping)
+        self.published_story_exploration_mapping = (published_story_exploration_mapping)
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
@@ -2349,7 +2313,8 @@ class TopicSummary:
         """
         utils.require_valid_url_fragment(
             url_fragment, 'Topic URL Fragment',
-            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
+            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        )
 
     def validate(self) -> None:
         """Validates all properties of this topic summary.
@@ -2364,63 +2329,69 @@ class TopicSummary:
 
         if self.thumbnail_filename is not None:
             utils.require_valid_thumbnail_filename(self.thumbnail_filename)
-        if (
-                self.thumbnail_bg_color is not None and not (
-                    Topic.require_valid_thumbnail_bg_color(
-                        self.thumbnail_bg_color))):
+        if (self.thumbnail_bg_color is not None and
+                not (Topic.require_valid_thumbnail_bg_color(self.thumbnail_bg_color))):
             raise utils.ValidationError(
-                'Topic thumbnail background color %s is not supported.' % (
-                    self.thumbnail_bg_color))
+                'Topic thumbnail background color %s is not supported.' %
+                (self.thumbnail_bg_color)
+            )
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
-            raise utils.ValidationError(
-                'Topic thumbnail image is not provided.')
+            raise utils.ValidationError('Topic thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
-                'Topic thumbnail background color is not specified.')
+                'Topic thumbnail background color is not specified.'
+            )
 
         if self.canonical_name == '':
-            raise utils.ValidationError(
-                'Canonical name field should not be empty')
+            raise utils.ValidationError('Canonical name field should not be empty')
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code)
+                'Invalid language code: %s' % self.language_code
+            )
 
         if self.canonical_story_count < 0:
             raise utils.ValidationError(
                 'Expected canonical_story_count to be non-negative, '
-                'received \'%s\'' % self.canonical_story_count)
+                'received \'%s\'' % self.canonical_story_count
+            )
 
         if self.additional_story_count < 0:
             raise utils.ValidationError(
                 'Expected additional_story_count to be non-negative, '
-                'received \'%s\'' % self.additional_story_count)
+                'received \'%s\'' % self.additional_story_count
+            )
 
         if self.uncategorized_skill_count < 0:
             raise utils.ValidationError(
                 'Expected uncategorized_skill_count to be non-negative, '
-                'received \'%s\'' % self.uncategorized_skill_count)
+                'received \'%s\'' % self.uncategorized_skill_count
+            )
 
         if self.total_skill_count < 0:
             raise utils.ValidationError(
                 'Expected total_skill_count to be non-negative, '
-                'received \'%s\'' % self.total_skill_count)
+                'received \'%s\'' % self.total_skill_count
+            )
 
         if self.total_skill_count < self.uncategorized_skill_count:
             raise utils.ValidationError(
                 'Expected total_skill_count to be greater than or equal to '
-                'uncategorized_skill_count %s, received \'%s\'' % (
-                    self.uncategorized_skill_count, self.total_skill_count))
+                'uncategorized_skill_count %s, received \'%s\'' %
+                (self.uncategorized_skill_count, self.total_skill_count)
+            )
 
         if self.total_published_node_count < 0:
             raise utils.ValidationError(
                 'Expected total_published_node_count to be non-negative, '
-                'received \'%s\'' % self.total_published_node_count)
+                'received \'%s\'' % self.total_published_node_count
+            )
 
         if self.subtopic_count < 0:
             raise utils.ValidationError(
                 'Expected subtopic_count to be non-negative, '
-                'received \'%s\'' % self.subtopic_count)
+                'received \'%s\'' % self.subtopic_count
+            )
 
     def to_dict(self) -> TopicSummaryDict:
         """Returns a dictionary representation of this domain object.
@@ -2444,11 +2415,14 @@ class TopicSummary:
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'published_story_exploration_mapping': (
-                self.published_story_exploration_mapping),
+                self.published_story_exploration_mapping
+            ),
             'topic_model_created_on': utils.get_time_in_millisecs(
-                self.topic_model_created_on),
+                self.topic_model_created_on
+            ),
             'topic_model_last_updated': utils.get_time_in_millisecs(
-                self.topic_model_last_updated)
+                self.topic_model_last_updated
+            )
         }
 
 
@@ -2456,10 +2430,7 @@ class TopicRights:
     """Domain object for topic rights."""
 
     def __init__(
-        self,
-        topic_id: str,
-        manager_ids: List[str],
-        topic_is_published: bool
+        self, topic_id: str, manager_ids: List[str], topic_is_published: bool
     ) -> None:
         """Constructs a TopicRights domain object.
 
@@ -2490,9 +2461,7 @@ class TopicChapterCounts:
     """Domain object for chapter counts in a topic."""
 
     def __init__(
-        self,
-        total_upcoming_chapters_count: int,
-        total_overdue_chapters_count: int,
+        self, total_upcoming_chapters_count: int, total_overdue_chapters_count: int,
         total_chapter_counts_for_each_story: List[int],
         published_chapter_counts_for_each_story: List[int]
     ) -> None:
@@ -2510,7 +2479,7 @@ class TopicChapterCounts:
         """
         self.total_upcoming_chapters_count = total_upcoming_chapters_count
         self.total_overdue_chapters_count = total_overdue_chapters_count
-        self.total_chapter_counts_for_each_story = (
-            total_chapter_counts_for_each_story)
+        self.total_chapter_counts_for_each_story = (total_chapter_counts_for_each_story)
         self.published_chapter_counts_for_each_story = (
-            published_chapter_counts_for_each_story)
+            published_chapter_counts_for_each_story
+        )

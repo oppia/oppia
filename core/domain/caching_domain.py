@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects for caching.
 
 Domain objects capture domain-specific logic and are agnostic of how the
@@ -30,9 +29,7 @@ class MemoryCacheStats:
     """
 
     def __init__(
-        self,
-        total_allocated_in_bytes: int,
-        peak_memory_usage_in_bytes: int,
+        self, total_allocated_in_bytes: int, peak_memory_usage_in_bytes: int,
         total_number_of_keys_stored: int
     ) -> None:
         """Initializes a Memory Cache Stats domain object.

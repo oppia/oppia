@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for translation fetchers."""
 
 from __future__ import annotations
@@ -24,14 +23,11 @@ from core.domain import translation_fetchers
 from core.platform import models
 from core.tests import test_utils
 
-
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import translation_models
 
-
-(translation_models,) = models.Registry.import_models([
-    models.Names.TRANSLATION])
+(translation_models, ) = models.Registry.import_models([models.Names.TRANSLATION])
 
 
 class MachineTranslationFetchersTests(test_utils.GenericTestBase):
@@ -39,33 +35,33 @@ class MachineTranslationFetchersTests(test_utils.GenericTestBase):
     def test_get_translation_from_model(self) -> None:
         model_id = (
             translation_models.MachineTranslationModel.create(
-                'en', 'es', 'hello world', 'hola mundo')
+                'en', 'es', 'hello world', 'hola mundo'
+            )
         )
         # Ruling out the possibility of None for mypy type checking.
         assert model_id is not None
-        model_instance = translation_models.MachineTranslationModel.get(
-            model_id)
+        model_instance = translation_models.MachineTranslationModel.get(model_id)
         # Ruling out the possibility of None for mypy type checking.
         assert model_instance is not None
         self.assertEqual(
-            translation_fetchers.get_translation_from_model(
-                model_instance).to_dict(),
+            translation_fetchers.get_translation_from_model(model_instance).to_dict(),
             translation_domain.MachineTranslation(
-                'en', 'es', 'hello world', 'hola mundo').to_dict()
+                'en', 'es', 'hello world', 'hola mundo'
+            ).to_dict()
         )
 
-    def test_get_machine_translation_with_no_translation_returns_none(
-        self
-    ) -> None:
+    def test_get_machine_translation_with_no_translation_returns_none(self) -> None:
         translation = translation_fetchers.get_machine_translation(
-            'en', 'es', 'untranslated_text')
+            'en', 'es', 'untranslated_text'
+        )
         self.assertIsNone(translation)
 
     def test_get_machine_translation_for_cached_translation_returns_from_cache(
         self
     ) -> None:
         translation_models.MachineTranslationModel.create(
-            'en', 'es', 'hello world', 'hola mundo')
+            'en', 'es', 'hello world', 'hola mundo'
+        )
         translation = translation_fetchers.get_machine_translation(
             'en', 'es', 'hello world'
         )
@@ -107,9 +103,7 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
             ], language_codes
         )
 
-    def test_get_entity_translation_returns_correctly(
-        self
-    ) -> None:
+    def test_get_entity_translation_returns_correctly(self) -> None:
         exp_id = 'exp1'
         translation_models.EntityTranslationsModel.create_new(
             'exploration', exp_id, 5, 'hi', {}
@@ -122,9 +116,7 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
         )
         self.assertEqual(entity_translation.language_code, 'hi')
 
-    def test_get_entity_translation_creates_empty_object(
-        self
-    ) -> None:
+    def test_get_entity_translation_creates_empty_object(self) -> None:
         exp_id = 'exp1'
         entity_translation = (
             translation_fetchers.get_entity_translation(

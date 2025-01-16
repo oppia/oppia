@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Registry for feature flags."""
 
 from __future__ import annotations
@@ -25,14 +24,15 @@ from core.platform import models
 from typing import List, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import config_models
 
-(config_models,) = models.Registry.import_models([models.Names.CONFIG])
+(config_models, ) = models.Registry.import_models([models.Names.CONFIG])
 
 FeatureNames = feature_flag_list.FeatureNames
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
-    feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE)
+    feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+)
 
 
 class Registry:
@@ -52,35 +52,29 @@ class Registry:
             Exception. The given name of the feature flag doesn't exist.
         """
         feature_flag_config_from_storage = (
-            cls.load_feature_flag_config_from_storage(name))
+            cls.load_feature_flag_config_from_storage(name)
+        )
         feature_flag_spec_values = (
-            FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name))
+            FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name)
+        )
 
         if feature_flag_spec_values is not None:
             feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
-                feature_flag_spec_values[0],
-                feature_flag_spec_values[1]
+                feature_flag_spec_values[0], feature_flag_spec_values[1]
             )
         else:
             raise Exception('Feature flag not found: %s.' % name)
 
         if feature_flag_config_from_storage is not None:
             return feature_flag_domain.FeatureFlag(
-                name,
-                feature_flag_spec,
-                feature_flag_config_from_storage
+                name, feature_flag_spec, feature_flag_config_from_storage
             )
         else:
             feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-                False,
-                0,
-                [],
-                None
+                False, 0, [], None
             )
             return feature_flag_domain.FeatureFlag(
-                name,
-                feature_flag_spec,
-                feature_flag_config
+                name, feature_flag_spec, feature_flag_config
             )
 
     @classmethod
@@ -104,9 +98,9 @@ class Registry:
         feature_flag = cls.get_feature_flag(name)
 
         feature_flag.feature_flag_config.set_force_enable_for_all_users(
-            force_enable_for_all_users)
-        feature_flag.feature_flag_config.set_rollout_percentage(
-            rollout_percentage)
+            force_enable_for_all_users
+        )
+        feature_flag.feature_flag_config.set_rollout_percentage(rollout_percentage)
         feature_flag.feature_flag_config.set_user_group_ids(user_group_ids)
 
         cls._update_feature_flag_storage_model(feature_flag)
@@ -125,7 +119,8 @@ class Registry:
             in storage.
         """
         feature_flag_config_model = config_models.FeatureFlagConfigModel.get(
-            name, strict=False)
+            name, strict=False
+        )
 
         if feature_flag_config_model is not None:
             return feature_flag_domain.FeatureFlagConfig(
@@ -147,10 +142,12 @@ class Registry:
             feature_flag: FeatureFlag. The feature flag domain object.
         """
         feature_flag.feature_flag_config.validate(
-            feature_flag.feature_flag_spec.feature_stage)
+            feature_flag.feature_flag_spec.feature_stage
+        )
 
         model_instance = config_models.FeatureFlagConfigModel.get(
-            feature_flag.name, strict=False)
+            feature_flag.name, strict=False
+        )
         if model_instance is None:
             model_instance = config_models.FeatureFlagConfigModel.create(
                 feature_flag.name,
@@ -161,10 +158,13 @@ class Registry:
             return
 
         model_instance.force_enable_for_all_users = (
-            feature_flag.feature_flag_config.force_enable_for_all_users)
+            feature_flag.feature_flag_config.force_enable_for_all_users
+        )
         model_instance.rollout_percentage = (
-            feature_flag.feature_flag_config.rollout_percentage)
+            feature_flag.feature_flag_config.rollout_percentage
+        )
         model_instance.user_group_ids = (
-            feature_flag.feature_flag_config.user_group_ids)
+            feature_flag.feature_flag_config.user_group_ids
+        )
         model_instance.update_timestamps()
         model_instance.put()

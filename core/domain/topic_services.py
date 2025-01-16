@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.]
-
 """Commands for operations on topics, and related models."""
 
 from __future__ import annotations
@@ -50,16 +49,14 @@ from core.platform import models
 from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
+(topic_models, ) = models.Registry.import_models([models.Names.TOPIC])
 
 
 def _create_topic(
-    committer_id: str,
-    topic: topic_domain.Topic,
-    commit_message: str,
+    committer_id: str, topic: topic_domain.Topic, commit_message: str,
     commit_cmds: List[topic_domain.TopicChange]
 ) -> None:
     """Creates a new topic, and ensures that rights for a new topic
@@ -75,11 +72,12 @@ def _create_topic(
     topic.validate()
     if does_topic_with_name_exist(topic.name):
         raise utils.ValidationError(
-            'Topic with name \'%s\' already exists' % topic.name)
+            'Topic with name \'%s\' already exists' % topic.name
+        )
     if does_topic_with_url_fragment_exist(topic.url_fragment):
         raise utils.ValidationError(
-            'Topic with URL Fragment \'%s\' already exists'
-            % topic.url_fragment)
+            'Topic with URL Fragment \'%s\' already exists' % topic.url_fragment
+        )
     create_new_topic_rights(topic.id, committer_id)
     model = topic_models.TopicModel(
         id=topic.id,
@@ -93,11 +91,11 @@ def _create_topic(
         description=topic.description,
         language_code=topic.language_code,
         canonical_story_references=[
-            reference.to_dict()
-            for reference in topic.canonical_story_references],
+            reference.to_dict() for reference in topic.canonical_story_references
+        ],
         additional_story_references=[
-            reference.to_dict()
-            for reference in topic.additional_story_references],
+            reference.to_dict() for reference in topic.additional_story_references
+        ],
         uncategorized_skill_ids=topic.uncategorized_skill_ids,
         subtopic_schema_version=topic.subtopic_schema_version,
         story_reference_schema_version=topic.story_reference_schema_version,
@@ -146,8 +144,7 @@ def does_topic_with_url_fragment_exist(url_fragment: str) -> bool:
     """
     if not isinstance(url_fragment, str):
         raise utils.ValidationError('Topic URL fragment should be a string.')
-    existing_topic = (
-        topic_fetchers.get_topic_by_url_fragment(url_fragment))
+    existing_topic = (topic_fetchers.get_topic_by_url_fragment(url_fragment))
     return existing_topic is not None
 
 
@@ -158,24 +155,23 @@ def save_new_topic(committer_id: str, topic: topic_domain.Topic) -> None:
         committer_id: str. ID of the committer.
         topic: Topic. Topic to be saved.
     """
-    commit_message = (
-        'New topic created with name \'%s\'.' % topic.name)
+    commit_message = ('New topic created with name \'%s\'.' % topic.name)
     _create_topic(
-        committer_id, topic, commit_message, [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_CREATE_NEW,
-            'name': topic.name
-        })])
+        committer_id, topic, commit_message, [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_CREATE_NEW,
+                    'name': topic.name
+                }
+            )
+        ]
+    )
 
 
 def apply_change_list(
     topic_id: str, change_list: Sequence[change_domain.BaseChange]
-) -> Tuple[
-    topic_domain.Topic,
-    Dict[str, subtopic_page_domain.SubtopicPage],
-    List[int],
-    List[int],
-    Dict[str, List[subtopic_page_domain.SubtopicPageChange]]
-]:
+) -> Tuple[topic_domain.Topic, Dict[str, subtopic_page_domain.SubtopicPage], List[int],
+           List[int], Dict[str, List[subtopic_page_domain.SubtopicPageChange]]]:
     """Applies a changelist to a topic and returns the result. The incoming
     changelist should not have simultaneuous creations and deletion of
     subtopics.
@@ -201,39 +197,36 @@ def apply_change_list(
     newly_created_subtopic_ids: List[int] = []
     existing_subtopic_page_ids_to_be_modified: List[int] = []
     deleted_subtopic_ids: List[int] = []
-    modified_subtopic_pages_list: List[
-        Optional[subtopic_page_domain.SubtopicPage]
-    ] = []
+    modified_subtopic_pages_list: List[Optional[subtopic_page_domain.SubtopicPage]] = []
     modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage] = {}
     modified_subtopic_change_cmds: Dict[
-        str, List[subtopic_page_domain.SubtopicPageChange]
-    ] = collections.defaultdict(list)
+        str,
+        List[subtopic_page_domain.SubtopicPageChange]] = collections.defaultdict(list)
 
     for change in change_list:
-        if (change.cmd ==
-                subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+        if (change.cmd == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
             # Here we use cast because we are narrowing down the type from
             # TopicChange to a specific change command.
             update_subtopic_page_property_cmd = cast(
-                subtopic_page_domain.UpdateSubtopicPagePropertyCmd,
-                change
+                subtopic_page_domain.UpdateSubtopicPagePropertyCmd, change
             )
-            if (
-                update_subtopic_page_property_cmd.subtopic_id <
-                topic.next_subtopic_id
-            ):
+            if (update_subtopic_page_property_cmd.subtopic_id < topic.next_subtopic_id):
                 existing_subtopic_page_ids_to_be_modified.append(
-                    update_subtopic_page_property_cmd.subtopic_id)
+                    update_subtopic_page_property_cmd.subtopic_id
+                )
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, update_subtopic_page_property_cmd.subtopic_id
                     )
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(
-                    update_subtopic_page_property_cmd)
+                    update_subtopic_page_property_cmd
+                )
     modified_subtopic_pages_list = (
         subtopic_page_services.get_subtopic_pages_with_ids(
-            topic_id, existing_subtopic_page_ids_to_be_modified))
+            topic_id, existing_subtopic_page_ids_to_be_modified
+        )
+    )
     for subtopic_page in modified_subtopic_pages_list:
         # Ruling out the possibility of None for mypy type checking.
         assert subtopic_page is not None
@@ -244,42 +237,40 @@ def apply_change_list(
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
-                add_subtopic_cmd = cast(
-                    topic_domain.AddSubtopicCmd, change
-                )
+                add_subtopic_cmd = cast(topic_domain.AddSubtopicCmd, change)
                 topic.add_subtopic(
-                    add_subtopic_cmd.subtopic_id,
-                    add_subtopic_cmd.title,
+                    add_subtopic_cmd.subtopic_id, add_subtopic_cmd.title,
                     add_subtopic_cmd.url_fragment
                 )
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, add_subtopic_cmd.subtopic_id))
+                        topic_id, add_subtopic_cmd.subtopic_id
+                    )
+                )
                 modified_subtopic_pages[subtopic_page_id] = (
                     subtopic_page_domain.SubtopicPage.create_default_subtopic_page( # pylint: disable=line-too-long
                         add_subtopic_cmd.subtopic_id, topic_id)
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(
-                    subtopic_page_domain.SubtopicPageChange({
-                        'cmd': 'create_new',
-                        'topic_id': topic_id,
-                        'subtopic_id': add_subtopic_cmd.subtopic_id
-                    }))
+                    subtopic_page_domain.SubtopicPageChange(
+                        {
+                            'cmd': 'create_new',
+                            'topic_id': topic_id,
+                            'subtopic_id': add_subtopic_cmd.subtopic_id
+                        }
+                    )
+                )
                 newly_created_subtopic_ids.append(add_subtopic_cmd.subtopic_id)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
-                delete_subtopic_cmd = cast(
-                    topic_domain.DeleteSubtopicCmd, change
-                )
+                delete_subtopic_cmd = cast(topic_domain.DeleteSubtopicCmd, change)
                 topic.delete_subtopic(delete_subtopic_cmd.subtopic_id)
-                if (
-                    delete_subtopic_cmd.subtopic_id in
-                    newly_created_subtopic_ids
-                ):
+                if (delete_subtopic_cmd.subtopic_id in newly_created_subtopic_ids):
                     raise Exception(
                         'The incoming changelist had simultaneous'
-                        ' creation and deletion of subtopics.')
+                        ' creation and deletion of subtopics.'
+                    )
                 deleted_subtopic_ids.append(delete_subtopic_cmd.subtopic_id)
             elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
                 # Here we use cast because we are narrowing down the type from
@@ -294,9 +285,7 @@ def apply_change_list(
                 delete_canonical_story_cmd = cast(
                     topic_domain.DeleteCanonicalStoryCmd, change
                 )
-                topic.delete_canonical_story(
-                    delete_canonical_story_cmd.story_id
-                )
+                topic.delete_canonical_story(delete_canonical_story_cmd.story_id)
             elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
@@ -320,15 +309,12 @@ def apply_change_list(
                 delete_additional_story_cmd = cast(
                     topic_domain.DeleteAdditionalStoryCmd, change
                 )
-                topic.delete_additional_story(
-                    delete_additional_story_cmd.story_id
-                )
+                topic.delete_additional_story(delete_additional_story_cmd.story_id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 add_uncategorized_skill_id_cmd = cast(
-                    topic_domain.AddUncategorizedSkillIdCmd,
-                    change
+                    topic_domain.AddUncategorizedSkillIdCmd, change
                 )
                 topic.add_uncategorized_skill_id(
                     add_uncategorized_skill_id_cmd.new_uncategorized_skill_id
@@ -337,8 +323,7 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 remove_uncategorized_skill_id_cmd = cast(
-                    topic_domain.RemoveUncategorizedSkillIdCmd,
-                    change
+                    topic_domain.RemoveUncategorizedSkillIdCmd, change
                 )
                 topic.remove_uncategorized_skill_id(
                     remove_uncategorized_skill_id_cmd.uncategorized_skill_id
@@ -347,8 +332,7 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 move_skill_id_to_subtopic_cmd = cast(
-                    topic_domain.MoveSkillIdToSubtopicCmd,
-                    change
+                    topic_domain.MoveSkillIdToSubtopicCmd, change
                 )
                 topic.move_skill_id_to_subtopic(
                     move_skill_id_to_subtopic_cmd.old_subtopic_id,
@@ -369,12 +353,9 @@ def apply_change_list(
             elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
-                rearrange_subtopic_cmd = cast(
-                    topic_domain.RearrangeSubtopicCmd, change
-                )
+                rearrange_subtopic_cmd = cast(topic_domain.RearrangeSubtopicCmd, change)
                 topic.rearrange_subtopic(
-                    rearrange_subtopic_cmd.from_index,
-                    rearrange_subtopic_cmd.to_index
+                    rearrange_subtopic_cmd.from_index, rearrange_subtopic_cmd.to_index
                 )
             elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
@@ -387,13 +368,11 @@ def apply_change_list(
                     remove_skill_id_from_subtopic_cmd.skill_id
                 )
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
-                if (change.property_name ==
-                        topic_domain.TOPIC_PROPERTY_NAME):
+                if (change.property_name == topic_domain.TOPIC_PROPERTY_NAME):
                     # Here we use cast because this 'if' condition forces
                     # change to have type UpdateTopicPropertyNameCmd.
                     update_topic_name_cmd = cast(
-                        topic_domain.UpdateTopicPropertyNameCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyNameCmd, change
                     )
                     topic.update_name(update_topic_name_cmd.new_value)
                 elif (change.property_name ==
@@ -401,51 +380,38 @@ def apply_change_list(
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateTopicPropertyAbbreviatedNameCmd.
                     update_abbreviated_name_cmd = cast(
-                        topic_domain.UpdateTopicPropertyAbbreviatedNameCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyAbbreviatedNameCmd, change
                     )
-                    topic.update_abbreviated_name(
-                        update_abbreviated_name_cmd.new_value
-                    )
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_URL_FRAGMENT):
+                    topic.update_abbreviated_name(update_abbreviated_name_cmd.new_value)
+                elif (change.property_name == topic_domain.TOPIC_PROPERTY_URL_FRAGMENT):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateTopicPropertyUrlFragmentCmd.
                     update_url_fragment_cmd = cast(
-                        topic_domain.UpdateTopicPropertyUrlFragmentCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyUrlFragmentCmd, change
                     )
                     topic.update_url_fragment(update_url_fragment_cmd.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_DESCRIPTION):
+                elif (change.property_name == topic_domain.TOPIC_PROPERTY_DESCRIPTION):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateTopicPropertyDescriptionCmd.
                     update_topic_description_cmd = cast(
-                        topic_domain.UpdateTopicPropertyDescriptionCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyDescriptionCmd, change
                     )
-                    topic.update_description(
-                        update_topic_description_cmd.new_value
-                    )
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
+                    topic.update_description(update_topic_description_cmd.new_value)
+                elif (change.property_name == topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE
+                      ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateTopicPropertyLanguageCodeCmd.
                     update_topic_language_code_cmd = cast(
-                        topic_domain.UpdateTopicPropertyLanguageCodeCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyLanguageCodeCmd, change
                     )
-                    topic.update_language_code(
-                        update_topic_language_code_cmd.new_value
-                    )
+                    topic.update_language_code(update_topic_language_code_cmd.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateTopicPropertyThumbnailFilenameCmd.
                     update_topic_thumbnail_filename_cmd = cast(
-                        topic_domain.UpdateTopicPropertyThumbnailFilenameCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyThumbnailFilenameCmd, change
                     )
                     update_thumbnail_filename(
                         topic, update_topic_thumbnail_filename_cmd.new_value
@@ -456,8 +422,7 @@ def apply_change_list(
                     # condition forces change to have type
                     # UpdateTopicPropertyThumbnailBGColorCmd.
                     update_topic_thumbnail_bg_color_cmd = cast(
-                        topic_domain.UpdateTopicPropertyThumbnailBGColorCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyThumbnailBGColorCmd, change
                     )
                     topic.update_thumbnail_bg_color(
                         update_topic_thumbnail_bg_color_cmd.new_value
@@ -468,8 +433,7 @@ def apply_change_list(
                     # condition forces change to have type
                     # UpdateTopicPropertyMetaTagContentCmd.
                     update_topic_meta_tag_content_cmd = cast(
-                        topic_domain.UpdateTopicPropertyMetaTagContentCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyMetaTagContentCmd, change
                     )
                     topic.update_meta_tag_content(
                         update_topic_meta_tag_content_cmd.new_value
@@ -492,15 +456,13 @@ def apply_change_list(
                     # condition forces change to have type
                     # UpdateTopicPropertyTitleFragmentForWebCmd.
                     update_title_fragment_for_web_cmd = cast(
-                        topic_domain.UpdateTopicPropertyTitleFragmentForWebCmd,
-                        change
+                        topic_domain.UpdateTopicPropertyTitleFragmentForWebCmd, change
                     )
                     topic.update_page_title_fragment_for_web(
                         update_title_fragment_for_web_cmd.new_value
                     )
                 elif (change.property_name ==
-                      topic_domain
-                      .TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST):
+                      topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateTopicPropertySkillIdsForDiagnosticTestCmd.
@@ -511,59 +473,60 @@ def apply_change_list(
                     topic.update_skill_ids_for_diagnostic_test(
                         update_skill_ids_for_diagnostic_test_cmd.new_value
                     )
-            elif (change.cmd ==
-                  subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+            elif (change.cmd == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 # Ruling out the possibility of any other type for mypy
                 # type checking.
                 assert isinstance(change.subtopic_id, int)
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, change.subtopic_id))
-                if ((modified_subtopic_pages[subtopic_page_id] is None) or
-                        (change.subtopic_id in deleted_subtopic_ids)):
+                        topic_id, change.subtopic_id
+                    )
+                )
+                if ((modified_subtopic_pages[subtopic_page_id] is None)
+                        or (change.subtopic_id in deleted_subtopic_ids)):
                     raise Exception(
-                        'The subtopic with id %s doesn\'t exist' % (
-                            change.subtopic_id))
+                        'The subtopic with id %s doesn\'t exist' % (change.subtopic_id)
+                    )
 
                 if (change.property_name ==
-                        subtopic_page_domain.
-                        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
+                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
                     # Here we use cast because this 'if'
                     # condition forces change to have type
                     # UpdateSubtopicPagePropertyPageContentsHtmlCmd.
                     update_subtopic_page_contents_html_cmd = cast(
-                        subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,  # pylint: disable=line-too-long
+                        subtopic_page_domain.
+                        UpdateSubtopicPagePropertyPageContentsHtmlCmd,  # pylint: disable=line-too-long
                         change
                     )
                     page_contents = state_domain.SubtitledHtml.from_dict(
-                        update_subtopic_page_contents_html_cmd.new_value)
+                        update_subtopic_page_contents_html_cmd.new_value
+                    )
                     page_contents.validate()
-                    modified_subtopic_pages[
-                        subtopic_page_id].update_page_contents_html(
-                            page_contents)
+                    modified_subtopic_pages[subtopic_page_id].update_page_contents_html(
+                        page_contents
+                    )
 
                 elif (change.property_name ==
-                      subtopic_page_domain.
-                      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
+                      subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSubtopicPagePropertyPageContentsAudioCmd.
                     update_subtopic_page_contents_audio_cmd = cast(
-                        subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,  # pylint: disable=line-too-long
+                        subtopic_page_domain.
+                        UpdateSubtopicPagePropertyPageContentsAudioCmd,  # pylint: disable=line-too-long
                         change
                     )
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_audio(
                             state_domain.RecordedVoiceovers.from_dict(
-                               update_subtopic_page_contents_audio_cmd.new_value
+                                update_subtopic_page_contents_audio_cmd.new_value
                             )
                         )
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 update_subtopic_property_cmd = cast(
-                    topic_domain.UpdateSubtopicPropertyCmd,
-                    change
+                    topic_domain.UpdateSubtopicPropertyCmd, change
                 )
                 if (update_subtopic_property_cmd.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
@@ -590,9 +553,8 @@ def apply_change_list(
                         update_subtopic_property_cmd.new_value
                     )
 
-            elif (
-                    change.cmd ==
-                    topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION):
                 # Loading the topic model from the datastore into a
                 # Topic domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -600,20 +562,16 @@ def apply_change_list(
                 continue
         return (
             topic, modified_subtopic_pages, deleted_subtopic_ids,
-            newly_created_subtopic_ids, modified_subtopic_change_cmds)
+            newly_created_subtopic_ids, modified_subtopic_change_cmds
+        )
 
     except Exception as e:
-        logging.error(
-            '%s %s %s %s' % (
-                e.__class__.__name__, e, topic_id, change_list)
-        )
+        logging.error('%s %s %s %s' % (e.__class__.__name__, e, topic_id, change_list))
         raise e
 
 
 def _save_topic(
-    committer_id: str,
-    topic: topic_domain.Topic,
-    commit_message: Optional[str],
+    committer_id: str, topic: topic_domain.Topic, commit_message: Optional[str],
     change_list: Sequence[change_domain.BaseChange]
 ) -> None:
     """Validates a topic and commits it to persistent storage. If
@@ -635,7 +593,8 @@ def _save_topic(
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
-            'save topic %s: %s' % (topic.id, change_list))
+            'save topic %s: %s' % (topic.id, change_list)
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=True)
     topic.validate(strict=topic_rights.topic_is_published)
 
@@ -648,26 +607,27 @@ def _save_topic(
     if topic.version > topic_model.version:
         raise Exception(
             'Unexpected error: trying to update version %s of topic '
-            'from version %s. Please reload the page and try again.'
-            % (topic_model.version, topic.version))
+            'from version %s. Please reload the page and try again.' %
+            (topic_model.version, topic.version)
+        )
     if topic.version < topic_model.version:
         raise Exception(
             'Trying to update version %s of topic from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (topic_model.version, topic.version))
+            'which is too old. Please reload the page and try again.' %
+            (topic_model.version, topic.version)
+        )
 
     topic_model_to_commit = populate_topic_model_fields(topic_model, topic)
     change_dicts = [change.to_dict() for change in change_list]
     topic_model_to_commit.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_TOPIC, None, [topic.id])
+        caching_services.CACHE_NAMESPACE_TOPIC, None, [topic.id]
+    )
     topic.version += 1
 
 
 def update_topic_and_subtopic_pages(
-    committer_id: str,
-    topic_id: str,
-    change_list: Sequence[change_domain.BaseChange],
+    committer_id: str, topic_id: str, change_list: Sequence[change_domain.BaseChange],
     commit_message: Optional[str]
 ) -> None:
     """Updates a topic and its subtopic pages. Commits changes.
@@ -686,37 +646,33 @@ def update_topic_and_subtopic_pages(
     """
     topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=True)
     if topic_rights.topic_is_published and not commit_message:
-        raise ValueError(
-            'Expected a commit message, received none.')
+        raise ValueError('Expected a commit message, received none.')
 
     old_topic = topic_fetchers.get_topic_by_id(topic_id)
     (
-        updated_topic, updated_subtopic_pages_dict,
-        deleted_subtopic_ids, newly_created_subtopic_ids,
-        updated_subtopic_pages_change_cmds_dict
+        updated_topic, updated_subtopic_pages_dict, deleted_subtopic_ids,
+        newly_created_subtopic_ids, updated_subtopic_pages_change_cmds_dict
     ) = apply_change_list(topic_id, change_list)
 
-    if (
-            old_topic.url_fragment != updated_topic.url_fragment and
-            does_topic_with_url_fragment_exist(updated_topic.url_fragment)):
+    if (old_topic.url_fragment != updated_topic.url_fragment
+            and does_topic_with_url_fragment_exist(updated_topic.url_fragment)):
         raise utils.ValidationError(
-            'Topic with URL Fragment \'%s\' already exists'
-            % updated_topic.url_fragment)
-    if (
-            old_topic.name != updated_topic.name and
-            does_topic_with_name_exist(updated_topic.name)):
+            'Topic with URL Fragment \'%s\' already exists' % updated_topic.url_fragment
+        )
+    if (old_topic.name != updated_topic.name
+            and does_topic_with_name_exist(updated_topic.name)):
         raise utils.ValidationError(
-            'Topic with name \'%s\' already exists' % updated_topic.name)
+            'Topic with name \'%s\' already exists' % updated_topic.name
+        )
 
-    _save_topic(
-        committer_id, updated_topic, commit_message, change_list
-    )
+    _save_topic(committer_id, updated_topic, commit_message, change_list)
     # The following loop deletes those subtopic pages that are already in the
     # datastore, which are supposed to be deleted in the current changelist.
     for subtopic_id in deleted_subtopic_ids:
         if subtopic_id not in newly_created_subtopic_ids:
             subtopic_page_services.delete_subtopic_page(
-                committer_id, topic_id, subtopic_id)
+                committer_id, topic_id, subtopic_id
+            )
 
     for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items():
         subtopic_page_change_list = updated_subtopic_pages_change_cmds_dict[
@@ -726,19 +682,18 @@ def update_topic_and_subtopic_pages(
         # were deleted above.
         if subtopic_id not in deleted_subtopic_ids:
             subtopic_page_services.save_subtopic_page(
-                committer_id, subtopic_page, commit_message,
-                subtopic_page_change_list)
+                committer_id, subtopic_page, commit_message, subtopic_page_change_list
+            )
     generate_topic_summary(topic_id)
 
     if old_topic.name != updated_topic.name:
         opportunity_services.update_opportunities_with_new_topic_name(
-            updated_topic.id, updated_topic.name)
+            updated_topic.id, updated_topic.name
+        )
 
 
 def delete_uncategorized_skill(
-    user_id: str,
-    topic_id: str,
-    uncategorized_skill_id: str
+    user_id: str, topic_id: str, uncategorized_skill_id: str
 ) -> None:
     """Removes skill with given id from the topic.
 
@@ -748,19 +703,22 @@ def delete_uncategorized_skill(
         uncategorized_skill_id: str. The uncategorized skill to remove from the
             topic.
     """
-    change_list = [topic_domain.TopicChange({
-        'cmd': 'remove_uncategorized_skill_id',
-        'uncategorized_skill_id': uncategorized_skill_id
-    })]
+    change_list = [
+        topic_domain.TopicChange(
+            {
+                'cmd': 'remove_uncategorized_skill_id',
+                'uncategorized_skill_id': uncategorized_skill_id
+            }
+        )
+    ]
     update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
-        'Removed %s from uncategorized skill ids' % uncategorized_skill_id)
+        'Removed %s from uncategorized skill ids' % uncategorized_skill_id
+    )
 
 
 def add_uncategorized_skill(
-    user_id: str,
-    topic_id: str,
-    uncategorized_skill_id: str
+    user_id: str, topic_id: str, uncategorized_skill_id: str
 ) -> None:
     """Adds a skill with given id to the topic.
 
@@ -770,20 +728,21 @@ def add_uncategorized_skill(
         uncategorized_skill_id: str. The id of the uncategorized skill to add
             to the topic.
     """
-    change_list = [topic_domain.TopicChange({
-        'cmd': 'add_uncategorized_skill_id',
-        'new_uncategorized_skill_id': uncategorized_skill_id
-    })]
+    change_list = [
+        topic_domain.TopicChange(
+            {
+                'cmd': 'add_uncategorized_skill_id',
+                'new_uncategorized_skill_id': uncategorized_skill_id
+            }
+        )
+    ]
     update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
-        'Added %s to uncategorized skill ids' % uncategorized_skill_id)
+        'Added %s to uncategorized skill ids' % uncategorized_skill_id
+    )
 
 
-def publish_story(
-    topic_id: str,
-    story_id: str,
-    committer_id: str
-) -> None:
+def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     """Marks the given story as published.
 
     Args:
@@ -796,6 +755,7 @@ def publish_story(
         Exception. The story is already published.
         Exception. The user does not have enough rights to publish the story.
     """
+
     def _are_nodes_valid_for_publishing(
         story_nodes: List[story_domain.StoryNode]
     ) -> None:
@@ -812,14 +772,12 @@ def publish_story(
         for node in story_nodes:
             assert node.exploration_id is not None
             exploration_id_list.append(node.exploration_id)
-        story_services.validate_explorations_for_story(
-            exploration_id_list, True)
+        story_services.validate_explorations_for_story(exploration_id_list, True)
 
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
     user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
-        raise Exception(
-            'The user does not have enough rights to publish the story.')
+        raise Exception('The user does not have enough rights to publish the story.')
 
     story = story_fetchers.get_story_by_id(story_id, strict=False)
     if story is None:
@@ -830,46 +788,51 @@ def publish_story(
 
     serial_chapter_curriculum_admin_view_feature_is_enabled = (
         feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames
-            .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-            None)
+            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.
+            value, None
+        )
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
         chapters_change_list = []
         for node in story.story_contents.nodes:
-            chapters_change_list.append(story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'node_id': node.id,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_STATUS),
-                'old_value': node.status,
-                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
-            }))
+            chapters_change_list.append(
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'node_id': node.id,
+                        'property_name': (story_domain.STORY_NODE_PROPERTY_STATUS),
+                        'old_value': node.status,
+                        'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+                    }
+                )
+            )
 
         if chapters_change_list:
             update_story_and_topic_summary(
-                committer_id, story_id, chapters_change_list,
-                'Published the story.', topic.id)
+                committer_id, story_id, chapters_change_list, 'Published the story.',
+                topic.id
+            )
 
     topic.publish_story(story_id)
-    change_list = [topic_domain.TopicChange({
-        'cmd': topic_domain.CMD_PUBLISH_STORY,
-        'story_id': story_id
-    })]
+    change_list = [
+        topic_domain.TopicChange(
+            {
+                'cmd': topic_domain.CMD_PUBLISH_STORY,
+                'story_id': story_id
+            }
+        )
+    ]
     _save_topic(
-        committer_id, topic, 'Published story with id %s' % story_id,
-        change_list)
+        committer_id, topic, 'Published story with id %s' % story_id, change_list
+    )
     generate_topic_summary(topic.id)
     # Create exploration opportunities corresponding to the story and linked
     # explorations.
     linked_exp_ids = story.story_contents.get_all_linked_exp_ids()
-    opportunity_services.add_new_exploration_opportunities(
-        story_id, linked_exp_ids)
+    opportunity_services.add_new_exploration_opportunities(story_id, linked_exp_ids)
 
 
-def unpublish_story(
-    topic_id: str, story_id: str, committer_id: str
-) -> None:
+def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     """Marks the given story as unpublished.
 
     Args:
@@ -884,8 +847,7 @@ def unpublish_story(
     """
     user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
-        raise Exception(
-            'The user does not have enough rights to unpublish the story.')
+        raise Exception('The user does not have enough rights to unpublish the story.')
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
     if topic is None:
         raise Exception('A topic with the given ID doesn\'t exist')
@@ -895,35 +857,43 @@ def unpublish_story(
 
     serial_chapter_curriculum_admin_view_feature_is_enabled = (
         feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames
-            .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-            None)
+            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.
+            value, None
+        )
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
         chapters_change_list = []
         for node in story.story_contents.nodes:
-            chapters_change_list.append(story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'node_id': node.id,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_STATUS),
-                'old_value': node.status,
-                'new_value': constants.STORY_NODE_STATUS_DRAFT
-            }))
+            chapters_change_list.append(
+                story_domain.StoryChange(
+                    {
+                        'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                        'node_id': node.id,
+                        'property_name': (story_domain.STORY_NODE_PROPERTY_STATUS),
+                        'old_value': node.status,
+                        'new_value': constants.STORY_NODE_STATUS_DRAFT
+                    }
+                )
+            )
 
         if chapters_change_list:
             update_story_and_topic_summary(
-                committer_id, story_id, chapters_change_list,
-                'Unpublished the story.', topic.id)
+                committer_id, story_id, chapters_change_list, 'Unpublished the story.',
+                topic.id
+            )
 
     topic.unpublish_story(story_id)
-    change_list = [topic_domain.TopicChange({
-        'cmd': topic_domain.CMD_UNPUBLISH_STORY,
-        'story_id': story_id
-    })]
+    change_list = [
+        topic_domain.TopicChange(
+            {
+                'cmd': topic_domain.CMD_UNPUBLISH_STORY,
+                'story_id': story_id
+            }
+        )
+    ]
     _save_topic(
-        committer_id, topic, 'Unpublished story with id %s' % story_id,
-        change_list)
+        committer_id, topic, 'Unpublished story with id %s' % story_id, change_list
+    )
     generate_topic_summary(topic.id)
 
     # Delete corresponding exploration opportunities and reject associated
@@ -933,9 +903,7 @@ def unpublish_story(
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
-def delete_canonical_story(
-    user_id: str, topic_id: str, story_id: str
-) -> None:
+def delete_canonical_story(user_id: str, topic_id: str, story_id: str) -> None:
     """Removes story with given id from the topic.
 
     NOTE TO DEVELOPERS: Presently, this function only removes story_reference
@@ -946,18 +914,20 @@ def delete_canonical_story(
         topic_id: str. The id of the topic from which to remove the story.
         story_id: str. The story to remove from the topic.
     """
-    change_list = [topic_domain.TopicChange({
-        'cmd': topic_domain.CMD_DELETE_CANONICAL_STORY,
-        'story_id': story_id
-    })]
+    change_list = [
+        topic_domain.TopicChange(
+            {
+                'cmd': topic_domain.CMD_DELETE_CANONICAL_STORY,
+                'story_id': story_id
+            }
+        )
+    ]
     update_topic_and_subtopic_pages(
-        user_id, topic_id, change_list,
-        'Removed %s from canonical story ids' % story_id)
+        user_id, topic_id, change_list, 'Removed %s from canonical story ids' % story_id
+    )
 
 
-def add_canonical_story(
-    user_id: str, topic_id: str, story_id: str
-) -> None:
+def add_canonical_story(user_id: str, topic_id: str, story_id: str) -> None:
     """Adds a story to the canonical story reference list of a topic.
 
     Args:
@@ -965,18 +935,20 @@ def add_canonical_story(
         topic_id: str. The id of the topic to which the story is to be added.
         story_id: str. The story to add to the topic.
     """
-    change_list = [topic_domain.TopicChange({
-        'cmd': topic_domain.CMD_ADD_CANONICAL_STORY,
-        'story_id': story_id
-    })]
+    change_list = [
+        topic_domain.TopicChange(
+            {
+                'cmd': topic_domain.CMD_ADD_CANONICAL_STORY,
+                'story_id': story_id
+            }
+        )
+    ]
     update_topic_and_subtopic_pages(
-        user_id, topic_id, change_list,
-        'Added %s to canonical story ids' % story_id)
+        user_id, topic_id, change_list, 'Added %s to canonical story ids' % story_id
+    )
 
 
-def delete_additional_story(
-    user_id: str, topic_id: str, story_id: str
-) -> None:
+def delete_additional_story(user_id: str, topic_id: str, story_id: str) -> None:
     """Removes story with given id from the topic.
 
     NOTE TO DEVELOPERS: Presently, this function only removes story_reference
@@ -987,18 +959,21 @@ def delete_additional_story(
         topic_id: str. The id of the topic from which to remove the story.
         story_id: str. The story to remove from the topic.
     """
-    change_list = [topic_domain.TopicChange({
-        'cmd': topic_domain.CMD_DELETE_ADDITIONAL_STORY,
-        'story_id': story_id
-    })]
+    change_list = [
+        topic_domain.TopicChange(
+            {
+                'cmd': topic_domain.CMD_DELETE_ADDITIONAL_STORY,
+                'story_id': story_id
+            }
+        )
+    ]
     update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
-        'Removed %s from additional story ids' % story_id)
+        'Removed %s from additional story ids' % story_id
+    )
 
 
-def add_additional_story(
-    user_id: str, topic_id: str, story_id: str
-) -> None:
+def add_additional_story(user_id: str, topic_id: str, story_id: str) -> None:
     """Adds a story to the additional story reference list of a topic.
 
     Args:
@@ -1006,13 +981,17 @@ def add_additional_story(
         topic_id: str. The id of the topic to which the story is to be added.
         story_id: str. The story to add to the topic.
     """
-    change_list = [topic_domain.TopicChange({
-        'cmd': topic_domain.CMD_ADD_ADDITIONAL_STORY,
-        'story_id': story_id
-    })]
+    change_list = [
+        topic_domain.TopicChange(
+            {
+                'cmd': topic_domain.CMD_ADD_ADDITIONAL_STORY,
+                'story_id': story_id
+            }
+        )
+    ]
     update_topic_and_subtopic_pages(
-        user_id, topic_id, change_list,
-        'Added %s to additional story ids' % story_id)
+        user_id, topic_id, change_list, 'Added %s to additional story ids' % story_id
+    )
 
 
 def delete_topic(
@@ -1034,8 +1013,10 @@ def delete_topic(
     """
     topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
     topic_rights_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
-        force_deletion=force_deletion)
+        committer_id,
+        feconf.COMMIT_MESSAGE_TOPIC_DELETED,
+        force_deletion=force_deletion
+    )
 
     # Delete the summary of the topic (regardless of whether
     # force_deletion is True or not).
@@ -1043,29 +1024,35 @@ def delete_topic(
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
-            committer_id, topic_id, subtopic['id'])
+            committer_id, topic_id, subtopic['id']
+        )
 
     all_story_references = (
-        topic_model.canonical_story_references +
-        topic_model.additional_story_references)
+        topic_model.canonical_story_references + topic_model.additional_story_references
+    )
     for story_reference in all_story_references:
         story_services.delete_story(
-            committer_id, story_reference['story_id'],
-            force_deletion=force_deletion)
+            committer_id, story_reference['story_id'], force_deletion=force_deletion
+        )
     topic_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
-        force_deletion=force_deletion)
+        committer_id,
+        feconf.COMMIT_MESSAGE_TOPIC_DELETED,
+        force_deletion=force_deletion
+    )
 
     feedback_services.delete_threads_for_multiple_entities(
-        feconf.ENTITY_TYPE_TOPIC, [topic_id])
+        feconf.ENTITY_TYPE_TOPIC, [topic_id]
+    )
 
     # This must come after the topic is retrieved. Otherwise the memcache
     # key will be reinstated.
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_TOPIC, None, [topic_id])
+        caching_services.CACHE_NAMESPACE_TOPIC, None, [topic_id]
+    )
     (
-        opportunity_services
-        .delete_exploration_opportunities_corresponding_to_topic(topic_id))
+        opportunity_services.
+        delete_exploration_opportunities_corresponding_to_topic(topic_id)
+    )
 
 
 def delete_topic_summary(topic_id: str) -> None:
@@ -1080,11 +1067,8 @@ def delete_topic_summary(topic_id: str) -> None:
 
 
 def update_story_and_topic_summary(
-    committer_id: str,
-    story_id: str,
-    change_list: List[story_domain.StoryChange],
-    commit_message: str,
-    topic_id: str
+    committer_id: str, story_id: str, change_list: List[story_domain.StoryChange],
+    commit_message: str, topic_id: str
 ) -> None:
     """Updates a story. Commits changes. Then generates a new
     topic summary.
@@ -1099,8 +1083,7 @@ def update_story_and_topic_summary(
             story.
         topic_id: str. The id of the topic to which the story is belongs.
     """
-    story_services.update_story(
-        committer_id, story_id, change_list, commit_message)
+    story_services.update_story(committer_id, story_id, change_list, commit_message)
     # Generate new TopicSummary after a Story has been updated to
     # make sure the TopicSummaryTile displays the correct number
     # of chapters on the classroom page.
@@ -1118,9 +1101,7 @@ def generate_topic_summary(topic_id: str) -> None:
     save_topic_summary(topic_summary)
 
 
-def compute_summary_of_topic(
-    topic: topic_domain.Topic
-) -> topic_domain.TopicSummary:
+def compute_summary_of_topic(topic: topic_domain.Topic) -> topic_domain.TopicSummary:
     """Create a TopicSummary domain object for a given Topic domain
     object and return it.
 
@@ -1152,13 +1133,13 @@ def compute_summary_of_topic(
     topic_model_subtopic_count = len(topic.subtopics)
 
     published_stories_query_result = story_fetchers.get_stories_by_ids(
-        published_canonical_story_ids + published_additional_story_ids,
-        strict=False)
+        published_canonical_story_ids + published_additional_story_ids, strict=False
+    )
     published_stories = [
-        story for story in published_stories_query_result
-        if story is not None]
-    topic_model_published_story_exploration_mapping: Dict[str, List[str]] = (
-        _compute_story_exploration_mapping(published_stories))
+        story for story in published_stories_query_result if story is not None
+    ]
+    topic_model_published_story_exploration_mapping: Dict[
+        str, List[str]] = (_compute_story_exploration_mapping(published_stories))
 
     total_published_node_count = 0
     for story in published_stories:
@@ -1166,10 +1147,10 @@ def compute_summary_of_topic(
             total_published_node_count += (
                 story.story_contents.get_published_node_count()
                 if feature_flag_services.is_feature_flag_enabled(
-                    feature_flag_list.FeatureNames
-                    .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-                    None)
-                else len(story.story_contents.nodes))
+                    feature_flag_list.FeatureNames.
+                    SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value, None
+                ) else len(story.story_contents.nodes)
+            )
     topic_model_published_node_count = total_published_node_count
 
     total_skill_count = topic_model_uncategorized_skill_count
@@ -1177,15 +1158,12 @@ def compute_summary_of_topic(
         total_skill_count += len(subtopic.skill_ids)
 
     if topic.created_on is None or topic.last_updated is None:
-        raise Exception(
-            'No data available for when the topic was last updated.'
-        )
+        raise Exception('No data available for when the topic was last updated.')
     topic_summary = topic_domain.TopicSummary(
         topic.id, topic.name, topic.canonical_name, topic.language_code,
         topic.description, topic.version, topic_model_canonical_story_count,
-        topic_model_additional_story_count,
-        topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, topic_model_published_node_count,
+        topic_model_additional_story_count, topic_model_uncategorized_skill_count,
+        topic_model_subtopic_count, total_skill_count, topic_model_published_node_count,
         topic.thumbnail_filename, topic.thumbnail_bg_color, topic.url_fragment,
         topic_model_published_story_exploration_mapping, topic.created_on,
         topic.last_updated
@@ -1212,10 +1190,10 @@ def _compute_story_exploration_mapping(
         mapping[story.id] = (
             story.story_contents.get_linked_exp_ids_of_published_nodes()
             if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames
-                .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-                None)
-            else story.story_contents.get_all_linked_exp_ids())
+                feature_flag_list.FeatureNames.
+                SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value, None
+            ) else story.story_contents.get_all_linked_exp_ids()
+        )
     return mapping
 
 
@@ -1228,9 +1206,11 @@ def save_topic_summary(topic_summary: topic_domain.TopicSummary) -> None:
             in the datastore.
     """
     existing_topic_summary_model = (
-        topic_models.TopicSummaryModel.get_by_id(topic_summary.id))
+        topic_models.TopicSummaryModel.get_by_id(topic_summary.id)
+    )
     topic_summary_model = populate_topic_summary_model_fields(
-    existing_topic_summary_model, topic_summary)
+        existing_topic_summary_model, topic_summary
+    )
     topic_summary_model.update_timestamps()
     topic_summary_model.put()
 
@@ -1254,17 +1234,15 @@ def publish_topic(topic_id: str, committer_id: str) -> None:
     topic.validate(strict=True)
     user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
-        raise Exception(
-            'The user does not have enough rights to publish the topic.')
+        raise Exception('The user does not have enough rights to publish the topic.')
 
     if topic_rights.topic_is_published:
         raise Exception('The topic is already published.')
     topic_rights.topic_is_published = True
-    commit_cmds = [topic_domain.TopicRightsChange({
-        'cmd': topic_domain.CMD_PUBLISH_TOPIC
-    })]
-    save_topic_rights(
-        topic_rights, committer_id, 'Published the topic', commit_cmds)
+    commit_cmds = [
+        topic_domain.TopicRightsChange({'cmd': topic_domain.CMD_PUBLISH_TOPIC})
+    ]
+    save_topic_rights(topic_rights, committer_id, 'Published the topic', commit_cmds)
 
 
 def unpublish_topic(topic_id: str, committer_id: str) -> None:
@@ -1284,23 +1262,19 @@ def unpublish_topic(topic_id: str, committer_id: str) -> None:
         raise Exception('The given topic does not exist')
     user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
-        raise Exception(
-            'The user does not have enough rights to unpublish the topic.')
+        raise Exception('The user does not have enough rights to unpublish the topic.')
 
     if not topic_rights.topic_is_published:
         raise Exception('The topic is already unpublished.')
     topic_rights.topic_is_published = False
-    commit_cmds = [topic_domain.TopicRightsChange({
-        'cmd': topic_domain.CMD_UNPUBLISH_TOPIC
-    })]
-    save_topic_rights(
-        topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
+    commit_cmds = [
+        topic_domain.TopicRightsChange({'cmd': topic_domain.CMD_UNPUBLISH_TOPIC})
+    ]
+    save_topic_rights(topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
 
 
 def save_topic_rights(
-    topic_rights: topic_domain.TopicRights,
-    committer_id: str,
-    commit_message: str,
+    topic_rights: topic_domain.TopicRights, committer_id: str, commit_message: str,
     commit_cmds: List[topic_domain.TopicRightsChange]
 ) -> None:
     """Saves a TopicRights domain object to the datastore.
@@ -1322,9 +1296,7 @@ def save_topic_rights(
     model.commit(committer_id, commit_message, commit_cmd_dicts)
 
 
-def create_new_topic_rights(
-    topic_id: str, committer_id: str
-) -> None:
+def create_new_topic_rights(topic_id: str, committer_id: str) -> None:
     """Creates a new topic rights object and saves it to the datastore.
 
     Args:
@@ -1364,8 +1336,7 @@ def filter_published_topic_ids(topic_ids: List[str]) -> List[str]:
 
 
 def check_can_edit_topic(
-    user: user_domain.UserActionsInfo,
-    topic_rights: Optional[topic_domain.TopicRights]
+    user: user_domain.UserActionsInfo, topic_rights: Optional[topic_domain.TopicRights]
 ) -> bool:
     """Checks whether the user can edit the given topic.
 
@@ -1411,23 +1382,22 @@ def deassign_user_from_all_topics(
         )
     for topic_rights in topic_rights_list:
         topic_rights.manager_ids.remove(user_id)
-        commit_cmds = [topic_domain.TopicRightsChange({
-            'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
-            'removed_user_id': user_id
-        })]
+        commit_cmds = [
+            topic_domain.TopicRightsChange(
+                {
+                    'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                    'removed_user_id': user_id
+                }
+            )
+        ]
         save_topic_rights(
-            topic_rights, committer.user_id,
-            'Removed all assigned topics from %s' % (
-                user_services.get_username(user_id)
-            ),
-            commit_cmds
+            topic_rights, committer.user_id, 'Removed all assigned topics from %s' %
+            (user_services.get_username(user_id)), commit_cmds
         )
 
 
 def deassign_manager_role_from_topic(
-    committer: user_domain.UserActionsInfo,
-    user_id: str,
-    topic_id: str
+    committer: user_domain.UserActionsInfo, user_id: str, topic_id: str
 ) -> None:
     """Deassigns given user from all topics assigned to them.
 
@@ -1451,25 +1421,24 @@ def deassign_manager_role_from_topic(
         raise Exception('User does not have manager rights in topic.')
 
     topic_rights.manager_ids.remove(user_id)
-    commit_cmds = [topic_domain.TopicRightsChange({
-        'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
-        'removed_user_id': user_id
-    })]
+    commit_cmds = [
+        topic_domain.TopicRightsChange(
+            {
+                'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                'removed_user_id': user_id
+            }
+        )
+    ]
     save_topic_rights(
-        topic_rights,
-        committer.user_id,
-        'Removed all assigned topics from %s' % (
-            user_services.get_username(user_id)
-        ),
+        topic_rights, committer.user_id,
+        'Removed all assigned topics from %s' % (user_services.get_username(user_id)),
         commit_cmds
     )
 
 
 def assign_role(
-    committer: user_domain.UserActionsInfo,
-    assignee: user_domain.UserActionsInfo,
-    new_role: str,
-    topic_id: str
+    committer: user_domain.UserActionsInfo, assignee: user_domain.UserActionsInfo,
+    new_role: str, topic_id: str
 ) -> None:
     """Assigns a new role to the user.
 
@@ -1492,27 +1461,22 @@ def assign_role(
     """
     committer_id = committer.user_id
     if committer_id is None:
-        raise Exception(
-            'Guest user is not allowed to assign roles to a user.'
-        )
+        raise Exception('Guest user is not allowed to assign roles to a user.')
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
-    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
-            committer.actions):
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY
+            not in committer.actions):
         logging.error(
             'User %s tried to allow user %s to be a %s of topic %s '
-            'but was refused permission.' % (
-                committer_id, assignee.user_id, new_role, topic_id))
-        raise Exception(
-            'UnauthorizedUserException: Could not assign new role.')
+            'but was refused permission.' %
+            (committer_id, assignee.user_id, new_role, topic_id)
+        )
+        raise Exception('UnauthorizedUserException: Could not assign new role.')
 
     if assignee.user_id is None:
-        raise Exception(
-            'Cannot change the role of the Guest user.'
-        )
+        raise Exception('Cannot change the role of the Guest user.')
     assignee_username = user_services.get_username(assignee.user_id)
     if role_services.ACTION_EDIT_OWNED_TOPIC not in assignee.actions:
-        raise Exception(
-            'The assignee doesn\'t have enough rights to become a manager.')
+        raise Exception('The assignee doesn\'t have enough rights to become a manager.')
 
     old_role = topic_domain.ROLE_NONE
     if topic_rights.is_manager(assignee.user_id):
@@ -1531,13 +1495,18 @@ def assign_role(
         raise Exception('Invalid role: %s' % new_role)
 
     commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
-        assignee_username, old_role, new_role)
-    commit_cmds = [topic_domain.TopicRightsChange({
-        'cmd': topic_domain.CMD_CHANGE_ROLE,
-        'assignee_id': assignee.user_id,
-        'old_role': old_role,
-        'new_role': new_role
-    })]
+        assignee_username, old_role, new_role
+    )
+    commit_cmds = [
+        topic_domain.TopicRightsChange(
+            {
+                'cmd': topic_domain.CMD_CHANGE_ROLE,
+                'assignee_id': assignee.user_id,
+                'old_role': old_role,
+                'new_role': new_role
+            }
+        )
+    ]
 
     save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds)
 
@@ -1574,22 +1543,21 @@ def update_thumbnail_filename(
             the filesystem.
     """
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
-    filepath = '%s/%s' % (
-        constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+    filepath = '%s/%s' % (constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
     if fs.isfile(filepath):
         thumbnail_size_in_bytes = len(fs.get(filepath))
         topic.update_thumbnail_filename_and_size(
-            new_thumbnail_filename, thumbnail_size_in_bytes)
+            new_thumbnail_filename, thumbnail_size_in_bytes
+        )
     else:
         raise Exception(
             'The thumbnail %s for topic with id %s does not exist'
-            ' in the filesystem.' % (new_thumbnail_filename, topic.id))
+            ' in the filesystem.' % (new_thumbnail_filename, topic.id)
+        )
 
 
 def update_subtopic_thumbnail_filename(
-    topic: topic_domain.Topic,
-    subtopic_id: int,
-    new_thumbnail_filename: str
+    topic: topic_domain.Topic, subtopic_id: int, new_thumbnail_filename: str
 ) -> None:
     """Updates the thumbnail filename and file size in a subtopic.
 
@@ -1605,16 +1573,17 @@ def update_subtopic_thumbnail_filename(
             the filesystem.
     """
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
-    filepath = '%s/%s' % (
-        constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+    filepath = '%s/%s' % (constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
     if fs.isfile(filepath):
         thumbnail_size_in_bytes = len(fs.get(filepath))
         topic.update_subtopic_thumbnail_filename_and_size(
-            subtopic_id, new_thumbnail_filename, thumbnail_size_in_bytes)
+            subtopic_id, new_thumbnail_filename, thumbnail_size_in_bytes
+        )
     else:
         raise Exception(
             'The thumbnail %s for subtopic with topic_id %s does not exist'
-            ' in the filesystem.' % (new_thumbnail_filename, topic.id))
+            ' in the filesystem.' % (new_thumbnail_filename, topic.id)
+        )
 
 
 def get_topic_id_to_diagnostic_test_skill_ids(
@@ -1640,8 +1609,8 @@ def get_topic_id_to_diagnostic_test_skill_ids(
     for topic in topics:
         if topic is None:
             continue
-        topic_id_to_diagnostic_test_skill_ids[topic.id] = (
-            topic.skill_ids_for_diagnostic_test)
+        topic_id_to_diagnostic_test_skill_ids[topic.id
+                                              ] = (topic.skill_ids_for_diagnostic_test)
 
     correct_topic_ids = list(topic_id_to_diagnostic_test_skill_ids.keys())
     # The topic IDs for which topic models do not exist are referred to as
@@ -1651,16 +1620,15 @@ def get_topic_id_to_diagnostic_test_skill_ids(
     ]
     if incorrect_topic_ids:
         error_msg = (
-            'No corresponding topic models exist for these topic IDs: %s.'
-            % (', '.join(incorrect_topic_ids))
+            'No corresponding topic models exist for these topic IDs: %s.' %
+            (', '.join(incorrect_topic_ids))
         )
         raise Exception(error_msg)
     return topic_id_to_diagnostic_test_skill_ids
 
 
 def populate_topic_model_fields(
-    topic_model: topic_models.TopicModel,
-    topic: topic_domain.Topic
+    topic_model: topic_models.TopicModel, topic: topic_domain.Topic
 ) -> topic_models.TopicModel:
     """Populate topic model with the data from topic object.
 
@@ -1689,15 +1657,13 @@ def populate_topic_model_fields(
     topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
     topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
     topic_model.subtopic_schema_version = topic.subtopic_schema_version
-    topic_model.story_reference_schema_version = (
-        topic.story_reference_schema_version)
+    topic_model.story_reference_schema_version = (topic.story_reference_schema_version)
     topic_model.next_subtopic_id = topic.next_subtopic_id
     topic_model.language_code = topic.language_code
     topic_model.meta_tag_content = topic.meta_tag_content
     topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
     topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
-    topic_model.skill_ids_for_diagnostic_test = (
-        topic.skill_ids_for_diagnostic_test)
+    topic_model.skill_ids_for_diagnostic_test = (topic.skill_ids_for_diagnostic_test)
     return topic_model
 
 
@@ -1726,23 +1692,22 @@ def populate_topic_summary_model_fields(
         'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
-        'total_published_node_count':
-            topic_summary.total_published_node_count,
+        'total_published_node_count': topic_summary.total_published_node_count,
         'thumbnail_filename': topic_summary.thumbnail_filename,
         'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
         'topic_model_created_on': topic_summary.topic_model_created_on,
         'url_fragment': topic_summary.url_fragment,
         'published_story_exploration_mapping': (
-            topic_summary.published_story_exploration_mapping)
+            topic_summary.published_story_exploration_mapping
+        )
     }
 
     if topic_summary_model is not None:
         topic_summary_model.populate(**topic_summary_dict)
     else:
         topic_summary_dict['id'] = topic_summary.id
-        topic_summary_model = topic_models.TopicSummaryModel(
-            **topic_summary_dict)
+        topic_summary_model = topic_models.TopicSummaryModel(**topic_summary_dict)
 
     return topic_summary_model
 
@@ -1777,8 +1742,8 @@ def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:
     ]
     if incorrect_topic_ids:
         error_msg = (
-            'No corresponding topic models exist for these topic IDs: %s.'
-            % (', '.join(incorrect_topic_ids))
+            'No corresponding topic models exist for these topic IDs: %s.' %
+            (', '.join(incorrect_topic_ids))
         )
         raise Exception(error_msg)
     return topic_id_to_topic_name
@@ -1798,11 +1763,9 @@ def get_chapter_counts_in_topic_summaries(
         counts domain object.
     """
 
-    topic_summary_id_mapping: Dict[
-        str, topic_domain.FrontendTopicSummaryDict] = {}
+    topic_summary_id_mapping: Dict[str, topic_domain.FrontendTopicSummaryDict] = {}
     for topic_summary in topic_summary_dicts:
-        topic_summary_id_mapping.update({
-            topic_summary['id']: topic_summary})
+        topic_summary_id_mapping.update({topic_summary['id']: topic_summary})
 
     topic_ids = [summary['id'] for summary in topic_summary_dicts]
     all_topics = topic_fetchers.get_topics_by_ids(topic_ids)
@@ -1810,8 +1773,10 @@ def get_chapter_counts_in_topic_summaries(
     all_story_ids: List[str] = []
     topic_chapter_counts_dict: Dict[str, topic_domain.TopicChapterCounts] = {}
     for topic in all_valid_topics:
-        story_ids = [story_reference.story_id for
-            story_reference in topic.canonical_story_references]
+        story_ids = [
+            story_reference.story_id
+            for story_reference in topic.canonical_story_references
+        ]
         all_story_ids = all_story_ids + story_ids
 
     all_stories = story_fetchers.get_stories_by_ids(all_story_ids)
@@ -1832,8 +1797,9 @@ def get_chapter_counts_in_topic_summaries(
                 stories.append(story_id_mapping[story_reference.story_id])
             else:
                 logging.error(
-                    'Topic %s has an invalid story reference ID %s' % (
-                        topic.id, story_reference.story_id))
+                    'Topic %s has an invalid story reference ID %s' %
+                    (topic.id, story_reference.story_id)
+                )
         for story in stories:
             nodes = story.story_contents.nodes
             total_chapters_count = len(nodes)
@@ -1851,12 +1817,13 @@ def get_chapter_counts_in_topic_summaries(
             published_chapter_counts.append(published_chapters_count)
 
         topic_chapter_counts = topic_domain.TopicChapterCounts(
-            upcoming_chapters_count, overdue_chapters_count,
-            total_chapter_counts, published_chapter_counts)
+            upcoming_chapters_count, overdue_chapters_count, total_chapter_counts,
+            published_chapter_counts
+        )
 
-        topic_chapter_counts_dict.update({
-            topic_summary_dict['id']: topic_chapter_counts
-        })
+        topic_chapter_counts_dict.update(
+            {topic_summary_dict['id']: topic_chapter_counts}
+        )
 
     return topic_chapter_counts_dict
 
@@ -1878,8 +1845,8 @@ def get_all_published_story_exploration_ids(
         published stories' chapters.
     """
     fetched_topic_summaries = (
-        [topic_fetchers.get_topic_summary_by_id(topic_id)] if topic_id
-        else topic_fetchers.get_all_topic_summaries()
+        [topic_fetchers.get_topic_summary_by_id(topic_id)]
+        if topic_id else topic_fetchers.get_all_topic_summaries()
     )
 
     # Keep each summary's mapping. For those without a mapping,
@@ -1892,8 +1859,7 @@ def get_all_published_story_exploration_ids(
         if summary.published_story_exploration_mapping is None:
             ids_of_topic_summaries_without_mapping.append(summary.id)
         else:
-            mappings.append(
-                summary.published_story_exploration_mapping)
+            mappings.append(summary.published_story_exploration_mapping)
     if len(ids_of_topic_summaries_without_mapping) > 0:
         topics_without_mapping = topic_fetchers.get_topics_by_ids(
             ids_of_topic_summaries_without_mapping
@@ -1901,48 +1867,42 @@ def get_all_published_story_exploration_ids(
 
         published_story_ids_grouped_by_topic = [
             [
-                story_ref.story_id for story_ref
-                in topic.canonical_story_references +
-                    topic.additional_story_references
-                if story_ref.story_is_published
-            ]
-            for topic in topics_without_mapping if topic is not None
+                story_ref.story_id for story_ref in topic.canonical_story_references +
+                topic.additional_story_references if story_ref.story_is_published
+            ] for topic in topics_without_mapping if topic is not None
         ]
         cumulative_published_story_counts_by_topic = list(
-            itertools.accumulate([0] + [
-                len(topic_published_story_ids)
-                for topic_published_story_ids
-                in published_story_ids_grouped_by_topic[:-1]
-            ])
+            itertools.accumulate(
+                [0] + [
+                    len(topic_published_story_ids) for topic_published_story_ids in
+                    published_story_ids_grouped_by_topic[:-1]
+                ]
+            )
         )
 
         published_stories_in_all_topics_without_mapping = [
             story for story in story_fetchers.get_stories_by_ids(
-                list(itertools.chain.from_iterable(
-                    published_story_ids_grouped_by_topic
-                )),
+                list(
+                    itertools.chain.from_iterable(published_story_ids_grouped_by_topic)
+                ),
                 strict=False
-            )
-            if story is not None
+            ) if story is not None
         ]
         published_stories_grouped_by_topic = [
             [
                 published_stories_in_all_topics_without_mapping[
-                    cumulative_published_story_counts_by_topic[i] + j
-                ]
+                    cumulative_published_story_counts_by_topic[i] + j]
                 for j in range(len(published_story_ids_grouped_by_topic[i]))
-            ]
-            for i in range(len(published_story_ids_grouped_by_topic))
+            ] for i in range(len(published_story_ids_grouped_by_topic))
         ]
 
         for published_stories_in_topic in published_stories_grouped_by_topic:
-            mappings.append(_compute_story_exploration_mapping(
-                published_stories_in_topic
-            ))
+            mappings.append(
+                _compute_story_exploration_mapping(published_stories_in_topic)
+            )
 
     exp_ids = itertools.chain.from_iterable(
-        itertools.chain.from_iterable(mapping.values())
-        for mapping in mappings
+        itertools.chain.from_iterable(mapping.values()) for mapping in mappings
     )
 
     return list(set(exp_ids))

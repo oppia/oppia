@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Registry for custom rich-text components."""
 
 from __future__ import annotations
@@ -29,7 +28,7 @@ from core import utils
 from typing import Any, Dict, List, Type, TypedDict, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     # Here, we are importing 'components' from rich_text_components only
     # for type checking.
     from extensions.rich_text_components import components
@@ -72,10 +71,10 @@ class Registry:
     def _refresh(cls) -> None:
         """Repopulate the registry."""
         cls._rte_components.clear()
-        package, filepath = os.path.split(
-            feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
+        package, filepath = os.path.split(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
         cls._rte_components = constants.parse_json_from_ts(
-            constants.get_package_file_contents(package, filepath))
+            constants.get_package_file_contents(package, filepath)
+        )
 
     @classmethod
     def get_all_rte_components(cls) -> Dict[str, RteComponentDict]:
@@ -101,11 +100,13 @@ class Registry:
         component_tags = {}
         for component_specs in component_list:
             tag_name = 'oppia-noninteractive-%s' % (
-                utils.camelcase_to_hyphenated(component_specs['backend_id']))
+                utils.camelcase_to_hyphenated(component_specs['backend_id'])
+            )
 
             component_tags[tag_name] = [
                 '%s-with-value' % ca_spec['name']
-                for ca_spec in component_specs['customization_arg_specs']]
+                for ca_spec in component_specs['customization_arg_specs']
+            ]
 
         return component_tags
 
@@ -134,16 +135,14 @@ class Registry:
         for component_name in component_names:
             for name, obj in inspect.getmembers(module):
                 if inspect.isclass(obj) and name == component_name:
-                    component_types_to_component_classes[
-                        'oppia-noninteractive-%s' % component_name.lower()] = (
-                            obj)
+                    component_types_to_component_classes['oppia-noninteractive-%s' %
+                                                         component_name.lower()
+                                                         ] = (obj)
 
         return component_types_to_component_classes
 
     @classmethod
-    def get_component_tag_names(
-        cls, key: str, expected_value: bool
-    ) -> List[str]:
+    def get_component_tag_names(cls, key: str, expected_value: bool) -> List[str]:
         """Get a list of component tag names which have the expected
         value of a key.
 
@@ -161,7 +160,8 @@ class Registry:
         for component_spec in rich_text_components_specs.values():
             if component_spec.get(key) == expected_value:
                 component_tag_names.append(
-                    'oppia-noninteractive-%s' % component_spec['frontend_id'])
+                    'oppia-noninteractive-%s' % component_spec['frontend_id']
+                )
         return component_tag_names
 
     @classmethod

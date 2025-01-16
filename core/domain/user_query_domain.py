@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects for user."""
 
 from __future__ import annotations
@@ -26,17 +25,11 @@ from core import utils
 
 from typing import List, Optional
 
-
 UserQueryParams = collections.namedtuple(
-    'UserQueryParams',
-    [
-        'inactive_in_last_n_days',
-        'has_not_logged_in_for_n_days',
-        'created_at_least_n_exps',
-        'created_fewer_than_n_exps',
-        'edited_at_least_n_exps',
-        'edited_fewer_than_n_exps',
-        'created_collection'
+    'UserQueryParams', [
+        'inactive_in_last_n_days', 'has_not_logged_in_for_n_days',
+        'created_at_least_n_exps', 'created_fewer_than_n_exps',
+        'edited_at_least_n_exps', 'edited_fewer_than_n_exps', 'created_collection'
     ],
     defaults=(None, None, None, None, None, None, None)
 )
@@ -90,7 +83,8 @@ class UserQuery:
         if not utils.is_user_id_valid(self.submitter_id):
             raise utils.ValidationError(
                 'Expected submitter ID to be a valid user ID, received %s' %
-                self.submitter_id)
+                self.submitter_id
+            )
 
         if self.status not in feconf.ALLOWED_USER_QUERY_STATUSES:
             raise utils.ValidationError('Invalid status: %s' % self.status)
@@ -99,14 +93,12 @@ class UserQuery:
             if not utils.is_user_id_valid(user_id):
                 raise utils.ValidationError(
                     'Expected user ID in user_ids to be a valid user ID, '
-                    'received %s' % user_id)
+                    'received %s' % user_id
+                )
 
     @classmethod
     def create_default(
-        cls,
-        query_id: str,
-        query_params: UserQueryParams,
-        submitter_id: str
+        cls, query_id: str, query_params: UserQueryParams, submitter_id: str
     ) -> UserQuery:
         """Create default user query.
 
@@ -119,8 +111,8 @@ class UserQuery:
             UserQuery. The default user query.
         """
         return cls(
-            query_id, query_params, submitter_id,
-            feconf.USER_QUERY_STATUS_PROCESSING, []
+            query_id, query_params, submitter_id, feconf.USER_QUERY_STATUS_PROCESSING,
+            []
         )
 
     def archive(self, sent_email_model_id: Optional[str] = None) -> None:

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Commands that can be used to operate on activity summaries."""
 
 from __future__ import annotations
@@ -35,7 +34,8 @@ from core.domain import user_domain
 from core.domain import user_services
 
 from typing import (
-    Callable, Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast)
+    Callable, Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast
+)
 
 
 class DisplayableCollectionSummaryDict(TypedDict):
@@ -120,43 +120,54 @@ class LibraryIndexGroupDict(TypedDict):
     search_categories: List[str]
 
 
-DisplayableSummaryDictsType = Union[
-    DisplayableCollectionSummaryDict,
-    DisplayableExplorationSummaryDict
-]
+DisplayableSummaryDictsType = Union[DisplayableCollectionSummaryDict,
+                                    DisplayableExplorationSummaryDict]
 
-_LIBRARY_INDEX_GROUPS: List[LibraryIndexGroupDict] = [{
-    'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
-    'search_categories': [
-        'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
-        'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
-        'Trigonometry',
-    ],
-}, {
-    'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
-    'search_categories': ['Algorithms', 'Computing', 'Programming'],
-}, {
-    'header_i18n_id': 'I18N_LIBRARY_GROUPS_SCIENCE',
-    'search_categories': [
-        'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
-        'Medicine', 'Physics',
-    ],
-}, {
-    'header_i18n_id': 'I18N_LIBRARY_GROUPS_HUMANITIES',
-    'search_categories': [
-        'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
-    ],
-}, {
-    'header_i18n_id': 'I18N_LIBRARY_GROUPS_LANGUAGES',
-    'search_categories': [
-        'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
-    ],
-}, {
-    'header_i18n_id': 'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
-    'search_categories': [
-        'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
-    ],
-}]
+_LIBRARY_INDEX_GROUPS: List[LibraryIndexGroupDict] = [
+    {
+        'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
+        'search_categories': [
+            'Mathematics',
+            'Algebra',
+            'Arithmetic',
+            'Calculus',
+            'Combinatorics',
+            'Geometry',
+            'Graph Theory',
+            'Logic',
+            'Probability',
+            'Statistics',
+            'Trigonometry',
+        ],
+    }, {
+        'header_i18n_id': 'I18N_LIBRARY_GROUPS_COMPUTING',
+        'search_categories': ['Algorithms', 'Computing', 'Programming'],
+    }, {
+        'header_i18n_id': 'I18N_LIBRARY_GROUPS_SCIENCE',
+        'search_categories': [
+            'Astronomy',
+            'Biology',
+            'Chemistry',
+            'Engineering',
+            'Environment',
+            'Medicine',
+            'Physics',
+        ],
+    }, {
+        'header_i18n_id': 'I18N_LIBRARY_GROUPS_HUMANITIES',
+        'search_categories': ['Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'],
+    }, {
+        'header_i18n_id': 'I18N_LIBRARY_GROUPS_LANGUAGES',
+        'search_categories': [
+            'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
+        ],
+    }, {
+        'header_i18n_id': 'I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE',
+        'search_categories': [
+            'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
+        ],
+    }
+]
 
 
 def get_human_readable_contributors_summary(
@@ -180,7 +191,8 @@ def get_human_readable_contributors_summary(
     """
     contributor_ids = list(contributors_summary.keys())
     contributor_usernames = user_services.get_human_readable_user_ids(
-        contributor_ids, strict=False)
+        contributor_ids, strict=False
+    )
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
@@ -223,15 +235,15 @@ def get_learner_collection_dict_by_id(
         Exception. No collection exists for the given collection id.
     """
     collection = collection_services.get_collection_by_id(
-        collection_id, strict=strict, version=version)
+        collection_id, strict=strict, version=version
+    )
 
     if collection is None:
-        raise Exception(
-            'No collection exists for the given collection id.'
-        )
+        raise Exception('No collection exists for the given collection id.')
     exp_ids = collection.exploration_ids
     exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exp_ids, user=user)
+        exp_ids, user=user
+    )
     exp_summaries_dict_map = {
         exp_summary_dict['id']: exp_summary_dict
         for exp_summary_dict in exp_summary_dicts
@@ -242,9 +254,10 @@ def get_learner_collection_dict_by_id(
     if user.user_id:
         completed_exp_ids = (
             collection_services.get_valid_completed_exploration_ids(
-                user.user_id, collection))
-        next_exploration_id = collection.get_next_exploration_id(
-            completed_exp_ids)
+                user.user_id, collection
+            )
+        )
+        next_exploration_id = collection.get_next_exploration_id(completed_exp_ids)
     else:
         # If the user is not logged in or they have not completed any of
         # the explorations yet within the context of this collection,
@@ -270,7 +283,8 @@ def get_learner_collection_dict_by_id(
     # difference in types, MyPy throws an error. Thus, to avoid the error,
     # we used ignore here.
     collection_dict['nodes'] = [
-        node.to_dict() for node in collection.nodes]  # type: ignore[misc]
+        node.to_dict() for node in collection.nodes
+    ]  # type: ignore[misc]
 
     collection_dict['playthrough_dict'] = {
         'next_exploration_id': next_exploration_id,
@@ -290,13 +304,14 @@ def get_learner_collection_dict_by_id(
                     'Expected collection to only reference valid '
                     'explorations, but found an exploration with ID: %s (was '
                     'the exploration deleted or is it a private exploration '
-                    'that you do not have edit access to?)'
-                    % exploration_id)
+                    'that you do not have edit access to?)' % exploration_id
+                )
             if collection_is_public and rights_manager.is_exploration_private(
                     exploration_id):
                 raise utils.ValidationError(
                     'Cannot reference a private exploration within a public '
-                    'collection, exploration ID: %s' % exploration_id)
+                    'collection, exploration ID: %s' % exploration_id
+                )
 
         if summary_dict:
             collection_node['exploration_summary'] = summary_dict
@@ -321,8 +336,8 @@ def get_displayable_collection_summary_dicts_matching_ids(
         in collection_ids.
     """
     collection_summaries_with_none = (
-        collection_services.get_collection_summaries_matching_ids(
-            collection_ids))
+        collection_services.get_collection_summaries_matching_ids(collection_ids)
+    )
     collection_summaries = []
     for collection_summary in collection_summaries_with_none:
         collection_summaries.append(collection_summary)
@@ -330,9 +345,7 @@ def get_displayable_collection_summary_dicts_matching_ids(
 
 
 def get_exp_metadata_dicts_matching_query(
-    query_string: str,
-    search_offset: Optional[int],
-    user: user_domain.UserActionsInfo
+    query_string: str, search_offset: Optional[int], user: user_domain.UserActionsInfo
 ) -> Tuple[List[exp_domain.ExplorationSummaryMetadataDict], Optional[int]]:
     """Given a query string and a search offset, returns a list of exploration
     metadata dicts that satisfy the search query.
@@ -354,10 +367,11 @@ def get_exp_metadata_dicts_matching_query(
     """
     exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(
-            query_string, [], [], offset=search_offset))
+            query_string, [], [], offset=search_offset
+        )
+    )
 
-    exploration_list = get_exploration_metadata_dicts(
-        exp_ids, user)
+    exploration_list = get_exploration_metadata_dicts(exp_ids, user)
 
     return exploration_list, new_search_offset
 
@@ -384,28 +398,26 @@ def get_exploration_metadata_dicts(
             'objective': the exploration objective.
     """
     exploration_summaries = (
-        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids)
+    )
     exploration_rights_objects = (
-        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
+        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids)
+    )
 
     filtered_exploration_summaries = []
-    for (exploration_summary, exploration_rights) in (
-            zip(exploration_summaries, exploration_rights_objects)):
+    for (exploration_summary, exploration_rights) in (zip(exploration_summaries,
+                                                          exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
-            if exploration_summary.status == (
-                    rights_domain.ACTIVITY_STATUS_PRIVATE):
+            if exploration_summary.status == (rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user.user_id is None:
                     continue
 
-                if not rights_manager.check_can_edit_activity(
-                        user, exploration_rights):
+                if not rights_manager.check_can_edit_activity(user, exploration_rights):
                     continue
 
             filtered_exploration_summaries.append(exploration_summary)
 
-    return [
-        summary.to_metadata_dict()
-        for summary in filtered_exploration_summaries]
+    return [summary.to_metadata_dict() for summary in filtered_exploration_summaries]
 
 
 def get_displayable_exp_summary_dicts_matching_ids(
@@ -448,20 +460,20 @@ def get_displayable_exp_summary_dicts_matching_ids(
         }, ]
     """
     exploration_summaries = (
-        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids)
+    )
     exploration_rights_objects = (
-        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
+        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids)
+    )
 
     filtered_exploration_summaries = []
-    for (exploration_summary, exploration_rights) in (
-            zip(exploration_summaries, exploration_rights_objects)):
+    for (exploration_summary, exploration_rights) in (zip(exploration_summaries,
+                                                          exploration_rights_objects)):
         if exploration_summary is not None and exploration_rights is not None:
-            if exploration_summary.status == (
-                    rights_domain.ACTIVITY_STATUS_PRIVATE):
+            if exploration_summary.status == (rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user is None:
                     continue
-                if not rights_manager.check_can_edit_activity(
-                        user, exploration_rights):
+                if not rights_manager.check_can_edit_activity(user, exploration_rights):
                     continue
 
             filtered_exploration_summaries.append(exploration_summary)
@@ -505,9 +517,9 @@ def get_displayable_exp_summary_dicts(
     """
     exp_version_references = [
         exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
-        for exp_summary in exploration_summaries]
-    exp_stats_list = stats_services.get_exploration_stats_multi(
-        exp_version_references)
+        for exp_summary in exploration_summaries
+    ]
+    exp_stats_list = stats_services.get_exploration_stats_multi(exp_version_references)
     view_counts = [exp_stats.num_starts for exp_stats in exp_stats_list]
 
     displayable_exp_summaries = []
@@ -520,7 +532,8 @@ def get_displayable_exp_summary_dicts(
                 'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
                 'category': exploration_summary.category,
                 'created_on_msec': utils.get_time_in_millisecs(
-                    exploration_summary.exploration_model_created_on),
+                    exploration_summary.exploration_model_created_on
+                ),
                 'objective': exploration_summary.objective,
                 'language_code': exploration_summary.language_code,
                 'last_updated_msec': utils.get_time_in_millisecs(
@@ -528,16 +541,19 @@ def get_displayable_exp_summary_dicts(
                 ),
                 'human_readable_contributors_summary': (
                     get_human_readable_contributors_summary(
-                        exploration_summary.contributors_summary)
+                        exploration_summary.contributors_summary
+                    )
                 ),
                 'status': exploration_summary.status,
                 'ratings': exploration_summary.ratings,
                 'community_owned': exploration_summary.community_owned,
                 'tags': exploration_summary.tags,
                 'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    exploration_summary.category),
+                    exploration_summary.category
+                ),
                 'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    exploration_summary.category),
+                    exploration_summary.category
+                ),
                 'num_views': view_counts[ind],
             }
 
@@ -547,9 +563,7 @@ def get_displayable_exp_summary_dicts(
 
 
 def _get_displayable_collection_summary_dicts(
-    collection_summaries: Sequence[
-        Optional[collection_domain.CollectionSummary]
-    ]
+    collection_summaries: Sequence[Optional[collection_domain.CollectionSummary]]
 ) -> List[DisplayableCollectionSummaryDict]:
     """Gets a summary of collections in human readable form.
 
@@ -576,28 +590,33 @@ def _get_displayable_collection_summary_dicts(
             'title': u'Exploration 2 Albert title',
         }, ]
     """
-    displayable_collection_summaries: List[
-        DisplayableCollectionSummaryDict
-    ] = []
+    displayable_collection_summaries: List[DisplayableCollectionSummaryDict] = []
     for collection_summary in collection_summaries:
         if collection_summary and collection_summary.status != (
                 rights_domain.ACTIVITY_STATUS_PRIVATE):
-            displayable_collection_summaries.append({
-                'id': collection_summary.id,
-                'title': collection_summary.title,
-                'category': collection_summary.category,
-                'activity_type': constants.ACTIVITY_TYPE_COLLECTION,
-                'objective': collection_summary.objective,
-                'language_code': collection_summary.language_code,
-                'tags': collection_summary.tags,
-                'node_count': collection_summary.node_count,
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_last_updated),
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        collection_summary.category)),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    collection_summary.category)})
+            displayable_collection_summaries.append(
+                {
+                    'id': collection_summary.id,
+                    'title': collection_summary.title,
+                    'category': collection_summary.category,
+                    'activity_type': constants.ACTIVITY_TYPE_COLLECTION,
+                    'objective': collection_summary.objective,
+                    'language_code': collection_summary.language_code,
+                    'tags': collection_summary.tags,
+                    'node_count': collection_summary.node_count,
+                    'last_updated_msec': utils.get_time_in_millisecs(
+                        collection_summary.collection_model_last_updated
+                    ),
+                    'thumbnail_icon_url': (
+                        utils.get_thumbnail_icon_url_for_category(
+                            collection_summary.category
+                        )
+                    ),
+                    'thumbnail_bg_color': utils.get_hex_color_for_category(
+                        collection_summary.category
+                    )
+                }
+            )
     return displayable_collection_summaries
 
 
@@ -628,19 +647,20 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
     header_id_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         collection_ids = search_services.search_collections(
-            '', group['search_categories'], language_codes, 8)[0]
+            '', group['search_categories'], language_codes, 8
+        )[0]
         header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
 
     collection_summaries = [
         summary for summary in
-        collection_services.get_collection_summaries_matching_ids(
-            all_collection_ids)
-        if summary is not None]
+        collection_services.get_collection_summaries_matching_ids(all_collection_ids)
+        if summary is not None
+    ]
     collection_summary_dicts = {
         summary_dict['id']: summary_dict
-        for summary_dict in _get_displayable_collection_summary_dicts(
-            collection_summaries)
+        for summary_dict in
+        _get_displayable_collection_summary_dicts(collection_summaries)
     }
 
     # Collect all exp ids so that the summary details can be retrieved with a
@@ -649,14 +669,16 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
     header_to_exp_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         exp_ids = search_services.search_explorations(
-            '', group['search_categories'], language_codes, 8)[0]
+            '', group['search_categories'], language_codes, 8
+        )[0]
         header_to_exp_ids[group['header_i18n_id']] = exp_ids
         all_exp_ids += exp_ids
 
     exp_summaries = [
-        summary for summary in
-        exp_fetchers.get_exploration_summaries_matching_ids(all_exp_ids)
-        if summary is not None]
+        summary
+        for summary in exp_fetchers.get_exploration_summaries_matching_ids(all_exp_ids)
+        if summary is not None
+    ]
 
     exp_summary_dicts = {
         summary_dict['id']: summary_dict
@@ -667,27 +689,32 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
     for group in _LIBRARY_INDEX_GROUPS:
         summary_dicts: Sequence[DisplayableSummaryDictsType] = []
         collection_ids_to_display = (
-            header_id_to_collection_ids[group['header_i18n_id']])
+            header_id_to_collection_ids[group['header_i18n_id']]
+        )
         summary_dicts = [
             collection_summary_dicts[collection_id]
             for collection_id in collection_ids_to_display
-            if collection_id in collection_summary_dicts]
+            if collection_id in collection_summary_dicts
+        ]
 
         exp_ids_to_display = header_to_exp_ids[group['header_i18n_id']]
         summary_dicts += [
             exp_summary_dicts[exp_id] for exp_id in exp_ids_to_display
-            if exp_id in exp_summary_dicts]
+            if exp_id in exp_summary_dicts
+        ]
 
         if not summary_dicts:
             continue
 
-        results.append({
-            'header_i18n_id': group['header_i18n_id'],
-            'categories': group['search_categories'],
-            'activity_summary_dicts': summary_dicts,
-            'has_full_results_page': True,
-            'full_results_url': None,
-        })
+        results.append(
+            {
+                'header_i18n_id': group['header_i18n_id'],
+                'categories': group['search_categories'],
+                'activity_summary_dicts': summary_dicts,
+                'has_full_results_page': True,
+                'full_results_url': None,
+            }
+        )
 
     return results
 
@@ -707,30 +734,35 @@ def require_activities_to_be_public(
             exist, or is not public.
     """
     exploration_ids, collection_ids = activity_services.split_by_type(
-        activity_references)
+        activity_references
+    )
 
-    activity_summaries_by_type = [{
-        'type': constants.ACTIVITY_TYPE_EXPLORATION,
-        'ids': exploration_ids,
-        'summaries': exp_fetchers.get_exploration_summaries_matching_ids(
-            exploration_ids),
-    }, {
-        'type': constants.ACTIVITY_TYPE_COLLECTION,
-        'ids': collection_ids,
-        'summaries': collection_services.get_collection_summaries_matching_ids(
-            collection_ids),
-    }]
+    activity_summaries_by_type = [
+        {
+            'type': constants.ACTIVITY_TYPE_EXPLORATION,
+            'ids': exploration_ids,
+            'summaries': exp_fetchers.
+            get_exploration_summaries_matching_ids(exploration_ids),
+        }, {
+            'type': constants.ACTIVITY_TYPE_COLLECTION,
+            'ids': collection_ids,
+            'summaries': collection_services.
+            get_collection_summaries_matching_ids(collection_ids),
+        }
+    ]
 
     for activities_info in activity_summaries_by_type:
         for index, summary in enumerate(activities_info['summaries']):
             if summary is None:
                 raise Exception(
                     'Cannot feature non-existent %s with id %s' %
-                    (activities_info['type'], activities_info['ids'][index]))
+                    (activities_info['type'], activities_info['ids'][index])
+                )
             if summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                 raise Exception(
                     'Cannot feature private %s with id %s' %
-                    (activities_info['type'], activities_info['ids'][index]))
+                    (activities_info['type'], activities_info['ids'][index])
+                )
 
 
 def get_featured_activity_summary_dicts(
@@ -765,16 +797,15 @@ def get_featured_activity_summary_dicts(
     """
     activity_references = activity_services.get_featured_activity_references()
     exploration_ids, collection_ids = activity_services.split_by_type(
-        activity_references)
+        activity_references
+    )
 
-    exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids)
+    exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(exploration_ids)
     col_summary_dicts = get_displayable_collection_summary_dicts_matching_ids(
-        collection_ids)
+        collection_ids
+    )
 
-    summary_dicts_by_id: Dict[
-        str, Dict[str, DisplayableSummaryDictsType]
-    ] = {
+    summary_dicts_by_id: Dict[str, Dict[str, DisplayableSummaryDictsType]] = {
         constants.ACTIVITY_TYPE_EXPLORATION: {
             summary_dict['id']: summary_dict
             for summary_dict in exp_summary_dicts
@@ -826,18 +857,16 @@ def get_top_rated_exploration_summary_dicts(
         }, ]
     """
     filtered_exp_summaries = [
-        exp_summary for exp_summary in
-        exp_services.get_top_rated_exploration_summaries(limit).values()
-        if exp_summary.language_code in language_codes and
-        sum(exp_summary.ratings.values()) > 0]
+        exp_summary
+        for exp_summary in exp_services.get_top_rated_exploration_summaries(limit
+                                                                            ).values()
+        if exp_summary.language_code in language_codes
+        and sum(exp_summary.ratings.values()) > 0
+    ]
 
-    sort_fnc: Callable[
-        [exp_domain.ExplorationSummary], float
-    ] = lambda exp_summary: exp_summary.scaled_average_rating
-    sorted_exp_summaries = sorted(
-        filtered_exp_summaries,
-        key=sort_fnc,
-        reverse=True)
+    sort_fnc: Callable[[exp_domain.ExplorationSummary],
+                       float] = lambda exp_summary: exp_summary.scaled_average_rating
+    sorted_exp_summaries = sorted(filtered_exp_summaries, key=sort_fnc, reverse=True)
 
     return get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
@@ -870,19 +899,16 @@ def get_recently_published_exp_summary_dicts(
         }, ]
     """
     recently_published_exploration_summaries = list(
-        exp_services.get_recently_published_exp_summaries(limit).values())
+        exp_services.get_recently_published_exp_summaries(limit).values()
+    )
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.
-    sort_fnc: Callable[
-        [exp_domain.ExplorationSummary], float
-    ] = lambda exp_summary: (
-        exp_summary.first_published_msec
-        if exp_summary.first_published_msec else 0
+    sort_fnc: Callable[[exp_domain.ExplorationSummary], float] = lambda exp_summary: (
+        exp_summary.first_published_msec if exp_summary.first_published_msec else 0
     )
     summaries = sorted(
-        recently_published_exploration_summaries,
-        key=sort_fnc,
-        reverse=True)
+        recently_published_exploration_summaries, key=sort_fnc, reverse=True
+    )
 
     return get_displayable_exp_summary_dicts(summaries)

@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """The services file for the feature flags."""
 
 from __future__ import annotations
@@ -28,23 +27,19 @@ from core.platform import models
 from typing import Dict, List, Mapping, Optional, Set
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import config_models
     from mypy_imports import user_models
 
-(config_models, user_models) = models.Registry.import_models(
-    [models.Names.CONFIG, models.Names.USER])
-
+(config_models,
+ user_models) = models.Registry.import_models([models.Names.CONFIG, models.Names.USER])
 
 ALL_FEATURE_FLAGS: List[feature_flag_list.FeatureNames] = (
-    feature_flag_list.DEV_FEATURES_LIST +
-    feature_flag_list.TEST_FEATURES_LIST +
+    feature_flag_list.DEV_FEATURES_LIST + feature_flag_list.TEST_FEATURES_LIST +
     feature_flag_list.PROD_FEATURES_LIST
 )
 
-ALL_FEATURES_NAMES_SET: Set[str] = set(
-    feature.value for feature in ALL_FEATURE_FLAGS
-)
+ALL_FEATURES_NAMES_SET: Set[str] = set(feature.value for feature in ALL_FEATURE_FLAGS)
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
     feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
@@ -80,12 +75,11 @@ def update_feature_flag(
     """
     if feature_flag_name not in ALL_FEATURES_NAMES_SET:
         raise FeatureFlagNotFoundException(
-            'Unknown feature flag: %s.' % feature_flag_name)
+            'Unknown feature flag: %s.' % feature_flag_name
+        )
 
     registry.Registry.update_feature_flag(
-        feature_flag_name,
-        force_enable_for_all_users,
-        rollout_percentage,
+        feature_flag_name, force_enable_for_all_users, rollout_percentage,
         user_group_ids
     )
 
@@ -122,29 +116,22 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
     feature_flags_to_fetch_from_storage = []
 
     for feature_flag_name_enum in ALL_FEATURE_FLAGS:
-        feature_flags_to_fetch_from_storage.append(
-            feature_flag_name_enum.value)
+        feature_flags_to_fetch_from_storage.append(feature_flag_name_enum.value)
 
     feature_flags_from_storage = load_feature_flags_from_storage(
-        feature_flags_to_fetch_from_storage)
+        feature_flags_to_fetch_from_storage
+    )
 
-    for feature_flag_name, feature_flag in (
-        feature_flags_from_storage.items()
-    ):
+    for feature_flag_name, feature_flag in (feature_flags_from_storage.items()):
         if feature_flag is not None:
             feature_flags.append(feature_flag)
         else:
             feature_flag_spec = _get_feature_flag_spec(feature_flag_name)
             feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-                False,
-                0,
-                [],
-                None
+                False, 0, [], None
             )
             feature_flag = feature_flag_domain.FeatureFlag(
-                feature_flag_name,
-                feature_flag_spec,
-                feature_flag_config
+                feature_flag_name, feature_flag_spec, feature_flag_config
             )
             feature_flags.append(feature_flag)
 
@@ -166,15 +153,15 @@ def load_feature_flags_from_storage(
         and value as the feature flag domain model if present in the storage
         layer otherwise None.
     """
-    feature_flag_name_to_feature_flag_dict: Dict[str, Optional[
-        feature_flag_domain.FeatureFlag]] = {}
+    feature_flag_name_to_feature_flag_dict: Dict[
+        str, Optional[feature_flag_domain.FeatureFlag]] = {}
     feature_flag_config_models = config_models.FeatureFlagConfigModel.get_multi(
-        feature_flag_names_list)
+        feature_flag_names_list
+    )
 
     for feature_flag_config_model in feature_flag_config_models:
         if feature_flag_config_model:
-            feature_flag_spec = _get_feature_flag_spec(
-                feature_flag_config_model.id)
+            feature_flag_spec = _get_feature_flag_spec(feature_flag_config_model.id)
             feature_flag_config = feature_flag_domain.FeatureFlagConfig(
                 feature_flag_config_model.force_enable_for_all_users,
                 feature_flag_config_model.rollout_percentage,
@@ -182,21 +169,15 @@ def load_feature_flags_from_storage(
                 feature_flag_config_model.last_updated
             )
 
-            feature_flag_name_to_feature_flag_dict[
-                feature_flag_config_model.id] = (
-                    feature_flag_domain.FeatureFlag(
-                        feature_flag_config_model.id,
-                        feature_flag_spec,
-                        feature_flag_config
-                    )
+            feature_flag_name_to_feature_flag_dict[feature_flag_config_model.id] = (
+                feature_flag_domain.FeatureFlag(
+                    feature_flag_config_model.id, feature_flag_spec, feature_flag_config
                 )
+            )
 
         for feature_flag_name in feature_flag_names_list:
-            if feature_flag_name not in (
-                feature_flag_name_to_feature_flag_dict
-            ):
-                feature_flag_name_to_feature_flag_dict[
-                    feature_flag_name] = None
+            if feature_flag_name not in (feature_flag_name_to_feature_flag_dict):
+                feature_flag_name_to_feature_flag_dict[feature_flag_name] = None
 
     return feature_flag_name_to_feature_flag_dict
 
@@ -224,19 +205,15 @@ def is_feature_flag_enabled(
 
     current_server = feature_flag_domain.get_server_mode()
 
-    if (
-        current_server == feature_flag_domain.ServerMode.TEST and
-        feature_flag.feature_flag_spec.feature_stage ==
-        feature_flag_domain.ServerMode.DEV
-    ):
+    if (current_server == feature_flag_domain.ServerMode.TEST
+            and feature_flag.feature_flag_spec.feature_stage
+            == feature_flag_domain.ServerMode.DEV):
         return False
 
-    if (
-        current_server == feature_flag_domain.ServerMode.PROD and
-        feature_flag.feature_flag_spec.feature_stage in (
-            feature_flag_domain.ServerMode.DEV,
-            feature_flag_domain.ServerMode.TEST)
-    ):
+    if (current_server == feature_flag_domain.ServerMode.PROD
+            and feature_flag.feature_flag_spec.feature_stage
+            in (feature_flag_domain.ServerMode.DEV,
+                feature_flag_domain.ServerMode.TEST)):
         return False
 
     if feature_flag.feature_flag_config.force_enable_for_all_users:
@@ -246,29 +223,27 @@ def is_feature_flag_enabled(
         user_group_models: List[user_models.UserGroupModel] = list(
             user_models.UserGroupModel.query(
                 user_models.UserGroupModel.user_ids == user_id
-            ).fetch())
+            ).fetch()
+        )
 
         user_group_models_ids: Set[str] = set(
-            user_group_model.id for user_group_model in user_group_models)
+            user_group_model.id for user_group_model in user_group_models
+        )
 
         for user_group_id in feature_flag.feature_flag_config.user_group_ids:
             if user_group_id in user_group_models_ids:
                 return True
 
         salt = feature_flag_name.encode('utf-8')
-        hashed_user_id = hashlib.sha256(
-            user_id.encode('utf-8') + salt).hexdigest()
+        hashed_user_id = hashlib.sha256(user_id.encode('utf-8') + salt).hexdigest()
         hash_value = int(hashed_user_id, 16)
         mod_result = hash_value % 1000
-        threshold = (
-            feature_flag.feature_flag_config.rollout_percentage / 100) * 1000
+        threshold = (feature_flag.feature_flag_config.rollout_percentage / 100) * 1000
         return bool(mod_result < threshold)
     return False
 
 
-def evaluate_all_feature_flag_configs(
-    user_id: Optional[str]
-) -> Dict[str, bool]:
+def evaluate_all_feature_flag_configs(user_id: Optional[str]) -> Dict[str, bool]:
     """Evaluates and returns the value of feature flags.
 
     Args:
@@ -282,7 +257,8 @@ def evaluate_all_feature_flag_configs(
     feature_flags = get_all_feature_flags()
     for feature_flag in feature_flags:
         feature_flag_status = is_feature_flag_enabled(
-            feature_flag.name, user_id, feature_flag=feature_flag)
+            feature_flag.name, user_id, feature_flag=feature_flag
+        )
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(feature_flag_status, bool)
         result_dict[feature_flag.name] = feature_flag_status

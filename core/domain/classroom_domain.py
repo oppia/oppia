@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.]
-
 """Domain objects for Classroom."""
 
 from __future__ import annotations
@@ -30,6 +29,7 @@ class ClassroomDict(TypedDict):
     course_details: str
     topic_list_intro: str
 
+
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
 # successful migration, this file should be deleted.
@@ -39,11 +39,7 @@ class Classroom:
     """Domain object for a classroom."""
 
     def __init__(
-        self,
-        name: str,
-        url_fragment: str,
-        topic_ids: List[str],
-        course_details: str,
+        self, name: str, url_fragment: str, topic_ids: List[str], course_details: str,
         topic_list_intro: str
     ) -> None:
         """Constructs a Classroom domain object.

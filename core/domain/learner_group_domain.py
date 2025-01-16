@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects for Learner Groups."""
 
 from __future__ import annotations
@@ -43,14 +42,9 @@ class LearnerGroup:
     """Domain object for learner group."""
 
     def __init__(
-        self,
-        group_id: str,
-        title: str,
-        description: str,
-        facilitator_user_ids: List[str],
-        learner_user_ids: List[str],
-        invited_learner_user_ids: List[str],
-        subtopic_page_ids: List[str],
+        self, group_id: str, title: str, description: str,
+        facilitator_user_ids: List[str], learner_user_ids: List[str],
+        invited_learner_user_ids: List[str], subtopic_page_ids: List[str],
         story_ids: List[str]
     ) -> None:
         """Constructs a LearnerGroup domain object.
@@ -109,30 +103,33 @@ class LearnerGroup:
 
         if len(self.facilitator_user_ids) < 1:
             raise utils.ValidationError(
-                'Expected learner group to have at least one facilitator.')
+                'Expected learner group to have at least one facilitator.'
+            )
 
         invited_learner_set = set(self.invited_learner_user_ids)
         learner_set = set(self.learner_user_ids)
 
         if len(invited_learner_set.intersection(learner_set)) > 0:
             raise utils.ValidationError(
-                'Learner group learner cannot be invited to join the group.')
+                'Learner group learner cannot be invited to join the group.'
+            )
 
         facilitator_set = set(self.facilitator_user_ids)
 
         if len(facilitator_set.intersection(learner_set)) > 0:
             raise utils.ValidationError(
-                'Learner group facilitator cannot be a learner of the group.')
+                'Learner group facilitator cannot be a learner of the group.'
+            )
 
         if len(facilitator_set.intersection(invited_learner_set)) > 0:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be invited to '
-                'join the group.')
+                'join the group.'
+            )
 
 
 class LearnerGroupSyllabusDict(TypedDict):
     """Dictionary reperesentation of learner group syllabus."""
 
-    story_summary_dicts: List[
-        story_domain.LearnerGroupSyllabusStorySummaryDict]
+    story_summary_dicts: List[story_domain.LearnerGroupSyllabusStorySummaryDict]
     subtopic_summary_dicts: List[subtopic_page_domain.SubtopicPageSummaryDict]

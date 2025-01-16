@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Domain objects for Wipeout."""
 
 from __future__ import annotations
@@ -33,12 +32,8 @@ class PendingDeletionRequest:
     """Domain object for a PendingDeletionRequest."""
 
     def __init__(
-        self,
-        user_id: str,
-        username: Optional[str],
-        email: str,
-        normalized_long_term_username: Optional[str],
-        deletion_complete: bool,
+        self, user_id: str, username: Optional[str], email: str,
+        normalized_long_term_username: Optional[str], deletion_complete: bool,
         pseudonymizable_entity_mappings: Dict[str, Dict[str, str]]
     ) -> None:
         """Constructs a PendingDeletionRequest domain object.
@@ -85,8 +80,7 @@ class PendingDeletionRequest:
             PendingDeletionRequest. The default pending deletion request
             domain object.
         """
-        return cls(
-            user_id, username, email, normalized_long_term_username, False, {})
+        return cls(user_id, username, email, normalized_long_term_username, False, {})
 
     def validate(self) -> None:
         """Checks that the domain object is valid.
@@ -98,4 +92,5 @@ class PendingDeletionRequest:
         for key in self.pseudonymizable_entity_mappings.keys():
             if key not in [name.value for name in feconf.ValidModelNames]:
                 raise utils.ValidationError(
-                    'pseudonymizable_entity_mappings contain wrong key')
+                    'pseudonymizable_entity_mappings contain wrong key'
+                )

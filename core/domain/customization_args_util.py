@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Utility methods for customization args of interactions."""
 
 from __future__ import annotations
@@ -28,26 +27,15 @@ from typing import Dict, List, Mapping, Optional, Union
 MYPY = False
 if MYPY:  # pragma: no cover
     AcceptableCustomizationArgsTypes = Union[
-        str,
-        int,
-        bool,
-        List[str],
-        domain.GraphDict,
-        Dict[str, Optional[str]],
-        List[state_domain.SubtitledHtml],
-        List[state_domain.SubtitledHtmlDict],
-        state_domain.SubtitledHtmlDict,
-        state_domain.SubtitledUnicodeDict,
-        state_domain.SubtitledUnicode,
-        domain.ImageAndRegionDict,
+        str, int, bool, List[str], domain.GraphDict, Dict[str, Optional[str]],
+        List[state_domain.SubtitledHtml], List[state_domain.SubtitledHtmlDict],
+        state_domain.SubtitledHtmlDict, state_domain.SubtitledUnicodeDict,
+        state_domain.SubtitledUnicode, domain.ImageAndRegionDict,
         domain.CustomizationArgSubtitledUnicodeDefaultDict,
-        List[domain.CustomizationArgSubtitledUnicodeDefaultDict],
-        None
-    ]
+        List[domain.CustomizationArgSubtitledUnicodeDefaultDict], None]
 
-    CustomizationArgsDictType = Mapping[
-        str, Mapping[str, AcceptableCustomizationArgsTypes]
-    ]
+    CustomizationArgsDictType = Mapping[str, Mapping[str,
+                                                     AcceptableCustomizationArgsTypes]]
 
 
 def validate_customization_args_and_values(
@@ -85,34 +73,35 @@ def validate_customization_args_and_values(
         ValidationError. The given 'customization_args' is missing at least one
             key.
     """
-    ca_spec_names = [
-        ca_spec.name for ca_spec in ca_specs_to_validate_against]
+    ca_spec_names = [ca_spec.name for ca_spec in ca_specs_to_validate_against]
 
     if not isinstance(customization_args, dict):
         raise utils.ValidationError(
-            'Expected customization args to be a dict, received %s'
-            % customization_args)
+            'Expected customization args to be a dict, received %s' % customization_args
+        )
 
     # Check for extra invalid keys.
     for arg_name in customization_args.keys():
         if not isinstance(arg_name, str):
-            raise utils.ValidationError(
-                'Invalid customization arg name: %s' % arg_name)
+            raise utils.ValidationError('Invalid customization arg name: %s' % arg_name)
         if arg_name not in ca_spec_names:
             raise utils.ValidationError(
-                '%s %s does not support customization arg %s.'
-                % (item_name.capitalize(), item_type, arg_name))
+                '%s %s does not support customization arg %s.' %
+                (item_name.capitalize(), item_type, arg_name)
+            )
 
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
         if ca_spec.name not in customization_args:
             raise utils.ValidationError(
-                'Customization argument is missing key: %s' % ca_spec.name)
+                'Customization argument is missing key: %s' % ca_spec.name
+            )
         try:
             customization_args[ca_spec.name]['value'] = (
                 schema_utils.normalize_against_schema(
-                    customization_args[ca_spec.name]['value'],
-                    ca_spec.schema))
+                    customization_args[ca_spec.name]['value'], ca_spec.schema
+                )
+            )
         except Exception as e:
             # TODO(sll): Raise an actual exception here if parameters are
             # not involved (If they are, can we get sample values for the

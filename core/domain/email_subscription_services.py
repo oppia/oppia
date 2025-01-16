@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Classes for informing subscribers when a new exploration is published."""
 
 from __future__ import annotations
@@ -37,4 +36,5 @@ def inform_subscribers(
     """
 
     email_manager.send_emails_to_subscribers(
-        creator_id, exploration_id, exploration_title)
+        creator_id, exploration_id, exploration_title
+    )

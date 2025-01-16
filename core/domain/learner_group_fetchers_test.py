@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for methods defined in learner group fetchers."""
 
 from __future__ import annotations
@@ -34,14 +33,13 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.LEARNER_GROUP_ID = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
+        self.LEARNER_GROUP_ID = (learner_group_fetchers.get_new_learner_group_id())
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
             [self.FACILITATOR_ID], [self.LEARNER_ID_1, self.LEARNER_ID_2],
-            ['subtopic_id_1'], ['story_id_1'])
+            ['subtopic_id_1'], ['story_id_1']
+        )
 
     def test_get_new_learner_group_id(self) -> None:
         self.assertIsNotNone(learner_group_fetchers.get_new_learner_group_id())
@@ -49,7 +47,8 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_learner_group_by_id(self) -> None:
         fake_learner_group_id = 'fake_learner_group_id'
         fake_learner_group = learner_group_fetchers.get_learner_group_by_id(
-            fake_learner_group_id)
+            fake_learner_group_id
+        )
         self.assertIsNone(fake_learner_group)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
@@ -61,10 +60,8 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(learner_group.group_id, self.LEARNER_GROUP_ID)
 
         with self.assertRaisesRegex(
-            Exception,
-            'No LearnerGroupModel found for the given group_id: '
-            'fake_learner_group_id'
-        ):
+                Exception, 'No LearnerGroupModel found for the given group_id: '
+                'fake_learner_group_id'):
             learner_group_fetchers.get_learner_group_by_id(
                 fake_learner_group_id, strict=True
             )
@@ -73,9 +70,8 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            Exception,
-            'No LearnerGroupsUserModel exists for the user_id: invalid_id'
-        ):
+                Exception,
+                'No LearnerGroupsUserModel exists for the user_id: invalid_id'):
             learner_group_fetchers.get_learner_group_models_by_ids(
                 ['invalid_id'], strict=True
             )
@@ -83,9 +79,8 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_learner_groups_of_facilitator(self) -> None:
         fake_facilitator_id = 'fake_facilitator_id'
         fake_learner_groups = (
-            learner_group_fetchers.get_learner_groups_of_facilitator(
-                fake_facilitator_id
-            )
+            learner_group_fetchers.
+            get_learner_groups_of_facilitator(fake_facilitator_id)
         )
         self.assertEqual(len(fake_learner_groups), 0)
 
@@ -99,22 +94,24 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_can_multi_learners_share_progress(self) -> None:
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True
+        )
 
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.LEARNER_ID_2, False)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_2, False
+        )
 
         self.assertEqual(
             learner_group_fetchers.can_multi_learners_share_progress(
                 [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
-            ), [True, False])
+            ), [True, False]
+        )
 
     def test_get_invited_learner_groups_of_learner(self) -> None:
         fake_learner_id = 'fake_learner_id'
         learner_groups = (
-            learner_group_fetchers.get_invited_learner_groups_of_learner(
-                fake_learner_id
-            )
+            learner_group_fetchers.
+            get_invited_learner_groups_of_learner(fake_learner_id)
         )
         self.assertEqual(len(learner_groups), 0)
 
@@ -135,7 +132,8 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(learner_groups), 0)
 
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True
+        )
         learner_groups = (
             learner_group_fetchers.get_learner_groups_joined_by_learner(
                 self.LEARNER_ID_1

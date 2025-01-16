@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for services relating to typed objects."""
 
 from __future__ import annotations
@@ -28,8 +27,8 @@ class ObjectRegistryUnitTests(test_utils.GenericTestBase):
     def test_get_object_class_by_type_method(self) -> None:
         """Tests the normal behavior of get_object_class_by_type()."""
         self.assertEqual(
-            object_registry.Registry.get_object_class_by_type('Int').__name__,
-            'Int')
+            object_registry.Registry.get_object_class_by_type('Int').__name__, 'Int'
+        )
 
     def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
@@ -65,12 +64,16 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
                     param_obj_type_name = param_obj_type.__name__
                     default_value = param_obj_type.default_value
                     self.assertIsNotNone(
-                        default_value, msg=(
+                        default_value,
+                        msg=(
                             'No default value specified for object class %s.' %
-                            param_obj_type_name))
+                            param_obj_type_name
+                        )
+                    )
                     self.assertIn(param_obj_type_name, object_default_vals)
                     self.assertEqual(
-                        default_value, object_default_vals[param_obj_type_name])
+                        default_value, object_default_vals[param_obj_type_name]
+                    )
 
     def test_get_object_default_values_is_valid(self) -> None:
         """Checks that the default values provided by get_default_values()
@@ -80,5 +83,4 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
         all_object_classes = object_registry.Registry.get_all_object_classes()
         for (obj_type, default_value) in object_default_vals.items():
             self.assertIn(obj_type, all_object_classes)
-            self.assertEqual(
-                default_value, all_object_classes[obj_type].default_value)
+            self.assertEqual(default_value, all_object_classes[obj_type].default_value)
