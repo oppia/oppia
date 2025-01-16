@@ -195,17 +195,50 @@
                 </span>
               </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item dropdown oppia-navbar-clickable-dropdown">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link oppia-impact-report-btn e2e-test-navbar-impact-report-button"
-                 [href]="IMPACT_REPORT_LINK"
-                 target="_blank"
-                 (blur)="aboutDropdown.close()"
+                 ngbDropdown
+                 #impactReportDropdown="ngbDropdown"
+                 (click)="impactReportDropdown.toggle()"
+                 (keydown.enter)="impactReportDropdown.toggle()"
+                 aria-expanded="false"
+                 role="button"
+                 tabindex="0"
                  rel="noopener">
                 <span class="link">
                   {{'I18N_TOPNAV_IMPACT_REPORT' | translate}}
                 </span>
-                <i class="fas fa-external-link-alt launch-icon"></i>
+                <i class="fas fa-caret-down"></i>
               </a>
+              <ul ngbDropdownMenu
+                  class="dropdown-menu oppia-navbar-dropdown impact-report-dropdown"
+                  (mouseover)="openSubmenu($event, 'impactReportMenu')"
+                  (mouseleave)="closeSubmenuIfNotMobile($event)">
+                <li class="nav-item">
+                  <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
+                     href="IMPACT_REPORT_LINK_2022"
+                     target="_blank"
+                     (blur)="impactReportDropdown.close()"
+                     rel="noopener">
+                    <span class="link">
+                      2022
+                    </span>
+                    <i class="fas fa-external-link-alt launch-icon"></i>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
+                     href="IMPACT_REPORT_LINK_2023"
+                     target="_blank"
+                     (blur)="impactReportDropdown.close()"
+                     rel="noopener">
+                    <span class="link">
+                      2023
+                    </span>
+                    <i class="fas fa-external-link-alt launch-icon"></i>
+                  </a>
+                </li>
+              </ul>
             </li>
           </ul>
         </li>
