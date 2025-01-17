@@ -39,7 +39,7 @@ class PendingDeletionRequest:
         email: str,
         normalized_long_term_username: Optional[str],
         deletion_complete: bool,
-        pseudonymizable_entity_mappings: Dict[str, Dict[str, str]]
+        pseudonymizable_entity_mappings: Dict[str, Dict[str, str]],
     ) -> None:
         """Constructs a PendingDeletionRequest domain object.
 
@@ -68,7 +68,7 @@ class PendingDeletionRequest:
         user_id: str,
         username: Optional[str],
         email: str,
-        normalized_long_term_username: Optional[str] = None
+        normalized_long_term_username: Optional[str] = None,
     ) -> PendingDeletionRequest:
         """Creates a PendingDeletionRequest object with default values.
 
@@ -85,8 +85,7 @@ class PendingDeletionRequest:
             PendingDeletionRequest. The default pending deletion request
             domain object.
         """
-        return cls(
-            user_id, username, email, normalized_long_term_username, False, {})
+        return cls(user_id, username, email, normalized_long_term_username, False, {})
 
     def validate(self) -> None:
         """Checks that the domain object is valid.
@@ -98,4 +97,5 @@ class PendingDeletionRequest:
         for key in self.pseudonymizable_entity_mappings.keys():
             if key not in [name.value for name in feconf.ValidModelNames]:
                 raise utils.ValidationError(
-                    'pseudonymizable_entity_mappings contain wrong key')
+                    'pseudonymizable_entity_mappings contain wrong key'
+                )

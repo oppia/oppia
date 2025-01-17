@@ -34,18 +34,15 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
     # type annotations with '_task_handler' we annotated the payload
     # as 'Dict[str, Any]'.
     def mock_task_handler(
-            self,
-            url: str,
-            payload: Dict[str, Any],
-            queue_name: str,
-            task_name: Optional[str] = None
+        self,
+        url: str,
+        payload: Dict[str, Any],
+        queue_name: str,
+        task_name: Optional[str] = None,
     ) -> None:
         self.output.append(
-            'Task %s in queue %s with payload %s is sent to %s.' % (
-                task_name if task_name else 'Default',
-                queue_name,
-                str(payload),
-                url)
+            'Task %s in queue %s with payload %s is sent to %s.'
+            % (task_name if task_name else 'Default', queue_name, str(payload), url)
         )
 
     def setUp(self) -> None:
@@ -53,38 +50,35 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.url = 'dummy_url'
         self.queue_name1 = 'queue_name1'
         self.queue_name2 = 'queue_name2'
-        self.payload1 = {
-            'param1': 'param1',
-            'param2': 2,
-            'param3': None
-        }
+        self.payload1 = {'param1': 'param1', 'param2': 2, 'param3': None}
 
         self.payload2 = {
             'param1': 'param2',
-            'param2': {
-                'arg': 'arg1'
-            },
-            'param3': [1, 2, 3]
+            'param2': {'arg': 'arg1'},
+            'param3': [1, 2, 3],
         }
         self.output: List[str] = []
         self.unit_test_emulator = cloud_tasks_emulator.Emulator(
-            task_handler=self.mock_task_handler, automatic_task_handling=False)
+            task_handler=self.mock_task_handler, automatic_task_handling=False
+        )
         self.dev_mode_emulator = cloud_tasks_emulator.Emulator(
-            task_handler=self.mock_task_handler)
+            task_handler=self.mock_task_handler
+        )
 
     def test_task_creation_is_handled_correctly(self) -> None:
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
-            self.queue_name1, self.url, payload=self.payload1)
+            self.queue_name1, self.url, payload=self.payload1
+        )
         self.unit_test_emulator.create_task(
-            self.queue_name2, self.url, payload=self.payload2)
+            self.queue_name2, self.url, payload=self.payload2
+        )
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 2)
-        task_list = self.unit_test_emulator.get_tasks(
-            queue_name=self.queue_name1)
+        task_list = self.unit_test_emulator.get_tasks(queue_name=self.queue_name1)
         self.assertEqual(
-            self.unit_test_emulator.get_number_of_tasks(
-                queue_name=self.queue_name1), 1)
+            self.unit_test_emulator.get_number_of_tasks(queue_name=self.queue_name1), 1
+        )
         self.assertEqual(len(task_list), 1)
 
         self.assertEqual(task_list[0].queue_name, self.queue_name1)
@@ -92,28 +86,25 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         task_list = self.unit_test_emulator.get_tasks()
         self.assertEqual(len(task_list), 2)
 
-    def test_flushing_and_executing_tasks_produces_correct_behavior(
-            self
-    ) -> None:
+    def test_flushing_and_executing_tasks_produces_correct_behavior(self) -> None:
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
-            self.queue_name1, self.url, payload=self.payload1)
+            self.queue_name1, self.url, payload=self.payload1
+        )
         self.unit_test_emulator.create_task(
-            self.queue_name2, self.url, payload=self.payload2)
+            self.queue_name2, self.url, payload=self.payload2
+        )
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 2)
 
-        self.unit_test_emulator.process_and_flush_tasks(
-            queue_name=self.queue_name1)
+        self.unit_test_emulator.process_and_flush_tasks(queue_name=self.queue_name1)
 
         self.assertEqual(
             set(self.output),
             {
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name1,
-                    str(self.payload1),
-                    self.url)
-            }
+                'Task Default in queue %s with payload %s is sent to %s.'
+                % (self.queue_name1, str(self.payload1), self.url)
+            },
         )
 
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 1)
@@ -121,38 +112,32 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.assertEqual(
             set(self.output),
             {
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name1,
-                    str(self.payload1),
-                    self.url),
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name2,
-                    str(self.payload2),
-                    self.url),
-            }
+                'Task Default in queue %s with payload %s is sent to %s.'
+                % (self.queue_name1, str(self.payload1), self.url),
+                'Task Default in queue %s with payload %s is sent to %s.'
+                % (self.queue_name2, str(self.payload2), self.url),
+            },
         )
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
     def test_tasks_scheduled_for_immediate_execution_are_handled_correctly(
-            self
+        self,
     ) -> None:
         self.dev_mode_emulator.create_task(
-            self.queue_name1, self.url, payload=self.payload1)
+            self.queue_name1, self.url, payload=self.payload1
+        )
         self.dev_mode_emulator.create_task(
-            self.queue_name2, self.url, payload=self.payload2)
+            self.queue_name2, self.url, payload=self.payload2
+        )
         # Allow the threads to execute the tasks scheduled immediately.
         time.sleep(1)
 
         self.assertEqual(
             set(self.output),
             {
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name1,
-                    str(self.payload1),
-                    self.url),
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name2,
-                    str(self.payload2),
-                    self.url),
-            }
+                'Task Default in queue %s with payload %s is sent to %s.'
+                % (self.queue_name1, str(self.payload1), self.url),
+                'Task Default in queue %s with payload %s is sent to %s.'
+                % (self.queue_name2, str(self.payload2), self.url),
+            },
         )

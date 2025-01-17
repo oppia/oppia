@@ -37,14 +37,33 @@ from extensions import domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, Iterator, List, Literal, Mapping, Optional, Tuple,
-    Type, TypedDict, TypeVar, Union, cast, overload
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    TypedDict,
+    TypeVar,
+    Union,
+    cast,
+    overload,
 )
 
-from core.domain import feature_flag_services # pylint: disable=invalid-import-from # isort:skip
+from core.domain import (
+    feature_flag_services,
+)  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import (
+    interaction_registry,
+)  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import (
+    rules_registry,
+)  # pylint: disable=invalid-import-from # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -66,9 +85,7 @@ AllowedRuleSpecInputTypes = Union[
     List[List[str]],
     # Here we use type Any because some rule specs have deeply nested types,
     # such as for the `NumberWithUnits` interaction.
-    Mapping[
-        str, Union[str, List[str], int, bool, float, Dict[str, int], List[Any]]
-    ],
+    Mapping[str, Union[str, List[str], int, bool, float, Dict[str, int], List[Any]]],
 ]
 
 
@@ -114,7 +131,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         outcome: Outcome,
         rule_specs: List[RuleSpec],
         training_data: List[str],
-        tagged_skill_misconception_id: Optional[str]
+        tagged_skill_misconception_id: Optional[str],
     ) -> None:
         """Initializes a AnswerGroup domain object.
 
@@ -130,9 +147,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 only when a state is part of a Question object that
                 tests a particular skill.
         """
-        self.rule_specs = [RuleSpec(
-            rule_spec.rule_type, rule_spec.inputs
-        ) for rule_spec in rule_specs]
+        self.rule_specs = [
+            RuleSpec(rule_spec.rule_type, rule_spec.inputs) for rule_spec in rule_specs
+        ]
         self.outcome = outcome
         self.training_data = training_data
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
@@ -147,12 +164,14 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
+            translation_domain.TranslatableContentsCollection()
+        )
 
         if self.outcome is not None:
             (
-                translatable_contents_collection
-                .add_fields_from_translatable_object(self.outcome)
+                translatable_contents_collection.add_fields_from_translatable_object(
+                    self.outcome
+                )
             )
         # TODO(#16256): Instead of hardcoding interactions name here,
         # Interaction can have a flag indicating whether the rule_specs can have
@@ -161,10 +180,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             if kwargs['interaction_id'] not in ['TextInput', 'SetInput']:
                 break
             (
-                translatable_contents_collection
-                .add_fields_from_translatable_object(
-                    rule_spec,
-                    interaction_id=kwargs['interaction_id'])
+                translatable_contents_collection.add_fields_from_translatable_object(
+                    rule_spec, interaction_id=kwargs['interaction_id']
+                )
             )
         return translatable_contents_collection
 
@@ -175,11 +193,10 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             dict. A dict, mapping all fields of AnswerGroup instance.
         """
         return {
-            'rule_specs': [rule_spec.to_dict()
-                           for rule_spec in self.rule_specs],
+            'rule_specs': [rule_spec.to_dict() for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
             'training_data': self.training_data,
-            'tagged_skill_misconception_id': self.tagged_skill_misconception_id
+            'tagged_skill_misconception_id': self.tagged_skill_misconception_id,
         }
 
     # TODO(#16467): Remove `validate` argument after validating all Question
@@ -203,10 +220,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         """
         return cls(
             Outcome.from_dict(answer_group_dict['outcome'], validate=validate),
-            [RuleSpec.from_dict(rs)
-             for rs in answer_group_dict['rule_specs']],
+            [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
-            answer_group_dict['tagged_skill_misconception_id']
+            answer_group_dict['tagged_skill_misconception_id'],
         )
 
     def validate(
@@ -237,49 +253,56 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
-                % self.rule_specs)
+                % self.rule_specs
+            )
 
         if (
-            self.tagged_skill_misconception_id is not None and
-            not tagged_skill_misconception_id_required and
-            not feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames.
-                EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
-                None
+            self.tagged_skill_misconception_id is not None
+            and not tagged_skill_misconception_id_required
+            and not feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
+                None,
             )
         ):
             raise utils.ValidationError(
                 'Expected tagged skill misconception id to be None, '
-                'received %s' % self.tagged_skill_misconception_id)
+                'received %s' % self.tagged_skill_misconception_id
+            )
 
         if (
-            self.tagged_skill_misconception_id is not None and
-            tagged_skill_misconception_id_required
+            self.tagged_skill_misconception_id is not None
+            and tagged_skill_misconception_id_required
         ):
             if not isinstance(self.tagged_skill_misconception_id, str):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
-                    'received %s' % self.tagged_skill_misconception_id)
+                    'received %s' % self.tagged_skill_misconception_id
+                )
 
             if not re.match(
-                    constants.VALID_SKILL_MISCONCEPTION_ID_REGEX,
-                    self.tagged_skill_misconception_id):
+                constants.VALID_SKILL_MISCONCEPTION_ID_REGEX,
+                self.tagged_skill_misconception_id,
+            ):
                 raise utils.ValidationError(
                     'Expected the format of tagged skill misconception id '
                     'to be <skill_id>-<misconception_id>, received %s'
-                    % self.tagged_skill_misconception_id)
+                    % self.tagged_skill_misconception_id
+                )
 
         if len(self.rule_specs) == 0:
             raise utils.ValidationError(
-                'There must be at least one rule for each answer group.')
+                'There must be at least one rule for each answer group.'
+            )
 
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
-                    'Unrecognized rule type: %s' % rule_spec.rule_type)
+                    'Unrecognized rule type: %s' % rule_spec.rule_type
+                )
             rule_spec.validate(
                 interaction.get_rule_param_list(rule_spec.rule_type),
-                exp_param_specs_dict)
+                exp_param_specs_dict,
+            )
 
         self.outcome.validate()
 
@@ -289,7 +312,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         conversion_fn: Callable[[str], str],
         html_field_types_to_rule_specs: Dict[
             str, rules_registry.RuleSpecsExtensionDict
-        ]
+        ],
     ) -> AnswerGroupDict:
         """Checks for HTML fields in an answer group dict and converts it
         according to the conversion function.
@@ -308,13 +331,15 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             dict. The converted answer group dict.
         """
         answer_group_dict['outcome']['feedback']['html'] = conversion_fn(
-            answer_group_dict['outcome']['feedback']['html'])
+            answer_group_dict['outcome']['feedback']['html']
+        )
 
-        for rule_spec_index, rule_spec in enumerate(
-                answer_group_dict['rule_specs']):
+        for rule_spec_index, rule_spec in enumerate(answer_group_dict['rule_specs']):
             answer_group_dict['rule_specs'][rule_spec_index] = (
                 RuleSpec.convert_html_in_rule_spec(
-                    rule_spec, conversion_fn, html_field_types_to_rule_specs))
+                    rule_spec, conversion_fn, html_field_types_to_rule_specs
+                )
+            )
 
         return answer_group_dict
 
@@ -328,10 +353,7 @@ class HintDict(TypedDict):
 class Hint(translation_domain.BaseTranslatableObject):
     """Value object representing a hint."""
 
-    def __init__(
-        self,
-        hint_content: SubtitledHtml
-    ) -> None:
+    def __init__(self, hint_content: SubtitledHtml) -> None:
         """Constructs a Hint domain object.
 
         Args:
@@ -341,8 +363,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         self.hint_content = hint_content
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self, **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the hint.
 
@@ -351,13 +372,15 @@ class Hint(translation_domain.BaseTranslatableObject):
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
+            translation_domain.TranslatableContentsCollection()
+        )
 
         translatable_contents_collection.add_translatable_field(
             self.hint_content.content_id,
             translation_domain.ContentType.HINT,
             translation_domain.TranslatableContentFormat.HTML,
-            self.hint_content.html)
+            self.hint_content.html,
+        )
         return translatable_contents_collection
 
     def to_dict(self) -> HintDict:
@@ -410,8 +433,9 @@ class Hint(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted hints dict.
         """
-        hint_dict['hint_content']['html'] = (
-            conversion_fn(hint_dict['hint_content']['html']))
+        hint_dict['hint_content']['html'] = conversion_fn(
+            hint_dict['hint_content']['html']
+        )
         return hint_dict
 
 
@@ -439,7 +463,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         interaction_id: str,
         answer_is_exclusive: bool,
         correct_answer: AcceptableCorrectAnswerTypes,
-        explanation: SubtitledHtml
+        explanation: SubtitledHtml,
     ) -> None:
         """Constructs a Solution domain object.
 
@@ -456,14 +480,13 @@ class Solution(translation_domain.BaseTranslatableObject):
                 translations for the solution's explanation.
         """
         self.answer_is_exclusive = answer_is_exclusive
-        self.correct_answer = (
-            interaction_registry.Registry.get_interaction_by_id(
-                interaction_id).normalize_answer(correct_answer))
+        self.correct_answer = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id
+        ).normalize_answer(correct_answer)
         self.explanation = explanation
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self, **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the solution.
 
@@ -472,13 +495,15 @@ class Solution(translation_domain.BaseTranslatableObject):
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
+            translation_domain.TranslatableContentsCollection()
+        )
 
         translatable_contents_collection.add_translatable_field(
             self.explanation.content_id,
             translation_domain.ContentType.SOLUTION,
             translation_domain.TranslatableContentFormat.HTML,
-            self.explanation.html)
+            self.explanation.html,
+        )
         return translatable_contents_collection
 
     def to_dict(self) -> SolutionDict:
@@ -500,10 +525,7 @@ class Solution(translation_domain.BaseTranslatableObject):
     # while we load the Question.
     @classmethod
     def from_dict(
-        cls,
-        interaction_id: str,
-        solution_dict: SolutionDict,
-        validate: bool = True
+        cls, interaction_id: str, solution_dict: SolutionDict, validate: bool = True
     ) -> Solution:
         """Return a Solution domain object from a dict.
 
@@ -522,9 +544,10 @@ class Solution(translation_domain.BaseTranslatableObject):
             interaction_id,
             solution_dict['answer_is_exclusive'],
             interaction_registry.Registry.get_interaction_by_id(
-                interaction_id).normalize_answer(
-                    solution_dict['correct_answer']),
-            explanation)
+                interaction_id
+            ).normalize_answer(solution_dict['correct_answer']),
+            explanation,
+        )
 
     def validate(self, interaction_id: str) -> None:
         """Validates all properties of Solution.
@@ -538,10 +561,12 @@ class Solution(translation_domain.BaseTranslatableObject):
         """
         if not isinstance(self.answer_is_exclusive, bool):
             raise utils.ValidationError(
-                'Expected answer_is_exclusive to be bool, received %s' %
-                self.answer_is_exclusive)
+                'Expected answer_is_exclusive to be bool, received %s'
+                % self.answer_is_exclusive
+            )
         interaction_registry.Registry.get_interaction_by_id(
-            interaction_id).normalize_answer(self.correct_answer)
+            interaction_id
+        ).normalize_answer(self.correct_answer)
         self.explanation.validate()
 
     @staticmethod
@@ -552,7 +577,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         html_field_types_to_rule_specs: Dict[
             str, rules_registry.RuleSpecsExtensionDict
         ],
-        interaction_spec: base.BaseInteractionDict
+        interaction_spec: base.BaseInteractionDict,
     ) -> SolutionDict:
         """Checks for HTML fields in a solution and convert it according
         to the conversion function.
@@ -578,63 +603,60 @@ class Solution(translation_domain.BaseTranslatableObject):
         if interaction_id is None:
             return solution_dict
 
-        solution_dict['explanation']['html'] = (
-            conversion_fn(solution_dict['explanation']['html']))
+        solution_dict['explanation']['html'] = conversion_fn(
+            solution_dict['explanation']['html']
+        )
 
         if interaction_spec['can_have_solution']:
             if solution_dict['correct_answer']:
                 for html_type in html_field_types_to_rule_specs.keys():
                     if html_type == interaction_spec['answer_type']:
 
-                        if (
-                                html_type ==
-                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+                        if html_type == feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML:
 
                             # Here correct_answer can only be of type
                             # List[List[str]] because here html_type is
                             # 'ListOfSetsOfHtmlStrings'.
-                            assert isinstance(
-                                solution_dict['correct_answer'], list
-                            )
+                            assert isinstance(solution_dict['correct_answer'], list)
                             for list_index, html_list in enumerate(
-                                    solution_dict['correct_answer']):
+                                solution_dict['correct_answer']
+                            ):
                                 assert isinstance(html_list, list)
                                 for answer_html_index, answer_html in enumerate(
-                                        html_list):
+                                    html_list
+                                ):
                                     # Here we use cast because above assert
                                     # conditions forces correct_answer to be of
                                     # type List[List[str]].
                                     correct_answer = cast(
-                                        List[List[str]],
-                                        solution_dict['correct_answer']
+                                        List[List[str]], solution_dict['correct_answer']
                                     )
-                                    correct_answer[list_index][
-                                        answer_html_index] = (
-                                            conversion_fn(answer_html))
+                                    correct_answer[list_index][answer_html_index] = (
+                                        conversion_fn(answer_html)
+                                    )
                         elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
                             # Here correct_answer can only be of type
                             # List[str] because here html_type is
                             # 'SetOfHtmlString'.
-                            assert isinstance(
-                                solution_dict['correct_answer'], list
-                            )
+                            assert isinstance(solution_dict['correct_answer'], list)
                             for answer_html_index, answer_html in enumerate(
-                                    solution_dict['correct_answer']):
+                                solution_dict['correct_answer']
+                            ):
                                 assert isinstance(answer_html, str)
                                 # Here we use cast because above assert
                                 # conditions forces correct_answer to be of
                                 # type List[str].
                                 set_of_html_correct_answer = cast(
-                                    List[str],
-                                    solution_dict['correct_answer']
+                                    List[str], solution_dict['correct_answer']
                                 )
-                                set_of_html_correct_answer[
-                                    answer_html_index] = (
-                                        conversion_fn(answer_html))
+                                set_of_html_correct_answer[answer_html_index] = (
+                                    conversion_fn(answer_html)
+                                )
                         else:
                             raise Exception(
                                 'The solution does not have a valid '
-                                'correct_answer type.')
+                                'correct_answer type.'
+                            )
 
         return solution_dict
 
@@ -686,7 +708,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         default_outcome: Optional[Outcome],
         confirmed_unclassified_answers: List[AnswerGroup],
         hints: List[Hint],
-        solution: Optional[Solution]
+        solution: Optional[Solution],
     ) -> None:
         """Initializes a InteractionInstance domain object.
 
@@ -722,8 +744,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self.solution = solution
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self, **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction instance.
 
@@ -732,37 +753,34 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
+            translation_domain.TranslatableContentsCollection()
+        )
 
         if self.default_outcome is not None:
             (
-                translatable_contents_collection
-                .add_fields_from_translatable_object(self.default_outcome)
+                translatable_contents_collection.add_fields_from_translatable_object(
+                    self.default_outcome
+                )
             )
         for answer_group in self.answer_groups:
             (
-                translatable_contents_collection
-                .add_fields_from_translatable_object(
-                    answer_group,
-                    interaction_id=self.id
+                translatable_contents_collection.add_fields_from_translatable_object(
+                    answer_group, interaction_id=self.id
                 )
             )
         for customization_arg in self.customization_args.values():
             (
-                translatable_contents_collection
-                .add_fields_from_translatable_object(
-                    customization_arg,
-                    interaction_id=self.id)
+                translatable_contents_collection.add_fields_from_translatable_object(
+                    customization_arg, interaction_id=self.id
+                )
             )
         for hint in self.hints:
-            (
-                translatable_contents_collection
-                .add_fields_from_translatable_object(hint)
-            )
+            (translatable_contents_collection.add_fields_from_translatable_object(hint))
         if self.solution is not None:
             (
-                translatable_contents_collection
-                .add_fields_from_translatable_object(self.solution)
+                translatable_contents_collection.add_fields_from_translatable_object(
+                    self.solution
+                )
             )
         return translatable_contents_collection
 
@@ -779,10 +797,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         customization_args_dict = {}
         if self.id:
             for ca_name in self.customization_args:
-                customization_args_dict[ca_name] = (
-                    self.customization_args[
-                        ca_name].to_customization_arg_dict()
-                )
+                customization_args_dict[ca_name] = self.customization_args[
+                    ca_name
+                ].to_customization_arg_dict()
 
         # Consistent with other usages of to_dict() across the codebase, all
         # values below are plain Python data structures and not domain objects,
@@ -795,9 +812,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'default_outcome': (
                 self.default_outcome.to_dict()
                 if self.default_outcome is not None
-                else None),
-            'confirmed_unclassified_answers': (
-                self.confirmed_unclassified_answers),
+                else None
+            ),
+            'confirmed_unclassified_answers': (self.confirmed_unclassified_answers),
             'hints': [hint.to_dict() for hint in self.hints],
             'solution': self.solution.to_dict() if self.solution else None,
         }
@@ -823,24 +840,24 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             object.
         """
         default_outcome_dict = (
-            Outcome.from_dict(
-                interaction_dict['default_outcome'], validate=validate)
-            if interaction_dict['default_outcome'] is not None else None)
+            Outcome.from_dict(interaction_dict['default_outcome'], validate=validate)
+            if interaction_dict['default_outcome'] is not None
+            else None
+        )
         solution_dict = (
             Solution.from_dict(
-                interaction_dict['id'], interaction_dict['solution'],
-                validate=validate)
-            if (
-                interaction_dict['solution'] is not None and
-                interaction_dict['id'] is not None
+                interaction_dict['id'], interaction_dict['solution'], validate=validate
             )
-            else None)
+            if (
+                interaction_dict['solution'] is not None
+                and interaction_dict['id'] is not None
+            )
+            else None
+        )
 
         customization_args = (
-            InteractionInstance
-            .convert_customization_args_dict_to_customization_args(
-                interaction_dict['id'],
-                interaction_dict['customization_args']
+            InteractionInstance.convert_customization_args_dict_to_customization_args(
+                interaction_dict['id'], interaction_dict['customization_args']
             )
         )
 
@@ -848,16 +865,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             interaction_dict['id'],
             customization_args,
             (
-                [AnswerGroup.from_dict(h, validate=validate)
-                for h in interaction_dict['answer_groups']]
+                [
+                    AnswerGroup.from_dict(h, validate=validate)
+                    for h in interaction_dict['answer_groups']
+                ]
             ),
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
-            (
-                [Hint.from_dict(h, validate=validate)
-                for h in interaction_dict['hints']]
-            ),
-            solution_dict)
+            ([Hint.from_dict(h, validate=validate) for h in interaction_dict['hints']]),
+            solution_dict,
+        )
 
     @property
     def is_terminal(self) -> bool:
@@ -868,9 +885,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             bool. Whether the interaction is terminal.
         """
         return bool(
-            self.id and interaction_registry.Registry.get_interaction_by_id(
-                self.id
-            ).is_terminal
+            self.id
+            and interaction_registry.Registry.get_interaction_by_id(self.id).is_terminal
         )
 
     @property
@@ -880,8 +896,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Whether the interaction is linear.
         """
-        return interaction_registry.Registry.get_interaction_by_id(
-            self.id).is_linear
+        return interaction_registry.Registry.get_interaction_by_id(self.id).is_linear
 
     def is_supported_on_android_app(self) -> bool:
         """Determines whether the interaction is a valid interaction that is
@@ -891,8 +906,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             bool. Whether the interaction is supported by the Android app.
         """
         return (
-            self.id is None or
-            self.id in android_validation_constants.VALID_INTERACTION_IDS
+            self.id is None
+            or self.id in android_validation_constants.VALID_INTERACTION_IDS
         )
 
     def is_rte_content_supported_on_android(
@@ -909,14 +924,14 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             bool. Whether the RTE content is valid.
         """
         for answer_group in self.answer_groups:
-            if require_valid_component_names(
-                    answer_group.outcome.feedback.html):
+            if require_valid_component_names(answer_group.outcome.feedback.html):
                 return False
 
         if (
-                self.default_outcome and self.default_outcome.feedback and
-                require_valid_component_names(
-                    self.default_outcome.feedback.html)):
+            self.default_outcome
+            and self.default_outcome.feedback
+            and require_valid_component_names(self.default_outcome.feedback.html)
+        ):
             return False
 
         for hint in self.hints:
@@ -924,9 +939,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 return False
 
         if (
-                self.solution and self.solution.explanation and
-                require_valid_component_names(
-                    self.solution.explanation.html)):
+            self.solution
+            and self.solution.explanation
+            and require_valid_component_names(self.solution.explanation.html)
+        ):
             return False
 
         return True
@@ -952,8 +968,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # is done because here we are accessing 'buttontext' key from continue
         # customization arg whose value is always of SubtitledUnicode type.
         button_text_subtitled_unicode = cast(
-            SubtitledUnicode,
-            self.customization_args['buttonText'].value
+            SubtitledUnicode, self.customization_args['buttonText'].value
         )
         text_value = button_text_subtitled_unicode.unicode_str
         if len(text_value) > 20:
@@ -970,8 +985,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # 'recommendedExplorationIds' key from EndExploration
         # customization arg whose value is always of List[str] type.
         recc_exp_ids = cast(
-            List[str],
-            self.customization_args['recommendedExplorationIds'].value
+            List[str], self.customization_args['recommendedExplorationIds'].value
         )
         if len(recc_exp_ids) > 3:
             raise utils.ValidationError(
@@ -995,16 +1009,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         seen_choices = []
         for choice in choices:
             if html_cleaner.is_html_empty(choice.html):
-                raise utils.ValidationError(
-                    'Choices should be non empty.'
-                )
+                raise utils.ValidationError('Choices should be non empty.')
 
             if choice.html not in seen_choices:
                 seen_choices.append(choice.html)
             else:
-                raise utils.ValidationError(
-                    'Choices should be unique.'
-                )
+                raise utils.ValidationError('Choices should be unique.')
 
     def _set_lower_and_upper_bounds(
         self,
@@ -1013,7 +1023,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         upper_bound: float,
         *,
         lb_inclusive: bool,
-        ub_inclusive: bool
+        ub_inclusive: bool,
     ) -> None:
         """Sets the lower and upper bounds for the range_var.
 
@@ -1047,26 +1057,20 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             within base_range.
         """
         if (
-            base_range['lower_bound'] is None or
-            test_range['lower_bound'] is None or
-            base_range['upper_bound'] is None or
-            test_range['upper_bound'] is None
+            base_range['lower_bound'] is None
+            or test_range['lower_bound'] is None
+            or base_range['upper_bound'] is None
+            or test_range['upper_bound'] is None
         ):
             return False
 
-        lb_satisfied = (
-            base_range['lower_bound'] < test_range['lower_bound'] or
-            (
-                base_range['lower_bound'] == test_range['lower_bound'] and
-                (not test_range['lb_inclusive'] or base_range['lb_inclusive'])
-            )
+        lb_satisfied = base_range['lower_bound'] < test_range['lower_bound'] or (
+            base_range['lower_bound'] == test_range['lower_bound']
+            and (not test_range['lb_inclusive'] or base_range['lb_inclusive'])
         )
-        ub_satisfied = (
-            base_range['upper_bound'] > test_range['upper_bound'] or
-            (
-                base_range['upper_bound'] == test_range['upper_bound'] and
-                (not test_range['ub_inclusive'] or base_range['ub_inclusive'])
-            )
+        ub_satisfied = base_range['upper_bound'] > test_range['upper_bound'] or (
+            base_range['upper_bound'] == test_range['upper_bound']
+            and (not test_range['ub_inclusive'] or base_range['ub_inclusive'])
         )
         return lb_satisfied and ub_satisfied
 
@@ -1084,18 +1088,21 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             bool. Returns True if the rules passes the range criteria check.
         """
         if earlier_rule.rule_type in (
-            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan',
-            'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
+            'HasDenominatorEqualTo',
+            'IsEquivalentTo',
+            'IsLessThan',
+            'IsEquivalentToAndInSimplestForm',
+            'IsGreaterThan',
         ):
             return True
 
         return later_rule.rule_type in (
-            'HasDenominatorEqualTo', 'IsLessThan', 'IsGreaterThan'
+            'HasDenominatorEqualTo',
+            'IsLessThan',
+            'IsGreaterThan',
         )
 
-    def _get_rule_value_of_fraction_interaction(
-        self, rule_spec: RuleSpec
-    ) -> float:
+    def _get_rule_value_of_fraction_interaction(self, rule_spec: RuleSpec) -> float:
         """Returns rule value of the rule_spec of FractionInput interaction so
         that we can keep track of rule's range.
 
@@ -1107,8 +1114,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         rule_value_f = rule_spec.inputs['f']
         value: float = (
-            rule_value_f['wholeNumber'] +
-            float(rule_value_f['numerator']) / rule_value_f['denominator']
+            rule_value_f['wholeNumber']
+            + float(rule_value_f['numerator']) / rule_value_f['denominator']
         )
         return value
 
@@ -1132,9 +1139,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         rule_spec_till_now: List[RuleSpecDict] = []
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs
-            ):
+            for rule_spec_index, rule_spec in enumerate(answer_group.rule_specs):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now and strict:
                     raise utils.ValidationError(
@@ -1151,7 +1156,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     'lower_bound': None,
                     'upper_bound': None,
                     'lb_inclusive': False,
-                    'ub_inclusive': False
+                    'ub_inclusive': False,
                 }
 
                 if rule_spec.rule_type == 'IsLessThanOrEqualTo':
@@ -1161,7 +1166,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         lower_infinity,
                         rule_value,
                         lb_inclusive=False,
-                        ub_inclusive=True
+                        ub_inclusive=True,
                     )
 
                 elif rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
@@ -1171,7 +1176,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         rule_value,
                         upper_infinity,
                         lb_inclusive=True,
-                        ub_inclusive=False
+                        ub_inclusive=False,
                     )
 
                 elif rule_spec.rule_type == 'Equals':
@@ -1181,7 +1186,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         rule_value,
                         rule_value,
                         lb_inclusive=True,
-                        ub_inclusive=True
+                        ub_inclusive=True,
                     )
 
                 elif rule_spec.rule_type == 'IsLessThan':
@@ -1191,7 +1196,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         lower_infinity,
                         rule_value,
                         lb_inclusive=False,
-                        ub_inclusive=False
+                        ub_inclusive=False,
                     )
 
                 elif rule_spec.rule_type == 'IsGreaterThan':
@@ -1201,7 +1206,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         rule_value,
                         upper_infinity,
                         lb_inclusive=False,
-                        ub_inclusive=False
+                        ub_inclusive=False,
                     )
 
                 elif rule_spec.rule_type == 'IsWithinTolerance':
@@ -1220,7 +1225,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         rule_value_x - rule_value_tol,
                         rule_value_x + rule_value_tol,
                         lb_inclusive=True,
-                        ub_inclusive=True
+                        ub_inclusive=True,
                     )
 
                 elif rule_spec.rule_type == 'IsInclusivelyBetween':
@@ -1239,7 +1244,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         rule_value_a,
                         rule_value_b,
                         lb_inclusive=True,
-                        ub_inclusive=True
+                        ub_inclusive=True,
                     )
 
                 for range_ele in ranges:
@@ -1276,31 +1281,28 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 denominator is equal to 'HasDenominatorEqualTo' rule value.
         """
         ranges: List[InteractionInstance.RangeVariableDict] = []
-        matched_denominator_list: List[
-            InteractionInstance.MatchedDenominatorDict] = []
+        matched_denominator_list: List[InteractionInstance.MatchedDenominatorDict] = []
         rule_spec_till_now: List[RuleSpecDict] = []
         inputs_without_fractions = [
             'HasDenominatorEqualTo',
             'HasNumeratorEqualTo',
             'HasIntegerPartEqualTo',
-            'HasNoFractionalPart'
+            'HasNoFractionalPart',
         ]
         rules_that_can_have_improper_fractions = [
             'IsExactlyEqualTo',
-            'HasFractionalPartExactlyEqualTo'
+            'HasFractionalPartExactlyEqualTo',
         ]
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
-        allow_non_zero_integ_part = (
-            self.customization_args['allowNonzeroIntegerPart'].value)
+        allow_non_zero_integ_part = self.customization_args[
+            'allowNonzeroIntegerPart'
+        ].value
         allow_imp_frac = self.customization_args['allowImproperFraction'].value
-        require_simple_form = (
-            self.customization_args['requireSimplestForm'].value)
+        require_simple_form = self.customization_args['requireSimplestForm'].value
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs
-            ):
+            for rule_spec_index, rule_spec in enumerate(answer_group.rule_specs):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now and strict:
                     raise utils.ValidationError(
@@ -1330,12 +1332,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             )
 
                     if (
-                        strict and
-                        not allow_imp_frac and
-                        den <= num and
-                        (
-                            rule_spec.rule_type in
-                            rules_that_can_have_improper_fractions
+                        strict
+                        and not allow_imp_frac
+                        and den <= num
+                        and (
+                            rule_spec.rule_type
+                            in rules_that_can_have_improper_fractions
                         )
                     ):
                         raise utils.ValidationError(
@@ -1353,25 +1355,24 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     'lower_bound': None,
                     'upper_bound': None,
                     'lb_inclusive': False,
-                    'ub_inclusive': False
+                    'ub_inclusive': False,
                 }
-                matched_denominator: (
-                    InteractionInstance.MatchedDenominatorDict
-                ) = {
+                matched_denominator: InteractionInstance.MatchedDenominatorDict = {
                     'ans_group_index': int(ans_group_index),
                     'rule_spec_index': int(rule_spec_index),
-                    'denominator': 0
+                    'denominator': 0,
                 }
 
                 if rule_spec.rule_type in (
-                    'IsEquivalentTo', 'IsExactlyEqualTo',
-                    'IsEquivalentToAndInSimplestForm'
+                    'IsEquivalentTo',
+                    'IsExactlyEqualTo',
+                    'IsEquivalentToAndInSimplestForm',
                 ):
                     if (
-                        rule_spec.rule_type == 'IsExactlyEqualTo' and
-                        not allow_non_zero_integ_part and
-                        whole != 0 and
-                        strict
+                        rule_spec.rule_type == 'IsExactlyEqualTo'
+                        and not allow_non_zero_integ_part
+                        and whole != 0
+                        and strict
                     ):
                         raise utils.ValidationError(
                             f'The rule \'{rule_spec_index}\' of '
@@ -1379,36 +1380,39 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'non zero integer part '
                             f'in FractionInput interaction.'
                         )
-                    rule_value_f = (
-                        self._get_rule_value_of_fraction_interaction(rule_spec))
+                    rule_value_f = self._get_rule_value_of_fraction_interaction(
+                        rule_spec
+                    )
                     self._set_lower_and_upper_bounds(
                         range_var,
                         rule_value_f,
                         rule_value_f,
                         lb_inclusive=True,
-                        ub_inclusive=True
+                        ub_inclusive=True,
                     )
 
                 if rule_spec.rule_type == 'IsGreaterThan':
-                    rule_value_f = (
-                        self._get_rule_value_of_fraction_interaction(rule_spec))
+                    rule_value_f = self._get_rule_value_of_fraction_interaction(
+                        rule_spec
+                    )
                     self._set_lower_and_upper_bounds(
                         range_var,
                         rule_value_f,
                         upper_infinity,
                         lb_inclusive=False,
-                        ub_inclusive=False
+                        ub_inclusive=False,
                     )
 
                 if rule_spec.rule_type == 'IsLessThan':
-                    rule_value_f = (
-                        self._get_rule_value_of_fraction_interaction(rule_spec))
+                    rule_value_f = self._get_rule_value_of_fraction_interaction(
+                        rule_spec
+                    )
                     self._set_lower_and_upper_bounds(
                         range_var,
                         lower_infinity,
                         rule_value_f,
                         lb_inclusive=False,
-                        ub_inclusive=False
+                        ub_inclusive=False,
                     )
 
                 if rule_spec.rule_type == 'HasDenominatorEqualTo':
@@ -1416,15 +1420,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     matched_denominator['denominator'] = rule_value_x
 
                 for range_ele in ranges:
-                    earlier_rule = (
-                        self.answer_groups[range_ele['ans_group_index']]
-                        .rule_specs[range_ele['rule_spec_index']]
-                    )
+                    earlier_rule = self.answer_groups[
+                        range_ele['ans_group_index']
+                    ].rule_specs[range_ele['rule_spec_index']]
                     if (
-                        self._should_check_range_criteria(
-                            earlier_rule, rule_spec) and
-                        self._is_enclosed_by(range_var, range_ele) and
-                        strict
+                        self._should_check_range_criteria(earlier_rule, rule_spec)
+                        and self._is_enclosed_by(range_var, range_ele)
+                        and strict
                     ):
                         raise utils.ValidationError(
                             f'Rule \'{rule_spec_index}\' from answer '
@@ -1439,10 +1441,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 # denominator is equal to `HasDenominatorEqualTo` rule value.
                 for den in matched_denominator_list:
                     if (
-                        den is not None and rule_spec.rule_type ==
-                        'HasFractionalPartExactlyEqualTo' and
-                        den['denominator'] ==
-                        rule_spec.inputs['f']['denominator']
+                        den is not None
+                        and rule_spec.rule_type == 'HasFractionalPartExactlyEqualTo'
+                        and den['denominator'] == rule_spec.inputs['f']['denominator']
                     ):
                         raise utils.ValidationError(
                             f'Rule \'{rule_spec_index}\' from answer '
@@ -1472,9 +1473,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         rule_spec_till_now: List[RuleSpecDict] = []
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs
-            ):
+            for rule_spec_index, rule_spec in enumerate(answer_group.rule_specs):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now and strict:
                     raise utils.ValidationError(
@@ -1488,9 +1487,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 if rule_spec.rule_type == 'IsEquivalentTo':
                     number_with_units_rules.append(rule_spec.inputs['f'])
                 if (
-                    rule_spec.rule_type == 'IsEqualTo' and
-                    rule_spec.inputs['f'] in number_with_units_rules and
-                    strict
+                    rule_spec.rule_type == 'IsEqualTo'
+                    and rule_spec.inputs['f'] in number_with_units_rules
+                    and strict
                 ):
                     raise utils.ValidationError(
                         f'The rule \'{rule_spec_index}\' of answer '
@@ -1517,16 +1516,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # we sure that the type is always going to be List[SubtitledHtml]
         # because 'MultipleChoiceInput' cust. arg objects always contain
         # 'choices' key with List[SubtitledHtml] types of values.
-        choices = cast(
-            List[SubtitledHtml],
-            self.customization_args['choices'].value
-        )
+        choices = cast(List[SubtitledHtml], self.customization_args['choices'].value)
         self._validates_choices_should_be_unique_and_nonempty(choices)
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs
-            ):
+            for rule_spec_index, rule_spec in enumerate(answer_group.rule_specs):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now and strict:
                     raise utils.ValidationError(
@@ -1558,8 +1552,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # customization args always contains 'minAllowableSelectionCount' key
         # with int type of values.
         min_value = cast(
-            int,
-            self.customization_args['minAllowableSelectionCount'].value
+            int, self.customization_args['minAllowableSelectionCount'].value
         )
         # Here we use cast because we are narrowing down the type from
         # various allowed cust. arg types to 'int', and here we are sure
@@ -1567,8 +1560,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # customization args always contains 'maxAllowableSelectionCount' key
         # with int type of values.
         max_value = cast(
-            int,
-            self.customization_args['maxAllowableSelectionCount'].value
+            int, self.customization_args['maxAllowableSelectionCount'].value
         )
         rule_spec_till_now: List[RuleSpecDict] = []
 
@@ -1578,9 +1570,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # List[SubtitledHtml] because 'ItemInputSelection' customization
         # args always contains 'choices' key with List[SubtitledHtml]
         # type of values.
-        choices = cast(
-            List[SubtitledHtml], self.customization_args['choices'].value
-        )
+        choices = cast(List[SubtitledHtml], self.customization_args['choices'].value)
         self._validates_choices_should_be_unique_and_nonempty(choices)
 
         # Minimum number of selections should be no greater than maximum
@@ -1604,9 +1594,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             )
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs
-            ):
+            for rule_spec_index, rule_spec in enumerate(answer_group.rule_specs):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now and strict:
                     raise utils.ValidationError(
@@ -1619,12 +1607,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 # `Equals` should have between min and max number of selections.
                 selected_choices_count = len(rule_spec.inputs['x'])
                 if rule_spec.rule_type == 'Equals':
-                    if (
-                        strict and
-                        (
-                            selected_choices_count < min_value or
-                            selected_choices_count > max_value
-                        )
+                    if strict and (
+                        selected_choices_count < min_value
+                        or selected_choices_count > max_value
                     ):
                         raise utils.ValidationError(
                             f'Selected wrong number of choices in rule '
@@ -1658,9 +1643,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. Less than 2 items are present.
             ValidationError. Answer choices are empty or duplicate.
         """
-        multi_item_value = (
-            self.customization_args
-            ['allowMultipleItemsInSamePosition'].value)
+        multi_item_value = self.customization_args[
+            'allowMultipleItemsInSamePosition'
+        ].value
         ele_x_at_y_rules = []
         rule_spec_till_now: List[RuleSpecDict] = []
         equal_ordering_one_at_incorec_posn = []
@@ -1671,22 +1656,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # List[SubtitledHtml] because 'DragAndDrop' customization
         # args always contains 'choices' key with List[SubtitledHtml]
         # type of values.
-        choices = cast(
-            List[SubtitledHtml],
-            self.customization_args['choices'].value
-        )
+        choices = cast(List[SubtitledHtml], self.customization_args['choices'].value)
         if len(choices) < 2:
             raise utils.ValidationError(
-                'There should be atleast 2 values inside DragAndDrop '
-                'interaction.'
+                'There should be atleast 2 values inside DragAndDrop ' 'interaction.'
             )
 
         self._validates_choices_should_be_unique_and_nonempty(choices)
 
         for ans_group_index, answer_group in enumerate(self.answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group.rule_specs
-            ):
+            for rule_spec_index, rule_spec in enumerate(answer_group.rule_specs):
                 # Rule should not be duplicate.
                 if rule_spec.to_dict() in rule_spec_till_now and strict:
                     raise utils.ValidationError(
@@ -1697,10 +1676,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 rule_spec_till_now.append(rule_spec.to_dict())
 
                 if (
-                    strict and
-                    not multi_item_value and (
-                    rule_spec.rule_type ==
-                    'IsEqualToOrderingWithOneItemAtIncorrectPosition')
+                    strict
+                    and not multi_item_value
+                    and (
+                        rule_spec.rule_type
+                        == 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                    )
                 ):
                     raise utils.ValidationError(
                         f'The rule \'{rule_spec_index}\' '
@@ -1728,9 +1709,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             )
 
                 if (
-                    rule_spec.rule_type == 'HasElementXBeforeElementY' and
-                    rule_spec.inputs['x'] == rule_spec.inputs['y'] and
-                    strict
+                    rule_spec.rule_type == 'HasElementXBeforeElementY'
+                    and rule_spec.inputs['x'] == rule_spec.inputs['y']
+                    and strict
                 ):
                     raise utils.ValidationError(
                         f'The rule \'{rule_spec_index}\' of '
@@ -1744,17 +1725,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 if rule_spec.rule_type == 'HasElementXAtPositionY':
                     element = rule_spec.inputs['x']
                     position = rule_spec.inputs['y']
-                    ele_x_at_y_rules.append(
-                        {'element': element, 'position': position}
-                    )
+                    ele_x_at_y_rules.append({'element': element, 'position': position})
 
                 if (
-                    rule_spec.rule_type ==
-                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                    rule_spec.rule_type
+                    == 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
                 ):
-                    equal_ordering_one_at_incorec_posn.append(
-                        rule_spec.inputs['x']
-                    )
+                    equal_ordering_one_at_incorec_posn.append(rule_spec.inputs['x'])
 
                 if rule_spec.rule_type == 'IsEqualToOrdering':
                     # `IsEqualToOrdering` rule should not have empty values.
@@ -1776,8 +1753,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             if ele_position > len(rule_spec.inputs['x']):
                                 continue
 
-                            rule_choice = rule_spec.inputs['x'][
-                                ele_position - 1]
+                            rule_choice = rule_spec.inputs['x'][ele_position - 1]
                             for choice in rule_choice:
                                 if choice == ele_element:
                                     raise utils.ValidationError(
@@ -1791,9 +1767,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         # `IsEqualToOrderingWithOneItemAtIncorrectPosition` when
                         # they are off by one value.
                         item_to_layer_idx = {}
-                        for layer_idx, layer in enumerate(
-                            rule_spec.inputs['x']
-                        ):
+                        for layer_idx, layer in enumerate(rule_spec.inputs['x']):
                             for item in layer:
                                 item_to_layer_idx[item] = layer_idx
 
@@ -1886,7 +1860,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     )
 
                     seen_strings_contains.append(
-                        rule_spec.inputs['x']['normalizedStrSet'])
+                        rule_spec.inputs['x']['normalizedStrSet']
+                    )
 
                 if rule_spec.rule_type == 'StartsWith':
                     if not strict:
@@ -1898,9 +1873,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     for start_with_rule_ele in seen_strings_startswith:
                         for start_with_rule_string in start_with_rule_ele:
                             for rule_value in rule_values:
-                                if rule_value.startswith(
-                                    start_with_rule_string
-                                ):
+                                if rule_value.startswith(start_with_rule_string):
                                     raise utils.ValidationError(
                                         f'Rule - \'{rule_spec_idx}\' of answer '
                                         f'group - \'{ans_group_idx}\' having '
@@ -1954,9 +1927,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                     for start_with_rule_ele in seen_strings_startswith:
                         for start_with_rule_string in start_with_rule_ele:
                             for rule_value in rule_values:
-                                if rule_value.startswith(
-                                    start_with_rule_string
-                                ):
+                                if rule_value.startswith(start_with_rule_string):
                                     raise utils.ValidationError(
                                         f'Rule - \'{rule_spec_idx}\' of answer '
                                         f'group - \'{ans_group_idx}\' having '
@@ -1971,7 +1942,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
         *,
         tagged_skill_misconception_id_required: bool = False,
-        strict: bool = False
+        strict: bool = False,
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -1990,46 +1961,51 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         if not isinstance(self.id, str):
             raise utils.ValidationError(
-                'Expected interaction id to be a string, received %s' %
-                self.id)
+                'Expected interaction id to be a string, received %s' % self.id
+            )
         try:
-            interaction = interaction_registry.Registry.get_interaction_by_id(
-                self.id)
+            interaction = interaction_registry.Registry.get_interaction_by_id(self.id)
         except KeyError as e:
-            raise utils.ValidationError(
-                'Invalid interaction id: %s' % self.id) from e
+            raise utils.ValidationError('Invalid interaction id: %s' % self.id) from e
 
         self._validate_customization_args()
 
         if not isinstance(self.answer_groups, list):
             raise utils.ValidationError(
-                'Expected answer groups to be a list, received %s.'
-                % self.answer_groups)
+                'Expected answer groups to be a list, received %s.' % self.answer_groups
+            )
         if not self.is_terminal and self.default_outcome is None:
             raise utils.ValidationError(
-                'Non-terminal interactions must have a default outcome.')
+                'Non-terminal interactions must have a default outcome.'
+            )
         if self.is_terminal and self.default_outcome is not None:
             raise utils.ValidationError(
-                'Terminal interactions must not have a default outcome.')
+                'Terminal interactions must not have a default outcome.'
+            )
         if self.is_terminal and self.answer_groups:
             raise utils.ValidationError(
-                'Terminal interactions must not have any answer groups.')
+                'Terminal interactions must not have any answer groups.'
+            )
         if self.is_linear and self.answer_groups:
             raise utils.ValidationError(
-                'Linear interactions must not have any answer groups.')
+                'Linear interactions must not have any answer groups.'
+            )
 
         for answer_group in self.answer_groups:
             answer_group.validate(
-                interaction, exp_param_specs_dict,
+                interaction,
+                exp_param_specs_dict,
                 tagged_skill_misconception_id_required=(
-                    tagged_skill_misconception_id_required))
+                    tagged_skill_misconception_id_required
+                ),
+            )
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
         if not isinstance(self.hints, list):
             raise utils.ValidationError(
-                'Expected hints to be a list, received %s'
-                % self.hints)
+                'Expected hints to be a list, received %s' % self.hints
+            )
         for hint in self.hints:
             hint.validate()
 
@@ -2050,11 +2026,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'MultipleChoiceInput': self._validate_multi_choice_input,
             'ItemSelectionInput': self._validate_item_selec_input,
             'DragAndDropSortInput': self._validate_drag_and_drop_input,
-            'TextInput': self._validate_text_input
+            'TextInput': self._validate_text_input,
         }
         interaction_id_to_non_strict_validation_func = {
             'Continue': self._validate_continue_interaction,
-            'EndExploration': self._validate_end_interaction
+            'EndExploration': self._validate_end_interaction,
         }
 
         if self.id in interaction_id_to_strict_validation_func:
@@ -2076,7 +2052,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(
                 'Expected customization args to be a dict, received %s'
-                % self.customization_args)
+                % self.customization_args
+            )
 
         # customization_args_dict here indicates a dict that maps customization
         # argument names to a customization argument dict, the dict
@@ -2085,10 +2062,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if self.id:
             for ca_name in self.customization_args:
                 try:
-                    customization_args_dict[ca_name] = (
-                        self.customization_args[
-                            ca_name].to_customization_arg_dict()
-                    )
+                    customization_args_dict[ca_name] = self.customization_args[
+                        ca_name
+                    ].to_customization_arg_dict()
                 except AttributeError as e:
                     raise utils.ValidationError(
                         'Expected customization arg value to be a '
@@ -2100,25 +2076,23 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # Because this is a private method and before calling this method we are
         # already checking if interaction_id exists or not.
         assert self.id is not None
-        interaction = interaction_registry.Registry.get_interaction_by_id(
-            self.id)
+        interaction = interaction_registry.Registry.get_interaction_by_id(self.id)
         customization_args_util.validate_customization_args_and_values(
-            'interaction', self.id, customization_args_dict,
-            interaction.customization_arg_specs)
+            'interaction',
+            self.id,
+            customization_args_dict,
+            interaction.customization_arg_specs,
+        )
 
         self.customization_args = (
-            InteractionInstance
-            .convert_customization_args_dict_to_customization_args(
-                self.id,
-                customization_args_dict
+            InteractionInstance.convert_customization_args_dict_to_customization_args(
+                self.id, customization_args_dict
             )
         )
 
     @classmethod
     def create_default_interaction(
-        cls,
-        default_dest_state_name: Optional[str],
-        content_id_for_default_outcome: str
+        cls, default_dest_state_name: Optional[str], content_id_for_default_outcome: str
     ) -> InteractionInstance:
         """Create a default InteractionInstance domain object:
             - customization_args: empty dictionary;
@@ -2140,17 +2114,20 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         default_outcome = Outcome(
             default_dest_state_name,
             None,
-            SubtitledHtml.create_default_subtitled_html(
-                content_id_for_default_outcome), False, [], None, None)
+            SubtitledHtml.create_default_subtitled_html(content_id_for_default_outcome),
+            False,
+            [],
+            None,
+            None,
+        )
 
-        return cls(
-            cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], None)
+        return cls(cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], None)
 
     @staticmethod
     def convert_html_in_interaction(
         interaction_dict: InteractionInstanceDict,
         ca_specs_dict: List[domain.CustomizationArgSpecsDict],
-        conversion_fn: Callable[[str], str]
+        conversion_fn: Callable[[str], str],
     ) -> InteractionInstanceDict:
         """Checks for HTML fields in the interaction and converts it
         according to the conversion function.
@@ -2164,6 +2141,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted interaction dict.
         """
+
         def wrapped_conversion_fn(
             value: SubtitledHtml, schema_obj_type: str
         ) -> SubtitledHtml:
@@ -2189,11 +2167,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # name to InteractionCustomizationArg, so that we can utilize
         # InteractionCustomizationArg helper functions.
         # Then, convert back to original dict format afterwards, at the end.
-        customization_args = (
-            InteractionCustomizationArg
-            .convert_cust_args_dict_to_cust_args_based_on_specs(
-                interaction_dict['customization_args'],
-                ca_specs_dict)
+        customization_args = InteractionCustomizationArg.convert_cust_args_dict_to_cust_args_based_on_specs(
+            interaction_dict['customization_args'], ca_specs_dict
         )
 
         for ca_spec in ca_specs_dict:
@@ -2202,7 +2177,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
                     ca_spec['schema'],
                     customization_args[ca_spec_name].value,
-                    wrapped_conversion_fn
+                    wrapped_conversion_fn,
                 )
             )
 
@@ -2211,8 +2186,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # representation of InteractionCustomizationArg.
         customization_args_dict = {}
         for ca_name in customization_args:
-            customization_args_dict[ca_name] = (
-                customization_args[ca_name].to_customization_arg_dict())
+            customization_args_dict[ca_name] = customization_args[
+                ca_name
+            ].to_customization_arg_dict()
 
         interaction_dict['customization_args'] = customization_args_dict
         return interaction_dict
@@ -2221,7 +2197,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def convert_customization_args_dict_to_customization_args(
         interaction_id: Optional[str],
         customization_args_dict: CustomizationArgsDictType,
-        state_schema_version: int = feconf.CURRENT_STATE_SCHEMA_VERSION
+        state_schema_version: int = feconf.CURRENT_STATE_SCHEMA_VERSION,
     ) -> Dict[str, InteractionCustomizationArg]:
         """Converts customization arguments dictionary to customization
         arguments. This is done by converting each customization argument to a
@@ -2239,25 +2215,20 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             dict. A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
-        all_interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids()
-        )
+        all_interaction_ids = interaction_registry.Registry.get_all_interaction_ids()
         interaction_id_is_valid = interaction_id not in all_interaction_ids
         if interaction_id_is_valid or interaction_id is None:
             return {}
 
         ca_specs_dict = (
-            interaction_registry.Registry
-            .get_all_specs_for_state_schema_version(
-                state_schema_version,
-                can_fetch_latest_specs=True
+            interaction_registry.Registry.get_all_specs_for_state_schema_version(
+                state_schema_version, can_fetch_latest_specs=True
             )[interaction_id]['customization_arg_specs']
         )
 
-        return (
-            InteractionCustomizationArg
-            .convert_cust_args_dict_to_cust_args_based_on_specs(
-                customization_args_dict, ca_specs_dict))
+        return InteractionCustomizationArg.convert_cust_args_dict_to_cust_args_based_on_specs(
+            customization_args_dict, ca_specs_dict
+        )
 
 
 class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
@@ -2270,9 +2241,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         value: UnionOfCustomizationArgsDictValues,
-        schema: Dict[
-            str, Union[SubtitledHtmlDict, SubtitledUnicodeDict, str]
-        ]
+        schema: Dict[str, Union[SubtitledHtmlDict, SubtitledUnicodeDict, str]],
     ) -> None:
         """Initializes a InteractionCustomizationArg domain object.
 
@@ -2284,8 +2253,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.schema = schema
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self, **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction customization args.
 
@@ -2294,7 +2262,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
+            translation_domain.TranslatableContentsCollection()
+        )
 
         subtitled_htmls = self.get_subtitled_html()
         for subtitled_html in subtitled_htmls:
@@ -2303,7 +2272,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                 translation_domain.ContentType.CUSTOMIZATION_ARG,
                 translation_domain.TranslatableContentFormat.HTML,
                 subtitled_html.html,
-                kwargs['interaction_id'])
+                kwargs['interaction_id'],
+            )
 
         subtitled_unicodes = self.get_subtitled_unicode()
         for subtitled_unicode in subtitled_unicodes:
@@ -2312,17 +2282,19 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                 translation_domain.ContentType.CUSTOMIZATION_ARG,
                 translation_domain.TranslatableContentFormat.UNICODE_STRING,
                 subtitled_unicode.unicode_str,
-                kwargs['interaction_id'])
+                kwargs['interaction_id'],
+            )
         return translatable_contents_collection
 
-    def to_customization_arg_dict(self) -> Dict[
-        str, UnionOfCustomizationArgsDictValues
-    ]:
+    def to_customization_arg_dict(
+        self,
+    ) -> Dict[str, UnionOfCustomizationArgsDictValues]:
         """Converts a InteractionCustomizationArgument domain object to a
         customization argument dictionary. This is done by
         traversing the customization argument schema, and converting
         SubtitledUnicode to unicode and SubtitledHtml to html where appropriate.
         """
+
         @overload
         def convert_content_to_dict(
             ca_value: SubtitledHtml, unused_schema_obj_type: str
@@ -2335,7 +2307,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 
         def convert_content_to_dict(
             ca_value: Union[SubtitledHtml, SubtitledUnicode],
-            unused_schema_obj_type: str
+            unused_schema_obj_type: str,
         ) -> Union[SubtitledHtmlDict, SubtitledUnicodeDict]:
             """Conversion function used to convert SubtitledHtml to
             SubtitledHtml dicts and SubtitledUnicode to SubtitledUnicode dicts.
@@ -2355,9 +2327,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 
         return {
             'value': InteractionCustomizationArg.traverse_by_schema_and_convert(
-                self.schema,
-                copy.deepcopy(self.value),
-                convert_content_to_dict
+                self.schema, copy.deepcopy(self.value), convert_content_to_dict
             )
         }
 
@@ -2368,7 +2338,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     def from_customization_arg_dict(
         cls,
         ca_dict: Dict[str, UnionOfCustomizationArgsDictValues],
-        ca_schema: Dict[str, Any]
+        ca_schema: Dict[str, Any],
     ) -> InteractionCustomizationArg:
         """Converts a customization argument dictionary to an
         InteractionCustomizationArgument domain object. This is done by
@@ -2385,16 +2355,15 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             InteractionCustomizationArg. The customization argument domain
             object.
         """
+
         @overload
         def convert_content_to_domain_obj(
-            ca_value: Dict[str, str],
-            schema_obj_type: Literal['SubtitledUnicode']
+            ca_value: Dict[str, str], schema_obj_type: Literal['SubtitledUnicode']
         ) -> SubtitledUnicode: ...
 
         @overload
         def convert_content_to_domain_obj(
-            ca_value: Dict[str, str],
-            schema_obj_type: Literal['SubtitledHtml']
+            ca_value: Dict[str, str], schema_obj_type: Literal['SubtitledHtml']
         ) -> SubtitledHtml: ...
 
         def convert_content_to_domain_obj(
@@ -2412,24 +2381,17 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             Returns:
                 dict. The unmodified customization argument value.
             """
-            if (
-                    schema_obj_type ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
-            ):
-                class_obj: Union[
-                    SubtitledUnicode, SubtitledHtml
-                ] = SubtitledUnicode(
-                    ca_value['content_id'], ca_value['unicode_str'])
+            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE:
+                class_obj: Union[SubtitledUnicode, SubtitledHtml] = SubtitledUnicode(
+                    ca_value['content_id'], ca_value['unicode_str']
+                )
 
             if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
-                class_obj = SubtitledHtml(
-                    ca_value['content_id'], ca_value['html'])
+                class_obj = SubtitledHtml(ca_value['content_id'], ca_value['html'])
             return class_obj
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
-            ca_schema,
-            copy.deepcopy(ca_dict['value']),
-            convert_content_to_domain_obj
+            ca_schema, copy.deepcopy(ca_dict['value']), convert_content_to_domain_obj
         )
 
         return cls(ca_value, ca_schema)
@@ -2444,7 +2406,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             self.schema,
             self.value,
             [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
-            lambda x: x
+            lambda x: x,
         )
 
     def get_subtitled_html(self) -> List[SubtitledHtml]:
@@ -2457,7 +2419,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             self.schema,
             self.value,
             [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-            lambda x: x
+            lambda x: x,
         )
 
     def get_content_ids(self) -> List[str]:
@@ -2470,15 +2432,18 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         return InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
             self.value,
-            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
-             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-            lambda x: x.content_id
+            [
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML,
+            ],
+            lambda x: x.content_id,
         )
 
     def validate_subtitled_html(self) -> None:
         """Calls the validate method on all SubtitledHtml domain objects in
         the customization arguments.
         """
+
         def validate_html(subtitled_html: SubtitledHtml) -> None:
             """A dummy value extractor that calls the validate method on
             the passed SubtitledHtml domain object.
@@ -2489,7 +2454,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             self.schema,
             self.value,
             [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-            validate_html
+            validate_html,
         )
 
     # Here we use type Any because the argument `schema` can accept
@@ -2499,7 +2464,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     def traverse_by_schema_and_convert(
         schema: Dict[str, Any],
         value: _GenericCustomizationArgType,
-        conversion_fn: AcceptableConversionFnType
+        conversion_fn: AcceptableConversionFnType,
     ) -> _GenericCustomizationArgType:
         """Helper function that recursively traverses an interaction
         customization argument spec to locate any SubtitledHtml or
@@ -2521,13 +2486,13 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             dict. The converted customization dict.
         """
         is_subtitled_html_spec = (
-            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
-            schema['obj_type'] ==
-            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
+            and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
+        )
         is_subtitled_unicode_spec = (
-            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
-            schema['obj_type'] ==
-            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
+            and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+        )
 
         if is_subtitled_html_spec or is_subtitled_unicode_spec:
             # Here we use MyPy ignore because here we are assigning
@@ -2540,10 +2505,9 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             # to generic type variable.
             value = [  # type: ignore[assignment]
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
-                    schema['items'],
-                    value_element,
-                    conversion_fn
-                ) for value_element in value
+                    schema['items'], value_element, conversion_fn
+                )
+                for value_element in value
             ]
         elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
             assert isinstance(value, dict)
@@ -2551,9 +2515,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                 name = property_spec['name']
                 value[name] = (
                     InteractionCustomizationArg.traverse_by_schema_and_convert(
-                        property_spec['schema'],
-                        value[name],
-                        conversion_fn)
+                        property_spec['schema'], value[name], conversion_fn
+                    )
                 )
 
         return value
@@ -2568,7 +2531,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         schema: Dict[str, Any],
         value: Any,
         obj_types_to_search_for: List[str],
-        value_extractor: Union[Callable[..., str], Callable[..., None]]
+        value_extractor: Union[Callable[..., str], Callable[..., None]],
     ) -> List[Any]:
         """Recursively traverses an interaction customization argument spec to
         locate values with schema obj_type in obj_types_to_search_for, and
@@ -2599,33 +2562,45 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         schema_type = schema['type']
 
         if (
-                schema_type == schema_utils.SCHEMA_TYPE_CUSTOM and
-                schema['obj_type'] in obj_types_to_search_for
+            schema_type == schema_utils.SCHEMA_TYPE_CUSTOM
+            and schema['obj_type'] in obj_types_to_search_for
         ):
             result.append(value_extractor(value))
         elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
-            result = list(itertools.chain.from_iterable([
-                InteractionCustomizationArg.traverse_by_schema_and_get(
-                    schema['items'],
-                    value_element,
-                    obj_types_to_search_for,
-                    value_extractor
-                ) for value_element in value]))
+            result = list(
+                itertools.chain.from_iterable(
+                    [
+                        InteractionCustomizationArg.traverse_by_schema_and_get(
+                            schema['items'],
+                            value_element,
+                            obj_types_to_search_for,
+                            value_extractor,
+                        )
+                        for value_element in value
+                    ]
+                )
+            )
         elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
-            result = list(itertools.chain.from_iterable([
-                InteractionCustomizationArg.traverse_by_schema_and_get(
-                    property_spec['schema'],
-                    value[property_spec['name']],
-                    obj_types_to_search_for,
-                    value_extractor
-                ) for property_spec in schema['properties']]))
+            result = list(
+                itertools.chain.from_iterable(
+                    [
+                        InteractionCustomizationArg.traverse_by_schema_and_get(
+                            property_spec['schema'],
+                            value[property_spec['name']],
+                            obj_types_to_search_for,
+                            value_extractor,
+                        )
+                        for property_spec in schema['properties']
+                    ]
+                )
+            )
 
         return result
 
     @staticmethod
     def convert_cust_args_dict_to_cust_args_based_on_specs(
         ca_dict: CustomizationArgsDictType,
-        ca_specs_dict: List[domain.CustomizationArgSpecsDict]
+        ca_specs_dict: List[domain.CustomizationArgSpecsDict],
     ) -> Dict[str, InteractionCustomizationArg]:
         """Converts customization arguments dictionary to customization
         arguments. This is done by converting each customization argument to a
@@ -2645,10 +2620,10 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         return {
             spec['name']: (
                 InteractionCustomizationArg.from_customization_arg_dict(
-                    ca_dict[spec['name']],
-                    spec['schema']
+                    ca_dict[spec['name']], spec['schema']
                 )
-            ) for spec in ca_specs_dict
+            )
+            for spec in ca_specs_dict
         }
 
 
@@ -2678,7 +2653,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         labelled_as_correct: bool,
         param_changes: List[param_domain.ParamChange],
         refresher_exploration_id: Optional[str],
-        missing_prerequisite_skill_id: Optional[str]
+        missing_prerequisite_skill_id: Optional[str],
     ) -> None:
         """Initializes a Outcome domain object.
 
@@ -2723,8 +2698,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self, **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the outcome.
 
@@ -2733,13 +2707,15 @@ class Outcome(translation_domain.BaseTranslatableObject):
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
+            translation_domain.TranslatableContentsCollection()
+        )
 
         translatable_contents_collection.add_translatable_field(
             self.feedback.content_id,
             translation_domain.ContentType.FEEDBACK,
             translation_domain.TranslatableContentFormat.HTML,
-            self.feedback.html)
+            self.feedback.html,
+        )
         return translatable_contents_collection
 
     def to_dict(self) -> OutcomeDict:
@@ -2754,9 +2730,10 @@ class Outcome(translation_domain.BaseTranslatableObject):
             'feedback': self.feedback.to_dict(),
             'labelled_as_correct': self.labelled_as_correct,
             'param_changes': [
-                param_change.to_dict() for param_change in self.param_changes],
+                param_change.to_dict() for param_change in self.param_changes
+            ],
             'refresher_exploration_id': self.refresher_exploration_id,
-            'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id
+            'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id,
         }
 
     # TODO(#16467): Remove `validate` argument after validating all Question
@@ -2765,9 +2742,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
     # data is not yet migrated, we do not want to call the validations
     # while we load the Question.
     @classmethod
-    def from_dict(
-        cls, outcome_dict: OutcomeDict, validate: bool = True
-    ) -> Outcome:
+    def from_dict(cls, outcome_dict: OutcomeDict, validate: bool = True) -> Outcome:
         """Return a Outcome domain object from a dict.
 
         Args:
@@ -2785,12 +2760,16 @@ class Outcome(translation_domain.BaseTranslatableObject):
             outcome_dict['dest_if_really_stuck'],
             feedback,
             outcome_dict['labelled_as_correct'],
-            [param_domain.ParamChange(
-                param_change['name'], param_change['generator_id'],
-                param_change['customization_args'])
-             for param_change in outcome_dict['param_changes']],
+            [
+                param_domain.ParamChange(
+                    param_change['name'],
+                    param_change['generator_id'],
+                    param_change['customization_args'],
+                )
+                for param_change in outcome_dict['param_changes']
+            ],
             outcome_dict['refresher_exploration_id'],
-            outcome_dict['missing_prerequisite_skill_id']
+            outcome_dict['missing_prerequisite_skill_id'],
         )
 
     def validate(self) -> None:
@@ -2804,18 +2783,21 @@ class Outcome(translation_domain.BaseTranslatableObject):
         if not isinstance(self.labelled_as_correct, bool):
             raise utils.ValidationError(
                 'The "labelled_as_correct" field should be a boolean, received '
-                '%s' % self.labelled_as_correct)
+                '%s' % self.labelled_as_correct
+            )
 
         if self.missing_prerequisite_skill_id is not None:
             if not isinstance(self.missing_prerequisite_skill_id, str):
                 raise utils.ValidationError(
                     'Expected outcome missing_prerequisite_skill_id to be a '
-                    'string, received %s' % self.missing_prerequisite_skill_id)
+                    'string, received %s' % self.missing_prerequisite_skill_id
+                )
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
                 'Expected outcome param_changes to be a list, received %s'
-                % self.param_changes)
+                % self.param_changes
+            )
         for param_change in self.param_changes:
             param_change.validate()
 
@@ -2823,7 +2805,8 @@ class Outcome(translation_domain.BaseTranslatableObject):
             if not isinstance(self.refresher_exploration_id, str):
                 raise utils.ValidationError(
                     'Expected outcome refresher_exploration_id to be a string, '
-                    'received %s' % self.refresher_exploration_id)
+                    'received %s' % self.refresher_exploration_id
+                )
 
     @staticmethod
     def convert_html_in_outcome(
@@ -2840,8 +2823,9 @@ class Outcome(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted outcome dict.
         """
-        outcome_dict['feedback']['html'] = (
-            conversion_fn(outcome_dict['feedback']['html']))
+        outcome_dict['feedback']['html'] = conversion_fn(
+            outcome_dict['feedback']['html']
+        )
         return outcome_dict
 
 
@@ -2867,7 +2851,7 @@ class Voiceover:
             'filename': self.filename,
             'file_size_bytes': self.file_size_bytes,
             'needs_update': self.needs_update,
-            'duration_secs': self.duration_secs
+            'duration_secs': self.duration_secs,
         }
 
     @classmethod
@@ -2885,14 +2869,15 @@ class Voiceover:
             voiceover_dict['filename'],
             voiceover_dict['file_size_bytes'],
             voiceover_dict['needs_update'],
-            voiceover_dict['duration_secs'])
+            voiceover_dict['duration_secs'],
+        )
 
     def __init__(
         self,
         filename: str,
         file_size_bytes: int,
         needs_update: bool,
-        duration_secs: float
+        duration_secs: float,
     ) -> None:
         """Initializes a Voiceover domain object.
 
@@ -2925,41 +2910,39 @@ class Voiceover:
         """
         if not isinstance(self.filename, str):
             raise utils.ValidationError(
-                'Expected audio filename to be a string, received %s' %
-                self.filename)
+                'Expected audio filename to be a string, received %s' % self.filename
+            )
         dot_index = self.filename.rfind('.')
         if dot_index in (-1, 0):
-            raise utils.ValidationError(
-                'Invalid audio filename: %s' % self.filename)
-        extension = self.filename[dot_index + 1:]
+            raise utils.ValidationError('Invalid audio filename: %s' % self.filename)
+        extension = self.filename[dot_index + 1 :]
         if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
-                'the following extensions: %s. Received: %s' % (
-                    list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()),
-                    self.filename))
+                'the following extensions: %s. Received: %s'
+                % (list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()), self.filename)
+            )
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
-                'Expected file size to be an int, received %s' %
-                self.file_size_bytes)
+                'Expected file size to be an int, received %s' % self.file_size_bytes
+            )
         if self.file_size_bytes <= 0:
-            raise utils.ValidationError(
-                'Invalid file size: %s' % self.file_size_bytes)
+            raise utils.ValidationError('Invalid file size: %s' % self.file_size_bytes)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
-                'Expected needs_update to be a bool, received %s' %
-                self.needs_update)
+                'Expected needs_update to be a bool, received %s' % self.needs_update
+            )
         if not isinstance(self.duration_secs, (float, int)):
             raise utils.ValidationError(
-                'Expected duration_secs to be a float, received %s' %
-                self.duration_secs)
+                'Expected duration_secs to be a float, received %s' % self.duration_secs
+            )
         if self.duration_secs < 0:
             raise utils.ValidationError(
                 'Expected duration_secs to be positive number, '
-                'or zero if not yet specified %s' %
-                self.duration_secs)
+                'or zero if not yet specified %s' % self.duration_secs
+            )
 
 
 class RecordedVoiceoversDict(TypedDict):
@@ -2974,9 +2957,7 @@ class RecordedVoiceovers:
     through their content_id.
     """
 
-    def __init__(
-        self, voiceovers_mapping: Dict[str, Dict[str, Voiceover]]
-    ) -> None:
+    def __init__(self, voiceovers_mapping: Dict[str, Dict[str, Voiceover]]) -> None:
         """Initializes a RecordedVoiceovers domain object.
 
         Args:
@@ -2993,13 +2974,10 @@ class RecordedVoiceovers:
             dict. A dict, mapping all fields of RecordedVoiceovers instance.
         """
         voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]] = {}
-        for (content_id, language_code_to_voiceover) in (
-                self.voiceovers_mapping.items()):
+        for content_id, language_code_to_voiceover in self.voiceovers_mapping.items():
             voiceovers_mapping[content_id] = {}
-            for (language_code, voiceover) in (
-                    language_code_to_voiceover.items()):
-                voiceovers_mapping[content_id][language_code] = (
-                    voiceover.to_dict())
+            for language_code, voiceover in language_code_to_voiceover.items():
+                voiceovers_mapping[content_id][language_code] = voiceover.to_dict()
         recorded_voiceovers_dict: RecordedVoiceoversDict = {
             'voiceovers_mapping': voiceovers_mapping
         }
@@ -3021,13 +2999,14 @@ class RecordedVoiceovers:
             object.
         """
         voiceovers_mapping: Dict[str, Dict[str, Voiceover]] = {}
-        for (content_id, language_code_to_voiceover) in (
-                recorded_voiceovers_dict['voiceovers_mapping'].items()):
+        for content_id, language_code_to_voiceover in recorded_voiceovers_dict[
+            'voiceovers_mapping'
+        ].items():
             voiceovers_mapping[content_id] = {}
-            for (language_code, voiceover) in (
-                    language_code_to_voiceover.items()):
-                voiceovers_mapping[content_id][language_code] = (
-                    Voiceover.from_dict(voiceover))
+            for language_code, voiceover in language_code_to_voiceover.items():
+                voiceovers_mapping[content_id][language_code] = Voiceover.from_dict(
+                    voiceover
+                )
 
         return cls(voiceovers_mapping)
 
@@ -3044,35 +3023,37 @@ class RecordedVoiceovers:
         """
         if expected_content_id_list is not None:
             if not set(self.voiceovers_mapping.keys()) == (
-                    set(expected_content_id_list)):
+                set(expected_content_id_list)
+            ):
                 raise utils.ValidationError(
                     'Expected state recorded_voiceovers to match the listed '
-                    'content ids %s, found %s' % (
-                        expected_content_id_list,
-                        list(self.voiceovers_mapping.keys()))
-                    )
+                    'content ids %s, found %s'
+                    % (expected_content_id_list, list(self.voiceovers_mapping.keys()))
+                )
 
-        for (content_id, language_code_to_voiceover) in (
-                self.voiceovers_mapping.items()):
+        for content_id, language_code_to_voiceover in self.voiceovers_mapping.items():
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
-                    'Expected content_id to be a string, received %s'
-                    % content_id)
+                    'Expected content_id to be a string, received %s' % content_id
+                )
             if not isinstance(language_code_to_voiceover, dict):
                 raise utils.ValidationError(
                     'Expected content_id value to be a dict, received %s'
-                    % language_code_to_voiceover)
-            for (language_code, voiceover) in (
-                    language_code_to_voiceover.items()):
+                    % language_code_to_voiceover
+                )
+            for language_code, voiceover in language_code_to_voiceover.items():
                 if not isinstance(language_code, str):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
-                        % language_code)
-                allowed_language_codes = [language['id'] for language in (
-                    constants.SUPPORTED_AUDIO_LANGUAGES)]
+                        % language_code
+                    )
+                allowed_language_codes = [
+                    language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+                ]
                 if language_code not in allowed_language_codes:
                     raise utils.ValidationError(
-                        'Invalid language_code: %s' % language_code)
+                        'Invalid language_code: %s' % language_code
+                    )
 
                 voiceover.validate()
 
@@ -3103,10 +3084,10 @@ class RecordedVoiceovers:
         """
         if not isinstance(content_id, str):
             raise Exception(
-                'Expected content_id to be a string, received %s' % content_id)
+                'Expected content_id to be a string, received %s' % content_id
+            )
         if content_id in self.voiceovers_mapping:
-            raise Exception(
-                'The content_id %s already exist.' % content_id)
+            raise Exception('The content_id %s already exist.' % content_id)
 
         self.voiceovers_mapping[content_id] = {}
 
@@ -3123,10 +3104,10 @@ class RecordedVoiceovers:
         """
         if not isinstance(content_id, str):
             raise Exception(
-                'Expected content_id to be a string, received %s' % content_id)
+                'Expected content_id to be a string, received %s' % content_id
+            )
         if content_id not in self.voiceovers_mapping:
-            raise Exception(
-                'The content_id %s does not exist.' % content_id)
+            raise Exception('The content_id %s does not exist.' % content_id)
 
         self.voiceovers_mapping.pop(content_id, None)
 
@@ -3142,9 +3123,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     """Value object representing a rule specification."""
 
     def __init__(
-        self,
-        rule_type: str,
-        inputs: Mapping[str, AllowedRuleSpecInputTypes]
+        self, rule_type: str, inputs: Mapping[str, AllowedRuleSpecInputTypes]
     ) -> None:
         """Initializes a RuleSpec domain object.
 
@@ -3165,8 +3144,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.inputs = inputs
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self, **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the rule spec.
 
@@ -3175,27 +3153,28 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
+            translation_domain.TranslatableContentsCollection()
+        )
 
         for input_value in self.inputs.values():
             if 'normalizedStrSet' in input_value:
                 translatable_contents_collection.add_translatable_field(
                     input_value['contentId'],
                     translation_domain.ContentType.RULE,
-                    translation_domain.TranslatableContentFormat
-                    .SET_OF_NORMALIZED_STRING,
+                    translation_domain.TranslatableContentFormat.SET_OF_NORMALIZED_STRING,
                     input_value['normalizedStrSet'],
                     kwargs['interaction_id'],
-                    self.rule_type)
+                    self.rule_type,
+                )
             if 'unicodeStrSet' in input_value:
                 translatable_contents_collection.add_translatable_field(
                     input_value['contentId'],
                     translation_domain.ContentType.RULE,
-                    translation_domain.TranslatableContentFormat
-                    .SET_OF_UNICODE_STRING,
+                    translation_domain.TranslatableContentFormat.SET_OF_UNICODE_STRING,
                     input_value['unicodeStrSet'],
                     kwargs['interaction_id'],
-                    self.rule_type)
+                    self.rule_type,
+                )
         return translatable_contents_collection
 
     def to_dict(self) -> RuleSpecDict:
@@ -3219,15 +3198,12 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         Returns:
             RuleSpec. The corresponding RuleSpec domain object.
         """
-        return cls(
-            rulespec_dict['rule_type'],
-            rulespec_dict['inputs']
-        )
+        return cls(rulespec_dict['rule_type'], rulespec_dict['inputs'])
 
     def validate(
         self,
         rule_params_list: List[Tuple[str, Type[objects.BaseObject]]],
-        exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
+        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
     ) -> None:
         """Validates a RuleSpec value object. It ensures the inputs dict does
         not refer to any non-existent parameters and that it contains values
@@ -3253,7 +3229,8 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         """
         if not isinstance(self.inputs, dict):
             raise utils.ValidationError(
-                'Expected inputs to be a dict, received %s' % self.inputs)
+                'Expected inputs to be a dict, received %s' % self.inputs
+            )
         input_key_set = set(self.inputs.keys())
         param_names_set = set(rp[0] for rp in rule_params_list)
         leftover_input_keys = input_key_set - param_names_set
@@ -3263,16 +3240,18 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         if leftover_input_keys:
             logging.warning(
                 'RuleSpec \'%s\' has inputs which are not recognized '
-                'parameter names: %s' % (self.rule_type, leftover_input_keys))
+                'parameter names: %s' % (self.rule_type, leftover_input_keys)
+            )
 
         # Check if there are missing parameters.
         if leftover_param_names:
             raise utils.ValidationError(
                 'RuleSpec \'%s\' is missing inputs: %s'
-                % (self.rule_type, leftover_param_names))
+                % (self.rule_type, leftover_param_names)
+            )
 
         rule_params_dict = {rp[0]: rp[1] for rp in rule_params_list}
-        for (param_name, param_value) in self.inputs.items():
+        for param_name, param_value in self.inputs.items():
             param_obj = rule_params_dict[param_name]
             # Validate the parameter type given the value.
             if isinstance(param_value, str) and '{{' in param_value:
@@ -3280,14 +3259,14 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                 # the parameter spec with the rule parameter.
                 start_brace_index = param_value.index('{{') + 2
                 end_brace_index = param_value.index('}}')
-                param_spec_name = param_value[
-                    start_brace_index:end_brace_index]
+                param_spec_name = param_value[start_brace_index:end_brace_index]
                 if param_spec_name not in exp_param_specs_dict:
                     raise utils.ValidationError(
                         'RuleSpec \'%s\' has an input with name \'%s\' which '
                         'refers to an unknown parameter within the '
-                        'exploration: %s' % (
-                            self.rule_type, param_name, param_spec_name))
+                        'exploration: %s'
+                        % (self.rule_type, param_name, param_spec_name)
+                    )
                 # TODO(bhenning): The obj_type of the param_spec
                 # (exp_param_specs_dict[param_spec_name]) should be validated
                 # to be the same as param_obj.__name__ to ensure the rule spec
@@ -3303,7 +3282,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         conversion_fn: Callable[[str], str],
         html_field_types_to_rule_specs: Dict[
             str, rules_registry.RuleSpecsExtensionDict
-        ]
+        ],
     ) -> RuleSpecDict:
         """Checks for HTML fields in a Rule Spec and converts it according
         to the conversion function.
@@ -3333,35 +3312,30 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         # been fixed, because this method has no reference to the interaction
         # type and draft changes use this method. The rules_index_dict below
         # is used to figure out the assembly of the html in the rulespecs.
-        for interaction_and_rule_details in (
-                html_field_types_to_rule_specs.values()):
+        for interaction_and_rule_details in html_field_types_to_rule_specs.values():
             rule_type_has_html = (
-                rule_spec_dict['rule_type'] in
-                interaction_and_rule_details['ruleTypes'].keys())
+                rule_spec_dict['rule_type']
+                in interaction_and_rule_details['ruleTypes'].keys()
+            )
             if rule_type_has_html:
                 html_type_format = interaction_and_rule_details['format']
-                input_variables_from_html_mapping = (
-                    interaction_and_rule_details['ruleTypes'][
-                        rule_spec_dict['rule_type']][
-                            'htmlInputVariables'])
+                input_variables_from_html_mapping = interaction_and_rule_details[
+                    'ruleTypes'
+                ][rule_spec_dict['rule_type']]['htmlInputVariables']
                 input_variable_match_found = False
                 for input_variable in rule_spec_dict['inputs'].keys():
                     if input_variable in input_variables_from_html_mapping:
                         input_variable_match_found = True
-                        rule_input_variable = (
-                            rule_spec_dict['inputs'][input_variable])
-                        if (html_type_format ==
-                                feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
-                            input_value = (
-                                rule_spec_dict['inputs'][input_variable]
-                            )
+                        rule_input_variable = rule_spec_dict['inputs'][input_variable]
+                        if html_type_format == feconf.HTML_RULE_VARIABLE_FORMAT_STRING:
+                            input_value = rule_spec_dict['inputs'][input_variable]
                             # Ruling out the possibility of any other type for
                             # mypy type checking.
                             assert isinstance(input_value, str)
-                            rule_spec_dict['inputs'][input_variable] = (
-                                conversion_fn(input_value))
-                        elif (html_type_format ==
-                              feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                            rule_spec_dict['inputs'][input_variable] = conversion_fn(
+                                input_value
+                            )
+                        elif html_type_format == feconf.HTML_RULE_VARIABLE_FORMAT_SET:
                             # Here we are checking the type of the
                             # rule_specs.inputs because the rule type
                             # 'Equals' is used by other interactions as
@@ -3369,48 +3343,50 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                             # a reference to the interaction ID.
                             if isinstance(rule_input_variable, list):
                                 for value_index, value in enumerate(
-                                        rule_input_variable):
+                                    rule_input_variable
+                                ):
                                     if isinstance(value, str):
                                         # Here we use cast because above assert
                                         # conditions forces 'inputs' to be of
                                         # type Dict[str, List[str]].
                                         variable_format_set_input = cast(
                                             Dict[str, List[str]],
-                                            rule_spec_dict['inputs']
+                                            rule_spec_dict['inputs'],
                                         )
-                                        variable_format_set_input[
-                                            input_variable][value_index] = (
-                                                conversion_fn(value))
-                        elif (html_type_format ==
-                              feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
-                            input_variable_list = (
-                                rule_spec_dict['inputs'][input_variable]
-                            )
+                                        variable_format_set_input[input_variable][
+                                            value_index
+                                        ] = conversion_fn(value)
+                        elif (
+                            html_type_format
+                            == feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+                        ):
+                            input_variable_list = rule_spec_dict['inputs'][
+                                input_variable
+                            ]
                             # Ruling out the possibility of any other type for
                             # mypy type checking.
                             assert isinstance(input_variable_list, list)
-                            for list_index, html_list in enumerate(
-                                    input_variable_list):
-                                for rule_html_index, rule_html in enumerate(
-                                        html_list):
+                            for list_index, html_list in enumerate(input_variable_list):
+                                for rule_html_index, rule_html in enumerate(html_list):
                                     # Here we use cast because above assert
                                     # conditions forces 'inputs' to be of
                                     # type Dict[str, List[List[str]]].
                                     list_of_sets_inputs = cast(
                                         Dict[str, List[List[str]]],
-                                        rule_spec_dict['inputs']
+                                        rule_spec_dict['inputs'],
                                     )
-                                    list_of_sets_inputs[input_variable][
-                                        list_index][rule_html_index] = (
-                                            conversion_fn(rule_html))
+                                    list_of_sets_inputs[input_variable][list_index][
+                                        rule_html_index
+                                    ] = conversion_fn(rule_html)
                         else:
                             raise Exception(
-                                'The rule spec does not belong to a valid'
-                                ' format.')
+                                'The rule spec does not belong to a valid' ' format.'
+                            )
                 if not input_variable_match_found:
                     raise Exception(
                         'Rule spec should have at least one valid input '
-                        'variable with Html in it.')
+                        'variable with Html in it.'
+                    )
 
         return rule_spec_dict
 
@@ -3425,11 +3401,7 @@ class SubtitledHtmlDict(TypedDict):
 class SubtitledHtml:
     """Value object representing subtitled HTML."""
 
-    def __init__(
-        self,
-        content_id: str,
-        html: str
-    ) -> None:
+    def __init__(self, content_id: str, html: str) -> None:
         """Initializes a SubtitledHtml domain object. Note that initializing
         the SubtitledHtml object does not clean the html. This is because we
         sometimes need to initialize SubtitledHtml and migrate the contained
@@ -3456,10 +3428,7 @@ class SubtitledHtml:
         Returns:
             dict. A dict, mapping all fields of SubtitledHtml instance.
         """
-        return {
-            'content_id': self.content_id,
-            'html': self.html
-        }
+        return {'content_id': self.content_id, 'html': self.html}
 
     @classmethod
     def from_dict(cls, subtitled_html_dict: SubtitledHtmlDict) -> SubtitledHtml:
@@ -3472,8 +3441,7 @@ class SubtitledHtml:
         Returns:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
-        return cls(
-            subtitled_html_dict['content_id'], subtitled_html_dict['html'])
+        return cls(subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
     def validate(self) -> None:
         """Validates properties of the SubtitledHtml, and cleans the html.
@@ -3484,12 +3452,11 @@ class SubtitledHtml:
         """
         if not isinstance(self.content_id, str):
             raise utils.ValidationError(
-                'Expected content id to be a string, received %s' %
-                self.content_id)
+                'Expected content id to be a string, received %s' % self.content_id
+            )
 
         if not isinstance(self.html, str):
-            raise utils.ValidationError(
-                'Invalid content HTML: %s' % self.html)
+            raise utils.ValidationError('Invalid content HTML: %s' % self.html)
 
         self.html = html_cleaner.clean(self.html)
 
@@ -3538,10 +3505,7 @@ class SubtitledUnicode:
         Returns:
             dict. A dict, mapping all fields of SubtitledUnicode instance.
         """
-        return {
-            'content_id': self.content_id,
-            'unicode_str': self.unicode_str
-        }
+        return {'content_id': self.content_id, 'unicode_str': self.unicode_str}
 
     @classmethod
     def from_dict(
@@ -3557,8 +3521,7 @@ class SubtitledUnicode:
             SubtitledUnicode. The corresponding SubtitledUnicode domain object.
         """
         return cls(
-            subtitled_unicode_dict['content_id'],
-            subtitled_unicode_dict['unicode_str']
+            subtitled_unicode_dict['content_id'], subtitled_unicode_dict['unicode_str']
         )
 
     def validate(self) -> None:
@@ -3570,17 +3533,16 @@ class SubtitledUnicode:
         """
         if not isinstance(self.content_id, str):
             raise utils.ValidationError(
-                'Expected content id to be a string, received %s' %
-                self.content_id)
+                'Expected content id to be a string, received %s' % self.content_id
+            )
 
         if not isinstance(self.unicode_str, str):
             raise utils.ValidationError(
-                'Invalid content unicode: %s' % self.unicode_str)
+                'Invalid content unicode: %s' % self.unicode_str
+            )
 
     @classmethod
-    def create_default_subtitled_unicode(
-        cls, content_id: str
-    ) -> SubtitledUnicode:
+    def create_default_subtitled_unicode(cls, content_id: str) -> SubtitledUnicode:
         """Create a default SubtitledUnicode domain object.
 
         Args:
@@ -3596,17 +3558,17 @@ DomainObjectCustomizationArgsConversionFnTypes = Union[
     Callable[[SubtitledHtml, str], SubtitledHtml],
     Callable[[SubtitledHtml, str], SubtitledHtmlDict],
     Callable[[SubtitledUnicode, str], SubtitledUnicodeDict],
-    Callable[[SubtitledHtml, str], List[str]]
+    Callable[[SubtitledHtml, str], List[str]],
 ]
 
 DictCustomizationArgsConversionFnTypes = Union[
     Callable[[Dict[str, str], Literal['SubtitledUnicode']], SubtitledUnicode],
-    Callable[[Dict[str, str], Literal['SubtitledHtml']], SubtitledHtml]
+    Callable[[Dict[str, str], Literal['SubtitledHtml']], SubtitledHtml],
 ]
 
 AcceptableConversionFnType = Union[
     DomainObjectCustomizationArgsConversionFnTypes,
-    DictCustomizationArgsConversionFnTypes
+    DictCustomizationArgsConversionFnTypes,
 ]
 
 
@@ -3637,7 +3599,7 @@ class State(translation_domain.BaseTranslatableObject):
         card_is_checkpoint: bool,
         linked_skill_id: Optional[str] = None,
         classifier_model_id: Optional[str] = None,
-        inapplicable_skill_misconception_ids: Optional[List[str]] = None
+        inapplicable_skill_misconception_ids: Optional[List[str]] = None,
     ) -> None:
         """Initializes a State domain object.
 
@@ -3666,16 +3628,24 @@ class State(translation_domain.BaseTranslatableObject):
         # The content displayed to the reader in this state.
         self.content = content
         # Parameter changes associated with this state.
-        self.param_changes = [param_domain.ParamChange(
-            param_change.name, param_change.generator.id,
-            param_change.customization_args
-        ) for param_change in param_changes]
+        self.param_changes = [
+            param_domain.ParamChange(
+                param_change.name,
+                param_change.generator.id,
+                param_change.customization_args,
+            )
+            for param_change in param_changes
+        ]
         # The interaction instance associated with this state.
         self.interaction = InteractionInstance(
-            interaction.id, interaction.customization_args,
-            interaction.answer_groups, interaction.default_outcome,
+            interaction.id,
+            interaction.customization_args,
+            interaction.answer_groups,
+            interaction.default_outcome,
             interaction.confirmed_unclassified_answers,
-            interaction.hints, interaction.solution)
+            interaction.hints,
+            interaction.solution,
+        )
         self.classifier_model_id = classifier_model_id
         self.recorded_voiceovers = recorded_voiceovers
         self.linked_skill_id = linked_skill_id
@@ -3688,8 +3658,7 @@ class State(translation_domain.BaseTranslatableObject):
         )
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self, **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the state.
 
@@ -3698,15 +3667,18 @@ class State(translation_domain.BaseTranslatableObject):
             An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
+            translation_domain.TranslatableContentsCollection()
+        )
 
         translatable_contents_collection.add_translatable_field(
             self.content.content_id,
             translation_domain.ContentType.CONTENT,
             translation_domain.TranslatableContentFormat.HTML,
-            self.content.html)
+            self.content.html,
+        )
         translatable_contents_collection.add_fields_from_translatable_object(
-            self.interaction)
+            self.interaction
+        )
         return translatable_contents_collection
 
     def validate(
@@ -3715,7 +3687,7 @@ class State(translation_domain.BaseTranslatableObject):
         allow_null_interaction: bool,
         *,
         tagged_skill_misconception_id_required: bool = False,
-        strict: bool = False
+        strict: bool = False,
     ) -> None:
         """Validates various properties of the State.
 
@@ -3746,35 +3718,43 @@ class State(translation_domain.BaseTranslatableObject):
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
                 'Expected state param_changes to be a list, received %s'
-                % self.param_changes)
+                % self.param_changes
+            )
         for param_change in self.param_changes:
             param_change.validate()
 
         if not allow_null_interaction and self.interaction.id is None:
             raise utils.ValidationError(
-                'This state does not have any interaction specified.')
+                'This state does not have any interaction specified.'
+            )
         if self.interaction.id is not None:
             self.interaction.validate(
                 param_specs_dict,
                 tagged_skill_misconception_id_required=(
-                    tagged_skill_misconception_id_required),
-                strict=strict)
+                    tagged_skill_misconception_id_required
+                ),
+                strict=strict,
+            )
 
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
                 'Expected solicit_answer_details to be a boolean, '
-                'received %s' % self.solicit_answer_details)
+                'received %s' % self.solicit_answer_details
+            )
         if self.solicit_answer_details:
             if self.interaction.id in (
-                    constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
+                constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS
+            ):
                 raise utils.ValidationError(
                     'The %s interaction does not support soliciting '
-                    'answer details from learners.' % (self.interaction.id))
+                    'answer details from learners.' % (self.interaction.id)
+                )
 
         if not isinstance(self.card_is_checkpoint, bool):
             raise utils.ValidationError(
                 'Expected card_is_checkpoint to be a boolean, '
-                'received %s' % self.card_is_checkpoint)
+                'received %s' % self.card_is_checkpoint
+            )
 
         self.recorded_voiceovers.validate(self.get_translatable_content_ids())
 
@@ -3782,13 +3762,14 @@ class State(translation_domain.BaseTranslatableObject):
             if not isinstance(self.linked_skill_id, str):
                 raise utils.ValidationError(
                     'Expected linked_skill_id to be a str, '
-                    'received %s.' % self.linked_skill_id)
+                    'received %s.' % self.linked_skill_id
+                )
 
         if not isinstance(self.inapplicable_skill_misconception_ids, list):
             raise utils.ValidationError(
                 'Expected inapplicable_skill_misconception_ids to be a '
-                'list, received %s.'
-                % self.inapplicable_skill_misconception_ids)
+                'list, received %s.' % self.inapplicable_skill_misconception_ids
+            )
 
     def is_rte_content_supported_on_android(self) -> bool:
         """Checks whether the RTE components used in the state are supported by
@@ -3797,6 +3778,7 @@ class State(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Whether the RTE components in the state is valid.
         """
+
         def require_valid_component_names(html: str) -> bool:
             """Checks if the provided html string contains only allowed
             RTE tags.
@@ -3810,16 +3792,20 @@ class State(translation_domain.BaseTranslatableObject):
             component_name_prefix = 'oppia-noninteractive-'
             component_names = set(
                 component['id'].replace(component_name_prefix, '')
-                for component in html_cleaner.get_rte_components(html))
-            return any(component_names.difference(
-                android_validation_constants.VALID_RTE_COMPONENTS))
+                for component in html_cleaner.get_rte_components(html)
+            )
+            return any(
+                component_names.difference(
+                    android_validation_constants.VALID_RTE_COMPONENTS
+                )
+            )
 
-        if self.content and require_valid_component_names(
-                self.content.html):
+        if self.content and require_valid_component_names(self.content.html):
             return False
 
         return self.interaction.is_rte_content_supported_on_android(
-            require_valid_component_names)
+            require_valid_component_names
+        )
 
     def get_training_data(self) -> List[TrainingDataDict]:
         """Retrieves training data from the State domain object.
@@ -3831,20 +3817,18 @@ class State(translation_domain.BaseTranslatableObject):
             training data.
         """
         state_training_data_by_answer_group: List[TrainingDataDict] = []
-        for (answer_group_index, answer_group) in enumerate(
-                self.interaction.answer_groups):
+        for answer_group_index, answer_group in enumerate(
+            self.interaction.answer_groups
+        ):
             if answer_group.training_data:
                 answers = copy.deepcopy(answer_group.training_data)
-                state_training_data_by_answer_group.append({
-                    'answer_group_index': answer_group_index,
-                    'answers': answers
-                })
+                state_training_data_by_answer_group.append(
+                    {'answer_group_index': answer_group_index, 'answers': answers}
+                )
         return state_training_data_by_answer_group
 
     @classmethod
-    def convert_state_dict_to_yaml(
-        cls, state_dict: StateDict, width: int
-    ) -> str:
+    def convert_state_dict_to_yaml(cls, state_dict: StateDict, width: int) -> str:
         """Converts the given state dict to yaml format.
 
         Args:
@@ -3888,12 +3872,14 @@ class State(translation_domain.BaseTranslatableObject):
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
         content_ids_for_voiceovers = (
-            self.recorded_voiceovers.get_content_ids_for_voiceovers())
+            self.recorded_voiceovers.get_content_ids_for_voiceovers()
+        )
         for content_id in content_ids_to_delete:
             if not content_id in content_ids_for_voiceovers:
                 raise Exception(
                     'The content_id %s does not exist in recorded_voiceovers.'
-                    % content_id)
+                    % content_id
+                )
 
             self.recorded_voiceovers.delete_content_id_for_voiceover(content_id)
 
@@ -3901,7 +3887,8 @@ class State(translation_domain.BaseTranslatableObject):
             if content_id in content_ids_for_voiceovers:
                 raise Exception(
                     'The content_id %s already exists in recorded_voiceovers'
-                    % content_id)
+                    % content_id
+                )
 
             self.recorded_voiceovers.add_content_id_for_voiceover(content_id)
 
@@ -3914,8 +3901,7 @@ class State(translation_domain.BaseTranslatableObject):
         old_content_id = self.content.content_id
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = content
-        self._update_content_ids_in_assets(
-            [old_content_id], [self.content.content_id])
+        self._update_content_ids_in_assets([old_content_id], [self.content.content_id])
 
     def update_param_changes(
         self, param_changes: List[param_domain.ParamChange]
@@ -3936,8 +3922,9 @@ class State(translation_domain.BaseTranslatableObject):
         """
         if self.interaction.id:
             old_content_id_list = [
-                answer_group.outcome.feedback.content_id for answer_group in (
-                    self.interaction.answer_groups)]
+                answer_group.outcome.feedback.content_id
+                for answer_group in (self.interaction.answer_groups)
+            ]
 
             for answer_group in self.interaction.answer_groups:
                 for rule_spec in answer_group.rule_specs:
@@ -3945,16 +3932,13 @@ class State(translation_domain.BaseTranslatableObject):
                         param_type = (
                             interaction_registry.Registry.get_interaction_by_id(
                                 self.interaction.id
-                            ).get_rule_param_type(
-                                rule_spec.rule_type, param_name))
+                            ).get_rule_param_type(rule_spec.rule_type, param_name)
+                        )
 
-                        if issubclass(
-                                param_type, objects.BaseTranslatableObject
-                        ):
+                        if issubclass(param_type, objects.BaseTranslatableObject):
                             old_content_id_list.append(value['contentId'])
 
-            self._update_content_ids_in_assets(
-                old_content_id_list, [])
+            self._update_content_ids_in_assets(old_content_id_list, [])
 
         self.interaction.id = interaction_id
         self.interaction.answer_groups = []
@@ -3968,8 +3952,7 @@ class State(translation_domain.BaseTranslatableObject):
         self.linked_skill_id = linked_skill_id
 
     def update_inapplicable_skill_misconception_ids(
-            self,
-            inapplicable_skill_misconception_ids: List[str]
+        self, inapplicable_skill_misconception_ids: List[str]
     ) -> None:
         """Update the inapplicable skill misconception ids attribute.
 
@@ -3978,13 +3961,14 @@ class State(translation_domain.BaseTranslatableObject):
                 list of inapplicable skill misconception ids for state.
         """
         self.inapplicable_skill_misconception_ids = list(
-            set(inapplicable_skill_misconception_ids))
+            set(inapplicable_skill_misconception_ids)
+        )
 
     def update_interaction_customization_args(
         self,
         customization_args_mapping: Mapping[
             str, Mapping[str, UnionOfCustomizationArgsDictValues]
-        ]
+        ],
     ) -> None:
         """Update the customization_args of InteractionInstance domain object.
 
@@ -4006,30 +3990,39 @@ class State(translation_domain.BaseTranslatableObject):
             CustomizationArgsDictType, customization_args_mapping
         )
         customization_args = (
-            InteractionInstance.
-            convert_customization_args_dict_to_customization_args(
-                self.interaction.id,
-                customization_args_dict)
+            InteractionInstance.convert_customization_args_dict_to_customization_args(
+                self.interaction.id, customization_args_dict
+            )
         )
         for ca_name in customization_args:
             customization_args[ca_name].validate_subtitled_html()
 
-        old_content_id_list = list(itertools.chain.from_iterable([
-            self.interaction.customization_args[ca_name].get_content_ids()
-            for ca_name in self.interaction.customization_args]))
+        old_content_id_list = list(
+            itertools.chain.from_iterable(
+                [
+                    self.interaction.customization_args[ca_name].get_content_ids()
+                    for ca_name in self.interaction.customization_args
+                ]
+            )
+        )
 
         self.interaction.customization_args = customization_args
-        new_content_id_list = list(itertools.chain.from_iterable([
-            self.interaction.customization_args[ca_name].get_content_ids()
-            for ca_name in self.interaction.customization_args]))
+        new_content_id_list = list(
+            itertools.chain.from_iterable(
+                [
+                    self.interaction.customization_args[ca_name].get_content_ids()
+                    for ca_name in self.interaction.customization_args
+                ]
+            )
+        )
 
         if len(new_content_id_list) != len(set(new_content_id_list)):
             raise Exception(
                 'All customization argument content_ids should be unique. '
-                'Content ids received: %s' % new_content_id_list)
+                'Content ids received: %s' % new_content_id_list
+            )
 
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
+        self._update_content_ids_in_assets(old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(
         self, answer_groups_list: List[AnswerGroup]
@@ -4046,21 +4039,22 @@ class State(translation_domain.BaseTranslatableObject):
         if not isinstance(answer_groups_list, list):
             raise Exception(
                 'Expected interaction_answer_groups to be a list, received %s'
-                % answer_groups_list)
+                % answer_groups_list
+            )
 
         interaction_answer_groups = []
         new_content_id_list = []
         old_content_id_list = [
-            answer_group.outcome.feedback.content_id for answer_group in (
-                self.interaction.answer_groups)]
+            answer_group.outcome.feedback.content_id
+            for answer_group in (self.interaction.answer_groups)
+        ]
 
         for answer_group in self.interaction.answer_groups:
             for rule_spec in answer_group.rule_specs:
                 for param_name, value in rule_spec.inputs.items():
-                    param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            self.interaction.id
-                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+                    param_type = interaction_registry.Registry.get_interaction_by_id(
+                        self.interaction.id
+                    ).get_rule_param_type(rule_spec.rule_type, param_name)
 
                     if issubclass(param_type, objects.BaseTranslatableObject):
                         old_content_id_list.append(value['contentId'])
@@ -4072,7 +4066,8 @@ class State(translation_domain.BaseTranslatableObject):
             if not isinstance(rule_specs_list, list):
                 raise Exception(
                     'Expected answer group rule specs to be a list, '
-                    'received %s' % rule_specs_list)
+                    'received %s' % rule_specs_list
+                )
 
             answer_group.rule_specs = []
             interaction_answer_groups.append(answer_group)
@@ -4083,24 +4078,19 @@ class State(translation_domain.BaseTranslatableObject):
                 rule_inputs = rule_spec.inputs
                 if not isinstance(rule_inputs, dict):
                     raise Exception(
-                        'Expected rule_inputs to be a dict, received %s'
-                        % rule_inputs)
+                        'Expected rule_inputs to be a dict, received %s' % rule_inputs
+                    )
                 for param_name, value in rule_inputs.items():
-                    param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            self.interaction.id
-                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+                    param_type = interaction_registry.Registry.get_interaction_by_id(
+                        self.interaction.id
+                    ).get_rule_param_type(rule_spec.rule_type, param_name)
 
-                    if (isinstance(value, str) and
-                            '{{' in value and '}}' in value):
+                    if isinstance(value, str) and '{{' in value and '}}' in value:
                         # TODO(jacobdavis11): Create checks that all parameters
                         # referred to exist and have the correct types.
                         normalized_param = value
                     else:
-                        if issubclass(
-                                param_type,
-                                objects.BaseTranslatableObject
-                        ):
+                        if issubclass(param_type, objects.BaseTranslatableObject):
                             new_content_id_list.append(value['contentId'])
 
                         try:
@@ -4108,8 +4098,8 @@ class State(translation_domain.BaseTranslatableObject):
                         except Exception as e:
                             raise Exception(
                                 'Value has the wrong type. It should be a %s. '
-                                'The value is %s' %
-                                (param_type.__name__, value)) from e
+                                'The value is %s' % (param_type.__name__, value)
+                            ) from e
 
                     rule_inputs[param_name] = normalized_param
 
@@ -4117,10 +4107,10 @@ class State(translation_domain.BaseTranslatableObject):
         self.interaction.answer_groups = interaction_answer_groups
 
         new_content_id_list += [
-            answer_group.outcome.feedback.content_id for answer_group in (
-                self.interaction.answer_groups)]
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
+            answer_group.outcome.feedback.content_id
+            for answer_group in (self.interaction.answer_groups)
+        ]
+        self._update_content_ids_in_assets(old_content_id_list, new_content_id_list)
 
     def update_interaction_default_outcome(
         self, default_outcome: Optional[Outcome]
@@ -4134,17 +4124,18 @@ class State(translation_domain.BaseTranslatableObject):
         new_content_id_list = []
         if self.interaction.default_outcome:
             old_content_id_list.append(
-                self.interaction.default_outcome.feedback.content_id)
+                self.interaction.default_outcome.feedback.content_id
+            )
 
         if default_outcome:
             self.interaction.default_outcome = default_outcome
             new_content_id_list.append(
-                self.interaction.default_outcome.feedback.content_id)
+                self.interaction.default_outcome.feedback.content_id
+            )
         else:
             self.interaction.default_outcome = None
 
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
+        self._update_content_ids_in_assets(old_content_id_list, new_content_id_list)
 
     def update_interaction_confirmed_unclassified_answers(
         self, confirmed_unclassified_answers: List[AnswerGroup]
@@ -4163,9 +4154,9 @@ class State(translation_domain.BaseTranslatableObject):
         if not isinstance(confirmed_unclassified_answers, list):
             raise Exception(
                 'Expected confirmed_unclassified_answers to be a list,'
-                ' received %s' % confirmed_unclassified_answers)
-        self.interaction.confirmed_unclassified_answers = (
-            confirmed_unclassified_answers)
+                ' received %s' % confirmed_unclassified_answers
+            )
+        self.interaction.confirmed_unclassified_answers = confirmed_unclassified_answers
 
     def update_interaction_hints(self, hints_list: List[Hint]) -> None:
         """Update the list of hints.
@@ -4178,20 +4169,19 @@ class State(translation_domain.BaseTranslatableObject):
         """
         if not isinstance(hints_list, list):
             raise Exception(
-                'Expected hints_list to be a list, received %s'
-                % hints_list)
+                'Expected hints_list to be a list, received %s' % hints_list
+            )
         old_content_id_list = [
-            hint.hint_content.content_id for hint in self.interaction.hints]
+            hint.hint_content.content_id for hint in self.interaction.hints
+        ]
         self.interaction.hints = copy.deepcopy(hints_list)
 
         new_content_id_list = [
-            hint.hint_content.content_id for hint in self.interaction.hints]
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
+            hint.hint_content.content_id for hint in self.interaction.hints
+        ]
+        self._update_content_ids_in_assets(old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(
-        self, solution: Optional[Solution]
-    ) -> None:
+    def update_interaction_solution(self, solution: Optional[Solution]) -> None:
         """Update the solution of interaction.
 
         Args:
@@ -4203,22 +4193,19 @@ class State(translation_domain.BaseTranslatableObject):
         old_content_id_list = []
         new_content_id_list = []
         if self.interaction.solution:
-            old_content_id_list.append(
-                self.interaction.solution.explanation.content_id)
+            old_content_id_list.append(self.interaction.solution.explanation.content_id)
 
         if solution is not None:
             if not isinstance(solution, Solution):
                 raise Exception(
-                    'Expected solution to be a Solution object,received %s'
-                    % solution)
+                    'Expected solution to be a Solution object,received %s' % solution
+                )
             self.interaction.solution = solution
-            new_content_id_list.append(
-                self.interaction.solution.explanation.content_id)
+            new_content_id_list.append(self.interaction.solution.explanation.content_id)
         else:
             self.interaction.solution = None
 
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
+        self._update_content_ids_in_assets(old_content_id_list, new_content_id_list)
 
     def update_recorded_voiceovers(
         self, recorded_voiceovers: RecordedVoiceovers
@@ -4231,9 +4218,7 @@ class State(translation_domain.BaseTranslatableObject):
         """
         self.recorded_voiceovers = recorded_voiceovers
 
-    def update_solicit_answer_details(
-        self, solicit_answer_details: bool
-    ) -> None:
+    def update_solicit_answer_details(self, solicit_answer_details: bool) -> None:
         """Update the solicit_answer_details of a state.
 
         Args:
@@ -4246,7 +4231,8 @@ class State(translation_domain.BaseTranslatableObject):
         if not isinstance(solicit_answer_details, bool):
             raise Exception(
                 'Expected solicit_answer_details to be a boolean, received %s'
-                % solicit_answer_details)
+                % solicit_answer_details
+            )
         self.solicit_answer_details = solicit_answer_details
 
     def update_card_is_checkpoint(self, card_is_checkpoint: bool) -> None:
@@ -4262,7 +4248,8 @@ class State(translation_domain.BaseTranslatableObject):
         if not isinstance(card_is_checkpoint, bool):
             raise Exception(
                 'Expected card_is_checkpoint to be a boolean, received %s'
-                % card_is_checkpoint)
+                % card_is_checkpoint
+            )
         self.card_is_checkpoint = card_is_checkpoint
 
     def to_dict(self) -> StateDict:
@@ -4273,8 +4260,9 @@ class State(translation_domain.BaseTranslatableObject):
         """
         return {
             'content': self.content.to_dict(),
-            'param_changes': [param_change.to_dict()
-                              for param_change in self.param_changes],
+            'param_changes': [
+                param_change.to_dict() for param_change in self.param_changes
+            ],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
             'linked_skill_id': self.linked_skill_id,
@@ -4283,7 +4271,7 @@ class State(translation_domain.BaseTranslatableObject):
             'card_is_checkpoint': self.card_is_checkpoint,
             'inapplicable_skill_misconception_ids': (
                 self.inapplicable_skill_misconception_ids
-            )
+            ),
         }
 
     # TODO(#16467): Remove `validate` argument after validating all Question
@@ -4307,16 +4295,18 @@ class State(translation_domain.BaseTranslatableObject):
             content.validate()
         return cls(
             content,
-            [param_domain.ParamChange.from_dict(param)
-             for param in state_dict['param_changes']],
-            InteractionInstance.from_dict(
-                state_dict['interaction'], validate=validate),
+            [
+                param_domain.ParamChange.from_dict(param)
+                for param in state_dict['param_changes']
+            ],
+            InteractionInstance.from_dict(state_dict['interaction'], validate=validate),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             state_dict['solicit_answer_details'],
             state_dict['card_is_checkpoint'],
             state_dict['linked_skill_id'],
             state_dict['classifier_model_id'],
-            state_dict['inapplicable_skill_misconception_ids'])
+            state_dict['inapplicable_skill_misconception_ids'],
+        )
 
     @classmethod
     def create_default_state(
@@ -4324,7 +4314,7 @@ class State(translation_domain.BaseTranslatableObject):
         default_dest_state_name: Optional[str],
         content_id_for_state_content: str,
         content_id_for_default_outcome: str,
-        is_initial_state: bool = False
+        is_initial_state: bool = False,
     ) -> State:
         """Return a State domain object with default value.
 
@@ -4343,17 +4333,19 @@ class State(translation_domain.BaseTranslatableObject):
         content_html = feconf.DEFAULT_STATE_CONTENT_STR
 
         recorded_voiceovers = RecordedVoiceovers({})
-        recorded_voiceovers.add_content_id_for_voiceover(
-            content_id_for_state_content)
-        recorded_voiceovers.add_content_id_for_voiceover(
-            content_id_for_default_outcome)
+        recorded_voiceovers.add_content_id_for_voiceover(content_id_for_state_content)
+        recorded_voiceovers.add_content_id_for_voiceover(content_id_for_default_outcome)
 
         return cls(
             SubtitledHtml(content_id_for_state_content, content_html),
             [],
             InteractionInstance.create_default_interaction(
-                default_dest_state_name, content_id_for_default_outcome),
-            recorded_voiceovers, False, is_initial_state)
+                default_dest_state_name, content_id_for_default_outcome
+            ),
+            recorded_voiceovers,
+            False,
+            is_initial_state,
+        )
 
     @classmethod
     def convert_html_fields_in_state(
@@ -4362,7 +4354,7 @@ class State(translation_domain.BaseTranslatableObject):
         conversion_fn: Callable[[str], str],
         state_schema_version: int = feconf.CURRENT_STATE_SCHEMA_VERSION,
         state_uses_old_interaction_cust_args_schema: bool = False,
-        state_uses_old_rule_template_schema: bool = False
+        state_uses_old_rule_template_schema: bool = False,
     ) -> StateDict:
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
@@ -4384,13 +4376,13 @@ class State(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted state_dict.
         """
-        state_dict['content']['html'] = (
-            conversion_fn(state_dict['content']['html']))
+        state_dict['content']['html'] = conversion_fn(state_dict['content']['html'])
         if state_dict['interaction']['default_outcome'] is not None:
             state_dict['interaction']['default_outcome'] = (
                 Outcome.convert_html_in_outcome(
-                    state_dict['interaction']['default_outcome'],
-                    conversion_fn))
+                    state_dict['interaction']['default_outcome'], conversion_fn
+                )
+            )
 
         if state_uses_old_rule_template_schema:
             # We need to retrieve an older version of
@@ -4398,49 +4390,52 @@ class State(translation_domain.BaseTranslatableObject):
             # after state schema v41, some html fields were removed.
             html_field_types_to_rule_specs = (
                 rules_registry.Registry.get_html_field_types_to_rule_specs(
-                    state_schema_version=41))
+                    state_schema_version=41
+                )
+            )
         else:
             html_field_types_to_rule_specs = (
-                rules_registry.Registry.get_html_field_types_to_rule_specs())
+                rules_registry.Registry.get_html_field_types_to_rule_specs()
+            )
 
         for answer_group_index, answer_group in enumerate(
-                state_dict['interaction']['answer_groups']):
+            state_dict['interaction']['answer_groups']
+        ):
             state_dict['interaction']['answer_groups'][answer_group_index] = (
                 AnswerGroup.convert_html_in_answer_group(
-                    answer_group, conversion_fn, html_field_types_to_rule_specs)
+                    answer_group, conversion_fn, html_field_types_to_rule_specs
+                )
             )
 
         for hint_index, hint in enumerate(state_dict['interaction']['hints']):
-            state_dict['interaction']['hints'][hint_index] = (
-                Hint.convert_html_in_hint(hint, conversion_fn))
+            state_dict['interaction']['hints'][hint_index] = Hint.convert_html_in_hint(
+                hint, conversion_fn
+            )
 
         interaction_id = state_dict['interaction']['id']
-        all_interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids()
-        )
+        all_interaction_ids = interaction_registry.Registry.get_all_interaction_ids()
         interaction_id_is_valid = interaction_id not in all_interaction_ids
         if interaction_id_is_valid or interaction_id is None:
             return state_dict
 
         if state_dict['interaction']['solution'] is not None:
             if state_uses_old_rule_template_schema:
-                interaction_spec = (
-                    interaction_registry.Registry
-                    .get_all_specs_for_state_schema_version(41)[
-                        interaction_id]
-                )
+                interaction_spec = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+                    41
+                )[
+                    interaction_id
+                ]
             else:
-                interaction_spec = (
-                    interaction_registry.Registry
-                    .get_all_specs()[interaction_id]
-                )
-            state_dict['interaction']['solution'] = (
-                Solution.convert_html_in_solution(
-                    state_dict['interaction']['id'],
-                    state_dict['interaction']['solution'],
-                    conversion_fn,
-                    html_field_types_to_rule_specs,
-                    interaction_spec))
+                interaction_spec = interaction_registry.Registry.get_all_specs()[
+                    interaction_id
+                ]
+            state_dict['interaction']['solution'] = Solution.convert_html_in_solution(
+                state_dict['interaction']['id'],
+                state_dict['interaction']['solution'],
+                conversion_fn,
+                html_field_types_to_rule_specs,
+                interaction_spec,
+            )
 
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to
@@ -4448,17 +4443,18 @@ class State(translation_domain.BaseTranslatableObject):
             # some html and unicode customization arguments were replaced with
             # SubtitledHtml and SubtitledUnicode.
             ca_specs = (
-                interaction_registry.Registry
-                .get_all_specs_for_state_schema_version(35)[
-                    interaction_id]['customization_arg_specs']
+                interaction_registry.Registry.get_all_specs_for_state_schema_version(
+                    35
+                )[interaction_id]['customization_arg_specs']
             )
 
             interaction_customization_arg_has_html = False
             for customization_arg_spec in ca_specs:
                 schema = customization_arg_spec['schema']
-                if (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                        schema['items']['type'] ==
-                        schema_utils.SCHEMA_TYPE_HTML):
+                if (
+                    schema['type'] == schema_utils.SCHEMA_TYPE_LIST
+                    and schema['items']['type'] == schema_utils.SCHEMA_TYPE_HTML
+                ):
                     interaction_customization_arg_has_html = True
 
             if interaction_customization_arg_has_html:
@@ -4470,27 +4466,20 @@ class State(translation_domain.BaseTranslatableObject):
                     # Dict[str, List[str]].
                     html_choices_ca_dict = cast(
                         Dict[str, List[str]],
-                        state_dict['interaction']['customization_args'][
-                            'choices']
+                        state_dict['interaction']['customization_args']['choices'],
                     )
-                    html_choices_ca_dict['value'] = ([
-                        conversion_fn(html)
-                        for html in html_choices_ca_dict['value']
-                    ])
+                    html_choices_ca_dict['value'] = [
+                        conversion_fn(html) for html in html_choices_ca_dict['value']
+                    ]
         else:
             ca_specs_dict = (
-                interaction_registry.Registry
-                .get_all_specs_for_state_schema_version(
-                    state_schema_version,
-                    can_fetch_latest_specs=True
+                interaction_registry.Registry.get_all_specs_for_state_schema_version(
+                    state_schema_version, can_fetch_latest_specs=True
                 )[interaction_id]['customization_arg_specs']
             )
-            state_dict['interaction'] = (
-                InteractionInstance.convert_html_in_interaction(
-                    state_dict['interaction'],
-                    ca_specs_dict,
-                    conversion_fn
-                ))
+            state_dict['interaction'] = InteractionInstance.convert_html_in_interaction(
+                state_dict['interaction'], ca_specs_dict, conversion_fn
+            )
 
         return state_dict
 
@@ -4507,8 +4496,8 @@ class State(translation_domain.BaseTranslatableObject):
             ValueError. The given content_id does not exist.
         """
         content_id_to_translatable_content = (
-            self.get_translatable_contents_collection()
-            .content_id_to_translatable_content)
+            self.get_translatable_contents_collection().content_id_to_translatable_content
+        )
 
         if content_id not in content_id_to_translatable_content:
             raise ValueError('Content ID %s does not exist' % content_id)
@@ -4516,14 +4505,13 @@ class State(translation_domain.BaseTranslatableObject):
         return content_id_to_translatable_content[content_id].content_value
 
     @classmethod
-    def traverse_v54_state_dict_for_contents(
-        cls,
-        state_dict: StateDict
-    ) -> Iterator[Tuple[
-        Union[SubtitledHtmlDict, Dict[str, Union[str, List[str]]]],
-        translation_domain.ContentType,
-        Optional[str]
-    ]]:
+    def traverse_v54_state_dict_for_contents(cls, state_dict: StateDict) -> Iterator[
+        Tuple[
+            Union[SubtitledHtmlDict, Dict[str, Union[str, List[str]]]],
+            translation_domain.ContentType,
+            Optional[str],
+        ]
+    ]:
         """This method iterates throughout the state dict and yields the value
         for each field. The yielded value is used for generating and updating
         the content-ids for the fields in the state in their respective methods.
@@ -4534,10 +4522,7 @@ class State(translation_domain.BaseTranslatableObject):
         Yields:
             (str|list(str), str). A tuple containing content and content-id.
         """
-        yield (
-            state_dict['content'],
-            translation_domain.ContentType.CONTENT,
-            None)
+        yield (state_dict['content'], translation_domain.ContentType.CONTENT, None)
 
         interaction = state_dict['interaction']
 
@@ -4546,15 +4531,13 @@ class State(translation_domain.BaseTranslatableObject):
             yield (
                 default_outcome['feedback'],
                 translation_domain.ContentType.DEFAULT_OUTCOME,
-                None)
+                None,
+            )
 
         answer_groups = interaction['answer_groups']
         for answer_group in answer_groups:
             outcome = answer_group['outcome']
-            yield (
-                outcome['feedback'],
-                translation_domain.ContentType.FEEDBACK,
-                None)
+            yield (outcome['feedback'], translation_domain.ContentType.FEEDBACK, None)
 
             if interaction['id'] not in ['TextInput', 'SetInput']:
                 continue
@@ -4568,58 +4551,57 @@ class State(translation_domain.BaseTranslatableObject):
                         yield (
                             input_value,
                             translation_domain.ContentType.RULE,
-                            'input')
+                            'input',
+                        )
                     if 'unicodeStrSet' in input_value:
                         yield (
                             input_value,
                             translation_domain.ContentType.RULE,
-                            'input')
+                            'input',
+                        )
 
         for hint in interaction['hints']:
-            yield (
-                hint['hint_content'], translation_domain.ContentType.HINT, None)
+            yield (hint['hint_content'], translation_domain.ContentType.HINT, None)
 
         solution = interaction['solution']
         if solution is not None:
             yield (
                 solution['explanation'],
                 translation_domain.ContentType.SOLUTION,
-                None)
+                None,
+            )
 
         interaction_id = interaction['id']
         customisation_args = interaction['customization_args']
         interaction_specs = (
-            interaction_registry.Registry
-                .get_all_specs_for_state_schema_version(
-                    feconf.CURRENT_STATE_SCHEMA_VERSION,
-                    can_fetch_latest_specs=True
-               )
+            interaction_registry.Registry.get_all_specs_for_state_schema_version(
+                feconf.CURRENT_STATE_SCHEMA_VERSION, can_fetch_latest_specs=True
+            )
         )
         if interaction_id in interaction_specs:
-            ca_specs_dict = interaction_specs[interaction_id][
-                'customization_arg_specs']
+            ca_specs_dict = interaction_specs[interaction_id]['customization_arg_specs']
             for spec in ca_specs_dict:
                 if spec['name'] != 'catchMisspellings':
                     customisation_arg = customisation_args[spec['name']]
-                    contents = (
-                        InteractionCustomizationArg.traverse_by_schema_and_get(
-                            spec['schema'], customisation_arg['value'], [
-                                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
-                                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-                            lambda x: x
-                        )
+                    contents = InteractionCustomizationArg.traverse_by_schema_and_get(
+                        spec['schema'],
+                        customisation_arg['value'],
+                        [
+                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
+                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML,
+                        ],
+                        lambda x: x,
                     )
                     for content in contents:
                         yield (
                             content,
                             translation_domain.ContentType.CUSTOMIZATION_ARG,
-                            spec['name']
+                            spec['name'],
                         )
 
     @classmethod
     def update_old_content_id_to_new_content_id_in_v54_states(
-        cls,
-        states_dict: Dict[str, StateDict]
+        cls, states_dict: Dict[str, StateDict]
     ) -> Tuple[Dict[str, StateDict], int]:
         """Updates the old content-ids from the state fields like hints,
         solution, etc with the newly generated content id.
@@ -4635,8 +4617,7 @@ class State(translation_domain.BaseTranslatableObject):
         PossibleContentIdsType = Union[str, List[str], List[List[str]]]
 
         def _replace_content_id(
-            old_id: PossibleContentIdsType,
-            id_mapping: Dict[str, str]
+            old_id: PossibleContentIdsType, id_mapping: Dict[str, str]
         ) -> str:
             """Replace old Id with the new Id."""
             assert isinstance(old_id, str)
@@ -4650,24 +4631,19 @@ class State(translation_domain.BaseTranslatableObject):
 
         object_content_ids_replacers: Dict[
             str,
-            Callable[
-                [PossibleContentIdsType, Dict[str, str]], PossibleContentIdsType
-            ]
+            Callable[[PossibleContentIdsType, Dict[str, str]], PossibleContentIdsType],
         ] = {}
 
-        object_content_ids_replacers['TranslatableHtmlContentId'] = (
-           _replace_content_id)
+        object_content_ids_replacers['TranslatableHtmlContentId'] = _replace_content_id
 
         object_content_ids_replacers['SetOfTranslatableHtmlContentIds'] = (
             lambda ids_set, id_mapping: [
-                _replace_content_id(old_id, id_mapping)
-                for old_id in ids_set
+                _replace_content_id(old_id, id_mapping) for old_id in ids_set
             ]
         )
-        object_content_ids_replacers[
-                'ListOfSetsOfTranslatableHtmlContentIds'] = (
+        object_content_ids_replacers['ListOfSetsOfTranslatableHtmlContentIds'] = (
             lambda items, id_mapping: [
-                [_replace_content_id(old_id, id_mapping)for old_id in ids_set]
+                [_replace_content_id(old_id, id_mapping) for old_id in ids_set]
                 for ids_set in items
             ]
         )
@@ -4676,14 +4652,16 @@ class State(translation_domain.BaseTranslatableObject):
             state: StateDict = states_dict[state_name]
             new_voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]] = {}
             old_to_new_content_id: Dict[str, str] = {}
-            old_voiceovers_mapping = state['recorded_voiceovers'][
-                'voiceovers_mapping']
+            old_voiceovers_mapping = state['recorded_voiceovers']['voiceovers_mapping']
 
-            for content, content_type, extra_prefix in (
-                cls.traverse_v54_state_dict_for_contents(state)
-            ):
+            for (
+                content,
+                content_type,
+                extra_prefix,
+            ) in cls.traverse_v54_state_dict_for_contents(state):
                 new_content_id = content_id_generator.generate(
-                    content_type, extra_prefix=extra_prefix)
+                    content_type, extra_prefix=extra_prefix
+                )
                 content_id_key = 'content_id'
                 if content_type == translation_domain.ContentType.RULE:
                     content_id_key = 'contentId'
@@ -4701,17 +4679,14 @@ class State(translation_domain.BaseTranslatableObject):
                 old_to_new_content_id[old_content_id] = new_content_id
 
                 new_voiceovers_mapping[new_content_id] = old_voiceovers_mapping[
-                    old_content_id]
+                    old_content_id
+                ]
 
-            state['recorded_voiceovers']['voiceovers_mapping'] = (
-                new_voiceovers_mapping
-            )
+            state['recorded_voiceovers']['voiceovers_mapping'] = new_voiceovers_mapping
 
             interaction_specs = (
-                interaction_registry.Registry
-                    .get_all_specs_for_state_schema_version(
-                        feconf.CURRENT_STATE_SCHEMA_VERSION,
-                        can_fetch_latest_specs=True
+                interaction_registry.Registry.get_all_specs_for_state_schema_version(
+                    feconf.CURRENT_STATE_SCHEMA_VERSION, can_fetch_latest_specs=True
                 )
             )
             interaction_id = state['interaction']['id']
@@ -4720,8 +4695,7 @@ class State(translation_domain.BaseTranslatableObject):
 
             interaction = state['interaction']
             answer_groups = interaction['answer_groups']
-            rule_descriptions = interaction_specs[interaction_id][
-                'rule_descriptions']
+            rule_descriptions = interaction_specs[interaction_id]['rule_descriptions']
             answer_type = interaction_specs[interaction_id]['answer_type']
 
             if interaction['solution']:
@@ -4732,12 +4706,11 @@ class State(translation_domain.BaseTranslatableObject):
                     # different types but the 'if' case above covers only for
                     # the PossibleContentIdsType.
                     correct_answer = cast(
-                        PossibleContentIdsType, solution_dict['correct_answer'])
-                    solution_dict['correct_answer'] = (
-                        object_content_ids_replacers[answer_type](
-                            correct_answer, old_to_new_content_id
-                        )
+                        PossibleContentIdsType, solution_dict['correct_answer']
                     )
+                    solution_dict['correct_answer'] = object_content_ids_replacers[
+                        answer_type
+                    ](correct_answer, old_to_new_content_id)
 
             if not rule_descriptions:
                 continue
@@ -4757,17 +4730,16 @@ class State(translation_domain.BaseTranslatableObject):
                         # Here we use cast because rule input can be a dict but
                         # the 'if' case above covers only for the
                         # PossibleContentIdsType.
-                        rule_input = cast(
-                            PossibleContentIdsType, rule_inputs[key])
-                        rule_inputs[key] = object_content_ids_replacers[
-                            value_class](rule_input, old_to_new_content_id)
+                        rule_input = cast(PossibleContentIdsType, rule_inputs[key])
+                        rule_inputs[key] = object_content_ids_replacers[value_class](
+                            rule_input, old_to_new_content_id
+                        )
 
         return states_dict, content_id_generator.next_content_id_index
 
     @classmethod
     def generate_old_content_id_to_new_content_id_in_v54_states(
-        cls,
-        states_dict: Dict[str, StateDict]
+        cls, states_dict: Dict[str, StateDict]
     ) -> Tuple[Dict[str, Dict[str, str]], int]:
         """Generates the new content-id for each state field based on
         next_content_id_index variable.
@@ -4788,10 +4760,11 @@ class State(translation_domain.BaseTranslatableObject):
         for state_name in sorted(states_dict.keys()):
             old_id_to_new_id: Dict[str, str] = {}
 
-            for content, content_type, extra_prefix in (
-                cls.traverse_v54_state_dict_for_contents(
-                    states_dict[state_name])
-            ):
+            for (
+                content,
+                content_type,
+                extra_prefix,
+            ) in cls.traverse_v54_state_dict_for_contents(states_dict[state_name]):
                 if content_type == translation_domain.ContentType.RULE:
                     # Here we use MyPy ignore because the content Id key for the
                     # contents in the rule inputs is contentId instead of
@@ -4802,14 +4775,12 @@ class State(translation_domain.BaseTranslatableObject):
 
                 assert isinstance(content_id, str)
                 old_id_to_new_id[content_id] = content_id_generator.generate(
-                    content_type, extra_prefix=extra_prefix)
+                    content_type, extra_prefix=extra_prefix
+                )
 
             states_to_content_id[state_name] = old_id_to_new_id
 
-        return (
-            states_to_content_id,
-            content_id_generator.next_content_id_index
-        )
+        return (states_to_content_id, content_id_generator.next_content_id_index)
 
 
 class StateVersionHistory:
@@ -4830,7 +4801,7 @@ class StateVersionHistory:
         self,
         previously_edited_in_version: Optional[int],
         state_name_in_previous_version: Optional[str],
-        committer_id: str
+        committer_id: str,
     ) -> None:
         """Initializes the StateVersionHistory domain object.
 
@@ -4857,15 +4828,13 @@ class StateVersionHistory:
         """
         return {
             'previously_edited_in_version': self.previously_edited_in_version,
-            'state_name_in_previous_version': (
-                self.state_name_in_previous_version),
-            'committer_id': self.committer_id
+            'state_name_in_previous_version': (self.state_name_in_previous_version),
+            'committer_id': self.committer_id,
         }
 
     @classmethod
     def from_dict(
-        cls,
-        state_version_history_dict: StateVersionHistoryDict
+        cls, state_version_history_dict: StateVersionHistoryDict
     ) -> StateVersionHistory:
         """Return a StateVersionHistory domain object from a dict.
 
@@ -4880,7 +4849,7 @@ class StateVersionHistory:
         return cls(
             state_version_history_dict['previously_edited_in_version'],
             state_version_history_dict['state_name_in_previous_version'],
-            state_version_history_dict['committer_id']
+            state_version_history_dict['committer_id'],
         )
 
 
@@ -4899,13 +4868,11 @@ UnionOfCustomizationArgsDictValues = Union[
     SubtitledUnicode,
     SubtitledUnicodeDict,
     domain.ImageAndRegionDict,
-    domain.GraphDict
+    domain.GraphDict,
 ]
 
 
 # Note: This Dict type depends on UnionOfCustomizationArgsDictValues so it
 # has to be defined after UnionOfCustomizationArgsDictValues is defined,
 # otherwise backend tests will fail with 'module has no attribute' error.
-CustomizationArgsDictType = Dict[
-    str, Dict[str, UnionOfCustomizationArgsDictValues]
-]
+CustomizationArgsDictType = Dict[str, Dict[str, UnionOfCustomizationArgsDictValues]]

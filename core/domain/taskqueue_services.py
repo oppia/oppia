@@ -27,7 +27,7 @@ from core.platform import models
 from typing import Any, Dict, Final
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import platform_taskqueue_services
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
@@ -58,14 +58,14 @@ FUNCTION_ID_UPDATE_STATS: Final = 'update_stats'
 FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: Final = 'delete_exps_from_user_models'
 FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: Final = 'delete_exps_from_activities'
 FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED: Final = (
-    'delete_users_pending_to_be_deleted')
+    'delete_users_pending_to_be_deleted'
+)
 FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION: Final = (
-    'check_completion_of_user_deletion')
-FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: Final = (
-    'regenerate_exploration_summary')
+    'check_completion_of_user_deletion'
+)
+FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: Final = 'regenerate_exploration_summary'
 FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: Final = 'untag_deleted_misconceptions'
-FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: Final = (
-    'remove_user_from_rights_models')
+FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: Final = 'remove_user_from_rights_models'
 
 
 # Here we use type Any because in defer() function '*args' points to the
@@ -73,12 +73,7 @@ FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: Final = (
 # type str, list, int and other types too. Similarly, '**kwargs' points to
 # the keyword arguments of any other function and those can also accept
 # different types of values like '*args'.
-def defer(
-    fn_identifier: str,
-    queue_name: str,
-    *args: Any,
-    **kwargs: Any
-) -> None:
+def defer(fn_identifier: str, queue_name: str, *args: Any, **kwargs: Any) -> None:
     """Adds a new task to a specified deferred queue scheduled for immediate
     execution.
 
@@ -98,20 +93,21 @@ def defer(
     payload = {
         'fn_identifier': fn_identifier,
         'args': (args if args else []),
-        'kwargs': (kwargs if kwargs else {})
+        'kwargs': (kwargs if kwargs else {}),
     }
     try:
         json.dumps(payload)
     except TypeError as e:
         raise ValueError(
             'The args or kwargs passed to the deferred call with '
-            'function_identifier, %s, are not json serializable.' %
-            fn_identifier) from e
+            'function_identifier, %s, are not json serializable.' % fn_identifier
+        ) from e
     # This is a workaround for a known python bug.
     # See https://bugs.python.org/issue7980
     datetime.datetime.strptime('', '')
     platform_taskqueue_services.create_http_task(
-        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
+        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload
+    )
 
 
 # Here we use type Any because the argument 'params' can accept payload
@@ -137,7 +133,11 @@ def enqueue_task(url: str, params: Dict[str, Any], countdown: int) -> None:
             'The params added to the email task call cannot be json serialized'
         ) from e
     scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
-        seconds=countdown)
+        seconds=countdown
+    )
     platform_taskqueue_services.create_http_task(
-        queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,
-        scheduled_for=scheduled_datetime)
+        queue_name=QUEUE_NAME_EMAILS,
+        url=url,
+        payload=params,
+        scheduled_for=scheduled_datetime,
+    )

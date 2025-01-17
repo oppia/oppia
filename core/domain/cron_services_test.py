@@ -52,19 +52,18 @@ class CronServicesTests(test_utils.GenericTestBase):
             story_ids=[],
             learnt_topic_ids=[],
             last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
-            deleted=True
+            deleted=True,
         )
-        completed_activities_model.update_timestamps(
-            update_last_updated_time=False)
+        completed_activities_model.update_timestamps(update_last_updated_time=False)
         completed_activities_model.put()
 
         self.assertIsNotNone(
-            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id)
+        )
 
         cron_services.delete_models_marked_as_deleted()
 
-        self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
+        self.assertIsNone(user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
 
     def test_mark_outdated_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -75,7 +74,7 @@ class CronServicesTests(test_utils.GenericTestBase):
             user_ids=[],
             submitter_id=admin_user_id,
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
-            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS
+            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
         )
         user_query_model.update_timestamps(update_last_updated_time=False)
         user_query_model.put()

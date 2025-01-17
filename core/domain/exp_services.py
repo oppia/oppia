@@ -72,8 +72,18 @@ from extensions import domain
 
 import deepdiff
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, Tuple, Type, TypedDict,
-    Union, cast, overload
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypedDict,
+    Union,
+    cast,
+    overload,
 )
 
 MYPY = False
@@ -84,20 +94,19 @@ if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
     from mypy_imports import user_models
 
-(base_models, exp_models, stats_models, user_models) = (
-    models.Registry.import_models([
+(base_models, exp_models, stats_models, user_models) = models.Registry.import_models(
+    [
         models.Names.BASE_MODEL,
         models.Names.EXPLORATION,
         models.Names.STATISTICS,
-        models.Names.USER
-    ])
+        models.Names.USER,
+    ]
 )
 
 datastore_services = models.Registry.import_datastore_services()
 
 AcceptableActivityModelTypes = Union[
-    user_models.CompletedActivitiesModel,
-    user_models.IncompleteActivitiesModel
+    user_models.CompletedActivitiesModel, user_models.IncompleteActivitiesModel
 ]
 
 
@@ -166,12 +175,13 @@ def is_exp_summary_editable(
     return user_id is not None and (
         user_id in exp_summary.editor_ids
         or user_id in exp_summary.owner_ids
-        or exp_summary.community_owned)
+        or exp_summary.community_owned
+    )
 
 
 # Query methods.
 def get_exploration_titles_and_categories(
-    exp_ids: List[str]
+    exp_ids: List[str],
 ) -> Dict[str, Dict[str, str]]:
     """Returns exploration titles and categories for the given ids.
 
@@ -192,14 +202,13 @@ def get_exploration_titles_and_categories(
     """
     explorations = [
         (exp_fetchers.get_exploration_from_model(e) if e else None)
-        for e in exp_models.ExplorationModel.get_multi(
-            exp_ids, include_deleted=True)]
+        for e in exp_models.ExplorationModel.get_multi(exp_ids, include_deleted=True)
+    ]
 
     result = {}
     for exploration in explorations:
         if exploration is None:
-            logging.error(
-                'Could not find exploration corresponding to id')
+            logging.error('Could not find exploration corresponding to id')
         else:
             result[exploration.id] = {
                 'title': exploration.title,
@@ -212,7 +221,7 @@ def get_exploration_ids_matching_query(
     query_string: str,
     categories: List[str],
     language_codes: List[str],
-    offset: Optional[int] = None
+    offset: Optional[int] = None,
 ) -> Tuple[List[str], Optional[int]]:
     """Returns a list with all exploration ids matching the given search query
     string, as well as a search offset for future fetches.
@@ -252,39 +261,48 @@ def get_exploration_ids_matching_query(
 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
-            returned_exploration_ids)
+            returned_exploration_ids
+        )
 
         exp_ids, search_offset = search_services.search_explorations(
-            query_string, categories, language_codes, remaining_to_fetch,
-            offset=search_offset)
+            query_string,
+            categories,
+            language_codes,
+            remaining_to_fetch,
+            offset=search_offset,
+        )
 
         invalid_exp_ids = []
-        for ind, model in enumerate(
-                exp_models.ExpSummaryModel.get_multi(exp_ids)):
+        for ind, model in enumerate(exp_models.ExpSummaryModel.get_multi(exp_ids)):
             if model is not None:
                 returned_exploration_ids.append(exp_ids[ind])
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
-                or search_offset is None):
+        if (
+            len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
+            or search_offset is None
+        ):
             break
 
         logging.error(
-                'Search index contains stale exploration ids: %s' %
-                ', '.join(invalid_exp_ids))
+            'Search index contains stale exploration ids: %s'
+            % ', '.join(invalid_exp_ids)
+        )
 
-    if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-            and search_offset is not None):
+    if (
+        len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
+        and search_offset is not None
+    ):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
-            '%s retries were needed.' % (query_string, MAX_ITERATIONS))
+            '%s retries were needed.' % (query_string, MAX_ITERATIONS)
+        )
 
     return (returned_exploration_ids, search_offset)
 
 
-def get_non_private_exploration_summaries(
-) -> Dict[str, exp_domain.ExplorationSummary]:
+def get_non_private_exploration_summaries() -> Dict[str, exp_domain.ExplorationSummary]:
     """Returns a dict with all non-private exploration summary domain objects,
     keyed by their id.
 
@@ -293,11 +311,12 @@ def get_non_private_exploration_summaries(
         non-private ExplorationSummary domain objects.
     """
     return exp_fetchers.get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_non_private())
+        exp_models.ExpSummaryModel.get_non_private()
+    )
 
 
 def get_top_rated_exploration_summaries(
-    limit: int
+    limit: int,
 ) -> Dict[str, exp_domain.ExplorationSummary]:
     """Returns a dict with top rated exploration summary model instances,
     keyed by their id. At most 'limit' entries are returned.
@@ -312,11 +331,12 @@ def get_top_rated_exploration_summaries(
         entries are returned.
     """
     return exp_fetchers.get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_top_rated(limit))
+        exp_models.ExpSummaryModel.get_top_rated(limit)
+    )
 
 
 def get_recently_published_exp_summaries(
-    limit: int
+    limit: int,
 ) -> Dict[str, exp_domain.ExplorationSummary]:
     """Returns a dict with recently published ExplorationSummary model
     instances, keyed by their exploration id. At most 'limit' entries are
@@ -332,7 +352,8 @@ def get_recently_published_exp_summaries(
         entries are returned.
     """
     return exp_fetchers.get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_recently_published(limit))
+        exp_models.ExpSummaryModel.get_recently_published(limit)
+    )
 
 
 def get_story_id_linked_to_exploration(exp_id: str) -> Optional[str]:
@@ -347,7 +368,8 @@ def get_story_id_linked_to_exploration(exp_id: str) -> Optional[str]:
         story, otherwise None.
     """
     exploration_context_model = exp_models.ExplorationContextModel.get(
-        exp_id, strict=False)
+        exp_id, strict=False
+    )
     if exploration_context_model is None:
         return None
 
@@ -367,7 +389,8 @@ def get_all_exploration_summaries() -> Dict[str, exp_domain.ExplorationSummary]:
         exploration id.
     """
     return exp_fetchers.get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_all().fetch())
+        exp_models.ExpSummaryModel.get_all().fetch()
+    )
 
 
 # Methods for exporting states and explorations to other formats.
@@ -387,18 +410,17 @@ def export_to_zip_file(
         (which can be subsequently converted into a zip file via
         zipfile.ZipFile()).
     """
-    exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, version=version)
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
     temp_file = io.BytesIO()
     with zipfile.ZipFile(
-            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+        temp_file, mode='w', compression=zipfile.ZIP_DEFLATED
+    ) as zfile:
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
-            exploration_file_name = re.sub(
-                r'[^A-Za-z0-9_ -]+', '', exploration.title)
+            exploration_file_name = re.sub(r'[^A-Za-z0-9_ -]+', '', exploration.title)
             # Trim whitespace when checking to handle potential
             # whitespace-only 'exploration_file_name'.
             if not exploration_file_name.strip():
@@ -406,12 +428,11 @@ def export_to_zip_file(
             else:
                 zfile.writestr('%s.yaml' % exploration_file_name, yaml_repr)
 
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         html_string_list = exploration.get_all_html_content_strings()
-        image_filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(
-                html_string_list))
+        image_filenames = html_cleaner.get_image_filenames_from_html_strings(
+            html_string_list
+        )
 
         for filename in image_filenames:
             filepath = 'image/%s' % filename
@@ -442,13 +463,11 @@ def export_states_to_yaml(
         dict. The keys are state names, and the values are YAML strings
         representing the corresponding state's contents.
     """
-    exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, version=version)
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id, version=version)
     exploration_dict = {}
     for state in exploration.states:
         exploration_dict[state] = utils.yaml_from_dict(
-            exploration.states[state].to_dict(),
-            width=width
+            exploration.states[state].to_dict(), width=width
         )
     return exploration_dict
 
@@ -482,125 +501,111 @@ def apply_change_list(
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 # Here we use cast because we are narrowing down the type from
                 # ExplorationChange to a specific change command.
-                add_state_cmd = cast(
-                    exp_domain.AddExplorationStateCmd,
-                    change
-                )
+                add_state_cmd = cast(exp_domain.AddExplorationStateCmd, change)
                 exploration.add_state(
                     add_state_cmd.state_name,
                     add_state_cmd.content_id_for_state_content,
-                    add_state_cmd.content_id_for_default_outcome
+                    add_state_cmd.content_id_for_default_outcome,
                 )
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
                 # Here we use cast because we are narrowing down the type from
                 # ExplorationChange to a specific change command.
-                rename_state_cmd = cast(
-                    exp_domain.RenameExplorationStateCmd,
-                    change
-                )
+                rename_state_cmd = cast(exp_domain.RenameExplorationStateCmd, change)
                 exploration.rename_state(
-                    rename_state_cmd.old_state_name,
-                    rename_state_cmd.new_state_name
+                    rename_state_cmd.old_state_name, rename_state_cmd.new_state_name
                 )
             elif change.cmd == exp_domain.CMD_DELETE_STATE:
                 # Here we use cast because we are narrowing down the type from
                 # ExplorationChange to a specific change command.
-                delete_state_cmd = cast(
-                    exp_domain.DeleteExplorationStateCmd,
-                    change
-                )
+                delete_state_cmd = cast(exp_domain.DeleteExplorationStateCmd, change)
                 exploration.delete_state(delete_state_cmd.state_name)
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                state: state_domain.State = exploration.states[
-                    change.state_name]
-                if (change.property_name ==
-                        exp_domain.STATE_PROPERTY_PARAM_CHANGES):
+                state: state_domain.State = exploration.states[change.state_name]
+                if change.property_name == exp_domain.STATE_PROPERTY_PARAM_CHANGES:
                     # Here we use cast because this 'if' condition forces
                     # change to have type EditExpStatePropertyParamChangesCmd.
                     edit_param_changes_cmd = cast(
-                        exp_domain.EditExpStatePropertyParamChangesCmd,
-                        change
+                        exp_domain.EditExpStatePropertyParamChangesCmd, change
                     )
-                    state.update_param_changes(list(map(
-                        to_param_domain, edit_param_changes_cmd.new_value
-                    )))
+                    state.update_param_changes(
+                        list(map(to_param_domain, edit_param_changes_cmd.new_value))
+                    )
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditExpStatePropertyContentCmd.
                     edit_content_cmd = cast(
-                        exp_domain.EditExpStatePropertyContentCmd,
-                        change
+                        exp_domain.EditExpStatePropertyContentCmd, change
                     )
-                    content = (
-                        state_domain.SubtitledHtml.from_dict(
-                            edit_content_cmd.new_value
-                        )
+                    content = state_domain.SubtitledHtml.from_dict(
+                        edit_content_cmd.new_value
                     )
                     content.validate()
                     state.update_content(content)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                elif change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ID:
                     state.update_interaction_id(change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                elif change.property_name == exp_domain.STATE_PROPERTY_LINKED_SKILL_ID:
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyLinkedSkillIdCmd.
                     edit_linked_skill_id_cmd = cast(
-                        exp_domain.EditExpStatePropertyLinkedSkillIdCmd,
-                        change
+                        exp_domain.EditExpStatePropertyLinkedSkillIdCmd, change
                     )
-                    state.update_linked_skill_id(
-                        edit_linked_skill_id_cmd.new_value
-                    )
-                elif (change.property_name ==
-                      exp_domain.
-                      STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS):
+                    state.update_linked_skill_id(edit_linked_skill_id_cmd.new_value)
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd.
                     edit_inapplicable_skill_misconception_ids = cast(
-                        exp_domain.
-                        EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd, # pylint: disable=line-too-long
-                        change
+                        exp_domain.EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd,  # pylint: disable=line-too-long
+                        change,
                     )
                     state.update_inapplicable_skill_misconception_ids(
                         edit_inapplicable_skill_misconception_ids.new_value
                     )
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyInteractionCustArgsCmd.
                     edit_interaction_cust_arg_cmd = cast(
-                        exp_domain.EditExpStatePropertyInteractionCustArgsCmd,
-                        change
+                        exp_domain.EditExpStatePropertyInteractionCustArgsCmd, change
                     )
                     state.update_interaction_customization_args(
-                        edit_interaction_cust_arg_cmd.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                        edit_interaction_cust_arg_cmd.new_value
+                    )
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS
+                ):
                     raise utils.InvalidInputException(
-                        'Editing interaction handlers is no longer supported')
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                        'Editing interaction handlers is no longer supported'
+                    )
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyInteractionAnswerGroupsCmd.
                     edit_interaction_answer_group_cmd = cast(
                         exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,  # pylint: disable=line-too-long
-                        change
+                        change,
                     )
-                    answer_groups = (
-                        edit_interaction_answer_group_cmd.new_value
-                    )
+                    answer_groups = edit_interaction_answer_group_cmd.new_value
                     new_answer_groups = [
                         state_domain.AnswerGroup.from_dict(answer_group)
                         for answer_group in answer_groups
                     ]
                     state.update_interaction_answer_groups(new_answer_groups)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                ):
                     new_outcome = None
                     if change.new_value:
                         # Here we use cast because this 'elif'
@@ -608,103 +613,110 @@ def apply_change_list(
                         # EditExpStatePropertyInteractionDefaultOutcomeCmd.
                         edit_interaction_default_outcome_cmd = cast(
                             exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,  # pylint: disable=line-too-long
-                            change
+                            change,
                         )
                         new_outcome = state_domain.Outcome.from_dict(
                             edit_interaction_default_outcome_cmd.new_value
                         )
                     state.update_interaction_default_outcome(new_outcome)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyUnclassifiedAnswersCmd.
                     edit_unclassified_answers_cmd = cast(
-                        exp_domain.EditExpStatePropertyUnclassifiedAnswersCmd,
-                        change
+                        exp_domain.EditExpStatePropertyUnclassifiedAnswersCmd, change
                     )
                     state.update_interaction_confirmed_unclassified_answers(
-                        edit_unclassified_answers_cmd.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                        edit_unclassified_answers_cmd.new_value
+                    )
+                elif (
+                    change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyInteractionHintsCmd.
                     edit_state_interaction_hints_cmd = cast(
-                        exp_domain.EditExpStatePropertyInteractionHintsCmd,
-                        change
+                        exp_domain.EditExpStatePropertyInteractionHintsCmd, change
                     )
-                    hint_dicts = (
-                        edit_state_interaction_hints_cmd.new_value
-                    )
+                    hint_dicts = edit_state_interaction_hints_cmd.new_value
                     if not isinstance(hint_dicts, list):
                         raise Exception(
                             'Expected hints_list to be a list,'
-                            ' received %s' % hint_dicts)
+                            ' received %s' % hint_dicts
+                        )
                     new_hints_list = [
                         state_domain.Hint.from_dict(hint_dict)
                         for hint_dict in hint_dicts
                     ]
                     state.update_interaction_hints(new_hints_list)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION
+                ):
                     new_solution = None
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyInteractionSolutionCmd.
                     edit_interaction_solution_cmd = cast(
-                        exp_domain.EditExpStatePropertyInteractionSolutionCmd,
-                        change
+                        exp_domain.EditExpStatePropertyInteractionSolutionCmd, change
                     )
                     if edit_interaction_solution_cmd.new_value is not None:
                         if state.interaction.id is None:
                             raise Exception(
-                                'solution cannot exist with None '
-                                'interaction id.'
+                                'solution cannot exist with None ' 'interaction id.'
                             )
                         new_solution = state_domain.Solution.from_dict(
                             state.interaction.id,
-                            edit_interaction_solution_cmd.new_value
+                            edit_interaction_solution_cmd.new_value,
                         )
                     state.update_interaction_solution(new_solution)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS
+                ):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
-                            'Expected solicit_answer_details to be a ' +
-                            'bool, received %s' % change.new_value)
+                            'Expected solicit_answer_details to be a '
+                            + 'bool, received %s' % change.new_value
+                        )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertySolicitAnswerDetailsCmd.
                     edit_solicit_answer_details_cmd = cast(
-                        exp_domain.EditExpStatePropertySolicitAnswerDetailsCmd,
-                        change
+                        exp_domain.EditExpStatePropertySolicitAnswerDetailsCmd, change
                     )
                     state.update_solicit_answer_details(
                         edit_solicit_answer_details_cmd.new_value
                     )
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                elif (
+                    change.property_name == exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT
+                ):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
-                            'Expected card_is_checkpoint to be a ' +
-                            'bool, received %s' % change.new_value)
+                            'Expected card_is_checkpoint to be a '
+                            + 'bool, received %s' % change.new_value
+                        )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyCardIsCheckpointCmd.
                     edit_card_is_checkpoint_cmd = cast(
-                        exp_domain.EditExpStatePropertyCardIsCheckpointCmd,
-                        change
+                        exp_domain.EditExpStatePropertyCardIsCheckpointCmd, change
                     )
                     state.update_card_is_checkpoint(
                         edit_card_is_checkpoint_cmd.new_value
                     )
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                elif (
+                    change.property_name
+                    == exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                ):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
-                            'received %s' % change.new_value)
+                            'received %s' % change.new_value
+                        )
                     # Explicitly convert the duration_secs value from
                     # int to float. Reason for this is the data from
                     # the frontend will be able to match the backend
@@ -716,48 +728,41 @@ def apply_change_list(
                     # condition forces change to have type
                     # EditExpStatePropertyRecordedVoiceoversCmd.
                     edit_recorded_voiceovers_cmd = cast(
-                        exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
-                        change
+                        exp_domain.EditExpStatePropertyRecordedVoiceoversCmd, change
                     )
-                    new_voiceovers_mapping = (
-                        edit_recorded_voiceovers_cmd.new_value[
-                            'voiceovers_mapping'
-                        ]
-                    )
-                    language_codes_to_audio_metadata = (
-                        new_voiceovers_mapping.values())
+                    new_voiceovers_mapping = edit_recorded_voiceovers_cmd.new_value[
+                        'voiceovers_mapping'
+                    ]
+                    language_codes_to_audio_metadata = new_voiceovers_mapping.values()
                     for language_codes in language_codes_to_audio_metadata:
                         for audio_metadata in language_codes.values():
-                            audio_metadata['duration_secs'] = (
-                                float(audio_metadata['duration_secs'])
+                            audio_metadata['duration_secs'] = float(
+                                audio_metadata['duration_secs']
                             )
-                    recorded_voiceovers = (
-                        state_domain.RecordedVoiceovers.from_dict(
-                            change.new_value))
+                    recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+                        change.new_value
+                    )
                     state.update_recorded_voiceovers(recorded_voiceovers)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     # Here we use cast because this 'if' condition forces
                     # change to have type EditExplorationPropertyTitleCmd.
                     edit_title_cmd = cast(
-                        exp_domain.EditExplorationPropertyTitleCmd,
-                        change
+                        exp_domain.EditExplorationPropertyTitleCmd, change
                     )
                     exploration.update_title(edit_title_cmd.new_value)
                 elif change.property_name == 'category':
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditExplorationPropertyCategoryCmd.
                     edit_category_cmd = cast(
-                        exp_domain.EditExplorationPropertyCategoryCmd,
-                        change
+                        exp_domain.EditExplorationPropertyCategoryCmd, change
                     )
                     exploration.update_category(edit_category_cmd.new_value)
                 elif change.property_name == 'objective':
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditExplorationPropertyObjectiveCmd.
                     edit_objective_cmd = cast(
-                        exp_domain.EditExplorationPropertyObjectiveCmd,
-                        change
+                        exp_domain.EditExplorationPropertyObjectiveCmd, change
                     )
                     exploration.update_objective(edit_objective_cmd.new_value)
                 elif change.property_name == 'language_code':
@@ -765,71 +770,53 @@ def apply_change_list(
                     # condition forces change to have type
                     # EditExplorationPropertyLanguageCodeCmd.
                     edit_language_code_cmd = cast(
-                        exp_domain.EditExplorationPropertyLanguageCodeCmd,
-                        change
+                        exp_domain.EditExplorationPropertyLanguageCodeCmd, change
                     )
-                    exploration.update_language_code(
-                        edit_language_code_cmd.new_value
-                    )
+                    exploration.update_language_code(edit_language_code_cmd.new_value)
                 elif change.property_name == 'tags':
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditExplorationPropertyTagsCmd.
                     edit_tags_cmd = cast(
-                        exp_domain.EditExplorationPropertyTagsCmd,
-                        change
+                        exp_domain.EditExplorationPropertyTagsCmd, change
                     )
                     exploration.update_tags(edit_tags_cmd.new_value)
                 elif change.property_name == 'blurb':
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditExplorationPropertyBlurbCmd.
                     edit_blurb_cmd = cast(
-                        exp_domain.EditExplorationPropertyBlurbCmd,
-                        change
+                        exp_domain.EditExplorationPropertyBlurbCmd, change
                     )
                     exploration.update_blurb(edit_blurb_cmd.new_value)
                 elif change.property_name == 'author_notes':
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditExplorationPropertyAuthorNotesCmd.
                     edit_author_notes_cmd = cast(
-                        exp_domain.EditExplorationPropertyAuthorNotesCmd,
-                        change
+                        exp_domain.EditExplorationPropertyAuthorNotesCmd, change
                     )
-                    exploration.update_author_notes(
-                        edit_author_notes_cmd.new_value
-                    )
+                    exploration.update_author_notes(edit_author_notes_cmd.new_value)
                 elif change.property_name == 'param_specs':
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditExplorationPropertyParamSpecsCmd.
                     edit_param_specs_cmd = cast(
-                        exp_domain.EditExplorationPropertyParamSpecsCmd,
-                        change
+                        exp_domain.EditExplorationPropertyParamSpecsCmd, change
                     )
-                    exploration.update_param_specs(
-                        edit_param_specs_cmd.new_value
-                    )
+                    exploration.update_param_specs(edit_param_specs_cmd.new_value)
                 elif change.property_name == 'param_changes':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExplorationPropertyParamChangesCmd.
                     edit_exp_param_changes_cmd = cast(
-                        exp_domain.EditExplorationPropertyParamChangesCmd,
-                        change
+                        exp_domain.EditExplorationPropertyParamChangesCmd, change
                     )
                     exploration.update_param_changes(
-                        list(
-                            map(
-                                to_param_domain,
-                                edit_exp_param_changes_cmd.new_value
-                            )
-                        )
+                        list(map(to_param_domain, edit_exp_param_changes_cmd.new_value))
                     )
                 elif change.property_name == 'init_state_name':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExplorationPropertyInitStateNameCmd.
                     edit_init_state_name_cmd = cast(
-                        exp_domain.EditExplorationPropertyInitStateNameCmd,
-                        change
+                        exp_domain.EditExplorationPropertyInitStateNameCmd, change
                     )
                     exploration.update_init_state_name(
                         edit_init_state_name_cmd.new_value
@@ -839,8 +826,7 @@ def apply_change_list(
                     # condition forces change to have type
                     # EditExplorationPropertyAutoTtsEnabledCmd.
                     edit_auto_tts_enabled_cmd = cast(
-                        exp_domain.EditExplorationPropertyAutoTtsEnabledCmd,
-                        change
+                        exp_domain.EditExplorationPropertyAutoTtsEnabledCmd, change
                     )
                     exploration.update_auto_tts_enabled(
                         edit_auto_tts_enabled_cmd.new_value
@@ -850,15 +836,13 @@ def apply_change_list(
                     # condition forces change to have type
                     # EditExplorationPropertyNextContentIdIndexCmd.
                     cmd = cast(
-                        exp_domain.EditExplorationPropertyNextContentIdIndexCmd,
-                        change
+                        exp_domain.EditExplorationPropertyNextContentIdIndexCmd, change
                     )
                     next_content_id_index = max(
-                        cmd.new_value, exploration.next_content_id_index)
-                    exploration.update_next_content_id_index(
-                        next_content_id_index)
-            elif (change.cmd ==
-                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+                        cmd.new_value, exploration.next_content_id_index
+                    )
+                    exploration.update_next_content_id_index(next_content_id_index)
+            elif change.cmd == exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
                 # Loading the exploration model from the datastore into an
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
@@ -869,26 +853,27 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # ExplorationChange to a specific change command.
                 migrate_states_schema_cmd = cast(
-                    exp_domain.MigrateStatesSchemaToLatestVersionCmd,
-                    change
+                    exp_domain.MigrateStatesSchemaToLatestVersionCmd, change
                 )
                 target_version_is_current_state_schema_version = (
-                    migrate_states_schema_cmd.to_version ==
-                    str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+                    migrate_states_schema_cmd.to_version
+                    == str(feconf.CURRENT_STATE_SCHEMA_VERSION)
                 )
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
                         'Expected to migrate to the latest state schema '
-                        'version %s, received %s' % (
+                        'version %s, received %s'
+                        % (
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
-                            migrate_states_schema_cmd.to_version))
+                            migrate_states_schema_cmd.to_version,
+                        )
+                    )
         return exploration
 
     except Exception as e:
         logging.error(
-            '%s %s %s %s' % (
-                e.__class__.__name__, e, exploration_id,
-                pprint.pformat(change_list))
+            '%s %s %s %s'
+            % (e.__class__.__name__, e, exploration_id, pprint.pformat(change_list))
         )
         raise e
 
@@ -917,7 +902,8 @@ def populate_exp_model_fields(
     exp_model.init_state_name = exploration.init_state_name
     exp_model.states = {
         state_name: state.to_dict()
-        for (state_name, state) in exploration.states.items()}
+        for (state_name, state) in exploration.states.items()
+    }
     exp_model.param_specs = exploration.param_specs_dict
     exp_model.param_changes = exploration.param_change_dicts
     exp_model.auto_tts_enabled = exploration.auto_tts_enabled
@@ -929,7 +915,7 @@ def populate_exp_model_fields(
 
 def populate_exp_summary_model_fields(
     exp_summary_model: Optional[exp_models.ExpSummaryModel],
-    exp_summary: exp_domain.ExplorationSummary
+    exp_summary: exp_domain.ExplorationSummary,
 ) -> exp_models.ExpSummaryModel:
     """Populate exploration summary model with the data from
     ExplorationSummary object.
@@ -951,10 +937,8 @@ def populate_exp_summary_model_fields(
         'tags': exp_summary.tags,
         'ratings': exp_summary.ratings,
         'scaled_average_rating': exp_summary.scaled_average_rating,
-        'exploration_model_last_updated': (
-            exp_summary.exploration_model_last_updated),
-        'exploration_model_created_on': (
-            exp_summary.exploration_model_created_on),
+        'exploration_model_last_updated': (exp_summary.exploration_model_last_updated),
+        'exploration_model_created_on': (exp_summary.exploration_model_created_on),
         'first_published_msec': exp_summary.first_published_msec,
         'status': exp_summary.status,
         'community_owned': exp_summary.community_owned,
@@ -964,7 +948,7 @@ def populate_exp_summary_model_fields(
         'viewer_ids': exp_summary.viewer_ids,
         'contributor_ids': list(exp_summary.contributors_summary.keys()),
         'contributors_summary': exp_summary.contributors_summary,
-        'version': exp_summary.version
+        'version': exp_summary.version,
     }
     if exp_summary_model is not None:
         exp_summary_model.populate(**exp_summary_dict)
@@ -981,7 +965,7 @@ def update_states_version_history(
     old_states_dict: Dict[str, state_domain.StateDict],
     new_states_dict: Dict[str, state_domain.StateDict],
     current_version: int,
-    committer_id: str
+    committer_id: str,
 ) -> Dict[str, state_domain.StateVersionHistory]:
     """Updates the version history of each state at a particular version
     of an exploration.
@@ -1018,27 +1002,26 @@ def update_states_version_history(
     # state_1 in the same commit, then there is no effective change in state
     # name and we need to clear them from this dict.
     effective_old_to_new_state_names = {}
-    for old_state_name, new_state_name in (
-        exp_versions_diff.old_to_new_state_names.items()
-    ):
+    for (
+        old_state_name,
+        new_state_name,
+    ) in exp_versions_diff.old_to_new_state_names.items():
         if old_state_name != new_state_name:
             effective_old_to_new_state_names[old_state_name] = new_state_name
     for old_state_name in effective_old_to_new_state_names:
         del states_version_history[old_state_name]
-    for old_state_name, new_state_name in (
-        effective_old_to_new_state_names.items()
-    ):
-        states_version_history[new_state_name] = (
-            state_domain.StateVersionHistory(
-                prev_version, old_state_name, committer_id))
+    for old_state_name, new_state_name in effective_old_to_new_state_names.items():
+        states_version_history[new_state_name] = state_domain.StateVersionHistory(
+            prev_version, old_state_name, committer_id
+        )
 
     # The following list includes states which exist in both the old states
     # and new states and were not renamed.
     states_which_were_not_renamed = []
     for state_name in old_states_dict:
         if (
-            state_name not in exp_versions_diff.deleted_state_names and
-            state_name not in effective_old_to_new_state_names
+            state_name not in exp_versions_diff.deleted_state_names
+            and state_name not in effective_old_to_new_state_names
         ):
             states_which_were_not_renamed.append(state_name)
 
@@ -1048,45 +1031,42 @@ def update_states_version_history(
     # The following dict stores whether the properties of states present
     # in states_which_were_not_renamed were changed using EDIT_STATE_PROPERTY.
     state_property_changed_data = {
-        state_name: False
-        for state_name in states_which_were_not_renamed
+        state_name: False for state_name in states_which_were_not_renamed
     }
     # The following ignore list contains those state properties which are
     # related to voiceovers. Hence, they are ignored in order to avoid
     # updating the version history in case of voiceover-only commits.
-    state_property_ignore_list = [
-        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
-    ]
+    state_property_ignore_list = [exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS]
     for change in change_list:
         if (
-            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-            change.property_name not in state_property_ignore_list
+            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
+            and change.property_name not in state_property_ignore_list
         ):
             state_name = change.state_name
             if state_name in state_property_changed_data:
                 state_property_changed_data[state_name] = True
 
-    for state_name, state_property_changed in (
-        state_property_changed_data.items()):
+    for state_name, state_property_changed in state_property_changed_data.items():
         if state_property_changed:
             # The purpose of checking the diff_dict between the two state
             # dicts ensure that we do not change the version history of that
             # particular state if the overall changes (by EDIT_STATE_PROPERTY)
             # get cancelled by each other and there is no 'net change'.
             diff_dict = deepdiff.DeepDiff(
-                old_states_dict[state_name], new_states_dict[state_name])
+                old_states_dict[state_name], new_states_dict[state_name]
+            )
             if diff_dict:
-                states_version_history[state_name] = (
-                    state_domain.StateVersionHistory(
-                        prev_version, state_name, committer_id
-                    ))
+                states_version_history[state_name] = state_domain.StateVersionHistory(
+                    prev_version, state_name, committer_id
+                )
 
     # Finally, add the states which were newly added during this commit. The
     # version history of these states are initialized as None because they
     # were newly added and have no 'previously edited version'.
     for state_name in exp_versions_diff.added_state_names:
-        states_version_history[state_name] = (
-            state_domain.StateVersionHistory(None, None, committer_id))
+        states_version_history[state_name] = state_domain.StateVersionHistory(
+            None, None, committer_id
+        )
 
     return states_version_history
 
@@ -1097,7 +1077,7 @@ def update_metadata_version_history(
     old_metadata_dict: exp_domain.ExplorationMetadataDict,
     new_metadata_dict: exp_domain.ExplorationMetadataDict,
     current_version: int,
-    committer_id: str
+    committer_id: str,
 ) -> exp_domain.MetadataVersionHistory:
     """Updates the version history of the exploration at a particular version
     of an exploration.
@@ -1120,8 +1100,7 @@ def update_metadata_version_history(
     prev_version = current_version - 1
 
     metadata_was_changed = any(
-        change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY
-        for change in change_list
+        change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY for change in change_list
     )
 
     if metadata_was_changed:
@@ -1139,7 +1118,7 @@ def update_metadata_version_history(
 
 def get_updated_committer_ids(
     states_version_history: Dict[str, state_domain.StateVersionHistory],
-    metadata_last_edited_committer_id: str
+    metadata_last_edited_committer_id: str,
 ) -> List[str]:
     """Extracts a list of user ids who made the 'previous commit' on each state
     and the exploration metadata from the exploration states and metadata
@@ -1169,7 +1148,7 @@ def get_updated_version_history_model(
     change_list: Sequence[exp_domain.ExplorationChange],
     committer_id: str,
     old_states: Dict[str, state_domain.State],
-    old_metadata: exp_domain.ExplorationMetadata
+    old_metadata: exp_domain.ExplorationMetadata,
 ) -> Optional[exp_models.ExplorationVersionHistoryModel]:
     """Returns an updated ExplorationVersionHistoryModel for the new version
     of the exploration (after the commit).
@@ -1189,16 +1168,18 @@ def get_updated_version_history_model(
     """
     version_history_model_id = (
         exp_models.ExplorationVersionHistoryModel.get_instance_id(
-            exploration.id, exploration.version - 1))
+            exploration.id, exploration.version - 1
+        )
+    )
     version_history_model = exp_models.ExplorationVersionHistoryModel.get(
-        version_history_model_id, strict=False)
+        version_history_model_id, strict=False
+    )
 
     # TODO(#16433): Remove this check once version history models are generated
     # for all exploration versions.
     if version_history_model is not None:
         old_states_dict = {
-            state_name: state.to_dict()
-            for state_name, state in old_states.items()
+            state_name: state.to_dict() for state_name, state in old_states.items()
         }
         new_states_dict = {
             state_name: state.to_dict()
@@ -1208,46 +1189,61 @@ def get_updated_version_history_model(
         new_metadata_dict = exploration.get_metadata().to_dict()
         states_version_history = {
             state_name: state_domain.StateVersionHistory.from_dict(
-                state_version_history_dict)
+                state_version_history_dict
+            )
             for state_name, state_version_history_dict in (
-                version_history_model.state_version_history.items())
+                version_history_model.state_version_history.items()
+            )
         }
         metadata_version_history = exp_domain.MetadataVersionHistory(
             version_history_model.metadata_last_edited_version_number,
-            version_history_model.metadata_last_edited_committer_id)
+            version_history_model.metadata_last_edited_committer_id,
+        )
 
         updated_states_version_history = update_states_version_history(
-            states_version_history, change_list, old_states_dict,
-            new_states_dict, exploration.version, committer_id
+            states_version_history,
+            change_list,
+            old_states_dict,
+            new_states_dict,
+            exploration.version,
+            committer_id,
         )
         updated_metadata_version_history = update_metadata_version_history(
-            metadata_version_history, change_list, old_metadata_dict,
-            new_metadata_dict, exploration.version, committer_id)
+            metadata_version_history,
+            change_list,
+            old_metadata_dict,
+            new_metadata_dict,
+            exploration.version,
+            committer_id,
+        )
         updated_committer_ids = get_updated_committer_ids(
             updated_states_version_history,
-            updated_metadata_version_history.last_edited_committer_id)
+            updated_metadata_version_history.last_edited_committer_id,
+        )
 
         updated_version_history_model_id = (
             exp_models.ExplorationVersionHistoryModel.get_instance_id(
-                exploration.id, exploration.version))
-        updated_version_history_model = (
-            exp_models.ExplorationVersionHistoryModel(
-                id=updated_version_history_model_id,
-                exploration_id=exploration.id,
-                exploration_version=exploration.version,
-                state_version_history={
-                    state_name: version_history.to_dict()
-                    for state_name, version_history in (
-                        updated_states_version_history.items())
-                },
-                metadata_last_edited_version_number=(
-                    updated_metadata_version_history.last_edited_version_number
-                ),
-                metadata_last_edited_committer_id=(
-                    updated_metadata_version_history.last_edited_committer_id
-                ),
-                committer_ids=updated_committer_ids
-            ))
+                exploration.id, exploration.version
+            )
+        )
+        updated_version_history_model = exp_models.ExplorationVersionHistoryModel(
+            id=updated_version_history_model_id,
+            exploration_id=exploration.id,
+            exploration_version=exploration.version,
+            state_version_history={
+                state_name: version_history.to_dict()
+                for state_name, version_history in (
+                    updated_states_version_history.items()
+                )
+            },
+            metadata_last_edited_version_number=(
+                updated_metadata_version_history.last_edited_version_number
+            ),
+            metadata_last_edited_committer_id=(
+                updated_metadata_version_history.last_edited_committer_id
+            ),
+            committer_ids=updated_committer_ids,
+        )
         return updated_version_history_model
     return None
 
@@ -1256,7 +1252,7 @@ def _compute_models_for_updating_exploration(
     committer_id: str,
     exploration: exp_domain.Exploration,
     commit_message: Optional[str],
-    change_list: Sequence[exp_domain.ExplorationChange]
+    change_list: Sequence[exp_domain.ExplorationChange],
 ) -> List[base_models.BaseModel]:
     """Returns a list of updated models related to the exploration model to be
     put to the datastore. The caller should ensure that the Exploration is
@@ -1288,21 +1284,22 @@ def _compute_models_for_updating_exploration(
         raise Exception(
             'Unexpected error: trying to update version %s of exploration '
             'from version %s. Please reload the page and try again.'
-            % (exploration_model.version, exploration.version))
+            % (exploration_model.version, exploration.version)
+        )
 
     if exploration.version < exploration_model.version:
         raise Exception(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
-            % (exploration_model.version, exploration.version))
+            % (exploration_model.version, exploration.version)
+        )
 
-    old_states = exp_fetchers.get_exploration_from_model(
-        exploration_model).states
+    old_states = exp_fetchers.get_exploration_from_model(exploration_model).states
     old_metadata = exp_fetchers.get_exploration_from_model(
-        exploration_model).get_metadata()
+        exploration_model
+    ).get_metadata()
 
-    exploration_model = populate_exp_model_fields(
-        exploration_model, exploration)
+    exploration_model = populate_exp_model_fields(exploration_model, exploration)
 
     change_list_dict = [change.to_dict() for change in change_list]
     models_to_put.extend(
@@ -1313,9 +1310,7 @@ def _compute_models_for_updating_exploration(
         )
     )
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION,
-        None,
-        [exploration.id]
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exploration.id]
     )
     exploration.version += 1
 
@@ -1324,29 +1319,24 @@ def _compute_models_for_updating_exploration(
     # Update the version history data for each state and the exploration
     # metadata in the new version of the exploration.
     version_history_model = get_updated_version_history_model(
-        exploration,
-        change_list,
-        committer_id,
-        old_states,
-        old_metadata
+        exploration, change_list, committer_id, old_states, old_metadata
     )
     if version_history_model is not None:
         models_to_put.append(version_history_model)
 
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
-        exploration.id, exploration.version, list(exploration.states.keys()),
-        exp_versions_diff, revert_to_version=None)
-
-    new_state_stats_mapping = stats_services.get_state_stats_mapping(
-        new_exp_stats
+        exploration.id,
+        exploration.version,
+        list(exploration.states.keys()),
+        exp_versions_diff,
+        revert_to_version=None,
     )
 
-    new_exp_stats_instance_id = (
-        stats_models.ExplorationStatsModel.get_entity_id(
-            new_exp_stats.exp_id,
-            new_exp_stats.exp_version
-        )
+    new_state_stats_mapping = stats_services.get_state_stats_mapping(new_exp_stats)
+
+    new_exp_stats_instance_id = stats_models.ExplorationStatsModel.get_entity_id(
+        new_exp_stats.exp_id, new_exp_stats.exp_version
     )
     models_to_put.append(
         stats_models.ExplorationStatsModel(
@@ -1359,16 +1349,14 @@ def _compute_models_for_updating_exploration(
             num_actual_starts_v2=new_exp_stats.num_actual_starts_v2,
             num_completions_v1=new_exp_stats.num_completions_v1,
             num_completions_v2=new_exp_stats.num_completions_v2,
-            state_stats_mapping=new_state_stats_mapping
+            state_stats_mapping=new_state_stats_mapping,
         )
     )
 
     # Trigger updates for exploration issues models.
     models_to_put.extend(
         stats_services.get_updated_exp_issues_models_for_new_exp_version(
-            exploration,
-            exp_versions_diff,
-            None
+            exploration, exp_versions_diff, None
         )
     )
     return models_to_put
@@ -1378,7 +1366,7 @@ def _create_exploration(
     committer_id: str,
     exploration: exp_domain.Exploration,
     commit_message: str,
-    commit_cmds: List[exp_domain.ExplorationChange]
+    commit_cmds: List[exp_domain.ExplorationChange],
 ) -> None:
     """Ensures that rights for a new exploration are saved first.
 
@@ -1412,11 +1400,12 @@ def _create_exploration(
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
-            for (state_name, state) in exploration.states.items()},
+            for (state_name, state) in exploration.states.items()
+        },
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        next_content_id_index=exploration.next_content_id_index
+        next_content_id_index=exploration.next_content_id_index,
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)
@@ -1424,7 +1413,8 @@ def _create_exploration(
 
     version_history_model = exp_models.ExplorationVersionHistoryModel(
         id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
-            exploration.id, exploration.version),
+            exploration.id, exploration.version
+        ),
         exploration_id=exploration.id,
         exploration_version=exploration.version,
         state_version_history={
@@ -1435,22 +1425,23 @@ def _create_exploration(
         },
         metadata_last_edited_version_number=None,
         metadata_last_edited_committer_id=committer_id,
-        committer_ids=[committer_id]
+        committer_ids=[committer_id],
     )
     version_history_model.update_timestamps()
     version_history_model.put()
 
     # Trigger statistics model creation.
     exploration_stats = stats_services.get_stats_for_new_exploration(
-        exploration.id, exploration.version, list(exploration.states.keys()))
+        exploration.id, exploration.version, list(exploration.states.keys())
+    )
     stats_services.create_stats_model(exploration_stats)
 
     # Trigger exploration issues model creation.
     stats_services.create_exp_issues_for_new_exploration(
-        exploration.id, exploration.version)
+        exploration.id, exploration.version
+    )
 
-    regenerate_exploration_summary_with_new_contributor(
-        exploration.id, committer_id)
+    regenerate_exploration_summary_with_new_contributor(exploration.id, committer_id)
 
 
 def save_new_exploration(
@@ -1464,14 +1455,23 @@ def save_new_exploration(
     """
     commit_message = (
         ('New exploration created with title \'%s\'.' % exploration.title)
-        if exploration.title else 'New exploration created.')
+        if exploration.title
+        else 'New exploration created.'
+    )
     _create_exploration(
-        committer_id, exploration, commit_message, [
-            exp_domain.CreateNewExplorationCmd({
-                'cmd': exp_domain.CMD_CREATE_NEW,
-                'title': exploration.title,
-                'category': exploration.category,
-            })])
+        committer_id,
+        exploration,
+        commit_message,
+        [
+            exp_domain.CreateNewExplorationCmd(
+                {
+                    'cmd': exp_domain.CMD_CREATE_NEW,
+                    'title': exploration.title,
+                    'category': exploration.category,
+                }
+            )
+        ],
+    )
     user_contributions = user_services.get_or_create_new_user_contributions(
         committer_id
     )
@@ -1482,9 +1482,7 @@ def save_new_exploration(
 
 
 def delete_exploration(
-    committer_id: str,
-    exploration_id: str,
-    force_deletion: bool = False
+    committer_id: str, exploration_id: str, force_deletion: bool = False
 ) -> None:
     """Deletes the exploration with the given exploration_id.
 
@@ -1503,14 +1501,11 @@ def delete_exploration(
             corresponding to the exploration. Otherwise, marks them as deleted
             but keeps the corresponding models in the datastore.
     """
-    delete_explorations(
-        committer_id, [exploration_id], force_deletion=force_deletion)
+    delete_explorations(committer_id, [exploration_id], force_deletion=force_deletion)
 
 
 def delete_explorations(
-    committer_id: str,
-    exploration_ids: List[str],
-    force_deletion: bool = False
+    committer_id: str, exploration_ids: List[str], force_deletion: bool = False
 ) -> None:
     """Delete the explorations with the given exploration_ids.
 
@@ -1531,15 +1526,18 @@ def delete_explorations(
     """
     # TODO(sll): Delete the files too?
     exp_models.ExplorationRightsModel.delete_multi(
-        exploration_ids, committer_id, '', force_deletion=force_deletion)
+        exploration_ids, committer_id, '', force_deletion=force_deletion
+    )
     exp_models.ExplorationModel.delete_multi(
-        exploration_ids, committer_id,
+        exploration_ids,
+        committer_id,
         feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
-        force_deletion=force_deletion)
+        force_deletion=force_deletion,
+    )
 
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
-        exploration_ids)
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, exploration_ids
+    )
 
     # Delete the explorations from search.
     search_services.delete_explorations_from_search_index(exploration_ids)
@@ -1547,27 +1545,32 @@ def delete_explorations(
     # Delete the exploration summaries, recommendations and opportunities
     # regardless of whether or not force_deletion is True.
     delete_exploration_summaries(exploration_ids)
-    recommendations_services.delete_explorations_from_recommendations(
-        exploration_ids)
+    recommendations_services.delete_explorations_from_recommendations(exploration_ids)
     opportunity_services.delete_exploration_opportunities(exploration_ids)
     feedback_services.delete_exploration_feedback_analytics(exploration_ids)
 
     # Remove the explorations from the featured activity references, if
     # necessary.
     activity_services.remove_featured_activities(
-        constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
+        constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids
+    )
 
     feedback_services.delete_threads_for_multiple_entities(
-        feconf.ENTITY_TYPE_EXPLORATION, exploration_ids)
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_ids
+    )
 
     # Remove from subscribers.
     taskqueue_services.defer(
         taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        exploration_ids,
+    )
     # Remove from activities.
     taskqueue_services.defer(
         taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        exploration_ids,
+    )
 
 
 def delete_explorations_from_user_models(exploration_ids: List[str]) -> None:
@@ -1579,59 +1582,56 @@ def delete_explorations_from_user_models(exploration_ids: List[str]) -> None:
     if not exploration_ids:
         return
 
-    subscription_models: Sequence[
-        user_models.UserSubscriptionsModel
-    ] = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.exploration_ids.IN(exploration_ids)
-    ).fetch()
-    for model in subscription_models:
-        model.exploration_ids = [
-            id_ for id_ in model.exploration_ids if id_ not in exploration_ids]
-    user_models.UserSubscriptionsModel.update_timestamps_multi(
-        list(subscription_models))
-    user_models.UserSubscriptionsModel.put_multi(list(subscription_models))
-
-    exp_user_data_models: Sequence[
-        user_models.ExplorationUserDataModel
-    ] = (
-        user_models.ExplorationUserDataModel.get_all().filter(
-            user_models.ExplorationUserDataModel.exploration_id.IN(
-                exploration_ids
-            )
+    subscription_models: Sequence[user_models.UserSubscriptionsModel] = (
+        user_models.UserSubscriptionsModel.query(
+            user_models.UserSubscriptionsModel.exploration_ids.IN(exploration_ids)
         ).fetch()
     )
-    user_models.ExplorationUserDataModel.delete_multi(
-        list(exp_user_data_models)
+    for model in subscription_models:
+        model.exploration_ids = [
+            id_ for id_ in model.exploration_ids if id_ not in exploration_ids
+        ]
+    user_models.UserSubscriptionsModel.update_timestamps_multi(
+        list(subscription_models)
     )
+    user_models.UserSubscriptionsModel.put_multi(list(subscription_models))
 
-    user_contributions_models: Sequence[
-        user_models.UserContributionsModel
-    ] = (
-        user_models.UserContributionsModel.get_all().filter(
+    exp_user_data_models: Sequence[user_models.ExplorationUserDataModel] = (
+        user_models.ExplorationUserDataModel.get_all()
+        .filter(user_models.ExplorationUserDataModel.exploration_id.IN(exploration_ids))
+        .fetch()
+    )
+    user_models.ExplorationUserDataModel.delete_multi(list(exp_user_data_models))
+
+    user_contributions_models: Sequence[user_models.UserContributionsModel] = (
+        user_models.UserContributionsModel.get_all()
+        .filter(
             datastore_services.any_of(
                 user_models.UserContributionsModel.created_exploration_ids.IN(
                     exploration_ids
                 ),
                 user_models.UserContributionsModel.edited_exploration_ids.IN(
                     exploration_ids
-                )
+                ),
             )
-        ).fetch()
+        )
+        .fetch()
     )
     for contribution_model in user_contributions_models:
         contribution_model.created_exploration_ids = [
-            exp_id for exp_id in contribution_model.created_exploration_ids
+            exp_id
+            for exp_id in contribution_model.created_exploration_ids
             if exp_id not in exploration_ids
         ]
         contribution_model.edited_exploration_ids = [
-            exp_id for exp_id in contribution_model.edited_exploration_ids
+            exp_id
+            for exp_id in contribution_model.edited_exploration_ids
             if exp_id not in exploration_ids
         ]
     user_models.UserContributionsModel.update_timestamps_multi(
-        list(user_contributions_models))
-    user_models.UserContributionsModel.put_multi(
         list(user_contributions_models)
     )
+    user_models.UserContributionsModel.put_multi(list(user_contributions_models))
 
 
 def delete_explorations_from_activities(exploration_ids: List[str]) -> None:
@@ -1647,7 +1647,7 @@ def delete_explorations_from_activities(exploration_ids: List[str]) -> None:
     model_classes: List[
         Union[
             Type[user_models.CompletedActivitiesModel],
-            Type[user_models.IncompleteActivitiesModel]
+            Type[user_models.IncompleteActivitiesModel],
         ]
     ] = [
         user_models.CompletedActivitiesModel,
@@ -1655,15 +1655,12 @@ def delete_explorations_from_activities(exploration_ids: List[str]) -> None:
     ]
     all_entities: List[AcceptableActivityModelTypes] = []
     for model_class in model_classes:
-        entities: Sequence[
-            AcceptableActivityModelTypes
-        ] = model_class.query(
+        entities: Sequence[AcceptableActivityModelTypes] = model_class.query(
             model_class.exploration_ids.IN(exploration_ids)
         ).fetch()
         for model in entities:
             model.exploration_ids = [
-                id_ for id_ in model.exploration_ids
-                if id_ not in exploration_ids
+                id_ for id_ in model.exploration_ids if id_ not in exploration_ids
             ]
         all_entities.extend(entities)
     datastore_services.update_timestamps_multi(all_entities)
@@ -1694,7 +1691,8 @@ def get_exploration_snapshots_metadata(
     version_nums = list(range(1, current_version + 1))
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
-        exploration_id, version_nums, allow_deleted=allow_deleted)
+        exploration_id, version_nums, allow_deleted=allow_deleted
+    )
 
 
 def get_last_updated_by_human_ms(exp_id: str) -> float:
@@ -1747,15 +1745,12 @@ def publish_exploration_and_update_user_profiles(
         )
     rights_manager.publish_exploration(committer, exp_id)
     exp_title = exp_fetchers.get_exploration_by_id(exp_id).title
-    email_subscription_services.inform_subscribers(
-        committer.user_id, exp_id, exp_title)
+    email_subscription_services.inform_subscribers(committer.user_id, exp_id, exp_title)
     contribution_time_msec = utils.get_current_time_in_millisecs()
-    contributor_ids = exp_fetchers.get_exploration_summary_by_id(
-        exp_id).contributor_ids
+    contributor_ids = exp_fetchers.get_exploration_summary_by_id(exp_id).contributor_ids
     for contributor in contributor_ids:
         contributor_user_settings = user_services.get_user_settings(
-            contributor,
-            strict=False
+            contributor, strict=False
         )
         if contributor_user_settings is not None:
             contributor_user_settings.update_first_contribution_msec(
@@ -1797,13 +1792,12 @@ def validate_exploration_for_story(
         ValidationError. Expected no exploration to have link tags.
     """
     validation_error_messages = []
-    if (
-            exp.language_code not in
-            android_validation_constants.SUPPORTED_LANGUAGES):
+    if exp.language_code not in android_validation_constants.SUPPORTED_LANGUAGES:
         error_string = (
             'Invalid language %s found for exploration '
             'with ID %s. This language is not supported for explorations '
-            'in a story on the mobile app.' % (exp.language_code, exp.id))
+            'in a story on the mobile app.' % (exp.language_code, exp.id)
+        )
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
@@ -1811,7 +1805,8 @@ def validate_exploration_for_story(
     if exp.param_specs or exp.param_changes:
         error_string = (
             'Expected no exploration in a story to have parameter '
-            'values in it. Invalid exploration: %s' % exp.id)
+            'values in it. Invalid exploration: %s' % exp.id
+        )
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
@@ -1820,7 +1815,8 @@ def validate_exploration_for_story(
         error_string = (
             'Expected all explorations in a story to '
             'be of a default category. '
-            'Invalid exploration: %s' % exp.id)
+            'Invalid exploration: %s' % exp.id
+        )
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
@@ -1832,7 +1828,8 @@ def validate_exploration_for_story(
                 'Invalid interaction %s in exploration '
                 'with ID: %s. This interaction is not supported for '
                 'explorations in a story on the '
-                'mobile app.' % (state.interaction.id, exp.id))
+                'mobile app.' % (state.interaction.id, exp.id)
+            )
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1841,7 +1838,8 @@ def validate_exploration_for_story(
             error_string = (
                 'RTE content in state %s of exploration '
                 'with ID %s is not supported on mobile for explorations '
-                'in a story.' % (state_name, exp.id))
+                'in a story.' % (state_name, exp.id)
+            )
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1854,16 +1852,15 @@ def validate_exploration_for_story(
             # customization arg whose value is always of List[str] type.
             recommended_exploration_ids = cast(
                 List[str],
-                state.interaction.customization_args[
-                    'recommendedExplorationIds'
-                ].value
+                state.interaction.customization_args['recommendedExplorationIds'].value,
             )
             if len(recommended_exploration_ids) != 0:
                 error_string = (
                     'Explorations in a story are not expected to contain '
                     'exploration recommendations. Exploration with ID: '
                     '%s contains exploration recommendations in its '
-                    'EndExploration interaction.' % (exp.id))
+                    'EndExploration interaction.' % (exp.id)
+                )
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
@@ -1876,7 +1873,7 @@ def validate_exploration_for_story(
             # always of List[SubtitledHtml] type.
             choices = cast(
                 List[state_domain.SubtitledHtml],
-                state.interaction.customization_args['choices'].value
+                state.interaction.customization_args['choices'].value,
             )
             if len(choices) < 4:
                 error_string = (
@@ -1893,7 +1890,8 @@ def validate_exploration_for_story(
             error_string = (
                 'Explorations in a story are not expected to contain '
                 'classifier models. State %s of exploration with ID %s '
-                'contains classifier models.' % (state_name, exp.id))
+                'contains classifier models.' % (state_name, exp.id)
+            )
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
@@ -1912,15 +1910,14 @@ def validate_exploration_for_story(
                 break
 
         if (
-            state.interaction.default_outcome is not None and
-            len(state.interaction.default_outcome.param_changes) > 0
+            state.interaction.default_outcome is not None
+            and len(state.interaction.default_outcome.param_changes) > 0
         ):
             error_string = (
                 'Explorations in a story are not expected to contain '
                 'parameter values. State %s of exploration with ID %s '
-                'contains parameter values in its default outcome.' % (
-                    state_name, exp.id
-                )
+                'contains parameter values in its default outcome.'
+                % (state_name, exp.id)
             )
             if strict:
                 raise utils.ValidationError(error_string)
@@ -1934,7 +1931,7 @@ def update_exploration(
     exploration_id: str,
     change_list: Optional[Sequence[exp_domain.ExplorationChange]],
     commit_message: Optional[str],
-    is_by_voice_artist: bool = False
+    is_by_voice_artist: bool = False,
 ) -> None:
     """Update an exploration. Commits changes.
 
@@ -1966,7 +1963,7 @@ def update_exploration(
         exploration_id=exploration_id,
         change_list=change_list,
         commit_message=commit_message,
-        is_by_voice_artist=is_by_voice_artist
+        is_by_voice_artist=is_by_voice_artist,
     )
 
     datastore_services.update_timestamps_multi(models_to_put)
@@ -1975,8 +1972,7 @@ def update_exploration(
     # Explicitly clear the cache for explorations after putting the new
     # version.
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
-        [exploration_id]
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exploration_id]
     )
 
 
@@ -2012,27 +2008,24 @@ def compute_models_to_put_when_saving_new_exp_version(
     Returns:
         list(BaseModel). A list of the models that were updated.
     """
-    models_to_put: List[
-        base_models.BaseModel
-    ] = []
+    models_to_put: List[base_models.BaseModel] = []
     if change_list is None:
         change_list = []
 
     if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
             'Voice artist does not have permission to make some '
-            'changes in the change list.')
+            'changes in the change list.'
+        )
 
     is_public = rights_manager.is_exploration_public(exploration_id)
     if is_public and not commit_message:
         raise ValueError(
-            'Exploration is public so expected a commit message but '
-            'received none.')
+            'Exploration is public so expected a commit message but ' 'received none.'
+        )
 
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION,
-        None,
-        [exploration_id]
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exploration_id]
     )
     old_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     old_content_id_set = set(old_exploration.get_translatable_content_ids())
@@ -2043,15 +2036,13 @@ def compute_models_to_put_when_saving_new_exp_version(
     updated_exploration.validate(strict=is_public)
     models_to_put.extend(
         _compute_models_for_updating_exploration(
-            committer_id,
-            updated_exploration,
-            commit_message,
-            change_list
+            committer_id, updated_exploration, commit_message, change_list
         )
     )
 
     voiceover_services.update_exploration_voice_artist_link_model(
-        committer_id, change_list, old_exploration, updated_exploration)
+        committer_id, change_list, old_exploration, updated_exploration
+    )
 
     new_content_id_set = set(updated_exploration.get_translatable_content_ids())
     content_ids_corresponding_translations_to_remove = (
@@ -2064,8 +2055,7 @@ def compute_models_to_put_when_saving_new_exp_version(
             voiceover_changes.append(change)
 
     new_voiceover_models = voiceover_services.compute_voiceover_related_change(
-        updated_exploration,
-        voiceover_changes
+        updated_exploration, voiceover_changes
     )
 
     models_to_put.extend(new_voiceover_models)
@@ -2076,20 +2066,17 @@ def compute_models_to_put_when_saving_new_exp_version(
             exp_domain.CMD_EDIT_TRANSLATION,
             exp_domain.CMD_REMOVE_TRANSLATIONS,
             exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
-            exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE
+            exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE,
         ]:
             continue
 
         if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
-            content_ids_corresponding_translations_to_remove.add(
-                change.content_id
-            )
+            content_ids_corresponding_translations_to_remove.add(change.content_id)
         translation_changes.append(change)
 
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_change(
-            updated_exploration,
-            translation_changes
+            updated_exploration, translation_changes
         )
     )
 
@@ -2106,10 +2093,10 @@ def compute_models_to_put_when_saving_new_exp_version(
     # suggestion rejection flow instead of applying the datastore changes here.
     if len(content_ids_corresponding_translations_to_remove) > 0:
         (
-            suggestion_services
-            .auto_reject_translation_suggestions_for_content_ids(
-                exploration_id,
-                content_ids_corresponding_translations_to_remove))
+            suggestion_services.auto_reject_translation_suggestions_for_content_ids(
+                exploration_id, content_ids_corresponding_translations_to_remove
+            )
+        )
 
     exp_user_data_model_to_put = get_exp_user_data_model_with_draft_discarded(
         exploration_id, committer_id
@@ -2120,18 +2107,11 @@ def compute_models_to_put_when_saving_new_exp_version(
         user_contributions = user_services.get_or_create_new_user_contributions(
             committer_id
         )
-        user_contributions.add_edited_exploration_id(
-            exploration_id
-        )
+        user_contributions.add_edited_exploration_id(exploration_id)
         models_to_put.append(
-            user_services.get_validated_user_contributions_model(
-                user_contributions
-            )
+            user_services.get_validated_user_contributions_model(user_contributions)
         )
-        user_settings = user_services.get_user_settings(
-            committer_id,
-            strict=False
-        )
+        user_settings = user_services.get_user_settings(committer_id, strict=False)
         if user_settings is not None:
             user_settings.record_user_edited_an_exploration()
             if not rights_manager.is_exploration_private(exploration_id):
@@ -2140,20 +2120,15 @@ def compute_models_to_put_when_saving_new_exp_version(
                 )
 
             models_to_put.append(
-                user_services.convert_to_user_settings_model(
-                    user_settings
-                )
+                user_services.convert_to_user_settings_model(user_settings)
             )
 
-    if opportunity_services.is_exploration_available_for_contribution(
-        exploration_id
-    ):
+    if opportunity_services.is_exploration_available_for_contribution(exploration_id):
         models_to_put.extend(
-            opportunity_services
-            .compute_opportunity_models_with_updated_exploration(
+            opportunity_services.compute_opportunity_models_with_updated_exploration(
                 exploration_id,
                 updated_exploration.get_content_count(),
-                translation_counts
+                translation_counts,
             )
         )
     exp_rights = rights_manager.get_exploration_rights(exploration_id)
@@ -2162,14 +2137,12 @@ def compute_models_to_put_when_saving_new_exp_version(
         updated_exploration,
         exp_rights,
         exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
-        skip_exploration_model_last_updated=True
+        skip_exploration_model_last_updated=True,
     )
     exp_summary.add_contribution_by_user(committer_id)
     exp_summary.version += 1
     updated_exp_summary_model: exp_models.ExpSummaryModel = (
-        populate_exp_summary_model_fields(
-            exp_summary_model, exp_summary
-        )
+        populate_exp_summary_model_fields(exp_summary_model, exp_summary)
     )
     models_to_put.append(updated_exp_summary_model)
     return models_to_put
@@ -2187,28 +2160,27 @@ def regenerate_exploration_summary_with_new_contributor(
         contributor_id: str. ID of the contributor to be added to
             the exploration summary.
     """
-    exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, strict=False)
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id, strict=False)
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
-        exploration_id, strict=False)
+        exploration_id, strict=False
+    )
     if exploration is not None:
-        exp_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=True)
+        exp_rights = rights_manager.get_exploration_rights(exploration_id, strict=True)
         if exp_summary is None:
             updated_exp_summary = generate_new_exploration_summary(
-                exploration, exp_rights)
+                exploration, exp_rights
+            )
         else:
             updated_exp_summary = update_exploration_summary(
-                exploration, exp_rights, exp_summary)
+                exploration, exp_rights, exp_summary
+            )
         updated_exp_summary.add_contribution_by_user(contributor_id)
         save_exploration_summary(updated_exp_summary)
     else:
         logging.error('Could not find exploration with ID %s', exploration_id)
 
 
-def regenerate_exploration_and_contributors_summaries(
-    exploration_id: str
-) -> None:
+def regenerate_exploration_and_contributors_summaries(exploration_id: str) -> None:
     """Regenerate a summary of the given exploration and also regenerate
     the contributors summary from the snapshots. If the summary does not exist,
     this function generates a new one.
@@ -2217,14 +2189,16 @@ def regenerate_exploration_and_contributors_summaries(
         exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_rights = rights_manager.get_exploration_rights(
-        exploration_id, strict=True)
+    exp_rights = rights_manager.get_exploration_rights(exploration_id, strict=True)
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
-        exploration_id, strict=True)
+        exploration_id, strict=True
+    )
     updated_exp_summary = update_exploration_summary(
-        exploration, exp_rights, exp_summary)
-    updated_exp_summary.contributors_summary = (
-        compute_exploration_contributors_summary(updated_exp_summary.id))
+        exploration, exp_rights, exp_summary
+    )
+    updated_exp_summary.contributors_summary = compute_exploration_contributors_summary(
+        updated_exp_summary.id
+    )
     save_exploration_summary(updated_exp_summary)
 
 
@@ -2232,7 +2206,7 @@ def update_exploration_summary(
     exploration: exp_domain.Exploration,
     exp_rights: rights_domain.ActivityRights,
     exp_summary: exp_domain.ExplorationSummary,
-    skip_exploration_model_last_updated: bool = False
+    skip_exploration_model_last_updated: bool = False,
 ) -> exp_domain.ExplorationSummary:
     """Updates an exploration summary domain object from a given exploration
     and its rights.
@@ -2260,37 +2234,46 @@ def update_exploration_summary(
     scaled_average_rating = get_scaled_average_rating(exp_summary.ratings)
 
     if skip_exploration_model_last_updated:
-        exploration_model_last_updated = (
-            exp_summary.exploration_model_last_updated)
+        exploration_model_last_updated = exp_summary.exploration_model_last_updated
     else:
         # TODO(#15895): Revisit this after we have validations for the model to
         # see whether exploration_model_last_updated and
         # ExplorationModel.last_updated are in sync or not.
         exploration_model_last_updated = datetime.datetime.fromtimestamp(
-            get_last_updated_by_human_ms(exploration.id) / 1000.0)
+            get_last_updated_by_human_ms(exploration.id) / 1000.0
+        )
 
     contributor_ids = list(exp_summary.contributors_summary.keys())
 
     if exploration.created_on is None:
-        raise Exception(
-            'No data available for when the exploration was created_on.'
-        )
+        raise Exception('No data available for when the exploration was created_on.')
 
     return exp_domain.ExplorationSummary(
-        exploration.id, exploration.title, exploration.category,
-        exploration.objective, exploration.language_code, exploration.tags,
-        exp_summary.ratings, scaled_average_rating, exp_rights.status,
-        exp_rights.community_owned, exp_rights.owner_ids, exp_rights.editor_ids,
-        exp_rights.voice_artist_ids, exp_rights.viewer_ids, contributor_ids,
-        exp_summary.contributors_summary, exploration.version,
-        exploration.created_on, exploration_model_last_updated,
-        exp_rights.first_published_msec
+        exploration.id,
+        exploration.title,
+        exploration.category,
+        exploration.objective,
+        exploration.language_code,
+        exploration.tags,
+        exp_summary.ratings,
+        scaled_average_rating,
+        exp_rights.status,
+        exp_rights.community_owned,
+        exp_rights.owner_ids,
+        exp_rights.editor_ids,
+        exp_rights.voice_artist_ids,
+        exp_rights.viewer_ids,
+        contributor_ids,
+        exp_summary.contributors_summary,
+        exploration.version,
+        exploration.created_on,
+        exploration_model_last_updated,
+        exp_rights.first_published_msec,
     )
 
 
 def generate_new_exploration_summary(
-    exploration: exp_domain.Exploration,
-    exp_rights: rights_domain.ActivityRights
+    exploration: exp_domain.Exploration, exp_rights: rights_domain.ActivityRights
 ) -> exp_domain.ExplorationSummary:
     """Generates a new exploration summary domain object from a given
     exploration and its rights.
@@ -2310,27 +2293,37 @@ def generate_new_exploration_summary(
     ratings = feconf.get_empty_ratings()
     scaled_average_rating = get_scaled_average_rating(ratings)
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        get_last_updated_by_human_ms(exploration.id) / 1000.0)
+        get_last_updated_by_human_ms(exploration.id) / 1000.0
+    )
 
     if exploration.created_on is None:
-        raise Exception(
-            'No data available for when the exploration was created_on.'
-        )
+        raise Exception('No data available for when the exploration was created_on.')
 
     return exp_domain.ExplorationSummary(
-        exploration.id, exploration.title, exploration.category,
-        exploration.objective, exploration.language_code, exploration.tags,
-        ratings, scaled_average_rating, exp_rights.status,
-        exp_rights.community_owned, exp_rights.owner_ids, exp_rights.editor_ids,
-        exp_rights.voice_artist_ids, exp_rights.viewer_ids, [], {},
-        exploration.version, exploration.created_on,
-        exploration_model_last_updated, exp_rights.first_published_msec
+        exploration.id,
+        exploration.title,
+        exploration.category,
+        exploration.objective,
+        exploration.language_code,
+        exploration.tags,
+        ratings,
+        scaled_average_rating,
+        exp_rights.status,
+        exp_rights.community_owned,
+        exp_rights.owner_ids,
+        exp_rights.editor_ids,
+        exp_rights.voice_artist_ids,
+        exp_rights.viewer_ids,
+        [],
+        {},
+        exploration.version,
+        exploration.created_on,
+        exploration_model_last_updated,
+        exp_rights.first_published_msec,
     )
 
 
-def compute_exploration_contributors_summary(
-    exploration_id: str
-) -> Dict[str, int]:
+def compute_exploration_contributors_summary(exploration_id: str) -> Dict[str, int]:
     """Returns a dict whose keys are user_ids and whose values are
     the number of (non-revert) commits made to the given exploration
     by that user_id. This does not count commits which have since been reverted.
@@ -2357,8 +2350,7 @@ def compute_exploration_contributors_summary(
             break
 
         if is_revert:
-            version_number = snapshot_metadata['commit_cmds'][0][
-                'version_number']
+            version_number = snapshot_metadata['commit_cmds'][0]['version_number']
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert isinstance(version_number, int)
@@ -2376,9 +2368,7 @@ def compute_exploration_contributors_summary(
     return contributors_summary
 
 
-def save_exploration_summary(
-    exp_summary: exp_domain.ExplorationSummary
-) -> None:
+def save_exploration_summary(exp_summary: exp_domain.ExplorationSummary) -> None:
     """Save an exploration summary domain object as an ExpSummaryModel entity
     in the datastore.
 
@@ -2386,10 +2376,12 @@ def save_exploration_summary(
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
 
-    existing_exp_summary_model = (
-        exp_models.ExpSummaryModel.get(exp_summary.id, strict=False))
+    existing_exp_summary_model = exp_models.ExpSummaryModel.get(
+        exp_summary.id, strict=False
+    )
     exp_summary_model = populate_exp_summary_model_fields(
-        existing_exp_summary_model, exp_summary)
+        existing_exp_summary_model, exp_summary
+    )
     exp_summary_model.update_timestamps()
     exp_summary_model.put()
     # The index should be updated after saving the exploration
@@ -2408,8 +2400,7 @@ def delete_exploration_summaries(exploration_ids: List[str]) -> None:
     """
     summary_models = exp_models.ExpSummaryModel.get_multi(exploration_ids)
     existing_summary_models = [
-        summary_model for summary_model in summary_models
-        if summary_model is not None
+        summary_model for summary_model in summary_models if summary_model is not None
     ]
     exp_models.ExpSummaryModel.delete_multi(existing_summary_models)
 
@@ -2429,22 +2420,28 @@ def revert_version_history(
     """
     version_history_model_id = (
         exp_models.ExplorationVersionHistoryModel.get_instance_id(
-            exploration_id, revert_to_version))
+            exploration_id, revert_to_version
+        )
+    )
     version_history_model = exp_models.ExplorationVersionHistoryModel.get(
-        version_history_model_id, strict=False)
+        version_history_model_id, strict=False
+    )
 
     if version_history_model is not None:
         new_version_history_model = exp_models.ExplorationVersionHistoryModel(
             id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
-                exploration_id, current_version + 1),
+                exploration_id, current_version + 1
+            ),
             exploration_id=exploration_id,
             exploration_version=current_version + 1,
             state_version_history=version_history_model.state_version_history,
             metadata_last_edited_version_number=(
-                version_history_model.metadata_last_edited_version_number),
+                version_history_model.metadata_last_edited_version_number
+            ),
             metadata_last_edited_committer_id=(
-                version_history_model.metadata_last_edited_committer_id),
-            committer_ids=version_history_model.committer_ids
+                version_history_model.metadata_last_edited_committer_id
+            ),
+            committer_ids=version_history_model.committer_ids,
         )
         new_version_history_model.update_timestamps()
         new_version_history_model.put()
@@ -2468,11 +2465,13 @@ def get_exploration_validation_error(
     """
     # Validate the previous version of the exploration.
     exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, version=revert_to_version)
+        exploration_id, version=revert_to_version
+    )
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     try:
         exploration.validate(
-            exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC)
+            exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC
+        )
     except Exception as ex:
         return str(ex)
 
@@ -2480,10 +2479,7 @@ def get_exploration_validation_error(
 
 
 def revert_exploration(
-    committer_id: str,
-    exploration_id: str,
-    current_version: int,
-    revert_to_version: int
+    committer_id: str, exploration_id: str, current_version: int, revert_to_version: int
 ) -> None:
     """Reverts an exploration to the given version number. Commits changes.
 
@@ -2499,25 +2495,27 @@ def revert_exploration(
         Exception. Version of exploration does not match the version of the
             currently-stored exploration model.
     """
-    exploration_model = exp_models.ExplorationModel.get(
-        exploration_id, strict=True)
+    exploration_model = exp_models.ExplorationModel.get(exploration_id, strict=True)
 
     if current_version > exploration_model.version:
         raise Exception(
             'Unexpected error: trying to update version %s of exploration '
             'from version %s. Please reload the page and try again.'
-            % (exploration_model.version, current_version))
+            % (exploration_model.version, current_version)
+        )
 
     if current_version < exploration_model.version:
         raise Exception(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
-            % (exploration_model.version, current_version))
+            % (exploration_model.version, current_version)
+        )
 
     # Validate the previous version of the exploration before committing the
     # change.
     exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, version=revert_to_version)
+        exploration_id, version=revert_to_version
+    )
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     exploration_is_public = (
         exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
@@ -2525,52 +2523,52 @@ def revert_exploration(
     exploration.validate(strict=exploration_is_public)
 
     exp_models.ExplorationModel.revert(
-        exploration_model, committer_id,
+        exploration_model,
+        committer_id,
         'Reverted exploration to version %s' % revert_to_version,
-        revert_to_version)
+        revert_to_version,
+    )
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
-        [exploration.id])
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exploration.id]
+    )
 
     revert_version_history(exploration_id, current_version, revert_to_version)
 
     reverted_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_changes_upon_revert(
-            reverted_exploration, revert_to_version))
+            reverted_exploration, revert_to_version
+        )
+    )
 
-    translation_and_opportunity_models_to_put: List[
-        base_models.BaseModel
-    ] = []
+    translation_and_opportunity_models_to_put: List[base_models.BaseModel] = []
 
     translation_and_opportunity_models_to_put.extend(new_translation_models)
 
-    if opportunity_services.is_exploration_available_for_contribution(
-        exploration_id
-    ):
+    if opportunity_services.is_exploration_available_for_contribution(exploration_id):
         translation_and_opportunity_models_to_put.extend(
-            opportunity_services
-            .compute_opportunity_models_with_updated_exploration(
-                exploration_id,
-                exploration.get_content_count(),
-                translation_counts
+            opportunity_services.compute_opportunity_models_with_updated_exploration(
+                exploration_id, exploration.get_content_count(), translation_counts
             )
         )
 
     regenerate_exploration_and_contributors_summaries(exploration_id)
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
-        exploration.id, current_version + 1, list(exploration.states.keys()),
-        None, revert_to_version)
+        exploration.id,
+        current_version + 1,
+        list(exploration.states.keys()),
+        None,
+        revert_to_version,
+    )
     stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, version=current_version)
+        exploration_id, version=current_version
+    )
     exp_issues_models_to_put = (
         stats_services.get_updated_exp_issues_models_for_new_exp_version(
-            current_exploration,
-            None,
-            revert_to_version
+            current_exploration, None, revert_to_version
         )
     )
     datastore_services.put_multi(exp_issues_models_to_put)
@@ -2579,7 +2577,7 @@ def revert_exploration(
 
 # Creation and deletion methods.
 def get_demo_exploration_components(
-    demo_path: str
+    demo_path: str,
 ) -> Tuple[str, List[Tuple[str, bytes]]]:
     """Gets the content of `demo_path` in the sample explorations folder.
 
@@ -2612,7 +2610,7 @@ def save_new_exploration_from_yaml_and_assets(
     yaml_content: str,
     exploration_id: str,
     assets_list: List[Tuple[str, bytes]],
-    strip_voiceovers: bool = False
+    strip_voiceovers: bool = False,
 ) -> None:
     """Saves a new exploration given its representation in YAML form and the
     list of assets associated with it.
@@ -2637,9 +2635,8 @@ def save_new_exploration_from_yaml_and_assets(
     # migrating to state schema version 25 involves adding dimensions to
     # images. So we need to have images in the datastore before we could
     # perform the migration.
-    for (asset_filename, asset_content) in assets_list:
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+    for asset_filename, asset_content in assets_list:
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(asset_filename, asset_content)
 
     exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
@@ -2650,16 +2647,23 @@ def save_new_exploration_from_yaml_and_assets(
             state.recorded_voiceovers.strip_all_existing_voiceovers()
 
     create_commit_message = (
-        'New exploration created from YAML file with title \'%s\'.'
-        % exploration.title)
+        'New exploration created from YAML file with title \'%s\'.' % exploration.title
+    )
 
     _create_exploration(
-        committer_id, exploration, create_commit_message, [
-            exp_domain.CreateNewExplorationCmd({
-                'cmd': exp_domain.CMD_CREATE_NEW,
-                'title': exploration.title,
-                'category': exploration.category,
-            })])
+        committer_id,
+        exploration,
+        create_commit_message,
+        [
+            exp_domain.CreateNewExplorationCmd(
+                {
+                    'cmd': exp_domain.CMD_CREATE_NEW,
+                    'title': exploration.title,
+                    'category': exploration.category,
+                }
+            )
+        ],
+    )
 
 
 def delete_demo(exploration_id: str) -> None:
@@ -2674,15 +2678,16 @@ def delete_demo(exploration_id: str) -> None:
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
 
-    exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, strict=False)
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id, strict=False)
     if not exploration:
         logging.info(
             'Exploration with id %s was not deleted, because it '
-            'does not exist.' % exploration_id)
+            'does not exist.' % exploration_id
+        )
     else:
         delete_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
+            feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True
+        )
 
 
 def load_demo(exploration_id: str) -> None:
@@ -2706,10 +2711,12 @@ def load_demo(exploration_id: str) -> None:
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id, assets_list)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id, assets_list
+    )
 
     publish_exploration_and_update_user_profiles(
-        user_services.get_system_user(), exploration_id)
+        user_services.get_system_user(), exploration_id
+    )
 
     index_explorations_given_ids([exploration_id])
 
@@ -2719,7 +2726,7 @@ def load_demo(exploration_id: str) -> None:
 def get_next_page_of_all_non_private_commits(
     page_size: int = feconf.COMMIT_LIST_PAGE_SIZE,
     urlsafe_start_cursor: Optional[str] = None,
-    max_age: Optional[datetime.timedelta] = None
+    max_age: Optional[datetime.timedelta] = None,
 ) -> Tuple[List[exp_domain.ExplorationCommitLogEntry], Optional[str], bool]:
     """Returns a page of non-private commits in reverse time order. If max_age
     is given, it should be a datetime.timedelta instance.
@@ -2750,23 +2757,38 @@ def get_next_page_of_all_non_private_commits(
         ValueError. The argument max_age is not datetime.timedelta or None.
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
-        raise ValueError(
-            'max_age must be a datetime.timedelta instance. or None.')
+        raise ValueError('max_age must be a datetime.timedelta instance. or None.')
 
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
-            page_size, urlsafe_start_cursor, max_age=max_age))
+            page_size, urlsafe_start_cursor, max_age=max_age
+        )
+    )
 
-    return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id,
-        entry.exploration_id, entry.commit_type, entry.commit_message,
-        entry.commit_cmds, entry.version, entry.post_commit_status,
-        entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], new_urlsafe_start_cursor, more)
+    return (
+        [
+            exp_domain.ExplorationCommitLogEntry(
+                entry.created_on,
+                entry.last_updated,
+                entry.user_id,
+                entry.exploration_id,
+                entry.commit_type,
+                entry.commit_message,
+                entry.commit_cmds,
+                entry.version,
+                entry.post_commit_status,
+                entry.post_commit_community_owned,
+                entry.post_commit_is_private,
+            )
+            for entry in results
+        ],
+        new_urlsafe_start_cursor,
+        more,
+    )
 
 
 def get_image_filenames_from_exploration(
-    exploration: exp_domain.Exploration
+    exploration: exp_domain.Exploration,
 ) -> List[str]:
     """Get the image filenames from the exploration.
 
@@ -2786,13 +2808,12 @@ def get_image_filenames_from_exploration(
             # whose values is always of ImageAndRegionDict type.
             image_paths = cast(
                 domain.ImageAndRegionDict,
-                state.interaction.customization_args['imageAndRegions'].value
+                state.interaction.customization_args['imageAndRegions'].value,
             )
             filenames.append(image_paths['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
-    filenames.extend(
-        html_cleaner.get_image_filenames_from_html_strings(html_list))
+    filenames.extend(html_cleaner.get_image_filenames_from_html_strings(html_list))
     return filenames
 
 
@@ -2867,15 +2888,18 @@ def index_explorations_given_ids(exp_ids: List[str]) -> None:
     Args:
         exp_ids: list(str). List of ids of the explorations to be indexed.
     """
-    exploration_summaries = exp_fetchers.get_exploration_summaries_matching_ids(
-        exp_ids)
-    search_services.index_exploration_summaries([
-        exploration_summary for exploration_summary in exploration_summaries
-        if exploration_summary is not None])
+    exploration_summaries = exp_fetchers.get_exploration_summaries_matching_ids(exp_ids)
+    search_services.index_exploration_summaries(
+        [
+            exploration_summary
+            for exploration_summary in exploration_summaries
+            if exploration_summary is not None
+        ]
+    )
 
 
 def is_voiceover_change_list(
-    change_list: Sequence[exp_domain.ExplorationChange]
+    change_list: Sequence[exp_domain.ExplorationChange],
 ) -> bool:
     """Checks whether the change list contains only the changes which are
     allowed for voice artist to do.
@@ -2890,8 +2914,8 @@ def is_voiceover_change_list(
     """
     voiceover_with_accent_feature_is_enabled = (
         feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value,
-            None)
+            feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value, None
+        )
     )
 
     for change in change_list:
@@ -2899,10 +2923,7 @@ def is_voiceover_change_list(
             if change.cmd != exp_domain.CMD_UPDATE_VOICEOVERS:
                 return False
         else:
-            if (
-                change.property_name !=
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
-            ):
+            if change.property_name != exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS:
                 return False
     return True
 
@@ -2930,20 +2951,21 @@ def get_composite_change_list(
     if from_version > to_version:
         raise Exception(
             'Unexpected error: Trying to find change list from version %s '
-            'of exploration to version %s.'
-            % (from_version, to_version))
+            'of exploration to version %s.' % (from_version, to_version)
+        )
 
     version_nums = list(range(from_version + 1, to_version + 1))
     snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
-        exp_id, version_nums, allow_deleted=False)
+        exp_id, version_nums, allow_deleted=False
+    )
 
     composite_change_list_dict = []
     for snapshot in snapshots_metadata:
         composite_change_list_dict += snapshot['commit_cmds']
 
     composite_change_list = [
-        exp_domain.ExplorationChange(change)
-        for change in composite_change_list_dict]
+        exp_domain.ExplorationChange(change) for change in composite_change_list_dict
+    ]
 
     return composite_change_list
 
@@ -2951,7 +2973,7 @@ def get_composite_change_list(
 def are_changes_mergeable(
     exp_id: str,
     change_list_version: int,
-    change_list: List[exp_domain.ExplorationChange]
+    change_list: List[exp_domain.ExplorationChange],
 ) -> bool:
     """Checks whether the change list can be merged when the
     intended exploration version of changes_list is not same as
@@ -2976,23 +2998,24 @@ def are_changes_mergeable(
     # A complete list of changes from one version to another
     # is composite_change_list.
     composite_change_list = get_composite_change_list(
-        exp_id, change_list_version,
-        current_exploration.version)
+        exp_id, change_list_version, current_exploration.version
+    )
 
     exp_at_change_list_version = exp_fetchers.get_exploration_by_id(
-        exp_id, version=change_list_version)
+        exp_id, version=change_list_version
+    )
 
-    changes_are_mergeable, send_email = (
-        exp_domain.ExplorationChangeMergeVerifier(
-            composite_change_list).is_change_list_mergeable(
-                change_list, exp_at_change_list_version,
-                current_exploration))
+    changes_are_mergeable, send_email = exp_domain.ExplorationChangeMergeVerifier(
+        composite_change_list
+    ).is_change_list_mergeable(
+        change_list, exp_at_change_list_version, current_exploration
+    )
 
     if send_email:
         change_list_dict = [change.to_dict() for change in change_list]
         email_manager.send_not_mergeable_change_list_to_admin_for_review(
-            exp_id, change_list_version, current_exploration.version,
-            change_list_dict)
+            exp_id, change_list_version, current_exploration.version, change_list_dict
+        )
     return changes_are_mergeable
 
 
@@ -3016,41 +3039,44 @@ def get_user_exploration_data(
     user_id: str,
     exploration_id: str,
     apply_draft: bool = False,
-    version: Optional[int] = None
+    version: Optional[int] = None,
 ) -> UserExplorationDataDict:
     """Returns a description of the given exploration."""
-    exp_user_data = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exploration_id)
     is_valid_draft_version = (
         is_version_of_draft_valid(
-            exploration_id, exp_user_data.draft_change_list_exp_version)
+            exploration_id, exp_user_data.draft_change_list_exp_version
+        )
         if exp_user_data and exp_user_data.draft_change_list_exp_version
-        else None)
+        else None
+    )
     if apply_draft:
-        updated_exploration = (
-            get_exp_with_draft_applied(exploration_id, user_id))
+        updated_exploration = get_exp_with_draft_applied(exploration_id, user_id)
         if updated_exploration is None:
             exploration = exp_fetchers.get_exploration_by_id(
-                exploration_id, version=version)
+                exploration_id, version=version
+            )
         else:
             exploration = updated_exploration
             is_valid_draft_version = True
     else:
         exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=version)
+            exploration_id, version=version
+        )
 
     states = {}
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
     draft_changes = (
-        exp_user_data.draft_change_list if exp_user_data
-        and exp_user_data.draft_change_list else None)
-    draft_change_list_id = (
-        exp_user_data.draft_change_list_id if exp_user_data else 0)
-    exploration_email_preferences = (
-        user_services.get_email_preferences_for_exploration(
-            user_id, exploration_id))
+        exp_user_data.draft_change_list
+        if exp_user_data and exp_user_data.draft_change_list
+        else None
+    )
+    draft_change_list_id = exp_user_data.draft_change_list_id if exp_user_data else 0
+    exploration_email_preferences = user_services.get_email_preferences_for_exploration(
+        user_id, exploration_id
+    )
 
     editor_dict: UserExplorationDataDict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
@@ -3062,8 +3088,7 @@ def get_user_exploration_data(
         'objective': exploration.objective,
         'param_changes': exploration.param_change_dicts,
         'param_specs': exploration.param_specs_dict,
-        'rights': rights_manager.get_exploration_rights(
-            exploration_id).to_dict(),
+        'rights': rights_manager.get_exploration_rights(exploration_id).to_dict(),
         'show_state_editor_tutorial_on_load': False,
         'show_state_translation_tutorial_on_load': False,
         'states': states,
@@ -3075,7 +3100,7 @@ def get_user_exploration_data(
         'email_preferences': exploration_email_preferences.to_dict(),
         'next_content_id_index': exploration.next_content_id_index,
         'edits_allowed': exploration.edits_allowed,
-        'exploration_metadata': exploration.get_metadata().to_dict()
+        'exploration_metadata': exploration.get_metadata().to_dict(),
     }
 
     return editor_dict
@@ -3087,7 +3112,7 @@ def create_or_update_draft(
     change_list: Sequence[exp_domain.ExplorationChange],
     exp_version: int,
     current_datetime: datetime.datetime,
-    is_by_voice_artist: bool = False
+    is_by_voice_artist: bool = False,
 ) -> None:
     """Create a draft with the given change list, or update the change list
     of the draft if it already exists. A draft is updated only if the change
@@ -3109,19 +3134,22 @@ def create_or_update_draft(
     if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
             'Voice artist does not have permission to make some '
-            'changes in the change list.')
+            'changes in the change list.'
+        )
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    if (exp_user_data and exp_user_data.draft_change_list and
-            exp_user_data.draft_change_list_last_updated > current_datetime):
+    if (
+        exp_user_data
+        and exp_user_data.draft_change_list
+        and exp_user_data.draft_change_list_last_updated > current_datetime
+    ):
         return
 
     updated_exploration = apply_change_list(exp_id, change_list)
     updated_exploration.validate(strict=False)
 
     if exp_user_data is None:
-        exp_user_data = user_models.ExplorationUserDataModel.create(
-            user_id, exp_id)
+        exp_user_data = user_models.ExplorationUserDataModel.create(user_id, exp_id)
 
     draft_change_list_id = exp_user_data.draft_change_list_id
     draft_change_list_id += 1
@@ -3155,40 +3183,45 @@ def get_exp_with_draft_applied(
     draft_change_list = []
     if exp_user_data:
         if exp_user_data.draft_change_list:
-            draft_change_list_exp_version = (
-                exp_user_data.draft_change_list_exp_version)
+            draft_change_list_exp_version = exp_user_data.draft_change_list_exp_version
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
-                for change in exp_user_data.draft_change_list]
-            if (exploration.version >
-                    exp_user_data.draft_change_list_exp_version):
+                for change in exp_user_data.draft_change_list
+            ]
+            if exploration.version > exp_user_data.draft_change_list_exp_version:
                 logging.info(
                     'Exploration and draft versions out of sync, trying '
-                    'to upgrade draft version to match exploration\'s.')
+                    'to upgrade draft version to match exploration\'s.'
+                )
                 new_draft_change_list = (
                     draft_upgrade_services.try_upgrading_draft_to_exp_version(
                         draft_change_list,
                         exp_user_data.draft_change_list_exp_version,
-                        exploration.version, exploration.id))
+                        exploration.version,
+                        exploration.id,
+                    )
+                )
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
     updated_exploration = None
 
-    if (exp_user_data and exp_user_data.draft_change_list and
-            are_changes_mergeable(
-                exp_id, draft_change_list_exp_version, draft_change_list)):
-        updated_exploration = apply_change_list(
-            exp_id, draft_change_list)
+    if (
+        exp_user_data
+        and exp_user_data.draft_change_list
+        and are_changes_mergeable(
+            exp_id, draft_change_list_exp_version, draft_change_list
+        )
+    ):
+        updated_exploration = apply_change_list(exp_id, draft_change_list)
         updated_exploration_has_no_invalid_math_tags = True
         # verify that all the math-tags are valid before returning the
         # updated exploration.
         for state in updated_exploration.states.values():
             html_string = ''.join(state.get_all_html_content_strings())
-            error_list = (
-                html_validation_service.
-                validate_math_tags_in_html_with_attribute_math_content(
-                    html_string))
+            error_list = html_validation_service.validate_math_tags_in_html_with_attribute_math_content(
+                html_string
+            )
             if len(error_list) > 0:
                 updated_exploration_has_no_invalid_math_tags = False
                 break
@@ -3206,8 +3239,7 @@ def discard_draft(exp_id: str, user_id: str) -> None:
         user_id: str. The id of the user whose draft is to be discarded.
     """
 
-    exp_user_data = user_models.ExplorationUserDataModel.get(
-        user_id, exp_id)
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if exp_user_data:
         exp_user_data.draft_change_list = None
         exp_user_data.draft_change_list_last_updated = None
@@ -3217,8 +3249,7 @@ def discard_draft(exp_id: str, user_id: str) -> None:
 
 
 def get_exp_user_data_model_with_draft_discarded(
-    exp_id: str,
-    user_id: str
+    exp_id: str, user_id: str
 ) -> Optional[user_models.ExplorationUserDataModel]:
     """Clears change list related fields in the ExplorationUserDataModel and
     returns it.
@@ -3232,8 +3263,7 @@ def get_exp_user_data_model_with_draft_discarded(
         draft discarded if it exists, otherwise None.
     """
 
-    exp_user_data = user_models.ExplorationUserDataModel.get(
-        user_id, exp_id)
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if exp_user_data:
         exp_user_data.draft_change_list = None
         exp_user_data.draft_change_list_last_updated = None
@@ -3260,11 +3290,12 @@ def get_interaction_id_for_state(exp_id: str, state_name: str) -> Optional[str]:
     if exploration.has_state_name(state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
-        'There exist no state in the exploration with the given state name.')
+        'There exist no state in the exploration with the given state name.'
+    )
 
 
 def regenerate_missing_stats_for_exploration(
-    exp_id: str
+    exp_id: str,
 ) -> Tuple[List[str], List[str], int, int]:
     """Regenerates missing ExplorationStats models and entries for all
     corresponding states in an exploration.
@@ -3295,24 +3326,24 @@ def regenerate_missing_stats_for_exploration(
     missing_exp_stats_indices = []
 
     exp_stats_list = stats_services.get_multiple_exploration_stats_by_version(
-        exp_id, exp_versions)
+        exp_id, exp_versions
+    )
 
     exp_list = (
-        exp_fetchers
-        .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
-            exp_id, exp_versions))
+        exp_fetchers.get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+            exp_id, exp_versions
+        )
+    )
 
     if all(exp_stats is None for exp_stats in exp_stats_list):
         for index, version in enumerate(exp_versions):
-            exp_stats_for_version = (
-                stats_services.get_stats_for_new_exploration(
-                    exp_id, version,
-                    list(exp_list[index].state_interaction_ids_dict.keys())))
+            exp_stats_for_version = stats_services.get_stats_for_new_exploration(
+                exp_id, version, list(exp_list[index].state_interaction_ids_dict.keys())
+            )
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 
-    snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
-        exp_id, exp_versions)
+    snapshots = exp_models.ExplorationModel.get_snapshots_metadata(exp_id, exp_versions)
     change_lists = []
     for snapshot in snapshots:
         change_list_for_snapshot = []
@@ -3324,8 +3355,7 @@ def regenerate_missing_stats_for_exploration(
             except utils.ValidationError:
                 logging.error(
                     'Exploration(id=%r) snapshots contains invalid '
-                    'commit_cmd: %r'
-                    % (exp_id, commit_cmd)
+                    'commit_cmd: %r' % (exp_id, commit_cmd)
                 )
                 continue
         change_lists.append(change_list_for_snapshot)
@@ -3333,15 +3363,17 @@ def regenerate_missing_stats_for_exploration(
     missing_exp_stats = []
     missing_state_stats = []
 
-    zipped_items = list(
-        zip(exp_stats_list, exp_list, change_lists))
+    zipped_items = list(zip(exp_stats_list, exp_list, change_lists))
     revert_commit_cmd = exp_models.ExplorationModel.CMD_REVERT_COMMIT
     for i, (exp_stats, exp, change_list) in enumerate(zipped_items):
         revert_to_version = next(
             (
-                int(change.version_number) for change in change_list
+                int(change.version_number)
+                for change in change_list
                 if change.cmd == revert_commit_cmd
-            ), None)
+            ),
+            None,
+        )
         new_exp_version = None
 
         if revert_to_version is not None:
@@ -3354,8 +3386,7 @@ def regenerate_missing_stats_for_exploration(
             prev_exp = exp_list[prev_exp_version_index]
             new_exp_version = revert_to_version
         else:
-            exp_versions_diff = exp_domain.ExplorationVersionsDiff(
-                change_list)
+            exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
             # We subtract 2 from exp.version to get the index of the
             # previous exploration version because exp_stats_list and
             # prev_exp start with version 1 in the 0th index.
@@ -3368,46 +3399,43 @@ def regenerate_missing_stats_for_exploration(
         if exp_stats:
             num_valid_exp_stats += 1
         elif exp.version == 1:
-            new_exploration_stats = (
-                stats_services.get_stats_for_new_exploration(
-                    exp_id, exp.version,
-                    list(exp.state_interaction_ids_dict.keys())))
+            new_exploration_stats = stats_services.get_stats_for_new_exploration(
+                exp_id, exp.version, list(exp.state_interaction_ids_dict.keys())
+            )
             stats_services.create_stats_model(new_exploration_stats)
             missing_exp_stats_indices.append(i)
             missing_exp_stats.append(
-                'ExplorationStats(exp_id=%r, exp_version=%r)'
-                % (exp_id, exp.version))
-            num_valid_state_stats += len(
-                new_exploration_stats.state_stats_mapping)
+                'ExplorationStats(exp_id=%r, exp_version=%r)' % (exp_id, exp.version)
+            )
+            num_valid_state_stats += len(new_exploration_stats.state_stats_mapping)
             continue
         else:
             exp_stats = prev_exp_stats and prev_exp_stats.clone()
 
             if exp_stats is None:
-                new_exploration_stats = (
-                    stats_services.get_stats_for_new_exploration(
-                        exp_id, exp.version,
-                        list(exp.state_interaction_ids_dict.keys())))
+                new_exploration_stats = stats_services.get_stats_for_new_exploration(
+                    exp_id, exp.version, list(exp.state_interaction_ids_dict.keys())
+                )
                 stats_services.create_stats_model(new_exploration_stats)
                 missing_exp_stats_indices.append(i)
                 missing_exp_stats.append(
                     'ExplorationStats(exp_id=%r, exp_version=%r)'
-                    % (exp_id, exp.version))
-                num_valid_state_stats += len(
-                    new_exploration_stats.state_stats_mapping)
+                    % (exp_id, exp.version)
+                )
+                num_valid_state_stats += len(new_exploration_stats.state_stats_mapping)
                 continue
 
             if exp_versions_diff:
                 exp_stats = stats_services.advance_version_of_exp_stats(
-                    new_exp_version, exp_versions_diff, exp_stats, None,
-                    None)
+                    new_exp_version, exp_versions_diff, exp_stats, None, None
+                )
             else:
                 exp_stats.exp_version = exp.version
             stats_services.create_stats_model(exp_stats)
             missing_exp_stats_indices.append(i)
             missing_exp_stats.append(
-                'ExplorationStats(exp_id=%r, exp_version=%r)'
-                % (exp_id, exp.version))
+                'ExplorationStats(exp_id=%r, exp_version=%r)' % (exp_id, exp.version)
+            )
 
         # Fill missing State-level stats.
         state_stats_mapping = exp_stats.state_stats_mapping
@@ -3417,9 +3445,9 @@ def regenerate_missing_stats_for_exploration(
                 continue
 
             if exp_versions_diff:
-                prev_state_name = (
-                    exp_versions_diff.new_to_old_state_names.get(
-                        state_name, state_name))
+                prev_state_name = exp_versions_diff.new_to_old_state_names.get(
+                    state_name, state_name
+                )
             else:
                 prev_state_name = state_name
 
@@ -3427,9 +3455,9 @@ def regenerate_missing_stats_for_exploration(
                 prev_interaction_id = (
                     prev_exp.state_interaction_ids_dict[prev_state_name]
                     if prev_state_name in prev_exp.state_interaction_ids_dict
-                    else None)
-                current_interaction_id = (
-                    exp.state_interaction_ids_dict[state_name])
+                    else None
+                )
+                current_interaction_id = exp.state_interaction_ids_dict[state_name]
                 exp_stats_list_item = exp_stats_list[i]
                 assert exp_stats_list_item is not None
                 # In early schema versions of ExplorationModel, the END
@@ -3438,12 +3466,9 @@ def regenerate_missing_stats_for_exploration(
                 # since been migrated but they do not have corresponding state
                 # stats models for the END state. So for such versions, a
                 # default state stats model should be created.
-                if (
-                    current_interaction_id != prev_interaction_id or
-                    (
-                        current_interaction_id == 'EndExploration' and
-                        prev_state_name == 'END'
-                    )
+                if current_interaction_id != prev_interaction_id or (
+                    current_interaction_id == 'EndExploration'
+                    and prev_state_name == 'END'
                 ):
                     exp_stats_list_item.state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default()
@@ -3451,30 +3476,39 @@ def regenerate_missing_stats_for_exploration(
                 else:
                     assert prev_exp_stats is not None
                     exp_stats_list_item.state_stats_mapping[state_name] = (
-                        prev_exp_stats.state_stats_mapping[
-                            prev_state_name].clone()
+                        prev_exp_stats.state_stats_mapping[prev_state_name].clone()
                     )
                 missing_state_stats.append(
                     'StateStats(exp_id=%r, exp_version=%r, '
-                    'state_name=%r)' % (exp_id, exp.version, state_name))
+                    'state_name=%r)' % (exp_id, exp.version, state_name)
+                )
             except Exception as e:
                 assert exp_versions_diff is not None
                 raise Exception(
                     'Exploration(id=%r, exp_version=%r) has no '
-                    'State(name=%r): %r' % (
-                        exp_id, exp_stats.exp_version, prev_state_name, {
-                            'added_state_names': (
-                                exp_versions_diff.added_state_names),
+                    'State(name=%r): %r'
+                    % (
+                        exp_id,
+                        exp_stats.exp_version,
+                        prev_state_name,
+                        {
+                            'added_state_names': (exp_versions_diff.added_state_names),
                             'deleted_state_names': (
-                                exp_versions_diff.deleted_state_names),
+                                exp_versions_diff.deleted_state_names
+                            ),
                             'new_to_old_state_names': (
-                                exp_versions_diff.new_to_old_state_names),
+                                exp_versions_diff.new_to_old_state_names
+                            ),
                             'old_to_new_state_names': (
-                                exp_versions_diff.old_to_new_state_names),
+                                exp_versions_diff.old_to_new_state_names
+                            ),
                             'prev_exp.states': (
-                                prev_exp.state_interaction_ids_dict.keys()),
-                            'prev_exp_stats': prev_exp_stats
-                        })) from e
+                                prev_exp.state_interaction_ids_dict.keys()
+                            ),
+                            'prev_exp_stats': prev_exp_stats,
+                        },
+                    )
+                ) from e
 
     for index, exp_stats in enumerate(exp_stats_list):
         if index not in missing_exp_stats_indices:
@@ -3482,8 +3516,10 @@ def regenerate_missing_stats_for_exploration(
             stats_services.save_stats_model(exp_stats)
 
     return (
-        missing_exp_stats, missing_state_stats,
-        num_valid_exp_stats, num_valid_state_stats
+        missing_exp_stats,
+        missing_state_stats,
+        num_valid_exp_stats,
+        num_valid_state_stats,
     )
 
 
@@ -3507,69 +3543,68 @@ def update_logged_out_user_progress(
     """
     # Fetch the model associated with the unique_progress_url_id.
     checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
-        unique_progress_url_id, strict=False)
+        unique_progress_url_id, strict=False
+    )
 
     # Create a model if it doesn't already exist.
     if checkpoint_url_model is None:
         checkpoint_url_model = exp_models.TransientCheckpointUrlModel.create(
-            exploration_id, unique_progress_url_id)
+            exploration_id, unique_progress_url_id
+        )
 
     current_exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, strict=True, version=exp_version)
+        exploration_id, strict=True, version=exp_version
+    )
 
     # If the exploration is being visited the first time.
     if checkpoint_url_model.furthest_reached_checkpoint_state_name is None:
-        checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
-            exp_version)
-        checkpoint_url_model.furthest_reached_checkpoint_state_name = (
-            state_name)
-    elif checkpoint_url_model.furthest_reached_checkpoint_exp_version <= exp_version: # pylint: disable=line-too-long
-        furthest_reached_checkpoint_exp = (
-            exp_fetchers.get_exploration_by_id(
-                exploration_id,
-                strict=True,
-                version=checkpoint_url_model.furthest_reached_checkpoint_exp_version # pylint: disable=line-too-long
-            )
+        checkpoint_url_model.furthest_reached_checkpoint_exp_version = exp_version
+        checkpoint_url_model.furthest_reached_checkpoint_state_name = state_name
+    elif (
+        checkpoint_url_model.furthest_reached_checkpoint_exp_version <= exp_version
+    ):  # pylint: disable=line-too-long
+        furthest_reached_checkpoint_exp = exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            strict=True,
+            version=checkpoint_url_model.furthest_reached_checkpoint_exp_version,  # pylint: disable=line-too-long
         )
         checkpoints_in_current_exp = user_services.get_checkpoints_in_order(
-            current_exploration.init_state_name, current_exploration.states)
+            current_exploration.init_state_name, current_exploration.states
+        )
         checkpoints_in_older_exp = user_services.get_checkpoints_in_order(
             furthest_reached_checkpoint_exp.init_state_name,
-            furthest_reached_checkpoint_exp.states)
+            furthest_reached_checkpoint_exp.states,
+        )
 
         # Get the furthest reached checkpoint in current exploration.
         furthest_reached_checkpoint_in_current_exp = (
-            user_services.
-                get_most_distant_reached_checkpoint_in_current_exploration(
-                    checkpoints_in_current_exp,
-                    checkpoints_in_older_exp,
-                    checkpoint_url_model.furthest_reached_checkpoint_state_name
-                )
+            user_services.get_most_distant_reached_checkpoint_in_current_exploration(
+                checkpoints_in_current_exp,
+                checkpoints_in_older_exp,
+                checkpoint_url_model.furthest_reached_checkpoint_state_name,
+            )
         )
 
         # If the furthest reached checkpoint doesn't exist in current
         # exploration.
         if furthest_reached_checkpoint_in_current_exp is None:
-            checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
-                exp_version)
-            checkpoint_url_model.furthest_reached_checkpoint_state_name = (
-                state_name)
+            checkpoint_url_model.furthest_reached_checkpoint_exp_version = exp_version
+            checkpoint_url_model.furthest_reached_checkpoint_state_name = state_name
         else:
             # Index of the furthest reached checkpoint.
             frc_index = checkpoints_in_current_exp.index(
-                furthest_reached_checkpoint_in_current_exp)
+                furthest_reached_checkpoint_in_current_exp
+            )
             # If furthest reached checkpoint is behind most recently
             # reached checkpoint.
             if frc_index <= checkpoints_in_current_exp.index(state_name):
-                checkpoint_url_model.furthest_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
-                    exp_version)
-                checkpoint_url_model.furthest_reached_checkpoint_state_name = (
-                    state_name)
+                checkpoint_url_model.furthest_reached_checkpoint_exp_version = (  # pylint: disable=line-too-long
+                    exp_version
+                )
+                checkpoint_url_model.furthest_reached_checkpoint_state_name = state_name
 
-    checkpoint_url_model.most_recently_reached_checkpoint_exp_version = (
-        exp_version)
-    checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
-        state_name)
+    checkpoint_url_model.most_recently_reached_checkpoint_exp_version = exp_version
+    checkpoint_url_model.most_recently_reached_checkpoint_state_name = state_name
     checkpoint_url_model.last_updated = datetime.datetime.utcnow()
     checkpoint_url_model.update_timestamps()
     checkpoint_url_model.put()
@@ -3583,7 +3618,8 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
 
 @overload
 def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
-    exploration_id: str, unique_progress_url_id: str,
+    exploration_id: str,
+    unique_progress_url_id: str,
 ) -> Optional[exp_domain.TransientCheckpointUrl]: ...
 
 
@@ -3612,76 +3648,77 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
     """
     # Fetch the model associated with the unique_progress_url_id.
     checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get(
-        unique_progress_url_id, strict=strict)
+        unique_progress_url_id, strict=strict
+    )
 
     if checkpoint_url_model is None:
         return None
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    most_recently_interacted_exploration = (
-        exp_fetchers.get_exploration_by_id(
-            exploration_id,
-            strict=True,
-            version=(
-               checkpoint_url_model.most_recently_reached_checkpoint_exp_version
-            )
-        ))
-    furthest_reached_exploration = (
-        exp_fetchers.get_exploration_by_id(
-            exploration_id,
-            strict=True,
-            version=checkpoint_url_model.furthest_reached_checkpoint_exp_version
-        ))
+    most_recently_interacted_exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id,
+        strict=True,
+        version=(checkpoint_url_model.most_recently_reached_checkpoint_exp_version),
+    )
+    furthest_reached_exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id,
+        strict=True,
+        version=checkpoint_url_model.furthest_reached_checkpoint_exp_version,
+    )
 
     most_recently_reached_checkpoint_in_current_exploration = (
-        user_services.
-            get_most_distant_reached_checkpoint_in_current_exploration(
-                user_services.get_checkpoints_in_order(
-                    latest_exploration.init_state_name,
-                    latest_exploration.states),
-                user_services.get_checkpoints_in_order(
-                    most_recently_interacted_exploration.init_state_name,
-                    most_recently_interacted_exploration.states),
-                checkpoint_url_model.most_recently_reached_checkpoint_state_name
-            )
+        user_services.get_most_distant_reached_checkpoint_in_current_exploration(
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name, latest_exploration.states
+            ),
+            user_services.get_checkpoints_in_order(
+                most_recently_interacted_exploration.init_state_name,
+                most_recently_interacted_exploration.states,
+            ),
+            checkpoint_url_model.most_recently_reached_checkpoint_state_name,
+        )
     )
 
     furthest_reached_checkpoint_in_current_exploration = (
-        user_services.
-            get_most_distant_reached_checkpoint_in_current_exploration(
-                user_services.get_checkpoints_in_order(
-                    latest_exploration.init_state_name,
-                    latest_exploration.states),
-                user_services.get_checkpoints_in_order(
-                    furthest_reached_exploration.init_state_name,
-                    furthest_reached_exploration.states),
-                checkpoint_url_model.furthest_reached_checkpoint_state_name
-            )
+        user_services.get_most_distant_reached_checkpoint_in_current_exploration(
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name, latest_exploration.states
+            ),
+            user_services.get_checkpoints_in_order(
+                furthest_reached_exploration.init_state_name,
+                furthest_reached_exploration.states,
+            ),
+            checkpoint_url_model.furthest_reached_checkpoint_state_name,
+        )
     )
 
     # If the most recently reached checkpoint doesn't exist in current
     # exploration.
     if (
-        most_recently_reached_checkpoint_in_current_exploration !=
-        checkpoint_url_model.most_recently_reached_checkpoint_state_name
+        most_recently_reached_checkpoint_in_current_exploration
+        != checkpoint_url_model.most_recently_reached_checkpoint_state_name
     ):
         checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
-            most_recently_reached_checkpoint_in_current_exploration)
+            most_recently_reached_checkpoint_in_current_exploration
+        )
         checkpoint_url_model.most_recently_reached_checkpoint_exp_version = (
-            latest_exploration.version)
+            latest_exploration.version
+        )
         checkpoint_url_model.update_timestamps()
         checkpoint_url_model.put()
 
     # If the furthest reached checkpoint doesn't exist in current
     # exploration.
     if (
-        furthest_reached_checkpoint_in_current_exploration !=
-        checkpoint_url_model.furthest_reached_checkpoint_state_name
+        furthest_reached_checkpoint_in_current_exploration
+        != checkpoint_url_model.furthest_reached_checkpoint_state_name
     ):
         checkpoint_url_model.furthest_reached_checkpoint_state_name = (
-            furthest_reached_checkpoint_in_current_exploration)
+            furthest_reached_checkpoint_in_current_exploration
+        )
         checkpoint_url_model.furthest_reached_checkpoint_exp_version = (
-            latest_exploration.version)
+            latest_exploration.version
+        )
         checkpoint_url_model.update_timestamps()
         checkpoint_url_model.put()
 
@@ -3691,28 +3728,27 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
 def sync_logged_out_learner_progress_with_logged_in_progress(
     user_id: str, exploration_id: str, unique_progress_url_id: str
 ) -> None:
-
     """Syncs logged out and logged in learner's checkpoints progress."""
 
-    logged_out_user_data = (
-        exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+    logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+        unique_progress_url_id
+    )
 
     # If logged out progress has been cleared by the cron job.
     if logged_out_user_data is None:
         return
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_user_data = exp_fetchers.get_exploration_user_data(
-        user_id,
-        exploration_id
-    )
+    exp_user_data = exp_fetchers.get_exploration_user_data(user_id, exploration_id)
 
     logged_in_user_model = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
+        user_id, exploration_id
+    )
 
     if logged_in_user_model is None or exp_user_data is None:
         logged_in_user_model = user_models.ExplorationUserDataModel.create(
-            user_id, exploration_id)
+            user_id, exploration_id
+        )
 
         logged_in_user_model.most_recently_reached_checkpoint_exp_version = (
             logged_out_user_data.most_recently_reached_checkpoint_exp_version
@@ -3729,13 +3765,14 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         logged_in_user_model.update_timestamps()
         logged_in_user_model.put()
 
-    elif logged_in_user_model.most_recently_reached_checkpoint_exp_version == logged_out_user_data.most_recently_reached_checkpoint_exp_version: # pylint: disable=line-too-long
+    elif (
+        logged_in_user_model.most_recently_reached_checkpoint_exp_version
+        == logged_out_user_data.most_recently_reached_checkpoint_exp_version
+    ):  # pylint: disable=line-too-long
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id,
             strict=True,
-            version=(
-               logged_out_user_data.most_recently_reached_checkpoint_exp_version
-            )
+            version=(logged_out_user_data.most_recently_reached_checkpoint_exp_version),
         )
         recent_checkpoint_state_name = (
             exp_user_data.most_recently_reached_checkpoint_state_name
@@ -3744,25 +3781,22 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         assert recent_checkpoint_state_name is not None
         most_recently_reached_checkpoint_index_in_logged_in_progress = (
             user_services.get_checkpoints_in_order(
-                current_exploration.init_state_name,
-                current_exploration.states
-            ).index(
-                recent_checkpoint_state_name
-            )
+                current_exploration.init_state_name, current_exploration.states
+            ).index(recent_checkpoint_state_name)
         )
 
         most_recently_reached_checkpoint_index_in_logged_out_progress = (
             user_services.get_checkpoints_in_order(
-                current_exploration.init_state_name,
-                current_exploration.states
-            ).index(
-                logged_out_user_data.most_recently_reached_checkpoint_state_name
-            )
+                current_exploration.init_state_name, current_exploration.states
+            ).index(logged_out_user_data.most_recently_reached_checkpoint_state_name)
         )
 
-        if most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress: # pylint: disable=line-too-long
-            logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
-                logged_out_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
+        if (
+            most_recently_reached_checkpoint_index_in_logged_in_progress
+            < most_recently_reached_checkpoint_index_in_logged_out_progress
+        ):  # pylint: disable=line-too-long
+            logged_in_user_model.most_recently_reached_checkpoint_exp_version = (  # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version  # pylint: disable=line-too-long
             )
             logged_in_user_model.most_recently_reached_checkpoint_state_name = (
                 logged_out_user_data.most_recently_reached_checkpoint_state_name
@@ -3777,22 +3811,18 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
             logged_in_user_model.put()
 
     elif (
-        logged_in_user_model.most_recently_reached_checkpoint_exp_version <
-        logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        logged_in_user_model.most_recently_reached_checkpoint_exp_version
+        < logged_out_user_data.most_recently_reached_checkpoint_exp_version
     ):
-        most_recently_interacted_exploration = (
-            exp_fetchers.get_exploration_by_id(
-                exploration_id,
-                strict=True,
-                version=exp_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
-            )
+        most_recently_interacted_exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            strict=True,
+            version=exp_user_data.most_recently_reached_checkpoint_exp_version,  # pylint: disable=line-too-long
         )
-        furthest_reached_exploration = (
-            exp_fetchers.get_exploration_by_id(
-                exploration_id,
-                strict=True,
-                version=exp_user_data.furthest_reached_checkpoint_exp_version
-            )
+        furthest_reached_exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            strict=True,
+            version=exp_user_data.furthest_reached_checkpoint_exp_version,
         )
 
         recent_checkpoint_state_name = (
@@ -3800,16 +3830,15 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         )
         # Ruling out the possibility of None for mypy type checking.
         assert recent_checkpoint_state_name is not None
-        most_recently_reached_checkpoint_in_current_exploration = (
-            user_services.get_most_distant_reached_checkpoint_in_current_exploration( # pylint: disable=line-too-long
-                user_services.get_checkpoints_in_order(
-                    latest_exploration.init_state_name,
-                    latest_exploration.states),
-                user_services.get_checkpoints_in_order(
-                    most_recently_interacted_exploration.init_state_name,
-                    most_recently_interacted_exploration.states),
-                recent_checkpoint_state_name
-            )
+        most_recently_reached_checkpoint_in_current_exploration = user_services.get_most_distant_reached_checkpoint_in_current_exploration(  # pylint: disable=line-too-long
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name, latest_exploration.states
+            ),
+            user_services.get_checkpoints_in_order(
+                most_recently_interacted_exploration.init_state_name,
+                most_recently_interacted_exploration.states,
+            ),
+            recent_checkpoint_state_name,
         )
 
         furthest_checkpoint_state_name = (
@@ -3817,39 +3846,42 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         )
         # Ruling out the possibility of None for mypy type checking.
         assert furthest_checkpoint_state_name is not None
-        furthest_reached_checkpoint_in_current_exploration = (
-            user_services.get_most_distant_reached_checkpoint_in_current_exploration( # pylint: disable=line-too-long
-                user_services.get_checkpoints_in_order(
-                    latest_exploration.init_state_name,
-                    latest_exploration.states),
-                user_services.get_checkpoints_in_order(
-                    furthest_reached_exploration.init_state_name,
-                    furthest_reached_exploration.states),
-                furthest_checkpoint_state_name
-            )
+        furthest_reached_checkpoint_in_current_exploration = user_services.get_most_distant_reached_checkpoint_in_current_exploration(  # pylint: disable=line-too-long
+            user_services.get_checkpoints_in_order(
+                latest_exploration.init_state_name, latest_exploration.states
+            ),
+            user_services.get_checkpoints_in_order(
+                furthest_reached_exploration.init_state_name,
+                furthest_reached_exploration.states,
+            ),
+            furthest_checkpoint_state_name,
         )
 
         # If the most recently reached checkpoint doesn't exist in current
         # exploration.
         if (
-            most_recently_reached_checkpoint_in_current_exploration !=
-            exp_user_data.most_recently_reached_checkpoint_state_name
+            most_recently_reached_checkpoint_in_current_exploration
+            != exp_user_data.most_recently_reached_checkpoint_state_name
         ):
             exp_user_data.most_recently_reached_checkpoint_state_name = (
-                most_recently_reached_checkpoint_in_current_exploration)
+                most_recently_reached_checkpoint_in_current_exploration
+            )
             exp_user_data.most_recently_reached_checkpoint_exp_version = (
-                latest_exploration.version)
+                latest_exploration.version
+            )
 
         # If the furthest reached checkpoint doesn't exist in current
         # exploration.
         if (
-            furthest_reached_checkpoint_in_current_exploration !=
-            exp_user_data.furthest_reached_checkpoint_state_name
+            furthest_reached_checkpoint_in_current_exploration
+            != exp_user_data.furthest_reached_checkpoint_state_name
         ):
             exp_user_data.furthest_reached_checkpoint_state_name = (
-                furthest_reached_checkpoint_in_current_exploration)
+                furthest_reached_checkpoint_in_current_exploration
+            )
             exp_user_data.furthest_reached_checkpoint_exp_version = (
-                latest_exploration.version)
+                latest_exploration.version
+            )
 
         recent_checkpoint_state_name = (
             exp_user_data.most_recently_reached_checkpoint_state_name
@@ -3858,24 +3890,22 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         assert recent_checkpoint_state_name is not None
         most_recently_reached_checkpoint_index_in_logged_in_progress = (
             user_services.get_checkpoints_in_order(
-                latest_exploration.init_state_name,
-                latest_exploration.states
-            ).index(
-                recent_checkpoint_state_name
-            )
+                latest_exploration.init_state_name, latest_exploration.states
+            ).index(recent_checkpoint_state_name)
         )
 
         most_recently_reached_checkpoint_index_in_logged_out_progress = (
             user_services.get_checkpoints_in_order(
-                latest_exploration.init_state_name,
-                latest_exploration.states
-            ).index(
-                logged_out_user_data.most_recently_reached_checkpoint_state_name
-                ))
+                latest_exploration.init_state_name, latest_exploration.states
+            ).index(logged_out_user_data.most_recently_reached_checkpoint_state_name)
+        )
 
-        if most_recently_reached_checkpoint_index_in_logged_in_progress < most_recently_reached_checkpoint_index_in_logged_out_progress: # pylint: disable=line-too-long
-            logged_in_user_model.most_recently_reached_checkpoint_exp_version = ( # pylint: disable=line-too-long
-                logged_out_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
+        if (
+            most_recently_reached_checkpoint_index_in_logged_in_progress
+            < most_recently_reached_checkpoint_index_in_logged_out_progress
+        ):  # pylint: disable=line-too-long
+            logged_in_user_model.most_recently_reached_checkpoint_exp_version = (  # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version  # pylint: disable=line-too-long
             )
             logged_in_user_model.most_recently_reached_checkpoint_state_name = (
                 logged_out_user_data.most_recently_reached_checkpoint_state_name
@@ -3904,7 +3934,8 @@ def set_exploration_edits_allowed(exp_id: str, edits_are_allowed: bool) -> None:
     base_models.BaseModel.update_timestamps_multi([exploration_model])
     base_models.BaseModel.put_multi([exploration_model])
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id]
+    )
 
 
 def rollback_exploration_to_safe_state(exp_id: str) -> int:
@@ -3922,29 +3953,25 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
     last_known_safe_version: int = exploration_model.version
     snapshot_content_model = None
     snapshot_metadata_model = None
-    models_to_delete: List[Union[
-        exp_models.ExplorationSnapshotContentModel,
-        exp_models.ExplorationSnapshotMetadataModel
-    ]] = []
+    models_to_delete: List[
+        Union[
+            exp_models.ExplorationSnapshotContentModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+        ]
+    ] = []
     for version in range(current_version_in_exp_model, 1, -1):
-        snapshot_content_model = (
-            exp_models.ExplorationSnapshotContentModel.get(
-                '%s-%s' % (exp_id, version), strict=False))
-        snapshot_metadata_model = (
-            exp_models.ExplorationSnapshotMetadataModel.get(
-                '%s-%s' % (exp_id, version), strict=False))
+        snapshot_content_model = exp_models.ExplorationSnapshotContentModel.get(
+            '%s-%s' % (exp_id, version), strict=False
+        )
+        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get(
+            '%s-%s' % (exp_id, version), strict=False
+        )
         if snapshot_content_model is None and snapshot_metadata_model is None:
             last_known_safe_version = version - 1
-        elif (
-            snapshot_content_model is None and
-            snapshot_metadata_model is not None
-        ):
+        elif snapshot_content_model is None and snapshot_metadata_model is not None:
             models_to_delete.append(snapshot_metadata_model)
             last_known_safe_version = version - 1
-        elif (
-            snapshot_content_model is not None and
-            snapshot_metadata_model is None
-        ):
+        elif snapshot_content_model is not None and snapshot_metadata_model is None:
             models_to_delete.append(snapshot_content_model)
             last_known_safe_version = version - 1
         else:
@@ -3954,12 +3981,15 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
         exp_summary_model = exp_models.ExpSummaryModel.get(exp_id)
         exp_summary_model.version = last_known_safe_version
         safe_exp_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True, version=last_known_safe_version)
+            exp_id, strict=True, version=last_known_safe_version
+        )
         safe_exp_model.version = last_known_safe_version
         base_models.BaseModel.update_timestamps_multi(
-            [safe_exp_model, exp_summary_model])
+            [safe_exp_model, exp_summary_model]
+        )
         base_models.BaseModel.put_multi([safe_exp_model, exp_summary_model])
         base_models.BaseModel.delete_multi(models_to_delete)
         caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id]
+        )
     return last_known_safe_version

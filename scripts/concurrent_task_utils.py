@@ -47,11 +47,7 @@ class TaskResult:
     """Task result for concurrent_task_utils."""
 
     def __init__(
-        self,
-        name: str,
-        failed: bool,
-        trimmed_messages: List[str],
-        messages: List[str]
+        self, name: str, failed: bool, trimmed_messages: List[str], messages: List[str]
     ) -> None:
         """Constructs a TaskResult object.
 
@@ -77,11 +73,11 @@ class TaskResult:
             task.
         """
         all_messages = self.messages[:]
-        status_message = (
-            '%s %s check %s' % (
-                (FAILED_MESSAGE_PREFIX, self.name, 'failed')
-                if self.failed else (
-                    SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
+        status_message = '%s %s check %s' % (
+            (FAILED_MESSAGE_PREFIX, self.name, 'failed')
+            if self.failed
+            else (SUCCESS_MESSAGE_PREFIX, self.name, 'passed')
+        )
         all_messages.append(status_message)
         return all_messages
 
@@ -97,7 +93,7 @@ class TaskThread(threading.Thread):
         verbose: bool,
         semaphore: threading.Semaphore,
         name: Optional[str],
-        report_enabled: bool
+        report_enabled: bool,
     ) -> None:
         super().__init__()
         self.func = func
@@ -121,27 +117,32 @@ class TaskThread(threading.Thread):
                         log(
                             'Report from %s check\n'
                             '----------------------------------------\n'
-                            '%s' % (task_result.name, '\n'.join(
-                                task_result.get_report())), show_time=True)
+                            '%s'
+                            % (task_result.name, '\n'.join(task_result.get_report())),
+                            show_time=True,
+                        )
                     # The following section will print the output of backend
                     # tests.
                     else:
                         log(
                             'LOG %s:\n%s'
-                            '----------------------------------------' %
-                            (self.name, task_result.messages[0]),
-                            show_time=True)
+                            '----------------------------------------'
+                            % (self.name, task_result.messages[0]),
+                            show_time=True,
+                        )
             log(
-                'FINISHED %s: %.1f secs' % (
-                    self.name, time.time() - self.start_time), show_time=True)
+                'FINISHED %s: %.1f secs' % (self.name, time.time() - self.start_time),
+                show_time=True,
+            )
         except Exception as e:
             self.exception = e
             self.stacktrace = traceback.format_exc()
             if 'KeyboardInterrupt' not in self.exception.args[0]:
                 log(str(e))
                 log(
-                    'ERROR %s: %.1f secs' %
-                    (self.name, time.time() - self.start_time), show_time=True)
+                    'ERROR %s: %.1f secs' % (self.name, time.time() - self.start_time),
+                    show_time=True,
+                )
         finally:
             self.semaphore.release()
             self.finished = True
@@ -153,15 +154,17 @@ def _check_all_tasks(tasks: List[TaskThread]) -> None:
 
     for task in tasks:
         if task.is_alive():
-            running_tasks_data.append('  %s (started %s)' % (
-                task.name,
-                time.strftime('%H:%M:%S', time.localtime(task.start_time))
-            ))
+            running_tasks_data.append(
+                '  %s (started %s)'
+                % (
+                    task.name,
+                    time.strftime('%H:%M:%S', time.localtime(task.start_time)),
+                )
+            )
 
         if task.exception:
             stacktrace = (
-                task.stacktrace
-                if task.stacktrace else 'No stacktrace present.'
+                task.stacktrace if task.stacktrace else 'No stacktrace present.'
             )
             ALL_ERRORS.append(stacktrace)
 
@@ -172,9 +175,7 @@ def _check_all_tasks(tasks: List[TaskThread]) -> None:
             log(task_details)
 
 
-def execute_tasks(
-    tasks: List[TaskThread], semaphore: threading.Semaphore
-) -> None:
+def execute_tasks(tasks: List[TaskThread], semaphore: threading.Semaphore) -> None:
     """Starts all tasks and checks the results.
     Runs no more than the allowable limit defined in the semaphore.
 
@@ -214,7 +215,7 @@ def create_task(
     verbose: bool,
     semaphore: threading.Semaphore,
     name: Optional[str] = None,
-    report_enabled: bool = True
+    report_enabled: bool = True,
 ) -> TaskThread:
     """Create a Task in its Thread.
 

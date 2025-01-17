@@ -43,58 +43,46 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
     def test_cannot_subscribe_without_login(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        payload = {
-            'creator_username': self.EDITOR_USERNAME
-        }
+        payload = {'creator_username': self.EDITOR_USERNAME}
         response = self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX,
             payload,
             csrf_token=csrf_token,
-            expected_status_int=401
+            expected_status_int=401,
         )
         self.assertEqual(
-            response['error'],
-            'You do not have credentials to manage subscriptions.'
+            response['error'], 'You do not have credentials to manage subscriptions.'
         )
 
-    def test_invalid_creator_username_raises_error_while_subscribing(
-        self
-    ) -> None:
+    def test_invalid_creator_username_raises_error_while_subscribing(self) -> None:
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        payload = {
-            'creator_username': 'invalid'
-        }
+        payload = {'creator_username': 'invalid'}
         response = self.post_json(
             feconf.SUBSCRIBE_URL_PREFIX,
             payload,
             csrf_token=csrf_token,
-            expected_status_int=500
+            expected_status_int=500,
         )
         self.assertEqual(
-            response['error'],
-            'No user_id found for the given username: invalid'
+            response['error'], 'No user_id found for the given username: invalid'
         )
 
-    def test_invalid_creator_username_raises_error_while_unsubscribing(
-        self
-    ) -> None:
+    def test_invalid_creator_username_raises_error_while_unsubscribing(self) -> None:
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        payload = {
-            'creator_username': 'invalid'
-        }
+        payload = {'creator_username': 'invalid'}
         response = self.post_json(
             feconf.UNSUBSCRIBE_URL_PREFIX,
             payload,
             csrf_token=csrf_token,
-            expected_status_int=500
+            expected_status_int=500,
         )
         self.assertEqual(
             response['error'],
-            'No creator user_id found for the given creator username: invalid'
+            'No creator user_id found for the given creator username: invalid',
         )
 
     def test_subscribe_handler(self) -> None:
@@ -103,31 +91,31 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        payload = {
-            'creator_username': self.EDITOR_USERNAME
-        }
+        payload = {'creator_username': self.EDITOR_USERNAME}
 
         # Test that the subscriber ID is added to the list of subscribers
         # of the creator and the creator ID is added to the list of
         # subscriptions of the user.
-        self.post_json(
-            feconf.SUBSCRIBE_URL_PREFIX, payload,
-            csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id])
+        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token=csrf_token)
         self.assertEqual(
-            subscription_services.get_all_creators_subscribed_to(
-                self.user_id), [self.editor_id])
+            subscription_services.get_all_subscribers_of_creator(self.editor_id),
+            [self.user_id],
+        )
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(self.user_id),
+            [self.editor_id],
+        )
 
         # Subscribing again, has no effect.
-        self.post_json(
-            feconf.SUBSCRIBE_URL_PREFIX, payload,
-            csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id])
+        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token=csrf_token)
         self.assertEqual(
-            subscription_services.get_all_creators_subscribed_to(
-                self.user_id), [self.editor_id])
+            subscription_services.get_all_subscribers_of_creator(self.editor_id),
+            [self.user_id],
+        )
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(self.user_id),
+            [self.editor_id],
+        )
 
         self.logout()
 
@@ -135,70 +123,64 @@ class SubscriptionTests(test_utils.GenericTestBase):
         self.login(self.USER2_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.post_json(
-            feconf.SUBSCRIBE_URL_PREFIX, payload,
-            csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id, self.user_id_2])
+        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token=csrf_token)
         self.assertEqual(
-            subscription_services.get_all_creators_subscribed_to(
-                self.user_id_2), [self.editor_id])
+            subscription_services.get_all_subscribers_of_creator(self.editor_id),
+            [self.user_id, self.user_id_2],
+        )
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(self.user_id_2),
+            [self.editor_id],
+        )
         self.logout()
 
     def test_unsubscribe_handler(self) -> None:
         """Test handler for unsubscriptions."""
 
-        payload = {
-            'creator_username': self.EDITOR_USERNAME
-        }
+        payload = {'creator_username': self.EDITOR_USERNAME}
 
         # Add one subscription to editor.
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            feconf.SUBSCRIBE_URL_PREFIX, payload,
-            csrf_token=csrf_token)
+        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token=csrf_token)
         self.logout()
 
         # Add another subscription.
         self.login(self.USER2_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            feconf.SUBSCRIBE_URL_PREFIX, payload,
-            csrf_token=csrf_token)
+        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token=csrf_token)
 
         # Test that on unsubscription, the learner ID is removed from the
         # list of subscriber IDs of the creator and the creator ID is
         # removed from the list of subscriptions of the learner.
-        self.post_json(
-            feconf.UNSUBSCRIBE_URL_PREFIX, payload,
-            csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id])
+        self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token=csrf_token)
         self.assertEqual(
-            subscription_services.get_all_creators_subscribed_to(
-                self.user_id_2), [])
+            subscription_services.get_all_subscribers_of_creator(self.editor_id),
+            [self.user_id],
+        )
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(self.user_id_2), []
+        )
 
         # Unsubscribing the same user has no effect.
-        self.post_json(
-            feconf.UNSUBSCRIBE_URL_PREFIX, payload,
-            csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [self.user_id])
+        self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token=csrf_token)
         self.assertEqual(
-            subscription_services.get_all_creators_subscribed_to(
-                self.user_id_2), [])
+            subscription_services.get_all_subscribers_of_creator(self.editor_id),
+            [self.user_id],
+        )
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(self.user_id_2), []
+        )
 
         self.logout()
 
         # Unsubscribing another user.
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            feconf.UNSUBSCRIBE_URL_PREFIX, payload,
-            csrf_token=csrf_token)
-        self.assertEqual(subscription_services.get_all_subscribers_of_creator(
-            self.editor_id), [])
+        self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token=csrf_token)
         self.assertEqual(
-            subscription_services.get_all_creators_subscribed_to(
-                self.user_id), [])
+            subscription_services.get_all_subscribers_of_creator(self.editor_id), []
+        )
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(self.user_id), []
+        )

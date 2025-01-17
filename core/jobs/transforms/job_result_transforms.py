@@ -69,9 +69,7 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
             JobRunResult. The JobRunResult object.
         """
         if isinstance(result_item, result.Ok):
-            return job_run_result.JobRunResult.as_stdout(
-                '%sSUCCESS:' % self.prefix
-            )
+            return job_run_result.JobRunResult.as_stdout('%sSUCCESS:' % self.prefix)
         else:
             return job_run_result.JobRunResult.as_stderr(
                 '%sERROR: "%s":' % (self.prefix, result_item.value)
@@ -121,11 +119,11 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
         """
         return (
             results
-            | 'Transform result to job run result' >> beam.Map(
-                self._transform_result_to_job_run_result)
+            | 'Transform result to job run result'
+            >> beam.Map(self._transform_result_to_job_run_result)
             | 'Count all elements' >> beam.combiners.Count.PerElement()
-            | 'Add count to job run result' >> beam.Map(
-                self._add_count_to_job_run_result)
+            | 'Add count to job run result'
+            >> beam.Map(self._add_count_to_job_run_result)
         )
 
 
@@ -168,10 +166,12 @@ class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
         return (
             objects
             | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for non-zero number of objects' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Add count to job run result' >> beam.Map(
+            | 'Only create result for non-zero number of objects'
+            >> (beam.Filter(lambda x: x > 0))
+            | 'Add count to job run result'
+            >> beam.Map(
                 lambda object_count: job_run_result.JobRunResult.as_stdout(
                     '%sSUCCESS: %s' % (self.prefix, object_count)
-                ))
+                )
+            )
         )

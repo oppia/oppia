@@ -30,19 +30,23 @@ if MYPY:  # pragma: no cover
 class EarlyQuit(base.BaseExplorationIssueSpec):
     """Issue that's recorded when the learner quits the exploration early."""
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'state_name',
-        'description': 'State name',
-        'schema': {
-            'type': 'unicode',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'state_name',
+            'description': 'State name',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
         },
-        'default_value': ''
-    }, {
-        'name': 'time_spent_in_exp_in_msecs',
-        'description': (
-            'Time spent in the exploration before quitting in milliseconds'),
-        'schema': {
-            'type': 'int',
+        {
+            'name': 'time_spent_in_exp_in_msecs',
+            'description': (
+                'Time spent in the exploration before quitting in milliseconds'
+            ),
+            'schema': {
+                'type': 'int',
+            },
+            'default_value': 0,
         },
-        'default_value': 0
-    }]
+    ]

@@ -32,8 +32,7 @@ from typing import Any, Optional, TypedDict
 #
 # This domain object is simply a convenience for pairing Auth IDs to their
 # corresponding Oppia-generated IDs in our APIs.
-AuthIdUserIdPair = (
-    collections.namedtuple('AuthIdUserIdPair', ['auth_id', 'user_id']))
+AuthIdUserIdPair = collections.namedtuple('AuthIdUserIdPair', ['auth_id', 'user_id'])
 
 
 class InvalidAuthSessionError(Exception):
@@ -77,10 +76,7 @@ class AuthClaims:
     """
 
     def __init__(
-        self,
-        auth_id: str,
-        email: Optional[str],
-        role_is_super_admin: bool
+        self, auth_id: str, email: Optional[str], role_is_super_admin: bool
     ) -> None:
         if not auth_id:
             raise Exception('auth_id must not be empty')
@@ -90,7 +86,10 @@ class AuthClaims:
 
     def __repr__(self) -> str:
         return 'AuthClaims(auth_id=%r, email=%r, role_is_super_admin=%r)' % (
-            self.auth_id, self.email, self.role_is_super_admin)
+            self.auth_id,
+            self.email,
+            self.role_is_super_admin,
+        )
 
     def __hash__(self) -> int:
         return hash((self.auth_id, self.email, self.role_is_super_admin))
@@ -99,9 +98,14 @@ class AuthClaims:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         # https://docs.python.org/2/library/constants.html#NotImplemented.
-        return NotImplemented if not isinstance(other, AuthClaims) else (
-            (self.auth_id, self.email, self.role_is_super_admin) ==
-            (other.auth_id, other.email, other.role_is_super_admin))
+        return (
+            NotImplemented
+            if not isinstance(other, AuthClaims)
+            else (
+                (self.auth_id, self.email, self.role_is_super_admin)
+                == (other.auth_id, other.email, other.role_is_super_admin)
+            )
+        )
 
 
 class UserAuthDetailsDict(TypedDict):
@@ -137,7 +141,7 @@ class UserAuthDetails:
         gae_id: Optional[str],
         firebase_auth_id: Optional[str],
         parent_user_id: Optional[str],
-        deleted: bool = False
+        deleted: bool = False,
     ) -> None:
         self.user_id = user_id
         self.gae_id = gae_id
@@ -148,9 +152,15 @@ class UserAuthDetails:
     def __repr__(self) -> str:
         return (
             'UserAuthDetails(user_id=%r, gae_id=%r, firebase_auth_id=%r, '
-            'parent_user_id=%r, deleted=%r)' % (
-                self.user_id, self.gae_id, self.firebase_auth_id,
-                self.parent_user_id, self.deleted))
+            'parent_user_id=%r, deleted=%r)'
+            % (
+                self.user_id,
+                self.gae_id,
+                self.firebase_auth_id,
+                self.parent_user_id,
+                self.deleted,
+            )
+        )
 
     def validate(self) -> None:
         """Checks whether user_id, gae_id, firebase_auth_id, and parent_user_id
@@ -171,39 +181,46 @@ class UserAuthDetails:
 
         if not isinstance(self.user_id, str):
             raise utils.ValidationError(
-                'user_id must be a string, but got %r' % self.user_id)
+                'user_id must be a string, but got %r' % self.user_id
+            )
 
         if not utils.is_user_id_valid(self.user_id):
             raise utils.ValidationError(
-                'user_id=%r has the wrong format' % self.user_id)
+                'user_id=%r has the wrong format' % self.user_id
+            )
 
-        if (self.gae_id is not None and
-                not isinstance(self.gae_id, str)):
+        if self.gae_id is not None and not isinstance(self.gae_id, str):
             raise utils.ValidationError(
-                'gae_id must be a string, but got %r' % self.gae_id)
+                'gae_id must be a string, but got %r' % self.gae_id
+            )
 
-        if (self.firebase_auth_id is not None and
-                not isinstance(self.firebase_auth_id, str)):
+        if self.firebase_auth_id is not None and not isinstance(
+            self.firebase_auth_id, str
+        ):
             raise utils.ValidationError(
-                'firebase_auth_id must be a string, but got %r' %
-                self.firebase_auth_id)
+                'firebase_auth_id must be a string, but got %r' % self.firebase_auth_id
+            )
 
-        if (self.parent_user_id is not None and
-                not utils.is_user_id_valid(self.parent_user_id)):
+        if self.parent_user_id is not None and not utils.is_user_id_valid(
+            self.parent_user_id
+        ):
             raise utils.ValidationError(
-                'parent_user_id=%r has the wrong format' % self.parent_user_id)
+                'parent_user_id=%r has the wrong format' % self.parent_user_id
+            )
 
         if self.is_full_user() and self.parent_user_id is not None:
             raise utils.ValidationError(
                 'parent_user_id must not be set for a full user, but got '
-                'gae_id=%r, firebase_auth_id=%r, parent_user_id=%r' % (
-                    self.gae_id, self.firebase_auth_id, self.parent_user_id))
+                'gae_id=%r, firebase_auth_id=%r, parent_user_id=%r'
+                % (self.gae_id, self.firebase_auth_id, self.parent_user_id)
+            )
 
         if not self.is_full_user() and self.parent_user_id is None:
             raise utils.ValidationError(
                 'parent_user_id must be set for a profile user, but got '
-                'gae_id=%r, firebase_auth_id=%r, parent_user_id=%r' % (
-                    self.gae_id, self.firebase_auth_id, self.parent_user_id))
+                'gae_id=%r, firebase_auth_id=%r, parent_user_id=%r'
+                % (self.gae_id, self.firebase_auth_id, self.parent_user_id)
+            )
 
     @property
     def auth_id(self) -> Optional[str]:

@@ -3,7 +3,6 @@ import io
 from re import Pattern
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-
 class Request:
     uri: str
     body: bytes
@@ -19,7 +18,6 @@ class Request:
 
     def arguments(self) -> List[str]: ...
     def get(self, value: str) -> Any: ...
-
     @classmethod
     def blank(
         cls,
@@ -58,28 +56,18 @@ class Response:
         domain: Optional[str] = ...,
         comment: Optional[str] = ...,
     ) -> None: ...
-
     def delete_cookie(
-        self,
-        key: str,
-        path: str = ...,
-        domain: Optional[str] = ...
+        self, key: str, path: str = ..., domain: Optional[str] = ...
     ) -> None: ...
 
 class WSGIApplication:
     debug: bool
 
     def __init__(
-        self,
-        routes: List[Route] = ...,
-        debug: bool = ...,
-        config: Dict[str, Any] = ...
+        self, routes: List[Route] = ..., debug: bool = ..., config: Dict[str, Any] = ...
     ) -> None: ...
-
     def __call__(
-        self,
-        environ: Dict[str, str],
-        start_response: Response
+        self, environ: Dict[str, str], start_response: Response
     ) -> Response: ...
 
 class Route:
@@ -99,7 +87,6 @@ class RequestHandler:
     def error(self, code: int) -> None: ...
     def dispatch(self) -> None: ...
     def initialize(self, request: Request, response: Response) -> None: ...
-
     @classmethod
     def write(cls, content: bytes) -> None: ...
     @classmethod
@@ -109,5 +96,5 @@ class RequestHandler:
         permanent: bool = False,
         abort: bool = False,
         code: Optional[int] = None,
-        body: Any = None
+        body: Any = None,
     ) -> Response: ...

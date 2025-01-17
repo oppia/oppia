@@ -37,8 +37,8 @@ class BeamJobHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def get(self) -> None:
         """Retrieves a list of Beam jobs."""
         sorted_beam_jobs = sorted(
-            beam_job_services.get_beam_jobs(),
-            key=lambda j: j.name)
+            beam_job_services.get_beam_jobs(), key=lambda j: j.name
+        )
         self.render_json({'jobs': [j.to_dict() for j in sorted_beam_jobs]})
 
 
@@ -61,8 +61,7 @@ class BeamJobRunHandlerNormalizedRequestDict(TypedDict):
 
 class BeamJobRunHandler(
     base.BaseHandler[
-        BeamJobRunHandlerNormalizedPayloadDict,
-        BeamJobRunHandlerNormalizedRequestDict
+        BeamJobRunHandlerNormalizedPayloadDict, BeamJobRunHandlerNormalizedRequestDict
     ]
 ):
     """Handler for managing the execution of Apache Beam jobs."""
@@ -72,20 +71,15 @@ class BeamJobRunHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
-            'job_name': {
-                'schema': {
-                    'type': 'unicode'
-                }
-            },
+            'job_name': {'schema': {'type': 'unicode'}},
         },
         'DELETE': {
             'job_id': {
                 'schema': {
                     'type': 'unicode',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': r'[A-Za-z0-9]{22}'
-                    }]
+                    'validators': [
+                        {'id': 'is_regex_matched', 'regex_pattern': r'[A-Za-z0-9]{22}'}
+                    ],
                 }
             }
         },
@@ -97,7 +91,8 @@ class BeamJobRunHandler(
         sorted_beam_job_runs = sorted(
             beam_job_services.get_beam_job_runs(),
             key=lambda j: j.job_updated_on,
-            reverse=True)
+            reverse=True,
+        )
         self.render_json({'runs': [r.to_dict() for r in sorted_beam_job_runs]})
 
     @acl_decorators.can_run_any_job
@@ -126,9 +121,7 @@ class BeamJobRunResultHandlerNormalizedRequestDict(TypedDict):
 
 
 class BeamJobRunResultHandler(
-    base.BaseHandler[
-        Dict[str, str], BeamJobRunResultHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], BeamJobRunResultHandlerNormalizedRequestDict]
 ):
     """Handler for getting the result of Apache Beam jobs."""
 
@@ -139,10 +132,9 @@ class BeamJobRunResultHandler(
             'job_id': {
                 'schema': {
                     'type': 'unicode',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': r'[A-Za-z0-9]{22}'
-                    }]
+                    'validators': [
+                        {'id': 'is_regex_matched', 'regex_pattern': r'[A-Za-z0-9]{22}'}
+                    ],
                 }
             }
         }

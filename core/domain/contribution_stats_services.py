@@ -27,16 +27,11 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models, ) = (
-    models.Registry.import_models([
-        models.Names.SUGGESTION
-    ])
-)
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 def get_translation_submitter_total_stats_from_model(
-    translation_submitter_model:
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel
+    translation_submitter_model: suggestion_models.TranslationSubmitterTotalContributionStatsModel,
 ) -> suggestion_registry.TranslationSubmitterTotalContributionStats:
     """Returns a domain object for TranslationSubmitterTotalContributionStats
     model.
@@ -56,9 +51,7 @@ def get_translation_submitter_total_stats_from_model(
         topic_ids_with_translation_submissions=(
             translation_submitter_model.topic_ids_with_translation_submissions
         ),
-        recent_review_outcomes=(
-            translation_submitter_model.recent_review_outcomes
-        ),
+        recent_review_outcomes=(translation_submitter_model.recent_review_outcomes),
         recent_performance=translation_submitter_model.recent_performance,
         overall_accuracy=translation_submitter_model.overall_accuracy,
         submitted_translations_count=(
@@ -71,8 +64,7 @@ def get_translation_submitter_total_stats_from_model(
             translation_submitter_model.accepted_translations_count
         ),
         accepted_translations_without_reviewer_edits_count=(
-            translation_submitter_model
-            .accepted_translations_without_reviewer_edits_count
+            translation_submitter_model.accepted_translations_without_reviewer_edits_count
         ),
         accepted_translation_word_count=(
             translation_submitter_model.accepted_translation_word_count
@@ -83,18 +75,13 @@ def get_translation_submitter_total_stats_from_model(
         rejected_translation_word_count=(
             translation_submitter_model.rejected_translation_word_count
         ),
-        first_contribution_date=(
-            translation_submitter_model.first_contribution_date
-        ),
-        last_contribution_date=(
-            translation_submitter_model.last_contribution_date
-        ),
+        first_contribution_date=(translation_submitter_model.first_contribution_date),
+        last_contribution_date=(translation_submitter_model.last_contribution_date),
     )
 
 
 def get_translation_reviewer_total_stats_from_model(
-    translation_reviewer_model:
-        suggestion_models.TranslationReviewerTotalContributionStatsModel
+    translation_reviewer_model: suggestion_models.TranslationReviewerTotalContributionStatsModel,
 ) -> suggestion_registry.TranslationReviewerTotalContributionStats:
     """Returns a domain object for TranslationReviewerTotalContributionStats
     model.
@@ -121,8 +108,7 @@ def get_translation_reviewer_total_stats_from_model(
             translation_reviewer_model.accepted_translations_count
         ),
         accepted_translations_with_reviewer_edits_count=(
-            translation_reviewer_model
-            .accepted_translations_with_reviewer_edits_count
+            translation_reviewer_model.accepted_translations_with_reviewer_edits_count
         ),
         accepted_translation_word_count=(
             translation_reviewer_model.accepted_translation_word_count
@@ -130,18 +116,13 @@ def get_translation_reviewer_total_stats_from_model(
         rejected_translations_count=(
             translation_reviewer_model.rejected_translations_count
         ),
-        first_contribution_date=(
-            translation_reviewer_model.first_contribution_date
-        ),
-        last_contribution_date=(
-            translation_reviewer_model.last_contribution_date
-        ),
+        first_contribution_date=(translation_reviewer_model.first_contribution_date),
+        last_contribution_date=(translation_reviewer_model.last_contribution_date),
     )
 
 
 def get_question_submitter_total_stats_from_model(
-    question_submitter_model:
-        suggestion_models.QuestionSubmitterTotalContributionStatsModel
+    question_submitter_model: suggestion_models.QuestionSubmitterTotalContributionStatsModel,
 ) -> suggestion_registry.QuestionSubmitterTotalContributionStats:
     """Returns a domain object for QuestionSubmitterTotalContributionStats
     model.
@@ -160,36 +141,22 @@ def get_question_submitter_total_stats_from_model(
         topic_ids_with_question_submissions=(
             question_submitter_model.topic_ids_with_question_submissions
         ),
-        recent_review_outcomes=(
-            question_submitter_model.recent_review_outcomes
-        ),
+        recent_review_outcomes=(question_submitter_model.recent_review_outcomes),
         recent_performance=question_submitter_model.recent_performance,
         overall_accuracy=question_submitter_model.overall_accuracy,
-        submitted_questions_count=(
-            question_submitter_model.submitted_questions_count
-        ),
-        accepted_questions_count=(
-            question_submitter_model.accepted_questions_count
-        ),
+        submitted_questions_count=(question_submitter_model.submitted_questions_count),
+        accepted_questions_count=(question_submitter_model.accepted_questions_count),
         accepted_questions_without_reviewer_edits_count=(
-            question_submitter_model
-            .accepted_questions_without_reviewer_edits_count
+            question_submitter_model.accepted_questions_without_reviewer_edits_count
         ),
-        rejected_questions_count=(
-            question_submitter_model.rejected_questions_count
-        ),
-        first_contribution_date=(
-            question_submitter_model.first_contribution_date
-        ),
-        last_contribution_date=(
-            question_submitter_model.last_contribution_date
-        ),
+        rejected_questions_count=(question_submitter_model.rejected_questions_count),
+        first_contribution_date=(question_submitter_model.first_contribution_date),
+        last_contribution_date=(question_submitter_model.last_contribution_date),
     )
 
 
 def get_question_reviewer_total_stats_from_model(
-    question_reviewer_model:
-        suggestion_models.QuestionReviewerTotalContributionStatsModel
+    question_reviewer_model: suggestion_models.QuestionReviewerTotalContributionStatsModel,
 ) -> suggestion_registry.QuestionReviewerTotalContributionStats:
     """Returns a domain object for QuestionReviewerTotalContributionStats
     model.
@@ -208,25 +175,14 @@ def get_question_reviewer_total_stats_from_model(
         topic_ids_with_question_reviews=(
             question_reviewer_model.topic_ids_with_question_reviews
         ),
-        reviewed_questions_count=(
-            question_reviewer_model.reviewed_questions_count
-        ),
-        accepted_questions_count=(
-            question_reviewer_model.accepted_questions_count
-        ),
+        reviewed_questions_count=(question_reviewer_model.reviewed_questions_count),
+        accepted_questions_count=(question_reviewer_model.accepted_questions_count),
         accepted_questions_with_reviewer_edits_count=(
-            question_reviewer_model
-            .accepted_questions_with_reviewer_edits_count
+            question_reviewer_model.accepted_questions_with_reviewer_edits_count
         ),
-        rejected_questions_count=(
-            question_reviewer_model.rejected_questions_count
-        ),
-        first_contribution_date=(
-            question_reviewer_model.first_contribution_date
-        ),
-        last_contribution_date=(
-            question_reviewer_model.last_contribution_date
-        ),
+        rejected_questions_count=(question_reviewer_model.rejected_questions_count),
+        first_contribution_date=(question_reviewer_model.first_contribution_date),
+        last_contribution_date=(question_reviewer_model.last_contribution_date),
     )
 
 
@@ -236,11 +192,10 @@ def get_translation_submitter_total_stats(
     language_code: str,
     sort_by: Optional[str],
     topic_ids: Optional[List[str]],
-    max_days_since_last_activity: Optional[int]
+    max_days_since_last_activity: Optional[int],
 ) -> Tuple[
-        List[suggestion_registry.TranslationSubmitterTotalContributionStats],
-        int,
-        bool]:
+    List[suggestion_registry.TranslationSubmitterTotalContributionStats], int, bool
+]:
     """Returns the list of domain objects according to values specified.
 
     Args:
@@ -269,26 +224,22 @@ def get_translation_submitter_total_stats(
                     after this batch.
     """
     translation_submitter_models, next_offset, more = (
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel
-        .fetch_page(
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.fetch_page(
             page_size=page_size,
             offset=offset,
             language_code=language_code,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            max_days_since_last_activity=max_days_since_last_activity
+            max_days_since_last_activity=max_days_since_last_activity,
         )
     )
 
     translation_submitter_stats = [
         get_translation_submitter_total_stats_from_model(model)
-        for model in translation_submitter_models]
+        for model in translation_submitter_models
+    ]
 
-    return (
-        translation_submitter_stats,
-        next_offset,
-        more
-    )
+    return (translation_submitter_stats, next_offset, more)
 
 
 def get_translation_reviewer_total_stats(
@@ -296,12 +247,10 @@ def get_translation_reviewer_total_stats(
     offset: int,
     language_code: str,
     sort_by: Optional[str],
-    max_days_since_last_activity: Optional[int]
+    max_days_since_last_activity: Optional[int],
 ) -> Tuple[
-        List[suggestion_registry.TranslationReviewerTotalContributionStats],
-        int,
-        bool
-    ]:
+    List[suggestion_registry.TranslationReviewerTotalContributionStats], int, bool
+]:
     """Returns the list of domain objects according to values specified.
 
     Args:
@@ -328,13 +277,12 @@ def get_translation_reviewer_total_stats(
                 after this batch.
     """
     translation_reviewer_models, next_offset, more = (
-        suggestion_models.TranslationReviewerTotalContributionStatsModel
-        .fetch_page(
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.fetch_page(
             page_size=page_size,
             offset=offset,
             language_code=language_code,
             sort_by=sort_by,
-            max_days_since_last_activity=max_days_since_last_activity
+            max_days_since_last_activity=max_days_since_last_activity,
         )
     )
 
@@ -343,11 +291,7 @@ def get_translation_reviewer_total_stats(
         for model in translation_reviewer_models
     ]
 
-    return (
-        translation_reviewer_stats,
-        next_offset,
-        more
-    )
+    return (translation_reviewer_stats, next_offset, more)
 
 
 def get_question_submitter_total_stats(
@@ -355,12 +299,10 @@ def get_question_submitter_total_stats(
     offset: int,
     sort_by: Optional[str],
     topic_ids: Optional[List[str]],
-    max_days_since_last_activity: Optional[int]
+    max_days_since_last_activity: Optional[int],
 ) -> Tuple[
-        List[suggestion_registry.QuestionSubmitterTotalContributionStats],
-        int,
-        bool
-    ]:
+    List[suggestion_registry.QuestionSubmitterTotalContributionStats], int, bool
+]:
     """Returns the list of domain objects according to values specified.
 
     Args:
@@ -388,13 +330,12 @@ def get_question_submitter_total_stats(
                 after this batch.
     """
     question_submitter_models, next_offset, more = (
-        suggestion_models.QuestionSubmitterTotalContributionStatsModel
-        .fetch_page(
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel.fetch_page(
             page_size=page_size,
             offset=offset,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            max_days_since_last_activity=max_days_since_last_activity
+            max_days_since_last_activity=max_days_since_last_activity,
         )
     )
 
@@ -403,23 +344,15 @@ def get_question_submitter_total_stats(
         for model in question_submitter_models
     ]
 
-    return (
-        question_submitter_stats,
-        next_offset,
-        more
-    )
+    return (question_submitter_stats, next_offset, more)
 
 
 def get_question_reviewer_total_stats(
     page_size: int,
     offset: int,
     sort_by: Optional[str],
-    max_days_since_last_activity: Optional[int]
-) -> Tuple[
-        List[suggestion_registry.QuestionReviewerTotalContributionStats],
-        int,
-        bool
-    ]:
+    max_days_since_last_activity: Optional[int],
+) -> Tuple[List[suggestion_registry.QuestionReviewerTotalContributionStats], int, bool]:
     """Returns the list of domain objects according to values specified.
 
     Args:
@@ -445,12 +378,11 @@ def get_question_reviewer_total_stats(
                 after this batch.
     """
     question_reviewer_models, next_offset, more = (
-        suggestion_models.QuestionReviewerTotalContributionStatsModel
-        .fetch_page(
+        suggestion_models.QuestionReviewerTotalContributionStatsModel.fetch_page(
             page_size=page_size,
             offset=offset,
             sort_by=sort_by,
-            max_days_since_last_activity=max_days_since_last_activity
+            max_days_since_last_activity=max_days_since_last_activity,
         )
     )
 
@@ -459,15 +391,11 @@ def get_question_reviewer_total_stats(
         for model in question_reviewer_models
     ]
 
-    return (
-        question_reviewer_stats,
-        next_offset,
-        more
-    )
+    return (question_reviewer_stats, next_offset, more)
 
 
 def get_all_translation_coordinator_stats(
-    sort: str
+    sort: str,
 ) -> List[user_domain.TranslationCoordinatorStats]:
     """Gets all TranslationCoordinatorStats corresponding to the supplied
     user and converts them to their corresponding domain objects.
@@ -481,24 +409,23 @@ def get_all_translation_coordinator_stats(
     """
     model_class = suggestion_models.TranslationCoordinatorsModel
     translation_coordinator_models: Sequence[
-        suggestion_models.TranslationCoordinatorsModel] = []
+        suggestion_models.TranslationCoordinatorsModel
+    ] = []
     if sort == (
-        suggestion_models.SortChoices.SORT_KEY_INCREASING_COORDINATOR_COUNTS
-        .value):
+        suggestion_models.SortChoices.SORT_KEY_INCREASING_COORDINATOR_COUNTS.value
+    ):
         translation_coordinator_models = (
-            model_class.query().order(
-                model_class.coordinators_count).fetch()
+            model_class.query().order(model_class.coordinators_count).fetch()
         )
     else:
         translation_coordinator_models = (
-            suggestion_models.TranslationCoordinatorsModel.query().order(
-                -model_class.coordinators_count).fetch()
+            suggestion_models.TranslationCoordinatorsModel.query()
+            .order(-model_class.coordinators_count)
+            .fetch()
         )
     return [
         user_domain.TranslationCoordinatorStats(
-            model.id,
-            model.coordinator_ids,
-            model.coordinators_count
+            model.id, model.coordinator_ids, model.coordinators_count
         )
         for model in translation_coordinator_models
     ]
@@ -514,9 +441,9 @@ def get_translator_counts(language_code: str) -> int:
     Returns:
         int. Number of translator counts.
     """
-    model_class = (
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel)
+    model_class = suggestion_models.TranslationSubmitterTotalContributionStatsModel
     return len(
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel
-        .query(model_class.language_code == language_code).fetch()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.query(
+            model_class.language_code == language_code
+        ).fetch()
     )

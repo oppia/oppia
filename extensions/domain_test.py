@@ -26,11 +26,13 @@ class CustomizationArgSpecDomainUnitTests(test_utils.GenericTestBase):
     """Tests for CustomizationArgSpec domain object methods."""
 
     def test_to_dict(self) -> None:
-        ca_spec = domain.CustomizationArgSpec(
-            'name', 'description', {}, None)
-        self.assertEqual(ca_spec.to_dict(), {
-            'name': 'name',
-            'description': 'description',
-            'schema': {},
-            'default_value': None
-        })
+        ca_spec = domain.CustomizationArgSpec('name', 'description', {}, None)
+        self.assertEqual(
+            ca_spec.to_dict(),
+            {
+                'name': 'name',
+                'description': 'description',
+                'schema': {},
+                'default_value': None,
+            },
+        )

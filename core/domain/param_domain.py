@@ -50,8 +50,7 @@ class CustomizationArgsDictWithValueList(CustomizationArgsDict):
 
 
 AllowedCustomizationArgsDict = Union[
-    CustomizationArgsDictWithValue,
-    CustomizationArgsDictWithValueList
+    CustomizationArgsDictWithValue, CustomizationArgsDictWithValueList
 ]
 
 
@@ -106,8 +105,9 @@ class ParamSpec:
         if self.obj_type not in feconf.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
                 '%s is not among the supported object types for parameters:'
-                ' {%s}.' %
-                (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES))))
+                ' {%s}.'
+                % (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES)))
+            )
 
 
 class ParamChangeDict(TypedDict):
@@ -125,7 +125,7 @@ class ParamChange:
         self,
         name: str,
         generator_id: str,
-        customization_args: AllowedCustomizationArgsDict
+        customization_args: AllowedCustomizationArgsDict,
     ) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
@@ -166,7 +166,8 @@ class ParamChange:
             parameter.
         """
         return value_generators_domain.Registry.get_generator_class_by_id(
-            self._generator_id)()
+            self._generator_id
+        )()
 
     @property
     def customization_args(self) -> AllowedCustomizationArgsDict:
@@ -180,7 +181,7 @@ class ParamChange:
             pair specifying whether parsing is done using the Jinja template
             engine. If the parameter is changed to one amongst several values,
             this dict contains a list of possible values.
-         """
+        """
         return self._customization_args
 
     def to_dict(self) -> ParamChangeDict:
@@ -192,7 +193,7 @@ class ParamChange:
         return {
             'name': self.name,
             'generator_id': self.generator.id,
-            'customization_args': self.customization_args
+            'customization_args': self.customization_args,
         }
 
     @classmethod
@@ -218,44 +219,49 @@ class ParamChange:
             customization arguments and the generator used.
         """
         return cls(
-            param_change_dict['name'], param_change_dict['generator_id'],
-            param_change_dict['customization_args']
+            param_change_dict['name'],
+            param_change_dict['generator_id'],
+            param_change_dict['customization_args'],
         )
 
     def get_value(self, context_params: Dict[str, str]) -> str:
         """Generates a single value for a parameter change."""
         value: str = self.generator.generate_value(
-            context_params, **self.customization_args)
+            context_params, **self.customization_args
+        )
         return value
 
     def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
         if not isinstance(self.name, str):
             raise utils.ValidationError(
-                'Expected param_change name to be a string, received %s'
-                % self.name)
+                'Expected param_change name to be a string, received %s' % self.name
+            )
         if not re.match(feconf.ALPHANUMERIC_REGEX, self.name):
             raise utils.ValidationError(
-                'Only parameter names with characters in [a-zA-Z0-9] are '
-                'accepted.')
+                'Only parameter names with characters in [a-zA-Z0-9] are ' 'accepted.'
+            )
 
         if not isinstance(self._generator_id, str):
             raise utils.ValidationError(
                 'Expected generator ID to be a string, received %s '
-                % self._generator_id)
+                % self._generator_id
+            )
 
         try:
             hasattr(self, 'generator')
         except KeyError as e:
             raise utils.ValidationError(
-                'Invalid generator ID %s' % self._generator_id) from e
+                'Invalid generator ID %s' % self._generator_id
+            ) from e
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(
                 'Expected a dict of customization_args, received %s'
-                % self.customization_args)
+                % self.customization_args
+            )
         for arg_name in self.customization_args:
             if not isinstance(arg_name, str):
                 raise Exception(
-                    'Invalid parameter change customization_arg name: %s'
-                    % arg_name)
+                    'Invalid parameter change customization_arg name: %s' % arg_name
+                )

@@ -24,13 +24,13 @@ from core.platform import models
 from typing import Dict, List, Literal, Optional, Sequence, TypedDict
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models, user_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.USER
-])
+(base_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.USER]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -76,8 +76,7 @@ class BlogPostModel(base_models.BaseModel):
     # blog post's url in the editor or the homepage, the blogPostModel will be
     # queried using the url fragment to retrieve data for populating the editor
     # dashboard / blog post page.
-    url_fragment = (
-        datastore_services.StringProperty(indexed=True, required=True))
+    url_fragment = datastore_services.StringProperty(indexed=True, required=True)
     # Tags associated with the blog post.
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
     # The thumbnail filename of the blog post. It's value will be None until
@@ -86,8 +85,7 @@ class BlogPostModel(base_models.BaseModel):
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
     # if the blog post is not currently published.
-    published_on = (
-        datastore_services.DateTimeProperty(indexed=True))
+    published_on = datastore_services.DateTimeProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -106,13 +104,10 @@ class BlogPostModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            cls.author_id == user_id
-        ).get(keys_only=True) is not None
+        return cls.query(cls.author_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there can
         be multiple blog post models relevant to a user.
         """
@@ -121,17 +116,20 @@ class BlogPostModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user to export."""
-        return dict(super(BlogPostModel, cls).get_export_policy(), **{
-            # We do not export the author_id because we should not
-            # export internal user ids.
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'title': base_models.EXPORT_POLICY.EXPORTED,
-            'content': base_models.EXPORT_POLICY.EXPORTED,
-            'url_fragment': base_models.EXPORT_POLICY.EXPORTED,
-            'tags': base_models.EXPORT_POLICY.EXPORTED,
-            'thumbnail_filename': base_models.EXPORT_POLICY.EXPORTED,
-            'published_on': base_models.EXPORT_POLICY.EXPORTED,
-        })
+        return dict(
+            super(BlogPostModel, cls).get_export_policy(),
+            **{
+                # We do not export the author_id because we should not
+                # export internal user ids.
+                'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'title': base_models.EXPORT_POLICY.EXPORTED,
+                'content': base_models.EXPORT_POLICY.EXPORTED,
+                'url_fragment': base_models.EXPORT_POLICY.EXPORTED,
+                'tags': base_models.EXPORT_POLICY.EXPORTED,
+                'thumbnail_filename': base_models.EXPORT_POLICY.EXPORTED,
+                'published_on': base_models.EXPORT_POLICY.EXPORTED,
+            },
+        )
 
     @classmethod
     def generate_new_blog_post_id(cls) -> str:
@@ -148,12 +146,11 @@ class BlogPostModel(base_models.BaseModel):
         """
         for _ in range(base_models.MAX_RETRIES):
             blog_post_id = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH)
+                str(utils.get_random_int(base_models.RAND_RANGE)), base_models.ID_LENGTH
+            )
             if not cls.get_by_id(blog_post_id):
                 return blog_post_id
-        raise Exception(
-            'New blog post id generator is producing too many collisions.')
+        raise Exception('New blog post id generator is producing too many collisions.')
 
     @classmethod
     def create(cls, blog_post_id: str, author_id: str) -> BlogPostModel:
@@ -170,8 +167,7 @@ class BlogPostModel(base_models.BaseModel):
             Exception. A blog post with the given blog post ID exists already.
         """
         if cls.get_by_id(blog_post_id):
-            raise Exception(
-                'A blog post with the given blog post ID exists already.')
+            raise Exception('A blog post with the given blog post ID exists already.')
 
         entity = cls(
             id=blog_post_id,
@@ -181,7 +177,7 @@ class BlogPostModel(base_models.BaseModel):
             published_on=None,
             url_fragment='',
             tags=[],
-            thumbnail_filename=None
+            thumbnail_filename=None,
         )
         entity.update_timestamps()
         entity.put()
@@ -202,7 +198,8 @@ class BlogPostModel(base_models.BaseModel):
         """
         return BlogPostModel.query(
             datastore_services.all_of(
-                cls.url_fragment == url_fragment, cls.deleted == False) # pylint: disable=singleton-comparison
+                cls.url_fragment == url_fragment, cls.deleted == False
+            )  # pylint: disable=singleton-comparison
         ).get()
 
     @classmethod
@@ -216,8 +213,9 @@ class BlogPostModel(base_models.BaseModel):
             dict. Dictionary of the data from BlogPostModel.
         """
         user_data: Dict[str, BlogPostModelDataDict] = {}
-        blog_post_models: Sequence[BlogPostModel] = cls.get_all().filter(
-            cls.author_id == user_id).fetch()
+        blog_post_models: Sequence[BlogPostModel] = (
+            cls.get_all().filter(cls.author_id == user_id).fetch()
+        )
         for blog_post_model in blog_post_models:
             user_data[blog_post_model.id] = {
                 'title': blog_post_model.title,
@@ -226,7 +224,8 @@ class BlogPostModel(base_models.BaseModel):
                 'tags': blog_post_model.tags,
                 'thumbnail_filename': blog_post_model.thumbnail_filename,
                 'published_on': utils.get_time_in_millisecs(
-                    blog_post_model.published_on),
+                    blog_post_model.published_on
+                ),
             }
 
         return user_data
@@ -248,8 +247,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     # Autogenerated summary of the blog post.
     summary = datastore_services.StringProperty(required=True, default='')
     # The unique url fragment of the blog post.
-    url_fragment = (
-        datastore_services.StringProperty(indexed=True, required=True))
+    url_fragment = datastore_services.StringProperty(indexed=True, required=True)
     # Tags associated with the blog post.
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
     # The thumbnail filename of the blog post.It's value will be none until
@@ -277,13 +275,10 @@ class BlogPostSummaryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            cls.author_id == user_id
-        ).get(keys_only=True) is not None
+        return cls.query(cls.author_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model data has already been associated as a part of the
         BlogPostModel to the user and thus does not need a separate user
         association.
@@ -296,15 +291,18 @@ class BlogPostSummaryModel(base_models.BaseModel):
         isn't exported because noteworthy details that belong to this
         model have already been exported as a part of the BlogPostModel.
         """
-        return dict(super(BlogPostSummaryModel, cls).get_export_policy(), **{
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'published_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
+        return dict(
+            super(BlogPostSummaryModel, cls).get_export_policy(),
+            **{
+                'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'published_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
 
 class BlogPostRightsModel(base_models.BaseModel):
@@ -319,7 +317,8 @@ class BlogPostRightsModel(base_models.BaseModel):
     # Whether this blog post is published or not.
     # False if blog post is a draft, True if published.
     blog_post_is_published = datastore_services.BooleanProperty(
-        indexed=True, required=True, default=False)
+        indexed=True, required=True, default=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -354,11 +353,16 @@ class BlogPostRightsModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            # NOTE: Even though `editor_ids` is repeated, we can compare it to a
-            # single value and it will return models where any of the editor IDs
-            # are equal to user_id.
-            cls.editor_ids == user_id).get(keys_only=True) is not None
+        return (
+            cls.query(
+                # NOTE: Even though `editor_ids` is repeated, we can compare it to a
+                # single value and it will return models where any of the editor IDs
+                # are equal to user_id.
+                cls.editor_ids
+                == user_id
+            ).get(keys_only=True)
+            is not None
+        )
 
     @classmethod
     def get_published_models_by_user(
@@ -384,19 +388,18 @@ class BlogPostRightsModel(base_models.BaseModel):
             according to the time when the model was last updated.
         """
         query = cls.query(
-            cls.editor_ids == user_id, cls.blog_post_is_published == True # pylint: disable=singleton-comparison
+            cls.editor_ids == user_id,
+            cls.blog_post_is_published == True,  # pylint: disable=singleton-comparison
         ).order(-cls.last_updated)
         return list(
-            query.fetch(
-                limit, offset=offset
-            ) if limit is not None else query.fetch(offset=offset)
+            query.fetch(limit, offset=offset)
+            if limit is not None
+            else query.fetch(offset=offset)
         )
 
     @classmethod
     def get_draft_models_by_user(
-        cls,
-        user_id: str,
-        limit: Optional[int] = None
+        cls, user_id: str, limit: Optional[int] = None
     ) -> List[BlogPostRightsModel]:
         """Retrieves the blog post rights objects for draft blog posts for which
         the given user is an editor.
@@ -413,11 +416,10 @@ class BlogPostRightsModel(base_models.BaseModel):
             according to the time when the model was last updated.
         """
         query = cls.query(
-            cls.editor_ids == user_id, cls.blog_post_is_published == False # pylint: disable=singleton-comparison
+            cls.editor_ids == user_id,
+            cls.blog_post_is_published == False,  # pylint: disable=singleton-comparison
         ).order(-cls.last_updated)
-        return list(
-            query.fetch(limit) if limit is not None else query.fetch()
-        )
+        return list(query.fetch(limit) if limit is not None else query.fetch())
 
     @classmethod
     def get_all_by_user(cls, user_id: str) -> List[BlogPostRightsModel]:
@@ -434,23 +436,22 @@ class BlogPostRightsModel(base_models.BaseModel):
         return list(cls.query(cls.editor_ids == user_id).fetch())
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users can edit the blog post.
         """
-        return (
-            base_models.MODEL_ASSOCIATION_TO_USER
-            .ONE_INSTANCE_SHARED_ACROSS_USERS
-        )
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(BlogPostRightsModel, cls).get_export_policy(), **{
-            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'blog_post_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(BlogPostRightsModel, cls).get_export_policy(),
+            **{
+                'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'blog_post_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, List[str]]:
@@ -464,8 +465,9 @@ class BlogPostRightsModel(base_models.BaseModel):
             in a python dict format. In this case, we are returning all the
             ids of blog posts for which the user is an editor.
         """
-        editable_blog_posts: Sequence[BlogPostRightsModel] = (
-            cls.query(cls.editor_ids == user_id).fetch())
+        editable_blog_posts: Sequence[BlogPostRightsModel] = cls.query(
+            cls.editor_ids == user_id
+        ).fetch()
         editable_blog_post_ids = [blog.id for blog in editable_blog_posts]
 
         return {
@@ -499,12 +501,10 @@ class BlogPostRightsModel(base_models.BaseModel):
         """
         if cls.get_by_id(blog_post_id):
             raise Exception(
-                'Blog Post ID conflict on creating new blog post rights model.')
+                'Blog Post ID conflict on creating new blog post rights model.'
+            )
 
-        entity = cls(
-            id=blog_post_id,
-            editor_ids=[author_id]
-        )
+        entity = cls(id=blog_post_id, editor_ids=[author_id])
         entity.update_timestamps()
         entity.put()
 
@@ -524,14 +524,14 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
     author_id = datastore_services.StringProperty(indexed=True, required=True)
     # The publicly viewable name of the user to display as author name in blog
     # posts.
-    displayed_author_name = (
-        datastore_services.StringProperty(indexed=True, required=True))
+    displayed_author_name = datastore_services.StringProperty(
+        indexed=True, required=True
+    )
     # User specified biography to be shown on their blog author page.
     author_bio = datastore_services.TextProperty(indexed=False)
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -552,9 +552,7 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            cls.author_id == user_id
-        ).get(keys_only=True) is not None
+        return cls.query(cls.author_id == user_id).get(keys_only=True) is not None
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, BlogAuthorDetailsModelDict]:
@@ -572,7 +570,7 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         if author_model:
             return {
                 'displayed_author_name': author_model.displayed_author_name,
-                'author_bio': author_model.author_bio
+                'author_bio': author_model.author_bio,
             }
         else:
             return {}
@@ -580,16 +578,19 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data corresponding to a user to export."""
-        return dict(super(BlogAuthorDetailsModel, cls).get_export_policy(), **{
-            # We do not export the author id of the model because we should not
-            # export internal user ids.
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'displayed_author_name': base_models.EXPORT_POLICY.EXPORTED,
-            'author_bio': base_models.EXPORT_POLICY.EXPORTED,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
+        return dict(
+            super(BlogAuthorDetailsModel, cls).get_export_policy(),
+            **{
+                # We do not export the author id of the model because we should not
+                # export internal user ids.
+                'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'displayed_author_name': base_models.EXPORT_POLICY.EXPORTED,
+                'author_bio': base_models.EXPORT_POLICY.EXPORTED,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @classmethod
     def generate_new_instance_id(cls) -> str:
@@ -606,12 +607,11 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         """
         for _ in range(base_models.MAX_RETRIES):
             instance_id = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH)
+                str(utils.get_random_int(base_models.RAND_RANGE)), base_models.ID_LENGTH
+            )
             if not cls.get_by_id(instance_id):
                 return instance_id
-        raise Exception(
-            'New instance id generator is producing too many collisions.')
+        raise Exception('New instance id generator is producing too many collisions.')
 
     @classmethod
     def create(
@@ -630,13 +630,15 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
         """
         if cls.get_by_author(author_id):
             raise Exception(
-                'A blog author details model for given user already exists.')
+                'A blog author details model for given user already exists.'
+            )
         model_id = cls.generate_new_instance_id()
         entity = cls(
             id=model_id,
             author_id=author_id,
             displayed_author_name=displayed_author_name,
-            author_bio=author_bio)
+            author_bio=author_bio,
+        )
         entity.update_timestamps()
         entity.put()
 

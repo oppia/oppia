@@ -32,7 +32,10 @@ from typing import Optional
 CLIENT = secretmanager.SecretManagerServiceClient(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()[0]))
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 
 @functools.lru_cache(maxsize=64)
@@ -45,8 +48,7 @@ def get_secret(name: str) -> Optional[str]:
     Returns:
         str. The value of the secret.
     """
-    secret_name = (
-        f'projects/{feconf.OPPIA_PROJECT_ID}/secrets/{name}/versions/latest')
+    secret_name = f'projects/{feconf.OPPIA_PROJECT_ID}/secrets/{name}/versions/latest'
     try:
         response = CLIENT.access_secret_version(request={'name': secret_name})
     except Exception:

@@ -29,7 +29,8 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
         super().setUp()
         self.temp_dir = tempfile.TemporaryDirectory()
         self.github_output_file_path = os.path.join(
-            self.temp_dir.name, 'github_output.json')
+            self.temp_dir.name, 'github_output.json'
+        )
         os.environ['GITHUB_OUTPUT'] = self.github_output_file_path
 
     def tearDown(self) -> None:
@@ -50,8 +51,7 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
         }
 
         check_github_workflow_status.main(['--jobs', json.dumps(jobs)])
-        self.assertEqual(
-            self.get_workflow_status_from_github_output(), 'failure')
+        self.assertEqual(self.get_workflow_status_from_github_output(), 'failure')
 
     def test_get_github_workflow_status_with_all_jobs_success(self) -> None:
         jobs = {
@@ -61,12 +61,9 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
         }
 
         check_github_workflow_status.main(['--jobs', json.dumps(jobs)])
-        self.assertEqual(
-            self.get_workflow_status_from_github_output(), 'success')
+        self.assertEqual(self.get_workflow_status_from_github_output(), 'success')
 
-    def test_get_github_workflow_status_with_jobs_success_or_skipped(
-        self
-    ) -> None:
+    def test_get_github_workflow_status_with_jobs_success_or_skipped(self) -> None:
         jobs = {
             'job1': {'result': 'skipped'},
             'job2': {'result': 'success'},
@@ -74,5 +71,4 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
         }
 
         check_github_workflow_status.main(['--jobs', json.dumps(jobs)])
-        self.assertEqual(
-            self.get_workflow_status_from_github_output(), 'success')
+        self.assertEqual(self.get_workflow_status_from_github_output(), 'success')

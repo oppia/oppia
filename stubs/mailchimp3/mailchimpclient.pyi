@@ -1,6 +1,5 @@
 from typing import Any, Dict, Optional
 
-
 class MailChimpClient(object):
     def __init__(
         self,
@@ -10,8 +9,7 @@ class MailChimpClient(object):
         enabled: bool = True,
         timeout: Optional[float] = None,
         request_hooks: Optional[Dict[str, str]] = None,
-        request_headers: Optional[Dict[str, Any]] = None
+        request_headers: Optional[Dict[str, Any]] = None,
     ): ...
-
 
 class MailChimpError(Exception): ...

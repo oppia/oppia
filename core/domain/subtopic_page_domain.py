@@ -27,23 +27,24 @@ from core.domain import translation_domain
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import (
+    html_validation_service,
+)  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML: Final = 'page_contents_html'
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO: Final = 'page_contents_audio'
-SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS: Final = (
-    'page_written_translations'
-)
+SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS: Final = 'page_written_translations'
 
 CMD_CREATE_NEW: Final = 'create_new'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: Final = 'update_subtopic_page_property'
 CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION: Final = (
-    'migrate_subtopic_page_contents_schema_to_latest_version')
+    'migrate_subtopic_page_contents_schema_to_latest_version'
+)
 
 
 class SubtopicPageChange(change_domain.BaseChange):
@@ -60,38 +61,46 @@ class SubtopicPageChange(change_domain.BaseChange):
     SUBTOPIC_PAGE_PROPERTIES: List[str] = [
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
-        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS
+        SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS,
     ]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': ['topic_id', 'subtopic_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-        'required_attribute_names': [
-            'property_name', 'new_value', 'old_value', 'subtopic_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
-        'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
+        {
+            'name': CMD_CREATE_NEW,
+            'required_attribute_names': ['topic_id', 'subtopic_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'required_attribute_names': [
+                'property_name',
+                'new_value',
+                'old_value',
+                'subtopic_id',
+            ],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+            'required_attribute_names': ['from_version', 'to_version'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+    ]
 
 
 AllowedUpdateSubtopicPagePropertyCmdTypes = Union[
     state_domain.SubtitledHtmlDict,
     state_domain.RecordedVoiceoversDict,
-    translation_domain.WrittenTranslationsDict
+    translation_domain.WrittenTranslationsDict,
 ]
 
 
@@ -176,7 +185,7 @@ class SubtopicPageContents:
         self,
         subtitled_html: state_domain.SubtitledHtml,
         recorded_voiceovers: state_domain.RecordedVoiceovers,
-        written_translations: translation_domain.WrittenTranslations
+        written_translations: translation_domain.WrittenTranslations,
     ) -> None:
         """Constructs a SubtopicPageContents domain object.
 
@@ -211,12 +220,14 @@ class SubtopicPageContents:
         """
         content_id = feconf.DEFAULT_SUBTOPIC_PAGE_CONTENT_ID
         return cls(
-            state_domain.SubtitledHtml.create_default_subtitled_html(
-                content_id),
+            state_domain.SubtitledHtml.create_default_subtitled_html(content_id),
             state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {content_id: {}}}),
+                {'voiceovers_mapping': {content_id: {}}}
+            ),
             translation_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {content_id: {}}}))
+                {'translations_mapping': {content_id: {}}}
+            ),
+        )
 
     def to_dict(self) -> SubtopicPageContentsDict:
         """Returns a dict representing this SubtopicPageContents domain object.
@@ -227,7 +238,7 @@ class SubtopicPageContents:
         return {
             'subtitled_html': self.subtitled_html.to_dict(),
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
-            'written_translations': self.written_translations.to_dict()
+            'written_translations': self.written_translations.to_dict(),
         }
 
     @classmethod
@@ -244,14 +255,18 @@ class SubtopicPageContents:
             SubtopicPageContents. The corresponding object.
         """
         page_contents = state_domain.SubtitledHtml.from_dict(
-            page_contents_dict['subtitled_html'])
+            page_contents_dict['subtitled_html']
+        )
         page_contents.validate()
         return cls(
             page_contents,
-            state_domain.RecordedVoiceovers.from_dict(page_contents_dict[
-                'recorded_voiceovers']),
-            translation_domain.WrittenTranslations.from_dict(page_contents_dict[
-                'written_translations']))
+            state_domain.RecordedVoiceovers.from_dict(
+                page_contents_dict['recorded_voiceovers']
+            ),
+            translation_domain.WrittenTranslations.from_dict(
+                page_contents_dict['written_translations']
+            ),
+        )
 
 
 class SubtopicPageDict(TypedDict):
@@ -275,7 +290,7 @@ class SubtopicPage:
         page_contents: SubtopicPageContents,
         page_contents_schema_version: int,
         language_code: str,
-        version: int
+        version: int,
     ) -> None:
         """Constructs a SubtopicPage domain object.
 
@@ -309,7 +324,7 @@ class SubtopicPage:
             'page_contents': self.page_contents.to_dict(),
             'page_contents_schema_version': self.page_contents_schema_version,
             'language_code': self.language_code,
-            'version': self.version
+            'version': self.version,
         }
 
     @classmethod
@@ -342,16 +357,19 @@ class SubtopicPage:
         """
         subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(
-            subtopic_page_id, topic_id,
+            subtopic_page_id,
+            topic_id,
             SubtopicPageContents.create_default_subtopic_page_contents(),
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE,
+            0,
+        )
 
     @classmethod
     def convert_html_fields_in_subtopic_page_contents(
         cls,
         subtopic_page_contents_dict: SubtopicPageContentsDict,
-        conversion_fn: Callable[[str], str]
+        conversion_fn: Callable[[str], str],
     ) -> SubtopicPageContentsDict:
         """Applies a conversion function on all the html strings in subtopic
         page contents to migrate them to a desired state.
@@ -365,9 +383,9 @@ class SubtopicPage:
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        subtopic_page_contents_dict['subtitled_html']['html'] = (
-            conversion_fn(
-                subtopic_page_contents_dict['subtitled_html']['html']))
+        subtopic_page_contents_dict['subtitled_html']['html'] = conversion_fn(
+            subtopic_page_contents_dict['subtitled_html']['html']
+        )
         return subtopic_page_contents_dict
 
     @classmethod
@@ -386,7 +404,8 @@ class SubtopicPage:
         """
         return cls.convert_html_fields_in_subtopic_page_contents(
             page_contents_dict,
-            html_validation_service.add_math_content_to_math_rte_components)
+            html_validation_service.add_math_content_to_math_rte_components,
+        )
 
     @classmethod
     def _convert_page_contents_v2_dict_to_v3_dict(
@@ -405,7 +424,8 @@ class SubtopicPage:
         """
         return cls.convert_html_fields_in_subtopic_page_contents(
             page_contents_dict,
-            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+            html_validation_service.convert_svg_diagram_tags_to_image_tags,
+        )
 
     @classmethod
     def _convert_page_contents_v3_dict_to_v4_dict(
@@ -422,14 +442,14 @@ class SubtopicPage:
             dict. The converted page_contents_dict.
         """
         return cls.convert_html_fields_in_subtopic_page_contents(
-            page_contents_dict,
-            html_validation_service.fix_incorrectly_encoded_chars)
+            page_contents_dict, html_validation_service.fix_incorrectly_encoded_chars
+        )
 
     @classmethod
     def update_page_contents_from_model(
         cls,
         versioned_page_contents: VersionedSubtopicPageContentsDict,
-        current_version: int
+        current_version: int,
     ) -> None:
         """Converts the page_contents blob contained in the given
         versioned_page_contents dict from current_version to
@@ -447,10 +467,13 @@ class SubtopicPage:
         versioned_page_contents['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
-            cls, '_convert_page_contents_v%s_dict_to_v%s_dict' % (
-                current_version, current_version + 1))
+            cls,
+            '_convert_page_contents_v%s_dict_to_v%s_dict'
+            % (current_version, current_version + 1),
+        )
         versioned_page_contents['page_contents'] = conversion_fn(
-            versioned_page_contents['page_contents'])
+            versioned_page_contents['page_contents']
+        )
 
     def get_subtopic_id_from_subtopic_page_id(self) -> int:
         """Returns the id from the subtopic page id of the object.
@@ -458,7 +481,7 @@ class SubtopicPage:
         Returns:
             int. The subtopic_id of the object.
         """
-        return int(self.id[len(self.topic_id) + 1:])
+        return int(self.id[len(self.topic_id) + 1 :])
 
     def update_page_contents_html(
         self, new_page_contents_html: state_domain.SubtitledHtml
@@ -484,8 +507,7 @@ class SubtopicPage:
 
     def update_page_contents_written_translations(
         self,
-        new_page_written_translations_dict: (
-            translation_domain.WrittenTranslationsDict)
+        new_page_written_translations_dict: translation_domain.WrittenTranslationsDict,
     ) -> None:
         """The new value for the written_translations data field.
 
@@ -495,7 +517,9 @@ class SubtopicPage:
         """
         self.page_contents.written_translations = (
             translation_domain.WrittenTranslations.from_dict(
-                new_page_written_translations_dict))
+                new_page_written_translations_dict
+            )
+        )
 
     def validate(self) -> None:
         """Validates various properties of the SubtopicPage object.
@@ -506,38 +530,43 @@ class SubtopicPage:
         """
         if not isinstance(self.topic_id, str):
             raise utils.ValidationError(
-                'Expected topic_id to be a string, received %s' %
-                self.topic_id)
+                'Expected topic_id to be a string, received %s' % self.topic_id
+            )
         if not isinstance(self.version, int):
             raise utils.ValidationError(
-                'Expected version number to be an int, received %s' %
-                self.version)
+                'Expected version number to be an int, received %s' % self.version
+            )
         self.page_contents.validate()
 
         if not isinstance(self.page_contents_schema_version, int):
             raise utils.ValidationError(
                 'Expected page contents schema version to be an integer, '
-                'received %s' % self.page_contents_schema_version)
+                'received %s' % self.page_contents_schema_version
+            )
         if (
-                self.page_contents_schema_version !=
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+            self.page_contents_schema_version
+            != feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+        ):
             raise utils.ValidationError(
                 'Expected page contents schema version to be %s, received %s'
                 % (
                     feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
-                    self.page_contents_schema_version)
+                    self.page_contents_schema_version,
+                )
             )
 
         if not isinstance(self.language_code, str):
             raise utils.ValidationError(
-                'Expected language code to be a string, received %s' %
-                self.language_code)
+                'Expected language code to be a string, received %s'
+                % self.language_code
+            )
         if not any(
-                self.language_code == lc['code']
-                for lc in constants.SUPPORTED_CONTENT_LANGUAGES
+            self.language_code == lc['code']
+            for lc in constants.SUPPORTED_CONTENT_LANGUAGES
         ):
             raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code)
+                'Invalid language code: %s' % self.language_code
+            )
 
 
 class SubtopicPageSummaryDict(TypedDict):
@@ -567,7 +596,7 @@ class SubtopicPageSummary:
         thumbnail_bg_color: Optional[str],
         subtopic_mastery: Optional[float],
         parent_topic_url_fragment: Optional[str],
-        classroom_url_fragment: Optional[str]
+        classroom_url_fragment: Optional[str],
     ):
         """Initialize a SubtopicPageSummary object.
 
@@ -611,5 +640,5 @@ class SubtopicPageSummary:
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'subtopic_mastery': self.subtopic_mastery,
             'parent_topic_url_fragment': self.parent_topic_url_fragment,
-            'classroom_url_fragment': self.classroom_url_fragment
+            'classroom_url_fragment': self.classroom_url_fragment,
         }

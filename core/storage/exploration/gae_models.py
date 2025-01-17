@@ -31,7 +31,7 @@ import core.storage.base_model.gae_models as base_models
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
@@ -63,21 +63,17 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the exploration being edited.
-    exploration_id = (
-        datastore_services.StringProperty(indexed=True, required=True))
+    exploration_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to pseudonymize or delete corresponding
         to a user: user_id field.
         """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
+        return base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -89,14 +85,15 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
-    def get_multi( # type: ignore[override]
+    def get_multi(  # type: ignore[override]
         cls, exp_id: str, exp_versions: List[int]
     ) -> List[Optional[ExplorationCommitLogEntryModel]]:
         """Gets the ExplorationCommitLogEntryModels for the given exploration
@@ -111,11 +108,11 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             ExplorationCommitLogEntryModel instances which matches the given
             exp_id and exp_versions.
         """
-        instance_ids = [cls.get_instance_id(exp_id, exp_version)
-                        for exp_version in exp_versions]
+        instance_ids = [
+            cls.get_instance_id(exp_id, exp_version) for exp_version in exp_versions
+        ]
 
-        return super(ExplorationCommitLogEntryModel, cls).get_multi(
-            instance_ids)
+        return super(ExplorationCommitLogEntryModel, cls).get_multi(instance_ids)
 
     @classmethod
     def get_instance_id(cls, exp_id: str, exp_version: int) -> str:
@@ -138,7 +135,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         cls,
         page_size: int,
         urlsafe_start_cursor: Optional[str],
-        max_age: Optional[datetime.timedelta] = None
+        max_age: Optional[datetime.timedelta] = None,
     ) -> Tuple[Sequence[ExplorationCommitLogEntryModel], Optional[str], bool]:
         """Fetches a list of all the non-private commits sorted by their
         last updated attribute.
@@ -169,15 +166,18 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
 
         if not isinstance(max_age, datetime.timedelta) and max_age is not None:
-            raise ValueError(
-                'max_age must be a datetime.timedelta instance or None.')
+            raise ValueError('max_age must be a datetime.timedelta instance or None.')
 
-        query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
+        query = cls.query(
+            cls.post_commit_is_private == False
+        )  # pylint: disable=singleton-comparison
         if max_age:
             query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age)
+                cls.last_updated >= datetime.datetime.utcnow() - max_age
+            )
         return cls._fetch_page_sorted_by_last_updated(
-            query, page_size, urlsafe_start_cursor)
+            query, page_size, urlsafe_start_cursor
+        )
 
 
 class ExplorationModel(base_models.VersionedModel):
@@ -200,7 +200,8 @@ class ExplorationModel(base_models.VersionedModel):
     objective = datastore_services.TextProperty(default='', indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
     language_code = datastore_services.StringProperty(
-        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True)
+        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True
+    )
     # Tags (topics, skills, concepts, etc.) associated with this
     # exploration.
     tags = datastore_services.StringProperty(repeated=True, indexed=True)
@@ -211,10 +212,10 @@ class ExplorationModel(base_models.VersionedModel):
 
     # The version of the states blob schema.
     states_schema_version = datastore_services.IntegerProperty(
-        required=True, default=0, indexed=True)
+        required=True, default=0, indexed=True
+    )
     # The name of the initial state of this exploration.
-    init_state_name = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    init_state_name = datastore_services.StringProperty(required=True, indexed=True)
     # A dict representing the states of this exploration. This dict should
     # not be empty.
     states = datastore_services.JsonProperty(default={}, indexed=False)
@@ -224,24 +225,23 @@ class ExplorationModel(base_models.VersionedModel):
     param_specs = datastore_services.JsonProperty(default={}, indexed=False)
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
-    param_changes = (
-        datastore_services.JsonProperty(repeated=True, indexed=False))
+    param_changes = datastore_services.JsonProperty(repeated=True, indexed=False)
     # A boolean indicating whether automatic text-to-speech is enabled in
     # this exploration.
-    auto_tts_enabled = (
-        datastore_services.BooleanProperty(default=True, indexed=True))
+    auto_tts_enabled = datastore_services.BooleanProperty(default=True, indexed=True)
     # The next_content_id index to use for generation of new content ids.
     next_content_id_index = datastore_services.IntegerProperty(
-        required=True, default=0, indexed=True)
+        required=True, default=0, indexed=True
+    )
     # An boolean indicating whether further edits can be made to the
     # exploration.
-    edits_allowed = datastore_services.BooleanProperty(
-        default=True, indexed=True)
+    edits_allowed = datastore_services.BooleanProperty(default=True, indexed=True)
     # A boolean indicating whether correctness feedback is enabled in this
     # exploration.
     # DEPRECATED. Do not use.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
-        default=True, indexed=True)
+        default=True, indexed=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -249,33 +249,34 @@ class ExplorationModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'blurb': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'author_notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'states_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'init_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'states': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'param_specs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'correctness_feedback_enabled':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'edits_allowed': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'blurb': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'author_notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'states_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'init_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'states': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'param_specs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'correctness_feedback_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'edits_allowed': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @classmethod
     def get_exploration_count(cls) -> int:
@@ -291,9 +292,7 @@ class ExplorationModel(base_models.VersionedModel):
             dict(str, BaseModel). Additional models needed for
             the commit process. Contains the ExplorationRightsModel.
         """
-        return {
-            'rights_model': ExplorationRightsModel.get_by_id(self.id)
-        }
+        return {'rights_model': ExplorationRightsModel.get_by_id(self.id)}
 
     # Here we use MyPy ignore because super class (VersionedModel)
     # defines this 'additional_models' argument as broader type but
@@ -308,7 +307,7 @@ class ExplorationModel(base_models.VersionedModel):
         commit_type: str,
         commit_message: Optional[str],
         commit_cmds: base_models.AllowedCommitCmdsListType,
-        additional_models: Mapping[str, ExplorationRightsModel]
+        additional_models: Mapping[str, ExplorationRightsModel],
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -334,22 +333,19 @@ class ExplorationModel(base_models.VersionedModel):
             the datastore.
         """
         models_to_put = super().compute_models_to_commit(
-            committer_id,
-            commit_type,
-            commit_message,
-            commit_cmds,
-            additional_models
+            committer_id, commit_type, commit_message, commit_cmds, additional_models
         )
 
         exploration_rights_model = additional_models['rights_model']
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
-            self.id, self.version,
+            self.id,
+            self.version,
             committer_id,
             commit_type,
             commit_message,
             commit_cmds,
             exploration_rights_model.status,
-            exploration_rights_model.community_owned
+            exploration_rights_model.community_owned,
         )
         exploration_commit_log.exploration_id = self.id
         return {
@@ -362,12 +358,12 @@ class ExplorationModel(base_models.VersionedModel):
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     @classmethod
-    def delete_multi( # type: ignore[override]
+    def delete_multi(  # type: ignore[override]
         cls,
         entity_ids: List[str],
         committer_id: str,
         commit_message: str,
-        force_deletion: bool = False
+        force_deletion: bool = False,
     ) -> None:
         """Deletes the given cls instances with the given entity_ids.
 
@@ -384,48 +380,53 @@ class ExplorationModel(base_models.VersionedModel):
         versioned_exp_models = cls.get_multi(entity_ids, include_deleted=True)
 
         super(ExplorationModel, cls).delete_multi(
-            entity_ids, committer_id,
-            commit_message, force_deletion=force_deletion)
+            entity_ids, committer_id, commit_message, force_deletion=force_deletion
+        )
 
         if not force_deletion:
             commit_log_models = []
             exp_rights_models = ExplorationRightsModel.get_multi(
-                entity_ids, include_deleted=True)
+                entity_ids, include_deleted=True
+            )
 
             versioned_and_exp_rights_models = zip(
-                versioned_exp_models, exp_rights_models)
+                versioned_exp_models, exp_rights_models
+            )
             for model, rights_model in versioned_and_exp_rights_models:
                 # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
                 assert rights_model is not None
                 exploration_commit_log = ExplorationCommitLogEntryModel.create(
-                    model.id, model.version, committer_id,
+                    model.id,
+                    model.version,
+                    committer_id,
                     feconf.COMMIT_TYPE_DELETE,
-                    commit_message, [{'cmd': cls.CMD_DELETE_COMMIT}],
-                    rights_model.status, rights_model.community_owned
+                    commit_message,
+                    [{'cmd': cls.CMD_DELETE_COMMIT}],
+                    rights_model.status,
+                    rights_model.community_owned,
                 )
                 exploration_commit_log.exploration_id = model.id
                 commit_log_models.append(exploration_commit_log)
-            ExplorationCommitLogEntryModel.update_timestamps_multi(
-                commit_log_models)
+            ExplorationCommitLogEntryModel.update_timestamps_multi(commit_log_models)
             datastore_services.put_multi(commit_log_models)
         else:
             # Delete the ExplorationVersionHistoryModels if force_deletion is
             # True.
             versioned_exp_models_without_none = [
-                model for model in versioned_exp_models
-                if model is not None
+                model for model in versioned_exp_models if model is not None
             ]
             version_history_keys = []
             for model in versioned_exp_models_without_none:
                 for version in range(1, model.version + 1):
-                    version_history_id = (
-                        ExplorationVersionHistoryModel.get_instance_id(
-                            model.id, version
+                    version_history_id = ExplorationVersionHistoryModel.get_instance_id(
+                        model.id, version
+                    )
+                    version_history_keys.append(
+                        datastore_services.Key(
+                            ExplorationVersionHistoryModel, version_history_id
                         )
                     )
-                    version_history_keys.append(datastore_services.Key(
-                        ExplorationVersionHistoryModel, version_history_id))
             datastore_services.delete_multi(version_history_keys)
 
     # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
@@ -463,10 +464,7 @@ class ExplorationModel(base_models.VersionedModel):
     # accepts content NDB JSON properties and those NDB JSON properties have
     # loose typing. So, once we explicitly type those NDB JSON properties, we
     # can remove Any type from the argument of '_reconstitute' method.
-    def _reconstitute(
-        self,
-        snapshot_dict: Dict[str, Any]
-    ) -> ExplorationModel:
+    def _reconstitute(self, snapshot_dict: Dict[str, Any]) -> ExplorationModel:
         """Populates the model instance with the snapshot.
         Some old ExplorationSnapshotContentModels can contain fields
         and field values that are no longer supported and would cause
@@ -482,8 +480,7 @@ class ExplorationModel(base_models.VersionedModel):
             with the snapshot.
         """
 
-        self.populate(
-            **ExplorationModel.convert_to_valid_dict(snapshot_dict))
+        self.populate(**ExplorationModel.convert_to_valid_dict(snapshot_dict))
         return self
 
 
@@ -502,28 +499,26 @@ class ExplorationContextModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )
 
 
-class ExplorationRightsSnapshotMetadataModel(
-        base_models.BaseSnapshotMetadataModel):
+class ExplorationRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
 
     pass
 
 
-class ExplorationRightsSnapshotContentModel(
-        base_models.BaseSnapshotContentModel):
+class ExplorationRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
 
     @staticmethod
@@ -552,9 +547,12 @@ class ExplorationRightsSnapshotContentModel(
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return ExplorationRightsSnapshotMetadataModel.query(
-            ExplorationRightsSnapshotMetadataModel.content_user_ids == user_id
-        ).get(keys_only=True) is not None
+        return (
+            ExplorationRightsSnapshotMetadataModel.query(
+                ExplorationRightsSnapshotMetadataModel.content_user_ids == user_id
+            ).get(keys_only=True)
+            is not None
+        )
 
 
 class ExplorationRightsModel(base_models.VersionedModel):
@@ -572,33 +570,29 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this exploration.
-    voice_artist_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
+    voice_artist_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     # Whether this exploration is owned by the community.
-    community_owned = (
-        datastore_services.BooleanProperty(indexed=True, default=False))
+    community_owned = datastore_services.BooleanProperty(indexed=True, default=False)
     # The exploration id which this exploration was cloned from. If None, this
     # exploration was created from scratch.
     cloned_from = datastore_services.StringProperty()
     # For private explorations, whether this exploration can be viewed
     # by anyone who has the URL. If the exploration is not private, this
     # setting is ignored.
-    viewable_if_private = (
-        datastore_services.BooleanProperty(indexed=True, default=False))
+    viewable_if_private = datastore_services.BooleanProperty(
+        indexed=True, default=False
+    )
     # Time, in milliseconds, when the exploration was first published.
-    first_published_msec = (
-        datastore_services.FloatProperty(indexed=True, default=None))
+    first_published_msec = datastore_services.FloatProperty(indexed=True, default=None)
 
     # The publication status of this exploration.
     status = datastore_services.StringProperty(
-        default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
-        choices=[
-            constants.ACTIVITY_STATUS_PRIVATE,
-            constants.ACTIVITY_STATUS_PUBLIC
-        ]
+        default=constants.ACTIVITY_STATUS_PRIVATE,
+        indexed=True,
+        choices=[constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC],
     )
 
     @staticmethod
@@ -607,35 +601,32 @@ class ExplorationRightsModel(base_models.VersionedModel):
         to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
         """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
+        return base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as one instance shared across users since multiple
         users contribute to an exploration and have varying rights.
         """
-        return (
-            base_models
-            .MODEL_ASSOCIATION_TO_USER
-            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @classmethod
     def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
@@ -646,7 +637,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'owner_ids': 'owned_exploration_ids',
             'editor_ids': 'editable_exploration_ids',
             'viewer_ids': 'viewable_exploration_ids',
-            'voice_artist_ids': 'voiced_exploration_ids'
+            'voice_artist_ids': 'voiced_exploration_ids',
         }
 
     @classmethod
@@ -659,18 +650,23 @@ class ExplorationRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(datastore_services.any_of(
-            cls.owner_ids == user_id,
-            cls.editor_ids == user_id,
-            cls.voice_artist_ids == user_id,
-            cls.viewer_ids == user_id
-        )).get(keys_only=True) is not None
+        return (
+            cls.query(
+                datastore_services.any_of(
+                    cls.owner_ids == user_id,
+                    cls.editor_ids == user_id,
+                    cls.voice_artist_ids == user_id,
+                    cls.viewer_ids == user_id,
+                )
+            ).get(keys_only=True)
+            is not None
+        )
 
     def save(
         self,
         committer_id: str,
         commit_message: str,
-        commit_cmds: base_models.AllowedCommitCmdsListType
+        commit_cmds: base_models.AllowedCommitCmdsListType,
     ) -> None:
         """Saves a new version of the exploration, updating the Exploration
         datastore model.
@@ -735,10 +731,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.
-        for field_name in (
-                'owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'):
+        for field_name in ('owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'):
             model_dict[field_name] = [
-                user_id for user_id in model_dict[field_name]
+                user_id
+                for user_id in model_dict[field_name]
                 if not utils.is_pseudonymous_id(user_id)
             ]
 
@@ -748,10 +744,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # accepts content NDB JSON properties and those NDB JSON properties have
     # loose typing. So, once we explicitly type those NDB JSON properties, we
     # can remove Any type from the argument of '_reconstitute' method.
-    def _reconstitute(
-        self,
-        snapshot_dict: Dict[str, Any]
-    ) -> ExplorationRightsModel:
+    def _reconstitute(self, snapshot_dict: Dict[str, Any]) -> ExplorationRightsModel:
         """Populates the model instance with the snapshot.
 
         Some old ExplorationRightsSnapshotContentModels can contain fields
@@ -767,8 +760,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             VersionedModel. The instance of the VersionedModel class populated
             with the the snapshot.
         """
-        self.populate(
-            **ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
+        self.populate(**ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
     def compute_models_to_commit(
@@ -780,7 +772,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Mapping[str, base_models.BaseModel],
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -806,20 +798,18 @@ class ExplorationRightsModel(base_models.VersionedModel):
             the datastore.
         """
         models_to_put = super().compute_models_to_commit(
-            committer_id,
-            commit_type,
-            commit_message,
-            commit_cmds,
-            additional_models
+            committer_id, commit_type, commit_message, commit_cmds, additional_models
         )
 
         snapshot_metadata_model = models_to_put['snapshot_metadata_model']
-        snapshot_metadata_model.content_user_ids = list(sorted(
-            set(self.owner_ids) |
-            set(self.editor_ids) |
-            set(self.voice_artist_ids) |
-            set(self.viewer_ids)
-        ))
+        snapshot_metadata_model.content_user_ids = list(
+            sorted(
+                set(self.owner_ids)
+                | set(self.editor_ids)
+                | set(self.voice_artist_ids)
+                | set(self.viewer_ids)
+            )
+        )
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
@@ -835,7 +825,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 assert isinstance(user_id_name_value, str)
                 commit_cmds_user_ids.add(user_id_name_value)
         snapshot_metadata_model.commit_cmds_user_ids = list(
-            sorted(commit_cmds_user_ids))
+            sorted(commit_cmds_user_ids)
+        )
 
         # Create and delete events will already be recorded in the
         # ExplorationModel.
@@ -851,14 +842,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
+                    self.status == constants.ACTIVITY_STATUS_PRIVATE
+                ),
             )
 
             return {
-                'snapshot_metadata_model': (
-                    models_to_put['snapshot_metadata_model']),
-                'snapshot_content_model': (
-                    models_to_put['snapshot_content_model']),
+                'snapshot_metadata_model': (models_to_put['snapshot_metadata_model']),
+                'snapshot_content_model': (models_to_put['snapshot_content_model']),
                 'commit_log_model': exploration_commit_log,
                 'versioned_model': models_to_put['versioned_model'],
             }
@@ -880,22 +870,19 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """
         owned_explorations = cls.get_all().filter(cls.owner_ids == user_id)
         editable_explorations = cls.get_all().filter(cls.editor_ids == user_id)
-        voiced_explorations = (
-            cls.get_all().filter(cls.voice_artist_ids == user_id))
+        voiced_explorations = cls.get_all().filter(cls.voice_artist_ids == user_id)
         viewable_explorations = cls.get_all().filter(cls.viewer_ids == user_id)
 
         owned_exploration_ids = [exp.key.id() for exp in owned_explorations]
-        editable_exploration_ids = (
-            [exp.key.id() for exp in editable_explorations])
+        editable_exploration_ids = [exp.key.id() for exp in editable_explorations]
         voiced_exploration_ids = [exp.key.id() for exp in voiced_explorations]
-        viewable_exploration_ids = (
-            [exp.key.id() for exp in viewable_explorations])
+        viewable_exploration_ids = [exp.key.id() for exp in viewable_explorations]
 
         return {
             'owned_exploration_ids': owned_exploration_ids,
             'editable_exploration_ids': editable_exploration_ids,
             'voiced_exploration_ids': voiced_exploration_ids,
-            'viewable_exploration_ids': viewable_exploration_ids
+            'viewable_exploration_ids': viewable_exploration_ids,
         }
 
 
@@ -903,20 +890,23 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
     """Model for storing the progress of a logged-out user."""
 
     # The exploration id.
-    exploration_id = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    exploration_id = datastore_services.StringProperty(required=True, indexed=True)
     # The state name of the furthest reached checkpoint.
     furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
-        default=None)
+        default=None
+    )
     # The exploration version of the furthest reached checkpoint.
-    furthest_reached_checkpoint_exp_version = (
-        datastore_services.IntegerProperty(default=None))
+    furthest_reached_checkpoint_exp_version = datastore_services.IntegerProperty(
+        default=None
+    )
     # The state name of the most recently reached checkpoint.
-    most_recently_reached_checkpoint_state_name = (
-        datastore_services.StringProperty(default=None))
+    most_recently_reached_checkpoint_state_name = datastore_services.StringProperty(
+        default=None
+    )
     # The exploration version of the most recently reached checkpoint.
-    most_recently_reached_checkpoint_exp_version = (
-        datastore_services.IntegerProperty(default=None))
+    most_recently_reached_checkpoint_exp_version = datastore_services.IntegerProperty(
+        default=None
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -924,32 +914,27 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'exploration_id':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'furthest_reached_checkpoint_state_name':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'furthest_reached_checkpoint_exp_version':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'most_recently_reached_checkpoint_state_name':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'most_recently_reached_checkpoint_exp_version':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'furthest_reached_checkpoint_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'furthest_reached_checkpoint_exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'most_recently_reached_checkpoint_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'most_recently_reached_checkpoint_exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @classmethod
     def create(
-        cls,
-        exploration_id: str,
-        unique_progress_url_id: str
+        cls, exploration_id: str, unique_progress_url_id: str
     ) -> TransientCheckpointUrlModel:
         """Creates a new TransientCheckpointUrlModel instance and returns it.
 
@@ -965,9 +950,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
             TransientCheckpointUrlModel. The newly created
             TransientCheckpointUrlModel instance.
         """
-        entity = cls(
-            id=unique_progress_url_id,
-            exploration_id=exploration_id)
+        entity = cls(id=unique_progress_url_id, exploration_id=exploration_id)
 
         entity.update_timestamps()
         entity.put()
@@ -990,7 +973,8 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         for _ in range(base_models.MAX_RETRIES):
             new_id = '%s' % ''.join(
                 random.choice(string.ascii_letters)
-                for _ in range(constants.MAX_PROGRESS_URL_ID_LENGTH))
+                for _ in range(constants.MAX_PROGRESS_URL_ID_LENGTH)
+            )
             if not cls.get_by_id(new_id):
                 return new_id
 
@@ -1020,8 +1004,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # The objective of this exploration.
     objective = datastore_services.TextProperty(required=True, indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
-    language_code = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
     # Tags associated with this exploration.
     tags = datastore_services.StringProperty(repeated=True, indexed=True)
 
@@ -1034,36 +1017,30 @@ class ExpSummaryModel(base_models.BaseModel):
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
     # exploration *summary* model was last updated).
-    exploration_model_last_updated = (
-        datastore_services.DateTimeProperty(indexed=True))
+    exploration_model_last_updated = datastore_services.DateTimeProperty(indexed=True)
     # Time when the exploration model was created (not to be confused
     # with created_on, which is the time when the exploration *summary*
     # model was created).
-    exploration_model_created_on = (
-        datastore_services.DateTimeProperty(indexed=True))
+    exploration_model_created_on = datastore_services.DateTimeProperty(indexed=True)
     # Time when the exploration was first published.
     first_published_msec = datastore_services.FloatProperty(indexed=True)
 
     # The publication status of this exploration.
     status = datastore_services.StringProperty(
-        default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
-        choices=[
-            constants.ACTIVITY_STATUS_PRIVATE,
-            constants.ACTIVITY_STATUS_PUBLIC
-        ]
+        default=constants.ACTIVITY_STATUS_PRIVATE,
+        indexed=True,
+        choices=[constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC],
     )
 
     # Whether this exploration is owned by the community.
-    community_owned = (
-        datastore_services.BooleanProperty(required=True, indexed=True))
+    community_owned = datastore_services.BooleanProperty(required=True, indexed=True)
 
     # The user_ids of owners of this exploration.
     owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this exploration.
-    voice_artist_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
+    voice_artist_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
@@ -1071,13 +1048,11 @@ class ExpSummaryModel(base_models.BaseModel):
     # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
     # synchronized, meaning that the keys in contributors_summary need be
     # equal to the contributor_ids list.
-    contributor_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
+    contributor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # A dict representing the contributors of non-trivial commits to this
     # exploration. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
-    contributors_summary = (
-        datastore_services.JsonProperty(default={}, indexed=False))
+    contributors_summary = datastore_services.JsonProperty(default={}, indexed=False)
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.).
     version = datastore_services.IntegerProperty()
@@ -1088,9 +1063,7 @@ class ExpSummaryModel(base_models.BaseModel):
         to a user: viewer_ids, voice_artist_ids, editor_ids, owner_ids,
         contributor_ids, and contributors_summary fields.
         """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
+        return base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -1102,13 +1075,18 @@ class ExpSummaryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(datastore_services.any_of(
-            cls.owner_ids == user_id,
-            cls.editor_ids == user_id,
-            cls.voice_artist_ids == user_id,
-            cls.viewer_ids == user_id,
-            cls.contributor_ids == user_id
-        )).get(keys_only=True) is not None
+        return (
+            cls.query(
+                datastore_services.any_of(
+                    cls.owner_ids == user_id,
+                    cls.editor_ids == user_id,
+                    cls.voice_artist_ids == user_id,
+                    cls.viewer_ids == user_id,
+                    cls.contributor_ids == user_id,
+                )
+            ).get(keys_only=True)
+            is not None
+        )
 
     @classmethod
     def get_non_private(cls) -> Sequence[ExpSummaryModel]:
@@ -1117,11 +1095,14 @@ class ExpSummaryModel(base_models.BaseModel):
         Returns:
             iterable. An iterable with non-private ExpSummary models.
         """
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return (
+            ExpSummaryModel.query()
+            .filter(ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE)
+            .filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            )
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_top_rated(cls, limit: int) -> Sequence[ExpSummaryModel]:
@@ -1135,18 +1116,18 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with the top rated exp summaries that are
             public in descending order of scaled_average_rating.
         """
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).order(
-            -ExpSummaryModel.scaled_average_rating
-        ).fetch(limit)
+        return (
+            ExpSummaryModel.query()
+            .filter(ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC)
+            .filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            )
+            .order(-ExpSummaryModel.scaled_average_rating)
+            .fetch(limit)
+        )
 
     @classmethod
-    def get_private_at_least_viewable(
-        cls, user_id: str
-    ) -> Sequence[ExpSummaryModel]:
+    def get_private_at_least_viewable(cls, user_id: str) -> Sequence[ExpSummaryModel]:
         """Fetches private exp summaries that are at least viewable by the
         given user.
 
@@ -1157,17 +1138,22 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with private exp summaries that are at least
             viewable by the given user.
         """
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            datastore_services.any_of(
-                ExpSummaryModel.owner_ids == user_id,
-                ExpSummaryModel.editor_ids == user_id,
-                ExpSummaryModel.voice_artist_ids == user_id,
-                ExpSummaryModel.viewer_ids == user_id)
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return (
+            ExpSummaryModel.query()
+            .filter(ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE)
+            .filter(
+                datastore_services.any_of(
+                    ExpSummaryModel.owner_ids == user_id,
+                    ExpSummaryModel.editor_ids == user_id,
+                    ExpSummaryModel.voice_artist_ids == user_id,
+                    ExpSummaryModel.viewer_ids == user_id,
+                )
+            )
+            .filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            )
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_at_least_editable(cls, user_id: str) -> Sequence[ExpSummaryModel]:
@@ -1180,13 +1166,19 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with exp summaries that are at least
             editable by the given user.
         """
-        return ExpSummaryModel.query().filter(
-            datastore_services.any_of(
-                ExpSummaryModel.owner_ids == user_id,
-                ExpSummaryModel.editor_ids == user_id)
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return (
+            ExpSummaryModel.query()
+            .filter(
+                datastore_services.any_of(
+                    ExpSummaryModel.owner_ids == user_id,
+                    ExpSummaryModel.editor_ids == user_id,
+                )
+            )
+            .filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            )
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_recently_published(cls, limit: int) -> Sequence[ExpSummaryModel]:
@@ -1200,17 +1192,18 @@ class ExpSummaryModel(base_models.BaseModel):
             recently published. The returned list is sorted by the time of
             publication with latest being first in the list.
         """
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).order(
-            -ExpSummaryModel.first_published_msec
-        ).fetch(limit)
+        return (
+            ExpSummaryModel.query()
+            .filter(ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC)
+            .filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            )
+            .order(-ExpSummaryModel.first_published_msec)
+            .fetch(limit)
+        )
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model data has already been exported as a part of the
         ExplorationModel and thus does not need a separate export.
         """
@@ -1222,29 +1215,30 @@ class ExpSummaryModel(base_models.BaseModel):
         because noteworthy details that belong to this model have
         already been exported as a part of the ExplorationModel.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'ratings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'scaled_average_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_model_last_updated':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_model_created_on':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'owner_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'editor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'voice_artist_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'ratings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'scaled_average_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_model_last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'owner_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'editor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'voice_artist_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
 
 class ExplorationVersionHistoryModel(base_models.BaseModel):
@@ -1267,11 +1261,11 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     """
 
     # The id of the corresponding exploration.
-    exploration_id = datastore_services.StringProperty(
-        required=True, indexed=True)
+    exploration_id = datastore_services.StringProperty(required=True, indexed=True)
     # The version of the corresponding exploration.
     exploration_version = datastore_services.IntegerProperty(
-        required=True, indexed=True)
+        required=True, indexed=True
+    )
     # The details of the previous commit on each state at a particular
     # version of the exploration. The json structure will look like the
     # following:
@@ -1284,8 +1278,7 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     # }
     # The json object can have multiple keys in this case depending on
     # the number of states.
-    state_version_history = datastore_services.JsonProperty(
-        default={}, indexed=False)
+    state_version_history = datastore_services.JsonProperty(default={}, indexed=False)
     # The exploration version on which the metadata was previously edited.
     # If its value is v, then it will indicate that the metadata was modified
     # when the exploration was updated from version v -> v + 1.
@@ -1293,16 +1286,17 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     # None indicates that the metadata was not modified after the creation of
     # the exploration.
     metadata_last_edited_version_number = datastore_services.IntegerProperty(
-        indexed=True)
+        indexed=True
+    )
     # The user id of the user who committed the latest changes to the
     # exploration metadata.
     metadata_last_edited_committer_id = datastore_services.StringProperty(
-        required=True, indexed=True)
+        required=True, indexed=True
+    )
     # The user ids of the users who did the 'previous commit' on each state
     # in this version of the exploration. It is required during the
     # wipeout process to query for the models efficiently.
-    committer_ids = datastore_services.StringProperty(
-        indexed=True, repeated=True)
+    committer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     @classmethod
     def get_instance_id(cls, exp_id: str, exp_version: int) -> str:
@@ -1329,9 +1323,12 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return ExplorationVersionHistoryModel.query(
-            ExplorationVersionHistoryModel.committer_ids == user_id
-        ).get(keys_only=True) is not None
+        return (
+            ExplorationVersionHistoryModel.query(
+                ExplorationVersionHistoryModel.committer_ids == user_id
+            ).get(keys_only=True)
+            is not None
+        )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1342,8 +1339,7 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """All the noteworthy data in this model which are related to a
         user's contributions to an exploration is already contained in various
         user models such as UserContributionsModel which fall under Takeout.
@@ -1358,13 +1354,18 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
         to an exploration is already contained in various user models such
         as UserContributionsModel which fall under Takeout.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'metadata_last_edited_version_number': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'metadata_last_edited_committer_id': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'metadata_last_edited_version_number': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'metadata_last_edited_committer_id': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )

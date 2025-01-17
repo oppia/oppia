@@ -43,41 +43,58 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 
-    def test_unpublished_activities_cannot_be_added_to_featured_list(
-        self
-    ) -> None:
+    def test_unpublished_activities_cannot_be_added_to_featured_list(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         # Posting a list that includes private activities results in an error.
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_2,
+                    }
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_1,
-                }, {
-                    'type': 'exploration',
-                    'id': self.EXP_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_1,
+                    },
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_2,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
 
         # Posting a list that only contains public activities succeeds.
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_1,
-                }],
-            }, csrf_token=csrf_token)
-        featured_activity_references = self.get_json(
-            '/moderatorhandler/featured')['featured_activity_references']
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_1,
+                    }
+                ],
+            },
+            csrf_token=csrf_token,
+        )
+        featured_activity_references = self.get_json('/moderatorhandler/featured')[
+            'featured_activity_references'
+        ]
         self.assertEqual(featured_activity_references[0]['id'], self.EXP_ID_1)
         self.logout()
 
@@ -94,7 +111,7 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,  # pylint: disable=line-too-long
                 'I\'m writing to inform you that '
-                'I have unpublished the above exploration.'
+                'I have unpublished the above exploration.',
             ),
         ]
     )
@@ -102,8 +119,8 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
         self.login(self.MODERATOR_EMAIL)
         expected_draft_text_body = (
             'I\'m writing to inform you that '
-            'I have unpublished the above exploration.')
-        d_text = self.get_json(
-            '/moderatorhandler/email_draft')['draft_email_body']
+            'I have unpublished the above exploration.'
+        )
+        d_text = self.get_json('/moderatorhandler/email_draft')['draft_email_body']
         self.assertEqual(d_text, expected_draft_text_body)
         self.logout()

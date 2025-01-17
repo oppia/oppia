@@ -30,7 +30,7 @@ REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,
-    decode_responses=False
+    decode_responses=False,
 )
 
 
@@ -38,10 +38,7 @@ class EmulatorBlob:
     """Object for storing the file data."""
 
     def __init__(
-        self,
-        name: str,
-        data: Union[bytes, str],
-        content_type: Optional[str]
+        self, name: str, data: Union[bytes, str], content_type: Optional[str]
     ) -> None:
         """Initialize blob.
 
@@ -59,8 +56,7 @@ class EmulatorBlob:
         self._name = name
         # TODO(#13500): Refactor this method that only bytes are passed
         # into data.
-        self._raw_bytes = (
-            data.encode('utf-8') if isinstance(data, str) else data)
+        self._raw_bytes = data.encode('utf-8') if isinstance(data, str) else data
         if content_type is None:
             guessed_content_type, _ = mimetypes.guess_type(name)
             self._content_type = (
@@ -85,9 +81,7 @@ class EmulatorBlob:
             self._content_type = content_type
 
     @classmethod
-    def create_copy(
-        cls, original_blob: EmulatorBlob, new_name: str
-    ) -> EmulatorBlob:
+    def create_copy(cls, original_blob: EmulatorBlob, new_name: str) -> EmulatorBlob:
         """Create new instance of EmulatorBlob with the same values.
 
         Args:
@@ -98,9 +92,7 @@ class EmulatorBlob:
             EmulatorBlob. New instance with the same values as original_blob.
         """
         return cls(
-            new_name,
-            original_blob.download_as_bytes(),
-            original_blob.content_type
+            new_name, original_blob.download_as_bytes(), original_blob.content_type
         )
 
     def to_dict(self) -> Mapping[bytes, bytes]:
@@ -116,7 +108,7 @@ class EmulatorBlob:
         blob_dict = {
             b'name': self._name.encode('utf-8'),
             b'raw_bytes': self._raw_bytes,
-            b'content_type': self._content_type.encode('utf-8')
+            b'content_type': self._content_type.encode('utf-8'),
         }
         return blob_dict
 
@@ -136,7 +128,7 @@ class EmulatorBlob:
         return cls(
             blob_dict[b'name'].decode('utf-8'),
             blob_dict[b'raw_bytes'],
-            blob_dict[b'content_type'].decode('utf-8')
+            blob_dict[b'content_type'].decode('utf-8'),
         )
 
     @property
@@ -177,9 +169,7 @@ class EmulatorBlob:
         return hash(self.name)
 
     def __repr__(self) -> str:
-        return (
-            'EmulatorBlob(name=%s, content_type=%s)' % (
-                self.name, self.content_type))
+        return 'EmulatorBlob(name=%s, content_type=%s)' % (self.name, self.content_type)
 
 
 class CloudStorageEmulator:
@@ -220,8 +210,7 @@ class CloudStorageEmulator:
             filepath: str. Filepath to upload the blob to.
             blob: EmulatorBlob. The blob to upload.
         """
-        REDIS_CLIENT.hset(
-            self._get_redis_key(filepath), mapping=blob.to_dict())
+        REDIS_CLIENT.hset(self._get_redis_key(filepath), mapping=blob.to_dict())
 
     def delete_blob(self, filepath: str) -> None:
         """Delete the blob at the given filepath.
@@ -240,7 +229,8 @@ class CloudStorageEmulator:
         """
         REDIS_CLIENT.hset(
             self._get_redis_key(filepath),
-            mapping=EmulatorBlob.create_copy(blob, filepath).to_dict())
+            mapping=EmulatorBlob.create_copy(blob, filepath).to_dict(),
+        )
 
     def list_blobs(self, prefix: str) -> List[EmulatorBlob]:
         """Get blobs whose filepaths start with the given prefix.
@@ -252,8 +242,9 @@ class CloudStorageEmulator:
             list(EmulatorBlob). The list of blobs whose filepaths start with
             the given prefix.
         """
-        matching_filepaths = (
-            REDIS_CLIENT.scan_iter(match='%s*' % self._get_redis_key(prefix)))
+        matching_filepaths = REDIS_CLIENT.scan_iter(
+            match='%s*' % self._get_redis_key(prefix)
+        )
 
         # Create a pipeline that is then executed at one.
         pipeline = REDIS_CLIENT.pipeline()
@@ -261,12 +252,9 @@ class CloudStorageEmulator:
             pipeline.hgetall(filepath)
         blob_dicts = pipeline.execute()
 
-        return [
-            EmulatorBlob.from_dict(blob_dict) for blob_dict in blob_dicts
-        ]
+        return [EmulatorBlob.from_dict(blob_dict) for blob_dict in blob_dicts]
 
     def reset(self) -> None:
         """Reset the emulator and remove all blobs."""
-        for key in REDIS_CLIENT.scan_iter(
-                match='%s*' % self._get_redis_key('')):
+        for key in REDIS_CLIENT.scan_iter(match='%s*' % self._get_redis_key('')):
             REDIS_CLIENT.delete(key)

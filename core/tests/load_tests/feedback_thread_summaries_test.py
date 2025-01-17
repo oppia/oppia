@@ -46,7 +46,7 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
         'status': 'open',
         'summary': None,
         'original_author_username': None,
-        'subject': 'a subject'
+        'subject': 'a subject',
     }
 
     USER_EMAIL: Final = 'user@example.com'
@@ -61,8 +61,12 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.owner_id, title='Bridges in England',
-            category='Architecture', language_code='en')
+            self.EXP_ID_1,
+            self.owner_id,
+            title='Bridges in England',
+            category='Architecture',
+            language_code='en',
+        )
 
     def test_get_thread_summaries_load_test(self) -> None:
         # The speed of fetching the summaries of 100 threads having 5 messages
@@ -72,11 +76,15 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
         # Create 100 threads.
         for _ in range(100):
             feedback_services.create_thread(
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
-                self.user_id, self.EXPECTED_THREAD_DICT['subject'],
-                'not used here')
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.EXP_ID_1,
+                self.user_id,
+                self.EXPECTED_THREAD_DICT['subject'],
+                'not used here',
+            )
         threadlist = feedback_services.get_all_threads(
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, False)
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, False
+        )
 
         thread_ids = []
         for thread in threadlist:
@@ -84,7 +92,8 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
             # Create 5 messages in each thread.
             for _ in range(5):
                 feedback_services.create_message(
-                    thread.id, self.user_id, None, None, 'editor message')
+                    thread.id, self.user_id, None, None, 'editor message'
+                )
 
         start = time.time()
         # Fetch the summaries of all the threads.

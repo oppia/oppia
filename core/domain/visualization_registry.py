@@ -37,13 +37,13 @@ class Registry:
         cls.visualizations_dict.clear()
 
         # Add new visualization instances to the registry.
-        for name, clazz in inspect.getmembers(
-                models, predicate=inspect.isclass):
+        for name, clazz in inspect.getmembers(models, predicate=inspect.isclass):
             if name.endswith('_test') or name == 'BaseVisualization':
                 continue
 
             ancestor_names = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
             if 'BaseVisualization' in ancestor_names:
                 cls.visualizations_dict[clazz.__name__] = clazz
 
@@ -60,7 +60,8 @@ class Registry:
             cls._refresh_registry()
         if visualization_id not in cls.visualizations_dict:
             raise TypeError(
-                '\'%s\' is not a valid visualization id.' % visualization_id)
+                '\'%s\' is not a valid visualization id.' % visualization_id
+            )
         return cls.visualizations_dict[visualization_id]
 
     @classmethod

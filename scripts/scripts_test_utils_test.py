@@ -50,9 +50,17 @@ class PopenStubTests(test_utils.TestBase):
     def test_explicit_attributes(self) -> None:
         child = scripts_test_utils.PopenStub()
         popen = scripts_test_utils.PopenStub(
-            pid=123, name='foo', stdout=b'abc', stderr=b'def',
-            reject_signal=True, reject_terminate=True, reject_kill=True,
-            unresponsive=True, return_code=1, child_procs=[child])
+            pid=123,
+            name='foo',
+            stdout=b'abc',
+            stderr=b'def',
+            reject_signal=True,
+            reject_terminate=True,
+            reject_kill=True,
+            unresponsive=True,
+            return_code=1,
+            child_procs=[child],
+        )
 
         self.assertEqual(popen.pid, 123)
         self.assertEqual(popen.stdout.getvalue(), b'abc')
@@ -294,18 +302,14 @@ class PopenStubTests(test_utils.TestBase):
         with self.assertRaisesRegex(RuntimeError, 'entered an infinite loop'):
             popen.wait()
 
-    def test_wait_with_timeout_on_unresponive_popen_raises_timeout_error(
-        self
-    ) -> None:
+    def test_wait_with_timeout_on_unresponive_popen_raises_timeout_error(self) -> None:
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
         with self.assertRaisesRegex(psutil.TimeoutExpired, '10'):
             popen.wait(timeout=10)
 
-    def test_communicate_on_unresponsive_popen_raises_runtime_error(
-        self
-    ) -> None:
+    def test_communicate_on_unresponsive_popen_raises_runtime_error(self) -> None:
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 

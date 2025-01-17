@@ -110,18 +110,15 @@ class UserSettings:
         has_viewed_lesson_info_modal_once: bool,
         username: Optional[str] = None,
         last_agreed_to_terms: Optional[datetime.datetime] = None,
-        last_started_state_editor_tutorial: (
-            Optional[datetime.datetime]) = None,
-        last_started_state_translation_tutorial: (
-            Optional[datetime.datetime]) = None,
-        last_logged_in: Optional[datetime.datetime]=None,
-        last_created_an_exploration: (
-            Optional[datetime.datetime]) = None,
-        last_edited_an_exploration: (
-            Optional[datetime.datetime]) = None,
+        last_started_state_editor_tutorial: Optional[datetime.datetime] = None,
+        last_started_state_translation_tutorial: Optional[datetime.datetime] = None,
+        last_logged_in: Optional[datetime.datetime] = None,
+        last_created_an_exploration: Optional[datetime.datetime] = None,
+        last_edited_an_exploration: Optional[datetime.datetime] = None,
         default_dashboard: str = constants.DASHBOARD_TYPE_LEARNER,
         creator_dashboard_display_pref: str = (
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']
+        ),
         user_bio: str = '',
         subject_interests: Optional[List[str]] = None,
         first_contribution_msec: Optional[float] = None,
@@ -132,7 +129,7 @@ class UserSettings:
         pin: Optional[str] = None,
         display_alias: Optional[str] = None,
         deleted: bool = False,
-        created_on: Optional[datetime.datetime] = None
+        created_on: Optional[datetime.datetime] = None,
     ) -> None:
         """Constructs a UserSettings domain object.
 
@@ -187,32 +184,30 @@ class UserSettings:
         self.roles = roles
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
-        self.last_started_state_editor_tutorial = (
-            last_started_state_editor_tutorial)
+        self.last_started_state_editor_tutorial = last_started_state_editor_tutorial
         self.last_started_state_translation_tutorial = (
-            last_started_state_translation_tutorial)
+            last_started_state_translation_tutorial
+        )
         self.last_logged_in = last_logged_in
         self.last_edited_an_exploration = last_edited_an_exploration
         self.last_created_an_exploration = last_created_an_exploration
         self.default_dashboard = default_dashboard
         self.creator_dashboard_display_pref = creator_dashboard_display_pref
         self.user_bio = user_bio
-        self.subject_interests = (
-            subject_interests if subject_interests else [])
+        self.subject_interests = subject_interests if subject_interests else []
         self.first_contribution_msec = first_contribution_msec
         self.preferred_language_codes = (
-            preferred_language_codes if preferred_language_codes else [])
+            preferred_language_codes if preferred_language_codes else []
+        )
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
-        self.preferred_translation_language_code = (
-            preferred_translation_language_code)
+        self.preferred_translation_language_code = preferred_translation_language_code
         self.pin = pin
         self.display_alias = display_alias
         self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
-        self.has_viewed_lesson_info_modal_once = (
-            has_viewed_lesson_info_modal_once)
+        self.has_viewed_lesson_info_modal_once = has_viewed_lesson_info_modal_once
 
     def validate(self) -> None:
         """Checks that the user_id, email, roles, banned, pin and display_alias
@@ -229,67 +224,67 @@ class UserSettings:
         """
         if not isinstance(self.user_id, str):
             raise utils.ValidationError(
-                'Expected user_id to be a string, received %s' % self.user_id)
+                'Expected user_id to be a string, received %s' % self.user_id
+            )
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
         if not utils.is_user_id_valid(
-                self.user_id,
-                allow_system_user_id=True,
-                allow_pseudonymous_id=True
+            self.user_id, allow_system_user_id=True, allow_pseudonymous_id=True
         ):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if not isinstance(self.banned, bool):
             raise utils.ValidationError(
-                'Expected banned to be a bool, received %s' % self.banned)
+                'Expected banned to be a bool, received %s' % self.banned
+            )
 
         if not isinstance(self.roles, list):
             raise utils.ValidationError(
-                'Expected roles to be a list, received %s' % self.roles)
+                'Expected roles to be a list, received %s' % self.roles
+            )
 
         if self.banned:
             if self.roles:
                 raise utils.ValidationError(
                     'Expected roles for banned user to be empty, '
-                    'recieved %s.' % self.roles)
+                    'recieved %s.' % self.roles
+                )
         else:
             default_roles = []
             if len(self.roles) != len(set(self.roles)):
                 raise utils.ValidationError(
-                    'Roles contains duplicate values: %s' % self.roles)
+                    'Roles contains duplicate values: %s' % self.roles
+                )
             for role in self.roles:
                 if not isinstance(role, str):
                     raise utils.ValidationError(
-                        'Expected roles to be a string, received %s' % role)
+                        'Expected roles to be a string, received %s' % role
+                    )
 
                 if role not in feconf.ALLOWED_USER_ROLES:
-                    raise utils.ValidationError(
-                        'Role %s does not exist.' % role)
+                    raise utils.ValidationError('Role %s does not exist.' % role)
 
                 if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
                     default_roles.append(role)
 
             if len(default_roles) != 1:
                 raise utils.ValidationError(
-                    'Expected roles to contains one default role.')
+                    'Expected roles to contains one default role.'
+                )
 
         if self.pin is not None:
             if not isinstance(self.pin, str):
                 raise utils.ValidationError(
-                    'Expected PIN to be a string, received %s' %
-                    self.pin
+                    'Expected PIN to be a string, received %s' % self.pin
                 )
 
             if (
-                    len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
-                    len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH
+                len(self.pin) != feconf.FULL_USER_PIN_LENGTH
+                and len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH
             ):
                 raise utils.ValidationError(
-                    'User PIN can only be of length %s or %s' %
-                    (
-                        feconf.FULL_USER_PIN_LENGTH,
-                        feconf.PROFILE_USER_PIN_LENGTH
-                    )
+                    'User PIN can only be of length %s or %s'
+                    % (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
                 )
 
             for character in self.pin:
@@ -298,33 +293,37 @@ class UserSettings:
                         'Only numeric characters are allowed in PIN.'
                     )
 
-        if (self.display_alias is not None and
-                not isinstance(self.display_alias, str)):
+        if self.display_alias is not None and not isinstance(self.display_alias, str):
             raise utils.ValidationError(
-                'Expected display_alias to be a string, received %s' %
-                self.display_alias
+                'Expected display_alias to be a string, received %s'
+                % self.display_alias
             )
 
         if not isinstance(self.email, str):
             raise utils.ValidationError(
-                'Expected email to be a string, received %s' % self.email)
+                'Expected email to be a string, received %s' % self.email
+            )
         if not self.email:
             raise utils.ValidationError('No user email specified.')
-        if ('@' not in self.email or self.email.startswith('@')
-                or self.email.endswith('@')):
-            raise utils.ValidationError(
-                'Invalid email address: %s' % self.email)
+        if (
+            '@' not in self.email
+            or self.email.startswith('@')
+            or self.email.endswith('@')
+        ):
+            raise utils.ValidationError('Invalid email address: %s' % self.email)
 
         if not isinstance(self.creator_dashboard_display_pref, str):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
-                'received %s' % self.creator_dashboard_display_pref)
-        if (self.creator_dashboard_display_pref not in
-                list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values(
-                    ))):
+                'received %s' % self.creator_dashboard_display_pref
+            )
+        if self.creator_dashboard_display_pref not in list(
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
+        ):
             raise utils.ValidationError(
                 '%s is not a valid value for the dashboard display '
-                'preferences.' % (self.creator_dashboard_display_pref))
+                'preferences.' % (self.creator_dashboard_display_pref)
+            )
 
     def record_user_edited_an_exploration(self) -> None:
         """Updates last_edited_an_exploration to the current datetime for the
@@ -332,9 +331,7 @@ class UserSettings:
         """
         self.last_edited_an_exploration = datetime.datetime.utcnow()
 
-    def update_first_contribution_msec(
-        self, first_contribution_msec: float
-    ) -> None:
+    def update_first_contribution_msec(self, first_contribution_msec: float) -> None:
         """Updates first_contribution_msec of user with given user_id
         if it is set to None.
 
@@ -359,21 +356,24 @@ class UserSettings:
             ValidationError. None or empty value is provided for display alias
                 attribute.
         """
-        if (not modifiable_user_data.display_alias or
-                not isinstance(modifiable_user_data.display_alias, str)):
+        if not modifiable_user_data.display_alias or not isinstance(
+            modifiable_user_data.display_alias, str
+        ):
             raise utils.ValidationError(
-                'Expected display_alias to be a string, received %s.' %
-                modifiable_user_data.display_alias
+                'Expected display_alias to be a string, received %s.'
+                % modifiable_user_data.display_alias
             )
         self.display_alias = modifiable_user_data.display_alias
-        self.preferred_language_codes = (
-            modifiable_user_data.preferred_language_codes)
+        self.preferred_language_codes = modifiable_user_data.preferred_language_codes
         self.preferred_site_language_code = (
-            modifiable_user_data.preferred_site_language_code)
+            modifiable_user_data.preferred_site_language_code
+        )
         self.preferred_audio_language_code = (
-            modifiable_user_data.preferred_audio_language_code)
+            modifiable_user_data.preferred_audio_language_code
+        )
         self.preferred_translation_language_code = (
-            modifiable_user_data.preferred_translation_language_code)
+            modifiable_user_data.preferred_translation_language_code
+        )
         self.pin = modifiable_user_data.pin
 
     def to_dict(self) -> UserSettingsDict:
@@ -392,33 +392,32 @@ class UserSettings:
             'normalized_username': self.normalized_username,
             'last_agreed_to_terms': self.last_agreed_to_terms,
             'last_started_state_editor_tutorial': (
-                self.last_started_state_editor_tutorial),
+                self.last_started_state_editor_tutorial
+            ),
             'last_started_state_translation_tutorial': (
-                self.last_started_state_translation_tutorial),
+                self.last_started_state_translation_tutorial
+            ),
             'last_logged_in': self.last_logged_in,
-            'last_edited_an_exploration': (
-                self.last_edited_an_exploration),
-            'last_created_an_exploration': (
-                self.last_created_an_exploration),
+            'last_edited_an_exploration': (self.last_edited_an_exploration),
+            'last_created_an_exploration': (self.last_created_an_exploration),
             'default_dashboard': self.default_dashboard,
-            'creator_dashboard_display_pref': (
-                self.creator_dashboard_display_pref),
+            'creator_dashboard_display_pref': (self.creator_dashboard_display_pref),
             'user_bio': self.user_bio,
             'subject_interests': self.subject_interests,
             'first_contribution_msec': self.first_contribution_msec,
             'preferred_language_codes': self.preferred_language_codes,
-            'preferred_site_language_code': (
-                self.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                self.preferred_audio_language_code),
+            'preferred_site_language_code': (self.preferred_site_language_code),
+            'preferred_audio_language_code': (self.preferred_audio_language_code),
             'preferred_translation_language_code': (
-                self.preferred_translation_language_code),
+                self.preferred_translation_language_code
+            ),
             'pin': self.pin,
             'display_alias': self.display_alias,
             'deleted': self.deleted,
             'created_on': self.created_on,
             'has_viewed_lesson_info_modal_once': (
-                self.has_viewed_lesson_info_modal_once)
+                self.has_viewed_lesson_info_modal_once
+            ),
         }
 
     @property
@@ -432,7 +431,7 @@ class UserSettings:
         """
 
         first_part = self.email[: self.email.find('@')]
-        last_part = self.email[self.email.find('@'):]
+        last_part = self.email[self.email.find('@') :]
         if len(first_part) <= 1:
             first_part = '..'
         elif len(first_part) <= 3:
@@ -489,16 +488,16 @@ class UserSettings:
         if len(username) > constants.MAX_USERNAME_LENGTH:
             raise utils.ValidationError(
                 'A username can have at most %s characters.'
-                % constants.MAX_USERNAME_LENGTH)
+                % constants.MAX_USERNAME_LENGTH
+            )
         if not re.match(feconf.ALPHANUMERIC_REGEX, username):
             raise utils.ValidationError(
-                'Usernames can only have alphanumeric characters.')
+                'Usernames can only have alphanumeric characters.'
+            )
 
         # Disallow usernames that contain the system usernames or the
         # strings "admin" or "oppia".
-        reserved_usernames = (
-            set(feconf.SYSTEM_USERS.values()) | {'admin', 'oppia'}
-        )
+        reserved_usernames = set(feconf.SYSTEM_USERS.values()) | {'admin', 'oppia'}
         for reserved_username in reserved_usernames:
             if reserved_username in username.lower().strip():
                 raise utils.ValidationError('This username is not available.')
@@ -540,10 +539,7 @@ class UserGroup:
     ALPHANUMERIC_REGEX = r'^[a-zA-Z0-9 ]+$'
 
     def __init__(
-        self,
-        user_group_id: str,
-        name: str,
-        member_usernames: List[str]
+        self, user_group_id: str, name: str, member_usernames: List[str]
     ) -> None:
         """Constructs a UserGroup domain object.
 
@@ -561,7 +557,8 @@ class UserGroup:
         """Validate various properties of UserGroup."""
         if not isinstance(self.name, str):
             raise utils.ValidationError(
-                'Expected name to be a string, received %s.' % self.name)
+                'Expected name to be a string, received %s.' % self.name
+            )
 
         if not re.match(self.ALPHANUMERIC_REGEX, self.name):
             raise utils.ValidationError(
@@ -571,15 +568,15 @@ class UserGroup:
 
         if not isinstance(self.member_usernames, list):
             raise utils.ValidationError(
-                'Expected \'member_usernames\' to be a list, ' +
-                'received %s.' % self.member_usernames
+                'Expected \'member_usernames\' to be a list, '
+                + 'received %s.' % self.member_usernames
             )
 
         for user_username in self.member_usernames:
             if not isinstance(user_username, str):
                 raise utils.ValidationError(
-                    'Expected each user username to be a string, ' +
-                    'received %s.' % user_username
+                    'Expected each user username to be a string, '
+                    + 'received %s.' % user_username
                 )
 
     def update_name(self, updated_name: str) -> None:
@@ -591,8 +588,7 @@ class UserGroup:
         self.name = updated_name
         self.validate()
 
-    def update_member_usernames(
-        self, updated_member_usernames: List[str]) -> None:
+    def update_member_usernames(self, updated_member_usernames: List[str]) -> None:
         """Update member_usernames of user group.
 
         Args:
@@ -613,7 +609,7 @@ class UserGroup:
         return {
             'user_group_id': self.user_group_id,
             'name': self.name,
-            'member_usernames': self.member_usernames
+            'member_usernames': self.member_usernames,
         }
 
     @classmethod
@@ -630,7 +626,7 @@ class UserGroup:
         return UserGroup(
             user_group_dict['user_group_id'],
             user_group_dict['name'],
-            user_group_dict['member_usernames']
+            user_group_dict['member_usernames'],
         )
 
 
@@ -644,10 +640,7 @@ class UserActionsInfo:
     """
 
     def __init__(
-        self,
-        user_id: Optional[str],
-        roles: List[str],
-        actions: List[str]
+        self, user_id: Optional[str], roles: List[str], actions: List[str]
     ) -> None:
         self._user_id = user_id
         self._roles = roles
@@ -696,7 +689,7 @@ class UserContributions:
         self,
         user_id: str,
         created_exploration_ids: List[str],
-        edited_exploration_ids: List[str]
+        edited_exploration_ids: List[str],
     ) -> None:
         """Constructs a UserContributions domain object.
 
@@ -728,31 +721,34 @@ class UserContributions:
         """
         if not isinstance(self.user_id, str):
             raise utils.ValidationError(
-                'Expected user_id to be a string, received %s' % self.user_id)
+                'Expected user_id to be a string, received %s' % self.user_id
+            )
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
 
         if not isinstance(self.created_exploration_ids, list):
             raise utils.ValidationError(
                 'Expected created_exploration_ids to be a list, received %s'
-                % self.created_exploration_ids)
+                % self.created_exploration_ids
+            )
         for exploration_id in self.created_exploration_ids:
             if not isinstance(exploration_id, str):
                 raise utils.ValidationError(
                     'Expected exploration_id in created_exploration_ids '
-                    'to be a string, received %s' % (
-                        exploration_id))
+                    'to be a string, received %s' % (exploration_id)
+                )
 
         if not isinstance(self.edited_exploration_ids, list):
             raise utils.ValidationError(
                 'Expected edited_exploration_ids to be a list, received %s'
-                % self.edited_exploration_ids)
+                % self.edited_exploration_ids
+            )
         for exploration_id in self.edited_exploration_ids:
             if not isinstance(exploration_id, str):
                 raise utils.ValidationError(
                     'Expected exploration_id in edited_exploration_ids '
-                    'to be a string, received %s' % (
-                        exploration_id))
+                    'to be a string, received %s' % (exploration_id)
+                )
 
     def add_created_exploration_id(self, exploration_id: str) -> None:
         """Adds an exploration_id to list of created explorations.
@@ -764,10 +760,7 @@ class UserContributions:
             self.created_exploration_ids.append(exploration_id)
             self.created_exploration_ids.sort()
 
-    def add_edited_exploration_id(
-        self,
-        exploration_id: str
-    ) -> None:
+    def add_edited_exploration_id(self, exploration_id: str) -> None:
         """Adds an exploration_id to list of edited explorations.
 
         Args:
@@ -797,7 +790,7 @@ class UserGlobalPrefs:
         can_receive_email_updates: bool,
         can_receive_editor_role_email: bool,
         can_receive_feedback_message_email: bool,
-        can_receive_subscription_email: bool
+        can_receive_subscription_email: bool,
     ) -> None:
         """Constructs a UserGlobalPrefs domain object.
 
@@ -813,8 +806,9 @@ class UserGlobalPrefs:
         """
         self.can_receive_email_updates = can_receive_email_updates
         self.can_receive_editor_role_email = can_receive_editor_role_email
-        self.can_receive_feedback_message_email = ( # pylint: disable=invalid-name
-            can_receive_feedback_message_email)
+        self.can_receive_feedback_message_email = (  # pylint: disable=invalid-name
+            can_receive_feedback_message_email
+        )
         self.can_receive_subscription_email = can_receive_subscription_email
 
     @classmethod
@@ -824,7 +818,8 @@ class UserGlobalPrefs:
             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+        )
 
 
 class UserExplorationPrefsDict(TypedDict):
@@ -845,9 +840,7 @@ class UserExplorationPrefs:
     """
 
     def __init__(
-        self,
-        mute_feedback_notifications: bool,
-        mute_suggestion_notifications: bool
+        self, mute_feedback_notifications: bool, mute_suggestion_notifications: bool
     ) -> None:
         """Constructs a UserExplorationPrefs domain object.
 
@@ -865,7 +858,8 @@ class UserExplorationPrefs:
         """Returns UserExplorationPrefs with default attributes."""
         return cls(
             feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE,
-            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE,
+        )
 
     def to_dict(self) -> UserExplorationPrefsDict:
         """Return dictionary representation of UserExplorationPrefs.
@@ -879,7 +873,7 @@ class UserExplorationPrefs:
         """
         return {
             'mute_feedback_notifications': self.mute_feedback_notifications,
-            'mute_suggestion_notifications': self.mute_suggestion_notifications
+            'mute_suggestion_notifications': self.mute_suggestion_notifications,
         }
 
 
@@ -892,7 +886,7 @@ class ExpUserLastPlaythrough:
         exploration_id: str,
         last_played_exp_version: int,
         last_updated: datetime.datetime,
-        last_played_state_name: str
+        last_played_state_name: str,
     ) -> None:
         self.id = '%s.%s' % (user_id, exploration_id)
         self.user_id = user_id
@@ -902,9 +896,7 @@ class ExpUserLastPlaythrough:
         self.last_played_state_name = last_played_state_name
 
     def update_last_played_information(
-        self,
-        last_played_exp_version: int,
-        last_played_state_name: str
+        self, last_played_exp_version: int, last_played_state_name: str
     ) -> None:
         """Updates the last playthrough information of the user.
 
@@ -928,7 +920,7 @@ class IncompleteActivities:
         collection_ids: List[str],
         story_ids: List[str],
         partially_learnt_topic_ids: List[str],
-        partially_mastered_topic_id: Optional[str] = None
+        partially_mastered_topic_id: Optional[str] = None,
     ) -> None:
         self.id = user_id
         self.exploration_ids = exploration_ids
@@ -994,9 +986,7 @@ class IncompleteActivities:
         """
         self.story_ids.remove(story_id)
 
-    def add_partially_learnt_topic_id(
-        self, partially_learnt_topic_id: str
-    ) -> None:
+    def add_partially_learnt_topic_id(self, partially_learnt_topic_id: str) -> None:
         """Adds the topic id to the list of partially learnt topic ids.
 
         Args:
@@ -1005,9 +995,7 @@ class IncompleteActivities:
         """
         self.partially_learnt_topic_ids.append(partially_learnt_topic_id)
 
-    def remove_partially_learnt_topic_id(
-        self, partially_learnt_topic_id: str
-    ) -> None:
+    def remove_partially_learnt_topic_id(self, partially_learnt_topic_id: str) -> None:
         """Removes the topic id from the list of partially learnt topic
         ids.
 
@@ -1028,7 +1016,7 @@ class CompletedActivities:
         collection_ids: List[str],
         story_ids: List[str],
         learnt_topic_ids: List[str],
-        mastered_topic_ids: Optional[List[str]] = None
+        mastered_topic_ids: Optional[List[str]] = None,
     ) -> None:
         self.id = user_id
         self.exploration_ids = exploration_ids
@@ -1128,7 +1116,7 @@ class LearnerGoals:
         self,
         user_id: str,
         topic_ids_to_learn: List[str],
-        topic_ids_to_master: List[str]
+        topic_ids_to_master: List[str],
     ) -> None:
         self.id = user_id
         self.topic_ids_to_learn = topic_ids_to_learn
@@ -1158,7 +1146,7 @@ class LearnerGoals:
         """
         return {
             'topic_ids_to_learn': self.topic_ids_to_learn,
-            'topic_ids_to_master': self.topic_ids_to_master
+            'topic_ids_to_master': self.topic_ids_to_master,
         }
 
 
@@ -1166,10 +1154,7 @@ class LearnerPlaylist:
     """Domain object for the learner playlist model."""
 
     def __init__(
-        self,
-        user_id: str,
-        exploration_ids: List[str],
-        collection_ids: List[str]
+        self, user_id: str, exploration_ids: List[str], collection_ids: List[str]
     ) -> None:
         self.id = user_id
         self.exploration_ids = exploration_ids
@@ -1186,8 +1171,7 @@ class LearnerPlaylist:
             position_to_be_inserted: int. The position at which it
                 is to be inserted.
         """
-        self.exploration_ids.insert(
-            position_to_be_inserted, exploration_id)
+        self.exploration_ids.insert(position_to_be_inserted, exploration_id)
 
     def add_exploration_id_to_list(self, exploration_id: str) -> None:
         """Inserts the exploration id at the end of the list.
@@ -1239,11 +1223,7 @@ class UserContributionProficiency:
     """Domain object for UserContributionProficiencyModel."""
 
     def __init__(
-        self,
-        user_id: str,
-        score_category: str,
-        score: int,
-        onboarding_email_sent: bool
+        self, user_id: str, score_category: str, score: int, onboarding_email_sent: bool
     ) -> None:
         self.user_id = user_id
         self.score_category = score_category
@@ -1288,13 +1268,15 @@ class UserContributionRights:
         can_review_translation_for_language_codes: List[str],
         can_review_voiceover_for_language_codes: List[str],
         can_review_questions: bool,
-        can_submit_questions: bool
+        can_submit_questions: bool,
     ):
         self.id = user_id
         self.can_review_translation_for_language_codes = (
-            can_review_translation_for_language_codes)
+            can_review_translation_for_language_codes
+        )
         self.can_review_voiceover_for_language_codes = (
-            can_review_voiceover_for_language_codes)
+            can_review_voiceover_for_language_codes
+        )
         self.can_review_questions = can_review_questions
         self.can_submit_questions = can_submit_questions
 
@@ -1308,9 +1290,10 @@ class UserContributionRights:
         # 'can_review_voiceover_for_language_codes' are List[str], so we need
         # the bool cast to ensure that the return value is boolean.
         return bool(
-            self.can_review_translation_for_language_codes or
-            self.can_review_voiceover_for_language_codes or
-            self.can_review_questions)
+            self.can_review_translation_for_language_codes
+            or self.can_review_voiceover_for_language_codes
+            or self.can_review_questions
+        )
 
     def can_submit_at_least_one_item(self) -> bool:
         """Checks whether user has rights to submit at least one item.
@@ -1325,44 +1308,52 @@ class UserContributionRights:
         if not isinstance(self.can_review_translation_for_language_codes, list):
             raise utils.ValidationError(
                 'Expected can_review_translation_for_language_codes to be a '
-                'list, found: %s' % type(
-                    self.can_review_translation_for_language_codes))
+                'list, found: %s' % type(self.can_review_translation_for_language_codes)
+            )
         for language_code in self.can_review_translation_for_language_codes:
             if not utils.is_supported_audio_language_code(language_code):
-                raise utils.ValidationError('Invalid language_code: %s' % (
-                    language_code))
-        if len(self.can_review_translation_for_language_codes) != len(set(
-                self.can_review_translation_for_language_codes)):
+                raise utils.ValidationError(
+                    'Invalid language_code: %s' % (language_code)
+                )
+        if len(self.can_review_translation_for_language_codes) != len(
+            set(self.can_review_translation_for_language_codes)
+        ):
             raise utils.ValidationError(
                 'Expected can_review_translation_for_language_codes list not '
-                'to have duplicate values, found: %s' % (
-                    self.can_review_translation_for_language_codes))
+                'to have duplicate values, found: %s'
+                % (self.can_review_translation_for_language_codes)
+            )
 
         if not isinstance(self.can_review_voiceover_for_language_codes, list):
             raise utils.ValidationError(
                 'Expected can_review_voiceover_for_language_codes to be a '
-                'list, found: %s' % type(
-                    self.can_review_voiceover_for_language_codes))
+                'list, found: %s' % type(self.can_review_voiceover_for_language_codes)
+            )
         for language_code in self.can_review_voiceover_for_language_codes:
             if not utils.is_supported_audio_language_code(language_code):
-                raise utils.ValidationError('Invalid language_code: %s' % (
-                    language_code))
-        if len(self.can_review_voiceover_for_language_codes) != len(set(
-                self.can_review_voiceover_for_language_codes)):
+                raise utils.ValidationError(
+                    'Invalid language_code: %s' % (language_code)
+                )
+        if len(self.can_review_voiceover_for_language_codes) != len(
+            set(self.can_review_voiceover_for_language_codes)
+        ):
             raise utils.ValidationError(
                 'Expected can_review_voiceover_for_language_codes list not to '
-                'have duplicate values, found: %s' % (
-                    self.can_review_voiceover_for_language_codes))
+                'have duplicate values, found: %s'
+                % (self.can_review_voiceover_for_language_codes)
+            )
 
         if not isinstance(self.can_review_questions, bool):
             raise utils.ValidationError(
                 'Expected can_review_questions to be a boolean value, '
-                'found: %s' % type(self.can_review_questions))
+                'found: %s' % type(self.can_review_questions)
+            )
 
         if not isinstance(self.can_submit_questions, bool):
             raise utils.ValidationError(
                 'Expected can_submit_questions to be a boolean value, '
-                'found: %s' % type(self.can_submit_questions))
+                'found: %s' % type(self.can_submit_questions)
+            )
 
 
 # TODO(#15106): Refactor ModifiableUserData to limit the number of Optional
@@ -1405,7 +1396,7 @@ class ModifiableUserData:
         preferred_site_language_code: Optional[str],
         preferred_audio_language_code: Optional[str],
         preferred_translation_language_code: Optional[str],
-        user_id: Optional[str] = None
+        user_id: Optional[str] = None,
     ) -> None:
         """Constructs a ModifiableUserData domain object.
 
@@ -1431,8 +1422,7 @@ class ModifiableUserData:
         self.preferred_language_codes = preferred_language_codes
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
-        self.preferred_translation_language_code = (
-            preferred_translation_language_code)
+        self.preferred_translation_language_code = preferred_translation_language_code
         # The user_id is not intended to be a modifiable attribute, it is just
         # needed to identify the object.
         self.user_id = user_id
@@ -1464,9 +1454,7 @@ class ModifiableUserData:
     CURRENT_SCHEMA_VERSION = 1
 
     @classmethod
-    def from_raw_dict(
-        cls, raw_user_data_dict: RawUserDataDict
-    ) -> ModifiableUserData:
+    def from_raw_dict(cls, raw_user_data_dict: RawUserDataDict) -> ModifiableUserData:
         """Converts the raw_user_data_dict into a ModifiableUserData domain
         object by converting it according to the latest schema format.
 
@@ -1487,21 +1475,22 @@ class ModifiableUserData:
 
         if data_schema_version is None:
             raise Exception(
-                'Invalid modifiable user data: no schema version specified.')
+                'Invalid modifiable user data: no schema version specified.'
+            )
         if not isinstance(data_schema_version, int):
             raise Exception(
                 'Version has invalid type, expected int, '
                 'received %s' % type(data_schema_version)
             )
         if (
-            not isinstance(data_schema_version, int) or
-            data_schema_version < 1 or
-            data_schema_version > cls.CURRENT_SCHEMA_VERSION
+            not isinstance(data_schema_version, int)
+            or data_schema_version < 1
+            or data_schema_version > cls.CURRENT_SCHEMA_VERSION
         ):
             raise Exception(
                 'Invalid version %s received. At present we can only process v1'
-                ' to v%s modifiable user data.' % (
-                    data_schema_version, cls.CURRENT_SCHEMA_VERSION)
+                ' to v%s modifiable user data.'
+                % (data_schema_version, cls.CURRENT_SCHEMA_VERSION)
             )
 
         return cls.from_dict(raw_user_data_dict)
@@ -1567,13 +1556,15 @@ class ExplorationUserData:
         draft_change_list_exp_version: Optional[int] = None,
         draft_change_list_id: int = 0,
         mute_suggestion_notifications: bool = (
-            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE
+        ),
         mute_feedback_notifications: bool = (
-            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE
+        ),
         furthest_reached_checkpoint_exp_version: Optional[int] = None,
         furthest_reached_checkpoint_state_name: Optional[str] = None,
         most_recently_reached_checkpoint_exp_version: Optional[int] = None,
-        most_recently_reached_checkpoint_state_name: Optional[str] = None
+        most_recently_reached_checkpoint_state_name: Optional[str] = None,
     ) -> None:
         """Constructs a ExplorationUserData domain object.
 
@@ -1617,13 +1608,17 @@ class ExplorationUserData:
         self.mute_suggestion_notifications = mute_suggestion_notifications
         self.mute_feedback_notifications = mute_feedback_notifications
         self.furthest_reached_checkpoint_exp_version = (
-            furthest_reached_checkpoint_exp_version)
+            furthest_reached_checkpoint_exp_version
+        )
         self.furthest_reached_checkpoint_state_name = (
-            furthest_reached_checkpoint_state_name)
+            furthest_reached_checkpoint_state_name
+        )
         self.most_recently_reached_checkpoint_exp_version = (
-            most_recently_reached_checkpoint_exp_version)
+            most_recently_reached_checkpoint_exp_version
+        )
         self.most_recently_reached_checkpoint_state_name = (
-            most_recently_reached_checkpoint_state_name)
+            most_recently_reached_checkpoint_state_name
+        )
 
     def to_dict(self) -> ExplorationUserDataDict:
         """Convert the ExplorationUserData domain instance into a dictionary
@@ -1638,20 +1633,23 @@ class ExplorationUserData:
             'rating': self.rating,
             'rated_on': self.rated_on,
             'draft_change_list': self.draft_change_list,
-            'draft_change_list_last_updated': (
-                self.draft_change_list_last_updated),
+            'draft_change_list_last_updated': (self.draft_change_list_last_updated),
             'draft_change_list_exp_version': self.draft_change_list_exp_version,
             'draft_change_list_id': self.draft_change_list_id,
             'mute_suggestion_notifications': self.mute_suggestion_notifications,
             'mute_feedback_notifications': self.mute_feedback_notifications,
             'furthest_reached_checkpoint_exp_version': (
-                self.furthest_reached_checkpoint_exp_version),
+                self.furthest_reached_checkpoint_exp_version
+            ),
             'furthest_reached_checkpoint_state_name': (
-                self.furthest_reached_checkpoint_state_name),
+                self.furthest_reached_checkpoint_state_name
+            ),
             'most_recently_reached_checkpoint_exp_version': (
-                self.most_recently_reached_checkpoint_exp_version),
+                self.most_recently_reached_checkpoint_exp_version
+            ),
             'most_recently_reached_checkpoint_state_name': (
-                self.most_recently_reached_checkpoint_state_name)
+                self.most_recently_reached_checkpoint_state_name
+            ),
         }
 
 
@@ -1674,11 +1672,7 @@ class LearnerGroupUserDetailsDict(TypedDict):
 class LearnerGroupUserDetails:
     """Domain object for user details of a particular learner group."""
 
-    def __init__(
-        self,
-        group_id: str,
-        progress_sharing_is_turned_on: bool
-    ) -> None:
+    def __init__(self, group_id: str, progress_sharing_is_turned_on: bool) -> None:
         """Constructs a LearnerGroupUserDetails domain object.
 
         Attributes:
@@ -1699,7 +1693,7 @@ class LearnerGroupUserDetails:
         """
         return {
             'group_id': self.group_id,
-            'progress_sharing_is_turned_on': self.progress_sharing_is_turned_on
+            'progress_sharing_is_turned_on': self.progress_sharing_is_turned_on,
         }
 
 
@@ -1711,7 +1705,7 @@ class LearnerGroupsUser:
         user_id: str,
         invited_to_learner_groups_ids: List[str],
         learner_groups_user_details: List[LearnerGroupUserDetails],
-        learner_groups_user_details_schema_version: int
+        learner_groups_user_details_schema_version: int,
     ) -> None:
         """Constructs a LearnerGroupsUser domain object.
 
@@ -1729,7 +1723,8 @@ class LearnerGroupsUser:
         self.invited_to_learner_groups_ids = invited_to_learner_groups_ids
         self.learner_groups_user_details = learner_groups_user_details
         self.learner_groups_user_details_schema_version = (
-            learner_groups_user_details_schema_version)
+            learner_groups_user_details_schema_version
+        )
 
     def to_dict(self) -> LearnerGroupsUserDict:
         """Convert the LearnerGroupsUser domain instance into a dictionary
@@ -1746,11 +1741,11 @@ class LearnerGroupsUser:
 
         return {
             'user_id': self.user_id,
-            'invited_to_learner_groups_ids':
-                self.invited_to_learner_groups_ids,
+            'invited_to_learner_groups_ids': self.invited_to_learner_groups_ids,
             'learner_groups_user_details': learner_groups_user_details_dict,
             'learner_groups_user_details_schema_version': (
-                self.learner_groups_user_details_schema_version)
+                self.learner_groups_user_details_schema_version
+            ),
         }
 
     def validate(self) -> None:
@@ -1761,12 +1756,12 @@ class LearnerGroupsUser:
                 are invalid.
         """
         for learner_group_details in self.learner_groups_user_details:
-            if learner_group_details.group_id in (
-                    self.invited_to_learner_groups_ids):
+            if learner_group_details.group_id in (self.invited_to_learner_groups_ids):
                 raise utils.ValidationError(
                     'Learner cannot be invited to join learner group '
-                    '%s since they are already its learner.' % (
-                        learner_group_details.group_id))
+                    '%s since they are already its learner.'
+                    % (learner_group_details.group_id)
+                )
 
 
 class TranslationCoordinatorStatsDict(TypedDict):
@@ -1781,10 +1776,7 @@ class TranslationCoordinatorStats:
     """Domain object for the TranslationCoordinatorStatsModel."""
 
     def __init__(
-        self,
-        language_id: str,
-        coordinator_ids: List[str],
-        coordinators_count: int
+        self, language_id: str, coordinator_ids: List[str], coordinators_count: int
     ) -> None:
         self.language_id = language_id
         self.coordinator_ids = coordinator_ids
@@ -1799,5 +1791,5 @@ class TranslationCoordinatorStats:
         return {
             'language_id': self.language_id,
             'coordinator_ids': self.coordinator_ids,
-            'coordinators_count': self.coordinators_count
+            'coordinators_count': self.coordinators_count,
         }

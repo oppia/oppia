@@ -36,10 +36,7 @@ class QuestionsListHandlerNormalizedRequestDict(TypedDict):
 
 
 class QuestionsListHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        QuestionsListHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], QuestionsListHandlerNormalizedRequestDict]
 ):
     """Manages receiving of all question summaries for display in topic editor
     and skill editor page.
@@ -52,19 +49,11 @@ class QuestionsListHandler(
         'comma_separated_skill_ids': {
             'schema': {
                 'type': 'object_dict',
-                'validation_method': domain_objects_validator.validate_skill_ids
+                'validation_method': domain_objects_validator.validate_skill_ids,
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'offset': {
-                'schema': {
-                    'type': 'int'
-                }
-            }
-        }
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {'offset': {'schema': {'type': 'int'}}}}
 
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids: str) -> None:
@@ -81,7 +70,8 @@ class QuestionsListHandler(
 
         question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                constants.NUM_QUESTIONS_PER_PAGE + 1, skill_ids, offset)
+                constants.NUM_QUESTIONS_PER_PAGE + 1, skill_ids, offset
+            )
         )
 
         if len(question_summaries) <= constants.NUM_QUESTIONS_PER_PAGE:
@@ -95,40 +85,37 @@ class QuestionsListHandler(
         for index, summary in enumerate(question_summaries):
             if summary is not None:
                 if len(skill_ids) == 1:
-                    return_dicts.append({
-                        'summary': summary.to_dict(),
-                        'skill_id': merged_question_skill_links[
-                            index].skill_ids[0],
-                        'skill_description': (
-                            merged_question_skill_links[
-                                index].skill_descriptions[0]),
-                        'skill_difficulty': (
-                            merged_question_skill_links[
-                                index].skill_difficulties[0])
-                    })
+                    return_dicts.append(
+                        {
+                            'summary': summary.to_dict(),
+                            'skill_id': merged_question_skill_links[index].skill_ids[0],
+                            'skill_description': (
+                                merged_question_skill_links[index].skill_descriptions[0]
+                            ),
+                            'skill_difficulty': (
+                                merged_question_skill_links[index].skill_difficulties[0]
+                            ),
+                        }
+                    )
                 else:
-                    return_dicts.append({
-                        'summary': summary.to_dict(),
-                        'skill_ids': merged_question_skill_links[
-                            index].skill_ids,
-                        'skill_descriptions': (
-                            merged_question_skill_links[
-                                index].skill_descriptions),
-                        'skill_difficulties': (
-                            merged_question_skill_links[
-                                index].skill_difficulties)
-                    })
+                    return_dicts.append(
+                        {
+                            'summary': summary.to_dict(),
+                            'skill_ids': merged_question_skill_links[index].skill_ids,
+                            'skill_descriptions': (
+                                merged_question_skill_links[index].skill_descriptions
+                            ),
+                            'skill_difficulties': (
+                                merged_question_skill_links[index].skill_difficulties
+                            ),
+                        }
+                    )
 
-        self.values.update({
-            'question_summary_dicts': return_dicts,
-            'more': more
-        })
+        self.values.update({'question_summary_dicts': return_dicts, 'more': more})
         self.render_json(self.values)
 
 
-class QuestionCountDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class QuestionCountDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data regarding the number of questions assigned to the given
     skill ids.
     """
@@ -140,7 +127,7 @@ class QuestionCountDataHandler(
         'comma_separated_skill_ids': {
             'schema': {
                 'type': 'object_dict',
-                'validation_method': domain_objects_validator.validate_skill_ids
+                'validation_method': domain_objects_validator.validate_skill_ids,
             }
         }
     }
@@ -151,11 +138,10 @@ class QuestionCountDataHandler(
         """Handles GET requests."""
         skill_ids = list(set(comma_separated_skill_ids.split(',')))
 
-        total_question_count = (
-            question_services.get_total_question_count_for_skill_ids(skill_ids))
+        total_question_count = question_services.get_total_question_count_for_skill_ids(
+            skill_ids
+        )
 
-        self.values.update({
-            'total_question_count': total_question_count
-        })
+        self.values.update({'total_question_count': total_question_count})
 
         self.render_json(self.values)

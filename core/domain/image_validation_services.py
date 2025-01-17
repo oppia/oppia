@@ -28,7 +28,8 @@ from typing import Optional, Union
 HUNDRED_KB_IN_BYTES = 100 * 1024
 ONE_MB_IN_BYTES = 1 * 1024 * 1024
 ENTITY_TYPES_WITH_MAX_SIZE_ONE_MB = [
-    feconf.ENTITY_TYPE_BLOG_POST, feconf.ENTITY_TYPE_CLASSROOM
+    feconf.ENTITY_TYPE_BLOG_POST,
+    feconf.ENTITY_TYPE_CLASSROOM,
 ]
 
 
@@ -51,9 +52,7 @@ def validate_image_and_filename(
         ValidationError. Image or filename supplied fails one of the
             validation checks.
     """
-    if (
-        entity_type in ENTITY_TYPES_WITH_MAX_SIZE_ONE_MB
-    ):
+    if entity_type in ENTITY_TYPES_WITH_MAX_SIZE_ONE_MB:
         max_file_size = ONE_MB_IN_BYTES
     else:
         max_file_size = HUNDRED_KB_IN_BYTES
@@ -65,27 +64,31 @@ def validate_image_and_filename(
 
     if len(raw_image) > max_file_size:
         raise utils.ValidationError(
-            'Image exceeds file size limit of %i KB.' % (max_file_size / 1024))
+            'Image exceeds file size limit of %i KB.' % (max_file_size / 1024)
+        )
     allowed_formats = ', '.join(
-        list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
+        list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
+    )
     # Ruling out the possibility of str for mypy type checking.
     assert isinstance(raw_image, bytes)
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
         invalid_tags, invalid_attrs = (
-            html_validation_service.get_invalid_svg_tags_and_attrs(raw_image))
+            html_validation_service.get_invalid_svg_tags_and_attrs(raw_image)
+        )
         if invalid_tags or invalid_attrs:
-            invalid_tags_message = (
-                'tags: %s' % invalid_tags if invalid_tags else '')
+            invalid_tags_message = 'tags: %s' % invalid_tags if invalid_tags else ''
             invalid_attrs_message = (
-                'attributes: %s' % invalid_attrs if invalid_attrs else '')
+                'attributes: %s' % invalid_attrs if invalid_attrs else ''
+            )
             raise utils.ValidationError(
-                'Unsupported tags/attributes found in the SVG:\n%s\n%s' % (
-                    invalid_tags_message, invalid_attrs_message))
-        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(
-                raw_image):
+                'Unsupported tags/attributes found in the SVG:\n%s\n%s'
+                % (invalid_tags_message, invalid_attrs_message)
+            )
+        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(raw_image):
             raise utils.ValidationError(
-                'The svg tag does not contains the \'xmlns\' attribute.')
+                'The svg tag does not contains the \'xmlns\' attribute.'
+            )
     else:
         # Verify that the data is recognized as an image.
         file_format = imghdr.what(None, h=raw_image)
@@ -99,19 +102,19 @@ def validate_image_and_filename(
         raise utils.ValidationError('Invalid filename')
     if '/' in filename or '..' in filename:
         raise utils.ValidationError(
-            'Filenames should not include slashes (/) or consecutive '
-            'dot characters.')
+            'Filenames should not include slashes (/) or consecutive ' 'dot characters.'
+        )
     if '.' not in filename:
         raise utils.ValidationError(
             'Image filename with no extension: it should have '
-            'one of the following extensions: %s.' % allowed_formats)
+            'one of the following extensions: %s.' % allowed_formats
+        )
 
     dot_index = filename.rfind('.')
-    extension = filename[dot_index + 1:].lower()
-    if (extension not in
-            feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
+    extension = filename[dot_index + 1 :].lower()
+    if extension not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]:
         raise utils.ValidationError(
-            'Expected a filename ending in .%s, received %s' %
-            (file_format, filename))
+            'Expected a filename ending in .%s, received %s' % (file_format, filename)
+        )
 
     return file_format

@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-import mypy_imports # pylint: disable=unused-import
+import mypy_imports  # pylint: disable=unused-import
 
 
 class MyPyImportsTests(test_utils.GenericTestBase):

@@ -38,12 +38,14 @@ class GetAuditsByKindTests(test_utils.TestBase):
         get_audit_do_fn_types_by_kind_swap = self.swap(
             validation_decorators.AuditsExisting,
             'get_audit_do_fn_types_by_kind',
-            self.get_audit_do_fn_types_by_kind_mock)
+            self.get_audit_do_fn_types_by_kind_mock,
+        )
 
         with get_audit_do_fn_types_by_kind_swap:
             self.assertIs(
                 base_validation_registry.get_audit_do_fn_types_by_kind(),
-                self.unique_obj)
+                self.unique_obj,
+            )
 
 
 class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
@@ -62,13 +64,14 @@ class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
         get_id_referencing_properties_by_kind_of_possessor_swap = self.swap(
             validation_decorators.RelationshipsOf,
             'get_id_referencing_properties_by_kind_of_possessor',
-            self.get_id_referencing_properties_by_kind_of_possessor_mock)
+            self.get_id_referencing_properties_by_kind_of_possessor_mock,
+        )
 
         with get_id_referencing_properties_by_kind_of_possessor_swap:
             self.assertIs(
-                base_validation_registry
-                .get_id_referencing_properties_by_kind_of_possessor(),
-                self.unique_obj)
+                base_validation_registry.get_id_referencing_properties_by_kind_of_possessor(),
+                self.unique_obj,
+            )
 
 
 class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
@@ -87,10 +90,11 @@ class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
         get_all_model_kinds_referenced_by_properties_swap = self.swap(
             validation_decorators.RelationshipsOf,
             'get_all_model_kinds_referenced_by_properties',
-            self.get_all_model_kinds_referenced_by_properties_mock)
+            self.get_all_model_kinds_referenced_by_properties_mock,
+        )
 
         with get_all_model_kinds_referenced_by_properties_swap:
             self.assertIs(
-                base_validation_registry
-                .get_all_model_kinds_referenced_by_properties(),
-                self.unique_obj)
+                base_validation_registry.get_all_model_kinds_referenced_by_properties(),
+                self.unique_obj,
+            )

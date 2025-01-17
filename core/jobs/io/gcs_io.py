@@ -39,14 +39,10 @@ BUCKET = app_identity_services.get_gcs_resource_bucket_name()
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class ReadFile(beam.PTransform): # type: ignore[misc]
+class ReadFile(beam.PTransform):  # type: ignore[misc]
     """Read files form the GCS."""
 
-    def __init__(
-        self,
-        bucket: str = BUCKET,
-        label: Optional[str] = None
-    ) -> None:
+    def __init__(self, bucket: str = BUCKET, label: Optional[str] = None) -> None:
         """Initializes the ReadFile PTransform.
 
         Args:
@@ -66,10 +62,7 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         Returns:
             PCollection. The PCollection of the file data.
         """
-        return (
-            file_paths
-            | 'Read the file' >> beam.Map(self._read_file)
-        )
+        return file_paths | 'Read the file' >> beam.Map(self._read_file)
 
     def _read_file(
         self, file_path: str
@@ -101,14 +94,14 @@ class FileObjectDict(TypedDict):
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class WriteFile(beam.PTransform): # type: ignore[misc]
+class WriteFile(beam.PTransform):  # type: ignore[misc]
     """Write files to GCS."""
 
     def __init__(
         self,
         mime_type: str = 'application/octet-stream',
         bucket: str = BUCKET,
-        label: Optional[str] = None
+        label: Optional[str] = None,
     ) -> None:
         """Initializes the WriteFile PTransform.
 
@@ -132,10 +125,7 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
             PCollection. The PCollection of the number of bytes that has
             written to GCS.
         """
-        return (
-            file_objects
-            | 'Write files to GCS' >> beam.Map(self._write_file)
-        )
+        return file_objects | 'Write files to GCS' >> beam.Map(self._write_file)
 
     def _write_file(self, file_obj: FileObjectDict) -> int:
         """Helper function to write file to the GCS.
@@ -148,7 +138,8 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
             int. Returns the number of bytes that has been written to GCS.
         """
         storage_services.commit(
-            self.bucket, file_obj['filepath'], file_obj['data'], self.mime_type)
+            self.bucket, file_obj['filepath'], file_obj['data'], self.mime_type
+        )
         return len(file_obj['data'])
 
 
@@ -156,14 +147,10 @@ class WriteFile(beam.PTransform): # type: ignore[misc]
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class DeleteFile(beam.PTransform): # type: ignore[misc]
+class DeleteFile(beam.PTransform):  # type: ignore[misc]
     """Delete files from GCS."""
 
-    def __init__(
-        self,
-        bucket: str = BUCKET,
-        label: Optional[str] = None
-    ) -> None:
+    def __init__(self, bucket: str = BUCKET, label: Optional[str] = None) -> None:
         """Initializes the DeleteFile PTransform.
 
         Args:
@@ -183,10 +170,7 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
         Returns:
             PCollection. The PCollection of the file data.
         """
-        return (
-            file_paths
-            | 'Delete the file' >> beam.Map(self._delete_file)
-        )
+        return file_paths | 'Delete the file' >> beam.Map(self._delete_file)
 
     def _delete_file(self, file_path: str) -> None:
         """Helper function to delete the file.
@@ -201,14 +185,10 @@ class DeleteFile(beam.PTransform): # type: ignore[misc]
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'PTransform' (has type 'Any')), we added an ignore here.
-class GetFiles(beam.PTransform): # type: ignore[misc]
+class GetFiles(beam.PTransform):  # type: ignore[misc]
     """Get all files with specefic prefix."""
 
-    def __init__(
-        self,
-        bucket: str = BUCKET,
-        label: Optional[str] = None
-    ) -> None:
+    def __init__(self, bucket: str = BUCKET, label: Optional[str] = None) -> None:
         """Initializes the GetFiles PTransform.
 
         Args:
@@ -227,9 +207,8 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
         Returns:
             PCollection. The PCollection of the file names.
         """
-        return (
-            prefixes
-            | 'Get names of the files' >> beam.Map(self._get_file_with_prefix)
+        return prefixes | 'Get names of the files' >> beam.Map(
+            self._get_file_with_prefix
         )
 
     def _get_file_with_prefix(self, prefix: str) -> List[str]:

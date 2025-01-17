@@ -50,7 +50,7 @@ from core.platform import models
 from typing import List
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import secrets_services
     from mypy_imports import translate_services
     from mypy_imports import translation_models
@@ -58,8 +58,7 @@ if MYPY: # pragma: no cover
 translate_services = models.Registry.import_translate_services()
 secrets_services = models.Registry.import_secrets_services()
 
-(translation_models,) = models.Registry.import_models([
-    models.Names.TRANSLATION])
+(translation_models,) = models.Registry.import_models([models.Names.TRANSLATION])
 
 
 def initialize_android_test_data() -> str:
@@ -99,15 +98,11 @@ def initialize_android_test_data() -> str:
         topic_services.delete_topic(user_id, topic.id)
 
         # Also delete the demo exploration's translations, if any.
-        test_exploration = exp_fetchers.get_exploration_by_id(
-            exp_id, strict=False)
+        test_exploration = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if test_exploration:
             entity_translation_model = (
                 translation_models.EntityTranslationsModel.get_model(
-                    entity_type,
-                    exp_id,
-                    test_exploration.version,
-                    target_language_code
+                    entity_type, exp_id, test_exploration.version, target_language_code
                 )
             )
             if entity_translation_model:
@@ -115,7 +110,8 @@ def initialize_android_test_data() -> str:
 
         # Unconditionally reset possible machine translations.
         translation_models.MachineTranslationModel.delete_multi(
-            translation_models.MachineTranslationModel.get_all().fetch())
+            translation_models.MachineTranslationModel.get_all().fetch()
+        )
 
         # Remove the topic from classroom pages if it's present.
         classrooms = classroom_config_services.get_all_classrooms()
@@ -125,9 +121,9 @@ def initialize_android_test_data() -> str:
             )
             del topic_id_to_prerequisite_topic_ids[topic.id]
             classroom.topic_id_to_prerequisite_topic_ids = (
-                topic_id_to_prerequisite_topic_ids)
-            classroom_config_services.update_classroom(
-                classroom)
+                topic_id_to_prerequisite_topic_ids
+            )
+            classroom_config_services.update_classroom(classroom)
 
     # Generate new Structure id for topic, story, skill and question.
     topic_id = topic_fetchers.get_new_topic_id()
@@ -137,31 +133,32 @@ def initialize_android_test_data() -> str:
 
     # Create dummy skill and question.
     skill = _create_dummy_skill(
-        skill_id, 'Dummy Skill for Android', '<p>Dummy Explanation 1</p>')
+        skill_id, 'Dummy Skill for Android', '<p>Dummy Explanation 1</p>'
+    )
     question = _create_dummy_question(question_id, 'Question 1', [skill_id])
     question_services.add_question(user_id, question)
     question_services.create_new_question_skill_link(
-        user_id, question_id, skill_id, 0.3)
+        user_id, question_id, skill_id, 0.3
+    )
 
     # Create and update topic to validate before publishing.
     topic = topic_domain.Topic.create_default_topic(
-        topic_id, 'Android test', 'test-topic-one', 'description', 'fragm')
+        topic_id, 'Android test', 'test-topic-one', 'description', 'fragm'
+    )
     topic.update_url_fragment('test-topic')
     topic.update_meta_tag_content('tag')
     topic.update_page_title_fragment_for_web('page title for topic')
 
     # Save the dummy image to the filesystem to be used as thumbnail.
     with utils.open_file(
-        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-        'rb',
-        encoding=None
+        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
     ) as f:
         raw_image = f.read()
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
     fs.commit(
         '%s/test_svg.svg' % constants.ASSET_TYPE_THUMBNAIL,
         raw_image,
-        mimetype='image/svg+xml'
+        mimetype='image/svg+xml',
     )
 
     # Update thumbnail properties.
@@ -179,9 +176,9 @@ def initialize_android_test_data() -> str:
     topic.update_subtopic_url_fragment(1, 'suburl')
     topic.move_skill_id_to_subtopic(None, 1, skill_id)
     topic.update_skill_ids_for_diagnostic_test([skill_id])
-    subtopic_page = (
-        subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-            1, topic_id))
+    subtopic_page = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+        1, topic_id
+    )
     subtopic_page.page_contents.subtitled_html.html = (
         'Example revision card. Click <oppia-noninteractive-skillreview '
         'skill_id-with-value="&amp;quot;%s&amp;quot;" text-with-value="'
@@ -192,7 +189,8 @@ def initialize_android_test_data() -> str:
     # Upload local exploration to the datastore and enable feedback.
     exp_services.load_demo(exp_id)
     rights_manager.release_ownership_of_exploration(
-        user_services.get_system_user(), exp_id)
+        user_services.get_system_user(), exp_id
+    )
 
     # Add and update the exploration/node to the story.
     story = story_domain.Story.create_default_story(
@@ -200,7 +198,7 @@ def initialize_android_test_data() -> str:
         'Android End to End testing',
         'Description',
         topic_id,
-        'android-end-to-end-testing'
+        'android-end-to-end-testing',
     )
 
     story.add_node(
@@ -208,37 +206,33 @@ def initialize_android_test_data() -> str:
     )
 
     story.update_node_description(
-        '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
-        'To test all Android interactions'
+        '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'To test all Android interactions'
     )
-    story.update_node_exploration_id(
-        '%s%d' % (story_domain.NODE_ID_PREFIX, 1), exp_id
-    )
+    story.update_node_exploration_id('%s%d' % (story_domain.NODE_ID_PREFIX, 1), exp_id)
 
     # Save the dummy image to the filesystem to be used as thumbnail.
     with utils.open_file(
-        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-        'rb',
-        encoding=None
+        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
     ) as f:
         raw_image = f.read()
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
     fs.commit(
         '%s/test_svg.svg' % constants.ASSET_TYPE_THUMBNAIL,
         raw_image,
-        mimetype='image/svg+xml'
+        mimetype='image/svg+xml',
     )
 
     story.update_node_thumbnail_filename(
-        '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'test_svg.svg')
+        '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'test_svg.svg'
+    )
     story.update_node_thumbnail_bg_color(
-        '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '#F8BF74')
+        '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '#F8BF74'
+    )
 
     # Update and validate the story.
     story.update_meta_tag_content('tag')
     story.update_thumbnail_filename('test_svg.svg')
-    story.update_thumbnail_bg_color(
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
+    story.update_thumbnail_bg_color(constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
 
     # Save the previously created structures
     # (skill, story, topic, subtopic).
@@ -246,19 +240,24 @@ def initialize_android_test_data() -> str:
     story_services.save_new_story(user_id, story)
     topic_services.save_new_topic(user_id, topic)
     subtopic_page_services.save_subtopic_page(
-        user_id, subtopic_page, 'Added subtopic',
-        [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-            'subtopic_id': 1,
-            'title': 'Dummy Subtopic Title',
-            'url_fragment': 'dummy-fragment'
-        })]
+        user_id,
+        subtopic_page,
+        'Added subtopic',
+        [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Dummy Subtopic Title',
+                    'url_fragment': 'dummy-fragment',
+                }
+            )
+        ],
     )
 
     # Generates translation opportunities for the Contributor Dashboard.
     exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-    opportunity_services.add_new_exploration_opportunities(
-        story_id, exp_ids_in_story)
+    opportunity_services.add_new_exploration_opportunities(story_id, exp_ids_in_story)
 
     # Publish the story and topic.
     topic_services.publish_story(topic_id, story_id, user_id)
@@ -281,67 +280,75 @@ def initialize_android_test_data() -> str:
             ' filepath-with-value="&amp;quot;img_20210622_123005_'
             'efcgi87dk2_height_130_width_289.png&amp;quot;">'
             '</oppia-noninteractive-image>'
-        ), (
+        ),
+        (
             '<p>Exploração de teste com todas as interações específicas do '
             'Android</p><oppia-noninteractive-image alt-with-value='
             '"&amp;quot;tests&amp;quot;" caption-with-value="&amp;quot;'
             '&amp;quot;" filepath-with-value="&amp;quot;img_20210622_'
             '123005_efcgi87dk2_height_130_width_289.png&amp;quot;">'
             '</oppia-noninteractive-image>'
-        )
+        ),
     )
     emulator_client.add_expected_response(
-        'en', target_language_code, 'Continue', 'Continuar')
+        'en', target_language_code, 'Continue', 'Continuar'
+    )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>What fraction represents half of something?</p>',
-        '<p>Que fração representa a metade de algo?</p>'
+        '<p>Que fração representa a metade de algo?</p>',
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>That answer isn\'t correct. Try again.</p>',
-        '<p>Essa resposta não está correta. Tente novamente.</p>')
+        '<p>Essa resposta não está correta. Tente novamente.</p>',
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Correct!</p>', '<p>Correto!</p>')
+        'en', target_language_code, '<p>Correct!</p>', '<p>Correto!</p>'
+    )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Remember that two halves, when added together, make one whole.</p>',
-        '<p>Lembre-se que duas metades, quando somadas, formam um todo.</p>'
+        '<p>Lembre-se que duas metades, quando somadas, formam um todo.</p>',
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>One half is a fraction resulting from dividing one by two.</p>',
-        '<p>A metade é uma fração resultante da divisão de um por dois.</p>'
+        '<p>A metade é uma fração resultante da divisão de um por dois.</p>',
     )
     emulator_client.add_expected_response(
         'en',
-        target_language_code, (
+        target_language_code,
+        (
             '<p>Half in fraction is represented by 1 in the numerator and 2'
             ' in the denominator.</p>'
-        ), (
+        ),
+        (
             '<p>A metade em fração é representada por 1 no numerador e 2 no'
             ' denominador.</p>'
-        )
+        ),
     )
     emulator_client.add_expected_response(
         'en',
-        target_language_code, (
+        target_language_code,
+        (
             '<p>Half of something has one part in the numerator for every'
             ' two parts in the denominator.</p>'
-        ), (
+        ),
+        (
             '<p>Metade de algo tem uma parte no numerador para cada duas'
             ' partes no denominador.</p>'
-        )
+        ),
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>In which language does Oppia mean \'to learn\'?</p>',
-        '<p>Em que língua Oppia significa \'aprender\'?</p>'
+        '<p>Em que língua Oppia significa \'aprender\'?</p>',
     )
     emulator_client.add_expected_response(
         'en',
@@ -350,25 +357,25 @@ def initialize_android_test_data() -> str:
         (
             '<p>Não exatamente. Tente novamente (ou talvez use um mecanismo'
             ' de pesquisa).</p>'
-        )
+        ),
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>What are the primary colors of light?</p>',
-        '<p>Quais são as cores primárias da luz?</p>'
+        '<p>Quais são as cores primárias da luz?</p>',
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>That\'s not quite right. Try again.</p>',
-        '<p>Isto não está completamente correto. Tente novamente.</p>'
+        '<p>Isto não está completamente correto. Tente novamente.</p>',
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p><strong>Correct!</strong></p>',
-        '<p><strong>Correto!</strong></p>'
+        '<p><strong>Correto!</strong></p>',
     )
     emulator_client.add_expected_response(
         'en',
@@ -376,158 +383,174 @@ def initialize_android_test_data() -> str:
         (
             '<p>\'Yellow\' is considered a primary color in the RYB spectrum, '
             'but that doesn\'t correspond to light. Try again!</p>'
-        ), (
+        ),
+        (
             '<p>\'Amarelo\' é considerada uma cor primária no espectro'
             ' RYB, mas não corresponde à luz. Tente novamente!</p>'
-        )
+        ),
     )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Red</p>', '<p>Vermelho</p>')
+        'en', target_language_code, '<p>Red</p>', '<p>Vermelho</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Yellow</p>', '<p>Amarelo</p>')
+        'en', target_language_code, '<p>Yellow</p>', '<p>Amarelo</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Green</p>', '<p>Verde</p>')
+        'en', target_language_code, '<p>Green</p>', '<p>Verde</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Blue</p>', '<p>Azul</p>')
+        'en', target_language_code, '<p>Blue</p>', '<p>Azul</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Orange</p>', '<p>Laranja</p>')
+        'en', target_language_code, '<p>Orange</p>', '<p>Laranja</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Purple</p>', '<p>Roxo</p>')
+        'en', target_language_code, '<p>Purple</p>', '<p>Roxo</p>'
+    )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Sort the following in descending order.</p>',
-        '<p>Classifique o seguinte em ordem decrescente.</p>'
+        '<p>Classifique o seguinte em ordem decrescente.</p>',
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Not quite. Try again.</p>',
-        '<p>Não exatamente. Tente novamente.</p>'
+        '<p>Não exatamente. Tente novamente.</p>',
+    )
+    emulator_client.add_expected_response(
+        'en', target_language_code, '<p>That\'s correct</p>', '<p>Está correto</p>'
+    )
+    emulator_client.add_expected_response(
+        'en', target_language_code, '<p>0.35</p>', '<p>0.35</p>'
+    )
+    emulator_client.add_expected_response(
+        'en', target_language_code, '<p>3/5</p>', '<p>3/5</p>'
+    )
+    emulator_client.add_expected_response(
+        'en', target_language_code, '<p>0.5</p>', '<p>0.5</p>'
+    )
+    emulator_client.add_expected_response(
+        'en', target_language_code, '<p>0.46</p>', '<p>0.46</p>'
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
-        '<p>That\'s correct</p>',
-        '<p>Está correto</p>'
-    )
-    emulator_client.add_expected_response(
-        'en', target_language_code, '<p>0.35</p>', '<p>0.35</p>')
-    emulator_client.add_expected_response(
-        'en', target_language_code, '<p>3/5</p>', '<p>3/5</p>')
-    emulator_client.add_expected_response(
-        'en', target_language_code, '<p>0.5</p>', '<p>0.5</p>')
-    emulator_client.add_expected_response(
-        'en', target_language_code, '<p>0.46</p>', '<p>0.46</p>')
-    emulator_client.add_expected_response(
-        'en',
-        target_language_code, (
+        (
             '<p>Sort the following in descending order, putting equal'
             ' items in the same position.</p>'
-        ), (
+        ),
+        (
             '<p>Classifique o seguinte em ordem decrescente, colocando'
             ' itens iguais na mesma posição.</p>'
-        )
+        ),
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Seems like you did the ascending order</p>',
-        '<p>Parece que você fez a ordem crescente</p>'
+        '<p>Parece que você fez a ordem crescente</p>',
     )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>6.0</p>', '<p>6.0</p>')
+        'en', target_language_code, '<p>6.0</p>', '<p>6.0</p>'
+    )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         'Congratulations, you have finished!',
-        'Parabéns, você terminou!'
+        'Parabéns, você terminou!',
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Click on the "O" letter in the below image.</p>',
-        '<p>Clique na letra "O" na imagem abaixo.</p>'
+        '<p>Clique na letra "O" na imagem abaixo.</p>',
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Select the left most letter</p>',
-        '<p>Selecione a letra mais à esquerda</p>'
+        '<p>Selecione a letra mais à esquerda</p>',
     )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Continue</p>', '<p>Continuar</p>')
+        'en', target_language_code, '<p>Continue</p>', '<p>Continuar</p>'
+    )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>What is 11 times 11?</p>',
-        '<p>Quanto é 11 vezes 11?</p>'
+        '<p>Quanto é 11 vezes 11?</p>',
     )
     emulator_client.add_expected_response(
         'en', target_language_code, '<p>Try again</p>', '<p>Tente novamente</p>'
     )
     emulator_client.add_expected_response(
-        'en', target_language_code,
+        'en',
+        target_language_code,
         '<p>Not quite. It\'s actually larger than that. Try again.</p>',
-        (
-            '<p>Não exatamente. Na verdade, é maior do que isso. Tente'
-            ' novamente.</p>'
-        )
+        ('<p>Não exatamente. Na verdade, é maior do que isso. Tente' ' novamente.</p>'),
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Not quite. It\'s less than that.</p>',
-        '<p>Não exatamente. É menos que isso.</p>'
+        '<p>Não exatamente. É menos que isso.</p>',
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Which bird can sustain flight for long periods of time?</p>',
-        '<p>Qual ave pode sustentar o vôo por longos períodos de tempo?</p>'
+        '<p>Qual ave pode sustentar o vôo por longos períodos de tempo?</p>',
     )
     emulator_client.add_expected_response(
-        'en',
-        target_language_code,
-        '<p>Try again.</p>',
-        '<p>Tente novamente.</p>'
+        'en', target_language_code, '<p>Try again.</p>', '<p>Tente novamente.</p>'
     )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         '<p>Correct! Eagles can sustain flight.</p>',
-        '<p>Correto! As águias podem sustentar o vôo.</p>'
+        '<p>Correto! As águias podem sustentar o vôo.</p>',
     )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Penguin</p>', '<p>Pinguim</p>')
+        'en', target_language_code, '<p>Penguin</p>', '<p>Pinguim</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Chicken</p>', '<p>Frango</p>')
+        'en', target_language_code, '<p>Chicken</p>', '<p>Frango</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Eagle</p>', '<p>Águia</p>')
+        'en', target_language_code, '<p>Eagle</p>', '<p>Águia</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Tiger</p>', '<p>Tigre</p>')
+        'en', target_language_code, '<p>Tiger</p>', '<p>Tigre</p>'
+    )
     emulator_client.add_expected_response(
         'en',
         target_language_code,
         (
             '<p>Two numbers are respectively 20% and 50% more than a third'
             ' number. The ratio of the two numbers is:</p>'
-        ), (
+        ),
+        (
             '<p>Dois números são, respectivamente, 20% e 50% mais do que um'
             ' terceiro número. A razão entre os dois números é:</p>'
-        )
+        ),
     )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Not correct</p>', '<p>Incorreto</p>')
+        'en', target_language_code, '<p>Not correct</p>', '<p>Incorreto</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, '<p>Correct</p>', '<p>Correto</p>')
+        'en', target_language_code, '<p>Correct</p>', '<p>Correto</p>'
+    )
     emulator_client.add_expected_response(
-        'en', target_language_code, 'finnish', 'finlandês')
+        'en', target_language_code, 'finnish', 'finlandês'
+    )
 
     # Add translations for the test exploration.
     test_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     translatable_text_dict = translation_services.get_translatable_text(
-        test_exploration, target_language_code)
+        test_exploration, target_language_code
+    )
     for translations_dict in translatable_text_dict.values():
         for content_id, translatable_content in translations_dict.items():
             content_to_translate = translatable_content.content_value
@@ -537,8 +560,9 @@ def initialize_android_test_data() -> str:
                     translation_services.get_and_cache_machine_translation(
                         source_language_code='en',
                         target_language_code=target_language_code,
-                        source_text=text_option
-                    ) for text_option in content_to_translate
+                        source_text=text_option,
+                    )
+                    for text_option in content_to_translate
                 ]
                 translated_content_value = []
                 for translated_str in translated_list:
@@ -549,12 +573,10 @@ def initialize_android_test_data() -> str:
                 # never fail as is_data_format_list is false so this will be
                 # a string.
                 assert isinstance(content_to_translate, str)
-                translated_str = (
-                    translation_services.get_and_cache_machine_translation(
-                        source_language_code='en',
-                        target_language_code=target_language_code,
-                        source_text=content_to_translate
-                    )
+                translated_str = translation_services.get_and_cache_machine_translation(
+                    source_language_code='en',
+                    target_language_code=target_language_code,
+                    source_text=content_to_translate,
                 )
                 assert translated_str is not None
                 translated_content_value = translated_str
@@ -562,7 +584,7 @@ def initialize_android_test_data() -> str:
             translated_content = translation_domain.TranslatedContent(
                 translated_content_value,
                 translatable_content.content_format,
-                needs_update=False
+                needs_update=False,
             )
             translation_services.add_new_translation(
                 entity_type,
@@ -570,7 +592,7 @@ def initialize_android_test_data() -> str:
                 test_exploration.version,
                 target_language_code,
                 content_id,
-                translated_content
+                translated_content,
             )
 
     # Add the new topic to all available classrooms.
@@ -586,9 +608,7 @@ def _upload_thumbnail(structure_id: str, structure_type: str) -> None:
     AssetDevHandler.
     """
     with utils.open_file(
-        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-        'rb',
-        encoding=None
+        os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb', encoding=None
     ) as f:
         image_content = f.read()
         fs_services.save_original_and_compressed_versions_of_image(
@@ -597,7 +617,7 @@ def _upload_thumbnail(structure_id: str, structure_type: str) -> None:
             structure_id,
             image_content,
             'thumbnail',
-            False
+            False,
         )
 
 
@@ -619,48 +639,44 @@ def _create_dummy_question(
     state = state_domain.State.create_default_state(
         'ABC',
         content_id_generator.generate(translation_domain.ContentType.CONTENT),
-        content_id_generator.generate(
-            translation_domain.ContentType.DEFAULT_OUTCOME
-        ),
-        is_initial_state=True
+        content_id_generator.generate(translation_domain.ContentType.DEFAULT_OUTCOME),
+        is_initial_state=True,
     )
     state.update_interaction_id('TextInput')
-    state.update_interaction_customization_args({
-        'placeholder': {
-            'value': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.CUSTOMIZATION_ARG),
-                'unicode_str': ''
-            }
-        },
-        'rows': {'value': 1},
-        'catchMisspellings': {
-            'value': False
+    state.update_interaction_customization_args(
+        {
+            'placeholder': {
+                'value': {
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG
+                    ),
+                    'unicode_str': '',
+                }
+            },
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False},
         }
-    })
+    )
 
     state.update_linked_skill_id(None)
     state.update_content(
-        state_domain.SubtitledHtml(state.content.content_id, question_content))
+        state_domain.SubtitledHtml(state.content.content_id, question_content)
+    )
 
     solution = state_domain.Solution(
         'TextInput',
         False,
         'Solution',
         state_domain.SubtitledHtml(
-            content_id_generator.generate(
-                translation_domain.ContentType.SOLUTION
-            ),
-            '<p>This is a solution.</p>'
-        )
+            content_id_generator.generate(translation_domain.ContentType.SOLUTION),
+            '<p>This is a solution.</p>',
+        ),
     )
     hints_list = [
         state_domain.Hint(
             state_domain.SubtitledHtml(
-                content_id_generator.generate(
-                    translation_domain.ContentType.HINT
-                ),
-                '<p>This is a hint.</p>'
+                content_id_generator.generate(translation_domain.ContentType.HINT),
+                '<p>This is a hint.</p>',
             )
         )
     ]
@@ -675,12 +691,12 @@ def _create_dummy_question(
                 content_id_generator.generate(
                     translation_domain.ContentType.DEFAULT_OUTCOME
                 ),
-                '<p>Dummy Feedback</p>'
+                '<p>Dummy Feedback</p>',
             ),
             True,
             [],
             None,
-            None
+            None,
         )
     )
     question = question_domain.Question(
@@ -691,7 +707,7 @@ def _create_dummy_question(
         0,
         linked_skill_ids,
         [],
-        content_id_generator.next_content_id_index
+        content_id_generator.next_content_id_index,
     )
     return question
 
@@ -712,10 +728,11 @@ def _create_dummy_skill(
     rubrics = [
         skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
         skill_domain.Rubric(constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-        skill_domain.Rubric(constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])
+        skill_domain.Rubric(constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
     ]
     skill = skill_domain.Skill.create_default_skill(
-        skill_id, skill_description, rubrics)
+        skill_id, skill_description, rubrics
+    )
     skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
     return skill
 

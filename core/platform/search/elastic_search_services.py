@@ -29,7 +29,7 @@ import elasticsearch
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
@@ -39,12 +39,19 @@ secrets_services = models.Registry.import_secrets_services()
 # where loading a exploration from local yaml file takes
 # longer than ElasticSearch expects.
 ES = elasticsearch.Elasticsearch(
-    ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
-    if feconf.ES_CLOUD_ID is None else None,
+    (
+        ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
+        if feconf.ES_CLOUD_ID is None
+        else None
+    ),
     cloud_id=feconf.ES_CLOUD_ID,
     http_auth=(
         (feconf.ES_USERNAME, secrets_services.get_secret('ES_PASSWORD'))
-        if feconf.ES_CLOUD_ID else None), timeout=30)
+        if feconf.ES_CLOUD_ID
+        else None
+    ),
+    timeout=30,
+)
 
 
 class SearchException(Exception):
@@ -93,11 +100,10 @@ def _fetch_response_from_elastic_search(
     num_docs_to_fetch = size + 1
     try:
         response = ES.search(
-            body=query_definition, index=index_name,
-            params={
-                'size': num_docs_to_fetch,
-                'from': offset
-            })
+            body=query_definition,
+            index=index_name,
+            params={'size': num_docs_to_fetch, 'from': offset},
+        )
     except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
         _create_index(index_name)
@@ -203,14 +209,7 @@ def clear_index(index_name: str) -> None:
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
     # https://stackoverflow.com/questions/57778438/delete-all-documents-from-elasticsearch-index-in-python-3-x
-    ES.delete_by_query(
-        index_name,
-        {
-            'query':
-                {
-                    'match_all': {}
-                }
-        })
+    ES.delete_by_query(index_name, {'query': {'match_all': {}}})
 
 
 def search(
@@ -270,20 +269,24 @@ def search(
                 'filter': [],
             }
         },
-        'sort': [{
-            'rank': {
-                'order': 'desc',
-                'missing': '_last',
-                'unmapped_type': 'float',
+        'sort': [
+            {
+                'rank': {
+                    'order': 'desc',
+                    'missing': '_last',
+                    'unmapped_type': 'float',
+                }
             }
-        }],
+        ],
     }
     if query_string:
-        query_definition['query']['bool']['must'] = [{
-            'multi_match': {
-                'query': query_string,
+        query_definition['query']['bool']['must'] = [
+            {
+                'multi_match': {
+                    'query': query_string,
+                }
             }
-        }]
+        ]
     if categories:
         category_string = ' '.join(['"%s"' % cat for cat in categories])
         query_definition['query']['bool']['filter'].append(
@@ -351,25 +354,27 @@ def blog_post_summaries_search(
                 'filter': [],
             }
         },
-        'sort': [{
-            'rank': {
-                'order': 'desc',
-                'missing': '_last',
-                'unmapped_type': 'float',
+        'sort': [
+            {
+                'rank': {
+                    'order': 'desc',
+                    'missing': '_last',
+                    'unmapped_type': 'float',
+                }
             }
-        }],
+        ],
     }
     if query_string:
-        query_definition['query']['bool']['must'] = [{
-            'multi_match': {
-                'query': query_string,
+        query_definition['query']['bool']['must'] = [
+            {
+                'multi_match': {
+                    'query': query_string,
+                }
             }
-        }]
+        ]
     if tags:
         for tag in tags:
-            query_definition['query']['bool']['filter'].append(
-                {'match': {'tags': tag}}
-            )
+            query_definition['query']['bool']['filter'].append({'match': {'tags': tag}})
 
     index_name = search_services.SEARCH_INDEX_BLOG_POSTS
     result_ids, resulting_offset = _fetch_response_from_elastic_search(

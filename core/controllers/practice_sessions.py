@@ -26,22 +26,17 @@ from core.domain import topic_fetchers
 from typing import Dict, List, TypedDict
 
 
-class PracticeSessionsPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class PracticeSessionsPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Renders the practice sessions page."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'selected_subtopic_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             }
         }
     }
@@ -62,18 +57,11 @@ class PracticeSessionsPage(
             unused_debug_mode: bool. Whether the app is running in debug mode.
         """
         if isinstance(exception, self.InvalidInputException):
-            (
-                _,
-                _,
-                classroom_url_fragment,
-                topic_url_fragment,
-                _,
-                _
-            ) = self.request.path.split('/')
+            (_, _, classroom_url_fragment, topic_url_fragment, _, _) = (
+                self.request.path.split('/')
+            )
             self.redirect(
-                '/learn/%s/%s/practice' % (
-                    classroom_url_fragment, topic_url_fragment
-                )
+                '/learn/%s/%s/practice' % (classroom_url_fragment, topic_url_fragment)
             )
             return
         super().handle_exception(exception, unused_debug_mode)
@@ -89,8 +77,7 @@ class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
 
 class PracticeSessionsPageDataHandler(
     base.BaseHandler[
-        Dict[str, str],
-        PracticeSessionsPageDataHandlerNormalizedRequestDict
+        Dict[str, str], PracticeSessionsPageDataHandlerNormalizedRequestDict
     ]
 ):
     """Fetches relevant data for the practice sessions page."""
@@ -98,15 +85,12 @@ class PracticeSessionsPageDataHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'selected_subtopic_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             }
         }
     }
@@ -125,8 +109,7 @@ class PracticeSessionsPageDataHandler(
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        selected_subtopic_ids = (
-            self.normalized_request['selected_subtopic_ids'])
+        selected_subtopic_ids = self.normalized_request['selected_subtopic_ids']
 
         selected_skill_ids = []
         for subtopic in topic.subtopics:
@@ -144,8 +127,10 @@ class PracticeSessionsPageDataHandler(
         for skill in skills:
             skill_ids_to_descriptions_map[skill.id] = skill.description
 
-        self.values.update({
-            'topic_name': topic.name,
-            'skill_ids_to_descriptions_map': skill_ids_to_descriptions_map
-        })
+        self.values.update(
+            {
+                'topic_name': topic.name,
+                'skill_ids_to_descriptions_map': skill_ids_to_descriptions_map,
+            }
+        )
         self.render_json(self.values)

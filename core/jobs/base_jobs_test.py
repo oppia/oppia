@@ -45,7 +45,9 @@ class JobMetaclassTests(test_utils.TestBase):
         super().tearDown()
 
     def test_does_not_put_base_classes_in_registry(self) -> None:
-        class FooJobBase(base_jobs.JobBase, metaclass=MockJobMetaclass): # pylint: disable=unused-variable
+        class FooJobBase(
+            base_jobs.JobBase, metaclass=MockJobMetaclass
+        ):  # pylint: disable=unused-variable
             """Job class with name that ends with 'Base'."""
 
             pass
@@ -72,14 +74,18 @@ class JobMetaclassTests(test_utils.TestBase):
         MockJobMetaclass('FooJob', (base_jobs.JobBase,), {})
 
         with self.assertRaisesRegex(TypeError, 'name is already used'):
-            class FooJob(base_jobs.JobBase, metaclass=MockJobMetaclass): # pylint: disable=unused-variable
+
+            class FooJob(
+                base_jobs.JobBase, metaclass=MockJobMetaclass
+            ):  # pylint: disable=unused-variable
                 """Job class with duplicate name."""
 
                 pass
 
     def test_raises_type_error_if_job_base_not_subclassed(self) -> None:
         with self.assertRaisesRegex(TypeError, 'must inherit from JobBase'):
-            class FooJob(metaclass=MockJobMetaclass): # pylint: disable=unused-variable
+
+            class FooJob(metaclass=MockJobMetaclass):  # pylint: disable=unused-variable
                 """Job class that does not inherit from JobBase."""
 
                 def __init__(self) -> None:
@@ -87,7 +93,10 @@ class JobMetaclassTests(test_utils.TestBase):
 
     def test_raises_type_error_if_job_name_not_suffixed_with_job(self) -> None:
         with self.assertRaisesRegex(TypeError, 'must end with "Job"'):
-            class FooBar(base_jobs.JobBase, metaclass=MockJobMetaclass): # pylint: disable=unused-variable
+
+            class FooBar(
+                base_jobs.JobBase, metaclass=MockJobMetaclass
+            ):  # pylint: disable=unused-variable
                 """Job class that does not have a name ending with "Job"."""
 
                 pass
@@ -97,7 +106,6 @@ class JobBaseTests(job_test_utils.PipelinedTestBase):
 
     def test_run_raises_not_implemented_error(self) -> None:
         with self.assertRaisesRegex(
-            NotImplementedError,
-            re.escape('Subclasses must implement the run() method')
+            NotImplementedError, re.escape('Subclasses must implement the run() method')
         ):
             base_jobs.JobBase(self.pipeline).run()

@@ -47,18 +47,29 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Dict, Final, Iterable, List, Literal, Mapping, Optional, Sequence, Tuple,
-    TypedDict, cast, overload)
+    Dict,
+    Final,
+    Iterable,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    cast,
+    overload,
+)
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import collection_models
     from mypy_imports import datastore_services
     from mypy_imports import user_models
 
-(collection_models, user_models) = models.Registry.import_models([
-    models.Names.COLLECTION, models.Names.USER
-])
+(collection_models, user_models) = models.Registry.import_models(
+    [models.Names.COLLECTION, models.Names.USER]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -85,7 +96,7 @@ class SnapshotsMetadataDict(TypedDict):
 
 
 def _migrate_collection_contents_to_latest_schema(
-    versioned_collection_contents: collection_domain.VersionedCollectionDict
+    versioned_collection_contents: collection_domain.VersionedCollectionDict,
 ) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the collection structure based on the schema version of the input
@@ -105,21 +116,21 @@ def _migrate_collection_contents_to_latest_schema(
             supported at present.
     """
     collection_schema_version = versioned_collection_contents['schema_version']
-    if not (1 <= collection_schema_version
-            <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+    if not (1 <= collection_schema_version <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d collection schemas at '
-            'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+            'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION
+        )
 
-    while (collection_schema_version <
-           feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+    while collection_schema_version < feconf.CURRENT_COLLECTION_SCHEMA_VERSION:
         collection_domain.Collection.update_collection_contents_from_model(
-            versioned_collection_contents, collection_schema_version)
+            versioned_collection_contents, collection_schema_version
+        )
         collection_schema_version += 1
 
 
 def get_collection_from_model(
-    collection_model: collection_models.CollectionModel
+    collection_model: collection_models.CollectionModel,
 ) -> collection_domain.Collection:
     """Returns a Collection domain object given a collection model loaded
     from the datastore.
@@ -136,8 +147,7 @@ def get_collection_from_model(
     # Ensure the original collection model does not get altered.
     versioned_collection_contents: collection_domain.VersionedCollectionDict = {
         'schema_version': collection_model.schema_version,
-        'collection_contents':
-            copy.deepcopy(collection_model.collection_contents)
+        'collection_contents': copy.deepcopy(collection_model.collection_contents),
     }
 
     # If collection is in version 2, copy nodes data to collection contents.
@@ -152,26 +162,31 @@ def get_collection_from_model(
         }
 
     # Migrate the collection if it is not using the latest schema version.
-    if (collection_model.schema_version !=
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
-        _migrate_collection_contents_to_latest_schema(
-            versioned_collection_contents)
+    if collection_model.schema_version != feconf.CURRENT_COLLECTION_SCHEMA_VERSION:
+        _migrate_collection_contents_to_latest_schema(versioned_collection_contents)
 
     return collection_domain.Collection(
-        collection_model.id, collection_model.title,
-        collection_model.category, collection_model.objective,
-        collection_model.language_code, collection_model.tags,
-        versioned_collection_contents['schema_version'], [
+        collection_model.id,
+        collection_model.title,
+        collection_model.category,
+        collection_model.objective,
+        collection_model.language_code,
+        collection_model.tags,
+        versioned_collection_contents['schema_version'],
+        [
             collection_domain.CollectionNode.from_dict(collection_node_dict)
-            for collection_node_dict in
-            versioned_collection_contents['collection_contents']['nodes']
+            for collection_node_dict in versioned_collection_contents[
+                'collection_contents'
+            ]['nodes']
         ],
-        collection_model.version, collection_model.created_on,
-        collection_model.last_updated)
+        collection_model.version,
+        collection_model.created_on,
+        collection_model.last_updated,
+    )
 
 
 def get_collection_summary_from_model(
-    collection_summary_model: collection_models.CollectionSummaryModel
+    collection_summary_model: collection_models.CollectionSummaryModel,
 ) -> collection_domain.CollectionSummary:
     """Returns a domain object for an Oppia collection summary given a
     collection summary model.
@@ -185,9 +200,12 @@ def get_collection_summary_from_model(
         from collection summary model.
     """
     return collection_domain.CollectionSummary(
-        collection_summary_model.id, collection_summary_model.title,
-        collection_summary_model.category, collection_summary_model.objective,
-        collection_summary_model.language_code, collection_summary_model.tags,
+        collection_summary_model.id,
+        collection_summary_model.title,
+        collection_summary_model.category,
+        collection_summary_model.objective,
+        collection_summary_model.language_code,
+        collection_summary_model.tags,
         collection_summary_model.status,
         collection_summary_model.community_owned,
         collection_summary_model.owner_ids,
@@ -198,55 +216,40 @@ def get_collection_summary_from_model(
         collection_summary_model.version,
         collection_summary_model.node_count,
         collection_summary_model.collection_model_created_on,
-        collection_summary_model.collection_model_last_updated
+        collection_summary_model.collection_model_last_updated,
     )
 
 
 @overload
+def get_collection_by_id(collection_id: str) -> collection_domain.Collection: ...
+
+
+@overload
 def get_collection_by_id(
-    collection_id: str
+    collection_id: str, *, version: Optional[int] = None
 ) -> collection_domain.Collection: ...
 
 
 @overload
 def get_collection_by_id(
-    collection_id: str,
-    *,
-    version: Optional[int] = None
+    collection_id: str, *, strict: Literal[True], version: Optional[int] = None
 ) -> collection_domain.Collection: ...
 
 
 @overload
 def get_collection_by_id(
-    collection_id: str,
-    *,
-    strict: Literal[True],
-    version: Optional[int] = None
-) -> collection_domain.Collection: ...
-
-
-@overload
-def get_collection_by_id(
-    collection_id: str,
-    *,
-    strict: Literal[False],
-    version: Optional[int] = None
+    collection_id: str, *, strict: Literal[False], version: Optional[int] = None
 ) -> Optional[collection_domain.Collection]: ...
 
 
 @overload
 def get_collection_by_id(
-    collection_id: str,
-    *,
-    strict: bool,
-    version: Optional[int] = None
+    collection_id: str, *, strict: bool, version: Optional[int] = None
 ) -> Optional[collection_domain.Collection]: ...
 
 
 def get_collection_by_id(
-    collection_id: str,
-    strict: bool = True,
-    version: Optional[int] = None
+    collection_id: str, strict: bool = True, version: Optional[int] = None
 ) -> Optional[collection_domain.Collection]:
     """Returns a domain object representing a collection.
 
@@ -263,29 +266,29 @@ def get_collection_by_id(
     """
     sub_namespace = str(version) if version else None
     cached_collection = caching_services.get_multi(
-        caching_services.CACHE_NAMESPACE_COLLECTION,
-        sub_namespace,
-        [collection_id]
+        caching_services.CACHE_NAMESPACE_COLLECTION, sub_namespace, [collection_id]
     ).get(collection_id)
 
     if cached_collection is not None:
         return cached_collection
     else:
         collection_model = collection_models.CollectionModel.get(
-            collection_id, strict=strict, version=version)
+            collection_id, strict=strict, version=version
+        )
         if collection_model:
             collection = get_collection_from_model(collection_model)
             caching_services.set_multi(
                 caching_services.CACHE_NAMESPACE_COLLECTION,
                 sub_namespace,
-                {collection_id: collection})
+                {collection_id: collection},
+            )
             return collection
         else:
             return None
 
 
 def get_collection_summary_by_id(
-    collection_id: str
+    collection_id: str,
 ) -> Optional[collection_domain.CollectionSummary]:
     """Returns a domain object representing a collection summary.
 
@@ -298,12 +301,12 @@ def get_collection_summary_by_id(
         None if no CollectionSummaryModel exists for the given ID.
     """
     collection_summary_model = collection_models.CollectionSummaryModel.get(
-        collection_id, strict=False)
+        collection_id, strict=False
+    )
     if collection_summary_model is None:
         return None
 
-    collection_summary = get_collection_summary_from_model(
-        collection_summary_model)
+    collection_summary = get_collection_summary_from_model(collection_summary_model)
     return collection_summary
 
 
@@ -330,7 +333,8 @@ def get_multiple_collections_by_id(
     result = {}
     uncached = []
     cache_result = caching_services.get_multi(
-        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids)
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids
+    )
 
     for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
@@ -339,8 +343,7 @@ def get_multiple_collections_by_id(
         if _id not in result:
             uncached.append(_id)
 
-    db_collection_models = collection_models.CollectionModel.get_multi(
-        uncached)
+    db_collection_models = collection_models.CollectionModel.get_multi(uncached)
     db_results_dict = {}
     not_found = []
     for index, cid in enumerate(uncached):
@@ -351,31 +354,31 @@ def get_multiple_collections_by_id(
         else:
             logging.info(
                 'Tried to fetch collection with id %s, but no such '
-                'collection exists in the datastore' % cid)
+                'collection exists in the datastore' % cid
+            )
             not_found.append(cid)
 
     if strict and not_found:
         raise ValueError(
             'Couldn\'t find collections with the following ids:\n%s'
-            % '\n'.join(not_found))
+            % '\n'.join(not_found)
+        )
 
-    cache_update = {
-        cid: val for cid, val in db_results_dict.items() if val is not None
-    }
+    cache_update = {cid: val for cid, val in db_results_dict.items() if val is not None}
 
     if cache_update:
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_COLLECTION, None, cache_update)
+            caching_services.CACHE_NAMESPACE_COLLECTION, None, cache_update
+        )
 
     result.update(db_results_dict)
     return result
 
 
 def get_collection_and_collection_rights_by_id(
-    collection_id: str
+    collection_id: str,
 ) -> Tuple[
-    Optional[collection_domain.Collection],
-    Optional[rights_domain.ActivityRights]
+    Optional[collection_domain.Collection], Optional[rights_domain.ActivityRights]
 ]:
     """Returns a tuple for collection domain object and collection rights
     object.
@@ -391,20 +394,20 @@ def get_collection_and_collection_rights_by_id(
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('CollectionModel', [collection_id]),
-                ('CollectionRightsModel', [collection_id])
-            ]))
+                ('CollectionRightsModel', [collection_id]),
+            ]
+        )
+    )
 
     collection = None
     if collection_and_rights[0][0] is not None:
-        collection = get_collection_from_model(
-            collection_and_rights[0][0])
+        collection = get_collection_from_model(collection_and_rights[0][0])
 
     collection_rights = None
     if collection_and_rights[1][0] is not None:
-        collection_rights = (
-            rights_manager.get_activity_rights_from_model(
-                collection_and_rights[1][0],
-                constants.ACTIVITY_TYPE_COLLECTION))
+        collection_rights = rights_manager.get_activity_rights_from_model(
+            collection_and_rights[1][0], constants.ACTIVITY_TYPE_COLLECTION
+        )
 
     return (collection, collection_rights)
 
@@ -420,7 +423,7 @@ def get_new_collection_id() -> str:
 
 # Query methods.
 def get_collection_titles_and_categories(
-    collection_ids: List[str]
+    collection_ids: List[str],
 ) -> Dict[str, Dict[str, str]]:
     """Returns collection titles and categories for the given ids.
 
@@ -437,7 +440,8 @@ def get_collection_titles_and_categories(
     """
     collection_list = [
         (get_collection_from_model(e) if e else None)
-        for e in collection_models.CollectionModel.get_multi(collection_ids)]
+        for e in collection_models.CollectionModel.get_multi(collection_ids)
+    ]
 
     result = {}
     for collection in collection_list:
@@ -451,9 +455,7 @@ def get_collection_titles_and_categories(
     return result
 
 
-def get_completed_exploration_ids(
-    user_id: str, collection_id: str
-) -> List[str]:
+def get_completed_exploration_ids(user_id: str, collection_id: str) -> List[str]:
     """Returns a list of explorations the user has completed within the context
     of the provided collection.
 
@@ -476,8 +478,7 @@ def get_completed_exploration_ids(
         the sake of this call, so it returns an empty list, indicating that no
         progress has yet been made.
     """
-    progress_model = user_models.CollectionProgressModel.get(
-        user_id, collection_id)
+    progress_model = user_models.CollectionProgressModel.get(user_id, collection_id)
     if progress_model:
         # TODO(#15621): The explicit declaration of type for ndb properties
         # should be removed. Currently, these ndb properties are annotated with
@@ -503,14 +504,16 @@ def get_explorations_completed_in_collections(
         collection.
     """
     progress_models = user_models.CollectionProgressModel.get_multi(
-        user_id, collection_ids)
+        user_id, collection_ids
+    )
 
     exploration_ids_completed_in_collections = []
 
     for progress_model in progress_models:
         if progress_model:
             exploration_ids_completed_in_collections.append(
-                progress_model.completed_explorations)
+                progress_model.completed_explorations
+            )
         else:
             exploration_ids_completed_in_collections.append([])
 
@@ -533,11 +536,9 @@ def get_valid_completed_exploration_ids(
         get_completed_exploration_ids which only includes explorations found
         within the current version of the collection.
     """
-    completed_exploration_ids = get_completed_exploration_ids(
-        user_id, collection.id)
+    completed_exploration_ids = get_completed_exploration_ids(user_id, collection.id)
     return [
-        exp_id for exp_id in completed_exploration_ids
-        if collection.get_node(exp_id)
+        exp_id for exp_id in completed_exploration_ids if collection.get_node(exp_id)
     ]
 
 
@@ -557,8 +558,7 @@ def get_next_exploration_id_to_complete_by_user(
         exploration if the user has yet to complete any explorations
         within the collection or None if the collection is completed.
     """
-    completed_exploration_ids = get_completed_exploration_ids(
-        user_id, collection_id)
+    completed_exploration_ids = get_completed_exploration_ids(user_id, collection_id)
 
     collection = get_collection_by_id(collection_id)
     if completed_exploration_ids:
@@ -580,7 +580,8 @@ def record_played_exploration_in_collection_context(
         exploration_id: str. ID of the given exploration.
     """
     progress_model = user_models.CollectionProgressModel.get_or_create(
-        user_id, collection_id)
+        user_id, collection_id
+    )
 
     if exploration_id not in progress_model.completed_explorations:
         progress_model.completed_explorations.append(exploration_id)
@@ -589,9 +590,7 @@ def record_played_exploration_in_collection_context(
 
 
 def get_collection_summary_dicts_from_models(
-    collection_summary_models: Iterable[
-        collection_models.CollectionSummaryModel
-    ]
+    collection_summary_models: Iterable[collection_models.CollectionSummaryModel],
 ) -> Dict[str, collection_domain.CollectionSummary]:
     """Given an iterable of CollectionSummaryModel instances, create a dict
     containing corresponding collection summary domain objects, keyed by id.
@@ -606,7 +605,8 @@ def get_collection_summary_dicts_from_models(
     """
     collection_summaries = [
         get_collection_summary_from_model(collection_summary_model)
-        for collection_summary_model in collection_summary_models]
+        for collection_summary_model in collection_summary_models
+    ]
     result = {}
     for collection_summary in collection_summaries:
         result[collection_summary.id] = collection_summary
@@ -614,7 +614,7 @@ def get_collection_summary_dicts_from_models(
 
 
 def get_collection_summaries_matching_ids(
-    collection_ids: List[str]
+    collection_ids: List[str],
 ) -> List[Optional[collection_domain.CollectionSummary]]:
     """Given a list of collection ids, return a list with the corresponding
     summary domain objects (or None if the corresponding summary does not
@@ -629,12 +629,12 @@ def get_collection_summaries_matching_ids(
     """
     return [
         (get_collection_summary_from_model(model) if model else None)
-        for model in collection_models.CollectionSummaryModel.get_multi(
-            collection_ids)]
+        for model in collection_models.CollectionSummaryModel.get_multi(collection_ids)
+    ]
 
 
 def get_collection_summaries_subscribed_to(
-    user_id: str
+    user_id: str,
 ) -> List[collection_domain.CollectionSummary]:
     """Returns a list of CollectionSummary domain objects that the user
     subscribes to.
@@ -647,15 +647,16 @@ def get_collection_summaries_subscribed_to(
         the user subscribes to.
     """
     return [
-        summary for summary in
-        get_collection_summaries_matching_ids(
+        summary
+        for summary in get_collection_summaries_matching_ids(
             subscription_services.get_collection_ids_subscribed_to(user_id)
-        ) if summary is not None
+        )
+        if summary is not None
     ]
 
 
 def get_collection_summaries_where_user_has_role(
-    user_id: str
+    user_id: str,
 ) -> List[collection_domain.CollectionSummary]:
     """Returns a list of CollectionSummary domain objects where the user has
     some role.
@@ -667,16 +668,16 @@ def get_collection_summaries_where_user_has_role(
         list(CollectionSummary). List of CollectionSummary domain objects
         where the user has some role.
     """
-    col_summary_models: Sequence[
-        collection_models.CollectionSummaryModel
-    ] = collection_models.CollectionSummaryModel.query(
-        datastore_services.any_of(
-            collection_models.CollectionSummaryModel.owner_ids == user_id,
-            collection_models.CollectionSummaryModel.editor_ids == user_id,
-            collection_models.CollectionSummaryModel.viewer_ids == user_id,
-            collection_models.CollectionSummaryModel.contributor_ids == user_id
-        )
-    ).fetch()
+    col_summary_models: Sequence[collection_models.CollectionSummaryModel] = (
+        collection_models.CollectionSummaryModel.query(
+            datastore_services.any_of(
+                collection_models.CollectionSummaryModel.owner_ids == user_id,
+                collection_models.CollectionSummaryModel.editor_ids == user_id,
+                collection_models.CollectionSummaryModel.viewer_ids == user_id,
+                collection_models.CollectionSummaryModel.contributor_ids == user_id,
+            )
+        ).fetch()
+    )
     return [
         get_collection_summary_from_model(col_summary_model)
         for col_summary_model in col_summary_models
@@ -687,7 +688,7 @@ def get_collection_ids_matching_query(
     query_string: str,
     categories: List[str],
     language_codes: List[str],
-    offset: Optional[int] = None
+    offset: Optional[int] = None,
 ) -> Tuple[List[str], Optional[int]]:
     """Returns a list with all collection ids matching the given search query
     string, as well as a search offset for future fetches.
@@ -720,24 +721,30 @@ def get_collection_ids_matching_query(
 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
-            returned_collection_ids)
+            returned_collection_ids
+        )
 
         collection_ids, search_offset = search_services.search_collections(
-            query_string, categories, language_codes, remaining_to_fetch,
-            offset=search_offset)
+            query_string,
+            categories,
+            language_codes,
+            remaining_to_fetch,
+            offset=search_offset,
+        )
 
         # Collection model cannot be None as we are fetching the collection ids
         # through query and there cannot be a collection id for which there is
         # no collection.
         for ind, _ in enumerate(
-                collection_models.CollectionSummaryModel.get_multi(
-                    collection_ids)):
+            collection_models.CollectionSummaryModel.get_multi(collection_ids)
+        ):
             returned_collection_ids.append(collection_ids[ind])
 
         # The number of collections in a page is always less than or equal to
         # feconf.SEARCH_RESULTS_PAGE_SIZE.
         if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
-                search_offset is None):
+            search_offset is None
+        ):
             break
 
     return (returned_collection_ids, search_offset)
@@ -746,7 +753,7 @@ def get_collection_ids_matching_query(
 # Repository SAVE and DELETE methods.
 def apply_change_list(
     collection_id: str,
-    change_list: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]]
+    change_list: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
 ) -> collection_domain.Collection:
     """Applies a changelist to a pristine collection and returns the result.
 
@@ -774,89 +781,80 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # CollectionChange to a specific change command.
                 add_collection_node_cmd = cast(
-                    collection_domain.AddCollectionNodeCmd,
-                    change
+                    collection_domain.AddCollectionNodeCmd, change
                 )
                 collection.add_node(add_collection_node_cmd.exploration_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
                 # Here we use cast because we are narrowing down the type from
                 # CollectionChange to a specific change command.
                 delete_collection_node_cmd = cast(
-                    collection_domain.DeleteCollectionNodeCmd,
-                    change
+                    collection_domain.DeleteCollectionNodeCmd, change
                 )
-                collection.delete_node(
-                    delete_collection_node_cmd.exploration_id
-                )
+                collection.delete_node(delete_collection_node_cmd.exploration_id)
             elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
                 # Here we use cast because we are narrowing down the type from
                 # CollectionChange to a specific change command.
                 swap_collection_nodes_cmd = cast(
-                    collection_domain.SwapCollectionNodesCmd,
-                    change
+                    collection_domain.SwapCollectionNodesCmd, change
                 )
                 collection.swap_nodes(
                     swap_collection_nodes_cmd.first_index,
-                    swap_collection_nodes_cmd.second_index
+                    swap_collection_nodes_cmd.second_index,
                 )
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if (change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_TITLE):
+                if change.property_name == collection_domain.COLLECTION_PROPERTY_TITLE:
                     # Here we use cast because this 'if' condition forces
                     # change to have type EditCollectionPropertyTitleCmd.
                     edit_collection_property_title_cmd = cast(
-                        collection_domain.EditCollectionPropertyTitleCmd,
-                        change
+                        collection_domain.EditCollectionPropertyTitleCmd, change
                     )
                     collection.update_title(
                         edit_collection_property_title_cmd.new_value
                     )
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
+                elif (
+                    change.property_name
+                    == collection_domain.COLLECTION_PROPERTY_CATEGORY
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyCategoryCmd.
                     edit_collection_property_category_cmd = cast(
-                        collection_domain.EditCollectionPropertyCategoryCmd,
-                        change
+                        collection_domain.EditCollectionPropertyCategoryCmd, change
                     )
                     collection.update_category(
                         edit_collection_property_category_cmd.new_value
                     )
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
+                elif (
+                    change.property_name
+                    == collection_domain.COLLECTION_PROPERTY_OBJECTIVE
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyObjectiveCmd.
                     edit_collection_property_objective_cmd = cast(
-                        collection_domain.EditCollectionPropertyObjectiveCmd,
-                        change
+                        collection_domain.EditCollectionPropertyObjectiveCmd, change
                     )
                     collection.update_objective(
                         edit_collection_property_objective_cmd.new_value
                     )
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                elif (
+                    change.property_name
+                    == collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyLanguageCodeCmd.
                     edit_collection_property_language_code_cmd = cast(
-                        collection_domain.EditCollectionPropertyLanguageCodeCmd,
-                        change
+                        collection_domain.EditCollectionPropertyLanguageCodeCmd, change
                     )
                     collection.update_language_code(
                         edit_collection_property_language_code_cmd.new_value
                     )
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_TAGS):
+                elif change.property_name == collection_domain.COLLECTION_PROPERTY_TAGS:
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditCollectionPropertyTagsCmd.
                     edit_collection_property_tags_cmd = cast(
-                        collection_domain.EditCollectionPropertyTagsCmd,
-                        change
+                        collection_domain.EditCollectionPropertyTagsCmd, change
                     )
-                    collection.update_tags(
-                        edit_collection_property_tags_cmd.new_value
-                    )
-            elif (change.cmd ==
-                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+                    collection.update_tags(edit_collection_property_tags_cmd.new_value)
+            elif change.cmd == collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -867,14 +865,13 @@ def apply_change_list(
 
     except Exception as e:
         logging.error(
-            '%s %s %s %s' % (
-                e.__class__.__name__, e, collection_id, change_list)
+            '%s %s %s %s' % (e.__class__.__name__, e, collection_id, change_list)
         )
         raise e
 
 
 def validate_exps_in_collection_are_public(
-    collection: collection_domain.Collection
+    collection: collection_domain.Collection,
 ) -> None:
     """Validates that explorations in a given collection are public.
 
@@ -889,14 +886,15 @@ def validate_exps_in_collection_are_public(
         if rights_manager.is_exploration_private(exploration_id):
             raise utils.ValidationError(
                 'Cannot reference a private exploration within a public '
-                'collection, exploration ID: %s' % exploration_id)
+                'collection, exploration ID: %s' % exploration_id
+            )
 
 
 def _save_collection(
     committer_id: str,
     collection: collection_domain.Collection,
     commit_message: Optional[str],
-    change_list: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]]
+    change_list: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
 ) -> None:
     """Validates a collection and commits it to persistent storage. If
     successful, increments the version number of the incoming collection domain
@@ -919,7 +917,8 @@ def _save_collection(
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
-            'save collection %s: %s' % (collection.id, change_list))
+            'save collection %s: %s' % (collection.id, change_list)
+        )
 
     collection_rights = rights_manager.get_collection_rights(collection.id)
     if collection_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
@@ -929,8 +928,7 @@ def _save_collection(
 
     # Validate that all explorations referenced by the collection exist.
     exp_ids = collection.exploration_ids
-    exp_summaries = (
-        exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
+    exp_summaries = exp_fetchers.get_exploration_summaries_matching_ids(exp_ids)
     exp_summaries_dict = {
         exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
     }
@@ -938,8 +936,9 @@ def _save_collection(
         if not exp_summaries_dict[collection_node.exploration_id]:
             raise utils.ValidationError(
                 'Expected collection to only reference valid explorations, '
-                'but found an exploration with ID: %s (was it deleted?)' %
-                collection_node.exploration_id)
+                'but found an exploration with ID: %s (was it deleted?)'
+                % collection_node.exploration_id
+            )
 
     # Ensure no explorations are being added that are 'below' the public status
     # of this collection. If the collection is private, it can have both
@@ -953,19 +952,20 @@ def _save_collection(
     # Collection model cannot be none as we are passing the collection as a
     # parameter and also this function is called by update_collection which only
     # works if the collection is put into the datastore.
-    collection_model = collection_models.CollectionModel.get(
-        collection.id, strict=True)
+    collection_model = collection_models.CollectionModel.get(collection.id, strict=True)
     if collection.version > collection_model.version:
         raise Exception(
             'Unexpected error: trying to update version %s of collection '
             'from version %s. Please reload the page and try again.'
-            % (collection_model.version, collection.version))
+            % (collection_model.version, collection.version)
+        )
 
     if collection.version < collection_model.version:
         raise Exception(
             'Trying to update version %s of collection from version %s, '
             'which is too old. Please reload the page and try again.'
-            % (collection_model.version, collection.version))
+            % (collection_model.version, collection.version)
+        )
 
     collection_model.category = collection.category
     collection_model.title = collection.title
@@ -974,13 +974,12 @@ def _save_collection(
     collection_model.tags = collection.tags
     collection_model.schema_version = collection.schema_version
     collection_model.collection_contents = {
-        'nodes': [
-            collection_node.to_dict() for collection_node in collection.nodes
-        ]
+        'nodes': [collection_node.to_dict() for collection_node in collection.nodes]
     }
     collection_model.commit(committer_id, commit_message, change_list)
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id])
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id]
+    )
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -990,7 +989,7 @@ def _create_collection(
     committer_id: str,
     collection: collection_domain.Collection,
     commit_message: str,
-    commit_cmds: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]]
+    commit_cmds: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
 ) -> None:
     """Creates a new collection, and ensures that rights for a new collection
     are saved first. This is because _save_collection() depends on the rights
@@ -1016,21 +1015,16 @@ def _create_collection(
         tags=collection.tags,
         schema_version=collection.schema_version,
         collection_contents={
-            'nodes': [
-                collection_node.to_dict()
-                for collection_node in collection.nodes
-            ]
+            'nodes': [collection_node.to_dict() for collection_node in collection.nodes]
         },
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
-    regenerate_collection_summary_with_new_contributor(
-        collection.id, committer_id)
+    regenerate_collection_summary_with_new_contributor(collection.id, committer_id)
 
 
 def save_new_collection(
-    committer_id: str,
-    collection: collection_domain.Collection
+    committer_id: str, collection: collection_domain.Collection
 ) -> None:
     """Saves a new collection.
 
@@ -1038,20 +1032,23 @@ def save_new_collection(
         committer_id: str. ID of the committer.
         collection: Collection. Collection to be saved.
     """
-    commit_message = (
-        'New collection created with title \'%s\'.' % collection.title)
+    commit_message = 'New collection created with title \'%s\'.' % collection.title
     _create_collection(
-        committer_id, collection, commit_message, [{
-            'cmd': CMD_CREATE_NEW,
-            'title': collection.title,
-            'category': collection.category,
-        }])
+        committer_id,
+        collection,
+        commit_message,
+        [
+            {
+                'cmd': CMD_CREATE_NEW,
+                'title': collection.title,
+                'category': collection.category,
+            }
+        ],
+    )
 
 
 def delete_collection(
-    committer_id: str,
-    collection_id: str,
-    force_deletion: bool = False
+    committer_id: str, collection_id: str, force_deletion: bool = False
 ) -> None:
     """Deletes the collection with the given collection_id.
 
@@ -1067,14 +1064,11 @@ def delete_collection(
             still retained in the datastore. This last option is the preferred
             one.
     """
-    delete_collections(
-        committer_id, [collection_id], force_deletion=force_deletion)
+    delete_collections(committer_id, [collection_id], force_deletion=force_deletion)
 
 
 def delete_collections(
-    committer_id: str,
-    collection_ids: List[str],
-    force_deletion: bool = False
+    committer_id: str, collection_ids: List[str], force_deletion: bool = False
 ) -> None:
     """Deletes the collections with the given collection_ids.
 
@@ -1090,16 +1084,20 @@ def delete_collections(
             models are still retained in the datastore.
     """
     collection_models.CollectionRightsModel.delete_multi(
-        collection_ids, committer_id, '', force_deletion=force_deletion)
+        collection_ids, committer_id, '', force_deletion=force_deletion
+    )
     collection_models.CollectionModel.delete_multi(
-        collection_ids, committer_id,
+        collection_ids,
+        committer_id,
         feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
-        force_deletion=force_deletion)
+        force_deletion=force_deletion,
+    )
 
     # This must come after the collection is retrieved. Otherwise the memcache
     # key will be reinstated.
     caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids)
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids
+    )
 
     # Delete the collection from search.
     search_services.delete_collections_from_search_index(collection_ids)
@@ -1110,11 +1108,12 @@ def delete_collections(
 
     # Remove the collection from the featured activity list, if necessary.
     activity_services.remove_featured_activities(
-        constants.ACTIVITY_TYPE_COLLECTION, collection_ids)
+        constants.ACTIVITY_TYPE_COLLECTION, collection_ids
+    )
 
 
 def get_collection_snapshots_metadata(
-    collection_id: str
+    collection_id: str,
 ) -> List[SnapshotsMetadataDict]:
     """Returns the snapshots for this collection, as dicts.
 
@@ -1133,7 +1132,8 @@ def get_collection_snapshots_metadata(
     version_nums = list(range(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
-        collection_id, version_nums)
+        collection_id, version_nums
+    )
 
 
 def publish_collection_and_update_user_profiles(
@@ -1157,24 +1157,16 @@ def publish_collection_and_update_user_profiles(
     collection_summary = get_collection_summary_by_id(collection_id)
     if collection_summary is None:
         raise Exception(
-            'No collection summary model exists for the given id: %s'
-            % collection_id
+            'No collection summary model exists for the given id: %s' % collection_id
         )
     contributor_ids = collection_summary.contributor_ids
     user_settings_models = []
     for contributor in contributor_ids:
-        user_settings = user_services.get_user_settings(
-            contributor,
-            strict=False
-        )
+        user_settings = user_services.get_user_settings(contributor, strict=False)
         if user_settings is not None:
-            user_settings.update_first_contribution_msec(
-                contribution_time_msec
-            )
+            user_settings.update_first_contribution_msec(contribution_time_msec)
             user_settings_models.append(
-                user_services.convert_to_user_settings_model(
-                    user_settings
-                )
+                user_services.convert_to_user_settings_model(user_settings)
             )
     datastore_services.update_timestamps_multi(user_settings_models)
     datastore_services.put_multi(user_settings_models)
@@ -1183,10 +1175,8 @@ def publish_collection_and_update_user_profiles(
 def update_collection(
     committer_id: str,
     collection_id: str,
-    change_list: Sequence[
-        Mapping[str, change_domain.AcceptableChangeDictTypes]
-    ],
-    commit_message: Optional[str]
+    change_list: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
+    commit_message: Optional[str],
 ) -> None:
     """Updates a collection. Commits changes.
 
@@ -1208,17 +1198,18 @@ def update_collection(
 
     if is_public and not commit_message:
         raise ValueError(
-            'Collection is public so expected a commit message but '
-            'received none.')
+            'Collection is public so expected a commit message but ' 'received none.'
+        )
 
     collection = apply_change_list(collection_id, change_list)
 
     _save_collection(committer_id, collection, commit_message, change_list)
-    regenerate_collection_summary_with_new_contributor(
-        collection.id, committer_id)
+    regenerate_collection_summary_with_new_contributor(collection.id, committer_id)
 
-    if (not rights_manager.is_collection_private(collection.id) and
-            committer_id != feconf.MIGRATION_BOT_USER_ID):
+    if (
+        not rights_manager.is_collection_private(collection.id)
+        and committer_id != feconf.MIGRATION_BOT_USER_ID
+    ):
         user_settings = user_services.get_user_settings(committer_id)
         if user_settings is not None:
             user_settings.update_first_contribution_msec(
@@ -1245,9 +1236,7 @@ def regenerate_collection_summary_with_new_contributor(
     save_collection_summary(collection_summary)
 
 
-def regenerate_collection_and_contributors_summaries(
-    collection_id: str
-) -> None:
+def regenerate_collection_and_contributors_summaries(collection_id: str) -> None:
     """Regenerate a summary of the given collection and also regenerate
     the contributors summary from the snapshots. If the summary does not exist,
     this function generates a new one.
@@ -1257,13 +1246,14 @@ def regenerate_collection_and_contributors_summaries(
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = _compute_summary_of_collection(collection)
-    collection_summary.contributors_summary = (
-        compute_collection_contributors_summary(collection_summary.id))
+    collection_summary.contributors_summary = compute_collection_contributors_summary(
+        collection_summary.id
+    )
     save_collection_summary(collection_summary)
 
 
 def _compute_summary_of_collection(
-    collection: collection_domain.Collection
+    collection: collection_domain.Collection,
 ) -> collection_domain.CollectionSummary:
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
@@ -1278,14 +1268,15 @@ def _compute_summary_of_collection(
         Exception. No data available for when the collection was last_updated.
         Exception. No data available for when the collection was created.
     """
-    collection_rights = collection_models.CollectionRightsModel.get_by_id(
-        collection.id)
-    collection_summary_model = (
-        collection_models.CollectionSummaryModel.get_by_id(collection.id))
+    collection_rights = collection_models.CollectionRightsModel.get_by_id(collection.id)
+    collection_summary_model = collection_models.CollectionSummaryModel.get_by_id(
+        collection.id
+    )
 
     contributors_summary = (
         collection_summary_model.contributors_summary
-        if collection_summary_model else {}
+        if collection_summary_model
+        else {}
     )
     contributor_ids = list(contributors_summary.keys())
 
@@ -1294,31 +1285,35 @@ def _compute_summary_of_collection(
     collection_model_node_count = len(collection.nodes)
 
     if collection_model_last_updated is None:
-        raise Exception(
-            'No data available for when the collection was last_updated.'
-        )
+        raise Exception('No data available for when the collection was last_updated.')
 
     if collection_model_created_on is None:
-        raise Exception(
-            'No data available for when the collection was created.'
-        )
+        raise Exception('No data available for when the collection was created.')
 
     collection_summary = collection_domain.CollectionSummary(
-        collection.id, collection.title, collection.category,
-        collection.objective, collection.language_code, collection.tags,
-        collection_rights.status, collection_rights.community_owned,
-        collection_rights.owner_ids, collection_rights.editor_ids,
-        collection_rights.viewer_ids, contributor_ids, contributors_summary,
-        collection.version, collection_model_node_count,
-        collection_model_created_on, collection_model_last_updated
+        collection.id,
+        collection.title,
+        collection.category,
+        collection.objective,
+        collection.language_code,
+        collection.tags,
+        collection_rights.status,
+        collection_rights.community_owned,
+        collection_rights.owner_ids,
+        collection_rights.editor_ids,
+        collection_rights.viewer_ids,
+        contributor_ids,
+        contributors_summary,
+        collection.version,
+        collection_model_node_count,
+        collection_model_created_on,
+        collection_model_last_updated,
     )
 
     return collection_summary
 
 
-def compute_collection_contributors_summary(
-    collection_id: str
-) -> Dict[str, int]:
+def compute_collection_contributors_summary(collection_id: str) -> Dict[str, int]:
     """Computes the contributors' summary for a given collection.
 
     Args:
@@ -1354,7 +1349,7 @@ def compute_collection_contributors_summary(
 
 
 def save_collection_summary(
-    collection_summary: collection_domain.CollectionSummary
+    collection_summary: collection_domain.CollectionSummary,
 ) -> None:
     """Save a collection summary domain object as a CollectionSummaryModel
     entity in the datastore.
@@ -1379,22 +1374,21 @@ def save_collection_summary(
         'version': collection_summary.version,
         'node_count': collection_summary.node_count,
         'collection_model_last_updated': (
-            collection_summary.collection_model_last_updated),
-        'collection_model_created_on': (
-            collection_summary.collection_model_created_on)
+            collection_summary.collection_model_last_updated
+        ),
+        'collection_model_created_on': (collection_summary.collection_model_created_on),
     }
 
-    collection_summary_model = (
-        collection_models.CollectionSummaryModel.get_by_id(
-            collection_summary.id))
+    collection_summary_model = collection_models.CollectionSummaryModel.get_by_id(
+        collection_summary.id
+    )
     if collection_summary_model is not None:
         collection_summary_model.populate(**collection_summary_dict)
         collection_summary_model.update_timestamps()
         collection_summary_model.put()
     else:
         collection_summary_dict['id'] = collection_summary.id
-        model = collection_models.CollectionSummaryModel(
-            **collection_summary_dict)
+        model = collection_models.CollectionSummaryModel(**collection_summary_dict)
         model.update_timestamps()
         model.put()
 
@@ -1406,14 +1400,11 @@ def delete_collection_summaries(collection_ids: List[str]) -> None:
         collection_ids: list(str). IDs of the collections whose collection
             summaries are to be deleted.
     """
-    summary_models = (
-        collection_models.CollectionSummaryModel.get_multi(collection_ids))
+    summary_models = collection_models.CollectionSummaryModel.get_multi(collection_ids)
     existing_summary_models = [
-        summary_model for summary_model in summary_models
-        if summary_model is not None
+        summary_model for summary_model in summary_models if summary_model is not None
     ]
-    collection_models.CollectionSummaryModel.delete_multi(
-        existing_summary_models)
+    collection_models.CollectionSummaryModel.delete_multi(existing_summary_models)
 
 
 def save_new_collection_from_yaml(
@@ -1429,18 +1420,23 @@ def save_new_collection_from_yaml(
     Returns:
         Collection. The domain object.
     """
-    collection = collection_domain.Collection.from_yaml(
-        collection_id, yaml_content)
+    collection = collection_domain.Collection.from_yaml(collection_id, yaml_content)
     commit_message = (
-        'New collection created from YAML file with title \'%s\'.'
-        % collection.title)
+        'New collection created from YAML file with title \'%s\'.' % collection.title
+    )
 
     _create_collection(
-        committer_id, collection, commit_message, [{
-            'cmd': CMD_CREATE_NEW,
-            'title': collection.title,
-            'category': collection.category,
-        }])
+        committer_id,
+        collection,
+        commit_message,
+        [
+            {
+                'cmd': CMD_CREATE_NEW,
+                'title': collection.title,
+                'category': collection.category,
+            }
+        ],
+    )
 
     return collection
 
@@ -1461,10 +1457,12 @@ def delete_demo(collection_id: str) -> None:
     if not collection:
         logging.info(
             'Collection with id %s was not deleted, because it '
-            'does not exist.' % collection_id)
+            'does not exist.' % collection_id
+        )
     else:
         delete_collection(
-            feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)
+            feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True
+        )
 
 
 def load_demo(collection_id: str) -> None:
@@ -1479,13 +1477,14 @@ def load_demo(collection_id: str) -> None:
     delete_demo(collection_id)
 
     demo_filepath = os.path.join(
-        feconf.SAMPLE_COLLECTIONS_DIR,
-        feconf.DEMO_COLLECTIONS[collection_id])
+        feconf.SAMPLE_COLLECTIONS_DIR, feconf.DEMO_COLLECTIONS[collection_id]
+    )
 
     yaml_content = utils.get_file_contents(demo_filepath)
 
     collection = save_new_collection_from_yaml(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id
+    )
 
     system_user = user_services.get_system_user()
     publish_collection_and_update_user_profiles(system_user, collection_id)
@@ -1510,6 +1509,10 @@ def index_collections_given_ids(collection_ids: List[str]) -> None:
             to be indexed.
     """
     collection_summaries = get_collection_summaries_matching_ids(collection_ids)
-    search_services.index_collection_summaries([
-        collection_summary for collection_summary in collection_summaries
-        if collection_summary is not None])
+    search_services.index_collection_summaries(
+        [
+            collection_summary
+            for collection_summary in collection_summaries
+            if collection_summary is not None
+        ]
+    )

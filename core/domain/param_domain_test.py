@@ -29,9 +29,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
     def setUp(self) -> None:
-        self.sample_customization_args: (
-            param_domain.CustomizationArgsDictWithValue
-        ) = {
+        self.sample_customization_args: param_domain.CustomizationArgsDictWithValue = {
             'value': '5',
             'parse_with_jinja': True,
         }
@@ -59,13 +57,9 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     def test_param_change_validation(self) -> None:
         """Test validation of parameter changes."""
         # Raise an error because the name is invalid.
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Only parameter names'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Only parameter names'):
             param_domain.ParamChange(
-                '¡hola',
-                'Copier',
-                self.sample_customization_args
+                '¡hola', 'Copier', self.sample_customization_args
             ).validate()
 
         # Raise an error because generator ID is not string.
@@ -76,25 +70,17 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             param_domain.ParamChange(
-                'abc',
-                123,  # type: ignore[arg-type]
-                self.sample_customization_args
+                'abc', 123, self.sample_customization_args  # type: ignore[arg-type]
             ).validate()
 
         # Raise an error because no such generator type exists.
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid generator ID'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Invalid generator ID'):
             param_domain.ParamChange(
-                'abc',
-                'InvalidGenerator',
-                self.sample_customization_args
+                'abc', 'InvalidGenerator', self.sample_customization_args
             ).validate()
 
         # Raise an error because customization_args is not a dict.
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected a dict'
-        ):
+        with self.assertRaisesRegex(utils.ValidationError, 'Expected a dict'):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
@@ -102,22 +88,20 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
         # Raise an error because the param_change name is not a string.
         with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected param_change name to be a string, received'
+            utils.ValidationError, 'Expected param_change name to be a string, received'
         ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             param_domain.ParamChange(
-                3,  # type: ignore[arg-type]
-                'Copier',
-                self.sample_customization_args
+                3, 'Copier', self.sample_customization_args  # type: ignore[arg-type]
             ).validate()
 
         # Raise an error because the arg names in customization_args are not
         # strings.
         with self.assertRaisesRegex(
-            Exception, 'Invalid parameter change customization_arg name:'):
+            Exception, 'Invalid parameter change customization_arg name:'
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
@@ -127,38 +111,38 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             ).validate()
 
     def test_param_spec_to_dict(self) -> None:
-        sample_dict = {
-            'obj_type': 'UnicodeString'
-        }
+        sample_dict = {'obj_type': 'UnicodeString'}
         param_spec = param_domain.ParamSpec(sample_dict['obj_type'])
         self.assertEqual(param_spec.to_dict(), sample_dict)
 
     def test_param_spec_from_dict(self) -> None:
-        sample_dict: param_domain.ParamSpecDict = {
-            'obj_type': 'UnicodeString'
-        }
+        sample_dict: param_domain.ParamSpecDict = {'obj_type': 'UnicodeString'}
         param_spec = param_domain.ParamSpec.from_dict(sample_dict)
         self.assertEqual(param_spec.to_dict(), sample_dict)
 
     def test_param_change_class(self) -> None:
         """Test the ParamChange class."""
         param_change = param_domain.ParamChange(
-            'abc', 'Copier', {'value': '3', 'parse_with_jinja': True})
+            'abc', 'Copier', {'value': '3', 'parse_with_jinja': True}
+        )
         param_change.validate()
         self.assertEqual(param_change.name, 'abc')
         self.assertEqual(param_change.generator.id, 'Copier')
-        self.assertEqual(param_change.to_dict(), {
-            'name': 'abc',
-            'generator_id': 'Copier',
-            'customization_args': {'value': '3', 'parse_with_jinja': True}
-        })
+        self.assertEqual(
+            param_change.to_dict(),
+            {
+                'name': 'abc',
+                'generator_id': 'Copier',
+                'customization_args': {'value': '3', 'parse_with_jinja': True},
+            },
+        )
         self.assertEqual(param_change.get_value({}), '3')
 
     def test_param_change_from_dict(self) -> None:
         sample_dict: param_domain.ParamChangeDict = {
             'name': 'abc',
             'generator_id': 'Copier',
-            'customization_args': self.sample_customization_args
+            'customization_args': self.sample_customization_args,
         }
         param_change = param_domain.ParamChange.from_dict(sample_dict)
         param_change.validate()

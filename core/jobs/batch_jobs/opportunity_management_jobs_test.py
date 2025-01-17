@@ -30,7 +30,7 @@ from core.platform import models
 from typing import Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
@@ -45,24 +45,26 @@ if MYPY: # pragma: no cover
     story_models,
     topic_models,
     skill_models,
-    question_models
-) = models.Registry.import_models([
-    models.Names.EXPLORATION,
-    models.Names.OPPORTUNITY,
-    models.Names.STORY,
-    models.Names.TOPIC,
-    models.Names.SKILL,
-    models.Names.QUESTION
-])
+    question_models,
+) = models.Registry.import_models(
+    [
+        models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
+        models.Names.STORY,
+        models.Names.TOPIC,
+        models.Names.SKILL,
+        models.Names.QUESTION,
+    ]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
 
 class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[opportunity_management_jobs.DeleteSkillOpportunityModelJob] = (
         opportunity_management_jobs.DeleteSkillOpportunityModelJob
-    ] = opportunity_management_jobs.DeleteSkillOpportunityModelJob
+    )
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -86,23 +88,23 @@ class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
         skill_opportunity_model_2.put()
 
         all_skill_opportunity_models = list(
-            opportunity_models.SkillOpportunityModel.get_all())
+            opportunity_models.SkillOpportunityModel.get_all()
+        )
         self.assertEqual(len(all_skill_opportunity_models), 2)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 2')])
 
         all_skill_opportunity_models = list(
-            opportunity_models.SkillOpportunityModel.get_all())
+            opportunity_models.SkillOpportunityModel.get_all()
+        )
         self.assertEqual(len(all_skill_opportunity_models), 0)
 
 
 class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[opportunity_management_jobs.GenerateSkillOpportunityModelJob] = (
         opportunity_management_jobs.GenerateSkillOpportunityModelJob
-    ] = opportunity_management_jobs.GenerateSkillOpportunityModelJob
+    )
 
     SKILL_1_ID: Final = 'skill_1'
     SKILL_1_DESCRIPTION: Final = 'skill 1'
@@ -118,14 +120,14 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_1_ID,
             skill_id=self.SKILL_1_ID,
-            skill_difficulty=1
+            skill_difficulty=1,
         )
 
         question_skill_link_model_2 = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_2_ID,
             skill_id=self.SKILL_2_ID,
-            skill_difficulty=1
+            skill_difficulty=1,
         )
         question_skill_link_model_1.update_timestamps()
         question_skill_link_model_2.update_timestamps()
@@ -143,26 +145,18 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
                     'content_id': 'explanation',
                 },
                 'worked_examples': [],
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {}
-                },
+                'recorded_voiceovers': {'voiceovers_mapping': {}},
                 'written_translations': {
-                    'translations_mapping': {
-                        'content': {},
-                        'default_outcome': {}
-                    }
-                }
+                    'translations_mapping': {'content': {}, 'default_outcome': {}}
+                },
             },
             next_misconception_id=0,
-            misconceptions_schema_version=feconf
-                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf
-                .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf
-                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             superseding_skill_id='blah',
             all_questions_merged=False,
-            prerequisite_skill_ids=[]
+            prerequisite_skill_ids=[],
         )
 
         skill_2_model = self.create_model(
@@ -178,166 +172,160 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
                     'content_id': 'explanation',
                 },
                 'worked_examples': [],
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {}
-                },
+                'recorded_voiceovers': {'voiceovers_mapping': {}},
                 'written_translations': {
-                    'translations_mapping': {
-                        'content': {},
-                        'default_outcome': {}
-                    }
-                }
+                    'translations_mapping': {'content': {}, 'default_outcome': {}}
+                },
             },
             next_misconception_id=0,
-            misconceptions_schema_version=feconf
-                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf
-                .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf
-                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             superseding_skill_id='blah',
             all_questions_merged=False,
-            prerequisite_skill_ids=[]
+            prerequisite_skill_ids=[],
         )
         skill_1_model.update_timestamps()
         skill_2_model.update_timestamps()
 
-        datastore_services.put_multi([
-            skill_1_model,
-            skill_2_model,
-            question_skill_link_model_1,
-            question_skill_link_model_2
-        ])
+        datastore_services.put_multi(
+            [
+                skill_1_model,
+                skill_2_model,
+                question_skill_link_model_1,
+                question_skill_link_model_2,
+            ]
+        )
 
     def test_generation_job_creates_new_models(self) -> None:
         all_opportunity_models = list(
-            opportunity_models.SkillOpportunityModel.get_all())
+            opportunity_models.SkillOpportunityModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 2')])
 
-        opportunity_model_1 = (
-            opportunity_models.SkillOpportunityModel.get(
-                self.SKILL_1_ID))
+        opportunity_model_1 = opportunity_models.SkillOpportunityModel.get(
+            self.SKILL_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert opportunity_model_1 is not None
         self.assertEqual(opportunity_model_1.id, self.SKILL_1_ID)
         self.assertEqual(
-            opportunity_model_1.skill_description,
-            self.SKILL_1_DESCRIPTION)
+            opportunity_model_1.skill_description, self.SKILL_1_DESCRIPTION
+        )
         self.assertEqual(opportunity_model_1.question_count, 1)
 
-        opportunity_model_2 = (
-            opportunity_models.SkillOpportunityModel.get(
-                self.SKILL_2_ID))
+        opportunity_model_2 = opportunity_models.SkillOpportunityModel.get(
+            self.SKILL_2_ID
+        )
         assert opportunity_model_2 is not None
         self.assertEqual(opportunity_model_2.id, self.SKILL_2_ID)
         self.assertEqual(
-            opportunity_model_2.skill_description,
-            self.SKILL_2_DESCRIPTION)
+            opportunity_model_2.skill_description, self.SKILL_2_DESCRIPTION
+        )
         self.assertEqual(opportunity_model_2.question_count, 1)
 
     def test_generation_job_does_not_count_duplicate_question_ids(self) -> None:
         all_opportunity_models = list(
-            opportunity_models.SkillOpportunityModel.get_all())
+            opportunity_models.SkillOpportunityModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
         question_1_duplicate_skilllinkmodel = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_1_ID,
             skill_id=self.SKILL_1_ID,
-            skill_difficulty=1
+            skill_difficulty=1,
         )
         question_1_duplicate_skilllinkmodel.update_timestamps()
         datastore_services.put_multi([question_1_duplicate_skilllinkmodel])
 
-        all_skill_link_models = list(
-            question_models.QuestionSkillLinkModel.get_all())
+        all_skill_link_models = list(question_models.QuestionSkillLinkModel.get_all())
         self.assertEqual(len(all_skill_link_models), 3)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 2')])
 
-        opportunity_model_1 = (
-            opportunity_models.SkillOpportunityModel.get(
-                self.SKILL_1_ID))
+        opportunity_model_1 = opportunity_models.SkillOpportunityModel.get(
+            self.SKILL_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert opportunity_model_1 is not None
         self.assertEqual(opportunity_model_1.id, self.SKILL_1_ID)
         self.assertEqual(
-            opportunity_model_1.skill_description,
-            self.SKILL_1_DESCRIPTION)
+            opportunity_model_1.skill_description, self.SKILL_1_DESCRIPTION
+        )
         self.assertEqual(opportunity_model_1.question_count, 1)
 
-        opportunity_model_2 = (
-            opportunity_models.SkillOpportunityModel.get(
-                self.SKILL_2_ID))
+        opportunity_model_2 = opportunity_models.SkillOpportunityModel.get(
+            self.SKILL_2_ID
+        )
         assert opportunity_model_2 is not None
         self.assertEqual(opportunity_model_2.id, self.SKILL_2_ID)
         self.assertEqual(
-            opportunity_model_2.skill_description,
-            self.SKILL_2_DESCRIPTION)
+            opportunity_model_2.skill_description, self.SKILL_2_DESCRIPTION
+        )
         self.assertEqual(opportunity_model_2.question_count, 1)
 
     def test_generation_job_counts_multiple_questions(self) -> None:
         all_opportunity_models = list(
-            opportunity_models.SkillOpportunityModel.get_all())
+            opportunity_models.SkillOpportunityModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
         question_skill_link_model_1 = self.create_model(
             question_models.QuestionSkillLinkModel,
             question_id=self.QUESTION_1_ID,
             skill_id=self.SKILL_2_ID,
-            skill_difficulty=1
+            skill_difficulty=1,
         )
         question_skill_link_model_1.update_timestamps()
         datastore_services.put_multi([question_skill_link_model_1])
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 2')])
 
-        opportunity_model_1 = (
-            opportunity_models.SkillOpportunityModel.get(
-                self.SKILL_1_ID))
+        opportunity_model_1 = opportunity_models.SkillOpportunityModel.get(
+            self.SKILL_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert opportunity_model_1 is not None
         self.assertEqual(opportunity_model_1.id, self.SKILL_1_ID)
         self.assertEqual(
-            opportunity_model_1.skill_description,
-            self.SKILL_1_DESCRIPTION)
+            opportunity_model_1.skill_description, self.SKILL_1_DESCRIPTION
+        )
         self.assertEqual(opportunity_model_1.question_count, 1)
 
-        opportunity_model_2 = (
-            opportunity_models.SkillOpportunityModel.get(
-                self.SKILL_2_ID))
+        opportunity_model_2 = opportunity_models.SkillOpportunityModel.get(
+            self.SKILL_2_ID
+        )
         assert opportunity_model_2 is not None
         self.assertEqual(opportunity_model_2.id, self.SKILL_2_ID)
         self.assertEqual(
-            opportunity_model_2.skill_description,
-            self.SKILL_2_DESCRIPTION)
+            opportunity_model_2.skill_description, self.SKILL_2_DESCRIPTION
+        )
         self.assertEqual(opportunity_model_2.question_count, 2)
 
     def test_generation_job_fails_when_validation_failure(self) -> None:
         all_opportunity_models = list(
-            opportunity_models.SkillOpportunityModel.get_all())
+            opportunity_models.SkillOpportunityModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
         with self.swap(
             opportunity_management_jobs.GenerateSkillOpportunityModelJob,
             '_count_unique_question_ids',
-            lambda _: -1
+            lambda _: -1,
         ):
 
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stdout='', stderr='ERROR: \"Expected question_count to be '
-                    'a non-negative integer, received -1\": 2'
-                )
-            ])
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='',
+                        stderr='ERROR: \"Expected question_count to be '
+                        'a non-negative integer, received -1\": 2',
+                    )
+                ]
+            )
 
 
 class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
@@ -362,7 +350,8 @@ class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
             incomplete_translation_language_codes=['cs'],
             translation_counts=321,
             language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=['fr'])
+            language_codes_with_assigned_voice_artists=['fr'],
+        )
         opportunity_model_1.update_timestamps()
         opportunity_model_1.put()
         opportunity_model_2 = self.create_model(
@@ -377,36 +366,32 @@ class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
             incomplete_translation_language_codes=['cs'],
             translation_counts=321,
             language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=['fr'])
+            language_codes_with_assigned_voice_artists=['fr'],
+        )
         opportunity_model_2.update_timestamps()
         opportunity_model_2.put()
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 2)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 2')])
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
 
-class GenerateExplorationOpportunitySummariesJobTests(
-    job_test_utils.JobTestBase):
+class GenerateExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob
     ] = opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob
 
-    VALID_USER_ID_1: Final = 'uid_%s' % (
-        'a' * feconf.USER_ID_RANDOM_PART_LENGTH
-    )
-    VALID_USER_ID_2: Final = 'uid_%s' % (
-        'b' * feconf.USER_ID_RANDOM_PART_LENGTH
-    )
+    VALID_USER_ID_1: Final = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    VALID_USER_ID_2: Final = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
     TOPIC_1_ID: Final = 'topic_1_id'
@@ -427,15 +412,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            canonical_story_references=[{
-                'story_id': self.STORY_1_ID,
-                'story_is_published': False
-            }],
-            page_title_fragment_for_web='fragm'
+            canonical_story_references=[
+                {'story_id': self.STORY_1_ID, 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='fragm',
         )
         self.topic_model.update_timestamps()
         topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel, id=self.TOPIC_1_ID)
+            topic_models.TopicRightsModel, id=self.TOPIC_1_ID
+        )
         topic_rights_model.update_timestamps()
 
         story_model = self.create_model(
@@ -447,21 +432,24 @@ class GenerateExplorationOpportunitySummariesJobTests(
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='story',
             story_contents={
-                'nodes': [{
-                    'id': 'node',
-                    'outline': 'outline',
-                    'title': 'node title',
-                    'description': 'description',
-                    'destination_node_ids': ['123'],
-                    'acquired_skill_ids': [],
-                    'exploration_id': self.EXP_1_ID,
-                    'prerequisite_skill_ids': [],
-                    'outline_is_finalized': True
-                }],
+                'nodes': [
+                    {
+                        'id': 'node',
+                        'outline': 'outline',
+                        'title': 'node title',
+                        'description': 'description',
+                        'destination_node_ids': ['123'],
+                        'acquired_skill_ids': [],
+                        'exploration_id': self.EXP_1_ID,
+                        'prerequisite_skill_ids': [],
+                        'outline_is_finalized': True,
+                    }
+                ],
                 'initial_node_id': 'abc',
-                'next_node_id': 'efg'
+                'next_node_id': 'efg',
             },
-            notes='note')
+            notes='note',
+        )
         story_model.update_timestamps()
 
         exp_model = self.create_model(
@@ -475,17 +463,16 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state': state_domain.State.create_default_state(
-                    'state', 'content_0', 'default_outcome_1',
-                    is_initial_state=True
+                    'state', 'content_0', 'default_outcome_1', is_initial_state=True
                 ).to_dict()
             },
-            next_content_id_index=2
+            next_content_id_index=2,
         )
         exp_model.states['state']['content']['html'] = 'A text for translation'
         exp_model.update_timestamps()
-        datastore_services.put_multi([
-            exp_model, story_model, self.topic_model, topic_rights_model
-        ])
+        datastore_services.put_multi(
+            [exp_model, story_model, self.topic_model, topic_rights_model]
+        )
 
     def test_empty_storage(self) -> None:
         self.topic_model.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
@@ -493,16 +480,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
 
     def test_generation_job_returns_initial_opportunity(self) -> None:
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 1')])
 
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
-                self.EXP_1_ID))
+        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            self.EXP_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert opportunity_model is not None
         self.assertEqual(opportunity_model.topic_id, self.TOPIC_1_ID)
@@ -513,18 +499,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.content_count, 1)
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'},
+        )
         self.assertEqual(opportunity_model.translation_counts, {})
-        self.assertEqual(
-            opportunity_model.language_codes_needing_voice_artists, ['cs'])
+        self.assertEqual(opportunity_model.language_codes_needing_voice_artists, ['cs'])
 
-    def test_generation_job_returns_multiple_opportunities_for_one_topic(
-        self
-    ) -> None:
-        self.topic_model.canonical_story_references.append({
-            'story_id': self.STORY_2_ID,
-            'story_is_published': False
-        })
+    def test_generation_job_returns_multiple_opportunities_for_one_topic(self) -> None:
+        self.topic_model.canonical_story_references.append(
+            {'story_id': self.STORY_2_ID, 'story_is_published': False}
+        )
         self.topic_model.update_timestamps()
 
         story_model = self.create_model(
@@ -536,21 +519,24 @@ class GenerateExplorationOpportunitySummariesJobTests(
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='story',
             story_contents={
-                'nodes': [{
-                    'id': 'node',
-                    'outline': 'outline',
-                    'title': 'node 2 title',
-                    'description': 'description',
-                    'destination_node_ids': ['123'],
-                    'acquired_skill_ids': [],
-                    'exploration_id': self.EXP_2_ID,
-                    'prerequisite_skill_ids': [],
-                    'outline_is_finalized': True
-                }],
+                'nodes': [
+                    {
+                        'id': 'node',
+                        'outline': 'outline',
+                        'title': 'node 2 title',
+                        'description': 'description',
+                        'destination_node_ids': ['123'],
+                        'acquired_skill_ids': [],
+                        'exploration_id': self.EXP_2_ID,
+                        'prerequisite_skill_ids': [],
+                        'outline_is_finalized': True,
+                    }
+                ],
                 'initial_node_id': 'abc',
-                'next_node_id': 'efg'
+                'next_node_id': 'efg',
             },
-            notes='note')
+            notes='note',
+        )
         story_model.update_timestamps()
 
         exp_model = self.create_model(
@@ -564,14 +550,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state1': state_domain.State.create_default_state(
-                    'state1', 'content_0', 'default_outcome_1',
-                    is_initial_state=True
+                    'state1', 'content_0', 'default_outcome_1', is_initial_state=True
                 ).to_dict(),
                 'state2': state_domain.State.create_default_state(
-                    'state2', 'content_2', 'default_outcome_3',
-                ).to_dict()
+                    'state2',
+                    'content_2',
+                    'default_outcome_3',
+                ).to_dict(),
             },
-            next_content_id_index=4
+            next_content_id_index=4,
         )
         exp_model.states['state1']['content']['html'] = 'A text for translation'
         exp_model.states['state2']['content']['html'] = 'A text for translation'
@@ -579,20 +566,20 @@ class GenerateExplorationOpportunitySummariesJobTests(
         datastore_services.put_multi([self.topic_model, exp_model, story_model])
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 1')])
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 2)
 
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
-                self.EXP_2_ID))
+        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            self.EXP_2_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert opportunity_model is not None
         self.assertEqual(opportunity_model.topic_id, self.TOPIC_1_ID)
@@ -603,13 +590,13 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.content_count, 2)
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'},
+        )
         self.assertEqual(opportunity_model.translation_counts, {})
-        self.assertEqual(
-            opportunity_model.language_codes_needing_voice_artists, ['en'])
+        self.assertEqual(opportunity_model.language_codes_needing_voice_artists, ['en'])
 
     def test_job_returns_one_opportunity_for_multiple_topics_with_same_exp(
-        self
+        self,
     ) -> None:
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -621,15 +608,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            canonical_story_references=[{
-                'story_id': self.STORY_2_ID,
-                'story_is_published': False
-            }],
-            page_title_fragment_for_web='fragm'
+            canonical_story_references=[
+                {'story_id': self.STORY_2_ID, 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='fragm',
         )
         topic_model.update_timestamps()
         topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel, id=self.TOPIC_2_ID)
+            topic_models.TopicRightsModel, id=self.TOPIC_2_ID
+        )
         topic_rights_model.update_timestamps()
 
         story_model = self.create_model(
@@ -641,38 +628,41 @@ class GenerateExplorationOpportunitySummariesJobTests(
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='story',
             story_contents={
-                'nodes': [{
-                    'id': 'node',
-                    'outline': 'outline',
-                    'title': 'node 2 title',
-                    'description': 'description',
-                    'destination_node_ids': ['123'],
-                    'acquired_skill_ids': [],
-                    'exploration_id': self.EXP_1_ID,
-                    'prerequisite_skill_ids': [],
-                    'outline_is_finalized': True
-                }],
+                'nodes': [
+                    {
+                        'id': 'node',
+                        'outline': 'outline',
+                        'title': 'node 2 title',
+                        'description': 'description',
+                        'destination_node_ids': ['123'],
+                        'acquired_skill_ids': [],
+                        'exploration_id': self.EXP_1_ID,
+                        'prerequisite_skill_ids': [],
+                        'outline_is_finalized': True,
+                    }
+                ],
                 'initial_node_id': 'abc',
-                'next_node_id': 'efg'
+                'next_node_id': 'efg',
             },
-            notes='note')
+            notes='note',
+        )
         story_model.update_timestamps()
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 1')])
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 1)
 
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
-                self.EXP_1_ID))
+        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            self.EXP_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert opportunity_model is not None
         self.assertEqual(opportunity_model.topic_id, self.TOPIC_1_ID)
@@ -683,40 +673,44 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.content_count, 1)
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'},
+        )
         self.assertEqual(opportunity_model.translation_counts, {})
-        self.assertEqual(
-            opportunity_model.language_codes_needing_voice_artists, ['cs'])
+        self.assertEqual(opportunity_model.language_codes_needing_voice_artists, ['cs'])
 
     def test_generation_job_fails_when_story_id_is_not_available(self) -> None:
-        self.topic_model.canonical_story_references.append({
-            'story_id': 'missing_id',
-            'story_is_published': False
-        })
+        self.topic_model.canonical_story_references.append(
+            {'story_id': 'missing_id', 'story_is_published': False}
+        )
         self.topic_model.update_timestamps()
         datastore_services.put_multi([self.topic_model])
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stderr=(
-                'ERROR: "Failed to regenerate opportunities for topic id: '
-                'topic_1_id, missing_exp_with_ids: [], '
-                'missing_story_with_ids: [\'missing_id\']": 1'
-            ))
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'ERROR: "Failed to regenerate opportunities for topic id: '
+                        'topic_1_id, missing_exp_with_ids: [], '
+                        'missing_story_with_ids: [\'missing_id\']": 1'
+                    )
+                )
+            ]
+        )
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
     def test_generation_job_fails_when_exp_id_is_not_available(self) -> None:
-        self.topic_model.canonical_story_references.append({
-            'story_id': self.STORY_2_ID,
-            'story_is_published': False
-        })
+        self.topic_model.canonical_story_references.append(
+            {'story_id': self.STORY_2_ID, 'story_is_published': False}
+        )
         self.topic_model.update_timestamps()
 
         story_model = self.create_model(
@@ -728,43 +722,52 @@ class GenerateExplorationOpportunitySummariesJobTests(
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='story',
             story_contents={
-                'nodes': [{
-                    'id': 'node',
-                    'outline': 'outline',
-                    'title': 'node 2 title',
-                    'description': 'description',
-                    'destination_node_ids': ['123'],
-                    'acquired_skill_ids': [],
-                    'exploration_id': 'missing_id',
-                    'prerequisite_skill_ids': [],
-                    'outline_is_finalized': True
-                }],
+                'nodes': [
+                    {
+                        'id': 'node',
+                        'outline': 'outline',
+                        'title': 'node 2 title',
+                        'description': 'description',
+                        'destination_node_ids': ['123'],
+                        'acquired_skill_ids': [],
+                        'exploration_id': 'missing_id',
+                        'prerequisite_skill_ids': [],
+                        'outline_is_finalized': True,
+                    }
+                ],
                 'initial_node_id': 'abc',
-                'next_node_id': 'efg'
+                'next_node_id': 'efg',
             },
-            notes='note')
+            notes='note',
+        )
         story_model.update_timestamps()
 
         datastore_services.put_multi([self.topic_model, story_model])
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stderr=(
-                'ERROR: "Failed to regenerate opportunities for topic id: '
-                'topic_1_id, missing_exp_with_ids: [\'missing_id\'], '
-                'missing_story_with_ids: []": 1'
-            ))
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'ERROR: "Failed to regenerate opportunities for topic id: '
+                        'topic_1_id, missing_exp_with_ids: [\'missing_id\'], '
+                        'missing_story_with_ids: []": 1'
+                    )
+                )
+            ]
+        )
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
     def test_generation_job_returns_multiple_opportunities_for_multiple_topics(
-        self
+        self,
     ) -> None:
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -776,15 +779,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            canonical_story_references=[{
-                'story_id': self.STORY_2_ID,
-                'story_is_published': False
-            }],
+            canonical_story_references=[
+                {'story_id': self.STORY_2_ID, 'story_is_published': False}
+            ],
             page_title_fragment_for_web='fragm',
         )
         topic_model.update_timestamps()
         topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel, id=self.TOPIC_2_ID)
+            topic_models.TopicRightsModel, id=self.TOPIC_2_ID
+        )
         topic_rights_model.update_timestamps()
 
         story_model = self.create_model(
@@ -796,21 +799,24 @@ class GenerateExplorationOpportunitySummariesJobTests(
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='story',
             story_contents={
-                'nodes': [{
-                    'id': 'node',
-                    'outline': 'outline',
-                    'title': 'node 2 title',
-                    'description': 'description',
-                    'destination_node_ids': ['123'],
-                    'acquired_skill_ids': [],
-                    'exploration_id': self.EXP_2_ID,
-                    'prerequisite_skill_ids': [],
-                    'outline_is_finalized': True
-                }],
+                'nodes': [
+                    {
+                        'id': 'node',
+                        'outline': 'outline',
+                        'title': 'node 2 title',
+                        'description': 'description',
+                        'destination_node_ids': ['123'],
+                        'acquired_skill_ids': [],
+                        'exploration_id': self.EXP_2_ID,
+                        'prerequisite_skill_ids': [],
+                        'outline_is_finalized': True,
+                    }
+                ],
                 'initial_node_id': 'abc',
-                'next_node_id': 'efg'
+                'next_node_id': 'efg',
             },
-            notes='note')
+            notes='note',
+        )
         story_model.update_timestamps()
 
         exp_model = self.create_model(
@@ -824,37 +830,38 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state1': state_domain.State.create_default_state(
-                    'state1', 'content_0', 'default_outcome_1',
-                    is_initial_state=True
+                    'state1', 'content_0', 'default_outcome_1', is_initial_state=True
                 ).to_dict(),
                 'state2': state_domain.State.create_default_state(
-                    'state2', 'content_2', 'default_outcome_3',
-                ).to_dict()
+                    'state2',
+                    'content_2',
+                    'default_outcome_3',
+                ).to_dict(),
             },
-            next_content_id_index=4
+            next_content_id_index=4,
         )
         exp_model.states['state1']['content']['html'] = 'A text for translation'
         exp_model.states['state2']['content']['html'] = 'A text for translation'
         exp_model.update_timestamps()
-        datastore_services.put_multi([
-            exp_model, story_model, topic_model, topic_rights_model
-        ])
+        datastore_services.put_multi(
+            [exp_model, story_model, topic_model, topic_rights_model]
+        )
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 0)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2')
-        ])
+        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 2')])
 
         all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
         self.assertEqual(len(all_opportunity_models), 2)
 
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get(
-                self.EXP_2_ID))
+        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            self.EXP_2_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert opportunity_model is not None
         self.assertEqual(opportunity_model.topic_id, self.TOPIC_2_ID)
@@ -865,10 +872,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.content_count, 2)
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
+            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'},
+        )
         self.assertEqual(opportunity_model.translation_counts, {})
-        self.assertEqual(
-            opportunity_model.language_codes_needing_voice_artists, ['en'])
+        self.assertEqual(opportunity_model.language_codes_needing_voice_artists, ['en'])
 
     def test_job_correctly_reports_opportunity_generation_errors(self) -> None:
         topic_model = self.create_model(
@@ -881,15 +888,15 @@ class GenerateExplorationOpportunitySummariesJobTests(
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            canonical_story_references=[{
-                'story_id': self.STORY_2_ID,
-                'story_is_published': False
-            }],
+            canonical_story_references=[
+                {'story_id': self.STORY_2_ID, 'story_is_published': False}
+            ],
             page_title_fragment_for_web='fragm',
         )
         topic_model.update_timestamps()
         topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel, id=self.TOPIC_2_ID)
+            topic_models.TopicRightsModel, id=self.TOPIC_2_ID
+        )
         topic_rights_model.update_timestamps()
 
         story_model = self.create_model(
@@ -901,21 +908,24 @@ class GenerateExplorationOpportunitySummariesJobTests(
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='story',
             story_contents={
-                'nodes': [{
-                    'id': 'node',
-                    'outline': 'outline',
-                    'title': 'node 2 title',
-                    'description': 'description',
-                    'destination_node_ids': ['123'],
-                    'acquired_skill_ids': [],
-                    'exploration_id': self.EXP_2_ID,
-                    'prerequisite_skill_ids': [],
-                    'outline_is_finalized': True
-                }],
+                'nodes': [
+                    {
+                        'id': 'node',
+                        'outline': 'outline',
+                        'title': 'node 2 title',
+                        'description': 'description',
+                        'destination_node_ids': ['123'],
+                        'acquired_skill_ids': [],
+                        'exploration_id': self.EXP_2_ID,
+                        'prerequisite_skill_ids': [],
+                        'outline_is_finalized': True,
+                    }
+                ],
                 'initial_node_id': 'abc',
-                'next_node_id': 'efg'
+                'next_node_id': 'efg',
             },
-            notes='note')
+            notes='note',
+        )
         story_model.update_timestamps()
 
         exp_model = self.create_model(
@@ -929,32 +939,34 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state1': state_domain.State.create_default_state(
-                    'state1', 'content_0', 'default_outcome_1',
-                    is_initial_state=True
+                    'state1', 'content_0', 'default_outcome_1', is_initial_state=True
                 ).to_dict(),
                 'state2': state_domain.State.create_default_state(
-                    'state2', 'content_2', 'default_outcome_3',
-                ).to_dict()
+                    'state2',
+                    'content_2',
+                    'default_outcome_3',
+                ).to_dict(),
             },
-            next_content_id_index=4
+            next_content_id_index=4,
         )
         exp_model.states['state1']['content']['html'] = 'A text for translation'
         exp_model.states['state2']['content']['html'] = 'A text for translation'
         exp_model.update_timestamps()
-        datastore_services.put_multi([
-            exp_model, story_model, topic_model, topic_rights_model
-        ])
+        datastore_services.put_multi(
+            [exp_model, story_model, topic_model, topic_rights_model]
+        )
 
         with self.swap_to_always_raise(
             opportunity_services,
             'create_exp_opportunity_summary',
-            Exception('Error generating opportunity')
+            Exception('Error generating opportunity'),
         ):
             error_template = (
-                'ERROR: '
-                '"(\'%s\', Exception(\'Error generating opportunity\'))": 1'
+                'ERROR: ' '"(\'%s\', Exception(\'Error generating opportunity\'))": 1'
             )
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(stderr=error_template % 'exp_1_id'),
-                job_run_result.JobRunResult(stderr=error_template % 'exp_2_id')
-            ])
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(stderr=error_template % 'exp_1_id'),
+                    job_run_result.JobRunResult(stderr=error_template % 'exp_2_id'),
+                ]
+            )

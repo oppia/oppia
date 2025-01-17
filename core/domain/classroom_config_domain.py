@@ -40,6 +40,7 @@ class ClassroomDict(TypedDict):
     banner_data: ImageDataDict
     index: int
 
+
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
 # successful migration, this file should be renamed as classroom_domain and
@@ -62,7 +63,7 @@ class Classroom:
         is_published: bool,
         thumbnail_data: ImageData,
         banner_data: ImageData,
-        index: int
+        index: int,
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -88,8 +89,7 @@ class Classroom:
         self.course_details = course_details
         self.teaser_text = teaser_text
         self.topic_list_intro = topic_list_intro
-        self.topic_id_to_prerequisite_topic_ids = (
-            topic_id_to_prerequisite_topic_ids)
+        self.topic_id_to_prerequisite_topic_ids = topic_id_to_prerequisite_topic_ids
         self.is_published = is_published
         self.thumbnail_data = thumbnail_data
         self.banner_data = banner_data
@@ -117,7 +117,7 @@ class Classroom:
             classroom_dict['is_published'],
             ImageData.from_dict(classroom_dict['thumbnail_data']),
             ImageData.from_dict(classroom_dict['banner_data']),
-            classroom_dict['index']
+            classroom_dict['index'],
         )
 
     def to_dict(self) -> ClassroomDict:
@@ -134,11 +134,12 @@ class Classroom:
             'teaser_text': self.teaser_text,
             'topic_list_intro': self.topic_list_intro,
             'topic_id_to_prerequisite_topic_ids': (
-                self.topic_id_to_prerequisite_topic_ids),
+                self.topic_id_to_prerequisite_topic_ids
+            ),
             'is_published': self.is_published,
             'thumbnail_data': self.thumbnail_data.to_dict(),
             'banner_data': self.banner_data.to_dict(),
-            'index': self.index
+            'index': self.index,
         }
 
     def get_topic_ids(self) -> List[str]:
@@ -158,8 +159,8 @@ class Classroom:
         """
         if not isinstance(name, str):
             raise utils.ValidationError(
-                'Expected name of the classroom to be a string, received: %s.'
-                % name)
+                'Expected name of the classroom to be a string, received: %s.' % name
+            )
 
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
@@ -167,7 +168,8 @@ class Classroom:
         if len(name) > constants.MAX_CHARS_IN_CLASSROOM_NAME:
             raise utils.ValidationError(
                 'Classroom name should be at most %d characters, received %s.'
-                % (constants.MAX_CHARS_IN_CLASSROOM_NAME, name))
+                % (constants.MAX_CHARS_IN_CLASSROOM_NAME, name)
+            )
 
     @classmethod
     def require_valid_teaser_text(cls, teaser_text: str) -> None:
@@ -179,7 +181,8 @@ class Classroom:
         if not isinstance(teaser_text, str):
             raise utils.ValidationError(
                 'Expected teaser_text of the classroom to be a string, '
-                'received: %s.' % teaser_text)
+                'received: %s.' % teaser_text
+            )
 
         if teaser_text == '':
             raise utils.ValidationError('teaser_text field should not be empty')
@@ -187,10 +190,8 @@ class Classroom:
         if len(teaser_text) > constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT:
             error_message = (
                 'Classroom teaser_text should be at most %d characters, '
-                'received %s.' % (
-                    constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT,
-                    teaser_text
-                )
+                'received %s.'
+                % (constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT, teaser_text)
             )
             raise utils.ValidationError(error_message)
 
@@ -204,21 +205,17 @@ class Classroom:
         if not isinstance(topic_list_intro, str):
             raise utils.ValidationError(
                 'Expected topic_list_intro of the classroom to be a string, '
-                'received: %s.' % topic_list_intro)
+                'received: %s.' % topic_list_intro
+            )
 
         if topic_list_intro == '':
-            raise utils.ValidationError(
-                'topic_list_intro field should not be empty')
+            raise utils.ValidationError('topic_list_intro field should not be empty')
 
-        if len(
-            topic_list_intro
-        ) > constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO:
+        if len(topic_list_intro) > constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO:
             error_message = (
                 'Classroom topic_list_intro should be at most %d '
-                'characters, received %s.' % (
-                    constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO,
-                    topic_list_intro
-                )
+                'characters, received %s.'
+                % (constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO, topic_list_intro)
             )
             raise utils.ValidationError(error_message)
 
@@ -232,21 +229,17 @@ class Classroom:
         if not isinstance(course_details, str):
             raise utils.ValidationError(
                 'Expected course_details of the classroom to be a string, '
-                'received: %s.' % course_details)
+                'received: %s.' % course_details
+            )
 
         if course_details == '':
-            raise utils.ValidationError(
-                'course_details field should not be empty')
+            raise utils.ValidationError('course_details field should not be empty')
 
-        if len(
-            course_details
-            ) > constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS:
+        if len(course_details) > constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS:
             error_message = (
                 'Classroom course_details should be at most %d characters, '
-                'received %s.' % (
-                    constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS,
-                        course_details
-                )
+                'received %s.'
+                % (constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS, course_details)
             )
             raise utils.ValidationError(error_message)
 
@@ -260,21 +253,20 @@ class Classroom:
         if not isinstance(url_fragment, str):
             raise utils.ValidationError(
                 'Expected url fragment of the classroom to be a string, '
-                'received: %s.' % url_fragment)
-
-        if url_fragment == '':
-            raise utils.ValidationError(
-                'Url fragment field should not be empty'
+                'received: %s.' % url_fragment
             )
 
+        if url_fragment == '':
+            raise utils.ValidationError('Url fragment field should not be empty')
+
         utils.require_valid_url_fragment(
-            url_fragment, 'Classroom URL Fragment',
-            constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+            url_fragment,
+            'Classroom URL Fragment',
+            constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT,
         )
 
     @classmethod
-    def require_valid_bg_color(
-        cls, bg_color: str, is_thumbnail: bool) -> None:
+    def require_valid_bg_color(cls, bg_color: str, is_thumbnail: bool) -> None:
         """Checks whether the image bg_color of the classroom is valid.
 
         Args:
@@ -285,37 +277,36 @@ class Classroom:
 
         if bg_color == '':
             raise utils.ValidationError(
-                f'{image_type}_bg_color field should not be empty')
+                f'{image_type}_bg_color field should not be empty'
+            )
 
-        if (
-            bg_color not in (
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['classroom'])):
+        if bg_color not in (constants.ALLOWED_THUMBNAIL_BG_COLORS['classroom']):
             raise utils.ValidationError(
                 f'Classroom {image_type} background color '
-                f'{bg_color} is not supported.')
+                f'{bg_color} is not supported.'
+            )
 
     @classmethod
     def check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
         cls, topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
-        ) -> None:
+    ) -> None:
         """Checks for loop in topic_id_to_prerequisite_topic_ids.
 
         Args:
-            topic_id_to_prerequisite_topic_ids: 
+            topic_id_to_prerequisite_topic_ids:
                 Dict[str, List[str]]. The topic ID to prerequisite ID mapping.
         """
         if not isinstance(topic_id_to_prerequisite_topic_ids, dict):
             raise utils.ValidationError(
                 'Expected topic ID to prerequisite topic IDs of the classroom '
-                'to be a string, received: %s.' % (
-                    topic_id_to_prerequisite_topic_ids))
+                'to be a string, received: %s.' % (topic_id_to_prerequisite_topic_ids)
+            )
         cyclic_check_error = (
             'The topic ID to prerequisite topic IDs graph '
             'should not contain any cycles.'
         )
         for topic_id in topic_id_to_prerequisite_topic_ids:
-            ancestors = copy.deepcopy(
-                topic_id_to_prerequisite_topic_ids[topic_id])
+            ancestors = copy.deepcopy(topic_id_to_prerequisite_topic_ids[topic_id])
             visited_topic_ids_for_current_node = []
             while len(ancestors) > 0:
                 if topic_id in ancestors:
@@ -327,9 +318,7 @@ class Classroom:
                     continue
 
                 ancestors.extend(
-                    topic_id_to_prerequisite_topic_ids.get(
-                        ancestor_topic_id, []
-                    )
+                    topic_id_to_prerequisite_topic_ids.get(ancestor_topic_id, [])
                 )
                 visited_topic_ids_for_current_node.append(ancestor_topic_id)
 
@@ -339,21 +328,25 @@ class Classroom:
         if not isinstance(self.classroom_id, str):
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
-                % self.classroom_id)
+                % self.classroom_id
+            )
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
         self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
-            self.topic_id_to_prerequisite_topic_ids)
+            self.topic_id_to_prerequisite_topic_ids
+        )
         if not isinstance(self.is_published, bool):
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
-                'received: %s.' % self.is_published)
+                'received: %s.' % self.is_published
+            )
 
         if strict:
             if not isinstance(self.index, int):
                 raise utils.ValidationError(
                     'Expected index of the classroom to be a boolean, '
-                    'received: %s.' % self.index)
+                    'received: %s.' % self.index
+                )
 
             if not isinstance(self.thumbnail_data, ImageData):
                 raise utils.ValidationError(
@@ -367,10 +360,10 @@ class Classroom:
                 )
             if self.thumbnail_data.filename == '':
                 raise utils.ValidationError(
-                    'thumbnail_filename field should not be empty')
+                    'thumbnail_filename field should not be empty'
+                )
             if self.banner_data.filename == '':
-                raise utils.ValidationError(
-                    'banner_filename field should not be empty')
+                raise utils.ValidationError('banner_filename field should not be empty')
             if not self.topic_id_to_prerequisite_topic_ids:
                 raise utils.ValidationError(
                     'A classroom should have at least one topic.'
@@ -426,7 +419,7 @@ class ImageData:
         return cls(
             image_data_dict['filename'],
             image_data_dict['bg_color'],
-            image_data_dict['size_in_bytes']
+            image_data_dict['size_in_bytes'],
         )
 
     def to_dict(self) -> ImageDataDict:

@@ -72,9 +72,8 @@ def check_dev_mode_is_true() -> None:
     """
     if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
         server_software = os.getenv('SERVER_SOFTWARE')
-        if (
-                server_software and
-                not server_software.startswith(('Development', 'gunicorn'))
+        if server_software and not server_software.startswith(
+            ('Development', 'gunicorn')
         ):
             raise Exception('DEV_MODE can\'t be true on production.')
 
@@ -89,50 +88,58 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 VOICEOVERS_DATA_DIR = os.path.join('data', 'voiceovers')
 
-EXTENSIONS_DIR_PREFIX = ('build' if not constants.DEV_MODE else '')
-ACTIONS_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
-ISSUES_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
-INTERACTIONS_DIR = (
-    os.path.join('extensions', 'interactions'))
-INTERACTIONS_SPECS_FILE_PATH = (
-    os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
-RTE_EXTENSIONS_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
-RTE_EXTENSIONS_DEFINITIONS_PATH = (
-    os.path.join('assets', 'rich_text_components_definitions.ts'))
+EXTENSIONS_DIR_PREFIX = 'build' if not constants.DEV_MODE else ''
+ACTIONS_DIR = os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions')
+ISSUES_DIR = os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues')
+INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
+INTERACTIONS_SPECS_FILE_PATH = os.path.join(INTERACTIONS_DIR, 'interaction_specs.json')
+RTE_EXTENSIONS_DIR = os.path.join(
+    EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'
+)
+RTE_EXTENSIONS_DEFINITIONS_PATH = os.path.join(
+    'assets', 'rich_text_components_definitions.ts'
+)
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
-    os.path.join('webpack_bundles') if constants.DEV_MODE else
-    os.path.join('build', 'webpack_bundles'))
+    os.path.join('webpack_bundles')
+    if constants.DEV_MODE
+    else os.path.join('build', 'webpack_bundles')
+)
 # To know more about AOT visit https://angular.io/guide/glossary#aot
 FRONTEND_AOT_DIR = (
-    os.path.join('dist', 'oppia-angular') if constants.DEV_MODE else
-    os.path.join('dist', 'oppia-angular-prod'))
-DEPENDENCIES_TEMPLATES_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
+    os.path.join('dist', 'oppia-angular')
+    if constants.DEV_MODE
+    else os.path.join('dist', 'oppia-angular-prod')
+)
+DEPENDENCIES_TEMPLATES_DIR = os.path.join(
+    EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'
+)
 
 VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
-    'local_compiled_js', 'extensions', 'value_generators')
+    'local_compiled_js', 'extensions', 'value_generators'
+)
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 
-VISUALIZATIONS_DIR = os.path.join(
-    'extensions', 'visualizations')
+VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 VISUALIZATIONS_DIR_FOR_JS = os.path.join(
-    'local_compiled_js', 'extensions', 'visualizations')
+    'local_compiled_js', 'extensions', 'visualizations'
+)
 
 OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH = os.path.join(
-    'objects', 'object_defaults.json')
+    'objects', 'object_defaults.json'
+)
 RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH = os.path.join(
-    'interactions', 'rule_templates.json')
+    'interactions', 'rule_templates.json'
+)
 HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH = os.path.join(
-    'interactions', 'html_field_types_to_rule_specs.json')
+    'interactions', 'html_field_types_to_rule_specs.json'
+)
 LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
-    'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
+    'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version'
+)
 
 
 class ValidModelNames(enum.Enum):
@@ -177,7 +184,7 @@ HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
 ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
     HTML_RULE_VARIABLE_FORMAT_SET,
     HTML_RULE_VARIABLE_FORMAT_STRING,
-    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS,
 ]
 
 ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
@@ -187,9 +194,7 @@ ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 MAX_BIO_LENGTH_IN_CHARS = 2000
 
 MAX_CHARS_IN_BLOG_POST_URL = (
-    constants.MAX_CHARS_IN_BLOG_POST_TITLE
-    + len('-')
-    + constants.BLOG_POST_ID_LENGTH
+    constants.MAX_CHARS_IN_BLOG_POST_TITLE + len('-') + constants.BLOG_POST_ID_LENGTH
 )
 
 # Allowed formats of how HTML is present in rule specs.
@@ -200,7 +205,7 @@ HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
 ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
     HTML_RULE_VARIABLE_FORMAT_SET,
     HTML_RULE_VARIABLE_FORMAT_STRING,
-    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS,
 ]
 
 ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
@@ -417,7 +422,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     IMAGE_FORMAT_JPEG: ['jpg', 'jpeg'],
     IMAGE_FORMAT_PNG: ['png'],
     IMAGE_FORMAT_GIF: ['gif'],
-    IMAGE_FORMAT_SVG: ['svg']
+    IMAGE_FORMAT_SVG: ['svg'],
 }
 
 # An array containing the image formats that can be compressed.
@@ -425,9 +430,7 @@ COMPRESSIBLE_IMAGE_FORMATS = [IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
-ACCEPTED_AUDIO_EXTENSIONS = {
-    'mp3': ['audio/mp3']
-}
+ACCEPTED_AUDIO_EXTENSIONS = {'mp3': ['audio/mp3']}
 
 # Prefix for data sent from the server to the client via JSON.
 XSSI_PREFIX = b')]}\'\n'
@@ -569,8 +572,7 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 ENABLE_MAINTENANCE_MODE = False
 
 # The interactions permissible for a question.
-ALLOWED_QUESTION_INTERACTION_IDS = [
-    'TextInput', 'MultipleChoiceInput', 'NumericInput']
+ALLOWED_QUESTION_INTERACTION_IDS = ['TextInput', 'MultipleChoiceInput', 'NumericInput']
 
 # Flag to disable sending emails related to reviews for suggestions. To be
 # flipped after deciding (and implementing) whether a user should be scored
@@ -600,20 +602,17 @@ EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'address_contributor_dashboard_suggestions'
 )
 EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS = (
-    'review_creator_dashboard_suggestions')
+    'review_creator_dashboard_suggestions'
+)
 EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'review_contributor_dashboard_suggestions'
 )
-EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
-    'add_contributor_dashboard_reviewers'
-)
+EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = 'add_contributor_dashboard_reviewers'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
     'notify_contributor_dashboard_achievements'
 )
-EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
-    'notify_curriculum_admins_chapters'
-)
+EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = 'notify_curriculum_admins_chapters'
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -627,18 +626,16 @@ MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
-    lambda recipient_username: 'Hi %s,' % recipient_username)
-DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = (
-    lambda sender_username: (
-        'Thanks!<br>%s (Oppia moderator)' % sender_username))
-DEFAULT_EMAIL_SUBJECT_FN: Callable[[str], str] = (
-    lambda exp_title: (
-        'Your Oppia exploration "%s" has been unpublished' % exp_title))
+    lambda recipient_username: 'Hi %s,' % recipient_username
+)
+DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = lambda sender_username: (
+    'Thanks!<br>%s (Oppia moderator)' % sender_username
+)
+DEFAULT_EMAIL_SUBJECT_FN: Callable[[str], str] = lambda exp_title: (
+    'Your Oppia exploration "%s" has been unpublished' % exp_title
+)
 
-VALID_MODERATOR_ACTIONS: Dict[
-    str,
-    Dict[str, Union[str, Callable[[str], str]]]
-] = {
+VALID_MODERATOR_ACTIONS: Dict[str, Dict[str, Union[str, Callable[[str], str]]]] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': DEFAULT_EMAIL_SUBJECT_FN,
@@ -658,8 +655,7 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC for the earliest
 # datetime that a report could be received.
-EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
-    1614556800)
+EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(1614556800)
 
 # The minimum and maximum package version codes for Oppia Android.
 MINIMUM_ANDROID_PACKAGE_VERSION_CODE = 1
@@ -728,30 +724,17 @@ SYSTEM_USERS = {
     SYSTEM_COMMITTER_ID: SYSTEM_COMMITTER_ID,
     MIGRATION_BOT_USER_ID: MIGRATION_BOT_USERNAME,
     SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME,
-    APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID: (
-        APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME)
+    APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID: (APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME),
 }
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
-    'Collapsible': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Collapsible')
-    },
-    'Image': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Image')
-    },
-    'Link': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Link')
-    },
-    'Math': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
-    },
-    'Tabs': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
-    },
-    'Video': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
-    },
+    'Collapsible': {'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Collapsible')},
+    'Image': {'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Image')},
+    'Link': {'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Link')},
+    'Math': {'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')},
+    'Tabs': {'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')},
+    'Video': {'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')},
 }
 
 # The list of interaction IDs which correspond to interactions that set their
@@ -801,7 +784,7 @@ DEMO_EXPLORATIONS = {
 
 DEMO_COLLECTIONS = {
     '0': 'welcome_to_collections.yaml',
-    '1': 'learner_flow_test_collection.yaml'
+    '1': 'learner_flow_test_collection.yaml',
 }
 
 # IDs of explorations which should not be displayable in either the learner or
@@ -809,8 +792,7 @@ DEMO_COLLECTIONS = {
 DISABLED_EXPLORATION_IDS = ['5']
 
 # Oppia Google Group URL.
-GOOGLE_GROUP_URL = (
-    'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
+GOOGLE_GROUP_URL = 'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia'
 
 # NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
 # Change to the correct url for internal testing in the testing production
@@ -821,26 +803,29 @@ OPPIA_SITE_URL = 'http://localhost:8181'
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
 TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
-    '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+    '%s/email/batchfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX
+)
 TASK_URL_FEEDBACK_STATUS_EMAILS = (
-    '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX)
+    '%s/email/feedbackthreadstatuschangeemailhandler' % TASKQUEUE_URL_PREFIX
+)
 TASK_URL_FLAG_EXPLORATION_EMAILS = (
-    '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
+    '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX
+)
 TASK_URL_INSTANT_FEEDBACK_EMAILS = (
-    '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
+    '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX
+)
 TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS = (
-    '%s/email/contributordashboardachievementnotificationemailhandler' % (
-        TASKQUEUE_URL_PREFIX))
-TASK_URL_DEFERRED = (
-    '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
+    '%s/email/contributordashboardachievementnotificationemailhandler'
+    % (TASKQUEUE_URL_PREFIX)
+)
+TASK_URL_DEFERRED = '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
-AUTOMATIC_VOICEOVER_ADMIN_CONTROL_URL = (
-    '/automatic_voiceover_admin_control_handler')
+AUTOMATIC_VOICEOVER_ADMIN_CONTROL_URL = '/automatic_voiceover_admin_control_handler'
 DIAGNOSTIC_TEST_PLAYER_PAGE_URL = '/diagnostic-test-player'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
@@ -865,8 +850,7 @@ CONTRIBUTOR_STATS_SUMMARIES_URL = '/contributorstatssummaries'
 CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = '/contributorallstatssummaries'
 CONTRIBUTOR_CERTIFICATE_URL = '/contributorcertificate'
 CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-admin-dashboard'
-CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX = (
-    '/contributor-dashboard-admin-stats')
+CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX = '/contributor-dashboard-admin-stats'
 COMMUNITY_CONTRIBUTION_STATS_URL = '/community-contribution-stats'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 PINNED_OPPORTUNITIES_URL = '/pinned-opportunities'
@@ -884,8 +868,7 @@ EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_IMAGE_UPLOAD_PREFIX = '/createhandler/imageupload'
 EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
-EXPLORATION_LEARNER_ANSWER_DETAILS = (
-    '/learneranswerinfohandler/learner_answer_details')
+EXPLORATION_LEARNER_ANSWER_DETAILS = '/learneranswerinfohandler/learner_answer_details'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
@@ -900,8 +883,7 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
-FEEDBACK_UPDATES_DATA_URL = (
-    '/feedbackupdateshandler/data')
+FEEDBACK_UPDATES_DATA_URL = '/feedbackupdateshandler/data'
 FEEDBACK_UPDATES_URL = '/feedbackupdates'
 FEEDBACK_UPDATES_THREAD_DATA_URL = '/feedbackupdatesthreadhandler'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
@@ -910,18 +892,19 @@ FRACTIONS_LANDING_PAGE_URL = '/fractions'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
 IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
-LEARNER_ANSWER_INFO_HANDLER_URL = (
-    '/learneranswerinfohandler/learner_answer_details')
+LEARNER_ANSWER_INFO_HANDLER_URL = '/learneranswerinfohandler/learner_answer_details'
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
-    '/learnerdashboardtopicsandstoriesprogresshandler/data')
-LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = (
-    '/learnercompletedchapterscounthandler/data')
+    '/learnerdashboardtopicsandstoriesprogresshandler/data'
+)
+LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = '/learnercompletedchapterscounthandler/data'
 LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
-    '/learnerdashboardcollectionsprogresshandler/data')
+    '/learnerdashboardcollectionsprogresshandler/data'
+)
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
-    '/learnerdashboardexplorationsprogresshandler/data')
+    '/learnerdashboardexplorationsprogresshandler/data'
+)
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
@@ -974,8 +957,7 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
-DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
-    '/diagnostic_test_skill_assignment_handler')
+DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = '/diagnostic_test_skill_assignment_handler'
 DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL = '/diagnostic_test_questions_handler_url'
 STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
@@ -993,15 +975,12 @@ SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
-UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX = (
-    '/updatetranslationsuggestionhandler')
-UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
-    '/updatequestionsuggestionhandler')
+UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX = '/updatetranslationsuggestionhandler'
+UPDATE_QUESTION_SUGGESTION_URL_PREFIX = '/updatequestionsuggestionhandler'
 USER_GROUPS_HANDLER_URL = '/user_groups_handler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
-TOPIC_VIEWER_URL_PREFIX = (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>')
+TOPIC_VIEWER_URL_PREFIX = '/learn/<classroom_url_fragment>/<topic_url_fragment>'
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_ID_TO_TOPIC_NAME = '/topic_id_to_topic_name_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
@@ -1014,7 +993,8 @@ TOPIC_URL_FRAGMENT_HANDLER = '/topic_url_fragment_handler'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 UNASSIGN_SKILL_DATA_HANDLER_URL = '/topics_and_skills_dashboard/unassign_skill'
 TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER = (
-    '/topic_id_to_diagnostic_test_skill_ids_handler')
+    '/topic_id_to_diagnostic_test_skill_ids_handler'
+)
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics-and-skills-dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
@@ -1024,8 +1004,7 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
-LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
-    '/learner_dashboard_learner_groups_handler')
+LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = '/learner_dashboard_learner_groups_handler'
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_DISPLAY_INFO_HANDLER_URL = '/classroom_display_info_handler'
@@ -1033,16 +1012,13 @@ UPDATE_CLASSROOMS_ORDER_HANDLER_URL = '/update_classrooms_order'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 NEW_CLASSROOM_HANDLER_URL = '/classroom_admin/create_new'
-TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL = (
-    '/topics_to_classrooms_relation'
-)
+TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL = '/topics_to_classrooms_relation'
 ALL_CLASSROOMS_SUMMARY_HANDLER_URL = '/all_classrooms_summary'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
-VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
-    '/voiceover_language_codes_mapping')
+VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = '/voiceover_language_codes_mapping'
 VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
 GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
 
@@ -1093,7 +1069,8 @@ OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # Run any migration job that is required to migrate existing trained models
 # before starting Oppia-ml again.
 FLOAT_VERIFIER_REGEX = (
-    '^([-+]?\\d*\\.\\d+)$|^([-+]?(\\d*\\.?\\d+|\\d+\\.?\\d*)e[-+]?\\d*)$')
+    '^([-+]?\\d*\\.\\d+)$|^([-+]?(\\d*\\.?\\d+|\\d+\\.?\\d*)e[-+]?\\d*)$'
+)
 
 # Current event models schema version. All event models with an
 # event_schema_version of 1 are the events collected before the rework of the
@@ -1122,7 +1099,7 @@ ALLOWED_USER_QUERY_STATUSES = (
     USER_QUERY_STATUS_PROCESSING,
     USER_QUERY_STATUS_COMPLETED,
     USER_QUERY_STATUS_ARCHIVED,
-    USER_QUERY_STATUS_FAILED
+    USER_QUERY_STATUS_FAILED,
 )
 
 # The time difference between which to consider two login events "close". This
@@ -1134,8 +1111,7 @@ PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
 # The i18n id for the header of the "Top Rated Explorations" category in the
 # library index page.
-LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = (
-    'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS')
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS'
 # The i18n id for the header of the "Recently Published" category in the
 # library index page.
 LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
@@ -1174,8 +1150,7 @@ ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_QUESTION_COORDINATOR = 'QUESTION_COORDINATOR'
 ROLE_ID_TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR'
 
-ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
-    ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
+ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
 
 ALLOWED_USER_ROLES = [
     ROLE_ID_CURRICULUM_ADMIN,
@@ -1192,7 +1167,7 @@ ALLOWED_USER_ROLES = [
     ROLE_ID_TRANSLATION_ADMIN,
     ROLE_ID_VOICEOVER_ADMIN,
     ROLE_ID_QUESTION_COORDINATOR,
-    ROLE_ID_TRANSLATION_COORDINATOR
+    ROLE_ID_TRANSLATION_COORDINATOR,
 ]
 
 # Intent of the User making query to role structure via admin interface. Used
@@ -1234,7 +1209,7 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -1252,8 +1227,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
-        ]
+            'oppia-noninteractive-tabs',
+        ],
     },
     'RTE_TYPE_CKEDITOR': {
         # Valid parent-child relation in CKEditor.
@@ -1270,11 +1245,9 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-collapsible': [
-                'blockquote', 'li', '[document]'
-            ],
+            'oppia-noninteractive-collapsible': ['blockquote', 'li', '[document]'],
             'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
+            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]'],
         },
         # Valid html tags in CKEditor.
         'ALLOWED_TAG_LIST': [
@@ -1292,10 +1265,9 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
-        ]
-
-    }
+            'oppia-noninteractive-tabs',
+        ],
+    },
 }
 
 # Classroom page names for generating URLs. These need to be kept in sync with
@@ -1368,102 +1340,119 @@ ROLE_NONE = 'none'
 ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS = [ENTITY_TYPE_SKILL]
 
 # The allowed list of roles which can be used in change_role command.
-ALLOWED_ACTIVITY_ROLES = [
-    ROLE_OWNER, ROLE_EDITOR, ROLE_VOICE_ARTIST, ROLE_VIEWER]
+ALLOWED_ACTIVITY_ROLES = [ROLE_OWNER, ROLE_EDITOR, ROLE_VOICE_ARTIST, ROLE_VIEWER]
 
 # The allowed list of status which can be used in change_exploration_status
 # and change_collection_status commands.
 ALLOWED_ACTIVITY_STATUS = [
-    constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
+    constants.ACTIVITY_STATUS_PRIVATE,
+    constants.ACTIVITY_STATUS_PUBLIC,
+]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
-    'name': CMD_CREATE_NEW,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}, {
-    'name': CMD_CHANGE_ROLE,
-    'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': ['assignee_id'],
-    'allowed_values': {
-        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [
+    {
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
     },
-    'deprecated_values': {}
-}, {
-    'name': CMD_REMOVE_ROLE,
-    'required_attribute_names': ['removed_user_id', 'old_role'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': ['removed_user_id'],
-    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES},
-    'deprecated_values': {}
-}, {
-    'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
-    'required_attribute_names': [
-        'old_viewable_if_private', 'new_viewable_if_private'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}, {
-    'name': CMD_RELEASE_OWNERSHIP,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}, {
-    'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-    'required_attribute_names': [
-        'old_first_published_msec', 'new_first_published_msec'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}, {
-    'name': CMD_DELETE_COMMIT,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}]
+    {
+        'name': CMD_CHANGE_ROLE,
+        'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': ['assignee_id'],
+        'allowed_values': {
+            'new_role': ALLOWED_ACTIVITY_ROLES,
+            'old_role': ALLOWED_ACTIVITY_ROLES,
+        },
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_REMOVE_ROLE,
+        'required_attribute_names': ['removed_user_id', 'old_role'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': ['removed_user_id'],
+        'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES},
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
+        'required_attribute_names': [
+            'old_viewable_if_private',
+            'new_viewable_if_private',
+        ],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_RELEASE_OWNERSHIP,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+        'required_attribute_names': [
+            'old_first_published_msec',
+            'new_first_published_msec',
+        ],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_DELETE_COMMIT,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
+    },
+]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
-    'name': CMD_CHANGE_COLLECTION_STATUS,
-    'required_attribute_names': ['old_status', 'new_status'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {
-        'old_status': ALLOWED_ACTIVITY_STATUS,
-        'new_status': ALLOWED_ACTIVITY_STATUS
-    },
-    'deprecated_values': {}
-})
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append(
+    {
+        'name': CMD_CHANGE_COLLECTION_STATUS,
+        'required_attribute_names': ['old_status', 'new_status'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'old_status': ALLOWED_ACTIVITY_STATUS,
+            'new_status': ALLOWED_ACTIVITY_STATUS,
+        },
+        'deprecated_values': {},
+    }
+)
 
 EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
-    COMMON_RIGHTS_ALLOWED_COMMANDS)
-EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
-    'name': CMD_CHANGE_EXPLORATION_STATUS,
-    'required_attribute_names': ['old_status', 'new_status'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {
-        'old_status': ALLOWED_ACTIVITY_STATUS,
-        'new_status': ALLOWED_ACTIVITY_STATUS
-    },
-    # TODO(#12991): Remove this once once we use the migration jobs to remove
-    # the deprecated values from the server data.
-    'deprecated_values': {
-        'new_status': ['publicized']
+    COMMON_RIGHTS_ALLOWED_COMMANDS
+)
+EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append(
+    {
+        'name': CMD_CHANGE_EXPLORATION_STATUS,
+        'required_attribute_names': ['old_status', 'new_status'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {
+            'old_status': ALLOWED_ACTIVITY_STATUS,
+            'new_status': ALLOWED_ACTIVITY_STATUS,
+        },
+        # TODO(#12991): Remove this once once we use the migration jobs to remove
+        # the deprecated values from the server data.
+        'deprecated_values': {'new_status': ['publicized']},
     }
-})
+)
 
 CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
 CMD_PUBLISH_TOPIC = 'publish_topic'
@@ -1476,51 +1465,59 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
-    'name': CMD_CREATE_NEW,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}, {
-    'name': CMD_CHANGE_ROLE,
-    'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': ['assignee_id'],
-    'allowed_values': {
-        'new_role': ALLOWED_TOPIC_ROLES, 'old_role': ALLOWED_TOPIC_ROLES
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = [
+    {
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
     },
-    'deprecated_values': {}
-}, {
-    'name': CMD_REMOVE_MANAGER_ROLE,
-    'required_attribute_names': ['removed_user_id'],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': ['removed_user_id'],
-    'allowed_values': {},
-    'deprecated_values': {}
-}, {
-    'name': CMD_PUBLISH_TOPIC,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}, {
-    'name': CMD_UNPUBLISH_TOPIC,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}, {
-    'name': CMD_DELETE_COMMIT,
-    'required_attribute_names': [],
-    'optional_attribute_names': [],
-    'user_id_attribute_names': [],
-    'allowed_values': {},
-    'deprecated_values': {}
-}]
+    {
+        'name': CMD_CHANGE_ROLE,
+        'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': ['assignee_id'],
+        'allowed_values': {
+            'new_role': ALLOWED_TOPIC_ROLES,
+            'old_role': ALLOWED_TOPIC_ROLES,
+        },
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_REMOVE_MANAGER_ROLE,
+        'required_attribute_names': ['removed_user_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': ['removed_user_id'],
+        'allowed_values': {},
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_PUBLISH_TOPIC,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_UNPUBLISH_TOPIC,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
+    },
+    {
+        'name': CMD_DELETE_COMMIT,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {},
+    },
+]
 
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
@@ -1547,7 +1544,7 @@ DEFAULT_TASKQUEUE_TIMEOUT_SECONDS = 30
 CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
     'EarlyQuit': 'state_name',
     'MultipleIncorrectSubmissions': 'state_name',
-    'CyclicStateTransitions': 'state_names'
+    'CyclicStateTransitions': 'state_names',
 }
 
 # Constants defining various suggestion types.
@@ -1568,8 +1565,14 @@ QUESTION_TEAM_LEAD = 'Ryan Hsiao'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
-    'suggestion_type', 'target_type', 'target_id', 'status', 'author_id',
-    'final_reviewer_id', 'score_category', 'language_code'
+    'suggestion_type',
+    'target_type',
+    'target_id',
+    'status',
+    'author_id',
+    'final_reviewer_id',
+    'score_category',
+    'language_code',
 ]
 
 # Possible targets that the suggestions can modify.
@@ -1577,20 +1580,20 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
     ENTITY_TYPE_EXPLORATION,
     ENTITY_TYPE_QUESTION,
     ENTITY_TYPE_SKILL,
-    ENTITY_TYPE_TOPIC
+    ENTITY_TYPE_TOPIC,
 ]
 
 # Possible suggestion types.
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
-    SUGGESTION_TYPE_ADD_QUESTION
+    SUGGESTION_TYPE_ADD_QUESTION,
 ]
 
 # The types of suggestions that are offered on the Contributor Dashboard.
 CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
-    SUGGESTION_TYPE_ADD_QUESTION
+    SUGGESTION_TYPE_ADD_QUESTION,
 ]
 
 # The sort keys of submitted questions shown on the Contributor Dashboard.
@@ -1610,7 +1613,10 @@ COMMIT_TYPE_DELETE = 'delete'
 
 # Interaction IDs of math related interactions.
 MATH_INTERACTION_IDS = [
-    'NumericExpressionInput', 'AlgebraicExpressionInput', 'MathEquationInput']
+    'NumericExpressionInput',
+    'AlgebraicExpressionInput',
+    'MathEquationInput',
+]
 
 # The task entry ID template used by the task entry model.
 TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'

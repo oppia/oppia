@@ -25,12 +25,13 @@ from core.platform import models
 from typing import List, Literal, Optional, Sequence, overload
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import learner_group_models
     from mypy_imports import user_models
 
 (learner_group_models, user_models) = models.Registry.import_models(
-    [models.Names.LEARNER_GROUP, models.Names.USER])
+    [models.Names.LEARNER_GROUP, models.Names.USER]
+)
 
 
 def get_new_learner_group_id() -> str:
@@ -50,7 +51,7 @@ def get_learner_group_by_id(
 
 @overload
 def get_learner_group_by_id(
-    group_id: str
+    group_id: str,
 ) -> Optional[learner_group_domain.LearnerGroup]: ...
 
 
@@ -84,22 +85,21 @@ def get_learner_group_by_id(
         Exception. No LearnerGroupModel found for the given group_id.
     """
     learner_group_model = learner_group_models.LearnerGroupModel.get(
-        group_id, strict=False)
+        group_id, strict=False
+    )
 
     if not learner_group_model:
         if strict:
             raise Exception(
-                'No LearnerGroupModel found for the given group_id: %s' %
-                group_id
+                'No LearnerGroupModel found for the given group_id: %s' % group_id
             )
         return None
 
-    return learner_group_services.get_learner_group_from_model(
-        learner_group_model)
+    return learner_group_services.get_learner_group_from_model(learner_group_model)
 
 
 def get_learner_groups_of_facilitator(
-    user_id: str
+    user_id: str,
 ) -> List[learner_group_domain.LearnerGroup]:
     """Returns a list of learner groups of the given facilitator.
 
@@ -109,8 +109,9 @@ def get_learner_groups_of_facilitator(
     Returns:
         list(LearnerGroup). A list of learner groups of the given facilitator.
     """
-    learner_grp_models = (
-        learner_group_models.LearnerGroupModel.get_by_facilitator_id(user_id))
+    learner_grp_models = learner_group_models.LearnerGroupModel.get_by_facilitator_id(
+        user_id
+    )
 
     if not learner_grp_models:
         return []
@@ -129,7 +130,7 @@ def get_learner_group_models_by_ids(
 
 @overload
 def get_learner_group_models_by_ids(
-    user_ids: List[str]
+    user_ids: List[str],
 ) -> List[Optional[user_models.LearnerGroupsUserModel]]: ...
 
 
@@ -158,14 +159,10 @@ def get_learner_group_models_by_ids(
         Exception. No LearnerGroupsUserModel exists for the given user_id.
     """
 
-    learner_group_user_models = user_models.LearnerGroupsUserModel.get_multi(
-        user_ids
-    )
+    learner_group_user_models = user_models.LearnerGroupsUserModel.get_multi(user_ids)
 
     if strict:
-        for index, learner_group_user_model in enumerate(
-            learner_group_user_models
-        ):
+        for index, learner_group_user_model in enumerate(learner_group_user_models):
             if learner_group_user_model is None:
                 raise Exception(
                     'No LearnerGroupsUserModel exists for the user_id: %s'
@@ -175,9 +172,7 @@ def get_learner_group_models_by_ids(
     return learner_group_user_models
 
 
-def can_multi_learners_share_progress(
-    user_ids: List[str], group_id: str
-) -> List[bool]:
+def can_multi_learners_share_progress(user_ids: List[str], group_id: str) -> List[bool]:
     """Returns the progress sharing permissions of the given users in the given
     group.
 
@@ -189,9 +184,7 @@ def can_multi_learners_share_progress(
         list(bool). True if a user has progress sharing permission of the
         given group as True, False otherwise.
     """
-    learner_group_user_models = get_learner_group_models_by_ids(
-        user_ids, strict=True
-    )
+    learner_group_user_models = get_learner_group_models_by_ids(user_ids, strict=True)
 
     progress_sharing_permissions: List[bool] = []
     for model in learner_group_user_models:
@@ -206,7 +199,7 @@ def can_multi_learners_share_progress(
 
 
 def get_invited_learner_groups_of_learner(
-    user_id: str
+    user_id: str,
 ) -> List[learner_group_domain.LearnerGroup]:
     """Returns a list of learner groups that the given learner has been
     invited to join.
@@ -219,8 +212,8 @@ def get_invited_learner_groups_of_learner(
         has been invited to join.
     """
     learner_grp_models = (
-        learner_group_models.LearnerGroupModel.get_by_invited_learner_user_id(
-            user_id))
+        learner_group_models.LearnerGroupModel.get_by_invited_learner_user_id(user_id)
+    )
 
     if not learner_grp_models:
         return []
@@ -232,7 +225,7 @@ def get_invited_learner_groups_of_learner(
 
 
 def get_learner_groups_joined_by_learner(
-    user_id: str
+    user_id: str,
 ) -> List[learner_group_domain.LearnerGroup]:
     """Returns a list of learner groups that the given learner has joined.
 
@@ -243,8 +236,9 @@ def get_learner_groups_joined_by_learner(
         list(LearnerGroup). A list of learner groups that the given learner
         is part of.
     """
-    learner_grp_models = (
-        learner_group_models.LearnerGroupModel.get_by_learner_user_id(user_id))
+    learner_grp_models = learner_group_models.LearnerGroupModel.get_by_learner_user_id(
+        user_id
+    )
 
     if not learner_grp_models:
         return []

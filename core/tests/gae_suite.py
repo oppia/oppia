@@ -33,29 +33,30 @@ from typing import Final, List, Optional
 
 sys.path.insert(1, os.getcwd())
 
-from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import (
+    common,
+)  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 CURR_DIR: Final = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR: Final = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR: Final = os.path.join(CURR_DIR, 'third_party')
-THIRD_PARTY_PYTHON_LIBS_DIR: Final = os.path.join(
-    THIRD_PARTY_DIR, 'python_libs'
-)
+THIRD_PARTY_PYTHON_LIBS_DIR: Final = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 
 GOOGLE_APP_ENGINE_SDK_HOME: Final = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk', 'platform',
-    'google_appengine')
+    OPPIA_TOOLS_DIR,
+    'google-cloud-sdk-335.0.0',
+    'google-cloud-sdk',
+    'platform',
+    'google_appengine',
+)
 
 _PARSER: Final = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--test_target',
-    help='optional dotted module name of the test(s) to run',
-    type=str)
+    '--test_target', help='optional dotted module name of the test(s) to run', type=str
+)
 
 
-def create_test_suites(
-    test_target: Optional[str] = None
-) -> List[unittest.TestSuite]:
+def create_test_suites(test_target: Optional[str] = None) -> List[unittest.TestSuite]:
     """Creates test suites. If test_target is None, runs all tests.
 
     Args:
@@ -75,11 +76,9 @@ def create_test_suites(
     loader = unittest.TestLoader()
     master_test_suite = (
         loader.loadTestsFromName(test_target)
-        if test_target else
-        loader.discover(
-            CURR_DIR,
-            pattern='[^core/tests/data]*_test.py',
-            top_level_dir=CURR_DIR
+        if test_target
+        else loader.discover(
+            CURR_DIR, pattern='[^core/tests/data]*_test.py', top_level_dir=CURR_DIR
         )
     )
     return [master_test_suite]
@@ -113,14 +112,14 @@ def main(args: Optional[List[str]] = None) -> None:
         test_target=parsed_args.test_target,
     )
 
-    results = [unittest.TextTestRunner(verbosity=2).run(suite)
-               for suite in suites]
+    results = [unittest.TextTestRunner(verbosity=2).run(suite) for suite in suites]
 
     for result in results:
         if result.errors or result.failures:
             raise Exception(
-                'Test suite failed: %s tests run, %s errors, %s failures.' % (
-                    result.testsRun, len(result.errors), len(result.failures)))
+                'Test suite failed: %s tests run, %s errors, %s failures.'
+                % (result.testsRun, len(result.errors), len(result.failures))
+            )
 
 
 if __name__ == '__main__':

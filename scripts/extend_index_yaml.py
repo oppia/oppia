@@ -29,9 +29,7 @@ import xmltodict
 import yaml
 
 XmlIndexesDict = Dict[
-    str, Dict[
-        str, List[Dict[str, Union[str, Dict[str, str], List[Dict[str, str]]]]]
-    ]
+    str, Dict[str, List[Dict[str, Union[str, Dict[str, str], List[Dict[str, str]]]]]]
 ]
 YamlIndexesDict = Dict[
     str, List[Dict[str, Union[str, Dict[str, str], List[Dict[str, str]]]]]
@@ -44,12 +42,12 @@ WEB_INF_INDEX_XML_PATH = os.path.join(
     'cloud_datastore_emulator_cache',
     'WEB-INF',
     'appengine-generated',
-    'datastore-indexes-auto.xml'
+    'datastore-indexes-auto.xml',
 )
 
 
 def reformat_xml_dict_into_yaml_dict(
-    xml_dict: XmlIndexesDict
+    xml_dict: XmlIndexesDict,
 ) -> Optional[YamlIndexesDict]:
     """Reformats the xml index dict into yaml index dict.
 
@@ -61,8 +59,8 @@ def reformat_xml_dict_into_yaml_dict(
     """
     yaml_index_entries = []
     if (
-        'datastore-indexes' not in xml_dict or
-        'datastore-index' not in xml_dict['datastore-indexes']
+        'datastore-indexes' not in xml_dict
+        or 'datastore-index' not in xml_dict['datastore-indexes']
     ):
         return None
 
@@ -77,9 +75,9 @@ def reformat_xml_dict_into_yaml_dict(
                 yaml_index_property['direction'] = 'desc'
             yaml_index_properties.append(yaml_index_property)
 
-        yaml_index_entries.append({
-            'kind': xml_index['@kind'], 'properties': yaml_index_properties
-        })
+        yaml_index_entries.append(
+            {'kind': xml_index['@kind'], 'properties': yaml_index_properties}
+        )
 
     return {'indexes': yaml_index_entries}
 
@@ -94,14 +92,14 @@ def main() -> None:
             f.read(), force_list={'datastore-index', 'property'}
         )
 
-    web_inf_index_yaml_dict = reformat_xml_dict_into_yaml_dict(
-        web_inf_index_xml_dict)
+    web_inf_index_yaml_dict = reformat_xml_dict_into_yaml_dict(web_inf_index_xml_dict)
 
     if web_inf_index_yaml_dict is None:
         return
 
     new_kinds = [
-        kind for kind in web_inf_index_yaml_dict['indexes']
+        kind
+        for kind in web_inf_index_yaml_dict['indexes']
         if kind not in index_yaml_dict['indexes']
     ]
 

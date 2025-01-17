@@ -45,13 +45,13 @@ class Registry:
         cls.objects_dict.clear()
 
         # Add new object instances to the registry.
-        for name, clazz in inspect.getmembers(
-                objects, predicate=inspect.isclass):
+        for name, clazz in inspect.getmembers(objects, predicate=inspect.isclass):
             if name == 'BaseObject':
                 continue
 
             ancestor_names = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
 
             assert 'BaseObject' in ancestor_names
             cls.objects_dict[clazz.__name__] = clazz
@@ -63,9 +63,7 @@ class Registry:
         return copy.deepcopy(cls.objects_dict)
 
     @classmethod
-    def get_object_class_by_type(
-        cls, obj_type: str
-    ) -> Type[objects.BaseObject]:
+    def get_object_class_by_type(cls, obj_type: str) -> Type[objects.BaseObject]:
         """Gets an object class by its type. Types are CamelCased.
 
         Refreshes once if the class is not found; subsequently, throws an

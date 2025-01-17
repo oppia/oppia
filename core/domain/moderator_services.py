@@ -23,9 +23,7 @@ from core.domain import taskqueue_services
 
 
 def enqueue_flag_exploration_email_task(
-    exploration_id: str,
-    report_text: str,
-    reporter_id: str
+    exploration_id: str, report_text: str, reporter_id: str
 ) -> None:
     """Adds a 'send flagged exploration email' task into taskqueue."""
     payload = {
@@ -35,5 +33,4 @@ def enqueue_flag_exploration_email_task(
     }
 
     # Emails about flagged explorations are sent immediately to moderators.
-    taskqueue_services.enqueue_task(
-        feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)
+    taskqueue_services.enqueue_task(feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)

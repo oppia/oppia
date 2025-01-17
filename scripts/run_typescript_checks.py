@@ -243,12 +243,14 @@ _PARSER = argparse.ArgumentParser(
 Run the script from the oppia root folder:
     python -m scripts.run_typescript_checks
 Note that the root folder MUST be named 'oppia'.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--strict_checks',
     help='optional; if specified, compiles typescript using strict config.',
-    action='store_true')
+    action='store_true',
+)
 
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
@@ -265,12 +267,11 @@ def validate_compiled_js_dir() -> None:
     if out_dir != COMPILED_JS_DIR:
         raise Exception(
             'COMPILED_JS_DIR: %s does not match the output directory '
-            'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
+            'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir)
+        )
 
 
-def compile_temp_strict_tsconfig(
-    config_path: str, error_messages: List[str]
-) -> None:
+def compile_temp_strict_tsconfig(config_path: str, error_messages: List[str]) -> None:
     """Compiles temporary strict TS config with files those are neither
     strictly typed nor present in TS_STRICT_EXCLUDE_PATHS. If there are any
     errors, we restores the original config.
@@ -321,8 +322,7 @@ def compile_temp_strict_tsconfig(
         shutil.rmtree(COMPILED_JS_DIR)
 
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, encoding='utf-8')
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
 
     # The value of `process.stdout` should not be None since we passed
     # the `stdout=subprocess.PIPE` argument to `Popen`.
@@ -336,9 +336,9 @@ def compile_temp_strict_tsconfig(
     if error_messages:
         print('\n%s' % '\n'.join(error_messages))
         print(
-            '%s Errors found during compilation.\n' % (
-                len([x for x in error_messages if x.startswith(PREFIXES)]))
-            )
+            '%s Errors found during compilation.\n'
+            % (len([x for x in error_messages if x.startswith(PREFIXES)]))
+        )
         sys.exit(1)
     else:
         print('Compilation successful!')
@@ -381,8 +381,7 @@ def compile_and_check_typescript(config_path: str) -> None:
     error_messages = list(iter(process.stdout.readline, ''))
 
     if config_path == STRICT_TSCONFIG_FILEPATH:
-        compile_temp_strict_tsconfig(
-            TEMP_STRICT_TSCONFIG_FILEPATH, error_messages)
+        compile_temp_strict_tsconfig(TEMP_STRICT_TSCONFIG_FILEPATH, error_messages)
     else:
         if error_messages:
             print('Errors found during compilation\n')
@@ -396,9 +395,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Run the typescript checks."""
     parsed_args = _PARSER.parse_args(args=args)
     compile_and_check_typescript(
-        STRICT_TSCONFIG_FILEPATH
-        if parsed_args.strict_checks else
-        TSCONFIG_FILEPATH)
+        STRICT_TSCONFIG_FILEPATH if parsed_args.strict_checks else TSCONFIG_FILEPATH
+    )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

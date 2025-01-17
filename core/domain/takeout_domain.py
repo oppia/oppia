@@ -25,9 +25,7 @@ class TakeoutData:
     """Domain object for all information exported as part of Takeout."""
 
     def __init__(
-        self,
-        user_data: Dict[str, Dict[str, str]],
-        user_images: List[TakeoutImage]
+        self, user_data: Dict[str, Dict[str, str]], user_images: List[TakeoutImage]
     ) -> None:
         """Constructs a TakeoutData domain object.
 
@@ -47,9 +45,7 @@ class TakeoutImage:
     for a single image.
     """
 
-    def __init__(
-        self, b64_image_data: str, image_export_path: str
-    ) -> None:
+    def __init__(self, b64_image_data: str, image_export_path: str) -> None:
         """Constructs a TakeoutImage domain object.
 
         Args:

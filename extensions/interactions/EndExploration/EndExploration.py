@@ -38,7 +38,8 @@ class EndExploration(base.BaseInteraction):
     name: str = 'End Exploration'
     description: str = (
         'Ends the exploration, and suggests recommendations for explorations '
-        'to try next.')
+        'to try next.'
+    )
     display_mode: str = base.DISPLAY_MODE_INLINE
     is_terminal: bool = True
     _dependency_ids: List[str] = []
@@ -49,24 +50,29 @@ class EndExploration(base.BaseInteraction):
     can_have_solution: bool = False
     show_generic_submit_button: bool = False
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'recommendedExplorationIds',
-        'description': (
-            'IDs of explorations to recommend to the learner (at most 3 are '
-            'shown). The ID of an exploration is the string of characters '
-            'appearing after \'/explore/\' in the URL bar.'),
-        'schema': {
-            'type': 'list',
-            'items': {
-                'type': 'unicode',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'recommendedExplorationIds',
+            'description': (
+                'IDs of explorations to recommend to the learner (at most 3 are '
+                'shown). The ID of an exploration is the string of characters '
+                'appearing after \'/explore/\' in the URL bar.'
+            ),
+            'schema': {
+                'type': 'list',
+                'items': {
+                    'type': 'unicode',
+                },
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': 3,
+                    }
+                ],
+                'ui_config': {
+                    'add_element_text': 'Add exploration ID',
+                },
             },
-            'validators': [{
-                'id': 'has_length_at_most',
-                'max_value': 3,
-            }],
-            'ui_config': {
-                'add_element_text': 'Add exploration ID',
-            }
-        },
-        'default_value': [],
-    }]
+            'default_value': [],
+        }
+    ]

@@ -37,9 +37,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import transaction_services
     from mypy_imports import user_models
 
-(stats_models, user_models) = models.Registry.import_models([
-    models.Names.STATISTICS, models.Names.USER
-])
+(stats_models, user_models) = models.Registry.import_models(
+    [models.Names.STATISTICS, models.Names.USER]
+)
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -99,7 +99,7 @@ class StatsEventsHandler(BaseEventHandler):
         cls,
         exploration_id: str,
         exp_version: int,
-        aggregated_stats: Dict[str, Dict[str, Union[int, str]]]
+        aggregated_stats: Dict[str, Dict[str, Union[int, str]]],
     ) -> None:
         """Handle events for incremental update to analytics models using
         aggregated stats data.
@@ -107,14 +107,17 @@ class StatsEventsHandler(BaseEventHandler):
         if 'undefined' in aggregated_stats['state_stats_mapping']:
             logging.error(
                 'Aggregated stats contains an undefined state name: %s'
-                % list(aggregated_stats['state_stats_mapping'].keys()))
+                % list(aggregated_stats['state_stats_mapping'].keys())
+            )
             return
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(
                 taskqueue_services.FUNCTION_ID_UPDATE_STATS,
                 taskqueue_services.QUEUE_NAME_STATS,
                 exploration_id,
-                exp_version, aggregated_stats)
+                exp_version,
+                aggregated_stats,
+            )
 
 
 class AnswerSubmissionEventHandler(BaseEventHandler):
@@ -135,7 +138,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         session_id: str,
         time_spent_in_secs: float,
         params: Dict[str, Union[str, int]],
-        normalized_answer: str
+        normalized_answer: str,
     ) -> None:
         """Records an event when an answer triggers a rule. The answer recorded
         here is a Python-representation of the actual answer submitted by the
@@ -143,19 +146,34 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         """
         # TODO(sll): Escape these args?
         stats_services.record_answer(
-            exploration_id, exploration_version, state_name, interaction_id,
+            exploration_id,
+            exploration_version,
+            state_name,
+            interaction_id,
             stats_domain.SubmittedAnswer(
-                normalized_answer, interaction_id, answer_group_index,
-                rule_spec_index, classification_categorization, params,
-                session_id, time_spent_in_secs))
+                normalized_answer,
+                interaction_id,
+                answer_group_index,
+                rule_spec_index,
+                classification_categorization,
+                params,
+                session_id,
+                time_spent_in_secs,
+            ),
+        )
 
-        feedback_is_useful = (
-            classification_categorization != (
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION))
+        feedback_is_useful = classification_categorization != (
+            exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+        )
 
         stats_models.AnswerSubmittedEventLogEntryModel.create(
-            exploration_id, exploration_version, state_name, session_id,
-            time_spent_in_secs, feedback_is_useful)
+            exploration_id,
+            exploration_version,
+            state_name,
+            session_id,
+            time_spent_in_secs,
+            feedback_is_useful,
+        )
 
 
 class ExplorationActualStartEventHandler(BaseEventHandler):
@@ -171,7 +189,8 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
         events.
         """
         stats_models.ExplorationActualStartEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id)
+            exp_id, exp_version, state_name, session_id
+        )
 
 
 class SolutionHitEventHandler(BaseEventHandler):
@@ -186,12 +205,12 @@ class SolutionHitEventHandler(BaseEventHandler):
         exp_version: int,
         state_name: str,
         session_id: str,
-        time_spent_in_state_secs: float
+        time_spent_in_state_secs: float,
     ) -> None:
         """Perform in-request processing of recording solution hit events."""
         stats_models.SolutionHitEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs)
+            exp_id, exp_version, state_name, session_id, time_spent_in_state_secs
+        )
 
 
 class StartExplorationEventHandler(BaseEventHandler):
@@ -207,14 +226,14 @@ class StartExplorationEventHandler(BaseEventHandler):
         state_name: str,
         session_id: str,
         params: Dict[str, str],
-        play_type: str
+        play_type: str,
     ) -> None:
         """Perform in-request processing of recording exploration start
         events.
         """
         stats_models.StartExplorationEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id, params,
-            play_type)
+            exp_id, exp_version, state_name, session_id, params, play_type
+        )
         handle_exploration_start(exp_id)
 
 
@@ -232,14 +251,14 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
         session_id: str,
         time_spent: float,
         params: Dict[str, str],
-        play_type: str
+        play_type: str,
     ) -> None:
         """Perform in-request processing of recording exploration leave
         events.
         """
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id, time_spent,
-            params, play_type)
+            exp_id, exp_version, state_name, session_id, time_spent, params, play_type
+        )
 
 
 class CompleteExplorationEventHandler(BaseEventHandler):
@@ -256,14 +275,14 @@ class CompleteExplorationEventHandler(BaseEventHandler):
         session_id: str,
         time_spent: float,
         params: Dict[str, str],
-        play_type: str
+        play_type: str,
     ) -> None:
         """Perform in-request processing of recording exploration completion
         events.
         """
         stats_models.CompleteExplorationEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id, time_spent,
-            params, play_type)
+            exp_id, exp_version, state_name, session_id, time_spent, params, play_type
+        )
 
 
 class RateExplorationEventHandler(BaseEventHandler):
@@ -273,17 +292,14 @@ class RateExplorationEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(
-        cls,
-        exp_id: str,
-        user_id: str,
-        rating: int,
-        old_rating: int
+        cls, exp_id: str, user_id: str, rating: int, old_rating: int
     ) -> None:
         """Perform in-request processing of recording exploration rating
         events.
         """
         stats_models.RateExplorationEventLogEntryModel.create(
-            exp_id, user_id, rating, old_rating)
+            exp_id, user_id, rating, old_rating
+        )
         handle_exploration_rating(exp_id, rating, old_rating)
 
 
@@ -301,12 +317,12 @@ class StateHitEventHandler(BaseEventHandler):
         state_name: str,
         session_id: str,
         params: Dict[str, str],
-        play_type: str
+        play_type: str,
     ) -> None:
         """Perform in-request processing of recording state hit events."""
         stats_models.StateHitEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id,
-            params, play_type)
+            exp_id, exp_version, state_name, session_id, params, play_type
+        )
 
 
 class StateCompleteEventHandler(BaseEventHandler):
@@ -321,12 +337,12 @@ class StateCompleteEventHandler(BaseEventHandler):
         exp_version: int,
         state_name: str,
         session_id: str,
-        time_spent_in_state_secs: float
+        time_spent_in_state_secs: float,
     ) -> None:
         """Perform in-request processing of recording state complete events."""
         stats_models.StateCompleteEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs)
+            exp_id, exp_version, state_name, session_id, time_spent_in_state_secs
+        )
 
 
 class LeaveForRefresherExpEventHandler(BaseEventHandler):
@@ -342,14 +358,19 @@ class LeaveForRefresherExpEventHandler(BaseEventHandler):
         exp_version: int,
         state_name: str,
         session_id: str,
-        time_spent_in_state_secs: float
+        time_spent_in_state_secs: float,
     ) -> None:
         """Perform in-request processing of recording "leave for refresher
         exploration" events.
         """
         stats_models.LeaveForRefresherExplorationEventLogEntryModel.create(
-            exp_id, refresher_exp_id, exp_version, state_name, session_id,
-            time_spent_in_state_secs)
+            exp_id,
+            refresher_exp_id,
+            exp_version,
+            state_name,
+            session_id,
+            time_spent_in_state_secs,
+        )
 
 
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):
@@ -371,17 +392,11 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
     EVENT_TYPE: str = feconf.EVENT_TYPE_THREAD_STATUS_CHANGED
 
     @classmethod
-    def _handle_event(
-        cls,
-        exp_id: str,
-        old_status: str,
-        new_status: str
-    ) -> None:
+    def _handle_event(cls, exp_id: str, old_status: str, new_status: str) -> None:
         """Perform in-request processing of recording reopening feedback
         thread events.
         """
-        feedback_services.handle_thread_status_changed(
-            exp_id, old_status, new_status)
+        feedback_services.handle_thread_status_changed(exp_id, old_status, new_status)
 
 
 def handle_exploration_start(exp_id: str) -> None:
@@ -390,9 +405,7 @@ def handle_exploration_start(exp_id: str) -> None:
     Args:
         exp_id: str. The exploration which has been started.
     """
-    exp_summary = exp_fetchers.get_exploration_summary_by_id(
-        exp_id, strict=False
-    )
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id, strict=False)
     if exp_summary is not None:
         for user_id in exp_summary.owner_ids:
             _increment_total_plays_count_transactional(user_id)
@@ -410,9 +423,7 @@ def handle_exploration_rating(
             refreshing, or None if the exploration hasn't been rated by the user
             yet.
     """
-    exp_summary = exp_fetchers.get_exploration_summary_by_id(
-        exp_id, strict=False
-    )
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id, strict=False)
     if exp_summary is not None:
         for user_id in exp_summary.owner_ids:
             _refresh_average_ratings_transactional(user_id, rating, old_rating)
@@ -434,7 +445,8 @@ def _refresh_average_ratings_transactional(
     user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
     if user_stats_model is None:
         user_models.UserStatsModel(
-            id=user_id, average_ratings=new_rating, num_ratings=1).put()
+            id=user_id, average_ratings=new_rating, num_ratings=1
+        ).put()
         return
 
     num_ratings = user_stats_model.num_ratings

@@ -31,7 +31,7 @@ import apache_beam as beam
 from typing import Iterator, List, Optional, Tuple, Type, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
@@ -64,8 +64,7 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):  # type: ignore[mi
             yield topic_validation_errors.ModelCanonicalNameMismatchError(model)
 
 
-@validation_decorators.AuditsExisting(
-    topic_models.TopicSnapshotMetadataModel)
+@validation_decorators.AuditsExisting(topic_models.TopicSnapshotMetadataModel)
 class ValidateTopicSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
         topic_models.TopicSnapshotMetadataModel
@@ -74,7 +73,8 @@ class ValidateTopicSnapshotMetadataModel(
     """Overrides _get_change_domain_class for TopicSnapshotMetadataModel."""
 
     def _get_change_domain_class(
-        self, input_model: topic_models.TopicSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        input_model: topic_models.TopicSnapshotMetadataModel,  # pylint: disable=unused-argument
     ) -> Type[topic_domain.TopicChange]:
         """Returns a change domain class.
 
@@ -88,18 +88,17 @@ class ValidateTopicSnapshotMetadataModel(
         return topic_domain.TopicChange
 
 
-@validation_decorators.AuditsExisting(
-    topic_models.TopicRightsSnapshotMetadataModel)
+@validation_decorators.AuditsExisting(topic_models.TopicRightsSnapshotMetadataModel)
 class ValidateTopicRightsSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
         topic_models.TopicRightsSnapshotMetadataModel
     ]
 ):
-    """Overrides _get_change_domain_class for TopicRightsSnapshotMetadataModel.
-    """
+    """Overrides _get_change_domain_class for TopicRightsSnapshotMetadataModel."""
 
     def _get_change_domain_class(
-        self, input_model: topic_models.TopicRightsSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        input_model: topic_models.TopicRightsSnapshotMetadataModel,  # pylint: disable=unused-argument
     ) -> Type[topic_domain.TopicRightsChange]:
         """Returns a change domain class.
 
@@ -115,12 +114,9 @@ class ValidateTopicRightsSnapshotMetadataModel(
 
 @validation_decorators.AuditsExisting(topic_models.TopicCommitLogEntryModel)
 class ValidateTopicCommitLogEntryModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        topic_models.TopicCommitLogEntryModel
-    ]
+    base_validation.BaseValidateCommitCmdsSchema[topic_models.TopicCommitLogEntryModel]
 ):
-    """Overrides _get_change_domain_class for TopicCommitLogEntryModel.
-    """
+    """Overrides _get_change_domain_class for TopicCommitLogEntryModel."""
 
     # Here we use MyPy ignore because the signature of this method doesn't
     # match with super class's _get_change_domain_class() method.
@@ -150,13 +146,11 @@ class ValidateTopicCommitLogEntryModel(
 
 @validation_decorators.RelationshipsOf(topic_models.TopicSummaryModel)
 def topic_summary_model_relationships(
-    model: Type[topic_models.TopicSummaryModel]
+    model: Type[topic_models.TopicSummaryModel],
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
-        List[
-            Type[Union[topic_models.TopicModel, topic_models.TopicRightsModel]]
-        ]
+        List[Type[Union[topic_models.TopicModel, topic_models.TopicRightsModel]]],
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""

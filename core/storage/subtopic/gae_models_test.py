@@ -27,22 +27,22 @@ from core.tests import test_utils
 from typing import Final
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import subtopic_models
 
-(base_models, subtopic_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.SUBTOPIC
-])
+(base_models, subtopic_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.SUBTOPIC]
+)
 
 
 class SubtopicPageSnapshotContentModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
-            subtopic_models.SubtopicPageSnapshotContentModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            subtopic_models.SubtopicPageSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
@@ -54,8 +54,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         expected_export_policy_dict = {
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'page_contents_schema_version': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'page_contents_schema_version': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -64,16 +63,16 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(
             subtopic_models.SubtopicPageModel.get_export_policy(),
-            expected_export_policy_dict)
+            expected_export_policy_dict,
+        )
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             subtopic_models.SubtopicPageModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
-    def test_that_subsidiary_models_are_created_when_new_model_is_saved(
-        self
-    ) -> None:
+    def test_that_subsidiary_models_are_created_when_new_model_is_saved(self) -> None:
         """Tests the _trusted_commit() method."""
 
         # SubtopicPage is created but not committed/saved.
@@ -82,15 +81,15 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
             topic_id='topic_id',
             page_contents={},
             page_contents_schema_version=(
-                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
-            language_code='en'
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+            ),
+            language_code='en',
         )
         # We check that subtopic page has not been saved before calling
         # commit().
         self.assertIsNone(
             subtopic_models.SubtopicPageModel.get(
-                entity_id=self.SUBTOPIC_PAGE_ID,
-                strict=False
+                entity_id=self.SUBTOPIC_PAGE_ID, strict=False
             )
         )
         # We call commit() expecting that _trusted_commit works fine
@@ -98,14 +97,13 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         subtopic_page.commit(
             committer_id=feconf.SYSTEM_COMMITTER_ID,
             commit_message='Created new topic',
-            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
         # Now we check that subtopic page is not None and that actually
         # now subtopic page exists, that means that commit() worked fine.
         self.assertIsNotNone(
             subtopic_models.SubtopicPageModel.get(
-                entity_id=self.SUBTOPIC_PAGE_ID,
-                strict=False
+                entity_id=self.SUBTOPIC_PAGE_ID, strict=False
             )
         )
 
@@ -115,23 +113,34 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self) -> None:
         commit = subtopic_models.SubtopicPageCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'msg', 'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False)
+            'b',
+            0,
+            'committer_id',
+            'msg',
+            'create',
+            [{}],
+            constants.ACTIVITY_STATUS_PUBLIC,
+            False,
+        )
         commit.subtopic_page_id = 'b'
         commit.update_timestamps()
         commit.put()
         self.assertTrue(
-            subtopic_models.SubtopicPageCommitLogEntryModel
-            .has_reference_to_user_id('committer_id'))
+            subtopic_models.SubtopicPageCommitLogEntryModel.has_reference_to_user_id(
+                'committer_id'
+            )
+        )
         self.assertFalse(
-            subtopic_models.SubtopicPageCommitLogEntryModel
-            .has_reference_to_user_id('x_id'))
+            subtopic_models.SubtopicPageCommitLogEntryModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            subtopic_models.SubtopicPageCommitLogEntryModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -142,18 +151,16 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'post_commit_community_owned': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'post_commit_is_private': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'post_commit_status': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_community_owned': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_is_private': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_status': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
             subtopic_models.SubtopicPageCommitLogEntryModel.get_export_policy(),
-            expected_export_policy_dict)
+            expected_export_policy_dict,
+        )
 
     def test__get_instance_id(self) -> None:
         # Calling create() method calls _get_instance (a protected method)
@@ -167,10 +174,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 commit_message='Created new SubtopicPageCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
                 status=constants.ACTIVITY_STATUS_PRIVATE,
-                community_owned=True
+                community_owned=True,
             )
         )
-        self.assertEqual(
-            subtopic_page_commit_log_entry.id,
-            'subtopicpage-entity_id-1'
-        )
+        self.assertEqual(subtopic_page_commit_log_entry.id, 'subtopicpage-entity_id-1')

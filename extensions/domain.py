@@ -93,7 +93,7 @@ AllowedDefaultValueTypes = Union[
     ImageAndRegionDict,
     CustomizationArgSubtitledUnicodeDefaultDict,
     List[CustomizationArgSubtitledHtmlDefaultDict],
-    None
+    None,
 ]
 
 
@@ -119,7 +119,7 @@ class CustomizationArgSpec:
         name: str,
         description: str,
         schema: Dict[str, Any],
-        default_value: AllowedDefaultValueTypes
+        default_value: AllowedDefaultValueTypes,
     ) -> None:
         self.name = name
         self.description = description
@@ -136,5 +136,5 @@ class CustomizationArgSpec:
             'name': self.name,
             'description': self.description,
             'schema': self.schema,
-            'default_value': self.default_value
+            'default_value': self.default_value,
         }

@@ -35,13 +35,14 @@ import result
 from typing import Iterable, Sequence, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import subtopic_models
 
-(base_models, subtopic_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.SUBTOPIC])
+(base_models, subtopic_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.SUBTOPIC]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -50,17 +51,16 @@ datastore_services = models.Registry.import_datastore_services()
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
-class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
+class MigrateSubtopicPageModels(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all Subtopic models, performs migration
-      and filters any error results.
+    and filters any error results.
     """
 
     @staticmethod
     def _migrate_subtopic(
-        subtopic_page_id: str,
-        subtopic_page_model: subtopic_models.SubtopicPageModel
-    ) -> result.Result[Tuple[str, subtopic_page_domain.SubtopicPage],
-     Tuple[str, Exception]
+        subtopic_page_id: str, subtopic_page_model: subtopic_models.SubtopicPageModel
+    ) -> result.Result[
+        Tuple[str, subtopic_page_domain.SubtopicPage], Tuple[str, Exception]
     ]:
         """Migrates subtopic and transform subtopic model into subtopic object.
 
@@ -77,7 +77,8 @@ class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
         """
         try:
             subtopic = subtopic_page_services.get_subtopic_page_from_model(
-                subtopic_page_model)
+                subtopic_page_model
+            )
             subtopic.validate()
         except Exception as e:
             logging.exception(e)
@@ -87,8 +88,7 @@ class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
 
     @staticmethod
     def _generate_subtopic_changes(
-        subtopic_page_id: str,
-        subtopic_page_model: subtopic_models.SubtopicPageModel
+        subtopic_page_id: str, subtopic_page_model: subtopic_models.SubtopicPageModel
     ) -> Iterable[Tuple[str, subtopic_page_domain.SubtopicPageChange]]:
         """Generates subtopic change objects. Subtopic change object is
         generated when schema version for some field is lower than the latest
@@ -103,23 +103,26 @@ class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
             (str, SubtopicPageChange). Tuple containing subtopic page ID and
             subtopic change object.
         """
-        subtopic_page_version = (
-            subtopic_page_model.page_contents_schema_version)
-        if subtopic_page_version < feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION: # pylint: disable=line-too-long
-            subtopic_change = subtopic_page_domain.SubtopicPageChange({
-                'cmd': (
-                    subtopic_page_domain.CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION), # pylint: disable=line-too-long
-                'from_version': subtopic_page_version,
-                'to_version': (
-                    feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION)
-            })
+        subtopic_page_version = subtopic_page_model.page_contents_schema_version
+        if (
+            subtopic_page_version < feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+        ):  # pylint: disable=line-too-long
+            subtopic_change = subtopic_page_domain.SubtopicPageChange(
+                {
+                    'cmd': (
+                        subtopic_page_domain.CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION
+                    ),  # pylint: disable=line-too-long
+                    'from_version': subtopic_page_version,
+                    'to_version': (
+                        feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+                    ),
+                }
+            )
             yield (subtopic_page_id, subtopic_change)
 
-    def expand(
-        self, pipeline: beam.Pipeline
-    ) -> Tuple[
+    def expand(self, pipeline: beam.Pipeline) -> Tuple[
         beam.PCollection[base_models.BaseModel],
-        beam.PCollection[job_run_result.JobRunResult]
+        beam.PCollection[job_run_result.JobRunResult],
     ]:
         """Migrate subtopic objects and flush the input
             in case of errors.
@@ -135,96 +138,95 @@ class MigrateSubtopicPageModels(beam.PTransform):# type: ignore[misc]
 
         unmigrated_subtopic_models = (
             pipeline
-            | 'Get all non-deleted subtopic models' >> (
-                ndb_io.GetModels(subtopic_models.SubtopicPageModel.get_all()))
+            | 'Get all non-deleted subtopic models'
+            >> (ndb_io.GetModels(subtopic_models.SubtopicPageModel.get_all()))
             # Pylint disable is needed becasue pylint is not able to correclty
             # detect that the value is passed through the pipe.
-            | 'Add subtopic keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda subtopic_model: subtopic_model.id)
+            | 'Add subtopic keys'
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda subtopic_model: subtopic_model.id
+            )
         )
 
         all_migrated_subtopic_results = (
             unmigrated_subtopic_models
-            | 'Transform and migrate model' >> beam.MapTuple(
-                self._migrate_subtopic)
+            | 'Transform and migrate model' >> beam.MapTuple(self._migrate_subtopic)
         )
 
         migrated_subtopic_job_run_results = (
             all_migrated_subtopic_results
-            | 'Generates results for migration' >> (
-                job_result_transforms.ResultsToJobRunResults(
-                    'SUBTOPIC PROCESSED'))
+            | 'Generates results for migration'
+            >> (job_result_transforms.ResultsToJobRunResults('SUBTOPIC PROCESSED'))
         )
 
         filtered_migrated_exp = (
             all_migrated_subtopic_results
-            | 'Filter migration results' >> (
-                results_transforms.DrainResultsOnError())
+            | 'Filter migration results' >> (results_transforms.DrainResultsOnError())
         )
 
-        migrated_subtopics = (
-            filtered_migrated_exp
-            | 'Unwrap ok' >> beam.Map(
-                lambda result_item: result_item.unwrap())
+        migrated_subtopics = filtered_migrated_exp | 'Unwrap ok' >> beam.Map(
+            lambda result_item: result_item.unwrap()
         )
 
         subtopic_changes = (
             unmigrated_subtopic_models
-            | 'Generates subtopic changes' >> beam.FlatMapTuple(
-                self._generate_subtopic_changes)
+            | 'Generates subtopic changes'
+            >> beam.FlatMapTuple(self._generate_subtopic_changes)
         )
 
         subtopic_objects_list = (
             {
                 'subtopic_model': unmigrated_subtopic_models,
                 'subtopic': migrated_subtopics,
-                'subtopic_changes': subtopic_changes
+                'subtopic_changes': subtopic_changes,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
         transformed_subtopic_objects_list = (
             subtopic_objects_list
-            | 'Remove unmigrated subtopics' >> beam.Filter(
-                lambda x: len(x['subtopic_changes']) > 0
-                    and len(x['subtopic']) > 0)
-            | 'Reorganize the subtopic objects' >> beam.Map(lambda objects: {
+            | 'Remove unmigrated subtopics'
+            >> beam.Filter(
+                lambda x: len(x['subtopic_changes']) > 0 and len(x['subtopic']) > 0
+            )
+            | 'Reorganize the subtopic objects'
+            >> beam.Map(
+                lambda objects: {
                     'subtopic_model': objects['subtopic_model'][0],
                     'subtopic': objects['subtopic'][0],
-                    'subtopic_changes': objects['subtopic_changes']
-                })
-
+                    'subtopic_changes': objects['subtopic_changes'],
+                }
+            )
         )
 
         already_migrated_job_run_results = (
             subtopic_objects_list
-            | 'Remove migrated models' >> beam.Filter(
-                lambda x: (
-                    len(x['subtopic_changes']) == 0 and len(x['subtopic']) > 0
-                ))
-            | 'Transform previously migrated subtopics to job run results' >> (
+            | 'Remove migrated models'
+            >> beam.Filter(
+                lambda x: (len(x['subtopic_changes']) == 0 and len(x['subtopic']) > 0)
+            )
+            | 'Transform previously migrated subtopics to job run results'
+            >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'SUBTOPIC PREVIOUSLY MIGRATED'))
+                    'SUBTOPIC PREVIOUSLY MIGRATED'
+                )
+            )
         )
 
         subtopic_objects_list_job_run_results = (
             transformed_subtopic_objects_list
-            | 'Transform subtopic objects into job run results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'SUBTOPIC MIGRATED'))
+            | 'Transform subtopic objects into job run results'
+            >> (job_result_transforms.CountObjectsToJobRunResult('SUBTOPIC MIGRATED'))
         )
 
         job_run_results = (
             migrated_subtopic_job_run_results,
             already_migrated_job_run_results,
-            subtopic_objects_list_job_run_results
+            subtopic_objects_list_job_run_results,
         ) | 'Flatten job run results' >> beam.Flatten()
 
-        return (
-            transformed_subtopic_objects_list,
-            job_run_results
-        )
+        return (transformed_subtopic_objects_list, job_run_results)
 
 
 class MigrateSubtopicPageJob(base_jobs.JobBase):
@@ -234,7 +236,7 @@ class MigrateSubtopicPageJob(base_jobs.JobBase):
     def _update_subtopic(
         subtopic_page_model: subtopic_models.SubtopicPageModel,
         migrated_subtopic: subtopic_page_domain.SubtopicPage,
-        subtopic_page_change: Sequence[subtopic_page_domain.SubtopicPageChange]
+        subtopic_page_change: Sequence[subtopic_page_domain.SubtopicPageChange],
     ) -> Sequence[base_models.BaseModel]:
         """Generates newly updated subtopic page models.
 
@@ -252,7 +254,8 @@ class MigrateSubtopicPageJob(base_jobs.JobBase):
         """
         updated_subtopic_model = (
             subtopic_page_services.populate_subtopic_page_model_fields(
-            subtopic_page_model, migrated_subtopic)
+                subtopic_page_model, migrated_subtopic
+            )
         )
 
         change_dicts = [change.to_dict() for change in subtopic_page_change]
@@ -260,10 +263,10 @@ class MigrateSubtopicPageJob(base_jobs.JobBase):
             models_to_put = updated_subtopic_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USER_ID,
                 feconf.COMMIT_TYPE_EDIT,
-                'Update subtopic page contents schema version to %d.' % (
-                    feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
+                'Update subtopic page contents schema version to %d.'
+                % (feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
                 change_dicts,
-                additional_models={}
+                additional_models={},
             )
         models_to_put_values = []
         for model in models_to_put.values():
@@ -283,23 +286,24 @@ class MigrateSubtopicPageJob(base_jobs.JobBase):
 
         transformed_subtopic_objects_list, job_run_results = (
             self.pipeline
-            | 'Perform migration and filter migration results' >> (
-                MigrateSubtopicPageModels())
+            | 'Perform migration and filter migration results'
+            >> (MigrateSubtopicPageModels())
         )
 
         subtopic_models_to_put = (
             transformed_subtopic_objects_list
-            | 'Generate subtopic models to put' >> beam.FlatMap(
+            | 'Generate subtopic models to put'
+            >> beam.FlatMap(
                 lambda subtopic_objects: self._update_subtopic(
                     subtopic_objects['subtopic_model'],
                     subtopic_objects['subtopic'],
                     subtopic_objects['subtopic_changes'],
-                ))
+                )
+            )
         )
 
         unused_put_results = (
-            subtopic_models_to_put
-            | 'Put models into datastore' >> ndb_io.PutModels()
+            subtopic_models_to_put | 'Put models into datastore' >> ndb_io.PutModels()
         )
 
         return job_run_results
@@ -319,8 +323,8 @@ class AuditSubtopicMigrationJob(base_jobs.JobBase):
 
         unused_transformed_subtopic_objects_list, job_run_results = (
             self.pipeline
-            | 'Perform migration and filter migration results' >> (
-                MigrateSubtopicPageModels())
+            | 'Perform migration and filter migration results'
+            >> (MigrateSubtopicPageModels())
         )
 
         return job_run_results

@@ -28,7 +28,7 @@ from extensions.actions import base
 from typing import Dict, List
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
 
 (stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
@@ -62,8 +62,7 @@ class Registry:
             module = importlib.import_module('.'.join(module_path_parts))
             clazz = getattr(module, action_type)
 
-            ancestor_names = [
-                base_class.__name__ for base_class in clazz.__bases__]
+            ancestor_names = [base_class.__name__ for base_class in clazz.__bases__]
             if 'BaseLearnerActionSpec' in ancestor_names:
                 cls._actions[clazz.__name__] = clazz()
 

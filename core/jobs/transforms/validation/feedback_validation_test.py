@@ -48,12 +48,11 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(
-                feedback_validation.ValidateEntityType())
+            | beam.ParDo(feedback_validation.ValidateEntityType())
         )
-        self.assert_pcoll_equal(output, [
-            feedback_validation_errors.InvalidEntityTypeError(model)
-        ])
+        self.assert_pcoll_equal(
+            output, [feedback_validation_errors.InvalidEntityTypeError(model)]
+        )
 
     def test_model_with_valid_entity_type_raises_no_error(self) -> None:
         model = feedback_models.GeneralFeedbackThreadModel(
@@ -67,8 +66,7 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(
-                feedback_validation.ValidateEntityType())
+            | beam.ParDo(feedback_validation.ValidateEntityType())
         )
         self.assert_pcoll_equal(output, [])
 
@@ -78,4 +76,7 @@ class RelationshipsOfTests(test_utils.TestBase):
     def test_feedback_analytics_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
-                'FeedbackAnalyticsModel', 'id'), ['ExplorationModel'])
+                'FeedbackAnalyticsModel', 'id'
+            ),
+            ['ExplorationModel'],
+        )

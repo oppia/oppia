@@ -22,7 +22,7 @@ import heapq
 
 from core import utils
 
-from typing import Any, List, Tuple, Union # isort: skip
+from typing import Any, List, Tuple, Union  # isort: skip
 
 # This is just to make sure that the output of the job have some reasonable
 # length. The maximum that model can hold is around 1 MB and this is much lower.
@@ -56,18 +56,12 @@ class JobRunResult:
         self.stdout, self.stderr = stdout, stderr
 
         if len(self.stdout) > MAX_OUTPUT_CHARACTERS:
-            self.stdout = '%s%s' % (
-                self.stdout[:MAX_OUTPUT_CHARACTERS], TRUNCATED_MARK
-            )
+            self.stdout = '%s%s' % (self.stdout[:MAX_OUTPUT_CHARACTERS], TRUNCATED_MARK)
         if len(self.stderr) > MAX_OUTPUT_CHARACTERS:
-            self.stderr = '%s%s' % (
-                self.stderr[:MAX_OUTPUT_CHARACTERS], TRUNCATED_MARK
-            )
+            self.stderr = '%s%s' % (self.stderr[:MAX_OUTPUT_CHARACTERS], TRUNCATED_MARK)
 
     @classmethod
-    def as_stdout(
-        cls, value: Union[str, int], use_repr: bool = False
-    ) -> JobRunResult:
+    def as_stdout(cls, value: Union[str, int], use_repr: bool = False) -> JobRunResult:
         """Returns a new JobRunResult with a stdout value.
 
         Args:
@@ -82,9 +76,7 @@ class JobRunResult:
         return JobRunResult(stdout=str_value)
 
     @classmethod
-    def as_stderr(
-        cls, value: Union[str, int], use_repr: bool = False
-    ) -> JobRunResult:
+    def as_stderr(cls, value: Union[str, int], use_repr: bool = False) -> JobRunResult:
         """Returns a new JobRunResult with a stderr value.
 
         Args:
@@ -120,8 +112,7 @@ class JobRunResult:
             # Use i as a tie-breaker so that results, which don't implement the
             # comparison operators, don't get compared with one another.
             heapq.heappush(
-                results_heap,
-                (len(result.stdout) + len(result.stderr), i, result)
+                results_heap, (len(result.stdout) + len(result.stderr), i, result)
             )
 
         batches = []
@@ -154,7 +145,9 @@ class JobRunResult:
     def __repr__(self) -> str:
         return '%s(stdout=%s, stderr=%s)' % (
             self.__class__.__name__,
-            utils.quoted(self.stdout), utils.quoted(self.stderr))
+            utils.quoted(self.stdout),
+            utils.quoted(self.stderr),
+        )
 
     def __hash__(self) -> int:
         return hash((self.stdout, self.stderr))
@@ -164,16 +157,19 @@ class JobRunResult:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         return (
-            (self.stdout, self.stderr) == (other.stdout, other.stderr) # pylint: disable=protected-access
-            if self.__class__ is other.__class__ else NotImplemented)
+            (self.stdout, self.stderr)
+            == (other.stdout, other.stderr)  # pylint: disable=protected-access
+            if self.__class__ is other.__class__
+            else NotImplemented
+        )
 
     # NOTE: Here we use type Any because the function could also return
     # NotImplemented:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __ne__(self, other: Any) -> Any:
         return (
-            not (self == other)
-            if self.__class__ is other.__class__ else NotImplemented)
+            not (self == other) if self.__class__ is other.__class__ else NotImplemented
+        )
 
     def __getstate__(self) -> Tuple[str, str]:
         """Called by pickle to get the value that uniquely defines self."""

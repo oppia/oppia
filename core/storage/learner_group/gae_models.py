@@ -26,7 +26,7 @@ from core.platform import models
 from typing import Dict, List, Literal, Sequence, TypedDict
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -60,7 +60,8 @@ class LearnerGroupModel(base_models.BaseModel):
     description = datastore_services.StringProperty(required=True, indexed=True)
     # The list of user_ids of facilitators of the learner group.
     facilitator_user_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True)
+        repeated=True, indexed=True
+    )
     # The list of user_ids of learners of the learner group.
     learner_user_ids = datastore_services.StringProperty(repeated=True)
     # The list of user_ids of the learners who are invited to join the
@@ -81,29 +82,27 @@ class LearnerGroupModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user as a
         user can be part of multiple learner groups.
         """
-        return (
-            base_models.MODEL_ASSOCIATION_TO_USER
-            .MULTIPLE_INSTANCES_PER_USER
-        )
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains user data to be exported."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'title': base_models.EXPORT_POLICY.EXPORTED,
-            'description': base_models.EXPORT_POLICY.EXPORTED,
-            'facilitator_user_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'learner_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'invited_learner_user_ids':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'subtopic_page_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'story_ids': base_models.EXPORT_POLICY.EXPORTED
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'title': base_models.EXPORT_POLICY.EXPORTED,
+                'description': base_models.EXPORT_POLICY.EXPORTED,
+                'facilitator_user_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'learner_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'invited_learner_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'subtopic_page_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+            },
+        )
 
     # Here we use MyPy ignore because the signature of this method doesn't
     # match with signature of super class's get_new_id() method.
@@ -120,22 +119,16 @@ class LearnerGroupModel(base_models.BaseModel):
         """
         for _ in range(base_models.MAX_RETRIES):
             group_id = ''.join(
-                random.choice('%s%s' % (
-                    string.ascii_lowercase, string.ascii_uppercase)
-                )
-                for _ in range(base_models.ID_LENGTH))
+                random.choice('%s%s' % (string.ascii_lowercase, string.ascii_uppercase))
+                for _ in range(base_models.ID_LENGTH)
+            )
             if not cls.get_by_id(group_id):
                 return group_id
 
         raise Exception('New id generator is producing too many collisions.')
 
     @classmethod
-    def create(
-        cls,
-        group_id: str,
-        title: str,
-        description: str
-    ) -> LearnerGroupModel:
+    def create(cls, group_id: str, title: str, description: str) -> LearnerGroupModel:
         """Creates a new LearnerGroupModel instance and returns it.
 
         Args:
@@ -150,8 +143,7 @@ class LearnerGroupModel(base_models.BaseModel):
             Exception. A learner group with the given group ID exists already.
         """
         if cls.get_by_id(group_id):
-            raise Exception(
-                'A learner group with the given group ID exists already.')
+            raise Exception('A learner group with the given group ID exists already.')
 
         entity = cls(id=group_id, title=title, description=description)
 
@@ -184,8 +176,9 @@ class LearnerGroupModel(base_models.BaseModel):
             datastore_services.any_of(
                 cls.learner_user_ids == user_id,
                 cls.invited_learner_user_ids == user_id,
-                cls.facilitator_user_ids == user_id
-        ))
+                cls.facilitator_user_ids == user_id,
+            )
+        )
         user_data = {}
         for learner_group_model in found_models:
             learner_group_data: LearnerGroupDataDict
@@ -194,9 +187,8 @@ class LearnerGroupModel(base_models.BaseModel):
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
                     'role_in_group': 'learner',
-                    'subtopic_page_ids':
-                        learner_group_model.subtopic_page_ids,
-                    'story_ids': learner_group_model.story_ids
+                    'subtopic_page_ids': learner_group_model.subtopic_page_ids,
+                    'story_ids': learner_group_model.story_ids,
                 }
             elif user_id in learner_group_model.invited_learner_user_ids:
                 learner_group_data = {
@@ -204,7 +196,7 @@ class LearnerGroupModel(base_models.BaseModel):
                     'description': learner_group_model.description,
                     'role_in_group': 'invited_learner',
                     'subtopic_page_ids': [],
-                    'story_ids': []
+                    'story_ids': [],
                 }
             else:
                 # To get to this branch, the user_id would need to be in
@@ -214,9 +206,8 @@ class LearnerGroupModel(base_models.BaseModel):
                     'title': learner_group_model.title,
                     'description': learner_group_model.description,
                     'role_in_group': 'facilitator',
-                    'subtopic_page_ids':
-                        learner_group_model.subtopic_page_ids,
-                    'story_ids': learner_group_model.story_ids
+                    'subtopic_page_ids': learner_group_model.subtopic_page_ids,
+                    'story_ids': learner_group_model.story_ids,
                 }
             user_data[learner_group_model.id] = learner_group_data
 
@@ -233,11 +224,14 @@ class LearnerGroupModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
-            cls.query(datastore_services.any_of(
-                cls.learner_user_ids == user_id,
-                cls.invited_learner_user_ids == user_id,
-                cls.facilitator_user_ids == user_id
-            )).get(keys_only=True) is not None
+            cls.query(
+                datastore_services.any_of(
+                    cls.learner_user_ids == user_id,
+                    cls.invited_learner_user_ids == user_id,
+                    cls.facilitator_user_ids == user_id,
+                )
+            ).get(keys_only=True)
+            is not None
         )
 
     @classmethod
@@ -252,8 +246,9 @@ class LearnerGroupModel(base_models.BaseModel):
             datastore_services.any_of(
                 cls.learner_user_ids == user_id,
                 cls.invited_learner_user_ids == user_id,
-                cls.facilitator_user_ids == user_id
-        ))
+                cls.facilitator_user_ids == user_id,
+            )
+        )
 
         learner_group_models_to_put = []
 
@@ -261,8 +256,8 @@ class LearnerGroupModel(base_models.BaseModel):
             # If the user is the facilitator of the group and there is
             # only one facilitator_user_id, delete the group.
             if (
-                user_id in learner_group_model.facilitator_user_ids and
-                len(learner_group_model.facilitator_user_ids) == 1
+                user_id in learner_group_model.facilitator_user_ids
+                and len(learner_group_model.facilitator_user_ids) == 1
             ):
                 learner_group_model.delete()
                 continue
@@ -271,8 +266,8 @@ class LearnerGroupModel(base_models.BaseModel):
             # more then one facilitator_user_ids, delete the user from the
             # facilitator_user_ids list.
             if (
-                user_id in learner_group_model.facilitator_user_ids and
-                len(learner_group_model.facilitator_user_ids) > 1
+                user_id in learner_group_model.facilitator_user_ids
+                and len(learner_group_model.facilitator_user_ids) > 1
             ):
                 learner_group_model.facilitator_user_ids.remove(user_id)
 
@@ -295,9 +290,7 @@ class LearnerGroupModel(base_models.BaseModel):
         cls.put_multi(learner_group_models_to_put)
 
     @classmethod
-    def get_by_facilitator_id(
-        cls, facilitator_id: str
-    ) -> Sequence[LearnerGroupModel]:
+    def get_by_facilitator_id(cls, facilitator_id: str) -> Sequence[LearnerGroupModel]:
         """Returns a list of all LearnerGroupModels that have the given
         facilitator id.
 
@@ -309,10 +302,13 @@ class LearnerGroupModel(base_models.BaseModel):
             have the given facilitator id or None if no such learner group
             models exist.
         """
-        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
-            datastore_services.any_of(
-                cls.facilitator_user_ids == facilitator_id
-        )).fetch()
+        found_models: Sequence[LearnerGroupModel] = (
+            cls.get_all()
+            .filter(
+                datastore_services.any_of(cls.facilitator_user_ids == facilitator_id)
+            )
+            .fetch()
+        )
 
         return found_models
 
@@ -331,10 +327,11 @@ class LearnerGroupModel(base_models.BaseModel):
             the given learner is part of or None if no such learner group
             models exist.
         """
-        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
-            datastore_services.any_of(
-                cls.learner_user_ids == learner_user_id
-        )).fetch()
+        found_models: Sequence[LearnerGroupModel] = (
+            cls.get_all()
+            .filter(datastore_services.any_of(cls.learner_user_ids == learner_user_id))
+            .fetch()
+        )
 
         return found_models
 
@@ -354,9 +351,14 @@ class LearnerGroupModel(base_models.BaseModel):
             the given learner is being invited to join or None if no such
             learner group models exist.
         """
-        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
-            datastore_services.any_of(
-                cls.invited_learner_user_ids == invited_learner_user_id
-        )).fetch()
+        found_models: Sequence[LearnerGroupModel] = (
+            cls.get_all()
+            .filter(
+                datastore_services.any_of(
+                    cls.invited_learner_user_ids == invited_learner_user_id
+                )
+            )
+            .fetch()
+        )
 
         return found_models

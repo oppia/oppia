@@ -28,10 +28,11 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
         redirects to the new Fractions landing url.
         """
         response = self.get_html_response(
-            feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302)
+            feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302
+        )
         self.assertEqual(
-            'http://localhost/math/fractions',
-            response.headers['location'])
+            'http://localhost/math/fractions', response.headers['location']
+        )
 
     def test_old_fraction_landing_url_with_viewer_type(self) -> None:
         """Test to validate the old Fractions landing url with viewerType
@@ -39,10 +40,11 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
         """
         response = self.get_html_response(
             '%s?viewerType=student' % feconf.FRACTIONS_LANDING_PAGE_URL,
-            expected_status_int=302)
+            expected_status_int=302,
+        )
         self.assertEqual(
-            'http://localhost/math/fractions',
-            response.headers['location'])
+            'http://localhost/math/fractions', response.headers['location']
+        )
 
 
 class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
@@ -50,6 +52,8 @@ class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
 
     def test_old_topic_url_redirect(self) -> None:
         response = self.get_html_response(
-            '/learn/maths/fractions', expected_status_int=302)
+            '/learn/maths/fractions', expected_status_int=302
+        )
         self.assertEqual(
-            'http://localhost/math/fractions', response.headers['location'])
+            'http://localhost/math/fractions', response.headers['location']
+        )

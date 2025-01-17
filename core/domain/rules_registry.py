@@ -39,8 +39,7 @@ class Registry:
     """Registry of rules."""
 
     _state_schema_version_to_html_field_types_to_rule_specs: Dict[
-        Optional[int],
-        Dict[str, RuleSpecsExtensionDict]
+        Optional[int], Dict[str, RuleSpecsExtensionDict]
     ] = {}
 
     @classmethod
@@ -66,16 +65,16 @@ class Registry:
         """
         specs_from_json: Dict[str, RuleSpecsExtensionDict] = {}
         cached = (
-            state_schema_version in
-            cls._state_schema_version_to_html_field_types_to_rule_specs)
+            state_schema_version
+            in cls._state_schema_version_to_html_field_types_to_rule_specs
+        )
 
         if not cached:
             if state_schema_version is None:
                 specs_from_json = json.loads(
                     constants.get_package_file_contents(
                         'extensions',
-                        feconf.
-                        HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH
+                        feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH,
                     )
                 )
                 cls._state_schema_version_to_html_field_types_to_rule_specs[
@@ -86,24 +85,24 @@ class Registry:
                     state_schema_version
                 )
                 spec_file = os.path.join(
-                    feconf
-                    .LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR,  # pylint: disable=line-too-long
-                    file_name
+                    feconf.LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR,  # pylint: disable=line-too-long
+                    file_name,
                 )
 
                 try:
                     specs_from_json = json.loads(
-                        constants.get_package_file_contents(
-                            'extensions', spec_file
-                        )
+                        constants.get_package_file_contents('extensions', spec_file)
                     )
                 except Exception as e:
                     raise Exception(
-                        'No specs json file found for state schema v%i' %
-                        state_schema_version) from e
+                        'No specs json file found for state schema v%i'
+                        % state_schema_version
+                    ) from e
 
                 cls._state_schema_version_to_html_field_types_to_rule_specs[
-                    state_schema_version] = specs_from_json
+                    state_schema_version
+                ] = specs_from_json
 
         return cls._state_schema_version_to_html_field_types_to_rule_specs[
-            state_schema_version]
+            state_schema_version
+        ]

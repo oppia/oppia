@@ -29,7 +29,7 @@ from typing import Dict, List, Optional, Union
 (email_models,) = models.Registry.import_models([models.Names.EMAIL])
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import email_services
 
 email_services = models.Registry.import_email_services()
@@ -85,7 +85,7 @@ def send_mail(
     plaintext_body: str,
     html_body: str,
     bcc_admin: bool = False,
-    attachments: Optional[List[Dict[str, str]]] = None
+    attachments: Optional[List[Dict[str, str]]] = None,
 ) -> None:
     """Sends an email.
 
@@ -117,31 +117,39 @@ def send_mail(
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
+    server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
     )
     if not server_can_send_emails:
         raise Exception('This app cannot send emails to users.')
 
     if not _is_email_valid(recipient_email):
-        raise ValueError(
-            'Malformed recipient email address: %s' % recipient_email)
+        raise ValueError('Malformed recipient email address: %s' % recipient_email)
 
     if not _is_sender_email_valid(sender_email):
-        raise ValueError(
-            'Malformed sender email address: %s' % sender_email)
+        raise ValueError('Malformed sender email address: %s' % sender_email)
     bcc = [feconf.ADMIN_EMAIL_ADDRESS] if bcc_admin else None
     response = email_services.send_email_to_recipients(
-        sender_email, [recipient_email], subject,
-        plaintext_body, html_body, bcc, '', None, attachments)
+        sender_email,
+        [recipient_email],
+        subject,
+        plaintext_body,
+        html_body,
+        bcc,
+        '',
+        None,
+        attachments,
+    )
 
     if not response:
-        raise Exception((
-            'Email to %s failed to send. Please try again later or '
-            'contact us to report a bug at '
-            'https://www.oppia.org/contact.') % recipient_email)
+        raise Exception(
+            (
+                'Email to %s failed to send. Please try again later or '
+                'contact us to report a bug at '
+                'https://www.oppia.org/contact.'
+            )
+            % recipient_email
+        )
 
 
 def send_bulk_mail(
@@ -150,7 +158,7 @@ def send_bulk_mail(
     subject: str,
     plaintext_body: str,
     html_body: str,
-    attachments: Optional[List[Dict[str, str]]] = None
+    attachments: Optional[List[Dict[str, str]]] = None,
 ) -> None:
     """Sends emails to all recipients in recipient_emails.
 
@@ -181,44 +189,45 @@ def send_bulk_mail(
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
+    server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
     )
     if not server_can_send_emails:
         raise Exception('This app cannot send emails to users.')
 
     for recipient_email in recipient_emails:
         if not _is_email_valid(recipient_email):
-            raise ValueError(
-                'Malformed recipient email address: %s' % recipient_email)
+            raise ValueError('Malformed recipient email address: %s' % recipient_email)
 
     if not _is_sender_email_valid(sender_email):
-        raise ValueError(
-            'Malformed sender email address: %s' % sender_email)
+        raise ValueError('Malformed sender email address: %s' % sender_email)
 
     response = email_services.send_email_to_recipients(
-        sender_email, recipient_emails, subject,
-        plaintext_body, html_body, attachments=attachments)
+        sender_email,
+        recipient_emails,
+        subject,
+        plaintext_body,
+        html_body,
+        attachments=attachments,
+    )
 
     if not response:
         raise Exception(
             'Bulk email failed to send. Please try again later or contact us '
-            'to report a bug at https://www.oppia.org/contact.')
+            'to report a bug at https://www.oppia.org/contact.'
+        )
 
 
 def convert_email_to_loggable_string(
-        sender_email: str,
-        recipient_emails: List[str],
-        subject: str,
-        plaintext_body: str,
-        html_body: str,
-        bcc: Optional[List[str]] = None,
-        reply_to: Optional[str] = None,
-        recipient_variables: Optional[
-            Dict[str, Dict[str, Union[str, float]]]] = None,
-        attachments: Optional[List[Dict[str, str]]] = None
+    sender_email: str,
+    recipient_emails: List[str],
+    subject: str,
+    plaintext_body: str,
+    html_body: str,
+    bcc: Optional[List[str]] = None,
+    reply_to: Optional[str] = None,
+    recipient_variables: Optional[Dict[str, Dict[str, Union[str, float]]]] = None,
+    attachments: Optional[List[Dict[str, str]]] = None,
 ) -> str:
     """Generates a loggable email which can be printed to console in order
     to model sending an email in non production mode.
@@ -260,11 +269,12 @@ def convert_email_to_loggable_string(
     """
     # Show the first 3 emails in the recipient list.
     recipient_email_list_str = ' '.join(
-        ['%s' %
-         (recipient_email,) for recipient_email in recipient_emails[:3]])
+        ['%s' % (recipient_email,) for recipient_email in recipient_emails[:3]]
+    )
     if len(recipient_emails) > 3:
-        recipient_email_list_str += (
-            '... Total: %s emails.' % (str(len(recipient_emails))))
+        recipient_email_list_str += '... Total: %s emails.' % (
+            str(len(recipient_emails))
+        )
 
     filenames = []
     if attachments:
@@ -273,14 +283,11 @@ def convert_email_to_loggable_string(
 
     # Show the first 3 emails in bcc email list.
     if bcc:
-        bcc_email_list_str = ' '.join(
-            ['%s' %
-             (bcc_email,) for bcc_email in bcc[:3]])
+        bcc_email_list_str = ' '.join(['%s' % (bcc_email,) for bcc_email in bcc[:3]])
         if len(bcc) > 3:
             bcc_email_list_str += '... Total: %s emails.' % str(len(bcc))
 
-    msg = (
-        """
+    msg = """
         EmailService.SendMail
         From: %s
         To: %s
@@ -292,26 +299,30 @@ def convert_email_to_loggable_string(
             Content-type: text/html
             Data length: %d
         """ % (
-            sender_email, recipient_email_list_str, subject,
-            len(plaintext_body), len(html_body)))
-    optional_msg_description = (
-        """
+        sender_email,
+        recipient_email_list_str,
+        subject,
+        len(plaintext_body),
+        len(html_body),
+    )
+    optional_msg_description = """
         Bcc: %s
         Reply_to: %s
         Recipient Variables:
             Length: %d
         """ % (
-            bcc_email_list_str if bcc else 'None',
-            reply_to if reply_to else 'None',
-            len(recipient_variables) if recipient_variables else 0))
-    attachments_msg_description = (
-        """
+        bcc_email_list_str if bcc else 'None',
+        reply_to if reply_to else 'None',
+        len(recipient_variables) if recipient_variables else 0,
+    )
+    attachments_msg_description = """
         Attachments: %s
-        """ % (', '.join(filenames) if len(filenames) > 0 else 'None')
+        """ % (
+        ', '.join(filenames) if len(filenames) > 0 else 'None'
     )
     loggable_msg = (
-        textwrap.dedent(msg) +
-        textwrap.dedent(optional_msg_description) +
-        textwrap.dedent(attachments_msg_description)
+        textwrap.dedent(msg)
+        + textwrap.dedent(optional_msg_description)
+        + textwrap.dedent(attachments_msg_description)
     )
     return loggable_msg

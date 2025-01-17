@@ -34,14 +34,15 @@ INSTALLATION_TOOL_VERSIONS = {
 REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.in'
 COMPILED_REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.txt'
 
-_PARSER = argparse.ArgumentParser(
-    'Install Python development dependencies')
+_PARSER = argparse.ArgumentParser('Install Python development dependencies')
 _PARSER.add_argument(
-    '--assert_compiled', action='store_true',
-    help='Assert that the dev requirements file is already compiled.')
+    '--assert_compiled',
+    action='store_true',
+    help='Assert that the dev requirements file is already compiled.',
+)
 _PARSER.add_argument(
-    '--uninstall', action='store_true',
-    help='Uninstall all dev requirements.')
+    '--uninstall', action='store_true', help='Uninstall all dev requirements.'
+)
 
 
 def check_python_env_is_suitable() -> None:
@@ -63,12 +64,10 @@ def check_python_env_is_suitable() -> None:
     # * When sys.real_prefix exists
     # If either is true, we are in a virtual environment. We also check that
     # sys.real_prefix is Truthy to make testing easier.
-    if (
-        sys.prefix == sys.base_prefix
-        and not (hasattr(sys, 'real_prefix') and getattr(sys, 'real_prefix'))
+    if sys.prefix == sys.base_prefix and not (
+        hasattr(sys, 'real_prefix') and getattr(sys, 'real_prefix')
     ):
-        raise AssertionError(
-            'Oppia must be developed within a virtual environment.')
+        raise AssertionError('Oppia must be developed within a virtual environment.')
 
 
 def install_installation_tools() -> None:
@@ -79,14 +78,17 @@ def install_installation_tools() -> None:
         # https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program.
         proc_pip_install = subprocess.Popen(
             [sys.executable, '-m', 'pip', 'install', f'{package}=={version}'],
-            stdout=subprocess.PIPE)
+            stdout=subprocess.PIPE,
+        )
 
         # We suppress the "Requirement already satisfied" warning since it
         # clutters the output.
         proc_filter_output = subprocess.Popen(
             ['grep', '-v', 'Requirement already satisfied'],
             stdin=proc_pip_install.stdout,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
         if proc_pip_install.stdout is not None:
             proc_pip_install.stdout.close()
@@ -101,8 +103,12 @@ def install_installation_tools() -> None:
 def install_dev_dependencies() -> None:
     """Install dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
-        ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH, '--pip-args',
-        '--require-hashes --no-deps'],
+        [
+            'pip-sync',
+            COMPILED_REQUIREMENTS_DEV_FILE_PATH,
+            '--pip-args',
+            '--require-hashes --no-deps',
+        ],
         check=True,
         encoding='utf-8',
     )
@@ -117,9 +123,7 @@ def uninstall_dev_dependencies() -> None:
     )
 
 
-def compile_pip_requirements(
-    requirements_path: str, compiled_path: str
-) -> bool:
+def compile_pip_requirements(requirements_path: str, compiled_path: str) -> bool:
     """Compile a requirements.txt file.
 
     Args:
@@ -133,9 +137,14 @@ def compile_pip_requirements(
         old_compiled = f.read()
     subprocess.run(
         [
-            'pip-compile', '--no-emit-index-url', '--quiet',
-            '--strip-extras', '--generate-hashes', requirements_path,
-            '--output-file', compiled_path,
+            'pip-compile',
+            '--no-emit-index-url',
+            '--quiet',
+            '--strip-extras',
+            '--generate-hashes',
+            requirements_path,
+            '--output-file',
+            compiled_path,
         ],
         check=True,
         encoding='utf-8',
@@ -152,7 +161,8 @@ def main(cli_args: Optional[List[str]] = None) -> None:
     check_python_env_is_suitable()
     install_installation_tools()
     not_compiled = compile_pip_requirements(
-        REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH)
+        REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH
+    )
     if args.uninstall:
         uninstall_dev_dependencies()
     else:
@@ -163,7 +173,8 @@ def main(cli_args: Optional[List[str]] = None) -> None:
                 f'{COMPILED_REQUIREMENTS_DEV_FILE_PATH} was changed by the '
                 'installation script. Please commit the changes. '
                 'You can get the changes again by running this command: '
-                'python -m scripts.install_python_dev_dependencies')
+                'python -m scripts.install_python_dev_dependencies'
+            )
 
 
 # This code cannot be covered by tests since it only runs when this file

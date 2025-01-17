@@ -39,28 +39,24 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(action_name, str))
 
     def test_get_all_actions(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'Role TEST_ROLE does not exist.'):
+        with self.assertRaisesRegex(Exception, 'Role TEST_ROLE does not exist.'):
             role_services.get_all_actions(['TEST_ROLE'])
 
         self.assertEqual(
             role_services.get_all_actions([feconf.ROLE_ID_GUEST]),
-            [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY])
+            [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY],
+        )
 
     def test_action_allocated_to_all_allowed_roles(self) -> None:
         role_actions = role_services.get_role_actions()
 
-        self.assertItemsEqual(
-            list(role_actions), feconf.ALLOWED_USER_ROLES)
+        self.assertItemsEqual(list(role_actions), feconf.ALLOWED_USER_ROLES)
 
     def test_log_role_query(self) -> None:
         self.assertEqual(
-            gae_models.RoleQueryAuditModel.has_reference_to_user_id(
-                'TEST_USER'),
-            False)
-        role_services.log_role_query(
-            'TEST_USER', feconf.ROLE_ACTION_ADD, role='GUEST')
+            gae_models.RoleQueryAuditModel.has_reference_to_user_id('TEST_USER'), False
+        )
+        role_services.log_role_query('TEST_USER', feconf.ROLE_ACTION_ADD, role='GUEST')
         self.assertEqual(
-            gae_models.RoleQueryAuditModel.has_reference_to_user_id(
-                'TEST_USER'),
-            True)
+            gae_models.RoleQueryAuditModel.has_reference_to_user_id('TEST_USER'), True
+        )

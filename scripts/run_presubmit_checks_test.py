@@ -34,50 +34,83 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.print_arr: list[str] = []
+
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
+
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
         current_dir = os.path.abspath(os.getcwd())
         self.changed_frontend_file = os.path.join(
-            current_dir, 'core', 'templates', 'testFile.ts')
+            current_dir, 'core', 'templates', 'testFile.ts'
+        )
         self.current_branch = 'test-branch'
-        self.cmd_to_check_current_branch = [
-            'git', 'rev-parse', '--abbrev-ref', 'HEAD']
+        self.cmd_to_check_current_branch = ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
         self.cmd_to_match_current_branch_with_remote = [
-            'git', 'ls-remote', '--heads', 'origin', self.current_branch, '|',
-            'wc', '-l']
+            'git',
+            'ls-remote',
+            '--heads',
+            'origin',
+            self.current_branch,
+            '|',
+            'wc',
+            '-l',
+        ]
 
         self.scripts_called = {
             'run_frontend_tests': False,
             'run_backend_tests': False,
-            'run_lint_checks': False
+            'run_lint_checks': False,
         }
-        def mock_frontend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
+
+        def mock_frontend_tests(
+            args: list[str],
+        ) -> None:  # pylint: disable=unused-argument
             self.scripts_called['run_frontend_tests'] = True
-        def mock_backend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
+
+        def mock_backend_tests(
+            args: list[str],
+        ) -> None:  # pylint: disable=unused-argument
             self.scripts_called['run_backend_tests'] = True
-        def mock_run_lint_checks(args: list[str]) -> None:  # pylint: disable=unused-argument
+
+        def mock_run_lint_checks(
+            args: list[str],
+        ) -> None:  # pylint: disable=unused-argument
             self.scripts_called['run_lint_checks'] = True
 
         self.swap_frontend_tests = self.swap_with_checks(
-            run_frontend_tests, 'main', mock_frontend_tests,
-            expected_kwargs=[{
-                'args': ['--run_minified_tests']
-            }])
+            run_frontend_tests,
+            'main',
+            mock_frontend_tests,
+            expected_kwargs=[{'args': ['--run_minified_tests']}],
+        )
         self.swap_backend_tests = self.swap_with_checks(
-            run_backend_tests, 'main', mock_backend_tests,
-            expected_kwargs=[{'args': []}])
+            run_backend_tests,
+            'main',
+            mock_backend_tests,
+            expected_kwargs=[{'args': []}],
+        )
         self.swap_run_lint_checks = self.swap_with_checks(
-            run_lint_checks, 'main', mock_run_lint_checks,
-            expected_kwargs=[{'args': []}])
+            run_lint_checks,
+            'main',
+            mock_run_lint_checks,
+            expected_kwargs=[{'args': []}],
+        )
 
     def test_run_presubmit_checks_when_branch_is_specified(self) -> None:
         specified_branch = 'develop'
         cmd_to_get_all_changed_file = [
-            'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
-            specified_branch]
-        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:  # pylint: disable=unused-argument
+            'git',
+            'diff',
+            '--cached',
+            '--name-only',
+            '--diff-filter=ACM',
+            specified_branch,
+        ]
+
+        def mock_check_output(
+            cmd: list[str], encoding: str = 'utf-8'
+        ) -> str:  # pylint: disable=unused-argument
             if cmd == self.cmd_to_check_current_branch:
                 return self.current_branch
             elif cmd == self.cmd_to_match_current_branch_with_remote:
@@ -87,8 +120,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
-            subprocess, 'check_output', mock_check_output)
+        swap_check_output = self.swap(subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=['-b', specified_branch])
@@ -97,17 +129,26 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             self.assertTrue(script)
         self.assertIn('Linting passed.', self.print_arr)
         self.assertIn(
-            'Comparing the current branch with %s' % specified_branch,
-            self.print_arr)
+            'Comparing the current branch with %s' % specified_branch, self.print_arr
+        )
         self.assertIn('Frontend tests passed.', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
 
     def test_run_presubmit_checks_when_current_branch_exists_on_remote_origin(
-            self) -> None:
+        self,
+    ) -> None:
         cmd_to_get_all_changed_file = [
-            'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
-            'origin/%s' % self.current_branch]
-        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:  # pylint: disable=unused-argument
+            'git',
+            'diff',
+            '--cached',
+            '--name-only',
+            '--diff-filter=ACM',
+            'origin/%s' % self.current_branch,
+        ]
+
+        def mock_check_output(
+            cmd: list[str], encoding: str = 'utf-8'
+        ) -> str:  # pylint: disable=unused-argument
             if cmd == self.cmd_to_check_current_branch:
                 return self.current_branch
             elif cmd == self.cmd_to_match_current_branch_with_remote:
@@ -117,8 +158,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
-            subprocess, 'check_output', mock_check_output)
+        swap_check_output = self.swap(subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=[])
@@ -128,16 +168,26 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         self.assertIn('Linting passed.', self.print_arr)
         self.assertIn(
             'Comparing the current branch with origin/%s' % self.current_branch,
-            self.print_arr)
+            self.print_arr,
+        )
         self.assertIn('Frontend tests passed.', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
 
     def test_frontend_tests_are_not_run_when_no_frontend_files_are_changed(
-            self) -> None:
+        self,
+    ) -> None:
         cmd_to_get_all_changed_file = [
-            'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
-            'develop']
-        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:  # pylint: disable=unused-argument
+            'git',
+            'diff',
+            '--cached',
+            '--name-only',
+            '--diff-filter=ACM',
+            'develop',
+        ]
+
+        def mock_check_output(
+            cmd: list[str], encoding: str = 'utf-8'
+        ) -> str:  # pylint: disable=unused-argument
             if cmd == self.cmd_to_check_current_branch:
                 return self.current_branch
             elif cmd == self.cmd_to_match_current_branch_with_remote:
@@ -147,8 +197,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
-            subprocess, 'check_output', mock_check_output)
+        swap_check_output = self.swap(subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests:
                 run_presubmit_checks.main(args=[])
@@ -157,7 +206,6 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         self.assertTrue(self.scripts_called['run_lint_checks'])
         self.assertTrue(self.scripts_called['run_backend_tests'])
         self.assertIn('Linting passed.', self.print_arr)
-        self.assertIn(
-            'Comparing the current branch with develop', self.print_arr)
+        self.assertIn('Comparing the current branch with develop', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
         self.assertNotIn('Frontend tests passed.', self.print_arr)

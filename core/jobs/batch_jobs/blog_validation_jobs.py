@@ -40,76 +40,76 @@ if MYPY:  # pragma: no cover
 class FindDuplicateBlogPostTitlesJob(base_jobs.JobBase):
     """Validates that all the Blog Posts have unique title."""
 
-    def run(
-        self
-    ) -> beam.PCollection[blog_validation_errors.DuplicateBlogTitleError]:
+    def run(self) -> beam.PCollection[blog_validation_errors.DuplicateBlogTitleError]:
         return (
             self.pipeline
-            | 'Get every Blog Model' >> (
-                ndb_io.GetModels(blog_models.BlogPostModel.query()))
+            | 'Get every Blog Model'
+            >> (ndb_io.GetModels(blog_models.BlogPostModel.query()))
             | GetModelsWithDuplicatePropertyValues('title')
-            | 'Flatten models into a list of errors' >> beam.FlatMap(
+            | 'Flatten models into a list of errors'
+            >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogTitleError(model)
                     for model in models
-                ])
+                ]
+            )
         )
 
 
 class FindDuplicateBlogPostUrlsJob(base_jobs.JobBase):
     """Validates that all the Blog Posts have unique url."""
 
-    def run(
-        self
-    ) -> beam.PCollection[blog_validation_errors.DuplicateBlogUrlError]:
+    def run(self) -> beam.PCollection[blog_validation_errors.DuplicateBlogUrlError]:
         return (
             self.pipeline
-            | 'Get every Blog Post Model' >> (
-                ndb_io.GetModels(blog_models.BlogPostModel.query()))
+            | 'Get every Blog Post Model'
+            >> (ndb_io.GetModels(blog_models.BlogPostModel.query()))
             | GetModelsWithDuplicatePropertyValues('url_fragment')
-            | 'Flatten models into a list of errors' >> beam.FlatMap(
+            | 'Flatten models into a list of errors'
+            >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)
                     for model in models
-                ])
+                ]
+            )
         )
 
 
 class FindDuplicateBlogPostSummaryTitlesJob(base_jobs.JobBase):
     """Validates that all the Blog Post Summary Model have unique title."""
 
-    def run(
-        self
-    ) -> beam.PCollection[blog_validation_errors.DuplicateBlogTitleError]:
+    def run(self) -> beam.PCollection[blog_validation_errors.DuplicateBlogTitleError]:
         return (
             self.pipeline
-            | 'Get every Blog Summary Model' >> (
-                ndb_io.GetModels(blog_models.BlogPostSummaryModel.query()))
+            | 'Get every Blog Summary Model'
+            >> (ndb_io.GetModels(blog_models.BlogPostSummaryModel.query()))
             | GetModelsWithDuplicatePropertyValues('title')
-            | 'Flatten models into a list of errors' >> beam.FlatMap(
+            | 'Flatten models into a list of errors'
+            >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogTitleError(model)
                     for model in models
-                ])
+                ]
+            )
         )
 
 
 class FindDuplicateBlogPostSummaryUrlsJob(base_jobs.JobBase):
     """Validates that all the Blog Post Summary Model have unique url."""
 
-    def run(
-        self
-    ) -> beam.PCollection[blog_validation_errors.DuplicateBlogUrlError]:
+    def run(self) -> beam.PCollection[blog_validation_errors.DuplicateBlogUrlError]:
         return (
             self.pipeline
-            | 'Get every Blog Post Summary Model' >> (
-                ndb_io.GetModels(blog_models.BlogPostSummaryModel.query()))
+            | 'Get every Blog Post Summary Model'
+            >> (ndb_io.GetModels(blog_models.BlogPostSummaryModel.query()))
             | GetModelsWithDuplicatePropertyValues('url_fragment')
-            | 'Flatten models into a list of errors' >> beam.FlatMap(
+            | 'Flatten models into a list of errors'
+            >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)
                     for model in models
-                ])
+                ]
+            )
         )
 
 
@@ -119,18 +119,20 @@ class FindDuplicateBlogAuthorDetailsModelForAuthorJob(base_jobs.JobBase):
     """
 
     def run(
-        self
+        self,
     ) -> beam.PCollection[blog_validation_errors.DuplicateBlogAuthorModelError]:
         return (
             self.pipeline
-            | 'Get every Blog Author Details Model' >> (
-                ndb_io.GetModels(blog_models.BlogAuthorDetailsModel.query()))
+            | 'Get every Blog Author Details Model'
+            >> (ndb_io.GetModels(blog_models.BlogAuthorDetailsModel.query()))
             | GetModelsWithDuplicatePropertyValues('author_id')
-            | 'Flatten models into a list of errors' >> beam.FlatMap(
+            | 'Flatten models into a list of errors'
+            >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogAuthorModelError(model)
                     for model in models
-                ])
+                ]
+            )
         )
 
 
@@ -147,28 +149,34 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
         self.property_name = property_name
 
     def expand(
-        self, blog_model_pcoll: beam.PCollection[Union[
+        self,
+        blog_model_pcoll: beam.PCollection[
+            Union[
+                blog_models.BlogPostModel,
+                blog_models.BlogPostSummaryModel,
+                blog_models.BlogAuthorDetailsModel,
+            ]
+        ],
+    ) -> beam.PCollection[
+        Union[
             blog_models.BlogPostModel,
             blog_models.BlogPostSummaryModel,
-            blog_models.BlogAuthorDetailsModel
-        ]]
-    ) -> beam.PCollection[Union[
-        blog_models.BlogPostModel,
-        blog_models.BlogPostSummaryModel,
-        blog_models.BlogAuthorDetailsModel
-    ]]:
+            blog_models.BlogAuthorDetailsModel,
+        ]
+    ]:
         return (
             blog_model_pcoll
-            | 'Discard models with empty property value' >> (
-                beam.Filter(lambda model: self.get_property_value(model) != ''))
-            | 'Generate (%s, model) key value pairs' % self.property_name >> (
-                beam.WithKeys(self.get_property_value)) # pylint: disable=no-value-for-parameter
-            | 'Group pairs by their %s' % self.property_name >> (
-                beam.GroupByKey())
-            | 'Discard %s key' % self.property_name >> (
-                beam.Values()) # pylint: disable=no-value-for-parameter
-            | 'Discard models with unique %s' % self.property_name >> (
-                beam.Filter(lambda models: len(list(models)) > 1))
+            | 'Discard models with empty property value'
+            >> (beam.Filter(lambda model: self.get_property_value(model) != ''))
+            | 'Generate (%s, model) key value pairs' % self.property_name
+            >> (
+                beam.WithKeys(self.get_property_value)
+            )  # pylint: disable=no-value-for-parameter
+            | 'Group pairs by their %s' % self.property_name >> (beam.GroupByKey())
+            | 'Discard %s key' % self.property_name
+            >> (beam.Values())  # pylint: disable=no-value-for-parameter
+            | 'Discard models with unique %s' % self.property_name
+            >> (beam.Filter(lambda models: len(list(models)) > 1))
         )
 
     def get_property_value(
@@ -182,9 +190,9 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
         Returns:
             value. The value of the property of model.
         """
-        property_value: Union[
-            str, bool, datetime.datetime
-        ] = job_utils.get_model_property(model, self.property_name)
+        property_value: Union[str, bool, datetime.datetime] = (
+            job_utils.get_model_property(model, self.property_name)
+        )
         # Here, we are narrowing down the type from Any to all the possible
         # types of a BlogPostModel's property.
         assert isinstance(property_value, (str, bool, datetime.datetime))

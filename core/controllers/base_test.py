@@ -66,15 +66,13 @@ PADDING: Final = 1
 class HelperFunctionTests(test_utils.GenericTestBase):
 
     def test_load_template(self) -> None:
-        oppia_root_path = os.path.join(
-            'core', 'templates', 'pages', 'oppia-root')
+        oppia_root_path = os.path.join('core', 'templates', 'pages', 'oppia-root')
         with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
                 '"Loading | Oppia"',
                 base.load_template(
-                    'oppia-root.mainpage.html',
-                    template_is_aot_compiled=False
-                )
+                    'oppia-root.mainpage.html', template_is_aot_compiled=False
+                ),
             )
 
 
@@ -87,13 +85,12 @@ class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """
 
     def test_template_filenames_are_unique(self) -> None:
-        templates_dir = os.path.join(
-            'core', 'templates', 'pages')
+        templates_dir = os.path.join('core', 'templates', 'pages')
         all_template_names: List[str] = []
         for root, _, filenames in os.walk(templates_dir):
             template_filenames = [
-                filename for filename in filenames if filename.endswith(
-                    '.html')]
+                filename for filename in filenames if filename.endswith('.html')
+            ]
             all_template_names = all_template_names + template_filenames
         self.assertEqual(len(all_template_names), len(set(all_template_names)))
 
@@ -184,7 +181,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Create a new user but do not submit their registration form.
         user_services.create_new_user(
             self.get_auth_id_from_email(self.PARTIALLY_LOGGED_IN_USER_EMAIL),
-            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+            self.PARTIALLY_LOGGED_IN_USER_EMAIL,
+        )
 
     def test_that_no_get_results_in_500_error(self) -> None:
         """Test that no GET request results in a 500 error."""
@@ -192,12 +190,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
+            with self.swap_to_always_return(secrets_services, 'get_secret', 'secret'):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
-                    url, [200, 301, 302, 400, 401, 404, 405])
+                    url, [200, 301, 302, 400, 401, 404, 405]
+                )
 
     def test_that_no_post_results_in_500_error(self) -> None:
         """Test that no POST request results in a 500 error."""
@@ -205,15 +202,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
+            with self.swap_to_always_return(secrets_services, 'get_secret', 'secret'):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
                     url,
                     [200, 301, 302, 400, 401, 404, 405],
                     http_method='POST',
-                    params={}
+                    params={},
                 )
 
     def test_that_no_put_results_in_500_error(self) -> None:
@@ -222,15 +217,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
+            with self.swap_to_always_return(secrets_services, 'get_secret', 'secret'):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
                     url,
                     [200, 301, 302, 400, 401, 404, 405],
                     http_method='PUT',
-                    params={}
+                    params={},
                 )
 
     def test_that_no_delete_results_in_500_error(self) -> None:
@@ -239,44 +232,44 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
+            with self.swap_to_always_return(secrets_services, 'get_secret', 'secret'):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
                     url,
                     [200, 301, 302, 400, 401, 404, 405],
                     http_method='DELETE',
-                    params={}
+                    params={},
                 )
 
     def test_requests_for_missing_csrf_token(self) -> None:
         """Tests request without csrf_token results in 401 error."""
 
-        self.post_json(
-            '/community-library/any', data={}, expected_status_int=401)
+        self.post_json('/community-library/any', data={}, expected_status_int=401)
 
-        self.put_json(
-            '/community-library/any', payload={}, expected_status_int=401)
+        self.put_json('/community-library/any', payload={}, expected_status_int=401)
 
     def test_requests_for_invalid_paths(self) -> None:
         """Test that requests for invalid paths result in a 404 error."""
         user_id = user_services.get_user_id_from_username('learneruser')
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
-        self.get_html_response(
-            '/community-library/extra', expected_status_int=404)
+        self.get_html_response('/community-library/extra', expected_status_int=404)
 
-        self.get_html_response(
-            '/community-library/data/extra', expected_status_int=404)
+        self.get_html_response('/community-library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/community-library/extra', data={}, csrf_token=csrf_token,
-            expected_status_int=404)
+            '/community-library/extra',
+            data={},
+            csrf_token=csrf_token,
+            expected_status_int=404,
+        )
 
         self.put_json(
-            '/community-library/extra', payload={}, csrf_token=csrf_token,
-            expected_status_int=404)
+            '/community-library/extra',
+            payload={},
+            csrf_token=csrf_token,
+            expected_status_int=404,
+        )
 
         self.delete_json('/community-library/data', expected_status_int=404)
 
@@ -285,8 +278,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # We set 'no-store' and 'must-revalidate', but webapp
         # adds 'no-cache' since it is basically a subset of 'no-store'.
         self.assertEqual(
-            response.headers['Cache-Control'],
-            'must-revalidate, no-cache, no-store'
+            response.headers['Cache-Control'], 'must-revalidate, no-cache, no-store'
         )
 
     def test_root_redirect_rules_for_deleted_user_prod_mode(self) -> None:
@@ -303,14 +295,21 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_get_with_invalid_return_type_logs_correct_warning(self) -> None:
         # Modify the testapp to use the mock handler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock', self.MockHandlerWithInvalidReturnType,
-                name='MockHandlerWithInvalidReturnType')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock',
+                        self.MockHandlerWithInvalidReturnType,
+                        name='MockHandlerWithInvalidReturnType',
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
         observed_log_messages: List[str] = []
+
         def mock_logging_function(msg: str) -> None:
             observed_log_messages.append(msg)
 
@@ -319,17 +318,25 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
                 observed_log_messages[0],
-                'Not a recognized return type: defaulting to render JSON.')
+                'Not a recognized return type: defaulting to render JSON.',
+            )
 
     def test_unrecognized_request_method_logs_correct_warning(self) -> None:
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock', self.MockHandlerWithInvalidReturnType,
-                name='MockHandlerWithInvalidReturnType')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock',
+                        self.MockHandlerWithInvalidReturnType,
+                        name='MockHandlerWithInvalidReturnType',
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
         observed_log_messages: List[str] = []
+
         def mock_logging_function(msg: str) -> None:
             observed_log_messages.append(msg)
 
@@ -337,14 +344,16 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.testapp.options('/mock', status=500)
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
-                observed_log_messages[0],
-                'Not a recognized request method.')
+                observed_log_messages[0], 'Not a recognized request method.'
+            )
 
     def test_dev_mode_cannot_be_true_on_production(self) -> None:
         server_software_swap = self.swap(
-            os, 'environ', {'SERVER_SOFTWARE': 'Production'})
+            os, 'environ', {'SERVER_SOFTWARE': 'Production'}
+        )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception, 'DEV_MODE can\'t be true on production.')
+            Exception, 'DEV_MODE can\'t be true on production.'
+        )
         with assert_raises_regexp_context_manager, server_software_swap:
             # This reloads the feconf module so that all the checks in
             # the module are reexecuted.
@@ -364,21 +373,20 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_redirect_when_user_is_disabled(self) -> None:
         get_auth_claims_from_request_swap = self.swap_to_always_raise(
-            auth_services,
-            'get_auth_claims_from_request',
-            auth_domain.UserDisabledError
+            auth_services, 'get_auth_claims_from_request', auth_domain.UserDisabledError
         )
         with get_auth_claims_from_request_swap:
             response = self.get_html_response('/', expected_status_int=302)
-            self.assertIn(
-                'pending-account-deletion', response.headers['location'])
+            self.assertIn('pending-account-deletion', response.headers['location'])
 
     def test_redirect_oppia_test_server(self) -> None:
         # The old demo server redirects to the new demo server.
         response = self.get_html_response(
-            'https://oppiaserver.appspot.com/splash', expected_status_int=301)
+            'https://oppiaserver.appspot.com/splash', expected_status_int=301
+        )
         self.assertEqual(
-            response.headers['Location'], 'https://oppiatestserver.appspot.com')
+            response.headers['Location'], 'https://oppiatestserver.appspot.com'
+        )
 
     def test_no_redirection_for_cron_jobs(self) -> None:
         # Valid URL, where user now has permissions.
@@ -389,12 +397,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Valid URL, but user does not have permissions.
         self.get_json(
             'https://oppiaserver.appspot.com/cron/models/cleanup',
-            expected_status_int=401)
+            expected_status_int=401,
+        )
 
         # Invalid URL.
         self.get_html_response(
-            'https://oppiaserver.appspot.com/cron/unknown',
-            expected_status_int=404)
+            'https://oppiaserver.appspot.com/cron/unknown', expected_status_int=404
+        )
 
     def test_no_redirection_for_tasks(self) -> None:
         tasks_data = '{"fn_identifier": "%s", "args": [[]], "kwargs": {}}' % (
@@ -407,7 +416,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'https://oppiaserver.appspot.com/task/deferredtaskshandler',
             tasks_data,
             use_payload=False,
-            expected_status_int=200
+            expected_status_int=200,
         )
         self.logout()
 
@@ -415,7 +424,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.post_json(
             'https://oppiaserver.appspot.com/task/deferredtaskshandler',
             tasks_data,
-            expected_status_int=401
+            expected_status_int=401,
         )
 
     def test_splash_redirect(self) -> None:
@@ -424,54 +433,59 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual('http://localhost/', response.headers['location'])
 
     def test_partially_logged_in_redirect(self) -> None:
-        login_context = self.login_context(
-            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+        login_context = self.login_context(self.PARTIALLY_LOGGED_IN_USER_EMAIL)
 
         with login_context:
-            response = self.get_html_response(
-                '/splash', expected_status_int=302)
+            response = self.get_html_response('/splash', expected_status_int=302)
             self.assertEqual(
-                response.location,
-                'http://localhost/logout?redirect_url=/splash')
+                response.location, 'http://localhost/logout?redirect_url=/splash'
+            )
 
     def test_no_partially_logged_in_redirect_from_logout(self) -> None:
-        login_context = self.login_context(
-            self.PARTIALLY_LOGGED_IN_USER_EMAIL)
+        login_context = self.login_context(self.PARTIALLY_LOGGED_IN_USER_EMAIL)
 
         with login_context:
-            response = self.get_html_response(
-                '/logout', expected_status_int=200)
+            response = self.get_html_response('/logout', expected_status_int=200)
 
-    def test_unauthorized_user_exception_raised_when_session_is_stale(
-        self
-    ) -> None:
+    def test_unauthorized_user_exception_raised_when_session_is_stale(self) -> None:
         with contextlib.ExitStack() as exit_stack:
-            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
-                auth_services, 'destroy_auth_session'))
+            call_counter = exit_stack.enter_context(
+                self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            )
             logs = exit_stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
-            exit_stack.enter_context(self.swap_to_always_raise(
-                auth_services, 'get_auth_claims_from_request',
-                error=auth_domain.StaleAuthSessionError('uh-oh')))
+                self.capture_logging(min_level=logging.ERROR)
+            )
+            exit_stack.enter_context(
+                self.swap_to_always_raise(
+                    auth_services,
+                    'get_auth_claims_from_request',
+                    error=auth_domain.StaleAuthSessionError('uh-oh'),
+                )
+            )
 
             response = self.get_html_response('/', expected_status_int=302)
 
         self.assertEqual(call_counter.times_called, 1)
         self.assertEqual(
             response.location,
-            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
+            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F',
+        )
 
-    def test_unauthorized_user_exception_raised_when_session_is_invalid(
-        self
-    ) -> None:
+    def test_unauthorized_user_exception_raised_when_session_is_invalid(self) -> None:
         with contextlib.ExitStack() as exit_stack:
-            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
-                auth_services, 'destroy_auth_session'))
+            call_counter = exit_stack.enter_context(
+                self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            )
             logs = exit_stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
-            exit_stack.enter_context(self.swap_to_always_raise(
-                auth_services, 'get_auth_claims_from_request',
-                error=auth_domain.InvalidAuthSessionError('uh-oh')))
+                self.capture_logging(min_level=logging.ERROR)
+            )
+            exit_stack.enter_context(
+                self.swap_to_always_raise(
+                    auth_services,
+                    'get_auth_claims_from_request',
+                    error=auth_domain.InvalidAuthSessionError('uh-oh'),
+                )
+            )
 
             response = self.get_html_response('/', expected_status_int=302)
 
@@ -479,24 +493,29 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.times_called, 1)
         self.assertEqual(
             response.location,
-            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
+            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F',
+        )
 
     def test_signup_attempt_on_wrong_page_fails(self) -> None:
         with contextlib.ExitStack() as exit_stack:
-            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
-                auth_services, 'destroy_auth_session'))
+            call_counter = exit_stack.enter_context(
+                self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            )
             logs = exit_stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
-            exit_stack.enter_context(self.swap_to_always_return(
-                auth_services,
-                'get_auth_claims_from_request',
-                auth_domain.AuthClaims(
-                    'auth_id', self.NEW_USER_EMAIL, role_is_super_admin=False)
-            ))
+                self.capture_logging(min_level=logging.ERROR)
+            )
+            exit_stack.enter_context(
+                self.swap_to_always_return(
+                    auth_services,
+                    'get_auth_claims_from_request',
+                    auth_domain.AuthClaims(
+                        'auth_id', self.NEW_USER_EMAIL, role_is_super_admin=False
+                    ),
+                )
+            )
             response = self.get_html_response('/', expected_status_int=200)
             self.assertIn(
-                b'<lightweight-oppia-root></lightweight-oppia-root>',
-                response.body
+                b'<lightweight-oppia-root></lightweight-oppia-root>', response.body
             )
 
         self.assert_matches_regexps(
@@ -504,7 +523,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             [
                 'Cannot find user auth_id with email %s on '
                 'page http://localhost/' % self.NEW_USER_EMAIL
-            ]
+            ],
         )
         self.assertEqual(call_counter.times_called, 1)
 
@@ -513,8 +532,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             swap_auth_claim = self.swap_to_always_return(
                 auth_services,
                 'get_auth_claims_from_request',
-                auth_domain.AuthClaims(
-                    'auth_id', None, role_is_super_admin=False)
+                auth_domain.AuthClaims('auth_id', None, role_is_super_admin=False),
             )
             logs = exit_stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR)
@@ -522,37 +540,33 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             with swap_auth_claim:
                 self.get_html_response('/')
 
-        self.assert_matches_regexps(
-            logs,
-            [
-                'No email address was found for the user.'
-            ]
-        )
+        self.assert_matches_regexps(logs, ['No email address was found for the user.'])
 
     def test_logs_request_with_invalid_payload(self) -> None:
         with contextlib.ExitStack() as exit_stack:
             logs = exit_stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
-            exit_stack.enter_context(self.swap_to_always_raise(
-                webapp2.Request, 'get',
-                error=ValueError('uh-oh')))
+                self.capture_logging(min_level=logging.ERROR)
+            )
+            exit_stack.enter_context(
+                self.swap_to_always_raise(
+                    webapp2.Request, 'get', error=ValueError('uh-oh')
+                )
+            )
             self.get_custom_response(
                 '/',
                 expected_content_type='text/plain',
                 params=None,
-                expected_status_int=500)
+                expected_status_int=500,
+            )
 
-        self.assertRegex(
-            logs[0],
-            'uh-oh: request GET /')
+        self.assertRegex(logs[0], 'uh-oh: request GET /')
 
 
 class MissingHandlerArgsTests(test_utils.GenericTestBase):
 
-    class MissingArgsHandler(
-        base.BaseHandler[Dict[str, str], Dict[str, str]]
-    ):
+    class MissingArgsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler for testing."""
+
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
         # Here we use MyPy ignore because the signature of 'post' method does
@@ -571,23 +585,25 @@ class MissingHandlerArgsTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         # Modify the testapp to use the MissingArgsHandler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [
-                webapp2.Route(
-                    '/MissingArgHandler',
-                    self.MissingArgsHandler,
-                    name='MissingArgHandler'
-                )
-            ],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/MissingArgHandler',
+                        self.MissingArgsHandler,
+                        name='MissingArgHandler',
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_missing_arg_handler_raises_error(self) -> None:
         response = self.testapp.post('/MissingArgHandler', status=500)
-        parsed_response = json.loads(response.body[len(feconf.XSSI_PREFIX):])
+        parsed_response = json.loads(response.body[len(feconf.XSSI_PREFIX) :])
         self.assertEqual(
             parsed_response['error'],
-            'Missing schema for POST method in MissingArgsHandler handler class.'
+            'Missing schema for POST method in MissingArgsHandler handler class.',
         )
 
 
@@ -599,14 +615,14 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(MaintenanceModeTests, self).setUp()
-        self.signup(
-            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.signup(self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
         self.add_user_role(
-            self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR)
+            self.RELEASE_COORDINATOR_USERNAME, feconf.ROLE_ID_RELEASE_COORDINATOR
+        )
         with contextlib.ExitStack() as context_stack:
             context_stack.enter_context(
-                self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
+                self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True)
+            )
             self.context_stack = context_stack.pop_all()
 
     def tearDown(self) -> None:
@@ -615,21 +631,20 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_html_response_is_rejected(self) -> None:
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+        )
 
-        response = self.get_html_response(
-            '/community-library', expected_status_int=200)
+        response = self.get_html_response('/community-library', expected_status_int=200)
 
         self.assertIn(b'<oppia-maintenance-page>', response.body)
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
-    def test_html_response_is_not_rejected_when_user_is_super_admin(
-        self
-    ) -> None:
+    def test_html_response_is_not_rejected_when_user_is_super_admin(self) -> None:
         self.context_stack.enter_context(self.super_admin_context())
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+        )
 
         response = self.get_html_response('/community-library')
 
@@ -638,12 +653,14 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_html_response_is_not_rejected_when_user_is_release_coordinator(
-        self
+        self,
     ) -> None:
         self.context_stack.enter_context(
-            self.login_context(self.RELEASE_COORDINATOR_EMAIL))
+            self.login_context(self.RELEASE_COORDINATOR_EMAIL)
+        )
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+        )
 
         response = self.get_html_response('/community-library')
 
@@ -655,12 +672,13 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.get_json('/csrfhandler')
 
         self.assertTrue(
-            base.CsrfTokenManager.is_csrf_token_valid(None, response['token']))
+            base.CsrfTokenManager.is_csrf_token_valid(None, response['token'])
+        )
 
     def test_session_begin_handler_is_not_rejected(self) -> None:
         call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(
-                auth_services, 'establish_auth_session'))
+            self.swap_with_call_counter(auth_services, 'establish_auth_session')
+        )
 
         self.get_html_response('/session_begin', expected_status_int=200)
 
@@ -668,7 +686,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_session_end_handler_is_not_rejected(self) -> None:
         call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+        )
 
         self.get_html_response('/session_end', expected_status_int=200)
 
@@ -676,7 +695,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_signup_fails(self) -> None:
         with self.assertRaisesRegex(
-            Exception, '\'<oppia-maintenance-page>\' unexpectedly found in'):
+            Exception, '\'<oppia-maintenance-page>\' unexpectedly found in'
+        ):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self) -> None:
@@ -687,17 +707,16 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL,
             self.CURRICULUM_ADMIN_USERNAME,
-            is_super_admin=True
+            is_super_admin=True,
         )
 
-    def test_admin_auth_session_is_preserved_when_in_maintenance_mode(
-        self
-    ) -> None:
+    def test_admin_auth_session_is_preserved_when_in_maintenance_mode(self) -> None:
         # TODO(#12692): Use stateful login sessions to assert the behavior of
         # logging out, rather than asserting that destroy_auth_session() gets
         # called.
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+        )
         self.context_stack.enter_context(self.super_admin_context())
 
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
@@ -709,14 +728,13 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-    def test_non_admin_auth_session_is_destroyed_when_in_maintenance_mode(
-        self
-    ) -> None:
+    def test_non_admin_auth_session_is_destroyed_when_in_maintenance_mode(self) -> None:
         # TODO(#12692): Use stateful login sessions to assert the behavior of
         # logging out, rather than asserting that destroy_auth_session() gets
         # called.
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+        )
 
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.get_json('/url_handler?current_url=/')
@@ -735,15 +753,11 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
         uid = 'user_id'
 
         token = base.CsrfTokenManager.create_csrf_token(uid)
-        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-            uid, token))
+        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(uid, token))
 
-        self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid('bad_user', token))
-        self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, 'new_token'))
-        self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, 'a/new/token'))
+        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid('bad_user', token))
+        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(uid, 'new_token'))
+        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(uid, 'a/new/token'))
 
     def test_token_expiry(self) -> None:
         # This can be any value.
@@ -754,30 +768,29 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
             return current_time
 
         with self.swap(
-            base.CsrfTokenManager, '_get_current_time',
-            types.MethodType(mock_get_current_time, base.CsrfTokenManager)):
+            base.CsrfTokenManager,
+            '_get_current_time',
+            types.MethodType(mock_get_current_time, base.CsrfTokenManager),
+        ):
             # Create a token and check that it expires correctly.
             token = base.CsrfTokenManager().create_csrf_token('uid')
-            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', token))
+            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid('uid', token))
 
             current_time = orig_time + 1
-            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', token))
+            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid('uid', token))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS - PADDING
-            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', token))
+            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid('uid', token))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
-            self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', token))
+            self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid('uid', token))
 
 
 class EscapingTests(test_utils.GenericTestBase):
 
     class FakePage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Fake page for testing autoescaping."""
+
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
@@ -798,10 +811,12 @@ class EscapingTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         # Modify the testapp to use the fake handler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/fake', self.FakePage, name='FakePage')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/fake', self.FakePage, name='FakePage')],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_special_char_escaping(self) -> None:
         response = self.testapp.post('/fake', params={})
@@ -819,6 +834,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         """Mock handler that subclasses BaseHandler and serves a response
         that is of a 'downloadable' type.
         """
+
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -830,22 +846,24 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         def get(self) -> None:  # type: ignore[override]
             """Handles GET requests."""
             file_contents = io.BytesIO(b'example')
-            self.render_downloadable_file(
-                file_contents, 'example.pdf', 'text/plain')
+            self.render_downloadable_file(file_contents, 'example.pdf', 'text/plain')
 
     def setUp(self) -> None:
         super(RenderDownloadableTests, self).setUp()
 
         # Modify the testapp to use the mock handler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_downloadable(self) -> None:
         response = self.testapp.get('/mock')
         self.assertEqual(
-            response.content_disposition, 'attachment; filename=example.pdf')
+            response.content_disposition, 'attachment; filename=example.pdf'
+        )
         self.assertEqual(response.body, b'example')
         self.assertEqual(response.content_type, 'text/plain')
 
@@ -854,8 +872,7 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_begin handler."""
 
     def test_get(self) -> None:
-        swap = self.swap_with_call_counter(
-            auth_services, 'establish_auth_session')
+        swap = self.swap_with_call_counter(auth_services, 'establish_auth_session')
 
         with swap as call_counter:
             self.get_html_response('/session_begin', expected_status_int=200)
@@ -867,8 +884,7 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_end handler."""
 
     def test_get(self) -> None:
-        swap = (
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+        swap = self.swap_with_call_counter(auth_services, 'destroy_auth_session')
 
         with swap as call_counter:
             self.get_html_response('/session_end', expected_status_int=200)
@@ -883,10 +899,19 @@ class I18nDictsTests(test_utils.GenericTestBase):
         """Returns the extracted keys from the json file corresponding to the
         given filename.
         """
-        return sorted(json.loads(utils.get_file_contents(
-            os.path.join(os.getcwd(), self.get_static_asset_filepath(),
-                         'assets', 'i18n', filename)
-        )).keys())
+        return sorted(
+            json.loads(
+                utils.get_file_contents(
+                    os.path.join(
+                        os.getcwd(),
+                        self.get_static_asset_filepath(),
+                        'assets',
+                        'i18n',
+                        filename,
+                    )
+                )
+            ).keys()
+        )
 
     def _extract_keys_from_html_file(self, filename: str) -> List[str]:
         """Returns the extracted keys from the html file corresponding to the
@@ -896,12 +921,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
         # '_I18N_IDS' do not get matched. Instances of such keys can be found
         # in learner_dashboard.html.
         regex_pattern = r'(\bI18N_[A-Z/_\d]*)'
-        return re.findall(regex_pattern, utils.get_file_contents(
-            filename))
+        return re.findall(regex_pattern, utils.get_file_contents(filename))
 
-    def _get_tags(
-        self, input_string: str, key: str, filename: str
-    ) -> List[str]:
+    def _get_tags(self, input_string: str, key: str, filename: str) -> List[str]:
         """Returns the parts in the input string that lie within <...>
         characters.
 
@@ -925,9 +947,10 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 bracket_level += 1
             elif c == '>':
                 self.assertGreater(
-                    bracket_level, 0,
-                    msg='Invalid HTML: %s at %s in %s' % (
-                        input_string, key, filename))
+                    bracket_level,
+                    0,
+                    msg='Invalid HTML: %s at %s in %s' % (input_string, key, filename),
+                )
                 result.append(current_string + c)
                 current_string = ''
                 bracket_level -= 1
@@ -935,8 +958,10 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 current_string += c
 
         self.assertEqual(
-            bracket_level, 0,
-            msg='Invalid HTML: %s at %s in %s' % (input_string, key, filename))
+            bracket_level,
+            0,
+            msg='Invalid HTML: %s at %s in %s' % (input_string, key, filename),
+        )
         return sorted(result)
 
     def test_i18n_keys_format(self) -> None:
@@ -955,11 +980,14 @@ class I18nDictsTests(test_utils.GenericTestBase):
 
         supported_language_filenames = [
             ('%s.json' % language_details['id'])
-            for language_details in constants.SUPPORTED_SITE_LANGUAGES]
+            for language_details in constants.SUPPORTED_SITE_LANGUAGES
+        ]
 
         filenames = os.listdir(
-            os.path.join(os.getcwd(), self.get_static_asset_filepath(),
-                         'assets', 'i18n'))
+            os.path.join(
+                os.getcwd(), self.get_static_asset_filepath(), 'assets', 'i18n'
+            )
+        )
         for filename in filenames:
             if filename == 'en.json':
                 continue
@@ -970,8 +998,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
 
             # If there are missing keys in supported site languages, log an
             # error, but don't fail the tests.
-            if (filename in supported_language_filenames and
-                    set(key_list) != set(master_key_list)):
+            if filename in supported_language_filenames and set(key_list) != set(
+                master_key_list
+            ):
                 untranslated_keys = list(set(master_key_list) - set(key_list))
                 self.log_line('Untranslated keys in %s:' % filename)
                 for key in untranslated_keys:
@@ -983,18 +1012,20 @@ class I18nDictsTests(test_utils.GenericTestBase):
         lexicographical order.
         """
         filenames = os.listdir(
-            os.path.join(os.getcwd(), self.get_static_asset_filepath(),
-                         'assets', 'i18n'))
+            os.path.join(
+                os.getcwd(), self.get_static_asset_filepath(), 'assets', 'i18n'
+            )
+        )
         for filename in filenames:
             with utils.open_file(
-                os.path.join(os.getcwd(), 'assets', 'i18n', filename),
-                mode='r') as f:
+                os.path.join(os.getcwd(), 'assets', 'i18n', filename), mode='r'
+            ) as f:
                 lines = f.readlines()
                 self.assertEqual(lines[0], '{\n')
                 self.assertEqual(lines[-1], '}\n')
                 lines = lines[1:-1]
 
-                key_list = [line[:line.find(':')].strip() for line in lines]
+                key_list = [line[: line.find(':')].strip() for line in lines]
                 for key in key_list:
                     self.assertTrue(key.startswith('"I18N_'))
                     if not key.startswith('"I18N_'):
@@ -1009,7 +1040,8 @@ class I18nDictsTests(test_utils.GenericTestBase):
         en_key_list = self._extract_keys_from_json_file('en.json')
         hacky_translation_keys = constants.HACKY_TRANSLATION_KEYS
         missing_hacky_translation_keys = list(
-            set(hacky_translation_keys) - set(en_key_list))
+            set(hacky_translation_keys) - set(en_key_list)
+        )
         self.assertEqual(missing_hacky_translation_keys, [])
 
     def test_keys_match_en_qqq(self) -> None:
@@ -1021,9 +1053,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
     def test_keys_in_source_code_match_en(self) -> None:
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
-        dirs_to_search = [
-            os.path.join('core', 'templates', ''),
-            'extensions']
+        dirs_to_search = [os.path.join('core', 'templates', ''), 'extensions']
         files_checked = 0
         missing_keys_count = 0
         for directory in dirs_to_search:
@@ -1032,12 +1062,16 @@ class I18nDictsTests(test_utils.GenericTestBase):
                     if filename.endswith('.html'):
                         files_checked += 1
                         html_key_list = self._extract_keys_from_html_file(
-                            os.path.join(root, filename))
-                        if not set(html_key_list) <= set(en_key_list): #pylint: disable=unneeded-not
-                            self.log_line('ERROR: Undefined keys in %s:'
-                                          % os.path.join(root, filename))
-                            missing_keys = list(
-                                set(html_key_list) - set(en_key_list))
+                            os.path.join(root, filename)
+                        )
+                        if not set(html_key_list) <= set(
+                            en_key_list
+                        ):  # pylint: disable=unneeded-not
+                            self.log_line(
+                                'ERROR: Undefined keys in %s:'
+                                % os.path.join(root, filename)
+                            )
+                            missing_keys = list(set(html_key_list) - set(en_key_list))
                             missing_keys_count += len(missing_keys)
                             for key in missing_keys:
                                 self.log_line(' - %s' % key)
@@ -1052,8 +1086,11 @@ class I18nDictsTests(test_utils.GenericTestBase):
         # For this test, show the entire diff if there is a mismatch.
         self.maxDiff = None
 
-        master_translation_dict = json.loads(utils.get_file_contents(
-            os.path.join(os.getcwd(), 'assets', 'i18n', 'en.json')))
+        master_translation_dict = json.loads(
+            utils.get_file_contents(
+                os.path.join(os.getcwd(), 'assets', 'i18n', 'en.json')
+            )
+        )
         # Remove anything outside '<'...'>' tags. Note that this handles both
         # HTML tags and Angular variable interpolations.
         master_tags_dict = {
@@ -1063,18 +1100,26 @@ class I18nDictsTests(test_utils.GenericTestBase):
 
         mismatches = []
 
-        filenames = os.listdir(os.path.join(
-            os.getcwd(), self.get_static_asset_filepath(), 'assets', 'i18n'))
+        filenames = os.listdir(
+            os.path.join(
+                os.getcwd(), self.get_static_asset_filepath(), 'assets', 'i18n'
+            )
+        )
         for filename in filenames:
             if filename == 'qqq.json':
                 continue
-            translation_dict = json.loads(utils.get_file_contents(
-                os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
+            translation_dict = json.loads(
+                utils.get_file_contents(
+                    os.path.join(os.getcwd(), 'assets', 'i18n', filename)
+                )
+            )
             for key, value in translation_dict.items():
                 tags = self._get_tags(value, key, filename)
                 if tags != master_tags_dict[key]:
-                    mismatches.append('%s (%s): %s != %s' % (
-                        filename, key, tags, master_tags_dict[key]))
+                    mismatches.append(
+                        '%s (%s): %s != %s'
+                        % (filename, key, tags, master_tags_dict[key])
+                    )
 
         # Sorting the list before printing makes it easier to systematically
         # fix any issues that arise.
@@ -1085,6 +1130,7 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
 
     class FakeHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """A fake handler class."""
+
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1098,17 +1144,15 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
             """Handles get requests."""
             raise self.InternalErrorException('fake exception')
 
-    def test_error_response_for_get_request_of_type_json_has_json_format(
-        self
-    ) -> None:
+    def test_error_response_for_get_request_of_type_json_has_json_format(self) -> None:
         fake_urls = []
         fake_urls.append(main.get_redirect_route(r'/fake', self.FakeHandler))
         fake_urls.append(main.URLS[-1])
         with self.swap(main, 'URLS', fake_urls):
             self.testapp = webtest.TestApp(
-                webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
-            response = self.get_json(
-                '/fake', expected_status_int=500)
+                webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG)
+            )
+            response = self.get_json('/fake', expected_status_int=500)
             self.assertTrue(isinstance(response, dict))
 
 
@@ -1119,13 +1163,15 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
 
     # Following handlers are present in base.py where acl_decorators cannot be
     # imported.
-    UNDECORATED_HANDLERS: FrozenSet[str] = frozenset([
-        'CsrfTokenHandler',
-        'Error404Handler',
-        'SessionBeginHandler',
-        'SessionEndHandler',
-        'SeedFirebaseHandler',
-    ])
+    UNDECORATED_HANDLERS: FrozenSet[str] = frozenset(
+        [
+            'CsrfTokenHandler',
+            'Error404Handler',
+            'SessionBeginHandler',
+            'SessionEndHandler',
+            'SeedFirebaseHandler',
+        ]
+    )
 
     def test_every_method_has_decorator(self) -> None:
         handlers_checked = []
@@ -1138,40 +1184,42 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
 
             if handler.get != base.BaseHandler.get:
                 handler_is_decorated = hasattr(handler.get, '__wrapped__')
-                handlers_checked.append(
-                    (handler.__name__, 'GET', handler_is_decorated))
+                handlers_checked.append((handler.__name__, 'GET', handler_is_decorated))
 
             if handler.post != base.BaseHandler.post:
                 handler_is_decorated = hasattr(handler.post, '__wrapped__')
                 handlers_checked.append(
-                    (handler.__name__, 'POST', handler_is_decorated))
+                    (handler.__name__, 'POST', handler_is_decorated)
+                )
 
             if handler.put != base.BaseHandler.put:
                 handler_is_decorated = hasattr(handler.put, '__wrapped__')
-                handlers_checked.append(
-                    (handler.__name__, 'PUT', handler_is_decorated))
+                handlers_checked.append((handler.__name__, 'PUT', handler_is_decorated))
 
             if handler.delete != base.BaseHandler.delete:
                 handler_is_decorated = hasattr(handler.delete, '__wrapped__')
                 handlers_checked.append(
-                    (handler.__name__, 'DELETE', handler_is_decorated))
+                    (handler.__name__, 'DELETE', handler_is_decorated)
+                )
 
         self.log_line('Verifying decorators for handlers .... ')
-        for (name, method, handler_is_decorated) in handlers_checked:
-            self.log_line('%s %s method: %s' % (
-                name, method, 'PASS' if handler_is_decorated else 'FAIL'))
-        self.log_line(
-            'Total number of handlers checked: %s' % len(handlers_checked))
+        for name, method, handler_is_decorated in handlers_checked:
+            self.log_line(
+                '%s %s method: %s'
+                % (name, method, 'PASS' if handler_is_decorated else 'FAIL')
+            )
+        self.log_line('Total number of handlers checked: %s' % len(handlers_checked))
 
         self.assertGreater(len(handlers_checked), 0)
 
-        for (name, method, handler_is_decorated) in handlers_checked:
+        for name, method, handler_is_decorated in handlers_checked:
             with self.subTest('%s.%s' % (name, method)):
                 self.assertTrue(handler_is_decorated)
 
 
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     """Test that request.GET.items() correctly retrieves escaped characters."""
+
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -1186,26 +1234,26 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
             self.render_json(self.values)
 
     def test_get_items(self) -> None:
-        mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler)],
+                debug=feconf.DEBUG,
+            )
+        )
         with self.swap(self, 'testapp', mock_testapp):
-            params = {
-                'param1': 'value1',
-                'param2': 'value2'
-            }
+            params = {'param1': 'value1', 'param2': 'value2'}
             result = self.get_json('/mock?param1=value1&param2=value2')
             self.assertDictContainsSubset(params, result)
             params = {
                 'param1': 'value with space',
                 'param2': 'value with & + - /',
-                'param3': 'value with . % @ 123 = ! <>'
+                'param3': 'value with . % @ 123 = ! <>',
             }
             result = self.get_json(
                 r'/mock?param1=value%20with%20space&'
                 'param2=value%20with%20%26%20%2B%20-%20/&'
-                'param3=value%20with%20.%20%%20@%20123%20=%20!%20%3C%3E')
+                'param3=value%20with%20.%20%%20@%20123%20=%20!%20%3C%3E'
+            )
             self.assertDictContainsSubset(params, result)
 
 
@@ -1226,7 +1274,8 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
             clazz = url.handler
             num_handlers_checked += 1
             all_base_classes = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
 
             # Check that it is a subclass of 'BaseHandler'.
             if 'BaseHandler' in all_base_classes:
@@ -1235,8 +1284,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                 # GET_HANDLER_ERROR_RETURN_TYPE that's one of
                 # the allowed values.
                 if 'get' in clazz.__dict__.keys():
-                    self.assertIn(
-                        class_return_type, handler_type_to_name_endings_dict)
+                    self.assertIn(class_return_type, handler_type_to_name_endings_dict)
                 class_name = clazz.__name__
                 # BulkEmailWebhookEndpoint is a unique class, compared to
                 # others, since it is never called from the frontend, and so
@@ -1248,33 +1296,42 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     continue
                 file_name = inspect.getfile(clazz)
                 line_num = inspect.getsourcelines(clazz)[1]
-                allowed_class_ending = (
-                    handler_type_to_name_endings_dict[class_return_type])
+                allowed_class_ending = handler_type_to_name_endings_dict[
+                    class_return_type
+                ]
                 # Check that the name of the class ends with
                 # the proper word if it has a get function.
                 if 'get' in clazz.__dict__.keys():
                     message = (
                         'Please ensure that the name of this class '
-                        'ends with \'%s\'' % allowed_class_ending)
-                    error_message = (
-                        '%s --> Line %s: %s' % (file_name, line_num, message))
+                        'ends with \'%s\'' % allowed_class_ending
+                    )
+                    error_message = '%s --> Line %s: %s' % (
+                        file_name,
+                        line_num,
+                        message,
+                    )
                     with self.subTest(class_name):
                         self.assertTrue(
-                            class_name.endswith(allowed_class_ending),
-                            msg=error_message)
+                            class_name.endswith(allowed_class_ending), msg=error_message
+                        )
 
                 # Check that the name of the class ends with 'Handler'
                 # if it does not has a get function.
                 else:
                     message = (
                         'Please ensure that the name of this class '
-                        'ends with \'Handler\'')
-                    error_message = (
-                        '%s --> Line %s: %s'
-                        % (file_name, line_num, message))
+                        'ends with \'Handler\''
+                    )
+                    error_message = '%s --> Line %s: %s' % (
+                        file_name,
+                        line_num,
+                        message,
+                    )
                     with self.subTest(class_name):
                         self.assertTrue(
-                            class_name.endswith('Handler'), msg=error_message)
+                            class_name.endswith('Handler'), msg=error_message
+                        )
 
         self.assertGreater(num_handlers_checked, 275)
 
@@ -1291,18 +1348,15 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
 
     class MockHandlerForTestingPageIframing(
         base.BaseHandler[
-            Dict[str, str],
-            MockHandlerForTestingPageIframingNormalizedRequestDict
+            Dict[str, str], MockHandlerForTestingPageIframingNormalizedRequestDict
         ]
     ):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'iframe_restriction': {
-                    'schema': {
-                        'type': 'basestring'
-                    },
-                    'default_value': None
+                    'schema': {'type': 'basestring'},
+                    'default_value': None,
                 }
             }
         }
@@ -1316,41 +1370,54 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             assert self.normalized_request is not None
             iframe_restriction = self.normalized_request.get('iframe_restriction')
             self.render_template(
-                'oppia-root.mainpage.html',
-                iframe_restriction=iframe_restriction)
+                'oppia-root.mainpage.html', iframe_restriction=iframe_restriction
+            )
 
     def setUp(self) -> None:
         super(IframeRestrictionTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         # Modify the testapp to use the mock handler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock', self.MockHandlerForTestingPageIframing,
-                name='MockHandlerForTestingPageIframing')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock',
+                        self.MockHandlerForTestingPageIframing,
+                        name='MockHandlerForTestingPageIframing',
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_responses_with_valid_iframe_restriction(self) -> None:
         self.login(self.OWNER_EMAIL)
         self.get_html_response('/mock')
 
         response = self.get_html_response(
-            '/mock', params={'iframe_restriction': 'DENY'})
-        self.assertEqual(response.headers['Content-Security-Policy'], 'frame-ancestors \'none\'')
+            '/mock', params={'iframe_restriction': 'DENY'}
+        )
+        self.assertEqual(
+            response.headers['Content-Security-Policy'], 'frame-ancestors \'none\''
+        )
 
         response = self.get_html_response(
-            '/mock', params={'iframe_restriction': 'SAMEORIGIN'})
-        self.assertEqual(response.headers['Content-Security-Policy'], 'frame-ancestors \'self\'')
+            '/mock', params={'iframe_restriction': 'SAMEORIGIN'}
+        )
+        self.assertEqual(
+            response.headers['Content-Security-Policy'], 'frame-ancestors \'self\''
+        )
 
         self.logout()
 
     def test_responses_with_invalid_iframe_restriction(self) -> None:
         self.login(self.OWNER_EMAIL)
         self.get_html_response(
-            '/mock', params={
-                'iframe_restriction': 'invalid_iframe_restriction'},
-            expected_status_int=500)
+            '/mock',
+            params={'iframe_restriction': 'invalid_iframe_restriction'},
+            expected_status_int=500,
+        )
         self.logout()
 
 
@@ -1369,11 +1436,14 @@ class SignUpTests(test_utils.GenericTestBase):
         self.logout()
 
         response = self.post_json(
-            feconf.SIGNUP_DATA_URL, {
+            feconf.SIGNUP_DATA_URL,
+            {
                 'username': 'abc',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-            }, csrf_token=csrf_token, expected_status_int=401,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=401,
         )
 
         self.assertEqual(response['error'], 'Registration session expired.')
@@ -1386,14 +1456,14 @@ class SignUpTests(test_utils.GenericTestBase):
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            feconf.SIGNUP_DATA_URL, {
+            feconf.SIGNUP_DATA_URL,
+            {
                 'username': 'abc',
                 'agreed_to_terms': True,
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
-                'can_receive_email_updates': (
-                    feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
-            }, csrf_token=csrf_token,
+                'can_receive_email_updates': (feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE),
+            },
+            csrf_token=csrf_token,
         )
 
         self.get_html_response('/community-library')
@@ -1406,16 +1476,21 @@ class SignUpTests(test_utils.GenericTestBase):
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
 
         response = self.post_json(
-            feconf.SIGNUP_DATA_URL, {
+            feconf.SIGNUP_DATA_URL,
+            {
                 'username': 'abc',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-            }, csrf_token='invalid_token', expected_status_int=401,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+            },
+            csrf_token='invalid_token',
+            expected_status_int=401,
         )
 
-        self.assertEqual(response['error'],
+        self.assertEqual(
+            response['error'],
             'Your session has expired, and unfortunately your '
-            'changes cannot be saved. Please refresh the page.')
+            'changes cannot be saved. Please refresh the page.',
+        )
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
@@ -1428,22 +1503,22 @@ class CsrfTokenHandlerTests(test_utils.GenericTestBase):
         response = self.get_json('/csrfhandler')
         csrf_token = response['token']
 
-        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-            None, csrf_token))
+        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(None, csrf_token))
 
 
 class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     """Tests all the functionality of SVS(Schema-Validation-System)
     architecture.
     """
-    handler_class_names_with_no_schema: Final = (
-        handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
-    wiki_page_link: Final = (
-        'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args')
 
-    def _get_list_of_routes_which_need_schemas(
-        self
-    ) -> List[routes.RedirectRoute]:
+    handler_class_names_with_no_schema: Final = (
+        handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+    )
+    wiki_page_link: Final = (
+        'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args'
+    )
+
+    def _get_list_of_routes_which_need_schemas(self) -> List[routes.RedirectRoute]:
         """This method iterates over all the routes and returns those routes
         which need schemas.
 
@@ -1458,7 +1533,8 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         """
         list_of_handlers_which_need_schemas = []
         list_of_routes_which_need_schemas = (
-            self._get_list_of_routes_which_need_schemas())
+            self._get_list_of_routes_which_need_schemas()
+        )
 
         for route in list_of_routes_which_need_schemas:
             handler = route.handler
@@ -1468,20 +1544,21 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 continue
 
             schema_written_for_request_methods = (
-                handler.HANDLER_ARGS_SCHEMAS is not None)
-            schema_written_for_url_path_args = (
-                handler.URL_PATH_ARGS_SCHEMAS is not None)
-            handler_has_schemas = (schema_written_for_request_methods and
-                schema_written_for_url_path_args)
+                handler.HANDLER_ARGS_SCHEMAS is not None
+            )
+            schema_written_for_url_path_args = handler.URL_PATH_ARGS_SCHEMAS is not None
+            handler_has_schemas = (
+                schema_written_for_request_methods and schema_written_for_url_path_args
+            )
 
             if handler_has_schemas is False:
                 list_of_handlers_which_need_schemas.append(handler_class_name)
 
         error_msg = (
             'The following handlers have missing schemas: [ %s ].'
-            '\nVisit %s to learn how to write schemas for handler args.' % (
-                ', '.join(
-                    list_of_handlers_which_need_schemas), self.wiki_page_link))
+            '\nVisit %s to learn how to write schemas for handler args.'
+            % (', '.join(list_of_handlers_which_need_schemas), self.wiki_page_link)
+        )
 
         self.assertEqual(list_of_handlers_which_need_schemas, [], error_msg)
 
@@ -1491,7 +1568,8 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         """
         handlers_with_missing_url_schema_keys = []
         list_of_routes_which_need_schemas = (
-            self._get_list_of_routes_which_need_schemas())
+            self._get_list_of_routes_which_need_schemas()
+        )
 
         for route in list_of_routes_which_need_schemas:
             handler = route.handler
@@ -1505,7 +1583,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             regex_pattern = r'<.*?>'
             url_path_arg_names = []
             for url_path_element in re.findall(regex_pattern, route.name):
-                url_path_keyword = url_path_element[1: -1]
+                url_path_keyword = url_path_element[1:-1]
                 # In some cases, url_path_arguments are defined with specific
                 # acceptable values, e.g: /<asset_type:(image|audio|thumbnail)>.
                 # So, to separate out the argument name from acceptable values,
@@ -1514,7 +1592,8 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 url_argument_delimiter_index = url_path_keyword.find(':')
                 url_path_arg_name = (
                     url_path_keyword[:url_argument_delimiter_index]
-                    if url_argument_delimiter_index != -1 else url_path_keyword
+                    if url_argument_delimiter_index != -1
+                    else url_path_keyword
                 )
                 url_path_arg_names.append(url_path_arg_name)
             schema_keys = handler.URL_PATH_ARGS_SCHEMAS.keys()
@@ -1523,26 +1602,26 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             if missing_schema_keys:
                 handlers_with_missing_url_schema_keys.append(handler_class_name)
                 self.log_line(
-                    'Missing keys in URL_PATH_ARGS_SCHEMAS for %s: %s.' % (
-                        handler_class_name, ', '.join(missing_schema_keys)))
+                    'Missing keys in URL_PATH_ARGS_SCHEMAS for %s: %s.'
+                    % (handler_class_name, ', '.join(missing_schema_keys))
+                )
 
         error_msg = (
             'Missing schema keys in URL_PATH_ARGS_SCHEMAS for [ %s ] classes.'
-            '\nVisit %s to learn how to write schemas for handler args.' % (
-                ', '.join(handlers_with_missing_url_schema_keys),
-                    self.wiki_page_link))
+            '\nVisit %s to learn how to write schemas for handler args.'
+            % (', '.join(handlers_with_missing_url_schema_keys), self.wiki_page_link)
+        )
 
         self.assertEqual(handlers_with_missing_url_schema_keys, [], error_msg)
 
-    def test_schema_keys_exactly_match_with_request_methods_in_handlers(
-        self
-    ) -> None:
+    def test_schema_keys_exactly_match_with_request_methods_in_handlers(self) -> None:
         """This test ensures that schema keys in HANDLER_ARGS_SCHEMAS must
         exactly match with request arguments.
         """
         handlers_with_missing_request_schema_keys = []
         list_of_routes_which_need_schemas = (
-            self._get_list_of_routes_which_need_schemas())
+            self._get_list_of_routes_which_need_schemas()
+        )
 
         for route in list_of_routes_which_need_schemas:
             handler = route.handler
@@ -1564,23 +1643,26 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 handler_request_methods.append('DELETE')
             methods_defined_in_schema = handler.HANDLER_ARGS_SCHEMAS.keys()
 
-            missing_schema_keys = (
-                set(handler_request_methods) - set(methods_defined_in_schema))
+            missing_schema_keys = set(handler_request_methods) - set(
+                methods_defined_in_schema
+            )
             if missing_schema_keys:
-                handlers_with_missing_request_schema_keys.append(
-                    handler_class_name)
+                handlers_with_missing_request_schema_keys.append(handler_class_name)
                 self.log_line(
-                    'Missing keys in HANDLER_ARGS_SCHEMAS for %s: %s.' % (
-                        handler_class_name, ', '.join(missing_schema_keys)))
+                    'Missing keys in HANDLER_ARGS_SCHEMAS for %s: %s.'
+                    % (handler_class_name, ', '.join(missing_schema_keys))
+                )
 
         error_msg = (
             'Missing schema keys in HANDLER_ARGS_SCHEMAS for [ %s ] classes.'
-            '\nVisit %s to learn how to write schemas for handler args.' % (
+            '\nVisit %s to learn how to write schemas for handler args.'
+            % (
                 ', '.join(handlers_with_missing_request_schema_keys),
-                    self.wiki_page_link))
+                self.wiki_page_link,
+            )
+        )
 
-        self.assertEqual(
-            handlers_with_missing_request_schema_keys, [], error_msg)
+        self.assertEqual(handlers_with_missing_request_schema_keys, [], error_msg)
 
     def test_default_value_in_schema_conforms_with_schema(self) -> None:
         """This test checks whether the default_value provided in schema
@@ -1588,7 +1670,8 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         """
         handlers_with_non_conforming_default_schemas = []
         list_of_routes_which_need_schemas = (
-            self._get_list_of_routes_which_need_schemas())
+            self._get_list_of_routes_which_need_schemas()
+        )
 
         for route in list_of_routes_which_need_schemas:
             handler = route.handler
@@ -1607,36 +1690,39 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     default_value = {arg: schema['default_value']}
                     default_value_schema = {arg: schema}
 
-                    _, errors = (
-                        payload_validator.validate_arguments_against_schema(
-                            default_value,
-                            default_value_schema,
-                            allowed_extra_args=True,
-                            allow_string_to_bool_conversion=False)
+                    _, errors = payload_validator.validate_arguments_against_schema(
+                        default_value,
+                        default_value_schema,
+                        allowed_extra_args=True,
+                        allow_string_to_bool_conversion=False,
                     )
                     if len(errors) == 0:
                         continue
                     self.log_line(
                         'Handler: %s, argument: %s, default_value '
-                            'validation failed.' % (handler_class_name, arg))
+                        'validation failed.' % (handler_class_name, arg)
+                    )
 
-                    if (handler_class_name not in
-                            handlers_with_non_conforming_default_schemas):
+                    if (
+                        handler_class_name
+                        not in handlers_with_non_conforming_default_schemas
+                    ):
                         handlers_with_non_conforming_default_schemas.append(
-                            handler_class_name)
+                            handler_class_name
+                        )
 
         error_msg = (
             'Schema validation for default values failed for handlers: [ %s ].'
-            '\nVisit %s to learn how to write schemas for handler args.' % (
+            '\nVisit %s to learn how to write schemas for handler args.'
+            % (
                 ', '.join(handlers_with_non_conforming_default_schemas),
-                        self.wiki_page_link))
+                self.wiki_page_link,
+            )
+        )
 
-        self.assertEqual(
-            handlers_with_non_conforming_default_schemas, [], error_msg)
+        self.assertEqual(handlers_with_non_conforming_default_schemas, [], error_msg)
 
-    def test_handlers_with_schemas_are_not_in_handler_schema_todo_list(
-        self
-    ) -> None:
+    def test_handlers_with_schemas_are_not_in_handler_schema_todo_list(self) -> None:
         """This test ensures that the
         HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in handler_schema_constants
         only contains handler class names which require schemas.
@@ -1644,9 +1730,11 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         list_of_handlers_to_be_removed = []
         handler_names_which_require_schemas = (
-        handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
+            handler_schema_constants.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS
+        )
         list_of_routes_which_need_schemas = (
-            self._get_list_of_routes_which_need_schemas())
+            self._get_list_of_routes_which_need_schemas()
+        )
 
         for route in list_of_routes_which_need_schemas:
             handler = route.handler
@@ -1656,19 +1744,21 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 continue
 
             schema_written_for_request_methods = (
-                handler.HANDLER_ARGS_SCHEMAS is not None)
-            schema_written_for_url_path_args = (
-                handler.URL_PATH_ARGS_SCHEMAS is not None)
-            handler_has_schemas = (schema_written_for_request_methods and
-                schema_written_for_url_path_args)
+                handler.HANDLER_ARGS_SCHEMAS is not None
+            )
+            schema_written_for_url_path_args = handler.URL_PATH_ARGS_SCHEMAS is not None
+            handler_has_schemas = (
+                schema_written_for_request_methods and schema_written_for_url_path_args
+            )
 
             if handler_has_schemas:
                 list_of_handlers_to_be_removed.append(handler_class_name)
 
         error_msg = (
             'Handlers to be removed from schema requiring list in '
-            'handler_schema_constants file: [ %s ].' % (
-                ', '.join(list_of_handlers_to_be_removed)))
+            'handler_schema_constants file: [ %s ].'
+            % (', '.join(list_of_handlers_to_be_removed))
+        )
 
         self.assertEqual(list_of_handlers_to_be_removed, [], error_msg)
 
@@ -1682,30 +1772,16 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         base.BaseHandler[Dict[str, str], Dict[str, str]]
     ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-        URL_PATH_ARGS_SCHEMAS = {
-            'exploration_id': {
-                'schema': {
-                    'type': 'int'
-                }
-            }
-        }
+        URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': {'type': 'int'}}}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_play_exploration
         def get(self, exploration_id: str) -> None:
             self.render_json({'exploration_id': exploration_id})
 
-    class MockHandlerWithValidSchema(
-        base.BaseHandler[Dict[str, str], Dict[str, str]]
-    ):
+    class MockHandlerWithValidSchema(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-        URL_PATH_ARGS_SCHEMAS = {
-            'exploration_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': {'type': 'basestring'}}}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_play_exploration
@@ -1726,21 +1802,41 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         super(SchemaValidationUrlArgsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_exploration/<exploration_id>',
-                    self.MockHandlerWithInvalidSchema)], debug=feconf.DEBUG))
+        self.mock_testapp1 = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_play_exploration/<exploration_id>',
+                        self.MockHandlerWithInvalidSchema,
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
-        self.mock_testapp2 = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_exploration/<exploration_id>',
-                    self.MockHandlerWithValidSchema)], debug=feconf.DEBUG))
+        self.mock_testapp2 = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_play_exploration/<exploration_id>',
+                        self.MockHandlerWithValidSchema,
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
-        self.mock_testapp3 = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_exploration/<exploration_id>',
-                    self.MockHandlerWithMissingUrlPathSchema)],
-                debug=feconf.DEBUG))
+        self.mock_testapp3 = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_play_exploration/<exploration_id>',
+                        self.MockHandlerWithMissingUrlPathSchema,
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
 
@@ -1748,13 +1844,14 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp1):
             response = self.get_json(
-                '/mock_play_exploration/%s' % self.exp_id,
-                    expected_status_int=400)
+                '/mock_play_exploration/%s' % self.exp_id, expected_status_int=400
+            )
             error_msg = (
                 'At \'http://localhost/mock_play_exploration/exp_id\' '
                 'these errors are happening:\n'
                 'Schema validation for \'exploration_id\' failed: Could not '
-                'convert str to int: %s' % self.exp_id)
+                'convert str to int: %s' % self.exp_id
+            )
             self.assertEqual(response['error'], error_msg)
         self.logout()
 
@@ -1762,19 +1859,21 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp2):
             response = self.get_json(
-                '/mock_play_exploration/%s' % self.exp_id,
-                    expected_status_int=200)
+                '/mock_play_exploration/%s' % self.exp_id, expected_status_int=200
+            )
         self.logout()
 
     def test_cannot_access_exploration_with_missing_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
         error_msg = (
             'Missing schema for url path args in '
-            'MockHandlerWithMissingUrlPathSchema handler class.')
+            'MockHandlerWithMissingUrlPathSchema handler class.'
+        )
 
         with self.swap(self, 'testapp', self.mock_testapp3):
-            response = self.get_json('/mock_play_exploration/%s' % self.exp_id,
-                expected_status_int=500)
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.exp_id, expected_status_int=500
+            )
             self.assertEqual(response['error'], error_msg)
         self.logout()
 
@@ -1811,21 +1910,12 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
     class MockHandlerWithInvalidSchema(
         base.BaseHandler[
-            Dict[str, str],
-            MockHandlerWithInvalidSchemaNormalizedRequestDict
+            Dict[str, str], MockHandlerWithInvalidSchemaNormalizedRequestDict
         ]
     ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {
-                'exploration_id': {
-                    'schema': {
-                        'type': 'int'
-                    }
-                }
-            }
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {'exploration_id': {'schema': {'type': 'int'}}}}
 
         @acl_decorators.can_play_exploration
         def get(self) -> None:
@@ -1848,8 +1938,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
     class MockHandlerWithDefaultGetSchema(
         base.BaseHandler[
-            Dict[str, str],
-            MockHandlerWithDefaultGetSchemaNormalizedRequestDict
+            Dict[str, str], MockHandlerWithDefaultGetSchemaNormalizedRequestDict
         ]
     ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1857,17 +1946,10 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'exploration_id': {
-                    'schema': {
-                        'type': 'basestring'
-                    },
-                    'default_value': 'random_exp_id'
+                    'schema': {'type': 'basestring'},
+                    'default_value': 'random_exp_id',
                 },
-                'apply_draft': {
-                    'schema': {
-                        'type': 'bool'
-                    },
-                    'default_value': False
-                }
+                'apply_draft': {'schema': {'type': 'bool'}, 'default_value': False},
             }
         }
 
@@ -1882,13 +1964,13 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             if exploration_id != 'random_exp_id':
                 raise self.InvalidInputException(
                     'Expected exploration_id to be random_exp_id received %s'
-                    % exploration_id)
+                    % exploration_id
+                )
             return self.render_json({'exploration_id': exploration_id})
 
     class MockHandlerWithDefaultPutSchema(
         base.BaseHandler[
-            MockHandlerWithDefaultPutSchemaNormalizedPayloadDict,
-            Dict[str, str]
+            MockHandlerWithDefaultPutSchemaNormalizedPayloadDict, Dict[str, str]
         ]
     ):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1896,10 +1978,8 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'PUT': {
                 'exploration_id': {
-                    'schema': {
-                        'type': 'basestring'
-                    },
-                    'default_value': 'random_exp_id'
+                    'schema': {'type': 'basestring'},
+                    'default_value': 'random_exp_id',
                 }
             }
         }
@@ -1915,33 +1995,58 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             if exploration_id != 'random_exp_id':
                 raise self.InvalidInputException(
                     'Expected exploration_id to be random_exp_id received %s'
-                    % exploration_id)
+                    % exploration_id
+                )
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self) -> None:
         super(SchemaValidationRequestArgsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_exploration',
-                    self.MockHandlerWithInvalidSchema)], debug=feconf.DEBUG))
+        self.mock_testapp1 = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_play_exploration', self.MockHandlerWithInvalidSchema
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
-        self.mock_testapp2 = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_exploration',
-                    self.MockHandlerWithMissingRequestSchema)],
-                debug=feconf.DEBUG))
+        self.mock_testapp2 = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_play_exploration',
+                        self.MockHandlerWithMissingRequestSchema,
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
-        self.mock_testapp3 = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_exploration',
-                    self.MockHandlerWithDefaultGetSchema)], debug=feconf.DEBUG))
+        self.mock_testapp3 = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_play_exploration', self.MockHandlerWithDefaultGetSchema
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
-        self.mock_testapp4 = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_play_exploration',
-                    self.MockHandlerWithDefaultPutSchema)], debug=feconf.DEBUG))
+        self.mock_testapp4 = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_play_exploration', self.MockHandlerWithDefaultPutSchema
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
 
@@ -1950,12 +2055,14 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp1):
             response = self.get_json(
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
-                    expected_status_int=400)
+                expected_status_int=400,
+            )
             error_msg = (
                 'At \'http://localhost/mock_play_exploration?'
                 'exploration_id=exp_id\' these errors are happening:\n'
                 'Schema validation for \'exploration_id\' failed: Could not '
-                'convert str to int: %s' % self.exp_id)
+                'convert str to int: %s' % self.exp_id
+            )
             self.assertEqual(response['error'], error_msg)
         self.logout()
 
@@ -1963,12 +2070,14 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         error_msg = (
             'Missing schema for GET method in '
-            'MockHandlerWithMissingRequestSchema handler class.')
+            'MockHandlerWithMissingRequestSchema handler class.'
+        )
 
         with self.swap(self, 'testapp', self.mock_testapp2):
             response = self.get_json(
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
-                    expected_status_int=500)
+                expected_status_int=500,
+            )
             self.assertEqual(response['error'], error_msg)
         self.logout()
 
@@ -1985,7 +2094,8 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
 
 class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
-        test_utils.GenericTestBase):
+    test_utils.GenericTestBase
+):
     """This test ensures that, InternalServerError is raised for
     the request with handler class which has schema but class name is still in
     HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS.
@@ -1993,16 +2103,9 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
 
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler with schema."""
+
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'arg_a': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                }
-            }
-        }
+        HANDLER_ARGS_SCHEMAS = {'POST': {'arg_a': {'schema': {'type': 'basestring'}}}}
 
         # Here we use MyPy ignore because the signature of 'post' method does
         # not match with the signature of super class's (BaseHandler) 'post'
@@ -2017,20 +2120,27 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
         user_id = user_services.get_user_id_from_username('learneruser')
         self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
         self.payload = {'arg_a': 'val'}
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_post_request_raise_internal_server_error(self) -> None:
         test_app_ctx = self.swap(self, 'testapp', self.testapp)
         handler_class_still_needs_schema_list_ctx = self.swap(
-            handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
-            ['MockHandler'])
+            handler_schema_constants,
+            'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
+            ['MockHandler'],
+        )
         with test_app_ctx, handler_class_still_needs_schema_list_ctx:
             self.post_json(
-                '/mock', self.payload, csrf_token=self.csrf_token,
-                expected_status_int=500)
+                '/mock',
+                self.payload,
+                csrf_token=self.csrf_token,
+                expected_status_int=500,
+            )
 
 
 class HeaderRequestsTests(test_utils.GenericTestBase):
@@ -2038,13 +2148,7 @@ class HeaderRequestsTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-        URL_PATH_ARGS_SCHEMAS = {
-            'entity_id': {
-                'schema': {
-                    'type': 'int'
-                }
-            }
-        }
+        URL_PATH_ARGS_SCHEMAS = {'entity_id': {'schema': {'type': 'int'}}}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         # Here we use MyPy ignore because the signature of 'get' method does not
@@ -2057,11 +2161,16 @@ class HeaderRequestsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
-            webapp2.Route(
-                '/mock/<entity_id>', self.MockHandler, name='MockHandler')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock/<entity_id>', self.MockHandler, name='MockHandler'
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_head_request_with_invalid_url_args_raises(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
@@ -2075,26 +2184,30 @@ class HeaderRequestsTests(test_utils.GenericTestBase):
 
 
 class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
-        test_utils.GenericTestBase):
+    test_utils.GenericTestBase
+):
     """This test ensures that, NotImplementedError should not be raised for
     the request method which are not present in the handler class.
     """
 
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-        """Mock handler with no get method.
-        """
+        """Mock handler with no get method."""
+
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, str] = {}
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def setUp(self) -> None:
-        super(RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest,
-            self).setUp()
+        super(
+            RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest, self
+        ).setUp()
 
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_get_request_do_not_raise_notimplemented_error(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
@@ -2115,24 +2228,15 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
     and payload args if they are present in a single request method."""
 
     class MockHandler(
-        base.BaseHandler[
-            MockHandlerNormalizedRequestDict, Dict[str, str]
-        ]
+        base.BaseHandler[MockHandlerNormalizedRequestDict, Dict[str, str]]
     ):
         """Fake page for testing autoescaping."""
+
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'arg_b': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                },
-                'arg_a': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                }
+                'arg_b': {'schema': {'type': 'basestring'}},
+                'arg_a': {'schema': {'type': 'basestring'}},
             }
         }
 
@@ -2158,10 +2262,12 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(HandlerClassWithBothRequestAndPayloadTest, self).setUp()
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+                debug=feconf.DEBUG,
+            )
+        )
         self.payload = {'arg_b': 'arg_in_payload'}
         user_id = user_services.get_user_id_from_username('learneruser')
         self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
@@ -2169,22 +2275,27 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
     def test_both_args_in_post_request(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
-                '/mock?arg_a=arg_in_request', self.payload,
-                csrf_token=self.csrf_token)
+                '/mock?arg_a=arg_in_request', self.payload, csrf_token=self.csrf_token
+            )
 
     def test_post_request_with_invalid_source_raise_error(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
-                '/mock?arg_a=arg_in_request', self.payload,
-                csrf_token=self.csrf_token, source='fake_url',
-                expected_status_int=400)
+                '/mock?arg_a=arg_in_request',
+                self.payload,
+                csrf_token=self.csrf_token,
+                source='fake_url',
+                expected_status_int=400,
+            )
 
     def test_post_request_with_valid_source_do_not_raise_error(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
-                '/mock?arg_a=arg_in_request', self.payload,
+                '/mock?arg_a=arg_in_request',
+                self.payload,
                 csrf_token=self.csrf_token,
-                source='http://localhost:8181/sample_url/')
+                source='http://localhost:8181/sample_url/',
+            )
 
 
 class MockUploadHandlerNormalizedPayloadDict(TypedDict):
@@ -2215,40 +2326,23 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
     class MockUploadHandler(
         base.BaseHandler[
             MockUploadHandlerNormalizedPayloadDict,
-            MockUploadHandlerNormalizedRequestDict
+            MockUploadHandlerNormalizedRequestDict,
         ]
     ):
         """Handles image uploads."""
+
         URL_PATH_ARGS_SCHEMAS = {
-            'entity_type': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'entity_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'entity_type': {'schema': {'type': 'basestring'}},
+            'entity_id': {'schema': {'type': 'basestring'}},
         }
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'image': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                },
-                'filename': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                },
+                'image': {'schema': {'type': 'basestring'}},
+                'filename': {'schema': {'type': 'basestring'}},
                 'filename_prefix': {
-                    'schema': {
-                        'type': 'basestring'
-                    },
-                    'default_value': None
-                }
+                    'schema': {'type': 'basestring'},
+                    'default_value': None,
+                },
             }
         }
 
@@ -2270,17 +2364,23 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(ImageUploadHandlerTest, self).setUp()
         self.signup(self.TEST_LEARNER_EMAIL, self.TEST_LEARNER_USERNAME)
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_upload/<entity_type>/<entity_id>',
-            self.MockUploadHandler, name='MockUploadHandler')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_upload/<entity_type>/<entity_id>',
+                        self.MockUploadHandler,
+                        name='MockUploadHandler',
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
         self.system_user = user_services.get_system_user()
         exp_services.load_demo('0')
 
-        rights_manager.release_ownership_of_exploration(
-            self.system_user, '0')
+        rights_manager.release_ownership_of_exploration(self.system_user, '0')
 
     def test_image_upload_and_download(self) -> None:
         """Test image uploading and downloading."""
@@ -2289,15 +2389,15 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
         with self.swap(self, 'testapp', self.testapp):
             response_dict = self.post_json(
-                '/mock_upload/exploration/0', {'filename': 'test.png'},
+                '/mock_upload/exploration/0',
+                {'filename': 'test.png'},
                 csrf_token=csrf_token,
-                upload_files=[('image', 'unused_filename', raw_image)]
+                upload_files=[('image', 'unused_filename', raw_image)],
             )
             filename = response_dict['filename']
         self.logout()
@@ -2309,20 +2409,11 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         URL_PATH_ARGS_SCHEMAS = {
             'mock_list': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             },
-            'mock_int': {
-                'schema': {
-                    'type': 'int'
-                }
-            }
+            'mock_int': {'schema': {'type': 'int'}},
         }
-        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         # Here we use MyPy ignore because the signature of 'get' method does not
         # match with the signature of super class's (BaseHandler) 'get' method,
@@ -2332,21 +2423,28 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
         def get(self, mock_list: List[str], mock_int: int) -> None:  # type: ignore[override]
             if not isinstance(mock_list, list):
                 raise self.InvalidInputException(
-                    'Expected arg mock_list to be a list. Was type %s' %
-                    type(mock_list))
+                    'Expected arg mock_list to be a list. Was type %s' % type(mock_list)
+                )
             if not isinstance(mock_int, int):
                 raise self.InvalidInputException(
-                    'Expected arg mock_int to be a int. Was type %s' %
-                    type(mock_int))
+                    'Expected arg mock_int to be a int. Was type %s' % type(mock_int)
+                )
             self.render_json({'mock_list': mock_list, 'mock_int': mock_int})
 
     def setUp(self) -> None:
         super(UrlPathNormalizationTest, self).setUp()
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_normalization/<mock_int>/<mock_list>',
-            self.MockHandler, name='MockHandler')],
-            debug=feconf.DEBUG,
-        ))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_normalization/<mock_int>/<mock_list>',
+                        self.MockHandler,
+                        name='MockHandler',
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_url_path_arg_normalization_is_successful(self) -> None:
         list_string = '["id1", "id2", "id3"]'
@@ -2355,27 +2453,19 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.testapp):
             self.get_json(
                 '/mock_normalization/%s/%s' % (int_string, list_string),
-                expected_status_int=200)
+                expected_status_int=200,
+            )
 
 
 class RaiseErrorOnGetTest(test_utils.GenericTestBase):
     """This test class is to ensure handlers with schema raises error
     when they use self.request or self.payload."""
 
-    class MockHandlerWithSchema(
-        base.BaseHandler[Dict[str, str], Dict[str, str]]
-    ):
+    class MockHandlerWithSchema(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler with schema."""
+
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'mock_int': {
-                    'schema': {
-                        'type': 'int'
-                    }
-                }
-            }
-        }
+        HANDLER_ARGS_SCHEMAS = {'POST': {'mock_int': {'schema': {'type': 'int'}}}}
 
         # Here we use MyPy ignore because the signature of 'post' method does
         # not match with the signature of super class's (BaseHandler) 'post'
@@ -2386,9 +2476,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
             self.payload.get('mock_int')
             return self.render_json({})
 
-    class MockHandlerWithoutSchema(
-        base.BaseHandler[Dict[str, str], Dict[str, str]]
-    ):
+    class MockHandlerWithoutSchema(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Mock handler without schema."""
 
         # Here we use MyPy ignore because the signature of 'post' method does
@@ -2405,11 +2493,17 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
         user_id = user_services.get_user_id_from_username('learneruser')
         self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
         self.payload = {'mock_int': 1}
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
-            webapp2.Route('/mock_with_schema', self.MockHandlerWithSchema),
-            webapp2.Route(
-                '/mock_without_schema', self.MockHandlerWithoutSchema),
-        ], debug=feconf.DEBUG))
+        self.testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route('/mock_with_schema', self.MockHandlerWithSchema),
+                    webapp2.Route(
+                        '/mock_without_schema', self.MockHandlerWithoutSchema
+                    ),
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
 
     def test_object_which_raises_error_on_get(self) -> None:
         error_message = 'error_message'
@@ -2418,21 +2512,29 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
             object_that_raises_error_on_get.get('key')
 
     def test_request_with_schema_using_payload_or_request_attr_raise_error(
-        self
+        self,
     ) -> None:
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
-                '/mock_with_schema', self.payload, csrf_token=self.csrf_token,
-                expected_status_int=500)
+                '/mock_with_schema',
+                self.payload,
+                csrf_token=self.csrf_token,
+                expected_status_int=500,
+            )
 
     def test_request_without_schema_using_payload_or_request_attr_raise_no_err(
-        self
+        self,
     ) -> None:
         test_app_ctx = self.swap(self, 'testapp', self.testapp)
         handler_class_still_needs_schema_list_ctx = self.swap(
-            handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
-            ['MockHandlerWithoutSchema'])
+            handler_schema_constants,
+            'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
+            ['MockHandlerWithoutSchema'],
+        )
         with test_app_ctx, handler_class_still_needs_schema_list_ctx:
             self.post_json(
-                '/mock_without_schema', self.payload, csrf_token=self.csrf_token,
-                expected_status_int=200)
+                '/mock_without_schema',
+                self.payload,
+                csrf_token=self.csrf_token,
+                expected_status_int=200,
+            )

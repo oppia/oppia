@@ -2,10 +2,7 @@ from typing import Dict, List, Optional, Union
 from google import auth
 
 class Client(object):
-    def __init__(
-            self,
-            credentials: auth.credentials.Credentials = ...
-    ) -> None: ...
+    def __init__(self, credentials: auth.credentials.Credentials = ...) -> None: ...
     def translate(
         self,
         values: Union[str, List[str]],

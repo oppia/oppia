@@ -32,18 +32,21 @@ if MYPY:  # pragma: no cover
 class ExplorationQuit(base.BaseLearnerActionSpec):
     """Learner action that's recorded when a learner quits an exploration."""
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'state_name',
-        'description': 'State name',
-        'schema': {
-            'type': 'unicode',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'state_name',
+            'description': 'State name',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
         },
-        'default_value': ''
-    }, {
-        'name': 'time_spent_in_state_in_msecs',
-        'description': 'Time spent in state in milliseconds',
-        'schema': {
-            'type': 'int',
+        {
+            'name': 'time_spent_in_state_in_msecs',
+            'description': 'Time spent in state in milliseconds',
+            'schema': {
+                'type': 'int',
+            },
+            'default_value': 0,
         },
-        'default_value': 0
-    }]
+    ]

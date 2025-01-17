@@ -40,47 +40,48 @@ class FractionInput(base.BaseInteraction):
     can_have_solution: bool = True
     show_generic_submit_button: bool = True
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'requireSimplestForm',
-        'description': 'Require the learner\'s answer to be in simplest form',
-        'schema': {
-            'type': 'bool',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'requireSimplestForm',
+            'description': 'Require the learner\'s answer to be in simplest form',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': False,
         },
-        'default_value': False
-    }, {
-        'name': 'allowImproperFraction',
-        'description': 'Allow improper fractions in the learner\'s answer',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'allowImproperFraction',
+            'description': 'Allow improper fractions in the learner\'s answer',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': True,
         },
-        'default_value': True
-    }, {
-        'name': 'allowNonzeroIntegerPart',
-        'description': 'Allow the answer to contain an integer part',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'allowNonzeroIntegerPart',
+            'description': 'Allow the answer to contain an integer part',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': True,
         },
-        'default_value': True
-    }, {
-        'name': 'customPlaceholder',
-        'description': 'Custom placeholder text (optional)',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode'
+        {
+            'name': 'customPlaceholder',
+            'description': 'Custom placeholder text (optional)',
+            'schema': {'type': 'custom', 'obj_type': 'SubtitledUnicode'},
+            'default_value': {'content_id': None, 'unicode_str': ''},
         },
-        'default_value': {
-            'content_id': None,
-            'unicode_str': ''
-        }
-    }]
+    ]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top answers',
-        },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }]
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Table with answer counts for top N answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
+        }
+    ]

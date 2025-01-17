@@ -36,18 +36,18 @@ if MYPY:
     from mypy_imports import story_models
     from mypy_imports import topic_models
 
-(story_models, topic_models) = models.Registry.import_models([
-    models.Names.STORY, models.Names.TOPIC
-])
+(story_models, topic_models) = models.Registry.import_models(
+    [models.Names.STORY, models.Names.TOPIC]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
 
 class MigrateStoryJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[story_migration_jobs.MigrateStoryJob] = (
         story_migration_jobs.MigrateStoryJob
-    ] = story_migration_jobs.MigrateStoryJob
+    )
 
     STORY_1_ID: Final = 'story_1_id'
     TOPIC_1_ID: Final = 'topic_1_id'
@@ -65,7 +65,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             node_titles=['title1', 'title2'],
             story_model_last_updated=datetime.datetime.utcnow(),
             story_model_created_on=datetime.datetime.utcnow(),
-            version=1
+            version=1,
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -77,37 +77,37 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            canonical_story_references=[{
-                'story_id': self.STORY_1_ID,
-                'story_is_published': False
-            }],
+            canonical_story_references=[
+                {'story_id': self.STORY_1_ID, 'story_is_published': False}
+            ],
             page_title_fragment_for_web='fragm',
         )
-        datastore_services.update_timestamps_multi([
-            topic_model, story_summary_model])
+        datastore_services.update_timestamps_multi([topic_model, story_summary_model])
         datastore_services.put_multi([topic_model, story_summary_model])
         self.latest_contents: story_domain.StoryContentsDict = {
-            'nodes': [{
-                'id': 'node_1111',
-                'title': 'title',
-                'description': 'description',
-                'thumbnail_filename': 'thumbnail_filename.svg',
-                'thumbnail_bg_color': '#F8BF74',
-                'thumbnail_size_in_bytes': None,
-                'destination_node_ids': [],
-                'acquired_skill_ids': [],
-                'prerequisite_skill_ids': [],
-                'outline': 'outline',
-                'outline_is_finalized': True,
-                'exploration_id': 'exp_id',
-                'status': None,
-                'planned_publication_date_msecs': None,
-                'last_modified_msecs': None,
-                'first_publication_date_msecs': None,
-                'unpublishing_reason': None
-            }],
+            'nodes': [
+                {
+                    'id': 'node_1111',
+                    'title': 'title',
+                    'description': 'description',
+                    'thumbnail_filename': 'thumbnail_filename.svg',
+                    'thumbnail_bg_color': '#F8BF74',
+                    'thumbnail_size_in_bytes': None,
+                    'destination_node_ids': [],
+                    'acquired_skill_ids': [],
+                    'prerequisite_skill_ids': [],
+                    'outline': 'outline',
+                    'outline_is_finalized': True,
+                    'exploration_id': 'exp_id',
+                    'status': None,
+                    'planned_publication_date_msecs': None,
+                    'last_modified_msecs': None,
+                    'first_publication_date_msecs': None,
+                    'unpublishing_reason': None,
+                }
+            ],
             'initial_node_id': 'node_1111',
-            'next_node_id': 'node_2222'
+            'next_node_id': 'node_2222',
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -135,22 +135,26 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()
-        story_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
-            'cmd': story_domain.CMD_CREATE_NEW
-        }])
+        story_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create story',
+            [{'cmd': story_domain.CMD_CREATE_NEW}],
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='STORY MIGRATED SUCCESS: 1'),
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='STORY MIGRATED SUCCESS: 1'),
+            ]
+        )
 
         migrated_story_model = story_models.StoryModel.get(self.STORY_1_ID)
         self.assertEqual(migrated_story_model.version, 2)
         self.assertEqual(
             migrated_story_model.story_contents_schema_version,
-            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
-        self.assertEqual(
-            migrated_story_model.story_contents, self.latest_contents)
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+        )
+        self.assertEqual(migrated_story_model.story_contents, self.latest_contents)
 
     def test_broken_story_is_not_migrated(self) -> None:
         story_model_one = self.create_model(
@@ -166,9 +170,11 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             url_fragment='urlfragment',
         )
         story_model_one.update_timestamps()
-        story_model_one.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
-            'cmd': story_domain.CMD_CREATE_NEW
-        }])
+        story_model_one.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create story',
+            [{'cmd': story_domain.CMD_CREATE_NEW}],
+        )
 
         story_model_two = self.create_model(
             story_models.StoryModel,
@@ -183,19 +189,23 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             url_fragment='urlfragment',
         )
         story_model_two.update_timestamps()
-        story_model_two.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
-            'cmd': story_domain.CMD_CREATE_NEW
-        }])
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'STORY PROCESSED ERROR: "(\'story_1_id\', ValidationError('
-                    '\'Expected description to be a string, received 123\''
-                    '))": 1'
-                )
-            ),
-            job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1')
-        ])
+        story_model_two.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create story',
+            [{'cmd': story_domain.CMD_CREATE_NEW}],
+        )
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'STORY PROCESSED ERROR: "(\'story_1_id\', ValidationError('
+                        '\'Expected description to be a string, received 123\''
+                        '))": 1'
+                    )
+                ),
+                job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
+            ]
+        )
 
         migrated_story_model = story_models.StoryModel.get(self.STORY_1_ID)
         self.assertEqual(migrated_story_model.version, 1)
@@ -207,7 +217,8 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             story_models.StoryModel,
             id=self.STORY_1_ID,
             story_contents_schema_version=(
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+            ),
             title='title',
             language_code='cs',
             notes='notes',
@@ -217,16 +228,20 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()
-        story_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
-            'cmd': story_domain.CMD_CREATE_NEW
-        }])
+        story_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create story',
+            [{'cmd': story_domain.CMD_CREATE_NEW}],
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='STORY PREVIOUSLY MIGRATED SUCCESS: 1'
-            ),
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='STORY PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
+            ]
+        )
 
         migrated_story_model = story_models.StoryModel.get(self.STORY_1_ID)
         self.assertEqual(migrated_story_model.version, 1)
@@ -234,9 +249,9 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
 
 class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[story_migration_jobs.AuditStoryMigrationJob] = (
         story_migration_jobs.AuditStoryMigrationJob
-    ] = story_migration_jobs.AuditStoryMigrationJob
+    )
 
     STORY_1_ID: Final = 'story_1_id'
     TOPIC_1_ID: Final = 'topic_1_id'
@@ -253,7 +268,7 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             node_titles=['title1', 'title2'],
             story_model_last_updated=datetime.datetime.utcnow(),
             story_model_created_on=datetime.datetime.utcnow(),
-            version=1
+            version=1,
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -265,37 +280,37 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             next_subtopic_id=1,
             language_code='cs',
             url_fragment='topic',
-            canonical_story_references=[{
-                'story_id': self.STORY_1_ID,
-                'story_is_published': False
-            }],
+            canonical_story_references=[
+                {'story_id': self.STORY_1_ID, 'story_is_published': False}
+            ],
             page_title_fragment_for_web='fragm',
         )
-        datastore_services.update_timestamps_multi([
-            topic_model, story_summary_model])
+        datastore_services.update_timestamps_multi([topic_model, story_summary_model])
         datastore_services.put_multi([topic_model, story_summary_model])
         self.latest_contents: story_domain.StoryContentsDict = {
-            'nodes': [{
-                'id': 'node_1111',
-                'title': 'title',
-                'description': 'description',
-                'thumbnail_filename': 'thumbnail_filename.svg',
-                'thumbnail_bg_color': '#F8BF74',
-                'thumbnail_size_in_bytes': None,
-                'destination_node_ids': [],
-                'acquired_skill_ids': [],
-                'prerequisite_skill_ids': [],
-                'outline': 'outline',
-                'outline_is_finalized': True,
-                'exploration_id': 'exp_id',
-                'status': 'Published',
-                'planned_publication_date_msecs': 100.0,
-                'last_modified_msecs': 100.0,
-                'first_publication_date_msecs': 200.0,
-                'unpublishing_reason': None
-            }],
+            'nodes': [
+                {
+                    'id': 'node_1111',
+                    'title': 'title',
+                    'description': 'description',
+                    'thumbnail_filename': 'thumbnail_filename.svg',
+                    'thumbnail_bg_color': '#F8BF74',
+                    'thumbnail_size_in_bytes': None,
+                    'destination_node_ids': [],
+                    'acquired_skill_ids': [],
+                    'prerequisite_skill_ids': [],
+                    'outline': 'outline',
+                    'outline_is_finalized': True,
+                    'exploration_id': 'exp_id',
+                    'status': 'Published',
+                    'planned_publication_date_msecs': 100.0,
+                    'last_modified_msecs': 100.0,
+                    'first_publication_date_msecs': 200.0,
+                    'unpublishing_reason': None,
+                }
+            ],
             'initial_node_id': 'node_1111',
-            'next_node_id': 'node_2222'
+            'next_node_id': 'node_2222',
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -323,14 +338,18 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()
-        story_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
-            'cmd': story_domain.CMD_CREATE_NEW
-        }])
+        story_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create story',
+            [{'cmd': story_domain.CMD_CREATE_NEW}],
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='STORY MIGRATED SUCCESS: 1'),
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='STORY MIGRATED SUCCESS: 1'),
+            ]
+        )
 
     def test_broken_story_is_not_migrated(self) -> None:
         story_model = self.create_model(
@@ -346,18 +365,22 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()
-        story_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
-            'cmd': story_domain.CMD_CREATE_NEW
-        }])
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'STORY PROCESSED ERROR: "(\'story_1_id\', ValidationError('
-                    '\'Expected description to be a string, received 123\''
-                    '))": 1'
+        story_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create story',
+            [{'cmd': story_domain.CMD_CREATE_NEW}],
+        )
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'STORY PROCESSED ERROR: "(\'story_1_id\', ValidationError('
+                        '\'Expected description to be a string, received 123\''
+                        '))": 1'
+                    )
                 )
-            )
-        ])
+            ]
+        )
 
         migrated_story_model = story_models.StoryModel.get(self.STORY_1_ID)
         self.assertEqual(migrated_story_model.version, 1)
@@ -367,7 +390,8 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             story_models.StoryModel,
             id=self.STORY_1_ID,
             story_contents_schema_version=(
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+            ),
             title='title',
             language_code='cs',
             notes='notes',
@@ -377,15 +401,20 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             url_fragment='urlfragment',
         )
         story_model.update_timestamps()
-        story_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Create story', [{
-            'cmd': story_domain.CMD_CREATE_NEW
-        }])
+        story_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Create story',
+            [{'cmd': story_domain.CMD_CREATE_NEW}],
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='STORY PREVIOUSLY MIGRATED SUCCESS: 1'),
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='STORY PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='STORY PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
+            ]
+        )
 
         migrated_story_model = story_models.StoryModel.get(self.STORY_1_ID)
         self.assertEqual(migrated_story_model.version, 1)

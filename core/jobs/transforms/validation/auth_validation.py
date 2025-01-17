@@ -45,8 +45,7 @@ class ValidateFirebaseSeedModelId(base_validation.ValidateBaseModelId):
 
 
 @validation_decorators.AuditsExisting(auth_models.UserIdByFirebaseAuthIdModel)
-class ValidateUserIdByFirebaseAuthIdModelId(
-        base_validation.ValidateBaseModelId):
+class ValidateUserIdByFirebaseAuthIdModelId(base_validation.ValidateBaseModelId):
     """Overrides regex to match the Firebase account ID pattern."""
 
     def __init__(self) -> None:
@@ -56,14 +55,18 @@ class ValidateUserIdByFirebaseAuthIdModelId(
 
 @validation_decorators.RelationshipsOf(auth_models.UserAuthDetailsModel)
 def user_auth_details_model_relationships(
-    model: Type[auth_models.UserAuthDetailsModel]
+    model: Type[auth_models.UserAuthDetailsModel],
 ) -> Iterator[
     Tuple[
         datastore_services.Property,
-        List[Type[Union[
-            auth_models.UserIdByFirebaseAuthIdModel,
-            auth_models.UserIdentifiersModel
-        ]]]
+        List[
+            Type[
+                Union[
+                    auth_models.UserIdByFirebaseAuthIdModel,
+                    auth_models.UserIdentifiersModel,
+                ]
+            ]
+        ],
     ]
 ]:
     """Yields how the properties of the model relate to the IDs of others."""
@@ -73,12 +76,9 @@ def user_auth_details_model_relationships(
 
 @validation_decorators.RelationshipsOf(auth_models.UserIdByFirebaseAuthIdModel)
 def user_id_by_firebase_auth_id_model_relationships(
-    model: Type[auth_models.UserIdByFirebaseAuthIdModel]
+    model: Type[auth_models.UserIdByFirebaseAuthIdModel],
 ) -> Iterator[
-    Tuple[
-        datastore_services.Property,
-        List[Type[auth_models.UserAuthDetailsModel]]
-    ]
+    Tuple[datastore_services.Property, List[Type[auth_models.UserAuthDetailsModel]]]
 ]:
     """Yields how the properties of the model relate to the IDs of others."""
     yield (model.user_id, [auth_models.UserAuthDetailsModel])
@@ -86,12 +86,9 @@ def user_id_by_firebase_auth_id_model_relationships(
 
 @validation_decorators.RelationshipsOf(auth_models.UserIdentifiersModel)
 def user_identifiers_model_relationships(
-    model: Type[auth_models.UserIdentifiersModel]
+    model: Type[auth_models.UserIdentifiersModel],
 ) -> Iterator[
-    Tuple[
-        datastore_services.Property,
-        List[Type[auth_models.UserAuthDetailsModel]]
-    ]
+    Tuple[datastore_services.Property, List[Type[auth_models.UserAuthDetailsModel]]]
 ]:
     """Yields how the properties of the model relate to the IDs of others."""
     yield (model.user_id, [auth_models.UserAuthDetailsModel])

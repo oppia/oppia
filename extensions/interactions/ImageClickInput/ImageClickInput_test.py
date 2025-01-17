@@ -19,7 +19,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.ImageClickInput import ImageClickInput # pylint: disable=unused-import # isort: skip
+from extensions.interactions.ImageClickInput import (
+    ImageClickInput,
+)  # pylint: disable=unused-import # isort: skip
 
 
 class ImageClickInputTests(test_utils.GenericTestBase):

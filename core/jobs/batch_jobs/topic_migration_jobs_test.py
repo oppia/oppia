@@ -38,9 +38,9 @@ if MYPY:
 
 class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[topic_migration_jobs.MigrateTopicJob] = (
         topic_migration_jobs.MigrateTopicJob
-    ] = topic_migration_jobs.MigrateTopicJob
+    )
 
     TOPIC_1_ID: Final = 'topic_1_id'
     TOPIC_2_ID: Final = 'topic_2_id'
@@ -64,7 +64,7 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             uncategorized_skill_count=0,
             subtopic_count=0,
             version=1,
-            published_story_exploration_mapping={}
+            published_story_exploration_mapping={},
         )
         first_topic_summary_model.update_timestamps()
         first_topic_summary_model.put()
@@ -86,56 +86,57 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             uncategorized_skill_count=0,
             subtopic_count=0,
             version=1,
-            published_story_exploration_mapping={}
+            published_story_exploration_mapping={},
         )
         second_topic_summary_model.update_timestamps()
         second_topic_summary_model.put()
 
         first_topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel,
-            id=self.TOPIC_1_ID,
-            topic_is_published=False
+            topic_models.TopicRightsModel, id=self.TOPIC_1_ID, topic_is_published=False
         )
         first_topic_rights_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
         second_topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel,
-            id=self.TOPIC_2_ID,
-            topic_is_published=False
+            topic_models.TopicRightsModel, id=self.TOPIC_2_ID, topic_is_published=False
         )
         second_topic_rights_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
         mock_story_reference_schema_version = 2
+
         # A mock method to update story references is being
         # used since there are no higher versions for story reference
         # schema. This should be removed when newer schema versions are
         # added.
         def mock_update_story_references_from_model(
             unused_cls: Type[topic_domain.Topic],
-            versioned_story_references: topic_domain.VersionedStoryReferencesDict, # pylint: disable=line-too-long
-            current_version: int
+            versioned_story_references: topic_domain.VersionedStoryReferencesDict,  # pylint: disable=line-too-long
+            current_version: int,
         ) -> None:
             versioned_story_references['schema_version'] = current_version + 1
 
         self.story_reference_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION',
-            mock_story_reference_schema_version)
+            feconf,
+            'CURRENT_STORY_REFERENCE_SCHEMA_VERSION',
+            mock_story_reference_schema_version,
+        )
         self.update_story_reference_swap = self.swap(
-            topic_domain.Topic, 'update_story_references_from_model',
-            classmethod(mock_update_story_references_from_model))
+            topic_domain.Topic,
+            'update_story_references_from_model',
+            classmethod(mock_update_story_references_from_model),
+        )
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
     def test_unmigrated_topic_with_unmigrated_prop_is_migrated(self) -> None:
-        with self.story_reference_schema_version_swap, self.update_story_reference_swap: # pylint: disable=line-too-long
+        with self.story_reference_schema_version_swap, self.update_story_reference_swap:  # pylint: disable=line-too-long
             unmigrated_topic_model = self.create_model(
                 topic_models.TopicModel,
                 id=self.TOPIC_1_ID,
@@ -153,24 +154,26 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             unmigrated_topic_model.commit(
                 feconf.SYSTEM_COMMITTER_ID,
                 'Create topic',
-                [{'cmd': topic_domain.CMD_CREATE_NEW}]
+                [{'cmd': topic_domain.CMD_CREATE_NEW}],
             )
 
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(
-                    stdout='TOPIC MIGRATED SUCCESS: 1'),
-            ])
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+                    job_run_result.JobRunResult(stdout='TOPIC MIGRATED SUCCESS: 1'),
+                ]
+            )
 
             migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
             self.assertEqual(migrated_topic_model.version, 2)
             self.assertEqual(
                 migrated_topic_model.subtopic_schema_version,
-                feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+                feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            )
             self.assertEqual(
                 migrated_topic_model.story_reference_schema_version,
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            )
 
     def test_topic_summary_of_unmigrated_topic_is_updated(self) -> None:
         unmigrated_topic_model = self.create_model(
@@ -190,13 +193,15 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         unmigrated_topic_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='TOPIC MIGRATED SUCCESS: 1'),
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='TOPIC MIGRATED SUCCESS: 1'),
+            ]
+        )
         migrated_topic_summary_model = topic_models.TopicSummaryModel.get(
             self.TOPIC_1_ID
         )
@@ -220,7 +225,7 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         first_unmigrated_topic_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
         second_unmigrated_topic_model = self.create_model(
@@ -240,27 +245,25 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         second_unmigrated_topic_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError('
-                    '\'Invalid language code: abc\''
-                    '))": 1'
-                )
-            ),
-            job_run_result.JobRunResult(
-                stdout='TOPIC PROCESSED SUCCESS: 1'
-            )
-        ])
-        first_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_1_ID)
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError('
+                        '\'Invalid language code: abc\''
+                        '))": 1'
+                    )
+                ),
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+            ]
+        )
+        first_migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
         self.assertEqual(first_migrated_topic_model.version, 1)
 
-        second_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_2_ID)
+        second_migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_2_ID)
         self.assertEqual(second_migrated_topic_model.version, 1)
 
     def test_migrated_topic_is_not_migrated(self) -> None:
@@ -281,15 +284,17 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         unmigrated_topic_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
-            ),
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
+            ]
+        )
 
         migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
         self.assertEqual(migrated_topic_model.version, 1)
@@ -297,9 +302,9 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
 
 class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[topic_migration_jobs.AuditTopicMigrateJob] = (
         topic_migration_jobs.AuditTopicMigrateJob
-    ] = topic_migration_jobs.AuditTopicMigrateJob
+    )
 
     TOPIC_1_ID: Final = 'topic_1_id'
     TOPIC_2_ID: Final = 'topic_2_id'
@@ -323,7 +328,7 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
             uncategorized_skill_count=0,
             subtopic_count=0,
             version=1,
-            published_story_exploration_mapping={}
+            published_story_exploration_mapping={},
         )
         first_topic_summary_model.update_timestamps()
         first_topic_summary_model.put()
@@ -345,50 +350,51 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
             uncategorized_skill_count=0,
             subtopic_count=0,
             version=1,
-            published_story_exploration_mapping={}
+            published_story_exploration_mapping={},
         )
         second_topic_summary_model.update_timestamps()
         second_topic_summary_model.put()
 
         first_topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel,
-            id=self.TOPIC_1_ID,
-            topic_is_published=False
+            topic_models.TopicRightsModel, id=self.TOPIC_1_ID, topic_is_published=False
         )
         first_topic_rights_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
         second_topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel,
-            id=self.TOPIC_2_ID,
-            topic_is_published=False
+            topic_models.TopicRightsModel, id=self.TOPIC_2_ID, topic_is_published=False
         )
         second_topic_rights_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
         mock_story_reference_schema_version = 2
+
         # A mock method to update story references is being
         # used since there are no higher versions for story reference
         # schema. This should be removed when newer schema versions are
         # added.
         def mock_update_story_references_from_model(
             unused_cls: Type[topic_domain.Topic],
-            versioned_story_references: topic_domain.VersionedStoryReferencesDict, # pylint: disable=line-too-long
-            current_version: int
+            versioned_story_references: topic_domain.VersionedStoryReferencesDict,  # pylint: disable=line-too-long
+            current_version: int,
         ) -> None:
             versioned_story_references['schema_version'] = current_version + 1
 
         self.story_reference_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION',
-            mock_story_reference_schema_version)
+            feconf,
+            'CURRENT_STORY_REFERENCE_SCHEMA_VERSION',
+            mock_story_reference_schema_version,
+        )
         self.update_story_reference_swap = self.swap(
-            topic_domain.Topic, 'update_story_references_from_model',
-            classmethod(mock_update_story_references_from_model))
+            topic_domain.Topic,
+            'update_story_references_from_model',
+            classmethod(mock_update_story_references_from_model),
+        )
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -411,7 +417,7 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
         first_unmigrated_topic_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
         second_unmigrated_topic_model = self.create_model(
@@ -431,27 +437,25 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
         second_unmigrated_topic_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError('
-                    '\'Invalid language code: abc\''
-                    '))": 1'
-                )
-            ),
-            job_run_result.JobRunResult(
-                stdout='TOPIC PROCESSED SUCCESS: 1'
-            )
-        ])
-        first_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_1_ID)
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError('
+                        '\'Invalid language code: abc\''
+                        '))": 1'
+                    )
+                ),
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+            ]
+        )
+        first_migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
         self.assertEqual(first_migrated_topic_model.version, 1)
 
-        second_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_2_ID)
+        second_migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_2_ID)
         self.assertEqual(second_migrated_topic_model.version, 1)
 
     def test_migrated_topic_is_not_migrated(self) -> None:
@@ -472,15 +476,17 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
         unmigrated_topic_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
-            ),
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
+            ]
+        )
 
         migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
         self.assertEqual(migrated_topic_model.version, 1)

@@ -30,11 +30,11 @@ from typing import Final, List, Optional
 import webapp2
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import platform_auth_services
 
-auth_models, = models.Registry.import_models([models.Names.AUTH])
+(auth_models,) = models.Registry.import_models([models.Names.AUTH])
 
 platform_auth_services = models.Registry.import_auth_services()
 
@@ -65,7 +65,7 @@ def create_profile_user_auth_details(
 
 
 def get_all_profiles_by_parent_user_id(
-    parent_user_id: str
+    parent_user_id: str,
 ) -> List[auth_models.UserAuthDetailsModel]:
     """Fetch the auth details of all profile users with the given parent user.
 
@@ -84,8 +84,7 @@ def get_all_profiles_by_parent_user_id(
 
 
 def establish_auth_session(
-    request: webapp2.Request,
-    response: webapp2.Response
+    request: webapp2.Request, response: webapp2.Response
 ) -> None:
     """Sets login cookies to maintain a user's sign-in session.
 
@@ -108,7 +107,7 @@ def destroy_auth_session(response: webapp2.Response) -> None:
 
 
 def get_user_auth_details_from_model(
-    user_auth_details_model: auth_models.UserAuthDetailsModel
+    user_auth_details_model: auth_models.UserAuthDetailsModel,
 ) -> auth_domain.UserAuthDetails:
     """Returns a UserAuthDetails domain object from the given model.
 
@@ -123,11 +122,12 @@ def get_user_auth_details_from_model(
         user_auth_details_model.gae_id,
         user_auth_details_model.firebase_auth_id,
         user_auth_details_model.parent_user_id,
-        deleted=user_auth_details_model.deleted)
+        deleted=user_auth_details_model.deleted,
+    )
 
 
 def get_auth_claims_from_request(
-    request: webapp2.Request
+    request: webapp2.Request,
 ) -> Optional[auth_domain.AuthClaims]:
     """Authenticates the request and returns claims about its authorizer.
 
@@ -177,8 +177,7 @@ def verify_external_auth_associations_are_deleted(user_id: str) -> bool:
         bool. True if and only if we have successfully verified that all
         external associations have been deleted.
     """
-    return platform_auth_services.verify_external_auth_associations_are_deleted(
-        user_id)
+    return platform_auth_services.verify_external_auth_associations_are_deleted(user_id)
 
 
 def get_auth_id_from_user_id(user_id: str) -> Optional[str]:
@@ -194,9 +193,7 @@ def get_auth_id_from_user_id(user_id: str) -> Optional[str]:
     return platform_auth_services.get_auth_id_from_user_id(user_id)
 
 
-def get_multi_auth_ids_from_user_ids(
-    user_ids: List[str]
-) -> List[Optional[str]]:
+def get_multi_auth_ids_from_user_ids(user_ids: List[str]) -> List[Optional[str]]:
     """Returns the auth IDs associated with the given user IDs.
 
     Args:
@@ -210,8 +207,7 @@ def get_multi_auth_ids_from_user_ids(
 
 
 def get_user_id_from_auth_id(
-    auth_id: str,
-    include_deleted: bool = False
+    auth_id: str, include_deleted: bool = False
 ) -> Optional[str]:
     """Returns the user ID associated with the given auth ID.
 
@@ -225,12 +221,11 @@ def get_user_id_from_auth_id(
         association exists.
     """
     return platform_auth_services.get_user_id_from_auth_id(
-        auth_id, include_deleted=include_deleted)
+        auth_id, include_deleted=include_deleted
+    )
 
 
-def get_multi_user_ids_from_auth_ids(
-    auth_ids: List[str]
-) -> List[Optional[str]]:
+def get_multi_user_ids_from_auth_ids(auth_ids: List[str]) -> List[Optional[str]]:
     """Returns the user IDs associated with the given auth IDs.
 
     Args:
@@ -244,7 +239,7 @@ def get_multi_user_ids_from_auth_ids(
 
 
 def associate_auth_id_with_user_id(
-    auth_id_user_id_pair: auth_domain.AuthIdUserIdPair
+    auth_id_user_id_pair: auth_domain.AuthIdUserIdPair,
 ) -> None:
     """Commits the association between auth ID and user ID.
 
@@ -259,7 +254,7 @@ def associate_auth_id_with_user_id(
 
 
 def associate_multi_auth_ids_with_user_ids(
-    auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]
+    auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair],
 ) -> None:
     """Commits the associations between auth IDs and user IDs.
 
@@ -270,8 +265,7 @@ def associate_multi_auth_ids_with_user_ids(
     Raises:
         Exception. One or more auth associations already exist.
     """
-    platform_auth_services.associate_multi_auth_ids_with_user_ids(
-        auth_id_user_id_pairs)
+    platform_auth_services.associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs)
 
 
 def grant_super_admin_privileges(user_id: str) -> None:
@@ -300,9 +294,7 @@ def get_csrf_secret_value() -> str:
         str. Returns the csrf secret value.
     """
     memcached_items = caching_services.get_multi(
-        caching_services.CACHE_NAMESPACE_DEFAULT,
-        None,
-        [CSRF_SECRET_INSTANCE_ID]
+        caching_services.CACHE_NAMESPACE_DEFAULT, None, [CSRF_SECRET_INSTANCE_ID]
     )
     if CSRF_SECRET_INSTANCE_ID in memcached_items:
         csrf_value = memcached_items[CSRF_SECRET_INSTANCE_ID]
@@ -312,23 +304,22 @@ def get_csrf_secret_value() -> str:
         return csrf_value
 
     csrf_secret_model = auth_models.CsrfSecretModel.get(
-        CSRF_SECRET_INSTANCE_ID, strict=False)
+        CSRF_SECRET_INSTANCE_ID, strict=False
+    )
 
     if csrf_secret_model is None:
         csrf_secret_value = base64.urlsafe_b64encode(os.urandom(20)).decode()
         auth_models.CsrfSecretModel(
-            id=CSRF_SECRET_INSTANCE_ID,
-            oppia_csrf_secret=csrf_secret_value
+            id=CSRF_SECRET_INSTANCE_ID, oppia_csrf_secret=csrf_secret_value
         ).put()
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT,
             None,
-            {
-                CSRF_SECRET_INSTANCE_ID: csrf_secret_value
-            }
+            {CSRF_SECRET_INSTANCE_ID: csrf_secret_value},
         )
         csrf_secret_model = auth_models.CsrfSecretModel.get(
-            CSRF_SECRET_INSTANCE_ID, strict=False)
+            CSRF_SECRET_INSTANCE_ID, strict=False
+        )
 
     # Ruling out the possibility of csrf_secret_model being None in
     # order to avoid mypy error.

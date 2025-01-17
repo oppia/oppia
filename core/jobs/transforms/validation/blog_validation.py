@@ -33,19 +33,18 @@ import apache_beam as beam
 from typing import Iterator, List, Tuple, Type, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
     from mypy_imports import user_models
 
 (blog_models, user_models) = models.Registry.import_models(
-    [models.Names.BLOG, models.Names.USER])
+    [models.Names.BLOG, models.Names.USER]
+)
 
 
 @validation_decorators.AuditsExisting(blog_models.BlogPostModel)
 class ValidateBlogPostModelDomainObjectsInstances(
-    base_validation.ValidateModelDomainObjectInstances[
-        blog_models.BlogPostModel
-    ]
+    base_validation.ValidateModelDomainObjectInstances[blog_models.BlogPostModel]
 ):
     """Provides the validation type for validating blog post objects."""
 
@@ -69,7 +68,7 @@ class ValidateBlogPostModelDomainObjectsInstances(
             blog_post_model.tags,
             blog_post_model.thumbnail_filename,
             blog_post_model.last_updated,
-            blog_post_model.published_on
+            blog_post_model.published_on,
         )
 
     def _get_domain_object_validation_type(
@@ -94,24 +93,22 @@ class ValidateBlogPostModelDomainObjectsInstances(
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(
-    blog_models.BlogPostModel,
-    blog_models.BlogPostSummaryModel)
+    blog_models.BlogPostModel, blog_models.BlogPostSummaryModel
+)
 class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether created_on, last_updated and published_on
     timestamps are valid for both blog post models and blog post summary models.
     """
 
     def process(
-        self, input_model: Union[
-            blog_models.BlogPostModel,
-            blog_models.BlogPostSummaryModel
-            ]
+        self,
+        input_model: Union[blog_models.BlogPostModel, blog_models.BlogPostSummaryModel],
     ) -> Iterator[
         Union[
             blog_validation_errors.InconsistentLastUpdatedTimestampsError,
             blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated,
             blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn,
-            blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError
+            blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError,
         ]
     ]:
         """Function that validates that the last updated timestamp of the blog
@@ -133,31 +130,37 @@ class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
         model = job_utils.clone_model(input_model)
 
         if model.created_on > (
-                model.last_updated + base_validation.MAX_CLOCK_SKEW_SECS):
-            yield blog_validation_errors.InconsistentLastUpdatedTimestampsError(
-                model)
+            model.last_updated + base_validation.MAX_CLOCK_SKEW_SECS
+        ):
+            yield blog_validation_errors.InconsistentLastUpdatedTimestampsError(model)
 
         current_datetime = datetime.datetime.utcnow()
         if model.published_on:
             if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
-                    current_datetime):
-                yield blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(model) # pylint: disable=line-too-long
+                current_datetime
+            ):
+                yield blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(
+                    model
+                )  # pylint: disable=line-too-long
 
             if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
-                    model.last_updated):
-                yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) # pylint: disable=line-too-long
+                model.last_updated
+            ):
+                yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(
+                    model
+                )  # pylint: disable=line-too-long
 
         if (model.last_updated - base_validation.MAX_CLOCK_SKEW_SECS) > (
-                current_datetime):
-            yield blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(model) # pylint: disable=line-too-long
+            current_datetime
+        ):
+            yield blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(
+                model
+            )  # pylint: disable=line-too-long
 
 
-@validation_decorators.AuditsExisting(
-    blog_models.BlogPostSummaryModel)
+@validation_decorators.AuditsExisting(blog_models.BlogPostSummaryModel)
 class ValidateBlogSummaryModelDomainObjectsInstances(
-    base_validation.ValidateModelDomainObjectInstances[
-        blog_models.BlogPostSummaryModel
-    ]
+    base_validation.ValidateModelDomainObjectInstances[blog_models.BlogPostSummaryModel]
 ):
     """Provides the validation type for validating blog post objects."""
 
@@ -181,7 +184,7 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
             summary_model.tags,
             summary_model.thumbnail_filename,
             summary_model.last_updated,
-            summary_model.published_on
+            summary_model.published_on,
         )
 
     def _get_domain_object_validation_type(
@@ -201,18 +204,21 @@ class ValidateBlogSummaryModelDomainObjectsInstances(
         return base_validation.ValidationModes.STRICT
 
 
-@validation_decorators.RelationshipsOf(
-    blog_models.BlogPostModel)
+@validation_decorators.RelationshipsOf(blog_models.BlogPostModel)
 def blog_post_model_relationships(
-    model: Type[blog_models.BlogPostModel]
+    model: Type[blog_models.BlogPostModel],
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
-        List[Type[Union[
-            blog_models.BlogPostSummaryModel,
-            blog_models.BlogPostRightsModel,
-            user_models.UserSettingsModel
-        ]]]
+        List[
+            Type[
+                Union[
+                    blog_models.BlogPostSummaryModel,
+                    blog_models.BlogPostRightsModel,
+                    user_models.UserSettingsModel,
+                ]
+            ]
+        ],
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
@@ -221,18 +227,21 @@ def blog_post_model_relationships(
     yield (model.author_id, [user_models.UserSettingsModel])
 
 
-@validation_decorators.RelationshipsOf(
-    blog_models.BlogPostSummaryModel)
+@validation_decorators.RelationshipsOf(blog_models.BlogPostSummaryModel)
 def blog_post_summary_model_relationships(
-    model: Type[blog_models.BlogPostSummaryModel]
+    model: Type[blog_models.BlogPostSummaryModel],
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
-        List[Type[Union[
-            blog_models.BlogPostModel,
-            blog_models.BlogPostRightsModel,
-            user_models.UserSettingsModel
-        ]]]
+        List[
+            Type[
+                Union[
+                    blog_models.BlogPostModel,
+                    blog_models.BlogPostRightsModel,
+                    user_models.UserSettingsModel,
+                ]
+            ]
+        ],
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
@@ -241,19 +250,23 @@ def blog_post_summary_model_relationships(
     yield (model.author_id, [user_models.UserSettingsModel])
 
 
-@validation_decorators.RelationshipsOf(
-    blog_models.BlogPostRightsModel)
+@validation_decorators.RelationshipsOf(blog_models.BlogPostRightsModel)
 def blog_post_rights_model_relationships(
-    model: Type[blog_models.BlogPostRightsModel]
+    model: Type[blog_models.BlogPostRightsModel],
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
-        List[Type[Union[
-            blog_models.BlogPostModel,
-            blog_models.BlogPostSummaryModel,
-            user_models.UserSettingsModel
-        ]]]
-    ]]:
+        List[
+            Type[
+                Union[
+                    blog_models.BlogPostModel,
+                    blog_models.BlogPostSummaryModel,
+                    user_models.UserSettingsModel,
+                ]
+            ]
+        ],
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [blog_models.BlogPostModel]
     yield model.id, [blog_models.BlogPostSummaryModel]
@@ -262,11 +275,9 @@ def blog_post_rights_model_relationships(
 
 @validation_decorators.RelationshipsOf(blog_models.BlogAuthorDetailsModel)
 def blog_author_details_model_relationships(
-    model: Type[blog_models.BlogAuthorDetailsModel]
+    model: Type[blog_models.BlogAuthorDetailsModel],
 ) -> Iterator[
-    Tuple[
-        model_property.PropertyType,
-        List[Type[user_models.UserSettingsModel]]
-    ]]:
+    Tuple[model_property.PropertyType, List[Type[user_models.UserSettingsModel]]]
+]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.author_id, [user_models.UserSettingsModel]

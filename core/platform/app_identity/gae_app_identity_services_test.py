@@ -27,8 +27,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def test_get_application_id(self) -> None:
         with self.swap(feconf, 'OPPIA_PROJECT_ID', 'some_id'):
-            self.assertEqual(
-                gae_app_identity_services.get_application_id(), 'some_id')
+            self.assertEqual(gae_app_identity_services.get_application_id(), 'some_id')
 
     def test_get_application_id_throws_error(self) -> None:
         with self.swap(feconf, 'OPPIA_PROJECT_ID', None):
@@ -41,4 +40,5 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'OPPIA_PROJECT_ID', 'some_id'):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
-                'some_id-resources')
+                'some_id-resources',
+            )

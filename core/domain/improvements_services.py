@@ -31,18 +31,16 @@ from core.platform import models
 from typing import Dict, Iterator, List, Optional, Sequence, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import improvements_models
 
-(improvements_models,) = (
-    models.Registry.import_models([models.Names.IMPROVEMENTS])
-)
+(improvements_models,) = models.Registry.import_models([models.Names.IMPROVEMENTS])
 datastore_services = models.Registry.import_datastore_services()
 
 
 def _yield_all_tasks_ordered_by_status(
-    composite_entity_id: str
+    composite_entity_id: str,
 ) -> Iterator[improvements_domain.TaskEntry]:
     """Yields all of the tasks corresponding to the given entity in storage.
 
@@ -70,7 +68,7 @@ def _yield_all_tasks_ordered_by_status(
 
 
 def get_task_entry_from_model(
-    task_entry_model: improvements_models.ExplorationStatsTaskEntryModel
+    task_entry_model: improvements_models.ExplorationStatsTaskEntryModel,
 ) -> improvements_domain.TaskEntry:
     """Returns a domain object corresponding to the given task entry model.
 
@@ -82,15 +80,21 @@ def get_task_entry_from_model(
         improvements_domain.TaskEntry. The corresponding domain object.
     """
     return improvements_domain.TaskEntry(
-        task_entry_model.entity_type, task_entry_model.entity_id,
-        task_entry_model.entity_version, task_entry_model.task_type,
-        task_entry_model.target_type, task_entry_model.target_id,
-        task_entry_model.issue_description, task_entry_model.status,
-        task_entry_model.resolver_id, task_entry_model.resolved_on)
+        task_entry_model.entity_type,
+        task_entry_model.entity_id,
+        task_entry_model.entity_version,
+        task_entry_model.task_type,
+        task_entry_model.target_type,
+        task_entry_model.target_id,
+        task_entry_model.issue_description,
+        task_entry_model.status,
+        task_entry_model.resolver_id,
+        task_entry_model.resolved_on,
+    )
 
 
 def fetch_exploration_tasks(
-    exploration: exp_domain.Exploration
+    exploration: exp_domain.Exploration,
 ) -> Tuple[List[improvements_domain.TaskEntry], Dict[str, List[str]]]:
     """Returns a tuple encoding the open and resolved tasks corresponding to the
     exploration.
@@ -108,16 +112,14 @@ def fetch_exploration_tasks(
                 tasks.
     """
     composite_entity_id = (
-        improvements_models.ExplorationStatsTaskEntryModel
-        .generate_composite_entity_id(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
-            exploration.id,
-            exploration.version
+        improvements_models.ExplorationStatsTaskEntryModel.generate_composite_entity_id(
+            constants.TASK_ENTITY_TYPE_EXPLORATION, exploration.id, exploration.version
         )
     )
     tasks_grouped_by_status = itertools.groupby(
         _yield_all_tasks_ordered_by_status(composite_entity_id),
-        operator.attrgetter('status'))
+        operator.attrgetter('status'),
+    )
 
     open_tasks: List[improvements_domain.TaskEntry] = []
     resolved_task_types_by_state_name = collections.defaultdict(list)
@@ -126,14 +128,12 @@ def fetch_exploration_tasks(
             open_tasks.extend(tasks)
         elif status_group == constants.TASK_STATUS_RESOLVED:
             for t in tasks:
-                resolved_task_types_by_state_name[t.target_id].append(
-                    t.task_type)
+                resolved_task_types_by_state_name[t.target_id].append(t.task_type)
     return open_tasks, dict(resolved_task_types_by_state_name)
 
 
 def fetch_exploration_task_history_page(
-    exploration: exp_domain.Exploration,
-    urlsafe_start_cursor: Optional[str] = None
+    exploration: exp_domain.Exploration, urlsafe_start_cursor: Optional[str] = None
 ) -> Tuple[List[improvements_domain.TaskEntry], Optional[str], bool]:
     """Fetches a page from the given exploration's history of resolved tasks.
 
@@ -158,28 +158,28 @@ def fetch_exploration_task_history_page(
     results: Sequence[improvements_models.ExplorationStatsTaskEntryModel] = []
     start_cursor = (
         datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
-        if urlsafe_start_cursor else None
+        if urlsafe_start_cursor
+        else None
     )
-    results, cursor, more = model_class.query(
-        model_class.entity_type == constants.TASK_ENTITY_TYPE_EXPLORATION,
-        model_class.entity_id == exploration.id,
-        model_class.status == constants.TASK_STATUS_RESOLVED
-    ).order(
-        -model_class.resolved_on
-    ).fetch_page(
-        feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor
+    results, cursor, more = (
+        model_class.query(
+            model_class.entity_type == constants.TASK_ENTITY_TYPE_EXPLORATION,
+            model_class.entity_id == exploration.id,
+            model_class.status == constants.TASK_STATUS_RESOLVED,
+        )
+        .order(-model_class.resolved_on)
+        .fetch_page(feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor)
     )
     # The urlsafe returns bytes and we need to decode them to string.
     return (
         [get_task_entry_from_model(model) for model in results],
         cursor.urlsafe().decode('utf-8') if cursor else None,
-        more
+        more,
     )
 
 
 def put_tasks(
-    tasks: List[improvements_domain.TaskEntry],
-    update_last_updated_time: bool = True
+    tasks: List[improvements_domain.TaskEntry], update_last_updated_time: bool = True
 ) -> None:
     """Puts each of the given tasks into storage if necessary, conditionally
     updating their last updated time.
@@ -194,7 +194,8 @@ def put_tasks(
             of the task models.
     """
     task_models = improvements_models.ExplorationStatsTaskEntryModel.get_multi(
-        [t.task_id for t in tasks])
+        [t.task_id for t in tasks]
+    )
     models_to_put = []
     for task, model in zip(tasks, task_models):
         if model is None:
@@ -211,17 +212,20 @@ def put_tasks(
                     issue_description=task.issue_description,
                     status=task.status,
                     resolver_id=task.resolver_id,
-                    resolved_on=task.resolved_on))
+                    resolved_on=task.resolved_on,
+                )
+            )
         elif apply_changes_to_model(task, model):
             models_to_put.append(model)
     improvements_models.ExplorationStatsTaskEntryModel.update_timestamps_multi(
-        models_to_put, update_last_updated_time=update_last_updated_time)
+        models_to_put, update_last_updated_time=update_last_updated_time
+    )
     improvements_models.ExplorationStatsTaskEntryModel.put_multi(models_to_put)
 
 
 def apply_changes_to_model(
     task_entry: improvements_domain.TaskEntry,
-    task_entry_model: improvements_models.ExplorationStatsTaskEntryModel
+    task_entry_model: improvements_models.ExplorationStatsTaskEntryModel,
 ) -> bool:
     """Makes changes to the given model when differences are found.
 
