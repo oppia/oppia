@@ -45,10 +45,6 @@ describe('Blog Admin', function () {
   it(
     'should assign roles to users and change tag properties',
     async function () {
-      const guestUsr1 = await UserFactory.createNewUser(
-        'guestUsr1',
-        'guest_user1@example.com'
-      );
       const guestUsr2 = await UserFactory.createNewUser(
         'guestUsr2',
         'guest_user2@example.com'
@@ -83,7 +79,6 @@ describe('Blog Admin', function () {
       await blogAdmin.expectMaximumTagLimitNotToBe(5);
       await blogAdmin.setMaximumTagLimitTo(5);
       await blogAdmin.expectMaximumTagLimitToBe(5);
-      await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
