@@ -103,6 +103,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           VIDEO_RECORDING_IS_ENABLED=1 \
+          FFMPEG_SCREEN_SIZE=640x480 \
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
           python -m scripts.run_e2e_tests --skip-install \
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
@@ -167,6 +168,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           VIDEO_RECORDING_IS_ENABLED=1 \
+          FFMPEG_SCREEN_SIZE=640x480 \
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
           python -m scripts.run_acceptance_tests \
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
