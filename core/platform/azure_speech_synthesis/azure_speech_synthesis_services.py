@@ -40,7 +40,7 @@ secrets_services = models.Registry.import_secrets_services()
 
 # A structured SSML template text used for speech synthesis with the Azure
 # Text-to-Speech service. The template contains placeholders for specifying the
-# language code, the voice code, and the speech content.
+# language code, the voice code, and the speech content respectively.
 SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS = """
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="%s">
     <voice name="%s">
@@ -145,6 +145,10 @@ def convert_plaintext_to_ssml_content(
 ) -> str:
     """The method transforms the given plaintext into SSML format using the
     SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS.
+
+    Speech Synthesis Markup Language (SSML) is an XML-based markup language
+    that can be used to fine-tune the text-to-speech output attributes such as
+    pitch, pronunciation, speaking rate, volume, and more.
 
     Args:
         plaintext: str. The text that should be converted into the primary
