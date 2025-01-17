@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import skill_services
 from core.domain import topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -27,8 +28,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
-from typing import Iterable, Tuple
+from typing import Iterable, Optional, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -173,7 +173,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 beam.MapTuple(self.transform_translation_review_stats)
         )
 
-        question_submitter_total_stats_models = (
+        question_submitter_total_stats_models_and_logs = (
             {
                 'question_contribution_stats':
                     question_contribution_stats,
@@ -190,6 +190,25 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                             value['question_general_suggestions_stats']
                         )
                 )
+        )
+
+        question_submitter_total_stats_models = (
+            question_submitter_total_stats_models_and_logs
+            | 'Unpack contribution models' >> beam.Map(
+                lambda element: element[0])
+            | 'Filter out stats with None values' >> beam.Filter(
+                lambda x: x is not None)
+        )
+
+        question_submitter_debug_logs = (
+            question_submitter_total_stats_models_and_logs
+            | 'Filter out logs with None values' >> beam.Filter(
+                lambda element: element[1] is not None)
+            | 'Unpack and get debug logs result1' >> beam.Map(
+                lambda element: (
+                    job_run_result.JobRunResult.as_stdout(element[1])
+                )
+            )
         )
 
         question_reviewer_total_stats_models = (
@@ -262,7 +281,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 translation_submitter_models_job_run_results,
                 translation_reviewer_models_job_run_results,
                 question_submitter_models_job_run_results,
-                question_reviewer_models_job_run_results
+                question_reviewer_models_job_run_results,
+                question_submitter_debug_logs
             )
             | 'Merge job run results' >> beam.Flatten()
         )
@@ -493,8 +513,9 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_contribution_stats:
             Iterable[suggestion_models.QuestionContributionStatsModel],
         question_general_suggestions_stats:
-            Iterable[suggestion_models.GeneralSuggestionModel]) -> (
-        suggestion_models.QuestionSubmitterTotalContributionStatsModel):
+            Iterable[suggestion_models.GeneralSuggestionModel]) -> Tuple[
+                Optional[suggestion_models.QuestionSubmitterTotalContributionStatsModel],  # pylint: disable=line-too-long
+                Optional[str]]:
         """Transforms QuestionContributionStatsModel and GeneralSuggestionModel
         to QuestionSubmitterTotalContributionStatsModel.
 
@@ -509,8 +530,11 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 GeneralSuggestionModel grouped by author_id.
 
         Returns:
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.
-            New QuestionSubmitterTotalContributionStatsModel model.
+            A 2-tuple with the following elements:
+            - suggestion_models.QuestionSubmitterTotalContributionStatsModel.
+            New QuestionSubmitterTotalContributionStatsModel model, if
+            Possible.
+            - The debug logs, if error detected.
         """
         # The key for sorting is defined separately because of a mypy bug.
         # A [no-any-return] is thrown if key is defined in the sort() method
@@ -558,62 +582,128 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         entity_id = contributor_user_id
 
+        by_topic_id = lambda m: m.topic_id
+
+        skill_ids_with_question_suggestions = set(
+            sorted([v.target_id for v in general_suggestion_stats]))
+
+        topic_ids_with_question_submissions_list = []
+        with datastore_services.get_ndb_context():
+            for skill_id in skill_ids_with_question_suggestions:
+                topic_assignments = sorted(
+                    skill_services.get_all_topic_assignments_for_skill(
+                        skill_id), key=by_topic_id)
+                for topic_assignment in topic_assignments:
+                    topic_ids_with_question_submissions_list.append(
+                        topic_assignment.topic_id)
+
+        topic_ids_with_question_submissions = set(
+            sorted(topic_ids_with_question_submissions_list))
+
+        topic_ids_with_contribution_stats = set(
+            sorted([v.topic_id for v in question_contribution_stats]))
+
         for stat in question_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 question_contribution_stats.remove(stat)
 
-        topic_ids = (
-            [v.topic_id for v in question_contribution_stats])
-        submitted_questions_count = sum(
-            v.submitted_questions_count
-                for v in question_contribution_stats)
-        accepted_questions_count = sum(
-            v.accepted_questions_count
-                for v in question_contribution_stats)
-        accepted_questions_without_reviewer_edits_count = sum(
-            v.accepted_questions_without_reviewer_edits_count
-                for v in question_contribution_stats)
-        first_contribution_date = min(
-            v.first_contribution_date for v in question_contribution_stats)
-        last_contribution_date = max(
-            v.last_contribution_date for v in question_contribution_stats)
+        valid_topic_ids_with_contribution_stats = set(
+            sorted([v.topic_id for v in question_contribution_stats]))
 
-        # Weights of overall_accuracy as documented in
-        # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
-        overall_accuracy = (
-            round(
-            accepted_questions_count / submitted_questions_count
-            * 100, 2)
-        )
+        # We only generate total contribution stats model if there exists a
+        # valid contribution stats model for each topic id, a contributor
+        # submitted a question suggestion to. Otherwise we return the debugging
+        # logs.
+        if topic_ids_with_question_submissions != (
+            valid_topic_ids_with_contribution_stats):
 
-        with datastore_services.get_ndb_context():
-            question_submit_stats_models = (
-                suggestion_models.QuestionSubmitterTotalContributionStatsModel(
-                id=entity_id,
-                contributor_id=contributor_user_id,
-                topic_ids_with_question_submissions=topic_ids,
-                recent_review_outcomes=recent_review_outcomes,
-                recent_performance=recent_performance,
-                overall_accuracy=overall_accuracy,
-                submitted_questions_count=submitted_questions_count,
-                accepted_questions_count=accepted_questions_count,
-                accepted_questions_without_reviewer_edits_count=(
-                    accepted_questions_without_reviewer_edits_count),
-                rejected_questions_count=rejected_questions_count,
-                first_contribution_date=first_contribution_date,
-                last_contribution_date=last_contribution_date
-                )
+            # Collects all the debug logs.
+            debug_logs = (
+                'Question submitter ID: %s.\n' % contributor_user_id)
+
+            debug_logs += (
+                'Unique skill IDs with question suggestion: \n')
+
+            with datastore_services.get_ndb_context():
+                for skill_id in skill_ids_with_question_suggestions:
+                    debug_logs += (
+                        '- %s\n' % skill_id)
+                    topic_assignments = sorted(
+                        skill_services.get_all_topic_assignments_for_skill(
+                            skill_id), key=by_topic_id)
+                    for topic_assignment in topic_assignments:
+                        debug_logs += (
+                            '-- Topic ID: %s\n' % topic_assignment.topic_id)
+
+            debug_logs += (
+                'Unique topic IDs with contribution stats: \n')
+            for topic_id in topic_ids_with_contribution_stats:
+                debug_logs += (
+                    '- %s\n' % topic_id)
+
+            debug_logs += (
+                'Unique valid topic IDs with contribution stats: \n')
+            for topic_id in valid_topic_ids_with_contribution_stats:
+                debug_logs += (
+                    '- %s\n' % topic_id)
+            return (None, debug_logs)
+
+        else:
+            topic_ids = (
+                [v.topic_id for v in question_contribution_stats])
+            submitted_questions_count = sum(
+                v.submitted_questions_count
+                    for v in question_contribution_stats)
+            accepted_questions_count = sum(
+                v.accepted_questions_count
+                    for v in question_contribution_stats)
+            accepted_questions_without_reviewer_edits_count = sum(
+                v.accepted_questions_without_reviewer_edits_count
+                    for v in question_contribution_stats)
+            first_contribution_date = min(
+                (v.first_contribution_date for v in (
+                    question_contribution_stats)))
+
+            last_contribution_date = max(
+                (v.last_contribution_date for v in (
+                    question_contribution_stats)))
+
+            # Weights of overall_accuracy as documented in
+            # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
+            overall_accuracy = (
+                round(
+                accepted_questions_count / submitted_questions_count
+                * 100, 2)
             )
-            question_submit_stats_models.update_timestamps()
-            return question_submit_stats_models
+
+            with datastore_services.get_ndb_context():
+                question_submit_stats_models = (
+                    suggestion_models.QuestionSubmitterTotalContributionStatsModel( # pylint: disable=line-too-long
+                    id=entity_id,
+                    contributor_id=contributor_user_id,
+                    topic_ids_with_question_submissions=topic_ids,
+                    recent_review_outcomes=recent_review_outcomes,
+                    recent_performance=recent_performance,
+                    overall_accuracy=overall_accuracy,
+                    submitted_questions_count=submitted_questions_count,
+                    accepted_questions_count=accepted_questions_count,
+                    accepted_questions_without_reviewer_edits_count=(
+                        accepted_questions_without_reviewer_edits_count),
+                    rejected_questions_count=rejected_questions_count,
+                    first_contribution_date=first_contribution_date,
+                    last_contribution_date=last_contribution_date
+                    )
+                )
+                question_submit_stats_models.update_timestamps()
+                return (question_submit_stats_models, None)
 
     @staticmethod
     def transform_question_review_stats(
         reviewer_user_id: str,
         question_reviewer_stats:
             Iterable[suggestion_models.QuestionReviewStatsModel]) -> (
-        suggestion_models.QuestionReviewerTotalContributionStatsModel):
+                suggestion_models.QuestionReviewerTotalContributionStatsModel):
         """Transforms QuestionReviewStatsModel to
         QuestionReviewerTotalContributionStatsModel.
 
@@ -632,11 +722,6 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_reviewer_stats = list(question_reviewer_stats)
         entity_id = reviewer_user_id
 
-        for stat in question_reviewer_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(
-                stat.topic_id):
-                question_reviewer_stats.remove(stat)
-
         topic_ids = (
             [v.topic_id for v in question_reviewer_stats])
         reviewed_questions_count = sum(
@@ -652,13 +737,13 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             reviewed_questions_count - accepted_questions_count
         )
         first_contribution_date = min(
-            v.first_contribution_date for v in question_reviewer_stats)
+            (v.first_contribution_date for v in question_reviewer_stats))
         last_contribution_date = max(
-            v.last_contribution_date for v in question_reviewer_stats)
+            (v.last_contribution_date for v in question_reviewer_stats))
 
         with datastore_services.get_ndb_context():
             question_review_stats_models = (
-                suggestion_models.QuestionReviewerTotalContributionStatsModel(
+                suggestion_models.QuestionReviewerTotalContributionStatsModel( # pylint: disable=line-too-long
                 id=entity_id,
                 contributor_id=reviewer_user_id,
                 topic_ids_with_question_reviews=topic_ids,
