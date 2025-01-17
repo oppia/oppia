@@ -55,6 +55,12 @@ NODE_VERSION = '16.13.0'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
+# Buf version.
+BUF_VERSION = '0.29.0'
+
+# Must match the version of protobuf in requirements_dev.in.
+PROTOC_VERSION = '3.18.3'
+
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
 # 2. Extract the cli in the folder that it was downloaded, most likely
@@ -84,7 +90,7 @@ GOOGLE_CLOUD_SDK_HOME = (
     if feconf.OPPIA_IS_DOCKERIZED
     else os.path.join(
         OPPIA_TOOLS_DIR_ABS_PATH,
-        'google-cloud-sdk-500.0.0',
+        'google-cloud-sdk-364.0.0',
         'google-cloud-sdk'
     )
 )
@@ -183,6 +189,7 @@ NODEMODULES_WDIO_BIN_PATH = (
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
+    os.path.join(CURR_DIR, 'proto_files'),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
@@ -310,8 +317,10 @@ def is_x64_architecture() -> bool:
     return sys.maxsize > 2**32
 
 
-NODE_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'node')
-NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
+NODE_BIN_PATH = os.path.join(
+    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
+NPX_BIN_PATH = os.path.join(
+    NODE_PATH, '' if is_windows_os() else 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([
@@ -640,6 +649,21 @@ def get_personal_access_token() -> str:
     return personal_access_token
 
 
+def convert_to_posixpath(file_path: str) -> str:
+    """Converts a Windows style filepath to posixpath format. If the operating
+    system is not Windows, this function does nothing.
+
+    Args:
+        file_path: str. The path to be converted.
+
+    Returns:
+        str. Returns a posixpath version of the file path.
+    """
+    if not is_windows_os():
+        return file_path
+    return file_path.replace('\\', '/')
+
+
 def create_readme(dir_path: str, readme_content: str) -> None:
     """Creates a readme in a given dir path with the specified
     readme content.
@@ -850,29 +874,11 @@ def url_retrieve(
         Exception. Raised when the provided URL does not use HTTPS but
             enforce_https is True.
     """
+    failures = 0
+    success = False
     if enforce_https and not url.startswith('https://'):
         raise Exception(
             'The URL %s should use HTTPS.' % url)
-
-    # Try downloading using curl initially.
-    print('Downloading %s to %s using curl...' % (url, output_path))
-    curl_task = subprocess.Popen(
-    # The -L flag is for following redirects.
-        ['curl', '-L', url, '--output', output_path],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
-    with curl_task:
-        out, err = curl_task.communicate()
-    if curl_task.returncode == 0:
-        # The download was successful.
-        print(out)
-        print(err)
-        return
-
-    # Download with urlopen if curl fails.
-    print('Downloading using curl failed. Trying with urlopen.')
-    print('Error log for curl: %s' % err)
-    failures = 0
-    success = False
     while not success and failures < max_attempts:
         try:
             with urlrequest.urlopen(
@@ -887,7 +893,6 @@ def url_retrieve(
             failures += 1
             print('Attempt %d of %d failed when downloading %s.' % (
                 failures, max_attempts, url))
-            print('Error in common.url_retrieve: %s' % exception)
             if failures >= max_attempts:
                 raise exception
             print('Error: %s' % exception)
