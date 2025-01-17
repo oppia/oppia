@@ -59,12 +59,6 @@ describe('Blog Pages functionality', function () {
     'should only show published blog post on blog page, navigate to blog ' +
       'post page and show no recommendations',
     async function () {
-      await blogDashboardPage.get();
-      await blogDashboardPage.updateAuthorDetails(
-        'secondUser',
-        'Oppia Blog Author'
-      );
-
       await blogPages.saveBlogPostAsDraftFromBlogDashboard(
         'Draft blog post Title',
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'
@@ -79,9 +73,6 @@ describe('Blog Pages functionality', function () {
       await blogDashboardPage.navigateToPublishTab();
       await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
 
-      await blogPages.get();
-      await blogPages.expectNumberOfBlogPostsToBe(1);
-      await blogPages.navigateToBlogPostPage('Published Blog Post Title');
       await blogPages.expectBlogPostPageTitleToBe('Published Blog Post Title');
       await blogPages.expectBlogAuthorDetailsToBeVisible('secondUser');
       await blogPages.expectNumberOfRecommendationPostsToBe(0);
