@@ -99,6 +99,7 @@ import {AutosaveInfoModalsService} from './services/autosave-info-modals.service
 import {ChangeListService} from './services/change-list.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {ContextService} from 'services/context.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {EditorFirstTimeEventsService} from './services/editor-first-time-events.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
@@ -133,6 +134,7 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {GraphDataService} from './services/graph-data.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {InteractionDetailsCacheService} from './editor-tab/services/interaction-details-cache.service';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
@@ -140,7 +142,9 @@ import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {LoaderService} from 'services/loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {ParameterMetadataService} from './services/parameter-metadata.service';
+import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PopulateRuleContentIdsService} from './services/populate-rule-content-ids.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ResponsesService} from './editor-tab/services/responses.service';
@@ -177,6 +181,7 @@ import {VersionHistoryService} from './services/version-history.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {PencilCodeEditorModule} from 'interactions/PencilCodeEditor/pencil-code-editor-interactions.module';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -191,6 +196,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     ]),
     NgbModule,
     InteractionExtensionsModule,
+    PencilCodeEditorModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
     MatMenuModule,
@@ -320,6 +326,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     ChangeListService,
     ComputeGraphService,
     ContextService,
+    CurrentInteractionService,
     EditorFirstTimeEventsService,
     EditabilityService,
     EditableExplorationBackendApiService,
@@ -354,6 +361,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     GraphDataService,
     ImageLocalStorageService,
     ImageUploadHelperService,
+    InteractionAttributesExtractorService,
     InteractionDetailsCacheService,
     InteractionRulesRegistryService,
     InternetConnectivityService,
@@ -363,7 +371,9 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     LocalStorageService,
     LoggerService,
     ParameterMetadataService,
+    PencilCodeEditorRulesService,
     PlatformFeatureService,
+    PlayerPositionService,
     PopulateRuleContentIdsService,
     ReadOnlyExplorationBackendApiService,
     ResponsesService,

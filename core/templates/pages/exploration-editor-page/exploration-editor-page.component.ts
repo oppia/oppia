@@ -17,7 +17,7 @@
  *               help tab in the navbar.
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
 import {HelpModalComponent} from './modal-templates/help-modal.component';
@@ -184,7 +184,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private versionHistoryService: VersionHistoryService,
     private entityVoiceoversService: EntityVoiceoversService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private renderer: Renderer2
   ) {}
 
   setDocumentTitle(): void {
@@ -682,6 +683,10 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.internetConnectivityService.startCheckingConnection();
+
+    const pencilCodeScript = this.renderer.createElement('script');
+    pencilCodeScript.src = 'https://pencilcode.net/lib/pencilcodeembed.js';
+    this.renderer.appendChild(document.body, pencilCodeScript);
 
     this.directiveSubscriptions.add(
       this.explorationPropertyService.onExplorationPropertyChanged.subscribe(
