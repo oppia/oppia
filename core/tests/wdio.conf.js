@@ -325,7 +325,7 @@ exports.config = {
         '-y',
         '-r', '30',
         '-f', 'x11grab',
-        '-s', '1285x1000',
+        '-s', process.env.SCREEN_SIZE ?? '1285x1000',
         '-i', process.env.DISPLAY,
         '-g', '300',
         '-loglevel', '16',
