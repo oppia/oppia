@@ -441,9 +441,11 @@ import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-ad
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { ExplorationPlayerPageAuthGuard } from 'pages/exploration-player-page/exploration-player-page-auth.guard';
+import { TopicsAndSkillsDashboardAuthGuard } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import { SkillEditorAccessGuard } from 'pages/skill-editor-page/skill-editor-access.guard';
 import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/mobile-menu.service';
 import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/collection-editor-page-auth.guard';
 import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
@@ -790,6 +792,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SidebarStatusService', SidebarStatusService],
   ['SignupPageBackendApiService', SignupPageBackendApiService],
   ['SiteAnalyticsService', SiteAnalyticsService],
+  ['SkillEditorAccessGuard', SkillEditorAccessGuard],
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
@@ -873,6 +876,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TranslationLanguageService', TranslationLanguageService],
   ['TranslateTextService', TranslateTextService],
   ['TranslateTextBackendApiService', TranslateTextBackendApiService],
+  ['TopicsAndSkillsDashboardAuthGuard', TopicsAndSkillsDashboardAuthGuard],
   ['TranslationTabActiveContentIdService',
     TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],

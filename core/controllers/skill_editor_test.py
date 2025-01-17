@@ -92,36 +92,6 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         raise utils.ValidationError()
 
 
-class SkillEditorTest(BaseSkillEditorControllerTests):
-    """Tests for SkillEditorPage."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.url = '%s/%s' % (feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id)
-
-    def test_access_skill_editor_page(self) -> None:
-        """Test access to editor pages for the sample skill."""
-
-        # Check that non-admins cannot access the editor page.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            self.url, expected_status_int=401)
-        self.logout()
-
-        # Check that admins can access and edit in the editor page.
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(self.url)
-        self.logout()
-
-    def test_skill_editor_page_fails(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        # Check GET returns 404 when cannot get skill by id.
-        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
-        self.get_html_response(self.url, expected_status_int=404)
-        self.logout()
-
-
 class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillRightsHandler."""
 

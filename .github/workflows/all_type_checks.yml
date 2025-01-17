@@ -1,4 +1,5 @@
 name: Type checks
+permissions: read-all
 on:
   merge_group:
     types: [checks_requested]
@@ -11,6 +12,9 @@ on:
       - develop
       - release-*
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
 jobs:
   backend_type_checks:
     name: Backend
@@ -18,17 +22,10 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
-      - name: Initialize Docker containers
-        run: |
-          make build
-          make stop
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Run Mypy type checks
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: make run_tests.mypy
+        run: python -m scripts.run_mypy_checks
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -41,18 +38,12 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
-      - name: Install Chrome
-        uses: ./.github/actions/install-chrome
-      - name: Initialize Containers
-        uses: ./.github/actions/install-oppia-dependencies-docker
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Run typescript tests
-        run: make run_tests.typescript
+        run: python -m scripts.run_typescript_checks
       - name: Run typescript tests in strict mode
-        run: make run_tests.typescript PYTHON_ARGS="--strict_checks"
+        run: python -m scripts.run_typescript_checks --strict_checks
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification

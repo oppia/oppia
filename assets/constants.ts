@@ -6748,6 +6748,24 @@ export default {
         }
       ]
     },
+    "CONTRIBUTOR_DASHBOARD": {
+      "ROUTE": "contributor-dashboard",
+      "TITLE": "Contributor Dashboard | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
     "EMAIL_DASHBOARD": {
       "ROUTE": "emaildashboard",
       "TITLE": "Email Dashboard - Oppia",
@@ -6958,6 +6976,23 @@ export default {
         }
       ]
     },
+    "SKILL_EDITOR": {
+      "ROUTE": "skill_editor/:skill_id",
+      "TITLE": "Skill Editor",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Edit and manage skills with the Skill Editor in Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Edit and manage skills with the Skill Editor in Oppia."
+        }
+      ]
+    },
     "DONATE": {
       "ROUTE": "donate",
       "TITLE": "I18N_DONATE_PAGE_BROWSER_TAB_TITLE",
@@ -7099,6 +7134,24 @@ export default {
           "PROPERTY_TYPE": "property",
           "PROPERTY_VALUE": "og:description",
           "CONTENT": "Sign up for Oppia and begin exploring a new subject."
+        }
+      ]
+    },
+    "TOPICS_AND_SKILLS_DASHBOARD": {
+      "ROUTE": "topics-and-skills-dashboard",
+      "TITLE": "Topics and Skills Dashboard | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]
     },

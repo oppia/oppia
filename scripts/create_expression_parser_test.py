@@ -23,7 +23,6 @@ from core.tests import test_utils
 
 from . import common
 from . import create_expression_parser
-from . import setup
 
 
 class CreateExpressionParserTests(test_utils.GenericTestBase):
@@ -36,10 +35,6 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
         ) -> None:  # pylint: disable=unused-argument
             cmd_token_list.append(cmd_tokens)
 
-        setup_script_args = []
-        def mock_setup(args: list[str]) -> None:
-            setup_script_args.append(args)
-
         libraries_installed = []
         def mock_install_npm_library(
             library_name: str, library_version: str, path: str) -> None:
@@ -47,7 +42,6 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
 
         swap_check_call = self.swap(
             subprocess, 'check_call', mock_check_call)
-        swap_setup = self.swap(setup, 'main', mock_setup)
         swap_install_npm_library = self.swap(
             common, 'install_npm_library', mock_install_npm_library)
 
@@ -58,9 +52,8 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
         cmd = [os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
             expression_parser_definition, expression_parser_js]
 
-        with swap_check_call, swap_setup, swap_install_npm_library:
+        with swap_check_call, swap_install_npm_library:
             create_expression_parser.main(args=[])
 
-        self.assertIsNot(len(setup_script_args), 0)
         self.assertEqual(libraries_installed[0][0], 'pegjs')
         self.assertIn(cmd, cmd_token_list)

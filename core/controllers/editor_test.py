@@ -784,7 +784,7 @@ solicit_answer_details: false
         exp_id = 'eid'
         self.save_new_valid_exploration(
             exp_id, owner_id,
-            title=u'¡Hola!',
+            title='¡Hola!',
             category='This is just a test category',
             objective='')
 
@@ -799,7 +799,7 @@ solicit_answer_details: false
             'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(zf_saved.namelist(), [u'Hola.yaml'])
+        self.assertEqual(zf_saved.namelist(), ['Hola.yaml'])
 
         self.logout()
 

@@ -146,8 +146,7 @@ def execute_mypy_checks() -> int:
     Returns:
         int. The return code from mypy checks.
     """
-    task = subprocess.Popen(
-        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install'])
+    task = subprocess.Popen([PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE])
     task.communicate()
     return task.returncode
 
@@ -174,7 +173,7 @@ def has_uncommitted_files() -> bool:
     uncommitted_files = subprocess.check_output(
         GIT_IS_DIRTY_CMD.split(' '), encoding='utf-8'
     )
-    return bool(len(uncommitted_files))
+    return bool(uncommitted_files)
 
 
 def install_hook() -> None:
@@ -275,7 +274,7 @@ def check_for_backend_python_library_inconsistencies() -> None:
         print('\n')
         common.print_each_string_after_two_new_lines([
             'Please fix these discrepancies by editing the `requirements.in`\n'
-            'file or running `scripts.install_third_party` to regenerate\n'
+            'file or running `scripts.install_third_party_libs` to regenerate\n'
             'the `third_party/python_libs` directory.\n'])
         sys.exit(1)
     else:
@@ -325,12 +324,15 @@ def main(args: Optional[List[str]] = None) -> None:
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
-            mypy_check_status = execute_mypy_checks()
-            if mypy_check_status != 0:
-                print(
-                    'Push failed, please correct the mypy type annotation '
-                    'issues above.')
-                sys.exit(mypy_check_status)
+            # When using Docker, we run MYPY checks in docker/pre_push_hook.sh
+            # itself.
+            if not feconf.OPPIA_IS_DOCKERIZED:
+                mypy_check_status = execute_mypy_checks()
+                if mypy_check_status != 0:
+                    print(
+                        'Push failed, please correct the mypy type annotation '
+                        'issues above.')
+                    sys.exit(mypy_check_status)
 
             backend_associated_test_file_check_status = (
                 run_script_and_get_returncode(
