@@ -62,7 +62,6 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
             dev_mode_azure_speech_synthesis_services.
             regenerate_speech_from_text(plaintext, language_accent_code))
 
-
         self.assertTrue(isinstance(result_binary_data, bytes))
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertIsNone(result_error)

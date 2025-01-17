@@ -82,8 +82,6 @@ def regenerate_speech_from_text(
     voiceover_filename = LANGUAGE_CODE_TO_VOICEOVER_FILENAMES[
         language_code]
 
-    voiceover_filename = 'sample_voiceover.mp3'
-
     voiceover_path = os.path.join(
         feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, voiceover_filename)
 
