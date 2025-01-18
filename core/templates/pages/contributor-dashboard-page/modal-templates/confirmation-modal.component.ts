@@ -50,7 +50,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
   `,
 })
 export class ConfirmationModalComponent {
-  @Input() content: {
+  @Input() content!: {
     title: string;
     message: string;
     confirmText: string;

@@ -30,7 +30,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
@@ -74,6 +74,8 @@ describe('Translation Modal Component', () => {
   let getUserContributionRightsDataAsyncSpy: jasmine.Spy;
   let userService: UserService;
   let activeModal: NgbActiveModal;
+  let modalService: NgbModal;
+  let modalRef: any;
   let httpTestingController: HttpTestingController;
   let fixture: ComponentFixture<TranslationModalComponent>;
   let component: TranslationModalComponent;
@@ -105,6 +107,7 @@ describe('Translation Modal Component', () => {
       declarations: [TranslationModalComponent, WrapTextWithEllipsisPipe],
       providers: [
         NgbActiveModal,
+        NgbModal,
         {
           provide: ChangeDetectorRef,
           useValue: changeDetectorRef,
@@ -129,6 +132,11 @@ describe('Translation Modal Component', () => {
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
     userService = TestBed.inject(UserService);
+    modalService = TestBed.inject(NgbModal);
+    modalRef = {
+      componentInstance: {},
+      result: Promise.resolve('confirm'),
+    };
     wds = TestBed.inject(WindowDimensionsService);
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
@@ -919,5 +927,124 @@ describe('Translation Modal Component', () => {
     component.updateTranslatedText();
 
     expect(activeModal.close).not.toHaveBeenCalled();
+  });
+
+  describe('when returning to previous translation', () => {
+    describe('with unsaved changes', () => {
+      beforeEach(() => {
+        component.hasUnsavedChanges = true;
+        component.activeWrittenTranslation = 'modified text';
+      });
+
+      it('should show confirmation modal and handle confirmation', fakeAsync(() => {
+        spyOn(modalService, 'open').and.returnValue(modalRef);
+        spyOn(
+          translateTextService,
+          'getPreviousTextToTranslate'
+        ).and.returnValue({
+          content_format: 'html',
+          content_value: 'previous text',
+          content_type: 'content',
+          interaction_id: null,
+          rule_type: null,
+        });
+        spyOn(component, 'updateActiveState');
+        spyOn(component, 'resetEditor');
+
+        component.returnToPreviousTranslation();
+        tick();
+
+        expect(modalService.open).toHaveBeenCalledWith(jasmine.any(Function), {
+          centered: true,
+          backdrop: 'static',
+        });
+        expect(component.hasUnsavedChanges).toBeFalse();
+        expect(
+          translateTextService.getPreviousTextToTranslate
+        ).toHaveBeenCalled();
+        expect(component.updateActiveState).toHaveBeenCalled();
+        expect(component.moreAvailable).toBeTrue();
+        expect(component.resetEditor).toHaveBeenCalled();
+      }));
+
+      it('should not proceed if modal is dismissed', fakeAsync(() => {
+        modalRef.result = Promise.reject('cancel');
+        spyOn(modalService, 'open').and.returnValue(modalRef);
+        spyOn(translateTextService, 'getPreviousTextToTranslate');
+        spyOn(component, 'updateActiveState');
+        spyOn(component, 'resetEditor');
+
+        component.returnToPreviousTranslation();
+        tick();
+
+        expect(modalService.open).toHaveBeenCalled();
+        expect(component.hasUnsavedChanges).toBeTrue();
+        expect(
+          translateTextService.getPreviousTextToTranslate
+        ).not.toHaveBeenCalled();
+        expect(component.updateActiveState).not.toHaveBeenCalled();
+        expect(component.resetEditor).not.toHaveBeenCalled();
+      }));
+    });
+
+    describe('without unsaved changes', () => {
+      beforeEach(() => {
+        component.hasUnsavedChanges = false;
+        component.activeWrittenTranslation = '';
+      });
+
+      it('should return to previous translation without confirmation', () => {
+        spyOn(modalService, 'open');
+        spyOn(
+          translateTextService,
+          'getPreviousTextToTranslate'
+        ).and.returnValue({
+          content_format: 'html',
+          content_value: 'previous text',
+          content_type: 'content',
+          interaction_id: null,
+          rule_type: null,
+        });
+        spyOn(component, 'updateActiveState');
+        spyOn(component, 'resetEditor');
+
+        component.returnToPreviousTranslation();
+
+        expect(modalService.open).not.toHaveBeenCalled();
+        expect(
+          translateTextService.getPreviousTextToTranslate
+        ).toHaveBeenCalled();
+        expect(component.updateActiveState).toHaveBeenCalled();
+        expect(component.moreAvailable).toBeTrue();
+        expect(component.resetEditor).toHaveBeenCalled();
+      });
+    });
+  });
+
+  // Update existing updateHtml test to include hasUnsavedChanges
+  describe('when updating HTML', () => {
+    it('should set hasUnsavedChanges when content changes', () => {
+      component.activeWrittenTranslation = 'old';
+      component.hasUnsavedChanges = false;
+      spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+
+      component.updateHtml('new');
+
+      expect(component.activeWrittenTranslation).toEqual('new');
+      expect(component.hasUnsavedChanges).toBeTrue();
+      expect(changeDetectorRef.detectChanges).toHaveBeenCalled();
+    });
+
+    it('should not set hasUnsavedChanges when content is unchanged', () => {
+      component.activeWrittenTranslation = 'old';
+      component.hasUnsavedChanges = false;
+      spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+
+      component.updateHtml('old');
+
+      expect(component.activeWrittenTranslation).toEqual('old');
+      expect(component.hasUnsavedChanges).toBeFalse();
+      expect(changeDetectorRef.detectChanges).not.toHaveBeenCalled();
+    });
   });
 });
