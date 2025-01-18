@@ -124,13 +124,9 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
         self.run_model = beam_job_services.create_beam_job_run_model(
             'WorkingJob', dataflow_job_id='123')
 
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
         self.dataflow_job = dataflow.Job(
             id='123',
-            project_id=oppia_project_id,
+            project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_PENDING,
             current_state_time=datetime.datetime.utcnow())
@@ -210,13 +206,9 @@ class CancelJobTests(test_utils.GenericTestBase):
         self.run_model = beam_job_services.create_beam_job_run_model(
             'WorkingJob', dataflow_job_id='123')
 
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
         self.dataflow_job = dataflow.Job(
             id='123',
-            project_id=oppia_project_id,
+            project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_CANCELLING,
             current_state_time=datetime.datetime.utcnow())

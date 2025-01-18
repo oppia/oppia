@@ -144,10 +144,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         super().setUp()
         # User A has one created exploration.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(system_email_address, str)
+        system_email_address = 'system@example.com'
         self.signup(system_email_address, 'systemUser')
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)

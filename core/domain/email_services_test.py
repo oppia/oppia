@@ -34,20 +34,14 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+        self.admin_email_address = 'testadmin@example.com'
+        self.system_email_address = 'system@example.com'
 
     def test_send_mail_raises_exception_for_invalid_permissions(self) -> None:
         """Tests the send_mail exception raised for invalid user permissions."""
         send_email_exception = (
             self.assertRaisesRegex(
                 Exception, 'This app cannot send emails to users.'))
-        assert isinstance(self.admin_email_address, str)
-        assert isinstance(self.system_email_address, str)
 
         with send_email_exception, self.swap(constants, 'DEV_MODE', False):
             email_services.send_mail(
@@ -67,8 +61,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
     )
     def test_send_mail_data_properly_sent(self) -> None:
         """Verifies that the data sent in send_mail is correct."""
-        assert isinstance(self.admin_email_address, str)
-        assert isinstance(self.system_email_address, str)
         email_services.send_mail(
             self.system_email_address, self.admin_email_address,
             'subject', 'body', 'html', bcc_admin=False)
@@ -93,8 +85,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Verifies that the bcc admin flag is working properly in
         send_mail.
         """
-        assert isinstance(self.admin_email_address, str)
-        assert isinstance(self.system_email_address, str)
         email_services.send_mail(
             self.system_email_address, self.admin_email_address,
             'subject', 'body', 'html', bcc_admin=True)
@@ -109,8 +99,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         send_email_exception = (
             self.assertRaisesRegex(
                 Exception, 'This app cannot send emails to users.'))
-        assert isinstance(self.admin_email_address, str)
-        assert isinstance(self.system_email_address, str)
 
         with send_email_exception, (
             self.swap(constants, 'DEV_MODE', False)
@@ -130,8 +118,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Verifies that the data sent in send_bulk_mail is correct
            for each user in the recipient list.
         """
-        assert isinstance(self.admin_email_address, str)
-        assert isinstance(self.system_email_address, str)
         recipients = [self.admin_email_address]
 
         email_services.send_bulk_mail(
@@ -240,8 +226,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         swap_send_email_to_recipients = self.swap(
             platform_email_services, 'send_email_to_recipients',
             lambda *_, **__: False)
-        assert isinstance(self.admin_email_address, str)
-        assert isinstance(self.system_email_address, str)
         recipients = [self.admin_email_address]
 
         with email_exception, swap_send_email_to_recipients:
@@ -278,14 +262,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
     )
     def test_loggable_email_string_generation(self) -> None:
         """Tests that loggable email string is generated correctly."""
-        system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-        assert isinstance(system_email_address, str)
-        assert isinstance(admin_email_address, str)
+        system_email_address = 'system@example.com'
+        admin_email_address = 'testadmin@example.com'
         msg_body = (
             """
             EmailService.SendMail

@@ -538,9 +538,7 @@ class TopicEditorTests(
 
     def setUp(self) -> None:
         super().setUp()
-        self.admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        self.admin_email_address = 'testadmin@example.com'
 
     def test_get_can_not_access_topic_page_with_nonexistent_topic_id(
         self
@@ -620,7 +618,6 @@ class TopicEditorTests(
 
         # Check that admins can access the editable topic data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(
             self.admin_email_address)
         self.assertEqual(len(messages), 0)
@@ -810,7 +807,6 @@ class TopicEditorTests(
         csrf_token = self.get_new_csrf_token()
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(
             self.admin_email_address)
         self.assertEqual(len(messages), 0)
@@ -1126,11 +1122,7 @@ class TopicPublishSendMailHandlerTests(
             '%s/%s' % (
                 feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
             {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-        admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-        assert isinstance(admin_email_address, str)
-        messages = self._get_sent_email_messages(admin_email_address)
+        messages = self._get_sent_email_messages('testadmin@example.com')
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s/%s, please review'
             ' and publish if it looks good.'

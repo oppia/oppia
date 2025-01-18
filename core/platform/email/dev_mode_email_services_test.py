@@ -34,12 +34,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+        self.admin_email_address = 'testadmin@example.com'
+        self.system_email_address = 'system@example.com'
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
@@ -82,8 +78,6 @@ class EmailTests(test_utils.GenericTestBase):
             'dev environment. Emails are sent out in the production'
             ' environment.')
 
-        assert isinstance(self.admin_email_address, str)
-        assert isinstance(self.system_email_address, str)
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
                 self.system_email_address, [self.admin_email_address],
@@ -145,7 +139,6 @@ class EmailTests(test_utils.GenericTestBase):
             ' environment.')
 
         with self.swap(logging, 'info', _mock_logging_function):
-            assert isinstance(self.system_email_address, str)
             dev_mode_email_services.send_email_to_recipients(
                 self.system_email_address,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],

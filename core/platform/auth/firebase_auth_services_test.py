@@ -1149,10 +1149,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False))
 
     def test_admin_email_address_is_super_admin(self) -> None:
-        admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-        assert isinstance(admin_email_address, str)
+        admin_email_address = 'testadmin@example.com'
 
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(

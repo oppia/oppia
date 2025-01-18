@@ -13049,9 +13049,7 @@ class ExplorationChangesMergeabilityUnitTests(
         self.content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        self.admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-              platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        self.admin_email_address = 'testadmin@example.com'
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
     def append_next_content_id_index_change(
@@ -17956,7 +17954,6 @@ class ExplorationChangesMergeabilityUnitTests(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 0)
         self.save_new_valid_exploration(
@@ -18281,7 +18278,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'Backend Version: %s<br><br>'
             'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
         )
-        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].html, expected_email_html_body)
@@ -18308,7 +18304,6 @@ class ExplorationChangesMergeabilityUnitTests(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 0)
         self.save_new_valid_exploration(
@@ -18378,7 +18373,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'Backend Version: %s<br><br>'
             'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
         )
-        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(expected_email_html_body, messages[0].html)

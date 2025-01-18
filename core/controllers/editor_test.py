@@ -2682,18 +2682,11 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.EDITOR_EMAIL)
         self.assertEqual(1, len(messages))
 
-        self.assertEqual(
-            messages[0].sender,
-            'Site Admin <%s>' % (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value)))
+        self.assertEqual(messages[0].sender, 'Site Admin <system@example.com>')
         self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
         self.assertFalse(hasattr(messages[0], 'cc'))
 
-        self.assertEqual(
-            messages[0].bcc,
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        self.assertEqual(messages[0].bcc, 'testadmin@example.com')
         self.assertEqual(
             messages[0].subject,
             'Your Oppia exploration "My Exploration" has been unpublished')

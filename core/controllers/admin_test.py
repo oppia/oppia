@@ -92,10 +92,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super().setUp()
 
-        self.admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-        assert isinstance(self.admin_email_address, str)
+        self.admin_email_address = 'testadmin@example.com'
 
         self.original_parameter_registry = (
             platform_parameter_registry.Registry.parameter_registry.copy())
@@ -3086,10 +3083,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(system_email_address, str)
+        system_email_address = 'system@example.com'
         self.signup(system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.login(system_email_address, is_super_admin=True)
         self.admin_user_id = self.get_user_id_from_email(
@@ -3148,10 +3142,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
+        self.system_email_address = 'system@example.com'
         self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_user_id = self.get_user_id_from_email(
             self.system_email_address)
@@ -3398,10 +3389,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.ADMIN_EMAIL."""
         super().setUp()
-        self.admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-        assert isinstance(self.admin_email_address, str)
+        self.admin_email_address = 'testadmin@example.com'
         self.signup(self.admin_email_address, 'testsuper')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)

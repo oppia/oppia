@@ -184,10 +184,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(self.oppia_project_id, str)
+        self.oppia_project_id = 'dev-project-id'
 
     def test_get_beam_entity_from_model(self) -> None:
 

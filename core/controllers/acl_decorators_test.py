@@ -1793,10 +1793,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
+        self.system_email_address = 'system@example.com'
         self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
@@ -2292,10 +2289,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
+        self.system_email_address = 'system@example.com'
         self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
@@ -2429,10 +2423,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
+        self.system_email_address = 'system@example.com'
         self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
@@ -2632,10 +2623,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
+        self.system_email_address = 'system@example.com'
         self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(

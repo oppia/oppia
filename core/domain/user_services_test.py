@@ -574,10 +574,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
         self.assertEqual(admin_settings.user_id, user_id)
-        self.assertEqual(
-            admin_settings.email,
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+        self.assertEqual(admin_settings.email, 'system@example.com')
         self.assertEqual(admin_settings.roles, roles)
         self.assertFalse(admin_settings.banned)
         self.assertEqual(admin_settings.username, 'admin')
