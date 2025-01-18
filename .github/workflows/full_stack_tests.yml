@@ -109,6 +109,7 @@ jobs:
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
+        if: ${{ failure() }}
         # Replace slashes in the filename with hyphens.
         run: |
           SUITE_NAME=${{ matrix.suite.name }}
