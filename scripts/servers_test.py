@@ -1086,15 +1086,23 @@ class ManagedProcessTests(test_utils.TestBase):
                     stdout=subprocess.PIPE))
 
     def test_managed_acceptance_test_server_headless(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
         suite_name = (
             'blog-admin/assign-roles-to-users-and-change-tag-properties')
 
-        with self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name,
-                headless=True,
-                stdout=subprocess.PIPE)):
-            self.assertEqual(os.getenv('HEADLESS'), 'true')
+        self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
+            suite_name=suite_name,
+            headless=True,
+            stdout=subprocess.PIPE))
+        self.exit_stack.close()
+
+        self.assertEqual(os.getenv('HEADLESS'), 'true')
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
+        program_args = popen_calls[0].program_args
+        self.assertIn(suite_name, program_args)
+        self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
 
     def test_managed_acceptance_test_server_mobile(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())

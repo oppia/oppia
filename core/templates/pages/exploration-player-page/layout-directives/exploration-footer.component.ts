@@ -63,7 +63,6 @@ export class ExplorationFooterComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   iframed!: boolean;
-  windowIsNarrow!: boolean;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
   isVisible: boolean = true;
@@ -124,12 +123,6 @@ export class ExplorationFooterComponent {
       this.userService.getUserInfoAsync().then(userInfo => {
         this.userIsLoggedIn = userInfo.isLoggedIn();
       });
-      this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-      this.directiveSubscriptions.add(
-        this.windowDimensionsService.getResizeEvent().subscribe(evt => {
-          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-        })
-      );
       if (
         !this.contextService.isInQuestionPlayerMode() ||
         this.contextService.getQuestionPlayerIsManuallySet()
