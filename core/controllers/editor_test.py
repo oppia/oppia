@@ -1282,9 +1282,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             # TODO(release-scripts#137): Update once project ID is verified on
             # all servers.
             self.assertEqual(observed_log_messages, [
-                'Logging project ID for debugging: dev-project-id',
-                'Logging project ID for debugging: dev-project-id',
-                'Logging project ID for debugging: dev-project-id',
+                'Logging project ID for debugging: no-project-id-specified',
+                'Logging project ID for debugging: no-project-id-specified',
+                'Logging project ID for debugging: no-project-id-specified',
                 '(%s) %s tried to delete exploration %s' %
                 ([feconf.ROLE_ID_FULL_USER], self.owner_id, exp_id),
                 '(%s) %s deleted exploration %s' %
@@ -1305,9 +1305,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             # TODO(release-scripts#137): Update once project ID is verified on
             # all servers.
             self.assertEqual(observed_log_messages, [
-                'Logging project ID for debugging: dev-project-id',
-                'Logging project ID for debugging: dev-project-id',
-                'Logging project ID for debugging: dev-project-id',
+                'Logging project ID for debugging: no-project-id-specified',
+                'Logging project ID for debugging: no-project-id-specified',
+                'Logging project ID for debugging: no-project-id-specified',
                 '(%s) %s tried to delete exploration %s' % (
                     [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
                     self.moderator_id, exp_id),

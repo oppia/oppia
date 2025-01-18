@@ -299,8 +299,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             observed_log_messages,
             ['Email ID %s permanently deleted from bulk email provider\'s db. '
              'Cannot access API, since this is a dev environment'
-             % self.USER_1_EMAIL] +
-                 (['Logging project ID for debugging: dev-project-id'] * 6)
+             % self.USER_1_EMAIL] + ([
+                 'Logging project ID for debugging: no-project-id-specified'
+                 ] * 6)
              )
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
