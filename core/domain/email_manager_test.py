@@ -28,7 +28,6 @@ from core.domain import html_cleaner
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list as param_list
 from core.domain import platform_parameter_registry
-from core.domain import platform_parameter_services as param_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import story_domain
@@ -1947,7 +1946,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
-                sent_email_model.sender_email, 
+                sent_email_model.sender_email,
                 'Site Admin <noreply@example.com>')
             self.assertEqual(
                 sent_email_model.intent,

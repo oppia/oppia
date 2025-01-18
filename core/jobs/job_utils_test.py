@@ -20,8 +20,6 @@ from __future__ import annotations
 
 import datetime
 
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.jobs import job_utils
 from core.platform import models
 from core.tests import test_utils

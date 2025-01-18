@@ -29,8 +29,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import auth_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services

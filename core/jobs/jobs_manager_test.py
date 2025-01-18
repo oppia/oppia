@@ -24,8 +24,6 @@ from unittest import mock
 
 from core import feconf
 from core.domain import beam_job_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.jobs import base_jobs
 from core.jobs import job_options
 from core.jobs import jobs_manager

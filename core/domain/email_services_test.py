@@ -21,7 +21,6 @@ import textwrap
 from core.constants import constants
 from core.domain import email_services
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.platform import models
 from core.tests import test_utils
 

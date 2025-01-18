@@ -30,7 +30,6 @@ from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import param_domain
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import translation_domain
