@@ -20,7 +20,7 @@
   This is the user journey of a logged-out-user:
   1. Navigate to the footer of the page where the newsletter subscription field is located.
   2. Enter their email address into the respective field and click on the "Subscribe" button to submit their email address for newsletter subscription.
-  3. Upon successful subscription, view a "Thanks for subscribing" modal and within this modal, find and click on the "See our video" button to verify its functionality.
+  3. Upon successful subscription, view a "Thanks for subscribing" modal and within this modal, find and click on the "Watch a video" button to verify its functionality.
   4. Similarly, within the same modal, find and click on the "Read our blog" button to confirm its functionality.
  */
 
@@ -30,7 +30,7 @@ import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Newsletter', function () {
+describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
@@ -38,20 +38,15 @@ describe('Newsletter', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to Enter the Email address to the newsletter subscription field and then click to the subscribe button. ' +
-      'Later, should be able to view "Thanks for subscribing" and able to click on the "See our video" and "Read our blog" button.',
+    "should be able to enter the email in the subscription field, click 'Subscribe,' see a 'Thanks for subscribing' message, and access the 'Watch a video' and 'Read our blog' buttons.",
     async function () {
-      // Navigate to the home page.
-      await loggedOutUser.navigateToHome();
       // Submit Email to the Newsletter Input Field.
       await loggedOutUser.submitEmailForNewsletter('example.abc@domain.xyz.mn');
       // Check for Thanks Message.
-      await loggedOutUser.expectNewsletterSubscriptionThanksMessage(
-        'Thanks for subscribing!'
-      );
+      await loggedOutUser.expectNewsletterSubscriptionThanksMessage();
       // Finds the Watch a video button then clicks it.
       await loggedOutUser.clickWatchAVideoButton();
-
+      // Navigate to the home page.
       await loggedOutUser.navigateToHome();
       await loggedOutUser.submitEmailForNewsletter('example.abc@domain.xyz.mn');
       // Finds the Read Blog button then clicks it.

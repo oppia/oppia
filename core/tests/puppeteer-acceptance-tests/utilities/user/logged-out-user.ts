@@ -366,14 +366,14 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const getStartedHeader = '.e2e-test-get-started-page';
 
-const newsletterInputField = '.e2e-test-newsletter-input';
+const newsletterEmailInputField = '.e2e-test-newsletter-input';
 const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
-const expectNewsletterSubscriptionThanksMessage =
+const newsletterSubscriptionThanksMessage =
   '.e2e-test-thanks-subscribe-message';
-const thanksWatchAVideoButton =
+const watchAVideoButtonInThanksForSubscribe =
   '.e2e-test-thanks-for-subscribe-watch-video-btn';
-const thanksReadBlogButton = '.e2e-test-thanks-for-subscribe-read-blog-btn';
-const watchVideoUrl = testConstants.URLs.WatchVideoLink;
+const readOurBlogButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-read-blog-btn';
 const readBlogUrl = testConstants.URLs.ReadBlogLink;
 
 /**
@@ -2491,26 +2491,23 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} email - The email to submit.
    */
   async submitEmailForNewsletter(email: string): Promise<void> {
-    await this.waitForElementToBeClickable(newsletterInputField);
-    await this.type(newsletterInputField, email);
+    await this.waitForElementToBeClickable(newsletterEmailInputField);
+    await this.type(newsletterEmailInputField, email);
     await this.clickOn(newsletterSubscribeButton);
   }
 
   /**
    * Function to check for presence of Thanks Message to verify Newsletter Subscription.
-   * @param {string} text - The message to check.
    */
-  async expectNewsletterSubscriptionThanksMessage(text: string): Promise<void> {
-    await this.page.waitForSelector(expectNewsletterSubscriptionThanksMessage);
+  async expectNewsletterSubscriptionThanksMessage(): Promise<void> {
+    await this.page.waitForSelector(newsletterSubscriptionThanksMessage);
     const thanksMessage = await this.page.$eval(
-      expectNewsletterSubscriptionThanksMessage,
+      newsletterSubscriptionThanksMessage,
       element => element.textContent
     );
 
-    if (!thanksMessage || !thanksMessage.includes(text)) {
-      throw new Error(
-        'Subscribing to newsletter did not complete successfully'
-      );
+    if (!thanksMessage || !thanksMessage.includes('Thanks for subscribing!')) {
+      throw new Error('Thank you message does not exist or incorrect');
     }
 
     showMessage('Subscribed to newsletter successfully');
@@ -2520,16 +2517,51 @@ export class LoggedOutUser extends BaseUser {
    * Function to verify the Watch a Video button after subscribing to newsletter.
    */
   async clickWatchAVideoButton(): Promise<void> {
-    await this.openExternalLink(thanksWatchAVideoButton, watchVideoUrl);
-    await this.clickOn(thanksWatchAVideoButton);
+    await this.page.waitForSelector(watchAVideoButtonInThanksForSubscribe);
+    const buttonText = await this.page.$eval(
+      watchAVideoButtonInThanksForSubscribe,
+      element => (element as HTMLElement).innerText
+    );
+    if (buttonText !== 'Watch a video') {
+      throw new Error('The Watch A Video button does not exist!');
+    }
+    await Promise.all([
+      this.clickAndWaitForNavigation(watchAVideoButtonInThanksForSubscribe),
+    ]);
+    await this.waitForPageToFullyLoad();
+
+    const url = this.page.url();
+    if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
+      throw new Error(
+        `The Watch A Video button should open the right page,
+          but it opens ${url} instead.`
+      );
+    }
+    showMessage('The Watch A Video button opens the right page.');
   }
 
   /**
    * Function to verify the Read Blog button after subscribing to newsletter.
    */
   async clickReadBlogButton(): Promise<void> {
-    await this.openExternalLink(thanksReadBlogButton, readBlogUrl);
-    await this.clickOn(thanksReadBlogButton);
+    await this.page.waitForSelector(readOurBlogButtonInThanksForSubscribe);
+    const buttonText = await this.page.$eval(
+      readOurBlogButtonInThanksForSubscribe,
+      element => (element as HTMLElement).innerText
+    );
+    if (buttonText !== 'Read our blog') {
+      throw new Error('The Read Our Blog button does not exist!');
+    }
+    await this.clickAndWaitForNavigation(readOurBlogButtonInThanksForSubscribe);
+
+    if (this.page.url() !== readBlogUrl) {
+      throw new Error(
+        `The Read Our Blog button should open the Blog page,
+          but it opens ${this.page.url()} instead.`
+      );
+    } else {
+      showMessage('The Read Our Blog button opens the Blog page.');
+    }
   }
 
   /**
