@@ -1189,7 +1189,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_grant_super_admin_privileges(self) -> None:
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
 
         grant_super_admin_privileges_stub = self.swap_with_call_counter(
@@ -1226,7 +1225,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Only the default system admin can manage super admins')
 
     def test_grant_super_admin_privileges_fails_without_username(self) -> None:
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.put_json(
@@ -1243,7 +1241,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges_fails_with_invalid_username(
         self
     ) -> None:
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
 
         self.put_json(
@@ -1251,8 +1248,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             csrf_token=self.get_new_csrf_token(), expected_status_int=404)
 
     def test_revoke_super_admin_privileges(self) -> None:
-        assert isinstance(self.admin_email_address, str)
-
         self.login(self.admin_email_address, is_super_admin=True)
 
         revoke_super_admin_privileges_stub = self.swap_with_call_counter(
@@ -1287,7 +1282,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Only the default system admin can manage super admins')
 
     def test_revoke_super_admin_privileges_fails_without_username(self) -> None:
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.delete_json(
@@ -1303,7 +1297,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_with_invalid_username(
         self
     ) -> None:
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
 
         self.delete_json(
@@ -1313,7 +1306,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_for_default_admin(
         self
     ) -> None:
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.delete_json(
@@ -3225,7 +3217,6 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        assert isinstance(self.system_email_address, str)
         self.login(self.system_email_address, is_super_admin=True)
 
         self.put_json(
@@ -3259,7 +3250,6 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        assert isinstance(self.system_email_address, str)
         self.login(self.system_email_address, is_super_admin=True)
 
         response = self.put_json(
@@ -3282,7 +3272,6 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        assert isinstance(self.system_email_address, str)
         self.login(self.system_email_address, is_super_admin=True)
 
         self.put_json(
@@ -3397,7 +3386,6 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             self.EXP_ID_1, self.editor_id, end_state_name='End')
 
     def test_interactions_by_exploration_id_handler(self) -> None:
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
 
         payload = {
@@ -3411,7 +3399,6 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             sorted(interaction_ids), ['EndExploration', 'TextInput'])
 
     def test_handler_with_invalid_exploration_id_raise_error(self) -> None:
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
 
         payload = {
@@ -3423,7 +3410,6 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
     def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None: # pylint: disable=line-too-long
-        assert isinstance(self.admin_email_address, str)
         self.login(self.admin_email_address, is_super_admin=True)
         response = self.get_json(
             '/interactions', params={},

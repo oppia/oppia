@@ -1831,7 +1831,6 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        assert isinstance(self.system_email_address, str)
         self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2325,7 +2324,6 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        assert isinstance(self.system_email_address, str)
         self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2461,7 +2459,6 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        assert isinstance(self.system_email_address, str)
         self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2642,7 +2639,6 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_primary_admin_can_delete_any_user(self) -> None:
-        assert isinstance(self.system_email_address, str)
         self.login(self.system_email_address)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
