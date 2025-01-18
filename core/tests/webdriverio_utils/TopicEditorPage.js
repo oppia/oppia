@@ -275,7 +275,10 @@ var TopicEditorPage = function () {
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function (count) {
-    // await browser.pause(60000);
+    await this.scrollToBottom();
+    waitFor.visibilityOf(
+      addSubtopicButton, 'Add subtopic button taking too long to appear.'
+    );
     var uncategorizedSkillItems = await $$('.e2e-test-skill-item');
     expect(uncategorizedSkillItems.length).toEqual(count);
   };
