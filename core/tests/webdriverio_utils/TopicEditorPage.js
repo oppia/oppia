@@ -114,7 +114,7 @@ var TopicEditorPage = function () {
   var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
   var subtopicsSelector = async function () {
     await waitFor.pageToFullyLoad();
-    await browser.pause(60000);
+    // await browser.pause(60000);
     // let singleSubtopic = $('.e2e-test-subtopic');
     //   await waitFor.presenceOf(
     //     singleSubtopic,
@@ -275,7 +275,7 @@ var TopicEditorPage = function () {
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function (count) {
-    await browser.pause(60000);
+    // await browser.pause(60000);
     var uncategorizedSkillItems = await $$('.e2e-test-skill-item');
     expect(uncategorizedSkillItems.length).toEqual(count);
   };
@@ -291,16 +291,22 @@ var TopicEditorPage = function () {
     await action.click('Delete Subtopic Button', deleteSubtopicButton);
   };
 
-  this.expectNumberOfSubtopicsToBe = async function (count) {
+  this.scrollToBottom = async function () {
     await waitFor.pageToFullyLoad();
+    await browser.pause(2000);
+    await browser.execute(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  };
+
+
+  this.expectNumberOfSubtopicsToBe = async function (count) {
+    await this.scrollToBottom();
     waitFor.visibilityOf(
       addSubtopicButton, 'Add subtopic button taking too long to appear.'
     );
-    // var subtopics = await subtopicsSelector();
-    await browser.pause(60000);
-    var subtopics = await $$('.e2e-test-subtopic');
-    console.log(subtopics);
-    expect(subtopics.length).toEqual(count);
+    var subtopicList = await subtopicsSelector();
+    expect(subtopicList.length).toEqual(count);
   };
 
   this.addSubtopic = async function (title, urlFragment, imgPath, htmlContent) {
