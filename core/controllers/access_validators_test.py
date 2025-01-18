@@ -863,13 +863,16 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='topic-one', url_fragment='topic-one',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
-            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
 
     def test_access_topic_editor_page_with_curriculum_admin_right(
