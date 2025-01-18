@@ -277,7 +277,8 @@ var TopicEditorPage = function () {
   this.expectNumberOfUncategorizedSkillsToBe = async function (count) {
     await this.scrollToBottom();
     waitFor.visibilityOf(
-      addSubtopicButton, 'Add subtopic button taking too long to appear.'
+      addSubtopicButton,
+      'Add subtopic button taking too long to appear.'
     );
     var uncategorizedSkillItems = await $$('.e2e-test-skill-item');
     expect(uncategorizedSkillItems.length).toEqual(count);
@@ -302,11 +303,11 @@ var TopicEditorPage = function () {
     });
   };
 
-
   this.expectNumberOfSubtopicsToBe = async function (count) {
     await this.scrollToBottom();
     waitFor.visibilityOf(
-      addSubtopicButton, 'Add subtopic button taking too long to appear.'
+      addSubtopicButton,
+      'Add subtopic button taking too long to appear.'
     );
     var subtopicList = await subtopicsSelector();
     expect(subtopicList.length).toEqual(count);

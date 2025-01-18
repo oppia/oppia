@@ -857,7 +857,6 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.logout()
 
 
-
 class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
     """Checks the access to the topic editor page and its rendering."""
 
@@ -901,7 +900,7 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/can_access_topic_editor/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
-            ), expected_status_int=401
+            ), expected_status_int=401)
 
 
 class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
