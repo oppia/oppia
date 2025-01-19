@@ -269,7 +269,7 @@ jobs:
     if: always()
     runs-on: ubuntu-22.04
     permissions:
-      pull-requests: write 
+      pull-requests: write  
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
