@@ -17,7 +17,7 @@
  *               help tab in the navbar.
  */
 
-import {Component, OnDestroy, OnInit, Renderer2} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
 import {HelpModalComponent} from './modal-templates/help-modal.component';
@@ -78,6 +78,10 @@ import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFacto
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {
+  InsertScriptService,
+  KNOWN_SCRIPTS,
+} from 'services/insert-script.service';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -185,7 +189,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private versionHistoryService: VersionHistoryService,
     private entityVoiceoversService: EntityVoiceoversService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
-    private renderer: Renderer2
+    private insertScriptService: InsertScriptService
   ) {}
 
   setDocumentTitle(): void {
@@ -684,9 +688,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.internetConnectivityService.startCheckingConnection();
 
-    const pencilCodeScript = this.renderer.createElement('script');
-    pencilCodeScript.src = 'https://pencilcode.net/lib/pencilcodeembed.js';
-    this.renderer.appendChild(document.body, pencilCodeScript);
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.PENCILCODE);
 
     this.directiveSubscriptions.add(
       this.explorationPropertyService.onExplorationPropertyChanged.subscribe(
