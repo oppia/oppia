@@ -538,14 +538,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(
             observed_log_messages,
             [
-                'Logging project ID for debugging: no-project-id-specified',
-                'Logging project ID for debugging: no-project-id-specified',
+                'Logging project ID for debugging: dev-project-id',
+                'Logging project ID for debugging: dev-project-id',
                 '[ADMIN] %s reloaded collection 0' % self.admin_id,
-                'Logging project ID for debugging: no-project-id-specified',
-                'Logging project ID for debugging: no-project-id-specified',
+                'Logging project ID for debugging: dev-project-id',
+                'Logging project ID for debugging: dev-project-id',
                 'Collection with id 0 was loaded.',
-                'Logging project ID for debugging: no-project-id-specified',
-                'Logging project ID for debugging: no-project-id-specified',
+                'Logging project ID for debugging: dev-project-id',
+                'Logging project ID for debugging: dev-project-id',
             ]
         )
 
