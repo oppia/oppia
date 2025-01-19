@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Mapping, Union, cast
+from typing import Any, Dict, List, Mapping, Union, TypedDict, Optional, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -185,6 +185,17 @@ class BaseChange:
         'deprecated_values': {}
     }]
 
+    class EditStateCommand(TypedDict):
+        cmd: str
+        state_name: str
+        description: Optional[str]
+    
+    class DeleteCommand(TypedDict):
+        cmd: str
+    
+    # Define the possible command types
+    CommandDict = Union[EditStateCommand, DeleteCommand]
+
     def __init__(
         self, change_dict: Mapping[str, AcceptableChangeDictTypes]
     ) -> None:
@@ -196,25 +207,58 @@ class BaseChange:
         Raises:
             ValidationError. The given change_dict is not valid.
         """
+        # Validate the change dictionary first
         self.validate_dict(change_dict)
 
+        # Get and set command name
         cmd_name = change_dict['cmd']
         self.cmd = cmd_name
 
+        # Get allowed commands
         all_allowed_commands = (
             self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS)
 
-        cmd_attribute_names = []
+        # Find the command specification
+        cmd_spec = None
         for cmd in all_allowed_commands:
             if cmd['name'] == cmd_name:
-                cmd_attribute_names = (
-                    cmd['required_attribute_names'] + cmd[
-                        'optional_attribute_names'])
+                cmd_spec = cmd
                 break
+        
+        if cmd_spec is None:
+            raise utils.ValidationError(f'Unknown command: {cmd_name}')
 
-        for attribute_name in cmd_attribute_names:
-            setattr(self, attribute_name, change_dict.get(attribute_name))
+        # Handle each command type explicitly
+        if cmd_name == feconf.CMD_DELETE_COMMIT:
+            # Delete command has no additional attributes
+            pass
+        
+        elif cmd_name == 'edit_state':
+            # Handle edit_state command
+            state_name = change_dict.get('state_name')
+            if not isinstance(state_name, str):
+                raise utils.ValidationError('state_name must be a string')
+            self.state_name = state_name
 
+            description = change_dict.get('description')
+            if description is not None and not isinstance(description, str):
+                raise utils.ValidationError('description must be a string')
+            self.description = description
+            
+        else:
+            # Generic attribute handling for other commands
+            for attr_name in cmd_spec['required_attribute_names']:
+                value = change_dict.get(attr_name)
+                if value is None:
+                    raise utils.ValidationError(
+                        f'Required attribute {attr_name} is missing')
+                self.__dict__[attr_name] = value
+
+            for attr_name in cmd_spec['optional_attribute_names']:
+                value = change_dict.get(attr_name)
+                if value is not None:
+                    self.__dict__[attr_name] = value
+    
     def validate_dict(
         self, change_dict: Mapping[str, AcceptableChangeDictTypes]
     ) -> None:
