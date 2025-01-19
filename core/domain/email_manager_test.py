@@ -75,7 +75,7 @@ class EmailToAdminTest(test_utils.EmailTestBase):
     )
     def test_email_to_admin_is_sent_correctly(self) -> None:
         # Make sure there are no emails already sent.
-        admin_email_address = 'testadmin@example.com'
+        admin_email_address = 'admin@system.com'
         messages = self._get_sent_email_messages(admin_email_address)
         self.assertEqual(len(messages), 0)
 
@@ -7052,7 +7052,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     )
     def test_account_deletion_failed_email_is_sent_correctly(self) -> None:
         # Make sure there are no emails already sent.
-        admin_email_address = 'testadmin@example.com'
+        admin_email_address = 'admin@system.com'
         messages = self._get_sent_email_messages(admin_email_address)
         self.assertEqual(messages, [])
 
@@ -7919,7 +7919,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
     )
     def test_not_mergeable_change_list_email_is_sent_correctly(self) -> None:
         # Make sure there are no emails already sent.
-        admin_email_address = 'testadmin@example.com'
+        admin_email_address = 'admin@system.com'
         messages = self._get_sent_email_messages(admin_email_address)
         self.assertEqual(messages, [])
 
