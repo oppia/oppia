@@ -114,12 +114,6 @@ var TopicEditorPage = function () {
   var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
   var subtopicsSelector = async function () {
     await waitFor.pageToFullyLoad();
-    // await browser.pause(60000);
-    // let singleSubtopic = $('.e2e-test-subtopic');
-    //   await waitFor.presenceOf(
-    //     singleSubtopic,
-    //     'Subtopic taking too long to appear'
-    //   );
     let listOfSubtopics = await $$('.e2e-test-subtopic');
     return listOfSubtopics;
   };
@@ -297,6 +291,9 @@ var TopicEditorPage = function () {
 
   this.scrollToBottom = async function () {
     await waitFor.pageToFullyLoad();
+    // We need to wait till the page is completely loaded else it will
+    // not be able to detect elements which will fail the tests
+    // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2000);
     await browser.execute(() => {
       window.scrollTo(0, document.body.scrollHeight);
