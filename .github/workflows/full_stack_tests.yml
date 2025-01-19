@@ -7,6 +7,7 @@ on:
     branches:
       - develop
       - release-*
+      - acceptance-*
   pull_request:
     branches:
       - develop
@@ -99,7 +100,7 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
           python -m scripts.run_e2e_tests --skip-install \
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Run E2E Test ${{ matrix.suite.name }} (Attempt \#2, Video Recording ENABLED)
+      - name: Run E2E Test ${{ matrix.suite.name }} (Attempt #2, Video Recording ENABLED)
         if: ${{ failure() }}
         run: |
           VIDEO_RECORDING_IS_ENABLED=1 \
@@ -165,7 +166,7 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
           python -m scripts.run_acceptance_tests \
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt \#2, Video Recording ENABLED)
+      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt #2, Video Recording ENABLED)
         if: ${{ failure() }}
         run: |
           VIDEO_RECORDING_IS_ENABLED=1 \
