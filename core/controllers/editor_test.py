@@ -1283,7 +1283,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.assertEqual(observed_log_messages, [
                 'Logging project ID for debugging: dev-project-id',
                 'Logging project ID for debugging: dev-project-id',
-                'Logging project ID for debugging: dev-project-idd',
+                'Logging project ID for debugging: dev-project-id',
                 '(%s) %s tried to delete exploration %s' %
                 ([feconf.ROLE_ID_FULL_USER], self.owner_id, exp_id),
                 '(%s) %s deleted exploration %s' %
