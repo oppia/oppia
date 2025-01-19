@@ -97,6 +97,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt install ffmpeg
+      - name: Generate modified suite name for artifacts
+        id: generate_suite_name_for_artifacts
+        # Replace slashes in the filename with hyphens.
+        run: |
+          SUITE_NAME=${{ matrix.suite.name }}
+          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
         run: >
           VIDEO_RECORDING_IS_ENABLED=0
@@ -110,13 +116,6 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
           python -m scripts.run_e2e_tests --skip-install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Generate modified suite name for artifacts
-        id: generate_suite_name_for_artifacts
-        if: ${{ failure() }}
-        # Replace slashes in the filename with hyphens.
-        run: |
-          SUITE_NAME=${{ matrix.suite.name }}
-          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -157,6 +156,12 @@ jobs:
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
+      - name: Generate modified suite name for artifacts
+        id: generate_suite_name_for_artifacts
+        # Replace slashes in the filename with underscores.
+        run: |
+          SUITE_NAME=${{ matrix.suite.name }}
+          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
         run: >
           VIDEO_RECORDING_IS_ENABLED=0
@@ -170,13 +175,6 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Generate modified suite name for artifacts
-        id: generate_suite_name_for_artifacts
-        if: ${{ failure() }}
-        # Replace slashes in the filename with underscores.
-        run: |
-          SUITE_NAME=${{ matrix.suite.name }}
-          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Uploading test recordings as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
