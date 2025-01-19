@@ -295,18 +295,6 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
             logging.info('Fetched old and new snapshot model correctly.')
 
-            # If the commit does not contain voiceover changes, then we should
-            # skip the snapshot model.
-            if not cls.is_voiceover_changes_made(
-                    metadata_models_dict[new_snapshot_model.id]):
-                debug_logs += (
-                    'No voiceovers added in snapshot version: %s.\n'
-                    % new_snapshot_model.id)
-                logging.info(
-                    'No voiceovers added in snapshot version: %s.\n'
-                    % new_snapshot_model.id)
-                continue
-
             try:
                 filenames_in_this_version = (
                     cls.extract_added_voiceovers_between_successive_snapshots(
