@@ -7,7 +7,6 @@ on:
     branches:
       - develop
       - release-*
-      - acceptance-*
   pull_request:
     branches:
       - develop
@@ -16,6 +15,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
+
 jobs:
   e2e_and_acceptance_coverage:
     name: Verify all e2e/acceptance tests are included
@@ -33,6 +33,7 @@ jobs:
         with:
           message: "The e2e/acceptance coverage test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+
   check_test_suites_to_run:
     name: Compute which tests to run
     runs-on: ubuntu-22.04
@@ -59,6 +60,7 @@ jobs:
         with:
           name: root-files-mapping
           path: root-files-mapping.json
+
   build:
     name: Build the app, and store build files as an artifact
     needs: [check_test_suites_to_run]
@@ -73,6 +75,7 @@ jobs:
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
+
   e2e_test:
     needs: [check_test_suites_to_run, build]
     runs-on: ubuntu-22.04
@@ -95,18 +98,18 @@ jobs:
           sudo apt-get update
           sudo apt install ffmpeg
       - name: Run E2E Test ${{ matrix.suite.name }}
-        run: |
-          VIDEO_RECORDING_IS_ENABLED=0 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_e2e_tests --skip-install \
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=0
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_e2e_tests --skip-install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Run E2E Test ${{ matrix.suite.name }} (Attempt #2, Video Recording ENABLED)
+      - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2, Video Recording ENABLED)
         if: ${{ failure() }}
-        run: |
-          VIDEO_RECORDING_IS_ENABLED=1 \
-          FFMPEG_SCREEN_SIZE=640x480 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_e2e_tests --skip-install \
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=1
+          FFMPEG_SCREEN_SIZE=640x480
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_e2e_tests --skip-install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
@@ -139,6 +142,7 @@ jobs:
         with:
           message: "An E2E test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+
   acceptance_test_with_python_installation:
     needs: [check_test_suites_to_run, build]
     runs-on: ubuntu-22.04
@@ -154,27 +158,27 @@ jobs:
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
+      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=0
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_acceptance_tests
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
+      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2, Video Recording ENABLED)
+        if: ${{ failure() }}
+        run: |
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_acceptance_tests
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
+        if: ${{ failure() }}
         # Replace slashes in the filename with underscores.
         run: |
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        run: |
-          VIDEO_RECORDING_IS_ENABLED=0 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_acceptance_tests \
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt #2, Video Recording ENABLED)
-        if: ${{ failure() }}
-        run: |
-          VIDEO_RECORDING_IS_ENABLED=1 \
-          FFMPEG_SCREEN_SIZE=640x480 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_acceptance_tests \
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Uploading test recording as an artifact
+      - name: Uploading test recordings as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
