@@ -75,6 +75,7 @@ import {QuestionBackendApiService} from 'domain/question/question-backend-api.se
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import { RteHelperService } from 'services/rte-helper.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -132,6 +133,7 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
     SubtopicEditorTabComponent,
   ],
   providers: [
+    RteHelperService,
     StoryCreationBackendApiService,
     EntityCreationService,
     CreateNewSkillModalService,
