@@ -554,9 +554,9 @@ class ElasticSearchStub:
         Args:
             index_name: str. The index that was not found.
 
-        Returns:
+        Raises:
             elasticsearch.NotFoundError. A manually-constructed error
-            indicating that the index was not found.
+                indicating that the index was not found.
         """
         raise elasticsearch.NotFoundError(
             404, 'index_not_found_exception', {
@@ -757,7 +757,7 @@ class ElasticSearchStub:
             'total': index_size,
             'batches': 1,
             'requests_per_second': -1.0,
-            'retries': {u'search': 0, u'bulk': 0},
+            'retries': {'search': 0, 'bulk': 0},
             'timed_out': False,
             'deleted': index_size
         }

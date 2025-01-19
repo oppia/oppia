@@ -3427,18 +3427,18 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of state name to one that uses unicode characters."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
-        self.assertNotIn(u'¡Hola! αβγ', exploration.states)
+        self.assertNotIn('¡Hola! αβγ', exploration.states)
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                'new_state_name': u'¡Hola! αβγ',
+                'new_state_name': '¡Hola! αβγ',
             })], 'Change state name')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertIn(u'¡Hola! αβγ', exploration.states)
+        self.assertIn('¡Hola! αβγ', exploration.states)
         self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
     def test_delete_state_cmd(self) -> None:
@@ -7430,14 +7430,14 @@ title: Old Title
 
         hint_list: List[state_domain.HintDict] = [{
             'hint_content': {
-                'content_id': u'hint_1',
+                'content_id': 'hint_1',
                 'html': (
-                    u'<p>Hello, this is html1 for state2'
-                    u'<oppia-noninteractive-image filepath-with-value="'
-                    u'&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                    u'"&amp;quot;&amp;quot;" alt-with-value='
-                    u'"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                    u'</p>')
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>')
             }
         }]
 

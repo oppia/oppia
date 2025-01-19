@@ -561,7 +561,9 @@ class ExpSnapshotsMigrationAuditJob(base_jobs.JobBase):
                 return result.Err((exp_id, Exception(error_message)))
 
             if target_state_schema_version == current_state_schema_version:
-                return result.Ok((exp_id, 'SUCCESS'))
+                break
+
+        return result.Ok((exp_id, 'SUCCESS'))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the audit of exploration

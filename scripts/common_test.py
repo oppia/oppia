@@ -40,7 +40,7 @@ from core import utils
 from core.tests import test_utils
 from scripts import servers
 
-from typing import Generator, List, Literal, NoReturn
+from typing import Generator, List, Literal, NoReturn, Tuple
 import yaml
 
 from . import common
@@ -974,7 +974,7 @@ class CommonTests(test_utils.GenericTestBase):
         with write_swap, self.assertRaisesRegex(OSError, 'OS error'):
             common.write_stdout_safe('test')
 
-    def test_write_stdout_safe_with_unsupportedoperation(self) -> None:
+    def test_write_stdout_safe_with_unsupported_operation(self) -> None:
         mock_stdout = io.StringIO()
 
         write_swap = self.swap_to_always_raise(
@@ -1018,104 +1018,6 @@ class CommonTests(test_utils.GenericTestBase):
                 getattr(context, method)(),
                 getattr(default_context, method)()
             )
-
-    def test_url_retrieve_with_successful_https_works(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            output_path = os.path.join(tempdir, 'buffer')
-            attempts = []
-            def mock_urlopen(
-                url: str, context: ssl.SSLContext
-            ) -> io.BufferedIOBase:
-                attempts.append(url)
-                self.assertLessEqual(len(attempts), 1)
-                self.assertEqual(url, 'https://example.com')
-                self._assert_ssl_context_matches_default(context)
-                return io.BytesIO(b'content')
-
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-
-            with urlopen_swap:
-                common.url_retrieve('https://example.com', output_path)
-            with open(output_path, 'rb') as buffer:
-                self.assertEqual(buffer.read(), b'content')
-
-    def test_url_retrieve_with_successful_https_works_on_retry(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            output_path = os.path.join(tempdir, 'output')
-            attempts = []
-            def mock_urlopen(
-                url: str, context: ssl.SSLContext
-            ) -> io.BufferedIOBase:
-                attempts.append(url)
-                self.assertLessEqual(len(attempts), 2)
-                self.assertEqual(url, 'https://example.com')
-                self._assert_ssl_context_matches_default(context)
-                if len(attempts) == 1:
-                    raise ssl.SSLError()
-                return io.BytesIO(b'content')
-
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-
-            with urlopen_swap:
-                common.url_retrieve('https://example.com', output_path)
-            with open(output_path, 'rb') as buffer:
-                self.assertEqual(buffer.read(), b'content')
-
-    def test_url_retrieve_runs_out_of_attempts(self) -> None:
-        attempts = []
-        def mock_open(_path: str, _options: str) -> NoReturn:
-            raise AssertionError('open() should not be called')
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> io.BufferedIOBase:
-            attempts.append(url)
-            self.assertLessEqual(len(attempts), 2)
-            self.assertEqual(url, 'https://example.com')
-            self._assert_ssl_context_matches_default(context)
-            raise ssl.SSLError('test_error')
-
-        open_swap = self.swap(builtins, 'open', mock_open)
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-
-        with open_swap, urlopen_swap:
-            with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
-                common.url_retrieve('https://example.com', 'test_path')
-
-    def test_url_retrieve_https_check_fails(self) -> None:
-        def mock_open(_path: str, _options: str) -> NoReturn:
-            raise AssertionError('open() should not be called')
-        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
-            raise AssertionError('urlopen() should not be called')
-
-        open_swap = self.swap(builtins, 'open', mock_open)
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-
-        with open_swap, urlopen_swap:
-            with self.assertRaisesRegex(
-                Exception, 'The URL http://example.com should use HTTPS.'
-            ):
-                common.url_retrieve('http://example.com', 'test_path')
-
-    def test_url_retrieve_with_successful_http_works(self) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            output_path = os.path.join(tempdir, 'output')
-            attempts = []
-            def mock_urlopen(
-                url: str, context: ssl.SSLContext
-            ) -> io.BufferedIOBase:
-                attempts.append(url)
-                self.assertLessEqual(len(attempts), 1)
-                self.assertEqual(url, 'https://example.com')
-                self._assert_ssl_context_matches_default(context)
-                return io.BytesIO(b'content')
-
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-
-            with urlopen_swap:
-                common.url_retrieve(
-                    'https://example.com', output_path, enforce_https=False)
-            with open(output_path, 'rb') as buffer:
-                self.assertEqual(buffer.read(), b'content')
 
     def test_chrome_bin_setup_with_google_chrome(self) -> None:
         isfile_swap = self.swap(
@@ -1190,7 +1092,7 @@ class CommonTests(test_utils.GenericTestBase):
             # `setattr` is used to set the attribute.
             setattr(feconf_temp_file, 'name', mock_feconf_path)
             with utils.open_file(mock_feconf_path, 'w') as tmp:
-                tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+                tmp.write('ENABLE_MAINTENANCE_MODE = False')
 
             with constants_path_swap, feconf_path_swap, check_output_swap:
                 common.modify_constants(prod_env=True, maintenance_mode=False)
@@ -1262,7 +1164,7 @@ class CommonTests(test_utils.GenericTestBase):
             # to set the attribute.
             setattr(feconf_temp_file, 'name', mock_feconf_path)
             with utils.open_file(mock_feconf_path, 'w') as tmp:
-                tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+                tmp.write('ENABLE_MAINTENANCE_MODE = False')
 
             with constants_path_swap, feconf_path_swap, check_output_swap:
                 common.modify_constants(prod_env=True, maintenance_mode=False)
@@ -1327,7 +1229,7 @@ class CommonTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(feconf_temp_file, 'name', mock_feconf_path)
         with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
+            tmp.write('ENABLE_MAINTENANCE_MODE = True')
         self.contextManager.__exit__(None, None, None)
         with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
             with constants_path_swap, feconf_path_swap:
@@ -1404,3 +1306,166 @@ class CommonTests(test_utils.GenericTestBase):
                         )
                     except yaml.YAMLError as e:
                         self.fail(f'Error parsing file "{filename}": {str(e)}')
+
+
+class UrlRetrieveTests(CommonTests):
+    """Test the methods related to retrieving URLs."""
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.curl_is_called = False
+
+        successful_mock_curl_process = subprocess.Popen(
+            ['echo', 'test'], stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        def mock_successful_curl_popen(  # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int, encoding: str
+        ) -> subprocess.Popen[bytes]:
+            self.assertEqual(cmd_tokens[0], 'curl')
+            self.curl_is_called = True
+            return successful_mock_curl_process
+
+        class MockErrorProcess:
+            def __init__(self) -> None:
+                self.returncode = 1
+
+            def communicate(self) -> Tuple[str, str]:
+                """Return required method."""
+                return '', 'Failure starting curl'
+
+            def __enter__(self) -> None:
+                pass
+
+            def __exit__(self, *unused_args: str) -> None:
+                pass
+
+        def mock_failing_curl_popen(  # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int, encoding: str
+        ) -> MockErrorProcess:
+            self.assertEqual(cmd_tokens[0], 'curl')
+            return MockErrorProcess()
+
+        self.swap_curl_success = self.swap(
+            subprocess, 'Popen', mock_successful_curl_popen)
+        self.swap_curl_failure = self.swap(
+            subprocess, 'Popen', mock_failing_curl_popen)
+
+    def test_url_retrieve_tries_curl_at_outset(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+
+            function_call_records = {
+                'urlopen': False,
+            }
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                function_call_records['urlopen'] = True
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+            with urlopen_swap, self.swap_curl_success:
+                common.url_retrieve('https://example.com', output_path)
+            self.assertTrue(self.curl_is_called)
+            self.assertFalse(function_call_records['urlopen'])
+
+    def test_url_retrieve_with_successful_https_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'buffer')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap, self.swap_curl_failure:
+                common.url_retrieve('https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_with_successful_https_works_on_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 2)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                if len(attempts) == 1:
+                    raise ssl.SSLError()
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap, self.swap_curl_failure:
+                common.url_retrieve('https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_runs_out_of_attempts(self) -> None:
+        attempts = []
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(
+            url: str, context: ssl.SSLContext
+        ) -> io.BufferedIOBase:
+            attempts.append(url)
+            self.assertLessEqual(len(attempts), 2)
+            self.assertEqual(url, 'https://example.com')
+            self._assert_ssl_context_matches_default(context)
+            raise ssl.SSLError('test_error')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap, self.swap_curl_failure:
+            with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
+                common.url_retrieve('https://example.com', 'test_path')
+
+    def test_url_retrieve_https_check_fails(self) -> None:
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
+            raise AssertionError('urlopen() should not be called')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap, self.swap_curl_failure:
+            with self.assertRaisesRegex(
+                Exception, 'The URL http://example.com should use HTTPS.'
+            ):
+                common.url_retrieve('http://example.com', 'test_path')
+
+    def test_url_retrieve_with_successful_http_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap, self.swap_curl_failure:
+                common.url_retrieve(
+                    'https://example.com', output_path, enforce_https=False)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')

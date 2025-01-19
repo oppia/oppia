@@ -525,8 +525,8 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.4.3'
-OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
+OPPIA_VERSION = '3.4.4'
+OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -768,40 +768,40 @@ LINEAR_INTERACTION_IDS = ['Continue']
 # either a YAML file or a directory (depending on whether it ends in .yaml).
 # These explorations can be found under data/explorations.
 DEMO_EXPLORATIONS = {
-    u'0': 'welcome',
-    u'1': 'multiples.yaml',
+    '0': 'welcome',
+    '1': 'multiples.yaml',
     # Exploration with ID 2 was removed as it contained string values inside
     # NumericInput interaction.
-    u'3': 'root_linear_coefficient_theorem',
-    u'4': 'three_balls',
-    u'6': 'boot_verbs.yaml',
-    u'7': 'hola.yaml',
+    '3': 'root_linear_coefficient_theorem',
+    '4': 'three_balls',
+    '6': 'boot_verbs.yaml',
+    '7': 'hola.yaml',
     # Exploration with ID 8 was removed as it contained string values inside
     # NumericInput interaction.
-    u'9': 'pitch_perfect.yaml',
-    u'10': 'test_interactions',
-    u'11': 'modeling_graphs',
-    u'12': 'protractor_test_1.yaml',
-    u'13': 'solar_system',
-    u'14': 'about_oppia.yaml',
-    u'15': 'classifier_demo_exploration.yaml',
-    u'16': 'all_interactions',
-    u'17': 'audio_test',
+    '9': 'pitch_perfect.yaml',
+    '10': 'test_interactions',
+    '11': 'modeling_graphs',
+    '12': 'protractor_test_1.yaml',
+    '13': 'solar_system',
+    '14': 'about_oppia.yaml',
+    '15': 'classifier_demo_exploration.yaml',
+    '16': 'all_interactions',
+    '17': 'audio_test',
     # Exploration with ID 18 was used for testing CodeClassifier functionality
     # which has been removed (#10060).
-    u'19': 'example_exploration_in_collection1.yaml',
-    u'20': 'example_exploration_in_collection2.yaml',
-    u'21': 'example_exploration_in_collection3.yaml',
-    u'22': 'protractor_mobile_test_exploration.yaml',
-    u'23': 'rating_test.yaml',
-    u'24': 'learner_flow_test.yaml',
-    u'25': 'exploration_player_test.yaml',
-    u'26': 'android_interactions',
+    '19': 'example_exploration_in_collection1.yaml',
+    '20': 'example_exploration_in_collection2.yaml',
+    '21': 'example_exploration_in_collection3.yaml',
+    '22': 'protractor_mobile_test_exploration.yaml',
+    '23': 'rating_test.yaml',
+    '24': 'learner_flow_test.yaml',
+    '25': 'exploration_player_test.yaml',
+    '26': 'android_interactions',
 }
 
 DEMO_COLLECTIONS = {
-    u'0': 'welcome_to_collections.yaml',
-    u'1': 'learner_flow_test_collection.yaml'
+    '0': 'welcome_to_collections.yaml',
+    '1': 'learner_flow_test_collection.yaml'
 }
 
 # IDs of explorations which should not be displayable in either the learner or
@@ -839,6 +839,8 @@ ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
+AUTOMATIC_VOICEOVER_ADMIN_CONTROL_URL = (
+    '/automatic_voiceover_admin_control_handler')
 DIAGNOSTIC_TEST_PLAYER_PAGE_URL = '/diagnostic-test-player'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'

@@ -147,19 +147,18 @@ def send_email_to_recipients(
             'attachment',
             (attachment['filename'], open(attachment['path'], 'rb')))
             for attachment in attachments
-        ] if attachments else None
+        ] if attachments else []
 
         response = requests.post(
             server,
             auth=('api', mailgun_api_key),
             data=data,
-            files=files,
+            files=(files or None),
             timeout=TIMEOUT_SECS
         )
 
-        if files:
-            for _, (_, file_obj) in files:
-                file_obj.close()
+        for _, (_, file_obj) in files:
+            file_obj.close()
 
         if response.status_code != 200:
             logging.error(

@@ -49,17 +49,6 @@ class EntityVoiceovers:
 
     NOTE: This domain object corresponds to EntityVoiceoversModel in the
     storage layer.
-
-    Args:
-        entity_id: str. The id of the corresponding entity.
-        entity_type: str. The type of the corresponding entity.
-        entity_version: str. The version of the corresponding entity.
-        language_accent_code: str. The language-accent code in which the
-            voiceover is stored.
-        voiceovers_mapping: dict(str, dict(VoiceoverType, VoiceoverDict)). A
-            dict containing content IDs as keys and nested dicts as values.
-            Each nested dict contains VoiceoverType as keys and VoiceoverDict
-            as values.
     """
 
     def __init__(
@@ -74,15 +63,14 @@ class EntityVoiceovers:
         """Constructs an EntityVoiceovers domain object.
 
         Args:
-            entity_id: str. The ID of the entity.
-            entity_type: str. The type of the entity.
-            entity_version: int. The version of the entity.
-            language_accent_code: str. The language-accent code of the
-                given voiceover.
+            entity_id: str. The ID of the corresponding entity.
+            entity_type: str. The type of the corresponding entity.
+            entity_version: int. The version of the corresponding entity.
+            language_accent_code: str. The language-accent code in which the
+                voiceovers are stored.
             voiceovers_mapping: dict(str, dict(VoiceoverType, VoiceoverDict)). A
-                dict containing content IDs as keys and nested dicts as values.
-                Each nested dict contains VoiceoverType as keys and
-                VoiceoverDict as values.
+                dict mapping content IDs to nested dicts. Each nested dict
+                contains VoiceoverType as keys and VoiceoverDict as values.
         """
         self.entity_id = entity_id
         self.entity_type = entity_type

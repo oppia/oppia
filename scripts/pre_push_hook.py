@@ -173,7 +173,7 @@ def has_uncommitted_files() -> bool:
     uncommitted_files = subprocess.check_output(
         GIT_IS_DIRTY_CMD.split(' '), encoding='utf-8'
     )
-    return bool(len(uncommitted_files))
+    return bool(uncommitted_files)
 
 
 def install_hook() -> None:

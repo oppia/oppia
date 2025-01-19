@@ -22,12 +22,10 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Check that all e2e and acceptance test files are captured in wdio.conf.js and core/tests/ci-test-suite-configs
-        run: make run_tests.check_tests_are_captured_in_ci
+        run: python -m scripts.check_tests_are_captured_in_ci
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -46,10 +44,8 @@ jobs:
           # This fetches all git refs, which is needed in the
           # check_ci_test_suites_to_run script below.
           fetch-depth: 0
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - id: compute_test_suites
         name: Check test suites to run
         env:
@@ -68,43 +64,14 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
-            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.docker.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: true
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /home/runner/work/oppia/oppia_tools
-            /home/runner/work/oppia/yarn_cache
-            /home/runner/work/oppia/oppia/third_party
-          key: ${{ runner.os }}-oppiadeps-${{ hashFiles('yarn.lock', 'dependencies.json', 'requirements.txt', 'requirements_dev.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-oppiadeps-
-            ${{ runner.os }}-
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
-      - name: Build Webpack
-        # Note: this and the following steps should be kept in sync with generate-build-files/action.yml.
-        run: python -m scripts.build --prod_env
-      - name: Zip build files
-        # We avoid using ../ or absolute paths because unzip treats these as
-        # security issues and will refuse to follow them.
-        run: |
-          zip -rqy build_files.zip oppia/build oppia/webpack_bundles oppia/app.yaml oppia/assets/hashes.json oppia/backend_prod_files oppia/dist
-        working-directory: /home/runner/work/oppia
-      - name: Upload build files artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build_files
-          path: /home/runner/work/oppia/build_files.zip
-          retention-days: 7
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Generate build files
+        uses: ./.github/actions/generate-build-files
   e2e_test:
     needs: [check_test_suites_to_run, build]
     runs-on: ubuntu-22.04
@@ -116,23 +83,8 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: true
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /home/runner/work/oppia/oppia_tools
-            /home/runner/work/oppia/yarn_cache
-            /home/runner/work/oppia/oppia/third_party
-          key: ${{ runner.os }}-oppiadeps-${{ hashFiles('yarn.lock', 'dependencies.json', 'requirements.txt', 'requirements_dev.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-oppiadeps-
-            ${{ runner.os }}-
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
       - name: Install Chrome
@@ -141,6 +93,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt install ffmpeg
+      - name: Generate modified suite name for artifacts
+        id: generate_suite_name_for_artifacts
+        # Replace slashes in the filename with hyphens.
+        run: |
+          SUITE_NAME=${{ matrix.suite.name }}
+          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
         uses: oppia/retry@a9fb265410e634c84ee90f3e87f323fde0541037
         with:
@@ -151,12 +109,6 @@ jobs:
             xvfb-run -a --server-args="-screen 0, 1285x1000x24"
             python -m scripts.run_e2e_tests --skip-install
             --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Generate modified suite name for artifacts
-        id: generate_suite_name_for_artifacts
-        # Replace slashes in the filename with hyphens.
-        run: |
-          SUITE_NAME=${{ matrix.suite.name }}
-          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -188,37 +140,22 @@ jobs:
     strategy:
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
-    name: Acceptance (${{ matrix.suite.name }} -- Python installation)
+    name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: true
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /home/runner/work/oppia/oppia_tools
-            /home/runner/work/oppia/yarn_cache
-            /home/runner/work/oppia/oppia/third_party
-          key: ${{ runner.os }}-oppiadeps-${{ hashFiles('yarn.lock', 'dependencies.json', 'requirements.txt', 'requirements_dev.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-oppiadeps-
-            ${{ runner.os }}-
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
+      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Uploading generated test to angular module mapping as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -238,70 +175,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{
-          failure() &&
-          github.event_name == 'push' &&
-          github.repository == 'oppia/oppia' &&
-          github.ref == 'refs/heads/develop'
-          }}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "An acceptance test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  acceptance_test_with_docker_installation:
-    needs: [check_test_suites_to_run, build]
-    runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.docker.count > 0 }}
-    strategy:
-      matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.docker.suites }}
-    name: Acceptance (${{ matrix.suite.name }})
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.8.15'
-          architecture: 'x64'
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - name: Merge develop branch into the current branch
-        uses: ./.github/actions/merge
-      - name: Install Chrome
-        uses: ./.github/actions/install-chrome
-      - name: Initializing Containers
-        run: |
-          make build
-          docker compose up angular-build -d
-          # This is required as acceptance tests are run on the host machine and not in the docker container.
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite.name }}
-      - name: Generate modified suite name for artifacts
-        id: generate_suite_name_for_artifacts
-        # Replace slashes in the filename with underscores.
-        run: |
-          SUITE_NAME=${{ matrix.suite.name }}
-          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
-      - name: Uploading generated test to angular module mapping as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite.name }}.txt
-      - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite.name }} MOBILE=true
-      - name: Uploading diff screenshots as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
+          # Note: The path must be kept in sync with the one specified in
+          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{
           failure() &&
@@ -324,52 +200,16 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: true
-      # Caching is disabled to avoid poisoning our cache with the
-      # changed lighthouse file (see later).
-      #
-      # - name: Cache dependencies
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: |
-      #       /home/runner/work/oppia/oppia_tools
-      #       /home/runner/work/oppia/yarn_cache
-      #       /home/runner/work/oppia/oppia/third_party
-      #     key: ${{ runner.os }}-oppiadeps-${{ hashFiles('yarn.lock', 'dependencies.json', 'requirements.txt', 'requirements_dev.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-oppiadeps-
-      #       ${{ runner.os }}-
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
-      - name: Increase lighthouse timeout
-        run: |
-          # Replace the 1.5 second timeout in lighthouse for retrieving
-          # sourcemaps with a 10 second timeout. This timeout is not
-          # configurable through Lighthouse's exposed API, so we have
-          # resorted to patching the code instead.
-          set -e
-          FILEPATH=$GITHUB_WORKSPACE/node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
-          SEARCH_TARGET="1500"
-          REPLACEMENT="10000"
-          occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
-          echo "Found $occurrences occurrences of '$SEARCH_TARGET'"
-          # Assert that there is only one match for the target string.
-          # If there are ever zero or multiple matches, the lighthouse
-          # code has changed and this logic needs to be reviewed.
-          [[ $occurrences == "1" ]]
-          # Replace the target string with the replacement string.
-          sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
-          echo "Replaced '$SEARCH_TARGET' with '$REPLACEMENT' in $FILEPATH"
-        shell: bash
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Install Chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-chrome
       - name: Run Lighthouse accessibility checks shard ${{ matrix.suite.name }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
+        run: |
+          python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
+        shell: bash
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -387,37 +227,22 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: true
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /home/runner/work/oppia/oppia_tools
-            /home/runner/work/oppia/yarn_cache
-            /home/runner/work/oppia/oppia/third_party
-          key: ${{ runner.os }}-oppiadeps-${{ hashFiles('yarn.lock', 'dependencies.json', 'requirements.txt', 'requirements_dev.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-oppiadeps-
-            ${{ runner.os }}-
-      - name: Install Oppia dependencies
-        uses: ./.github/actions/install-oppia-dependencies
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
       - name: Install Chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-chrome
-      - name: Run Lighthouse performance checks (shard ${{ matrix.suite.name }})
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
+      - name: Run Lighthouse performance checks (shard ${{ matrix.suite.name }})
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Uploading puppeteer video as artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -439,7 +264,6 @@ jobs:
       - check_test_suites_to_run
       - e2e_test
       - acceptance_test_with_python_installation
-      - acceptance_test_with_docker_installation
       - lighthouse_accessibility_test
       - lighthouse_performance_test
     if: always()
@@ -447,18 +271,32 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Check workflow status
         uses: ./.github/actions/check-workflow-status
         id: check_workflow_status
         with:
           jobs: ${{ toJson(needs) }}
+      - name: Leave a comment on the PR if workflow failed
+        if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
+        uses: ./.github/actions/post-comment
+        with:
+          owner: ${{ github.event.repository.owner.login }}
+          repo: ${{ github.event.repository.name }}
+          issue_number: ${{ github.event.number }}
+          message: >
+            🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like
+            the CI checks are failing on your PR. Please look at the logs and
+            follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
+            to fix them, or report the error as a flake. Thanks!
       - name: Fail if workflow status is failure
         if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
-        run: exit 1
+        run: |
+          exit 1
+        shell: bash
+    permissions:
+      pull-requests: write
   trigger_build_and_deploy:
     name: Trigger build and deploy
     needs: [check_workflow_statuses]
@@ -489,8 +327,7 @@ jobs:
           client-payload: '{
             "version": "${{ env.VERSION }}",
             "app_name": "oppiatestserver",
-            "maintenance_mode": "false",
+            "maintenance_mode": false,
             "sha": "${{ github.sha }}",
-            "build_was_manually_triggered": "false",
             "repo_owner": "${{ github.repository_owner }}"
           }'

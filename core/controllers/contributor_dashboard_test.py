@@ -52,17 +52,6 @@ if MYPY:  # pragma: no cover
 (suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
-class ContributorDashboardPageTest(test_utils.GenericTestBase):
-    """Test for showing contributor dashboard pages."""
-
-    def test_contributor_dashboard_page_loads_correctly(
-        self
-    ) -> None:
-        response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
-        response.mustcontain(
-            '<contributor-dashboard-page></contributor-dashboard-page>')
-
-
 class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ContributionOpportunitiesHandler."""
 
