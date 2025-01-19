@@ -30,7 +30,12 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmationModalComponent} from './confirmation-modal.component';
 import {AppConstants} from 'app.constants';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
@@ -919,5 +924,141 @@ describe('Translation Modal Component', () => {
     component.updateTranslatedText();
 
     expect(activeModal.close).not.toHaveBeenCalled();
+  });
+
+  describe('returnToPreviousTranslation', () => {
+    let modalService: NgbModal;
+    let modalRef: NgbModalRef;
+
+    beforeEach(() => {
+      modalService = TestBed.inject(NgbModal);
+      modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      spyOn(modalService, 'open').and.returnValue(modalRef);
+    });
+
+    it('should return to previous translation without confirmation if no unsaved changes', () => {
+      component.hasUnsavedChanges = false;
+      component.activeWrittenTranslation = '';
+      spyOn(translateTextService, 'getPreviousTextToTranslate').and.returnValue(
+        {
+          text: 'previous text',
+          more: true,
+          status: 'draft',
+          translation: '',
+          dataFormat: 'html',
+          contentType: 'content',
+        }
+      );
+
+      component.returnToPreviousTranslation();
+
+      expect(modalService.open).not.toHaveBeenCalled();
+      expect(
+        translateTextService.getPreviousTextToTranslate
+      ).toHaveBeenCalled();
+      expect(component.textToTranslate).toBe('previous text');
+      expect(component.moreAvailable).toBeTrue();
+    });
+
+    it('should show confirmation modal when there are unsaved changes', fakeAsync(() => {
+      component.hasUnsavedChanges = true;
+      component.activeWrittenTranslation = 'new translation';
+      component.textToTranslate = 'original text';
+
+      modalRef.componentInstance = {content: {}};
+      modalRef.result = Promise.resolve('confirm');
+
+      component.returnToPreviousTranslation();
+
+      expect(modalService.open).toHaveBeenCalledWith(
+        ConfirmationModalComponent,
+        {
+          centered: true,
+          backdrop: 'static',
+        }
+      );
+
+      expect(modalRef.componentInstance.content).toEqual({
+        title: 'Unsaved Changes',
+        message:
+          'You have unsaved changes. Are you sure you want to go back? Your changes will be lost.',
+        confirmText: 'Discard Changes',
+        cancelText: 'Continue Editing',
+      });
+    }));
+
+    it('should discard changes and return to previous translation when confirmed', fakeAsync(() => {
+      component.hasUnsavedChanges = true;
+      component.activeWrittenTranslation = 'new translation';
+      component.textToTranslate = 'original text';
+
+      modalRef.componentInstance = {content: {}};
+      modalRef.result = Promise.resolve('confirm');
+
+      spyOn(translateTextService, 'getPreviousTextToTranslate').and.returnValue(
+        {
+          text: 'previous text',
+          more: true,
+          status: 'draft',
+          translation: '',
+          dataFormat: 'html',
+          contentType: 'content',
+        }
+      );
+
+      component.returnToPreviousTranslation();
+      tick();
+
+      expect(component.hasUnsavedChanges).toBeFalse();
+      expect(component.activeWrittenTranslation).toBe('');
+      expect(
+        translateTextService.getPreviousTextToTranslate
+      ).toHaveBeenCalled();
+      expect(component.textToTranslate).toBe('previous text');
+      expect(component.moreAvailable).toBeTrue();
+    }));
+
+    it('should keep current translation when modal is cancelled', fakeAsync(() => {
+      component.hasUnsavedChanges = true;
+      component.activeWrittenTranslation = 'new translation';
+      component.textToTranslate = 'original text';
+
+      modalRef.componentInstance = {content: {}};
+      modalRef.result = Promise.reject();
+
+      spyOn(translateTextService, 'getPreviousTextToTranslate');
+
+      component.returnToPreviousTranslation();
+      tick();
+
+      expect(component.hasUnsavedChanges).toBeTrue();
+      expect(component.activeWrittenTranslation).toBe('new translation');
+      expect(
+        translateTextService.getPreviousTextToTranslate
+      ).not.toHaveBeenCalled();
+    }));
+
+    it('should not show confirmation modal for empty changes', () => {
+      component.hasUnsavedChanges = true;
+      component.activeWrittenTranslation = '';
+      component.textToTranslate = 'original text';
+
+      component.returnToPreviousTranslation();
+
+      expect(modalService.open).not.toHaveBeenCalled();
+    });
+
+    it('should not show confirmation modal when translation matches original', () => {
+      component.hasUnsavedChanges = true;
+      component.activeWrittenTranslation = 'original text';
+      component.textToTranslate = 'original text';
+
+      component.returnToPreviousTranslation();
+
+      expect(modalService.open).not.toHaveBeenCalled();
+    });
   });
 });
