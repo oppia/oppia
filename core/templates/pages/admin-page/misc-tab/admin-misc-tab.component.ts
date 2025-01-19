@@ -396,6 +396,24 @@ export class AdminMiscTabComponent implements OnInit {
       );
   }
 
+  updateRedisModel(): void {
+    this.setStatusMessage.emit('Updating blog post data...');
+    this.adminBackendApiService
+      .updateBlogPostDataAsync(
+        this.blogPostId,
+        this.authorUsername,
+        this.publishedOn
+      )
+      .then(
+        () => {
+          this.setStatusMessage.emit('Successfully updated blog post data');
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
+  }
+
   resetForm(): void {
     this.expId = '';
     this.expVersion = 0;
