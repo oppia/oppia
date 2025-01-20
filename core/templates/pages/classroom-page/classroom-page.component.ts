@@ -257,7 +257,7 @@ export class ClassroomPageComponent implements OnDestroy {
     // Remove the second clause here, once the issue is resolved.
     return (
       this.platformFeatureService.status.DiagnosticTest.isEnabled &&
-      this.classroomData._isDiagnosticTestEnabled
+      this.classroomUrlFragment === 'math'
     );
   }
 }

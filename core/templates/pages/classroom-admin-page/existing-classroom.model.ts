@@ -43,7 +43,6 @@ interface ExistingClassroom extends NewClassroom {
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
   _topicIdToTopicName: TopicIdToTopicName;
   _isPublished: boolean;
-  _isDiagnosticTestEnabled: boolean;
   _thumbnail_data: ImageData;
   _banner_data: ImageData;
   getClassroomDict: () => ClassroomDict;
@@ -68,7 +67,6 @@ export class ExistingClassroomData
   _topicsCountInClassroom: number;
   _topicIdToTopicName!: TopicIdToTopicName;
   _isPublished: boolean;
-  _isDiagnosticTestEnabled: boolean;
   _thumbnail_data: ImageData;
   _banner_data: ImageData;
 
@@ -81,7 +79,6 @@ export class ExistingClassroomData
     topicListIntro: string,
     topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds,
     isPublished: boolean,
-    isDiagnosticTestEnabled: boolean,
     thumbnailData: ImageData,
     bannerData: ImageData
   ) {
@@ -95,7 +92,6 @@ export class ExistingClassroomData
       this._topicIdToPrerequisiteTopicIds
     ).length;
     this._isPublished = isPublished;
-    this._isDiagnosticTestEnabled = isDiagnosticTestEnabled;
     this._thumbnail_data = thumbnailData;
     this._banner_data = bannerData;
   }
@@ -128,20 +124,12 @@ export class ExistingClassroomData
     return this._isPublished;
   }
 
-  getIsDiagnosticTestEnabled(): boolean {
-    return this._isDiagnosticTestEnabled;
-  }
-
   setCourseDetails(courseDetails: string): void {
     this._courseDetails = courseDetails;
   }
 
   setIsPublished(isPublished: boolean): void {
     this._isPublished = isPublished;
-  }
-
-  setIsDiagnosticTestEnabled(isDiagnosticTestEnabled: boolean): void {
-    this._isDiagnosticTestEnabled = isDiagnosticTestEnabled;
   }
 
   setTeaserText(teaserText: string): void {
@@ -178,7 +166,6 @@ export class ExistingClassroomData
       classroomDict.topicListIntro,
       classroomDict.topicIdToPrerequisiteTopicIds,
       classroomDict.isPublished,
-      classroomDict.isDiagnosticTestEnabled,
       classroomDict.thumbnailData,
       classroomDict.bannerData
     );
@@ -194,7 +181,6 @@ export class ExistingClassroomData
       topicListIntro: this._topicListIntro,
       topicIdToPrerequisiteTopicIds: this._topicIdToPrerequisiteTopicIds,
       isPublished: this._isPublished,
-      isDiagnosticTestEnabled: this._isDiagnosticTestEnabled,
       thumbnailData: this._thumbnail_data,
       bannerData: this._banner_data,
     };
