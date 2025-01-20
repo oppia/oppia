@@ -326,7 +326,6 @@ exports.config = {
         '-r', '30',
         '-f', 'x11grab',
         '-preset', 'ultrafast',
-        '-vf', 'scale=' + process.env.FFMPEG_SCREEN_SIZE ?? '1285x1000',
         '-s', '1285x1000',
         '-i', process.env.DISPLAY,
         '-g', '300',
@@ -375,6 +374,9 @@ exports.config = {
     if (// eslint-disable-next-line eqeqeq
     process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       ffmpegProcess.kill();
+      console.log('ffmpeg process killed');
+      console.log('Is there file in videopath: ' + fs.existsSync(videoPath))
+
       if (passed === true && !ALL_VIDEOS && fs.existsSync(videoPath)) {
         fs.unlinkSync(videoPath);
         // eslint-disable-next-line no-console
