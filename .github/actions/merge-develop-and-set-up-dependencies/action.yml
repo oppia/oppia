@@ -1,0 +1,114 @@
+name: Merge develop and set up dependencies
+description: 'Merge develop into current branch, and set up dependencies'
+runs:
+  using: composite
+  steps:
+    - name: Merge develop branch into the current branch
+      uses: ./.github/actions/merge
+    - name: Setup Python 3.9.20
+      uses: actions/setup-python@v5
+      id: setup_python
+      with:
+        python-version: '3.9.20'
+        architecture: 'x64'
+        cache: 'pip'
+        cache-dependency-path: |
+          requirements_dev.txt
+    - name: Show whether a cache hit occurred (for debugging purposes).
+      run: |
+        echo "${{ steps.setup_python.outputs.cache-hit }}"
+      shell: bash
+    - name: Write the exact Python version to a file for cache-busting.
+      run: |
+        echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
+      shell: bash
+    - name: Cache Python dev dependencies
+      id: restore_python_dev_dependencies_cache
+      uses: actions/cache@v4
+      # We need to include install_python_dev_dependencies.py in the cache key
+      # because it has the version numbers for pip, pip-tools and setuptools.
+      with:
+        key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
+        path: |
+          /opt/hostedtoolcache/Python/3.9.20/x64
+    - name: Install third-party Python dev dependencies
+      if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 3
+        retry_on: error
+        shell: bash
+        timeout_minutes: 30
+        # Note that the effects of this don't seem to be cached by setup-python,
+        # resulting in the occasional "No module named PIL" errors in CI.
+        command: python -m scripts.install_python_dev_dependencies
+    - name: Show where pip installs its packages, and the contents of that folder.
+      run: |
+        pip show certifi
+        ls -la /opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages
+        ls -la /opt/hostedtoolcache/Python/3.9.20/x64/bin
+      shell: bash
+    - name: Check Yarn Cache
+      run: |
+        # Move outside repository root to ignore the configs in
+        # oppia/.yarnrc. These configs specify that yarn should use the
+        # Oppia-managed yarn executable, which hasn't been downloaded
+        # yet.
+        cd ..
+        # Create a new .yarnrc file to check what is already in the
+        # Oppia-managed yarn cache.
+        echo 'cache-folder "yarn_cache"' > .yarnrc
+        yarn cache list
+        # Delete the .yarnrc file that we just created.
+        rm .yarnrc
+        # Move back to the repository root.
+        cd -
+      shell: bash
+    # Production pip dependencies are installed in a custom folder rather than
+    # the pip cache (see "Caching Python dependencies" in the README at
+    # https://github.com/actions/setup-python?tab=readme-ov-file).
+    #
+    # This means that using the cache provided by the setup-python action above
+    # doesn't work for global dependencies. So, instead, we follow the "Best
+    # Practice" in this comment and cache that directory directly:
+    # https://github.com/actions/setup-python/issues/881#issuecomment-2147747696
+    #
+    # Note that, in the case of a cache miss, the cache is populated when the
+    # job completes successfully. See
+    # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#cache-hits-and-misses
+    - name: Write the exact Python version to a file for cache-busting.
+      run: |
+        echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
+      shell: bash
+    - name: Cache third_party and node_modules
+      id: restore_third_party_and_node_modules_cache
+      uses: actions/cache@v4
+      with:
+        # We don't use the restore-keys option, since the hash in the key
+        # should fully define the cache. See https://stackoverflow.com/a/74620917
+        # for some useful context on cases in which restore-keys is useful.
+        #
+        # Note that we need to include install_python_dev_dependencies.py in
+        # the cache key because it has the version numbers for pip, pip-tools
+        # and setuptools.
+        key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'yarn.lock', 'requirements_dev.txt', 'requirements.txt', 'dependencies.json',  'scripts/install_python_dev_dependencies.py') }}
+        path: |
+          /home/runner/work/oppia/oppia_tools
+          /home/runner/work/oppia/yarn_cache
+          /home/runner/work/oppia/oppia/node_modules
+          /home/runner/work/oppia/oppia/third_party/python_libs
+          /home/runner/work/oppia/oppia/third_party/static
+    - name: Install third-party libs on cache miss (retries on error)
+      if: steps.restore_third_party_and_node_modules_cache.outputs.cache-hit == false
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 3
+        retry_on: error
+        shell: bash
+        timeout_minutes: 30
+        command: python -m scripts.install_third_party_libs
+    - name: Check Yarn Cache
+      # Check the yarn cache again to see what packages were just
+      # installed.
+      run: yarn cache list
+      shell: bash

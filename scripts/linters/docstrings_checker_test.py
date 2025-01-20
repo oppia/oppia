@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/docstrings_checker."""
+"""Unit tests for scripts/linters/docstrings_checker."""
 
 from __future__ import annotations
 

@@ -772,7 +772,6 @@ describe('ImageWithRegionsEditorComponent', () => {
       0,
       null
     );
-    spyOn(Event.prototype, 'preventDefault');
     component.mouseX = 500;
     component.mouseY = 400;
     component.hoveredRegion = null;
@@ -784,7 +783,6 @@ describe('ImageWithRegionsEditorComponent', () => {
 
     component.onSvgMouseDown(evt);
 
-    expect(Event.prototype.preventDefault).toHaveBeenCalled();
     expect(component.rectWidth).toBe(0);
     expect(component.rectHeight).toBe(0);
     expect(component.originalMouseX).toBe(500);

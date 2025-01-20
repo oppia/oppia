@@ -49,9 +49,9 @@ export class GoalListComponent implements OnInit {
       this.goalTopic.getThumbnailFilename()
     );
 
-    this.allCurrentNodes = this.goalTopic.canonicalStorySummaryDicts.map(
-      story => this.getMostRecentCompletedNode(story)
-    );
+    this.allCurrentNodes = this.goalTopic
+      .getCanonicalStorySummaryDicts()
+      .map(story => this.getMostRecentCompletedNode(story));
   }
 
   getStoryProgress(story: StorySummary): number {

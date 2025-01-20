@@ -510,7 +510,6 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   onSvgMouseDown(evt: MouseEvent): void {
-    evt.preventDefault();
     this.originalMouseX = this.mouseX;
     this.originalMouseY = this.mouseY;
     if (this.hoveredRegion === null) {

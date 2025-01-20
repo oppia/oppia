@@ -355,7 +355,7 @@ const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
 const mobileNavbarButtonSelector = '.text-uppercase';
-const skipLinkSelector = '.e2e-test-skip-link';
+const mainContentSelector = '.e2e-test-main-content';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
 const lessonLanguageSelector = '.oppia-content-language-selector';
@@ -3881,7 +3881,7 @@ export class LoggedOutUser extends BaseUser {
         expectedFocusedElement = await this.page.$(searchInputSelector);
         break;
       case 's':
-        expectedFocusedElement = await this.page.$(skipLinkSelector);
+        expectedFocusedElement = await this.page.$(mainContentSelector);
         break;
       case 'c':
         expectedFocusedElement = await this.page.$(

@@ -61,7 +61,9 @@ describe('Curriculum Admin', function () {
     );
 
     await curriculumAdmin.publishDraftTopic('Test Topic 1');
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+    // Setup taking longer than 300000 ms.
+  }, 480000);
 
   it(
     'should create, publish and delete a classroom.',

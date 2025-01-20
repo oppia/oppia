@@ -84,7 +84,7 @@ describe('Profile menu flow', function () {
     });
 
     it('should visit the learner dashboard from the profile dropdown menu', async function () {
-      var learnerDashboardLink = $('.e2e-test-learner-dashboard-link');
+      var learnerDashboardLink = $('.e2e-test-learner-dashboard-menu-link');
       await action.click('Learner Dashboard Link', learnerDashboardLink);
       await waitFor.pageToFullyLoad();
       expect(await browser.getUrl()).toEqual(

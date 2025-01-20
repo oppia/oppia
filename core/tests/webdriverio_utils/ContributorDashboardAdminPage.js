@@ -311,19 +311,11 @@ var ContributorDashboardAdminPage = function () {
     var month = selectedDate.getMonth() + 1;
     var year = selectedDate.getFullYear();
 
-    if (year) {
-      var yearsToNavigate =
-        year - new Date(initialValueOfDatePicker).getFullYear();
-
-      await this.navigateThroughMonths(yearsToNavigate * 12);
-    }
-
-    if (month) {
-      var currentMonth = new Date(initialValueOfDatePicker).getMonth() + 1;
-      var monthsToNavigate = month - currentMonth;
-
-      await this.navigateThroughMonths(monthsToNavigate);
-    }
+    var yearsToNavigate =
+      year - new Date(initialValueOfDatePicker).getFullYear();
+    var currentMonth = new Date(initialValueOfDatePicker).getMonth() + 1;
+    var monthsToNavigate = month - currentMonth;
+    await this.navigateThroughMonths(yearsToNavigate * 12 + monthsToNavigate);
 
     if (day) {
       /**

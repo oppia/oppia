@@ -289,9 +289,9 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
                 'outline_is_finalized': True,
                 'exploration_id': 'exp_id',
                 'status': 'Published',
-                'planned_publication_date_msecs': 100,
-                'last_modified_msecs': 100,
-                'first_publication_date_msecs': 200,
+                'planned_publication_date_msecs': 100.0,
+                'last_modified_msecs': 100.0,
+                'first_publication_date_msecs': 200.0,
                 'unpublishing_reason': None
             }],
             'initial_node_id': 'node_1111',

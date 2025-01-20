@@ -488,12 +488,8 @@ def main(args: Optional[List[str]] = None) -> None:
                 # permanently moved to.
                 docker_exclude_tests = [
                     'scripts.install_third_party_libs_test',
-                    'scripts.install_third_party_test',
                     'scripts.install_python_dev_dependencies_test',
                     'scripts.install_python_prod_dependencies_test',
-                    'scripts.setup_gae_test',
-                    'scripts.setup_test',
-                    'scripts.script_import_test',
                     'scripts.build_test',
                     'scripts.run_acceptance_tests_test'
                 ]

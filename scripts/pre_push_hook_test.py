@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 
+from core import feconf
 from core.tests import test_utils
 from scripts import common
 
@@ -387,13 +388,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_mypy_check_failure(self) -> None:
         self.mypy_check_code = 1
-        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
-            with self.get_changed_files_swap, self.uncommitted_files_swap:
-                with self.check_output_swap, self.start_linter_swap:
-                    with self.execute_mypy_checks_swap:
-                        with self.assertRaisesRegex(SystemExit, '1'):
-                            with self.swap_check_backend_python_libs:
-                                pre_push_hook.main(args=[])
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
+                with self.get_changed_files_swap, self.uncommitted_files_swap:
+                    with self.check_output_swap, self.start_linter_swap:
+                        with self.execute_mypy_checks_swap:
+                            with self.assertRaisesRegex(SystemExit, '1'):
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
         self.assertIn(
             'Push failed, please correct the mypy type annotation issues '
             'above.', self.print_arr)
@@ -611,7 +613,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 '\n',
                 'Please fix these discrepancies by editing the '
                 '`requirements.in`\nfile or running '
-                '`scripts.install_third_party` to regenerate\nthe '
+                '`scripts.install_third_party_libs` to regenerate\nthe '
                 '`third_party/python_libs` directory.\n\n'
             ])
 
@@ -648,7 +650,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 '\n',
                 'Please fix these discrepancies by editing the '
                 '`requirements.in`\nfile or running '
-                '`scripts.install_third_party` to regenerate\nthe '
+                '`scripts.install_third_party_libs` to regenerate\nthe '
                 '`third_party/python_libs` directory.\n\n'
             ])
 

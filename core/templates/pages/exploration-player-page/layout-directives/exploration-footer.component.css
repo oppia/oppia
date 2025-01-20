@@ -339,3 +339,13 @@
     display: none;
   }
 }
+
+@media (max-width: 450px) {
+  .oppia-lesson-info-header {
+    display: none;
+  }
+
+  .oppia-footer-info-icon {
+    display: none;
+  }
+}

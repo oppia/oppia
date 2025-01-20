@@ -2670,9 +2670,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
-            'planned_publication_date_msecs': 1690800486000,
-            'first_publication_date_msecs': 1672684200000,
-            'last_modified_msecs': 1672684200000,
+            'planned_publication_date_msecs': 1690800486000.0,
+            'first_publication_date_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000.0,
             'unpublishing_reason': None
         }
         node_2: story_domain.StoryNodeDict = {
@@ -2690,9 +2690,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_DRAFT,
-            'planned_publication_date_msecs': 1659264486000,
+            'planned_publication_date_msecs': 1659264486000.0,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000.0,
             'unpublishing_reason': None
         }
         node_3: story_domain.StoryNodeDict = {
@@ -2710,9 +2710,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
-            'planned_publication_date_msecs': 1690800486000,
+            'planned_publication_date_msecs': 1690800486000.0,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000.0,
             'unpublishing_reason': None
         }
         node_4: story_domain.StoryNodeDict = {
@@ -2730,9 +2730,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
-            'planned_publication_date_msecs': 1693478886000,
+            'planned_publication_date_msecs': 1693478886000.0,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000.0,
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [

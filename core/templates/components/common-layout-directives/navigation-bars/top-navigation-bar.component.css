@@ -428,7 +428,7 @@
   display: block;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:hover {
-  opacity: 1;
+  opacity: 0.9;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:focus {
   outline: 1px dotted #212121;

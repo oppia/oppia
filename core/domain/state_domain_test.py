@@ -879,8 +879,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         expected_training_data = [{
             'answer_group_index': 1,
-            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
-                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+            'answers': ['cheerful', 'merry', 'ecstatic', 'glad',
+                        'overjoyed', 'pleased', 'thrilled', 'smile']}]
 
         observed_training_data = state.get_training_data()
 
@@ -3018,10 +3018,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
-            'correct_answer': u'hello_world!',
+            'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': u'<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>'
             }
         }
         # Ruling out the possibility of None for mypy type checking.

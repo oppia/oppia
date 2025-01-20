@@ -45,7 +45,7 @@ export class KeyboardShortcutService {
         '.oppia-skip-to-content'
       ) as HTMLElement;
       if (skipButton !== null) {
-        skipButton.focus();
+        skipButton.click();
       }
     });
 
@@ -117,7 +117,7 @@ export class KeyboardShortcutService {
         '.oppia-skip-to-content'
       ) as HTMLElement;
       if (skipButton !== null) {
-        skipButton.focus();
+        skipButton.click();
       }
     });
 
