@@ -188,6 +188,10 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
             GeneralSuggestionModel ID and a list of the filenames of all images
             in the translation suggestions represented by all models in the
             input.
+
+        Raises:
+            Exception. Raised for debugging if an exception is raised while
+                parsing the translation html string.
         """
         model_id, model_pcoll = group
         image_filenames: List[str] = []
