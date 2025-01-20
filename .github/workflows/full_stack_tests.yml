@@ -98,6 +98,7 @@ jobs:
           sudo apt-get update
           sudo apt install ffmpeg
       - name: Generate modified suite name for artifacts
+        if: ${{ failure() }}
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with hyphens.
         run: |
