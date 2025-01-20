@@ -1773,10 +1773,12 @@ class TestBase(unittest.TestCase):
                 new_function_with_checks.call_num > 0, called, msg=msg)  # type: ignore[attr-defined]
             pretty_unused_args = [
                 ', '.join(itertools.chain(
-                    (repr(a) for a in args),
-                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
+                    (repr(a) for a in args) if args is not None else [],
+                    (
+                        '%s=%r' % kwarg for kwarg in kwargs.items()
+                        ) if kwargs is not None else []))
                 for args, kwargs in itertools.zip_longest(
-                    expected_args_iter, expected_kwargs_iter, fillvalue={})
+                    expected_args_iter, expected_kwargs_iter)
             ]
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
@@ -1885,11 +1887,7 @@ class TestBase(unittest.TestCase):
         Raises:
             AssertionError. When dictionaries doesn't match.
         """
-        # Here we use MyPy ignore because, assertDictEqual's argument can only
-        # accept Dict[Any, Any] type but to allow both Dict and TypedDict type
-        # we used Mapping here which causes MyPy to throw `incompatible argument
-        # type` error. Thus to avoid the error, we used ignore here.
-        super().assertDictEqual(dict_one, dict_two, msg=msg)  # type: ignore[arg-type]
+        super().assertDictEqual(dict_one, dict_two, msg=msg)
 
     # Here we use type Any because the method 'assertItemsEqual' can accept any
     # kind of iterables to compare them against each other, and these iterables

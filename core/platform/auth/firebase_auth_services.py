@@ -63,7 +63,7 @@ from core.platform import models
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import webapp2
 
 MYPY = False
@@ -405,7 +405,7 @@ def associate_multi_auth_ids_with_user_ids(
         Exception. One or more auth associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
-    auth_ids, user_ids = zip(*auth_id_user_id_pairs)
+    auth_ids, user_ids = map(list, zip(*auth_id_user_id_pairs))
 
     user_id_collisions = get_multi_user_ids_from_auth_ids(auth_ids)
     if any(user_id is not None for user_id in user_id_collisions):

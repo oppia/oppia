@@ -147,7 +147,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_version: int,
         language_accent_code: str,
         voiceovers_mapping: Dict[str, Dict[
-            feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]]
+            str, Optional[state_domain.VoiceoverDict]]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 

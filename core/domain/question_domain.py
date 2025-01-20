@@ -405,7 +405,7 @@ class Question(translation_domain.BaseTranslatableObject):
         # fields MyPy throws an error. Thus to avoid the error, we used ignore.
         question_state_dict['recorded_voiceovers'] = {
             'voiceovers_mapping': (
-                question_state_dict.pop('content_ids_to_audio_translations'))  # type: ignore[misc]
+                question_state_dict.pop('content_ids_to_audio_translations'))  # type: ignore[typeddict-item]
         }
         return question_state_dict
 
@@ -455,7 +455,7 @@ class Question(translation_domain.BaseTranslatableObject):
             # discontinued in the latest answer_group. So, while accessing these
             # discontinued fields MyPy throws an error. Thus to avoid the
             # error, we used ignore here.
-            del answer_group['tagged_misconception_id']  # type: ignore[misc]
+            del answer_group['tagged_misconception_id']  # type: ignore[typeddict-item]
 
         return question_state_dict
 
@@ -680,12 +680,12 @@ class Question(translation_domain.BaseTranslatableObject):
                             # conversion function for old schema and the
                             # StateDict doesn't have the writtent translation
                             # property in the latest schema.
-                            'written_translations']['translations_mapping']: # type: ignore[misc]
+                            'written_translations']['translations_mapping']: # type: ignore[typeddict-item]
                             # Here we use MyPy ignore because this is a
                             # conversion function for old schema and the
                             # StateDict doesn't have the writtent translation
                             # property in the latest schema.
-                        del question_state_dict['written_translations'][ # type: ignore[misc]
+                        del question_state_dict['written_translations'][ # type: ignore[typeddict-item]
                             'translations_mapping'][content_id]
 
                 question_state_dict['interaction']['id'] = new_interaction_id
@@ -735,7 +735,7 @@ class Question(translation_domain.BaseTranslatableObject):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         translations_mapping = question_state_dict[
-            'written_translations']['translations_mapping'] # type: ignore[misc]
+            'written_translations']['translations_mapping'] # type: ignore[typeddict-item]
         for content_id in translations_mapping:
             # Find maximum existing content_id index.
             content_id_suffix = content_id.split('_')[-1]
@@ -763,7 +763,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id is None:
-            question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
+            question_state_dict['next_content_id_index'] = ( # type: ignore[typeddict-unknown-key]
                 max_existing_content_id_index + 1)
             return question_state_dict
 
@@ -967,12 +967,12 @@ class Question(translation_domain.BaseTranslatableObject):
         )
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
+        question_state_dict['next_content_id_index'] = ( # type: ignore[typeddict-unknown-key]
             content_id_counter.next_content_id_index)
         for new_content_id in content_id_counter.new_content_ids:
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
-            question_state_dict['written_translations'][ # type: ignore[misc]
+            question_state_dict['written_translations'][ # type: ignore[typeddict-item]
                 'translations_mapping'][new_content_id] = {}
             question_state_dict[
                 'recorded_voiceovers'][
@@ -1080,7 +1080,7 @@ class Question(translation_domain.BaseTranslatableObject):
             })
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
-            question_state_dict['written_translations']['translations_mapping'][ # type: ignore[misc]
+            question_state_dict['written_translations']['translations_mapping'][ # type: ignore[typeddict-item]
                 'ca_placeholder_0'] = {}
             question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
                 'ca_placeholder_0'] = {}
@@ -1183,7 +1183,7 @@ class Question(translation_domain.BaseTranslatableObject):
             content_id_counter = ContentIdCounter(
                 # Here we use MyPy ignore because the latest schema of state
                 # dict doesn't contains next_content_id_index property.
-                question_state_dict['next_content_id_index']) # type: ignore[misc]
+                question_state_dict['next_content_id_index']) # type: ignore[typeddict-item]
             answer_group_dicts = question_state_dict[
                 'interaction']['answer_groups']
             for answer_group_dict in answer_group_dicts:
@@ -1216,13 +1216,13 @@ class Question(translation_domain.BaseTranslatableObject):
                         }
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains next_content_id_index property.
-            question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
+            question_state_dict['next_content_id_index'] = ( # type: ignore[typeddict-unknown-key]
                 content_id_counter.next_content_id_index)
             for new_content_id in content_id_counter.new_content_ids:
                 # Here we use MyPy ignore because the latest schema of state
                 # dict doesn't contains written_translations property.
                 question_state_dict[
-                    'written_translations'][ # type: ignore[misc]
+                    'written_translations'][ # type: ignore[typeddict-item]
                         'translations_mapping'][new_content_id] = {}
                 question_state_dict[
                     'recorded_voiceovers'][
@@ -1800,10 +1800,10 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        del question_state_dict['next_content_id_index'] # type: ignore[misc]
+        del question_state_dict['next_content_id_index'] # type: ignore[typeddict-item]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        del question_state_dict['written_translations'] # type: ignore[misc]
+        del question_state_dict['written_translations'] # type: ignore[typeddict-item]
         states_dict, next_content_id_index = (
             state_domain.State
             .update_old_content_id_to_new_content_id_in_v54_states({

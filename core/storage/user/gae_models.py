@@ -2064,10 +2064,8 @@ class StoryProgressModel(base_models.BaseModel):
         cls, user_id: str, story_id: str, *, strict: bool = ...
     ) -> Optional[StoryProgressModel]: ...
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
     @classmethod
-    def get( # type: ignore[override]
+    def get(
         cls, user_id: str, story_id: str, strict: bool = True
     ) -> Optional[StoryProgressModel]:
         """Gets the StoryProgressModel for the given user and story

@@ -571,11 +571,11 @@ def get_displayable_question_skill_link_details(
 
     merged_question_skill_links = []
     for ind, skill_ids_list in enumerate(grouped_skill_ids):
-        skills = skill_models.SkillModel.get_multi(skill_ids_list)
+        skills: List[Optional[skill_models.SkillModel]] = skill_models.SkillModel.get_multi(skill_ids_list)
         merged_question_skill_links.append(
             question_domain.MergedQuestionSkillLink(
                 question_ids[ind], skill_ids_list,
-                [skill.description if skill else None for skill in skills],
+                [str(skill.description) for skill in skills if skill is not None],
                 grouped_difficulties[ind]))
 
     question_summaries = get_question_summaries_by_ids(question_ids)

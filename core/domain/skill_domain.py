@@ -1553,10 +1553,10 @@ class Skill:
         # are some fields that are discontinued in the latest domain object
         # (eg. explanation). So, while accessing these discontinued fields MyPy
         # throws an error. Thus, to avoid the error, we used ignore here.
-        explanation = rubric_dict['explanation']  # type: ignore[misc]
+        explanation = rubric_dict['explanation']  # type: ignore[typeddict-item]
         # Here we use MyPy ignore because MyPy doesn't allow key deletion from
         # TypedDict.
-        del rubric_dict['explanation']  # type: ignore[misc]
+        del rubric_dict['explanation']  # type: ignore[typeddict-item]
         rubric_dict['explanations'] = [explanation]
         return rubric_dict
 

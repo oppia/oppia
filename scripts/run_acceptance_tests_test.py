@@ -67,7 +67,7 @@ def mock_managed_long_lived_process(
     # where instance of 'PlatformParameter' is expected, and this is
     # done to Replace the stored instance with None in order to
     # trigger the unexpected exception during update.
-    stub.poll = lambda: mock_poll(stub)    # type: ignore[assignment]
+    stub.poll = lambda: mock_poll(stub)    # type: ignore[method-assign]
 
     return contextlib.nullcontext(enter_result=stub)
 

@@ -749,7 +749,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # for state) and StateDict do not contain this older key. So, because of
         # this MyPy throws an `TypedDict "StateDict" has no key` error. Thus to
         # avoid the error, we used ignore here.
-        self.question_state_dict['content_ids_to_audio_translations'] = (  # type: ignore[misc]
+        self.question_state_dict['content_ids_to_audio_translations'] = (  # type: ignore[typeddict-unknown-key]
             test_data['voiceovers_mapping'])
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
@@ -1053,7 +1053,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = { # type: ignore[misc]
+        self.question_state_dict['written_translations'] = { # type: ignore[typeddict-unknown-key]
             'translations_mapping': {
                 'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
             }
@@ -1223,7 +1223,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        self.question_state_dict['written_translations'] = { # type: ignore[misc]
+        self.question_state_dict['written_translations'] = { # type: ignore[typeddict-unknown-key]
             'translations_mapping': {
                 'temp_id_1': {
                     'en': {
@@ -1244,7 +1244,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        test_value['state']['next_content_id_index'] = 0 # type: ignore[misc]
+        test_value['state']['next_content_id_index'] = 0 # type: ignore[typeddict-unknown-key]
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
@@ -1252,11 +1252,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 36)
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        self.assertEqual(test_value['state']['next_content_id_index'], 3) # type: ignore[misc]
+        self.assertEqual(test_value['state']['next_content_id_index'], 3) # type: ignore[typeddict-item]
 
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        t_map = test_value['state']['written_translations'][ # type: ignore[misc]
+        t_map = test_value['state']['written_translations'][ # type: ignore[typeddict-item]
             'translations_mapping']
         self.assertEqual(t_map['temp_id_1']['en']['data_format'], 'html')
         self.assertEqual(t_map['temp_id_2']['en']['data_format'], 'html')
@@ -1280,7 +1280,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
+        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[typeddict-item]
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -1305,7 +1305,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
+            test_value['state']['written_translations']['translations_mapping'], # type: ignore[typeddict-item]
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1331,7 +1331,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
+        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[typeddict-item]
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -1368,7 +1368,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
+        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[typeddict-item]
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -1418,7 +1418,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
+            test_value['state']['written_translations']['translations_mapping'], # type: ignore[typeddict-item]
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1443,7 +1443,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
+        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[typeddict-item]
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -1486,7 +1486,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
+            test_value['state']['written_translations']['translations_mapping'], # type: ignore[typeddict-item]
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1590,7 +1590,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'recorded_voiceovers']['voiceovers_mapping'] = {}
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = { # type: ignore[misc]
+        self.question_state_dict['written_translations'] = { # type: ignore[typeddict-unknown-key]
             'translations_mapping': {}
         }
 
@@ -1622,7 +1622,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
+            test_value['state']['written_translations']['translations_mapping'], # type: ignore[typeddict-item]
             {'ca_placeholder_0': {}}
         )
 
@@ -1673,7 +1673,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversion_from_v40_to_v41(self) -> None:
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = { # type: ignore[misc]
+        self.question_state_dict['written_translations'] = { # type: ignore[typeddict-unknown-key]
             'translations_mapping': {}
         }
         self.question_state_dict['interaction']['id'] = 'TextInput'
@@ -1701,7 +1701,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        self.question_state_dict['next_content_id_index'] = 0 # type: ignore[misc]
+        self.question_state_dict['next_content_id_index'] = 0 # type: ignore[typeddict-unknown-key]
         self.question_state_dict[
             'recorded_voiceovers']['voiceovers_mapping'] = {}
 
@@ -1716,7 +1716,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 41)
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        self.assertEqual(test_value['state']['next_content_id_index'], 1) # type: ignore[misc]
+        self.assertEqual(test_value['state']['next_content_id_index'], 1) # type: ignore[typeddict-item]
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0][
                 'rule_specs'][0]['inputs']['x'],
@@ -1756,7 +1756,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        test_value['state']['next_content_id_index'] = 0 # type: ignore[misc]
+        test_value['state']['next_content_id_index'] = 0 # type: ignore[typeddict-unknown-key]
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
         test_value['state_schema_version'] = 40
 
@@ -1766,7 +1766,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 41)
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
-        self.assertEqual(test_value['state']['next_content_id_index'], 1) # type: ignore[misc]
+        self.assertEqual(test_value['state']['next_content_id_index'], 1) # type: ignore[typeddict-item]
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0][
                 'rule_specs'][0]['inputs']['x'],

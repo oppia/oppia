@@ -113,7 +113,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally
         # test wrong inputs that we can normally catch by typing.
-        self.broken_contents['nodes'][0]['description'] = 123  # type: ignore[arg-type]
+        self.broken_contents['nodes'][0]['description'] = 123  # type: ignore[typeddict-item]
 
         self.unmigrated_contents = copy.deepcopy(self.latest_contents)
         self.unmigrated_contents['nodes'][0]['thumbnail_size_in_bytes'] = 123
@@ -301,7 +301,7 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally
         # test wrong inputs that we can normally catch by typing.
-        self.broken_contents['nodes'][0]['description'] = 123  # type: ignore[arg-type]
+        self.broken_contents['nodes'][0]['description'] = 123  # type: ignore[typeddict-item]
 
         self.unmigrated_contents = copy.deepcopy(self.latest_contents)
         self.unmigrated_contents['nodes'][0]['thumbnail_size_in_bytes'] = 123

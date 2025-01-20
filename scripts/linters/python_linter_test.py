@@ -40,7 +40,7 @@ INVALID_DOCSTRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_docstring.py')
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES: Dict[str, List[str]] = multiprocessing.Manager().dict()
+PROCESSES: Dict[str, List[str]] = dict(multiprocessing.Manager().dict())
 NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE = NAME_SPACE.files
 

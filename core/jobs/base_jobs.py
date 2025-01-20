@@ -120,7 +120,7 @@ class JobMetaclass(type):
         # So, to narrow down the type from 'type' to 'JobMetaclass', we used
         # cast here.
         if name == 'JobBase':
-            return cast(JobMetaclass, job_cls)
+            return job_cls
 
         if not name.endswith('Base'):
             if issubclass(job_cls, JobBase):
@@ -136,7 +136,7 @@ class JobMetaclass(type):
         # is 'type' but we want to return a more narrower type 'JobMetaclass'.
         # So, to narrow down the type from 'type' to 'JobMetaclass', we used
         # cast here.
-        return cast(JobMetaclass, job_cls)
+        return job_cls
 
     @classmethod
     def get_all_jobs(mcs) -> List[Type[JobBase]]:

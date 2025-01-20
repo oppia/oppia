@@ -29,7 +29,7 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Dict, Final, List, TypedDict, Union, cast
+from typing import Dict, Final, List, TypedDict, Union, cast, Type
 
 
 class ComponentsDict(TypedDict):

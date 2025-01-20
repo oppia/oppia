@@ -819,14 +819,14 @@ class SessionStateStats:
             # Here we use MyPy ignore because MyPy does not recognize
             # that keys represented by the variable exp_stats_property
             # are string literals.
-            if not isinstance(aggregated_stats[exp_stats_property], int): # type: ignore[misc]
+            if not isinstance(aggregated_stats[exp_stats_property], int): # type: ignore[literal-required]
                 raise utils.ValidationError(
                     'Expected %s to be an int, received %s' % (
                         exp_stats_property,
                         # Here we use MyPy ignore because MyPy does not
                         # recognize that keys represented by the variable
                         # exp_stats_property are string literals.
-                        aggregated_stats[exp_stats_property] # type: ignore[misc]
+                        aggregated_stats[exp_stats_property] # type: ignore[literal-required]
                     )
                 )
         state_stats_mapping = aggregated_stats['state_stats_mapping']

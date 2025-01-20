@@ -1379,8 +1379,11 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             self.assertIn('ABC', init_content)
             self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
+        # Here we use MyPy ignore because we are assigning a string value
+        # which is not convertible to int, but we expect versions that are int
+        # or convertible to integer.
         # May not revert to any version that's not convertible to int.
-        for rev_version in ('abc', ()):
+        for rev_version in ('abc', ()):  # type: ignore[assignment]
             response_dict = self.post_json(
                 '/createhandler/revert/%s' % self.EXP_ID, {
                     'current_version': 2,

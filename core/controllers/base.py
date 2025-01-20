@@ -515,7 +515,7 @@ class BaseHandler(
         # Here we use MyPy ignore because here we assigning RaiseErrorOnGet's
         # instance to a 'get' method, and according to MyPy assignment to a
         # method is not allowed.
-        self.request.get = RaiseErrorOnGet(  # type: ignore[assignment]
+        self.request.get = RaiseErrorOnGet(  # type: ignore[method-assign]
             'Use self.normalized_request instead of self.request.').get
         self.payload = RaiseErrorOnGet(
             'Use self.normalized_payload instead of self.payload.')
@@ -1010,9 +1010,7 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    # Here we use MyPy ignore because the signature of 'get' method is not
-    # compatible with super class's (BaseHandler) 'get' method.
-    def get(self) -> None:  # type: ignore[override]
+    def get(self) -> None:
         csrf_token = CsrfTokenManager.create_csrf_token(
             self.user_id)
         self.render_json({

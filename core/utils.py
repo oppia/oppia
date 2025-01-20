@@ -1248,7 +1248,7 @@ def compute_list_difference(list_a: List[str], list_b: List[str]) -> List[str]:
 # without type parameters, but here to count the order elements, we are
 # inheriting from OrderedDict type without providing type parameters which
 # cause MyPy to throw an error. Thus, to avoid the error, we used ignore here.
-class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
+class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg, misc]
     """Counter that remembers the order elements are first encountered."""
 
     pass

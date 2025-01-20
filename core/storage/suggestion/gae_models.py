@@ -2353,7 +2353,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
@@ -2366,7 +2366,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             language_code: str. The language code to get results for.
-            sort_by: SortChoices|None. A string indicating how to sort the
+            sort_by: str|None. A string indicating how to sort the
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
@@ -2776,7 +2776,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
@@ -2788,7 +2788,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             language_code: str. The language code to get results for.
-            sort_by: SortChoices|None. A string indicating how to sort the
+            sort_by: str|None. A string indicating how to sort the
                 result.
             max_days_since_last_activity: Optional[int]. The number of days
                 before today from which to start considering users'
@@ -3101,7 +3101,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
@@ -3113,7 +3113,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
-            sort_by: SortChoices|None. A string indicating how to sort the
+            sort_by: str|None. A string indicating how to sort the
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
@@ -3401,7 +3401,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
@@ -3412,7 +3412,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
-            sort_by: SortChoices|None. A string indicating how to sort the
+            sort_by: str|None. A string indicating how to sort the
                 result.
             max_days_since_last_activity: Optional[int]. The number of days
                 before today from which to start considering users'

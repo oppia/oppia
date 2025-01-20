@@ -149,7 +149,7 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                         feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
                     'has_full_results_page': True,
                     'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
-                    'protractor_id': 'top-rated',  # type: ignore[typeddict-item]
+                    'protractor_id': 'top-rated',  # type: ignore[typeddict-unknown-key]
                 })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(

@@ -1541,7 +1541,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         version = '-1'
-        user_data_dict['schema_version'] = version  # type: ignore[arg-type]
+        user_data_dict['schema_version'] = version  # type: ignore[typeddict-item]
         error_msg = (
             'Version has invalid type, expected int, '
             'received %s' % type(version)

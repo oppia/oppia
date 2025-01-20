@@ -8,7 +8,7 @@ certifi==2023.7.22
 coverage==7.2.3
 esprima==4.0.1
 isort==5.12.0
-mypy==0.812
+mypy==1.14.1
 psutil==5.9.5
 pycodestyle==2.10.0
 pylint==2.17.2

@@ -117,12 +117,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
+        def get(self) -> None:
             self.render_template('invalid_page.html')
 
         def options(self) -> None:
@@ -137,12 +132,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
+        def get(self) -> None:
             """Handles GET requests."""
             pass
 
@@ -152,12 +142,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
+        def get(self) -> None:
             """Handles GET requests."""
             pass
 
@@ -555,12 +540,7 @@ class MissingHandlerArgsTests(test_utils.GenericTestBase):
         """Mock handler for testing."""
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests."""
             self.render_json({})
 
@@ -781,12 +761,7 @@ class EscapingTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests."""
             self.render_json({'big_value': u'\n<script>马={{'})
 
@@ -822,12 +797,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
+        def get(self) -> None:
             """Handles GET requests."""
             file_contents = io.BytesIO(b'example')
             self.render_downloadable_file(
@@ -1089,12 +1059,7 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
+        def get(self) -> None:
             """Handles get requests."""
             raise self.InternalErrorException('fake exception')
 
@@ -1176,12 +1141,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
+        def get(self) -> None:
             self.values.update(list(self.request.GET.items()))
             self.render_json(self.values)
 
@@ -1307,12 +1267,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
+        def get(self) -> None:
             assert self.normalized_request is not None
             iframe_restriction = self.normalized_request.get('iframe_restriction')
             self.render_template(
@@ -1871,12 +1826,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
+        def get(self) -> None:
             assert self.normalized_request is not None
             exploration_id = self.normalized_request['exploration_id']
             if exploration_id != 'random_exp_id':
@@ -1904,12 +1854,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'put' method does
-        # not match with the signature of super class's (BaseHandler) 'put'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def put(self) -> None:  # type: ignore[override]
+        def put(self) -> None:
             assert self.normalized_payload is not None
             exploration_id = self.normalized_payload['exploration_id']
             if exploration_id != 'random_exp_id':
@@ -2004,12 +1949,7 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.render_json({})
 
     def setUp(self) -> None:
@@ -2047,12 +1987,7 @@ class HeaderRequestsTests(test_utils.GenericTestBase):
         }
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self, entity_id: str) -> None:  # type: ignore[override]
+        def get(self, entity_id: str) -> None:
             self.render_json({'entity_id': entity_id})
 
     def setUp(self) -> None:
@@ -2136,12 +2071,7 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             """Handles POST requests. This request method contains both type
             of args, i.e., request args as well as payload args.
             """
@@ -2252,12 +2182,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self, entity_type: str, entity_id: str) -> None:  # type: ignore[override]
+        def post(self, entity_type: str, entity_id: str) -> None:
             """Saves an image uploaded by a content creator."""
             assert self.normalized_payload is not None
             assert self.normalized_request is not None
@@ -2324,12 +2249,7 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
             'GET': {}
         }
 
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self, mock_list: List[str], mock_int: int) -> None:  # type: ignore[override]
+        def get(self, mock_list: List[str], mock_int: int) -> None:
             if not isinstance(mock_list, list):
                 raise self.InvalidInputException(
                     'Expected arg mock_list to be a list. Was type %s' %
@@ -2377,12 +2297,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
             }
         }
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.payload.get('mock_int')
             return self.render_json({})
 
@@ -2391,12 +2306,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
     ):
         """Mock handler without schema."""
 
-        # Here we use MyPy ignore because the signature of 'post' method does
-        # not match with the signature of super class's (BaseHandler) 'post'
-        # method, and this happens because all handler methods in the main
-        # codebase have decorators which modify the function signature
-        # accordingly, but these methods in base_test.py do not.
-        def post(self) -> None:  # type: ignore[override]
+        def post(self) -> None:
             self.payload.get('mock_int')
             return self.render_json({})
 

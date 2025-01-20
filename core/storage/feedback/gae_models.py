@@ -514,10 +514,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         cls, thread_id: str, message_id: int, *, strict: bool = ...
     ) -> Optional[GeneralFeedbackMessageModel]: ...
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
     @classmethod
-    def get( # type: ignore[override]
+    def get(
         cls, thread_id: str, message_id: int, strict: bool = True
     ) -> Optional[GeneralFeedbackMessageModel]:
         """Gets the GeneralFeedbackMessageModel entry for the given ID. Raises
@@ -611,8 +609,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
         assert None not in thread_models
         return [
-            thread_model.message_count if thread_model else None
-            for thread_model in thread_models
+            thread_model.message_count for thread_model in thread_models
+            if thread_model is not None
         ]
 
     # TODO(#13523): Change the return value of the function below from

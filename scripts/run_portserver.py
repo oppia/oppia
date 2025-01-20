@@ -58,7 +58,8 @@ import sys
 import threading
 
 from core import utils
-from typing import Callable, Deque, Final, List, Optional, Sequence
+from typing import Callable, Deque, Final, List, Optional, Sequence, cast
+from typing_extensions import Buffer
 
 _PROTOCOLS: Final = [
     (socket.SOCK_STREAM, socket.IPPROTO_TCP),
@@ -486,7 +487,7 @@ class Server:
         """
         request = connection.recv(Server.message_size)
         response = handler(request)
-        connection.sendall(response)
+        connection.sendall(cast(Buffer, response))
         connection.close()
 
     def _start_server(self, path: str) -> socket.SocketType:

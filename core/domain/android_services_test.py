@@ -129,6 +129,10 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
             new_topic.id, strict=True)
         self.assertTrue(new_topic_rights.topic_is_published)
 
+        # This assert is used to eliminate the possibility of None
+        # during mypy type checking.
+        assert new_topic.last_updated is not None
+        assert old_topic_last_updated is not None
         self.assertGreater(new_topic.last_updated, old_topic_last_updated)
 
     def test_reinitialize_topic_is_published_when_exploration_does_not_exist(

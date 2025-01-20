@@ -1589,10 +1589,8 @@ class VersionedModel(BaseModel):
         version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
     @classmethod
-    def get(  # type: ignore[override]
+    def get(
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
         strict: bool = True,
