@@ -35,6 +35,7 @@ export class LessonCardComponent implements OnInit {
   @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;
   @Input() topic!: string;
   @Input() isCommunityLessonComplete?: boolean;
+  @Input() isGoal?: boolean;
 
   desc!: string;
   imgColor!: string;

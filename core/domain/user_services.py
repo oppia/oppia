@@ -329,15 +329,11 @@ def get_users_settings(
             if user_settings_model is None:
                 raise Exception('User with ID \'%s\' not found.' % user_id)
     result: List[Optional[user_domain.UserSettings]] = []
-    system_email_address = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-    assert isinstance(system_email_address, str)
     for i, model in enumerate(user_settings_models):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
             result.append(user_domain.UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
-                email=system_email_address,
+                email=feconf.SYSTEM_EMAIL_ADDRESS,
                 roles=[
                     feconf.ROLE_ID_FULL_USER,
                     feconf.ROLE_ID_CURRICULUM_ADMIN,

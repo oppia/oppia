@@ -1,4 +1,4 @@
-<background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && !isShowRedesignedLearnerDashboardActive && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
+<background-banner *ngIf="!isShowRedesignedLearnerDashboardActive() && (!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME))"></background-banner>
 <div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
      class="position-relative" [ngClass]="{'oppia-learner-dash-container w-100' : isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-container' : !isShowRedesignedLearnerDashboardActive()}">
   <div [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
@@ -50,29 +50,32 @@
           </picture>
         </li>
         <li>
-          <button class="align-items-center d-inline-flex e2e-test-home-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+          <button aria-label="Go to home tab"
+                  class="align-items-center d-inline-flex e2e-test-home-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
                   [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)">
-            <span class="fas fa-home fa-lg"></span>
+            <span aria-hidden="true" class="fas fa-home fa-lg"></span>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME | translate }}
           </button>
         </li>
         <li>
-          <button class="align-items-center d-inline-flex e2e-test-goals-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+          <button aria-label="Go to goals tab"
+                  class="align-items-center d-inline-flex e2e-test-goals-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
                   [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
-            <span class="fas fa-bullseye fa-lg"></span>
+            <span aria-hidden="true" class="fas fa-bullseye fa-lg"></span>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate }}
           </button>
         </li>
         <li>
-          <button class="align-items-center d-inline-flex e2e-test-community-lessons-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+          <button aria-label="Go to progress tab"
+                  class="align-items-center d-inline-flex e2e-test-community-lessons-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
                   [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
-            <span class="fas fa-chart-line fa-lg"></span>
+            <span aria-hidden="true" class="fas fa-chart-line fa-lg"></span>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate }}
           </button>
         </li>
@@ -115,8 +118,9 @@
       </mat-card>
     </div>
     <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dash-tab overflow-hidden px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
-      <div class="d-flex w-100"
+      <div class="d-flex flex-column w-100"
            [ngClass]="{'oppia-learner-dashboard-main-content-container pl-5': !windowIsNarrow && !isShowRedesignedLearnerDashboardActive(), 'justify-content-center': windowIsNarrow}">
+        <p *ngIf="isShowRedesignedLearnerDashboardActive()" class="oppia-learner-dash-greeting mt-4"> {{ getDashboardTabHeading() | translate: {username: username} }} </p>
         <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
@@ -126,6 +130,7 @@
                           [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                           [untrackedTopics]="untrackedTopics"
                           [username]="username"
+                          [totalLessonsInPlaylists]="totalLessonsInPlaylists"
                           (setActiveSection)="setActiveSection($event)">
           </oppia-home-tab>
         </div>
@@ -135,7 +140,8 @@
                            [completedGoals]="learntTopicsList"
                            [untrackedTopics]="untrackedTopics"
                            [partiallyLearntTopicsList]="partiallyLearntTopicsList"
-                           [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
+                           [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics"
+                           [learnerDashboardRedesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
           </oppia-goals-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !windowIsNarrow">
@@ -166,9 +172,11 @@
                                        [explorationPlaylist]="explorationPlaylist"
                                        [collectionPlaylist]="collectionPlaylist"
                                        [subscriptionsList]="subscriptionsList"
+                                       [partiallyLearntTopicsList]="partiallyLearntTopicsList"
+                                       [learntTopicsList]="learntTopicsList"
                                        [completedToIncompleteCollections]="completedToIncompleteCollections"
                                        [learnerDashboardRedesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
-                                       [username]="username">
+                                       [currentGoals]="topicsToLearn">
           </oppia-community-lessons-tab>
         </div>
       </div>

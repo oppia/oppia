@@ -36,8 +36,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import payload_validator
 from core.domain import auth_domain
-from core.domain import classifier_domain
-from core.domain import classifier_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import taskqueue_services
@@ -131,21 +129,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """Do a OPTIONS request. This is an unrecognized request method in our
             codebase.
             """
-            self.render_template('invalid_page.html')
-
-    class MockHandlerForTestingErrorPageWithIframed(
-        base.BaseHandler[Dict[str, str], Dict[str, str]]
-    ):
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
-            self.iframed = True
             self.render_template('invalid_page.html')
 
     class MockHandlerForTestingUiAccessWrapper(
@@ -356,25 +339,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 observed_log_messages[0],
                 'Not a recognized request method.')
-
-    def test_renders_error_page_with_iframed(self) -> None:
-        # Modify the testapp to use the mock handler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_iframed', self.MockHandlerForTestingErrorPageWithIframed,
-                name='MockHandlerForTestingErrorPageWithIframed')],
-            debug=feconf.DEBUG,
-        ))
-        # The 500 is expected because the template file does not exist
-        # (so it is a legitimate server error caused by the
-        # MockHandlerForTestingErrorPageWithIframed).
-        response = self.get_html_response(
-            '/mock_iframed', expected_status_int=500)
-
-        self.assertIn(
-            b'<oppia-error-iframed-page-root></oppia-error-iframed-page-root>',
-            response.body
-        )
 
     def test_dev_mode_cannot_be_true_on_production(self) -> None:
         server_software_swap = self.swap(
@@ -1466,122 +1430,6 @@ class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
             None, csrf_token))
-
-
-class CorrectMockVMHandlerNormalizedPayloadDict(TypedDict):
-    """Type for the CorrectMockVMHandler's normalized_payload dictionary."""
-
-    vm_id: str
-    signature: str
-    message: bytes
-
-
-class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
-    """Unit tests for OppiaMLVMHandler class."""
-
-    class IncorrectMockVMHandler(
-        base.OppiaMLVMHandler[Dict[str, str], Dict[str, str]]
-    ):
-        """Derived VM Handler class with missing function implementation for
-        extract_request_message_vm_id_and_signature function.
-        """
-
-        REQUIRE_PAYLOAD_CSRF_CHECK = False
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'vm_id': {'schema': {'type': 'basestring'}},
-                'signature': {'schema': {'type': 'basestring'}},
-                'message': {'schema': {'type': 'basestring'}},
-            }
-        }
-
-        @acl_decorators.is_from_oppia_ml
-        def post(self) -> None:
-            return self.render_json({})
-
-    class CorrectMockVMHandler(
-        base.OppiaMLVMHandler[
-            CorrectMockVMHandlerNormalizedPayloadDict,
-            Dict[str, str]
-        ]
-    ):
-        """Derived VM Handler class with
-        extract_request_message_vm_id_and_signature function implementation.
-        """
-
-        REQUIRE_PAYLOAD_CSRF_CHECK = False
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'vm_id': {'schema': {'type': 'basestring'}},
-                'signature': {'schema': {'type': 'basestring'}},
-                'message': {'schema': {'type': 'basestring'}},
-            }
-        }
-
-        def extract_request_message_vm_id_and_signature(
-            self
-        ) -> classifier_domain.OppiaMLAuthInfo:
-            """Returns the message, vm_id and signature retrieved from the
-            incoming requests.
-            """
-            assert self.normalized_payload is not None
-            signature = self.normalized_payload['signature']
-            vm_id = self.normalized_payload['vm_id']
-            message = self.normalized_payload['message']
-            return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
-
-        @acl_decorators.is_from_oppia_ml
-        def post(self) -> None:
-            self.render_json({'job_id': 'new_job'})
-
-    def setUp(self) -> None:
-        super(OppiaMLVMHandlerTests, self).setUp()
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
-            webapp2.Route('/incorrectmock', self.IncorrectMockVMHandler),
-            webapp2.Route('/correctmock', self.CorrectMockVMHandler)],
-            debug=feconf.DEBUG,
-        ))
-
-    def test_that_incorrect_derived_class_raises_exception(self) -> None:
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.post_json(
-                '/incorrectmock', payload, expected_status_int=500)
-
-    def test_that_correct_derived_class_does_not_raise_exception(self) -> None:
-        def _mock_get_secret(name: str) -> Optional[str]:
-            if name == 'VM_ID':
-                return 'vm_default'
-            elif name == 'SHARED_SECRET_KEY':
-                return '1a2b3c4e'
-            return None
-        swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            _mock_get_secret,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
-            self.post_json(
-                '/correctmock', payload, expected_status_int=200)
 
 
 class SchemaValidationIntegrationTests(test_utils.GenericTestBase):

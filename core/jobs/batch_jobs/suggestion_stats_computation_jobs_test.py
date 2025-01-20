@@ -712,65 +712,69 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
     def test_creates_multiple_stats_models_from_multiple_users(
         self
     ) -> None:
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
-        first_suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'unicode'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_ACCEPTED,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1,
-            final_reviewer_id='reviewer1'
-        )
-        first_suggestion_model.update_timestamps()
-        first_suggestion_model.put()
+        # Define a fixed datetime.
+        mocked_now = datetime.datetime(2024, 10, 28)
 
-        second_suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_2,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'unicode'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_ACCEPTED,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1,
-            final_reviewer_id='reviewer1'
-        )
-        second_suggestion_model.update_timestamps()
-        second_suggestion_model.put()
+        with self.mock_datetime_utcnow(mocked_now):
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
+            first_suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'unicode'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_ACCEPTED,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                final_reviewer_id='reviewer1'
+            )
+            first_suggestion_model.update_timestamps()
+            first_suggestion_model.put()
+
+            second_suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_2,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'unicode'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_ACCEPTED,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                final_reviewer_id='reviewer1'
+            )
+            second_suggestion_model.update_timestamps()
+            second_suggestion_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -879,11 +883,11 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_review_stats_model.accepted_translation_word_count, 6)
         self.assertEqual(
             translation_review_stats_model.first_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
         self.assertEqual(
             translation_review_stats_model.last_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
 
     def _create_valid_question_data(

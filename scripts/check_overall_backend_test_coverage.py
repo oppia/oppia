@@ -27,10 +27,15 @@ from scripts import common
 def main() -> None:
     """Checks if backend overall line coverage is 100%."""
     env = os.environ.copy()
+
+    # See the "Report" section at
+    # https://coverage.readthedocs.io/en/latest/cmd.html
+    # for what each of the options mean.
     cmd = [
         sys.executable, '-m', 'coverage', 'report',
         '--omit="%s*","third_party/*","/usr/share/*"'
-        % common.OPPIA_TOOLS_DIR, '--show-missing']
+        % common.OPPIA_TOOLS_DIR, '--show-missing',
+        '--skip-covered', '--skip-empty']
     process = subprocess.run(
         cmd, capture_output=True, encoding='utf-8', env=env,
         check=False)

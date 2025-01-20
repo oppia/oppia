@@ -50,8 +50,8 @@ def create_directory(directory_path: str) -> None:
 # if it does not match the expected prefix.
 def test_python_version() -> None:
     running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
-    if running_python_version != '3.8.15':
-        print('Please use Python 3.8.15. Exiting...')
+    if running_python_version != '3.9.20':
+        print('Please use Python 3.9.20. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():
@@ -68,23 +68,6 @@ def test_python_version() -> None:
                 'pythonpath-in-windows-7'])
         # Exit when no suitable Python environment can be found.
         raise Exception('No suitable python version found.')
-
-    # Verify that Python 2 is available. Python 2 is needed for the
-    # app_devserver. See the Google Cloud docs:
-    # https://cloud.google.com/appengine/docs/standard/python3/testing-and-deploying-your-app#local-dev-server
-    return_code = subprocess.call(
-        'python2 -V', stderr=subprocess.DEVNULL, shell=True
-    )
-    if return_code != 0:
-        print(
-            '\033[91m'
-            'The Oppia server needs Python 2 to be installed. '
-            'Please follow the instructions at '
-            'https://github.com/oppia/oppia/wiki/Troubleshooting#'
-            'python-2-is-not-available to fix this.'
-            '\033[0m'
-        )
-        sys.exit(1)
 
 
 def download_and_install_package(url_to_retrieve: str, filename: str) -> None:

@@ -748,48 +748,6 @@ describe('Admin backend api service', () => {
   });
 
   // Test cases for Admin Misc Tab.
-  it(
-    'should change the status of chapters of length and measurement' +
-      ' topic to "Published" when calling publishChaptersAsync',
-    fakeAsync(() => {
-      abas.publishChaptersAsync().then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne('/adminhandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(200);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should fail to change the status of chapters of length and measurement' +
-      ' topic to "Published" when calling publishChaptersAsync',
-    fakeAsync(() => {
-      abas.publishChaptersAsync().then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne('/adminhandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(
-        {
-          error: 'Failed to publish chapters of length and measurement topic.',
-        },
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
-        }
-      );
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Failed to publish chapters of length and measurement topic.'
-      );
-    })
-  );
-
   it('should clear search index when calling clearSearchIndexAsync', fakeAsync(() => {
     abas.clearSearchIndexAsync().then(successHandler, failHandler);
 

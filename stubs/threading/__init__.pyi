@@ -34,9 +34,8 @@ if sys.version_info >= (3, 10):
     def getprofile() -> Optional[ProfileFunction]: ...
     __all__ += ["getprofile", "gettrace"]
 
-if sys.version_info >= (3, 8):
-    from _thread import get_native_id as get_native_id
-    __all__ += ["ExceptHookArgs", "excepthook", "get_native_id"]
+from _thread import get_native_id as get_native_id
+__all__ += ["ExceptHookArgs", "excepthook", "get_native_id"]
 
 ProfileFunction = Callable[..., Any]
 TraceFunction = Callable[..., Any]
@@ -80,13 +79,9 @@ class Thread:
     def start(self) -> None: ...
     def run(self) -> None: ...
     def join(self, timeout: Optional[float] = ...) -> None: ...
-    if sys.version_info >= (3, 8):
-        @property
-        def native_id(self) -> Optional[int]: ...  # only available on some platforms
-
+    @property
+    def native_id(self) -> Optional[int]: ...  # only available on some platforms
     def is_alive(self) -> bool: ...
-    if sys.version_info < (3, 9):
-        def isAlive(self) -> bool: ...
 
 class _DummyThread(Thread):
     def __init__(self) -> None: ...
@@ -153,10 +148,7 @@ class Semaphore:
     def __enter__(
         self, blocking: bool = ..., timeout: Optional[float] = ...
     ) -> bool: ...
-    if sys.version_info >= (3, 9):
-        def release(self, n: int = ...) -> None: ...
-    else:
-        def release(self) -> None: ...
+    def release(self, n: int = ...) -> None: ...
 
 class BoundedSemaphore(Semaphore): ...
 
@@ -167,11 +159,10 @@ class Event:
     def clear(self) -> None: ...
     def wait(self, timeout: Optional[float] = ...) -> bool: ...
 
-if sys.version_info >= (3, 8):
-    from _thread import _excepthook, _ExceptHookArgs
+from _thread import _excepthook, _ExceptHookArgs
 
-    excepthook = _excepthook
-    ExceptHookArgs = _ExceptHookArgs
+excepthook = _excepthook
+ExceptHookArgs = _ExceptHookArgs
 
 class Timer(Thread):
     args: Iterable[Any]

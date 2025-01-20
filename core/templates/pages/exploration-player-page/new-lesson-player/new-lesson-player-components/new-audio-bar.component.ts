@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import './new-audio-bar.component.css';
 
 @Component({
@@ -26,10 +25,3 @@ import './new-audio-bar.component.css';
   styleUrls: ['./new-audio-bar.component.css'],
 })
 export class NewAudioBarComponent {}
-
-angular.module('oppia').directive(
-  'oppiaNewAudioBar',
-  downgradeComponent({
-    component: NewAudioBarComponent,
-  }) as angular.IDirectiveFactory
-);

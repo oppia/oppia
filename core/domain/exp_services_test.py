@@ -29,7 +29,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -58,9 +57,7 @@ from core.platform import models
 from core.tests import test_utils
 from extensions import domain
 
-from typing import (
-    Dict, Final, List, Optional, Sequence, Tuple, Type, Union, cast
-)
+from typing import Dict, Final, List, Optional, Sequence, Type, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -156,154 +153,6 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.user_id_admin)
-
-
-class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
-    """Test that classifier models are correctly mapped when an exploration
-    is reverted.
-    """
-
-    def test_raises_key_error_for_invalid_id(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'tes_exp_id', title='some title', category='Algebra',
-            language_code=constants.DEFAULT_LANGUAGE_CODE
-        )
-        exploration.objective = 'An objective'
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
-        self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], 'NumericInput',
-            content_id_generator
-        )
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-        interaction_answer_groups = [{
-            'rule_specs': [{
-                    'inputs': {
-                        'x': 60
-                    },
-                    'rule_type': 'IsLessThanOrEqualTo'
-            }],
-            'outcome': {
-                'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                'dest_if_really_stuck': None,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Try again</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': ['answer1', 'answer2', 'answer3'],
-            'tagged_skill_misconception_id': None
-        }]
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            'new_value': interaction_answer_groups
-        })]
-        with self.assertRaisesRegex(
-            Exception,
-            'No classifier algorithm found for NumericInput interaction'
-        ):
-            with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-                with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
-                    with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                        exp_services.update_exploration(
-                            self.owner_id, 'tes_exp_id', change_list, '')
-
-    def test_reverting_an_exploration_maintains_classifier_models(self) -> None:
-        """Test that when exploration is reverted to previous version
-        it maintains appropriate classifier models mapping.
-        """
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            self.save_new_valid_exploration(
-                self.EXP_0_ID, self.owner_id, title='Bridges in England',
-                category='Architecture', language_code='en')
-
-        interaction_answer_groups: List[state_domain.AnswerGroupDict] = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_3',
-                        'normalizedStrSet': ['abc']
-                    }
-                },
-            }],
-            'outcome': {
-                'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                'dest_if_really_stuck': None,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Try again</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': ['answer1', 'answer2', 'answer3'],
-            'tagged_skill_misconception_id': None
-        }]
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            'new_value': interaction_answer_groups
-        })]
-
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.update_exploration(
-                        self.owner_id, self.EXP_0_ID, change_list, '')
-
-        exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        interaction_id = exp.states[
-            feconf.DEFAULT_INIT_STATE_NAME].interaction.id
-        # Ruling out the possibility of None for mypy type checking.
-        assert interaction_id is not None
-        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
-            interaction_id]['algorithm_id']
-        job = classifier_services.get_classifier_training_job(
-            self.EXP_0_ID, exp.version, feconf.DEFAULT_INIT_STATE_NAME,
-            algorithm_id)
-        self.assertIsNotNone(job)
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'A new title'
-        })]
-
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.update_exploration(
-                        self.owner_id, self.EXP_0_ID, change_list, '')
-
-                    exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-                    # Revert exploration to previous version.
-                    exp_services.revert_exploration(
-                        self.owner_id, self.EXP_0_ID, exp.version,
-                        exp.version - 1)
-
-        new_job = classifier_services.get_classifier_training_job(
-            self.EXP_0_ID, exp.version, feconf.DEFAULT_INIT_STATE_NAME,
-            algorithm_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert new_job is not None
-        assert job is not None
-        self.assertEqual(job.job_id, new_job.job_id)
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
@@ -1134,23 +983,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'This state does not have any interaction specified.'
             ):
             exploration.validate(strict=True)
-
-    def test_save_new_exploration_with_ml_classifiers(self) -> None:
-        exploration_id = 'eid'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[Tuple[str, bytes]] = []
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-                assets_list)
-
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        state_with_training_data = exploration.states['Home']
-        self.assertIsNotNone(
-            state_with_training_data)
-        self.assertEqual(len(state_with_training_data.to_dict()), 9)
 
     def test_save_and_retrieve_exploration(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)

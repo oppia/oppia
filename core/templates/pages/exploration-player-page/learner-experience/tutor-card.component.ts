@@ -23,7 +23,6 @@ import {
   ViewChild,
   Renderer2,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
@@ -509,10 +508,3 @@ export class TutorCardComponent {
     return 'input-response-pair-' + index;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTutorCard',
-  downgradeComponent({
-    component: TutorCardComponent,
-  }) as angular.IDirectiveFactory
-);

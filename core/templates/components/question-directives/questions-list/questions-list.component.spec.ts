@@ -461,34 +461,36 @@ describe('Questions List Component', () => {
     expect(component.getQuestionIndex(1)).toBe(52);
   });
 
-  it('should fetch question summaries on moving to next page', () => {
+  it('should fetch question summaries and use them on moving to next page', done => {
     component.selectedSkillId = 'skillId1';
     spyOn(questionsListService, 'incrementPageNumber');
-    spyOn(questionsListService, 'getQuestionSummariesAsync');
+    spyOn(questionsListService, 'getQuestionSummariesAsync').and.resolveTo();
+    spyOn(questionsListService, 'getCachedQuestionSummaries');
 
     component.goToNextPage();
 
-    expect(questionsListService.incrementPageNumber).toHaveBeenCalled();
-    expect(questionsListService.getQuestionSummariesAsync).toHaveBeenCalledWith(
-      'skillId1',
-      true,
-      false
-    );
+    // Since goToNextPage calls an async function but is not async itself, we need to let that call finish.
+    setTimeout(() => {
+      expect(questionsListService.incrementPageNumber).toHaveBeenCalled();
+      expect(
+        questionsListService.getQuestionSummariesAsync
+      ).toHaveBeenCalledWith('skillId1', true, false);
+      expect(
+        questionsListService.getCachedQuestionSummaries
+      ).toHaveBeenCalled();
+      done();
+    });
   });
 
-  it('should fetch question summaries on moving to previous page', () => {
+  it('should use cached question summaries on moving to previous page', () => {
     component.selectedSkillId = 'skillId1';
     spyOn(questionsListService, 'decrementPageNumber');
-    spyOn(questionsListService, 'getQuestionSummariesAsync');
+    spyOn(questionsListService, 'getCachedQuestionSummaries');
 
     component.goToPreviousPage();
 
     expect(questionsListService.decrementPageNumber).toHaveBeenCalled();
-    expect(questionsListService.getQuestionSummariesAsync).toHaveBeenCalledWith(
-      'skillId1',
-      false,
-      false
-    );
+    expect(questionsListService.getCachedQuestionSummaries).toHaveBeenCalled();
   });
 
   it(

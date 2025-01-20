@@ -256,7 +256,6 @@ class AdminHandler(
                         'generate_dummy_explorations',
                         'generate_dummy_translation_opportunities',
                         'clear_search_index',
-                        'publish_chapters_of_length_and_measurement_topic',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
@@ -525,11 +524,6 @@ class AdminHandler(
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
                 search_services.clear_blog_post_summaries_search_index()
-            elif action == 'publish_chapters_of_length_and_measurement_topic':
-                # This is the real topic_id and story_id
-                # of the length and measurement topic.
-                topic_services.publish_story(
-                    'bdO7c687WBBW', 'OVJ4RdjxbcAf', self.user_id)
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':
@@ -2184,9 +2178,7 @@ class AdminSuperAdminPrivilegesHandler(
             NotFoundException. No such user exists.
         """
         assert self.normalized_payload is not None
-        if self.email != parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
-        ):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
         username = self.normalized_payload['username']
@@ -2210,9 +2202,7 @@ class AdminSuperAdminPrivilegesHandler(
                 super admin account.
         """
         assert self.normalized_request is not None
-        admin_email_address = parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
-        if self.email != admin_email_address:
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
         username = self.normalized_request['username']
@@ -2221,7 +2211,7 @@ class AdminSuperAdminPrivilegesHandler(
         if user_settings is None:
             raise self.NotFoundException('No such user exists')
 
-        if user_settings.email == admin_email_address:
+        if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
             raise self.InvalidInputException(
                 'Cannot revoke privileges from the default super admin account')
 

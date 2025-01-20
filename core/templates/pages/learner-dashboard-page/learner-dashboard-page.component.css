@@ -312,6 +312,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 
 
 .oppia-learner-dash-container {
+  background-color: #f2f4f7;
   padding: 0 16px;
 }
 
@@ -467,11 +468,14 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 }
 
 .oppia-learner-dash-button-sm {
+  align-items: center;
   border: 1px solid;
   border-radius: 4px;
+  display: inline-flex;
   font-size: 14px;
   font-weight: 500;
   height: 36px;
+  justify-content: center;
   padding: 10px 8px;
   text-decoration: none;
   transition: all 300ms ease-out;

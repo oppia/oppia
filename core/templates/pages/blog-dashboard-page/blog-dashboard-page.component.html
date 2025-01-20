@@ -64,14 +64,16 @@
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
             <button mat-icon-button
                     (click)="activeView = 'gridView'"
-                    class="e2e-test-tiles-view-button">
+                    class="e2e-test-tiles-view-button"
+                    aria-label="Switch to tiles view">
               <i [ngClass]="{'view-active': activeView === 'gridView'}"
                  class="fas fa-border-all blog-dashboard-grid-list-icon">
               </i>
             </button>
             <button mat-icon-button
                     (click)="activeView = 'listView'"
-                    class="e2e-test-list-view-button">
+                    class="e2e-test-list-view-button"
+                    aria-label="Switch to list view">
               <i [ngClass]="{'view-active': activeView === 'listView'}"
                  class="fas fa-list blog-dashboard-grid-list-icon">
               </i>

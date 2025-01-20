@@ -83,7 +83,6 @@ EXCLUDED_PATHS: Final = (
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
-    'extensions/classifiers/proto/*',
     'core/tests/puppeteer-acceptance-tests/build/*',
     '.mypy_cache/*',
     'docker/patched_wsgi_server.py',
@@ -193,7 +192,6 @@ BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexpDict] = [
         'excluded_files': (),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
-            'extensions/classifiers/',
             'extensions/objects/',
             'extensions/value_generators/')
     },

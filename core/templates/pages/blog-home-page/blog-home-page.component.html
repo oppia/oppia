@@ -113,14 +113,11 @@
               <input type="text"
                      class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
-                     (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
-                     [ngModelOptions]="{ updateOn: 'blur', standalone: 'true' }"
+                     [ngModelOptions]="{ updateOn: 'change', standalone: 'true' }"
                      aria-label="Search bar"
-                     (keydown.enter)="$event.target.blur()"
-                     (input)="searchToBeExec($event)">
+                     (keydown.enter)="onSearchQueryChangeExec()">
               <div class="input-group oppia-input-group">
-                <div class="input-group-addon oppia-search-bar-icon"
-                     [ngClass]="{'d-block': isSmallScreenViewActive()}">
+                <div class="input-group-addon oppia-search-bar-icon" [ngClass]="{'d-block': isSmallScreenViewActive()}">
                   <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">
                   </i>
                   <span *ngIf="isSearchInProgress()">
@@ -131,14 +128,15 @@
             </div>
           </form>
           <h4 class="d-flex flex-grow-1 search-heading">
-            {{ 'I18N_BLOG_HOME_PAGE_TAGS_SEARCH_HEADING' | translate }}
+          {{ 'I18N_BLOG_HOME_PAGE_TAGS_SEARCH_HEADING' | translate }}
           </h4>
-          <oppia-tag-filter *ngIf="listOfDefaultTags.length > 0"
-                            [(listOfDefaultTags)]="listOfDefaultTags"
-                            [(selectedTags)]="selectedTags"
-                            [smallScreenViewIsActive]="isSmallScreenViewActive()"
-                            (selectionsChange)="onSearchQueryChangeExec()">
+          <oppia-tag-filter *ngIf="listOfDefaultTags.length > 0" [(listOfDefaultTags)]="listOfDefaultTags"
+          [(selectedTags)]="selectedTags" [smallScreenViewIsActive]="isSmallScreenViewActive()"
+          >
           </oppia-tag-filter>
+          <button class="btn primary-button" (click)="onSearchQueryChangeExec()">
+            <span>Search</span>
+          </button>
         </div>
       </div>
     </div>

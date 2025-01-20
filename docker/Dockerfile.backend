@@ -1,17 +1,16 @@
-# Added platform flag here because -- https://stackoverflow.com/questions/71040681/qemu-x86-64-could-not-open-lib64-ld-linux-x86-64-so-2-no-such-file-or-direc
-FROM --platform=linux/amd64 python:3.8.17-slim-buster AS backend
+# The platform flag is added because of https://stackoverflow.com/a/71611002
+FROM --platform=linux/amd64 python:3.9.20-bullseye AS backend
 
 ENV OPPIA_IS_DOCKERIZED="true"
 
 WORKDIR /
 
-# Installing the pre-requisites libs and dependencies
+# Installing prerequisite libs and dependencies.
 RUN apt-get update -y && apt-get upgrade -y \
     curl \
     git \
     npm \
     openjdk-11-jre \
-    python2 \
     python3-matplotlib \
     unzip \
     wget \
@@ -28,8 +27,8 @@ RUN pip install pip-tools==6.6.2 setuptools==58.5.3 cmake
 
 WORKDIR /app/vm_deps
 
-# Installing google cloud sdk
-RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz && \
+# Installing Google Cloud SDK
+RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-500.0.0-linux-x86_64.tar.gz && \
     tar -xzf gcloud-sdk.tar.gz && \
     ./google-cloud-sdk/install.sh --quiet && \
     ./google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras && \
@@ -39,32 +38,9 @@ RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/cha
 WORKDIR /app
 RUN curl -L https://github.com/remko/dsadmin/releases/download/v0.20.0/dsadmin-v0.20.0-linux-amd64.tar.gz | tar -xzvf -
 
-
 WORKDIR /app/oppia
 
-ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
-    PROTOC_LINUX_FILE='protoc-3.13.0-linux-x86_64.zip' \
-    BUF_DIR='/app/vm_deps/buf-0.29.0' \
-    PROTOC_DIR='/app/vm_deps/buf-0.29.0/protoc' \
-    BUF_BASE_URL='https://github.com/bufbuild/buf/releases/download/v0.29.0/' \
-    PROTOC_URL='https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0' \
-    PROTOC_FILES_PATH='/app/oppia/third_party/oppia-ml-proto-0.0.0'
-
-RUN npm install protoc-gen-ts@0.3.4 google-protobuf@3.13.0 typescript@4.1.6
-
-# Download BUF_LINUX_FILES and PROTOC_LINUX_FILE
-RUN wget -P $BUF_DIR $PROTOC_URL/$PROTOC_LINUX_FILE
-RUN unzip $BUF_DIR/$PROTOC_LINUX_FILE -d $PROTOC_DIR \
-    && rm $BUF_DIR/$PROTOC_LINUX_FILE
-# Set the shell as /bin/bash explicitly. This is required to make use of the array syntax correctly
-SHELL ["/bin/bash", "-c"]
-RUN IFS=' ' read -ra BUF_FILES <<< "$BUF_LINUX_FILES"; \
-    for bin_file in "${BUF_FILES[@]}"; do \
-        wget -P $BUF_DIR $BUF_BASE_URL/$bin_file; \
-    done
-
-RUN chmod -R 744 $BUF_DIR \
-    && chmod -R 744 $PROTOC_DIR
+RUN npm install typescript@4.1.6
 
 # Installing python dependencies from the requirements_dev.txt file
 COPY requirements.txt .
@@ -78,29 +54,12 @@ RUN pip download --no-deps -r requirements.txt -d /root/.cache
 RUN pip download --no-deps -r requirements_dev.txt -d /root/.cache
 RUN pip download -r mypy_requirements.txt -d /root/.cache
 
-# Installing buf and proto for Linux -- this docker container is based on Linux
-COPY buf.gen.yaml .
-COPY /extensions/classifiers/proto/ ./extensions/classifiers/proto/
-
 # Installing third party dependencies
 COPY scripts/install_dependencies_json_packages.py ./scripts/install_dependencies_json_packages.py
 COPY dependencies.json .
 
-# Installation for proto buf requires the third party dependencies to be installed (oppia-ml-proto)
-# This also downloads frontend dependencies, which should be removed once the dependencies.json is deprecated
+# This script downloads frontend dependencies, which should be removed once the dependencies.json file is deprecated.
 RUN python -m scripts.install_dependencies_json_packages
-
-# Compiling the protobuf files
-RUN mkdir /app/oppia/proto_files
-RUN /app/vm_deps/buf-0.29.0/protoc/bin/protoc \
-    --plugin=protoc-gen-ts=/app/oppia/node_modules/.bin/protoc-gen-ts \
-    --ts_out=/app/oppia/extensions/classifiers/proto/ \
-    --js_out=import_style=commonjs,binary:/app/oppia/extensions/classifiers/proto/ \
-    --python_out=/app/oppia/proto_files \
-    --proto_path=$PROTOC_FILES_PATH \
-    $PROTOC_FILES_PATH/*.proto
-
-RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import text_classifier_pb2 as text__classifier__pb2/' /app/oppia/proto_files/training_job_response_payload_pb2.py
 
 # Mark /app/oppia as a safe directory for Git operations to work properly in tests.
 RUN git config --global --add safe.directory /app/oppia

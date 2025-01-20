@@ -40,7 +40,8 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         self.cmd = [
             sys.executable, '-m', 'coverage', 'report',
             '--omit="%s*","third_party/*","/usr/share/*"'
-            % common.OPPIA_TOOLS_DIR, '--show-missing']
+            % common.OPPIA_TOOLS_DIR, '--show-missing',
+            '--skip-covered', '--skip-empty']
 
     def test_no_data_in_coverage_report_throws_error(self) -> None:
         class MockProcess:

@@ -28,7 +28,6 @@ import {
   ChangeDetectorRef,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -211,10 +210,3 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
     return null;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSupplementalCard',
-  downgradeComponent({
-    component: SupplementalCardComponent,
-  }) as angular.IDirectiveFactory
-);

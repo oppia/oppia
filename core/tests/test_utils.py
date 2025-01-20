@@ -25,6 +25,7 @@ import copy
 import datetime
 import functools
 import inspect
+import io
 import itertools
 import json
 import logging
@@ -33,7 +34,6 @@ import os
 import random
 import re
 import string
-from types import TracebackType
 import unittest
 
 from core import feature_flag_list
@@ -45,7 +45,6 @@ from core.controllers import base
 from core.domain import auth_domain
 from core.domain import blog_services
 from core.domain import caching_domain
-from core.domain import classifier_domain
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import collection_domain
@@ -55,7 +54,6 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_services
-from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import object_registry
 from core.domain import param_domain
@@ -81,15 +79,14 @@ from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
-from proto_files import text_classifier_pb2
 from scripts import common
 
 import elasticsearch
 import requests_mock
 from typing import (
-    IO, Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
-    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set, Tuple,
-    Type, TypedDict, TypeVar, Union, cast, overload
+    Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
+    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set,
+    Tuple, Type, TypedDict, TypeVar, Union, cast, overload
 )
 import webapp2
 import webtest
@@ -1505,93 +1502,24 @@ class TestBase(unittest.TestCase):
         """
         captured_logs: List[str] = []
 
-        class ListStream(IO[str]):
+        class ListStream(io.StringIO):
             """Stream-like object that appends writes to the captured logs."""
 
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with IO's write().
-            def write(self, msg: str) -> None:  # type: ignore[override]
-                """Appends stripped messages to captured logs."""
+            def write(self, msg: str) -> int:
+                """Appends stripped messages to captured logs.
+
+                Args:
+                    msg: str. The string to be written.
+
+                Returns:
+                    int. The length of the written string in bytes.
+                """
                 captured_logs.append(msg.strip())
+                return len(msg.strip())
 
             def flush(self) -> None:
                 """Does nothing."""
                 pass
-
-            # Here, class ListStream inherits from IO and making an instance
-            # below but due to the absence of some methods MyPy throws an error
-            # that 'Cannot instantiate abstract class 'ListStream' with abstract
-            # attributes'. So, to suppress the error, we defined all the methods
-            # that was present in super class. Since these are just added for
-            # type checking, we don't need to test them and so have excluded
-            # them from the coverage checks.
-            @property
-            def mode(self) -> str:
-                pass  # pragma: no cover
-
-            @property
-            def name(self) -> str:
-                pass  # pragma: no cover
-
-            def close(self) -> None:
-                pass  # pragma: no cover
-
-            @property
-            def closed(self) -> bool:
-                pass  # pragma: no cover
-
-            def fileno(self) -> int:
-                pass  # pragma: no cover
-
-            def isatty(self) -> bool:
-                pass  # pragma: no cover
-
-            def read(self, n: int = -1) -> str:
-                pass  # pragma: no cover
-
-            def readable(self) -> bool:
-                pass  # pragma: no cover
-
-            def readline(self, limit: int = -1) -> str:
-                pass  # pragma: no cover
-
-            def readlines(self, hint: int = -1) -> List[str]:
-                pass  # pragma: no cover
-
-            def seek(self, offset: int, whence: int = 0) -> int:
-                pass  # pragma: no cover
-
-            def seekable(self) -> bool:
-                pass  # pragma: no cover
-
-            def tell(self) -> int:
-                pass  # pragma: no cover
-
-            def truncate(self, size: Optional[int] = None) -> int:
-                pass  # pragma: no cover
-
-            def writable(self) -> bool:
-                pass  # pragma: no cover
-
-            def writelines(self, lines: Iterable[str]) -> None:
-                pass  # pragma: no cover
-
-            def __enter__(self) -> IO[str]:
-                pass  # pragma: no cover
-
-            def __exit__(
-                self,
-                type: Optional[Type[BaseException]], # pylint: disable=redefined-builtin
-                value: Optional[BaseException],
-                traceback: Optional[TracebackType]
-            ) -> None:
-                pass  # pragma: no cover
-
-            def __iter__(self) -> Iterator[str]:
-                pass  # pragma: no cover
-
-            def __next__(self) -> str:
-                pass  # pragma: no cover
 
         list_stream_handler = logging.StreamHandler(ListStream())
 
@@ -2158,6 +2086,58 @@ class AppEngineTestBase(TestBase):
         """
         raise Exception('Please mock this method in the test.')
 
+    @contextlib.contextmanager
+    def mock_datetime_utcnow(
+        self, mocked_now: datetime.datetime
+    ) -> Iterator[None]:
+        """Mocks parts of the datastore to accept a fake datetime type that
+        always returns the same value for utcnow.
+
+        Example:
+            import datetime
+            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            with mock_datetime_utcnow(mocked_now):
+                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+            actual_now = datetime.datetime.utcnow() # Returns actual time.
+
+        Args:
+            mocked_now: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
+
+        Yields:
+            None. Empty yield statement.
+
+        Raises:
+            Exception. Given argument is not a datetime.
+        """
+        if not isinstance(mocked_now, datetime.datetime):
+            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
+
+        old_datetime = datetime.datetime
+
+        class MockDatetimeType(type):
+            """Overrides isinstance() behavior."""
+
+            @classmethod
+            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
+                return isinstance(instance, old_datetime)
+
+        class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
+            """Always returns mocked_now as the current UTC time."""
+
+            # Here we use MyPy ignore because the signature of this
+            # method doesn't match with datetime.datetime's utcnow().
+            @classmethod
+            def utcnow(cls) -> datetime.datetime:  # type: ignore[override]
+                """Returns the mocked datetime."""
+                return mocked_now
+
+        setattr(datetime, 'datetime', MockDatetime)
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', old_datetime)
+
 
 class GenericTestBase(AppEngineTestBase):
     """Base test class with common/generic helper methods.
@@ -2592,58 +2572,6 @@ version: 1
         os.environ['USER_ID'] = ''
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
-
-    @contextlib.contextmanager
-    def mock_datetime_utcnow(
-        self, mocked_now: datetime.datetime
-    ) -> Iterator[None]:
-        """Mocks parts of the datastore to accept a fake datetime type that
-        always returns the same value for utcnow.
-
-        Example:
-            import datetime
-            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-            with mock_datetime_utcnow(mocked_now):
-                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
-            actual_now = datetime.datetime.utcnow() # Returns actual time.
-
-        Args:
-            mocked_now: datetime.datetime. The datetime which will be used
-                instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
-
-        Raises:
-            Exception. Given argument is not a datetime.
-        """
-        if not isinstance(mocked_now, datetime.datetime):
-            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
-
-        old_datetime = datetime.datetime
-
-        class MockDatetimeType(type):
-            """Overrides isinstance() behavior."""
-
-            @classmethod
-            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
-                return isinstance(instance, old_datetime)
-
-        class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
-            """Always returns mocked_now as the current UTC time."""
-
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with datetime.datetime's utcnow().
-            @classmethod
-            def utcnow(cls) -> datetime.datetime:  # type: ignore[override]
-                """Returns the mocked datetime."""
-                return mocked_now
-
-        setattr(datetime, 'datetime', MockDatetime)
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', old_datetime)
 
     @contextlib.contextmanager
     def login_context(
@@ -4548,90 +4476,6 @@ class GenericEmailTestBase(GenericTestBase):
 
 
 EmailTestBase = GenericEmailTestBase
-
-
-class ClassifierTestBase(GenericEmailTestBase):
-    """Base class for classifier test classes that need common functions
-    for related to reading classifier data and mocking the flow of the
-    storing the trained models through post request.
-
-    This class is derived from GenericEmailTestBase because the
-    TrainedClassifierHandlerTests test suite requires email services test
-    functions in addition to the classifier functions defined below.
-    """
-
-    # Here we use type Any because method 'post_blob' can return a JSON
-    # dict which can contain different types of values. So, to allow every
-    # type of value we used Any here.
-    def post_blob(
-        self, url: str, payload: bytes, expected_status_int: int = 200
-    ) -> Dict[str, Any]:
-        """Post a BLOB object to the server; return the received object.
-
-        Note that this method should only be used for
-        classifier.TrainedClassifierHandler handler and for no one else. The
-        reason being, we don't have any general mechanism for security for
-        transferring binary data. TrainedClassifierHandler implements a
-        specific mechanism which is restricted to the handler.
-
-        Args:
-            url: str. The URL to which BLOB object in payload should be sent
-                through a post request.
-            payload: bytes. Binary data which needs to be sent.
-            expected_status_int: int. The status expected as a response of post
-                request.
-
-        Returns:
-            dict. Parsed JSON response received upon invoking the post request.
-        """
-        data = payload
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-        response = self._send_post_request(
-            self.testapp, url, data,
-            expect_errors, expected_status_int=expected_status_int,
-            headers={'content-type': 'application/octet-stream'})
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-
-        self.assertEqual(response.status_int, expected_status_int)
-        # Here we use type Any because the 'result' is a JSON result dict
-        # that can contain different types of values. So, to allow every type
-        # of value we used Any here.
-        result: Dict[str, Any] = self._parse_json_response(
-            response,
-            expect_errors
-        )
-        return result
-
-    def _get_classifier_data_from_classifier_training_job(
-        self, classifier_training_job: classifier_domain.ClassifierTrainingJob
-    ) -> text_classifier_pb2.TextClassifierFrozenModel:
-        """Retrieves classifier training job from GCS using metadata stored in
-        classifier_training_job.
-
-        Args:
-            classifier_training_job: ClassifierTrainingJob. Domain object
-                containing metadata of the training job which is used to
-                retrieve the trained model.
-
-        Returns:
-            FrozenModel. Protobuf object containing classifier data.
-        """
-        filename = classifier_training_job.classifier_data_filename
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id)
-        classifier_data = utils.decompress_from_zlib(fs.get(filename))
-        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
-        classifier_data_proto.ParseFromString(classifier_data)
-        return classifier_data_proto
 
 
 class FunctionWrapper:

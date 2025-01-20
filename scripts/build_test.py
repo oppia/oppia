@@ -667,7 +667,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(always_rebuilt_filepaths), sorted(
                 ['base.py', 'CodeRepl.py', '__init__.py', 'some_file.js',
-                 'DragAndDropSortInput.py', 'code_repl_prediction.html']))
+                 'DragAndDropSortInput.py', 'randomfile.html']))
         self.assertGreater(len(always_rebuilt_filepaths), 0)
 
         # Test that 'some_file.js' is not rebuilt, i.e it is built for the first

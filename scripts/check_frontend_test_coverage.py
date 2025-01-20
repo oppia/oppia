@@ -43,7 +43,6 @@ LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 EXCLUDED_DIRECTORIES = [
     'node_modules/*',
-    'extensions/classifiers/proto/*'
 ]
 
 # Contains the name of all files that is not 100% coverage.
@@ -86,7 +85,6 @@ NOT_FULLY_COVERED_FILENAMES = [
         'translation-file-hash-loader-backend-api.service.ts',
     # Please don't try to cover unit-test-utils.ajs.ts file.
     'core/templates/tests/unit-test-utils.ajs.ts',
-    'extensions/classifiers/python-program.tokenizer.ts',
     'extensions/interactions/MusicNotesInput/directives/'
         'oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/'

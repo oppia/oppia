@@ -18,7 +18,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {Subscription} from 'rxjs';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -438,10 +437,3 @@ export class AudioBarComponent {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAudioBar',
-  downgradeComponent({
-    component: AudioBarComponent,
-  }) as angular.IDirectiveFactory
-);

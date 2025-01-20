@@ -59,6 +59,9 @@ class FeatureNames(enum.Enum):
         'exploration_editor_can_tag_misconceptions')
     ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
     REDESIGNED_TOPIC_VIEWER_PAGE = 'redesigned_topic_viewer_page'
+    AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP = (
+        'automatic_voiceover_regeneration_from_exp')
+    LABEL_ACCENT_TO_VOICE_ARTIST = 'label_accent_to_voice_artist'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -84,7 +87,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -94,8 +98,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
-    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
-    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
 ]
 
@@ -111,6 +113,9 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.DIAGNOSTIC_TEST,
+    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
+    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
+    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -240,7 +245,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to promptly update '
             'translations of content they are editing in the exploration '
             'editor page.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
@@ -248,7 +253,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to view a list of '
             'misconceptions and tag answer groups with misconceptions '
             'for a curated exploration.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
@@ -263,6 +268,20 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
             feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
+        (
+            'The flag enables the automatic regeneration of voiceovers '
+            'directly from the exploration editor page.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST.value: (
+        (
+            'The flag enables the voice artist accent labeling feature '
+            'on the voiceover admin page.',
+            feature_flag_domain.ServerMode.PROD
         )
     )
 }

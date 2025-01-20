@@ -34,7 +34,6 @@ import time
 import unicodedata
 import urllib.parse
 import urllib.request
-import zlib
 
 from core import feconf
 from core.constants import constants
@@ -1267,30 +1266,6 @@ def get_hashable_value(value: Any) -> Any:
             (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
-
-
-def compress_to_zlib(data: bytes) -> bytes:
-    """Compress the data to zlib format for efficient storage and communication.
-
-    Args:
-        data: str. Data to be compressed.
-
-    Returns:
-        str. Compressed data string.
-    """
-    return zlib.compress(data)
-
-
-def decompress_from_zlib(data: bytes) -> bytes:
-    """Decompress the zlib compressed data.
-
-    Args:
-        data: str. Data to be decompressed.
-
-    Returns:
-        str. Decompressed data string.
-    """
-    return zlib.decompress(data)
 
 
 # The mentioned types can be changed in future if they are inadequate to

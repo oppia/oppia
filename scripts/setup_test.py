@@ -122,19 +122,8 @@ class SetupTests(test_utils.GenericTestBase):
         self.cd_swap = self.swap(common, 'CD', MockCD)
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
-        self.version_info_py38_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=8, micro=15)
-        )
-        self.python2_print_swap = self.swap_with_checks(
-            builtins,
-            'print',
-            lambda *x: None,
-            expected_args=[(
-                '\033[91mThe Oppia server needs Python 2 to be installed. '
-                'Please follow the instructions at https://github.com/oppia/'
-                'oppia/wiki/Troubleshooting#python-2-is-not-available to fix '
-                'this.\033[0m',
-            )]
+        self.version_info_py39_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=9, micro=20)
         )
 
     def test_create_directory_tree_with_missing_dir(self) -> None:
@@ -161,7 +150,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertFalse(check_function_calls['makedirs_is_called'])
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py38_swap:
+        with self.version_info_py39_swap:
             setup.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(
@@ -220,13 +209,6 @@ class SetupTests(test_utils.GenericTestBase):
                 'http://docs.python-guide.org/en/latest/starting/install/win/',
                 'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
                 'pythonpath-in-windows-7'])
-
-    def test_python_version_testing_with_python2_wrong_code(self) -> None:
-        check_call_swap = self.swap_to_always_return(subprocess, 'call', 1)
-
-        with self.python2_print_swap, self.version_info_py38_swap:
-            with check_call_swap, self.assertRaisesRegex(SystemExit, '1'):
-                setup.test_python_version()
 
     def test_download_and_install_package(self) -> None:
         check_function_calls = {

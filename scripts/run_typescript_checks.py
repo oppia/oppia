@@ -23,18 +23,12 @@ import shutil
 import subprocess
 import sys
 
+from core import utils
+from scripts import common
 from typing import List, Optional, Sequence
+import yaml
 
-# TODO(#15567): This can be removed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
-from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-from core import utils # isort:skip
-
-import yaml # isort:skip
-
+from . import build
 
 # Contains the name of all files that are not strictly typed.
 # This list must be kept up-to-date; the changes (only remove) should be done
@@ -106,7 +100,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.spec.ts',
     'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.import.ts',
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
-    'core/templates/pages/creator-dashboard-page/creator-dashboard-page.import.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/exploration-editor-tab.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/exploration-editor-tab.component.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component.ts',

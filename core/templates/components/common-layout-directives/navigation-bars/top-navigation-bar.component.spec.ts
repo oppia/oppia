@@ -26,6 +26,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -486,6 +487,24 @@ describe('TopNavigationBarComponent', () => {
     expect(component.truncateNavbar()).toBe(undefined);
     expect(component.checkIfI18NCompleted).not.toHaveBeenCalled();
     expect(document.querySelector).not.toHaveBeenCalled();
+  });
+
+  it('should show logo and language dropdown when component is embedded', () => {
+    expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
+      '/assets/images/logo/288x128_logo_white.webp'
+    );
+    expect(component.getStaticImageUrl('/logo/288x128_logo_white.png')).toBe(
+      '/assets/images/logo/288x128_logo_white.png'
+    );
+
+    component.pageIsIframed = true;
+
+    fixture.detectChanges();
+
+    const languageChangeElement = fixture.debugElement.query(
+      By.css('.oppia-language-dropdown-button')
+    );
+    expect(languageChangeElement).toBeTruthy();
   });
 
   it(

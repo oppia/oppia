@@ -30,7 +30,6 @@ from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import param_domain
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import translation_domain
@@ -3495,132 +3494,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.objective = 'An objective'
 
         exploration.validate(strict=True)
-
-    def test_get_trainable_states_dict(self) -> None:
-        """Test the get_trainable_states_dict() method."""
-        exp_id = 'exp_id1'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[Tuple[str, bytes]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-            assets_list)
-
-        exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True)
-        old_states = exp_fetchers.get_exploration_from_model(
-            exploration_model).states
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-
-        # Rename a state to add it in unchanged answer group.
-        exploration.rename_state('Home', 'Renamed state')
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'rename_state',
-            'old_state_name': 'Home',
-            'new_state_name': 'Renamed state'
-        })]
-
-        expected_dict = {
-            'state_names_with_changed_answer_groups': [],
-            'state_names_with_unchanged_answer_groups': ['Renamed state']
-        }
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        actual_dict = exploration.get_trainable_states_dict(
-            old_states, exp_versions_diff)
-        self.assertEqual(actual_dict, expected_dict)
-
-        # Modify answer groups to trigger change in answer groups.
-        state = exploration.states['Renamed state']
-        exploration.states['Renamed state'].interaction.answer_groups.insert(
-            3, state.interaction.answer_groups[3])
-        answer_groups = []
-        for answer_group in state.interaction.answer_groups:
-            answer_groups.append(answer_group.to_dict())
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'state_name': 'Renamed state',
-            'property_name': 'answer_groups',
-            'new_value': answer_groups
-        })]
-
-        expected_dict = {
-            'state_names_with_changed_answer_groups': ['Renamed state'],
-            'state_names_with_unchanged_answer_groups': []
-        }
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        actual_dict = exploration.get_trainable_states_dict(
-            old_states, exp_versions_diff)
-        self.assertEqual(actual_dict, expected_dict)
-
-        # Add new state to trigger change in answer groups.
-        exploration.add_states(['New state'])
-        exploration.states['New state'] = copy.deepcopy(
-            exploration.states['Renamed state'])
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'add_state',
-            'state_name': 'New state',
-            'content_id_for_state_content': 'content_0',
-            'content_id_for_default_outcome': 'default_outcome_1'
-        })]
-
-        expected_dict = {
-            'state_names_with_changed_answer_groups': [
-                'Renamed state', 'New state'],
-            'state_names_with_unchanged_answer_groups': []
-        }
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        actual_dict = exploration.get_trainable_states_dict(
-            old_states, exp_versions_diff)
-        self.assertEqual(actual_dict, expected_dict)
-
-        # Delete state.
-        exploration.delete_state('New state')
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'delete_state',
-            'state_name': 'New state'
-        })]
-
-        expected_dict = {
-            'state_names_with_changed_answer_groups': ['Renamed state'],
-            'state_names_with_unchanged_answer_groups': []
-        }
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        actual_dict = exploration.get_trainable_states_dict(
-            old_states, exp_versions_diff)
-        self.assertEqual(actual_dict, expected_dict)
-
-        # Test addition and multiple renames.
-        exploration.add_states(['New state'])
-        exploration.states['New state'] = copy.deepcopy(
-            exploration.states['Renamed state'])
-        exploration.rename_state('New state', 'New state2')
-        exploration.rename_state('New state2', 'New state3')
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'add_state',
-            'state_name': 'New state',
-            'content_id_for_state_content': 'content_0',
-            'content_id_for_default_outcome': 'default_outcome_1'
-        }), exp_domain.ExplorationChange({
-            'cmd': 'rename_state',
-            'old_state_name': 'New state',
-            'new_state_name': 'New state2'
-        }), exp_domain.ExplorationChange({
-            'cmd': 'rename_state',
-            'old_state_name': 'New state2',
-            'new_state_name': 'New state3'
-        })]
-
-        expected_dict = {
-            'state_names_with_changed_answer_groups': [
-                'Renamed state', 'New state3'
-            ],
-            'state_names_with_unchanged_answer_groups': []
-        }
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        actual_dict = exploration.get_trainable_states_dict(
-            old_states, exp_versions_diff)
-        self.assertEqual(actual_dict, expected_dict)
 
     def test_get_metadata(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -13175,9 +13048,6 @@ class ExplorationChangesMergeabilityUnitTests(
         self.content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        self.admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-              platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
     def append_next_content_id_index_change(
@@ -18061,25 +17931,14 @@ class ExplorationChangesMergeabilityUnitTests(
         self.assertEqual(changes_are_not_mergeable, False)
 
     @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
-                'testadmin@example.com'
-            ),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
-        ]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_is_sent_to_admin_in_case_of_adding_deleting_state_changes(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        assert isinstance(self.admin_email_address, str)
-        messages = self._get_sent_email_messages(self.admin_email_address)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 0)
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
@@ -18403,31 +18262,20 @@ class ExplorationChangesMergeabilityUnitTests(
             'Backend Version: %s<br><br>'
             'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
         )
-        assert isinstance(self.admin_email_address, str)
-        messages = self._get_sent_email_messages(self.admin_email_address)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].html, expected_email_html_body)
 
     @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
-                'testadmin@example.com'
-            ),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
-        ]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        assert isinstance(self.admin_email_address, str)
-        messages = self._get_sent_email_messages(self.admin_email_address)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 0)
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
@@ -18496,8 +18344,8 @@ class ExplorationChangesMergeabilityUnitTests(
             'Backend Version: %s<br><br>'
             'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
         )
-        assert isinstance(self.admin_email_address, str)
-        messages = self._get_sent_email_messages(self.admin_email_address)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 1)
         self.assertEqual(expected_email_html_body, messages[0].html)
 

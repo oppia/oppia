@@ -45,6 +45,7 @@ import {downgradeComponent} from '@angular/upgrade/static';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {I18nService} from 'i18n/i18n.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
@@ -80,6 +81,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
+  pageIsIframed: boolean = false;
   isSuperAdmin: boolean = false;
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
@@ -181,6 +183,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private windowRef: WindowRef,
+    private urlService: UrlService,
     private focusManagerService: FocusManagerService,
     private platformFeatureService: PlatformFeatureService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
@@ -194,6 +197,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.focusManagerService.setFocus(this.labelForClearingFocus);
     this.userMenuIsShown = this.currentUrl !== this.NAV_MODE_SIGNUP;
     this.inClassroomPage = false;
+    this.pageIsIframed = this.urlService.isIframed();
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
       (languageInfo: LanguageInfo) => {
         return languageInfo;
@@ -463,6 +467,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+
+    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+  }
+
   /**
    * Checks if i18n has been run.
    * If i18n has not yet run, the <a> and <span> tags will have
@@ -552,10 +562,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       NavbarAndFooterGATrackingPages.TEACH
     );
     this.windowRef.nativeWindow.location.href = '/teach';
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
   }
 
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {

@@ -70,11 +70,6 @@ export interface ClassroomPageData {
   topic_list_intro: string;
 }
 
-export interface VmidSharedSecretKeyMapping {
-  shared_secret_key: string;
-  vm_id: string;
-}
-
 export interface AdminPageDataBackendDict {
   demo_explorations: string[][];
   demo_collections: string[][];
@@ -336,12 +331,6 @@ export class AdminBackendApiService {
         .then(resolve, errorResponse => {
           reject(errorResponse.error.error);
         });
-    });
-  }
-
-  async publishChaptersAsync(): Promise<void> {
-    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'publish_chapters_of_length_and_measurement_topic',
     });
   }
 

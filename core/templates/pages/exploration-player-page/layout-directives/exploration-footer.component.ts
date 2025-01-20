@@ -18,7 +18,6 @@
  */
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
@@ -420,15 +419,15 @@ export class ExplorationFooterComponent {
   }
 
   shouldRenderLessonInfoTooltip(): boolean {
-    const shouldRenderLessonInfoTooltip =
+    const lessonInfoTooltipShouldBeShown =
       !this.footerIsInQuestionPlayerMode &&
       !this.hasLearnerHasViewedLessonInfoTooltip() &&
       this.getMostRecentlyReachedCheckpointIndex() === 2;
 
-    if (shouldRenderLessonInfoTooltip) {
+    if (lessonInfoTooltipShouldBeShown) {
       this.lessonInfoButton.nativeElement.focus();
     }
-    return shouldRenderLessonInfoTooltip;
+    return lessonInfoTooltipShouldBeShown;
   }
 
   learnerHasViewedLessonInfo(): void {
@@ -442,10 +441,3 @@ export class ExplorationFooterComponent {
     return this.learnerHasViewedLessonInfoTooltip;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaExplorationFooter',
-    downgradeComponent({component: ExplorationFooterComponent})
-  );

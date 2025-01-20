@@ -108,7 +108,10 @@ export class InteractiveCodeReplComponent
         }
       ) as CodeReplCustomizationArgs;
 
-    this.interactionIsActive = this.lastAnswer === null;
+    this.interactionIsActive = true;
+    if (this.lastAnswer) {
+      this.interactionIsActive = false;
+    }
     this.language = language.value;
     this.placeholder = placeholder.value;
     this.preCode = preCode.value;

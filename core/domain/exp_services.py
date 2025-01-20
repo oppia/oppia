@@ -42,7 +42,6 @@ from core.constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import change_domain
-from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import email_manager
 from core.domain import email_subscription_services
@@ -1364,36 +1363,7 @@ def _compute_models_for_updating_exploration(
         )
     )
 
-    if feconf.ENABLE_ML_CLASSIFIERS:
-        trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states, exp_versions_diff)
-        state_names_with_changed_answer_groups = trainable_states_dict[
-            'state_names_with_changed_answer_groups']
-        state_names_with_unchanged_answer_groups = trainable_states_dict[
-            'state_names_with_unchanged_answer_groups']
-        state_names_to_train_classifier = state_names_with_changed_answer_groups
-        if state_names_with_unchanged_answer_groups:
-            (
-                state_names_without_classifier,
-                state_training_jobs_mapping_models_to_put
-            ) = (
-                classifier_services
-                .get_new_job_models_for_non_trainable_states(
-                    exploration, state_names_with_unchanged_answer_groups,
-                    exp_versions_diff
-                )
-            )
-            state_names_to_train_classifier.extend(
-                state_names_without_classifier)
-            models_to_put.extend(state_training_jobs_mapping_models_to_put)
-        if state_names_to_train_classifier:
-            models_to_put.extend(
-                classifier_services.get_new_job_models_for_trainable_states(
-                    exploration, state_names_to_train_classifier
-                )
-            )
-
-    # Trigger exploration issues model updation.
+    # Trigger updates for exploration issues models.
     models_to_put.extend(
         stats_services.get_updated_exp_issues_models_for_new_exp_version(
             exploration,
@@ -1474,22 +1444,6 @@ def _create_exploration(
     exploration_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, list(exploration.states.keys()))
     stats_services.create_stats_model(exploration_stats)
-
-    if feconf.ENABLE_ML_CLASSIFIERS:
-        # Find out all states that need a classifier to be trained.
-        state_names_to_train = []
-        for state_name in exploration.states:
-            state = exploration.states[state_name]
-            if state.can_undergo_classification():
-                state_names_to_train.append(state_name)
-
-        if state_names_to_train:
-            datastore_services.put_multi(
-                classifier_services.get_new_job_models_for_trainable_states(
-                    exploration,
-                    state_names_to_train
-                )
-            )
 
     # Trigger exploration issues model creation.
     stats_services.create_exp_issues_for_new_exploration(
@@ -2621,12 +2575,6 @@ def revert_exploration(
     )
     datastore_services.put_multi(exp_issues_models_to_put)
     datastore_services.put_multi(translation_and_opportunity_models_to_put)
-
-    if feconf.ENABLE_ML_CLASSIFIERS:
-        exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=revert_to_version)
-        classifier_services.create_classifier_training_job_for_reverted_exploration( # pylint: disable=line-too-long
-            current_exploration, exploration_to_revert_to)
 
 
 # Creation and deletion methods.

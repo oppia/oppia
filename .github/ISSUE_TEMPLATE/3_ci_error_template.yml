@@ -19,6 +19,14 @@ body:
         - Other
     validations:
       required: true
+  - type: input
+    id: step
+    attributes:
+      label: Which CI step failed?
+      description: |
+        Add the name of the specific CI step which failed. (Example: "Checkout repository" or "Run backend associated test file check")
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:
@@ -41,7 +49,7 @@ body:
     id: occurrences
     attributes:
       label: Occurrences
-      description: How many times has this flake occurred? Please provide a link to the flake report and the date of each occurrence.
+      description: How many times has this flake occurred? Please provide a link to the failing run on GitHub Actions, and the date of each occurrence.
     validations:
       required: true
   - type: input

@@ -291,8 +291,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
-                    b'-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    b'+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
+                    b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n'
+                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n')
             return (
                 b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
                 b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
@@ -327,8 +327,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
-                    b'-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    b'+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
+                    b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n'
+                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n')
             return (
                 b'-  "FIREBASE_CONFIG_API_KEY": "fake-api-key",\n'
                 b'+  "FIREBASE_CONFIG_API_KEY": "changed-api-key",\n')
