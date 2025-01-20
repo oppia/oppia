@@ -78,40 +78,6 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             return False
 
     @classmethod
-    def is_voiceover_changes_made(
-        cls, exp_snapshot_metadata_model: (
-            exp_models.ExplorationSnapshotMetadataModel)
-    ) -> bool:
-        """Checks whether the given snapshot model contains voiceover-related
-        changes.
-
-        Args:
-            exp_snapshot_metadata_model: ExplorationSnapshotMetadataModel.
-                The exploration snapshot metadata model.
-
-        Returns:
-            bool. Whether the given snapshot model contains voiceover-related
-            changes.
-        """
-
-        try:
-            for change in exp_snapshot_metadata_model.commit_cmds:
-                if (
-                    change['cmd'] == 'edit_state_property' and (
-                        change['property_name'] == 'recorded_voiceovers' or
-                        change['property_name'] == (
-                            'content_ids_to_audio_translations')
-                    )
-                ):
-                    return True
-        except Exception:
-            logging.exception(
-                'Not able to check voiceover changes for snapshot model ID %s.'
-                % exp_snapshot_metadata_model.id
-            )
-        return False
-
-    @classmethod
     def extract_added_voiceovers_between_successive_snapshots(
         cls,
         new_snapshot_model: exp_models.ExplorationSnapshotContentModel,
