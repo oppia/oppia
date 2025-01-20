@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import html
+import logging
 
 from core import feconf
 from core.jobs import base_jobs
@@ -192,13 +193,23 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
         image_filenames: List[str] = []
         for model in model_pcoll:
             translation_html = model.change_cmd['translation_html']
-            translation_tree = bs4.BeautifulSoup(
-                translation_html, 'html.parser')
-            image_nodes = translation_tree.findAll(
-                name='oppia-noninteractive-image')
-            image_filenames += [
-                html.unescape(node.get('filepath-with-value')).strip('"')
-                for node in image_nodes]
+            if not isinstance(translation_html, str):  # pragma: no cover
+                logging.error(
+                    'Expected translation_html to be type str, not %s. obj: %s',
+                    type(translation_html), translation_html)
+            try:
+                translation_tree = bs4.BeautifulSoup(
+                    translation_html, 'html.parser')
+                image_nodes = translation_tree.findAll(
+                    name='oppia-noninteractive-image')
+                image_filenames += [
+                    html.unescape(node.get('filepath-with-value')).strip('"')
+                    for node in image_nodes]
+            except Exception as exception:  # pragma: no cover
+                logging.exception(
+                    'Exception raised while processing "%s": %s',
+                    translation_html, exception)
+                raise exception
 
         return (model_id, image_filenames)
 
