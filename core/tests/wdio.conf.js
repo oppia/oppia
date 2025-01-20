@@ -373,7 +373,7 @@ exports.config = {
       test, context, { error, result, duration, passed, retries }) {
     if (// eslint-disable-next-line eqeqeq
     process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
-      ffmpegProcess.kill();
+      ffmpegProcess.kill('SIGINT');
       console.log('ffmpeg process killed');
       console.log('Is there file in videopath: ' + fs.existsSync(videoPath))
 
