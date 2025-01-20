@@ -139,7 +139,7 @@ services:
     command: redis-server /app/oppia/redis_docker.conf
 
   elasticsearch:
-    image: elasticsearch:7.17.0
+    image: elasticsearch:8.17.0
     container_name: oppia-elasticsearch
     environment:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m

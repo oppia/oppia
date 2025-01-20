@@ -58,7 +58,7 @@ certifi==2023.7.22 \
     --hash=sha256:92d6037539857d8206b8f6ae472e8b77db8058fec5937a1ef3f54304089edbb9
     # via
     #   -r requirements.in
-    #   elasticsearch
+    #   elastic-transport
     #   requests
 charset-normalizer==3.3.2 \
     --hash=sha256:06435b539f889b1f6f4ac1758871aae42dc3a8c0e24ac9e60c2384973ad73027 \
@@ -177,9 +177,13 @@ dill==0.3.1.1 \
 docopt==0.6.2 \
     --hash=sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491
     # via hdfs
-elasticsearch==7.17.0 \
-    --hash=sha256:406013783cc36af28ea36cd58cf184cd646530e47eea41336b386322fb878b59 \
-    --hash=sha256:ccbf3d1651eb79798a55c1e84b8be850db3873f0329e74086a2cfba37e8c288c
+elastic-transport==8.17.0 \
+    --hash=sha256:59f553300866750e67a38828fede000576562a0e66930c641adb75249e0c95af \
+    --hash=sha256:e755f38f99fa6ec5456e236b8e58f0eb18873ac8fe710f74b91a16dd562de2a5
+    # via elasticsearch
+elasticsearch==8.17.0 \
+    --hash=sha256:15965240fe297279f0e68b260936d9ced9606aa7ef8910b9b56727f96ef00d5b \
+    --hash=sha256:c1069bf2204ba8fab29ff00b2ce6b37324b2cc6ff593283b97df43426ec13053
     # via -r requirements.in
 exceptiongroup==1.2.2 \
     --hash=sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b \
@@ -1330,7 +1334,7 @@ urllib3==1.26.18 \
     --hash=sha256:f8ecc1bba5667413457c529ab955bf8c67b45db799d159066261719e328580a0
     # via
     #   -r requirements.in
-    #   elasticsearch
+    #   elastic-transport
     #   requests
 webapp2==3.0.0b1 \
     --hash=sha256:4215a2ab407f0e0ad1c1ec134ff5bebcdfd7995b0ce99c1cc9cc9ba28a6814ce
