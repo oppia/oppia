@@ -136,10 +136,9 @@ class ClassroomModel(base_models.BaseModel):
         cls, classroom_id: str, name: str, url_fragment: str,
         course_details: str, teaser_text: str, topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
-        is_published: bool, thumbnail_filename: str,
-        thumbnail_bg_color: str, thumbnail_size_in_bytes: int,
-        banner_filename: str, banner_bg_color: str,
-        banner_size_in_bytes: int, index: int
+        is_published: bool, thumbnail_filename: str, thumbnail_bg_color: str,
+        thumbnail_size_in_bytes: int, banner_filename: str,
+        banner_bg_color: str, banner_size_in_bytes: int, index: int
     ) -> ClassroomModel:
         """Creates a new ClassroomModel entry.
 
