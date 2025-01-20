@@ -1,30 +1,75 @@
-name: CI Flake report
+name: CI Failure Report
 description: Create a report to help us improve
-title: "[Flake]: "
+title: "[CI Failure]: "
 labels: [triage needed, bug, CI breakage]
 body:
+  - type: markdown
+    attributes:
+      value: >
+        Thanks for taking the time to file a CI failure report!
+
+
+        If the CI failure is happening on a PR (and not on develop), please
+        ensure you've read
+        [this wiki page](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR)
+        and are filing this issue as part of the process described there.
+        Thanks!
   - type: dropdown
     id: ci-test-type
     attributes:
       label: CI Test Type
-      description: In which CI test did this Flake occur?
+      description: In which CI test did this failure occur?
       options:
-        - Frontend
         - E2E
         - Acceptance
+        - Frontend
         - Backend
-        - Backend associated test file check
         - Lighthouse CI performance
         - Lighthouse CI accessibility
         - Other
+    validations:
+      required: true
+  - type: input
+    id: step
+    attributes:
+      label: Which CI step failed?
+      description: >
+        Add the name of the specific CI step which failed. (Example: "Checkout
+        repository" or "Run backend associated test file check")
     validations:
       required: true
   - type: textarea
     id: logs
     attributes:
       label: Stacktrace
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      description: >
+        Please copy and paste any relevant log output. This will be
+        automatically formatted into code, so no need for backticks.
       render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots (if e2e tests)
+      description: >
+        For e2e CI failures, include screenshots/videos of the failure here,
+        since these get wiped from GitHub Actions after a few days.
+
+
+        To do this: Click on "Summary" at the top-left of the test log page,
+        scroll to the bottom, download the appropriate
+        webdriverio-screenshots/webdriverio-video artifacts, and upload them
+        here.
+    validations:
+      required: false
+  - type: textarea
+    id: occurrences
+    attributes:
+      label: Occurrences
+      description: >
+        How many times has this failure occurred? Please provide a link to the
+        failing run on GitHub Actions, and the date of each occurrence.
     validations:
       required: true
   - type: textarea
@@ -32,21 +77,15 @@ body:
     attributes:
       label: Additional Information
       description: |
-        Add any other context about the flake here, e.g. the link to the GitHub Actions logs page.
-
-        For e2e flakes, include screenshots/videos of the failure here, since these may get wiped from GitHub Actions after a few days/weeks. (Click on "Summary" at the top-left of the test log page, scroll to the bottom, downlaod the appropriate webdriverio-screenshots/webdriverio-video artifacts, and upload them here.)
+        Add any other context about the failure here.
     validations:
       required: false
-  - type: textarea
-    id: occurrences
-    attributes:
-      label: Occurrences
-      description: How many times has this flake occurred? Please provide a link to the flake report and the date of each occurrence.
-    validations:
-      required: true
   - type: input
     attributes:
       label: Debugging document link
-      description: If you have started a debugging doc, please paste the link here. Make sure that the sharing settings are set to "Anyone with the link can comment".
+      description: >
+        If you have started a debugging doc, please paste the link here. Make
+        sure that the sharing settings are set to "Anyone with the link can
+        comment".
     validations:
       required: false

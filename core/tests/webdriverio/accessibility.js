@@ -84,8 +84,6 @@ describe('screenreader and keyboard user accessibility features', function () {
   it('should skip to the main content element', async function () {
     await libraryPage.get();
     await browser.keys('s');
-    var skipLink = $('.e2e-test-skip-link');
-    await action.click('Skip link', skipLink);
     var mainContent = $('.e2e-test-main-content');
     expect(await mainContent.isFocused()).toEqual(true);
   });
@@ -457,8 +455,8 @@ describe('screenreader and keyboard user accessibility features', function () {
 
     await libraryPage.get();
     await waitFor.pageToFullyLoad();
-    var skipLink = $('.e2e-test-skip-link');
-    await checkActionShortcuts('s', skipLink);
+    var mainContent = $('.e2e-test-main-content');
+    await checkActionShortcuts('s', mainContent);
 
     await libraryPage.get();
     await waitFor.pageToFullyLoad();
@@ -483,8 +481,8 @@ describe('screenreader and keyboard user accessibility features', function () {
     await explorationPlayerPage.expectExplorationToNotBeOver();
 
     // Should test the skip to main content shortcut.
-    var skipLink = $('.e2e-test-skip-link');
-    await checkActionShortcuts('s', skipLink);
+    var mainContent = $('.e2e-test-main-content');
+    await checkActionShortcuts('s', mainContent);
   });
 
   it('should move focus to next and back buttons in exploration player', async function () {

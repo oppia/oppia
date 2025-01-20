@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {InteractionRulesService} from '../services/answer-classification.service';
@@ -74,10 +73,3 @@ export class LearnerAnswerInfoCard {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaLearnerAnswerInfoCard',
-    downgradeComponent({component: LearnerAnswerInfoCard})
-  );

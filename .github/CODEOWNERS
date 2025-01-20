@@ -82,17 +82,6 @@
 /scripts/run_typescript_checks*.py @oppia/dev-workflow-reviewers
 
 
-# Answer classification team.
-/core/controllers/classifier*.py @oppia/ml
-/core/domain/classifier*.py @oppia/ml
-/proto_files/ @oppia/ml
-/core/templates/domain/classifier/ @oppia/ml
-/core/templates/services/classifier-data-backend-api.service*.ts @oppia/ml
-/extensions/classifiers/ @oppia/ml
-/buf.yaml @oppia/ml
-/buf.gen.yaml @oppia/ml
-
-
 # App Feedback Reporting project
 /core/domain/app_feedback_report_*.py @oppia/web-android-compatibility-reviewers
 /core/controllers/incoming_app_feedback_report*.py @oppia/web-android-compatibility-reviewers
@@ -234,6 +223,7 @@
 /core/templates/components/stale-tab-info/ @oppia/lace-frontend-reviewers
 /core/templates/components/unsaved-changes-status-info/ @oppia/lace-frontend-reviewers
 /core/templates/components/version-diff-visualization/ @oppia/lace-frontend-reviewers
+/core/templates/domain/classifier/ @oppia/lace-frontend-reviewers
 /core/templates/domain/editor/ @oppia/lace-frontend-reviewers
 /core/templates/domain/entity_editor_browser_tabs_info/ @oppia/lace-frontend-reviewers
 /core/templates/domain/exploration/ @oppia/lace-frontend-reviewers
@@ -525,7 +515,6 @@
 /core/templates/pages/login-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/logout-page/ @oppia/lace-frontend-reviewers
 /core/templates/app-events/ @oppia/lace-frontend-reviewers
-/core/templates/services/app.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/document-attribute-customization.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/meta-tag-customization.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-frontend-reviewers
@@ -555,7 +544,6 @@
 # Python typing
 /mypy.ini @oppia/dev-workflow-reviewers
 /mypy_imports*.py @oppia/dev-workflow-reviewers
-/mypy_requirements.txt @oppia/dev-workflow-reviewers
 /stubs/ @oppia/dev-workflow-reviewers
 /scripts/run_mypy_checks*.py @oppia/dev-workflow-reviewers
 

@@ -34,7 +34,6 @@ import time
 import unicodedata
 import urllib.parse
 import urllib.request
-import zlib
 
 from core import feconf
 from core.constants import constants
@@ -325,32 +324,6 @@ def yaml_from_dict(dictionary: Mapping[str, Any], width: int = 80) -> str:
     return yaml_str
 
 
-# Here we use type Any because here obj has a recursive structure. The list
-# element or dictionary value could recursively be the same structure, hence
-# we use Any as their types.
-def recursively_remove_key(
-        obj: Union[Dict[str, Any], List[Any]], key_to_remove: str
-) -> None:
-    """Recursively removes keys from a list or dict.
-
-    Args:
-        obj: *. List or dict passed for which the keys has to
-            be removed.
-        key_to_remove: str. Key value that has to be removed.
-
-    Returns:
-        *. Dict or list with a particular key value removed.
-    """
-    if isinstance(obj, list):
-        for item in obj:
-            recursively_remove_key(item, key_to_remove)
-    elif isinstance(obj, dict):
-        if key_to_remove in obj:
-            del obj[key_to_remove]
-        for key, unused_value in obj.items():
-            recursively_remove_key(obj[key], key_to_remove)
-
-
 def get_random_int(upper_bound: int) -> int:
     """Returns a random integer in [0, upper_bound).
 
@@ -557,7 +530,7 @@ class JSONEncoderForHTML(json.JSONEncoder):
     # but we are returning Union[str, unicode].
     def encode(self, o: str) -> str:
         chunks = self.iterencode(o, True)
-        return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
+        return ''.join(chunks)
 
     def iterencode(self, o: str, _one_shot: bool = False) -> Iterator[str]:
         chunks = super().iterencode(o, _one_shot=_one_shot)
@@ -620,20 +593,6 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
         float. The time in milliseconds since the Epoch.
     """
     return datetime_obj.timestamp() * 1000.0
-
-
-def convert_millisecs_time_to_datetime_object(
-        date_time_msecs: float) -> datetime.datetime:
-    """Returns the datetime object from the given date time in milliseconds.
-
-    Args:
-        date_time_msecs: float. Date time represented in milliseconds.
-
-    Returns:
-        datetime. An object of type datetime.datetime corresponding to
-        the given milliseconds.
-    """
-    return datetime.datetime.fromtimestamp(date_time_msecs / 1000.0)
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -1267,30 +1226,6 @@ def get_hashable_value(value: Any) -> Any:
             (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
-
-
-def compress_to_zlib(data: bytes) -> bytes:
-    """Compress the data to zlib format for efficient storage and communication.
-
-    Args:
-        data: str. Data to be compressed.
-
-    Returns:
-        str. Compressed data string.
-    """
-    return zlib.compress(data)
-
-
-def decompress_from_zlib(data: bytes) -> bytes:
-    """Decompress the zlib compressed data.
-
-    Args:
-        data: str. Data to be decompressed.
-
-    Returns:
-        str. Decompressed data string.
-    """
-    return zlib.decompress(data)
 
 
 # The mentioned types can be changed in future if they are inadequate to

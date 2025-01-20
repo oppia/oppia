@@ -233,7 +233,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
         assert self.blog_post.last_updated is not None
         expected_blog_post_dict = {
-            'id': u'%s' % self.blog_post.id,
+            'id': self.blog_post.id,
             'displayed_author_name': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
@@ -241,7 +241,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'thumbnail_filename': None,
             'url_fragment': '',
             'published_on': None,
-            'last_updated': u'%s' % utils.convert_naive_datetime_to_string(
+            'last_updated': utils.convert_naive_datetime_to_string(
                 self.blog_post.last_updated)
         }
         self.assertEqual(
@@ -257,7 +257,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.BLOG_EDITOR_USERNAME, json_response['displayed_author_name'])
         expected_blog_post_dict = {
-            'id': u'%s' % self.blog_post.id,
+            'id': self.blog_post.id,
             'displayed_author_name': self.BLOG_EDITOR_USERNAME,
             'title': '',
             'content': '',
@@ -265,7 +265,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'thumbnail_filename': None,
             'url_fragment': '',
             'published_on': None,
-            'last_updated': u'%s' % utils.convert_naive_datetime_to_string(
+            'last_updated': utils.convert_naive_datetime_to_string(
                 self.blog_post.last_updated)
         }
         self.assertEqual(
@@ -330,7 +330,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'new author name', json_response['displayed_author_name'])
         assert self.blog_post.last_updated is not None
         expected_blog_post_dict = {
-            'id': u'%s' % self.blog_post.id,
+            'id': self.blog_post.id,
             'displayed_author_name': 'new author name',
             'title': '',
             'content': '',
@@ -338,7 +338,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'thumbnail_filename': None,
             'url_fragment': '',
             'published_on': None,
-            'last_updated': u'%s' % utils.convert_naive_datetime_to_string(
+            'last_updated': utils.convert_naive_datetime_to_string(
                 self.blog_post.last_updated)
         }
         self.assertEqual(

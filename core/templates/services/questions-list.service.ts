@@ -78,11 +78,11 @@ export class QuestionsListService {
     );
   }
 
-  getQuestionSummariesAsync(
+  async getQuestionSummariesAsync(
     skillId: string,
     fetchMore: boolean,
     resetHistory: boolean
-  ): void {
+  ): Promise<void> {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
       this._nextOffsetForQuestions = 0;
@@ -101,7 +101,7 @@ export class QuestionsListService {
       this._moreQuestionsAvailable === true &&
       fetchMore
     ) {
-      this.questionBackendApiService
+      return this.questionBackendApiService
         .fetchQuestionSummariesAsync(skillId, this._nextOffsetForQuestions)
         .then(response => {
           let questionSummaries = response.questionSummaries.map(summary => {

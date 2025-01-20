@@ -24,6 +24,7 @@ from core import utils
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import fs_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -231,6 +232,143 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
+    def test_get_classroom_data_with_topic_without_summary_skips_topic(
+        self
+    ) -> None:
+        # Create a prerequisite topic for a classroom and delete its summary.
+        no_summary_topic_id = topic_fetchers.get_new_topic_id()
+        no_summary_topic = topic_domain.Topic.create_default_topic(
+            no_summary_topic_id, 'no_summary_topic',
+            'no-summary-topic', 'description', 'fragm')
+
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        topic_services.save_new_topic(admin_id, no_summary_topic)
+        topic_services.delete_topic_summary(no_summary_topic_id)
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.save_new_valid_classroom(
+            classroom_id='test_id',
+            topic_id_to_prerequisite_topic_ids={
+                        no_summary_topic_id: [],
+                        self.public_topic_id_1: [],
+                        self.private_topic_id: []
+            },
+            course_details='Course details for classroom.',
+            topic_list_intro='Topics covered for classroom'
+        )
+        self.logout()
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
+        topic_summary_dict = (
+            topic_fetchers.get_topic_summary_by_id(
+                self.public_topic_id_1
+            ).to_dict()
+        )
+        public_topic_1_summary_dict = dict(
+            topic_summary_dict,
+            **{'is_published': True}
+        )
+
+        topic_summary_dict = (
+            topic_fetchers.get_topic_summary_by_id(
+                self.private_topic_id
+            ).to_dict()
+        )
+        private_topic_summary_dict = dict(
+            topic_summary_dict,
+            **{'is_published': False}
+        )
+        # Skips 'no_summary_topic'.
+        expected_dict = {
+            'classroom_id': 'test_id',
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_summary_dicts': [
+                public_topic_1_summary_dict, private_topic_summary_dict
+            ],
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom',
+            'teaser_text': 'Teaser Text',
+            'thumbnail_data': dummy_thumbnail_data.to_dict(),
+            'banner_data': dummy_banner_data.to_dict(),
+            'is_published': True,
+            'public_classrooms_count': 1
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
+
+    def test_get_multiple_classrooms_counts_all_published_unmatching_classrooms(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        # Create a published classroom with a url_fragment matching 'math'.
+        self.save_new_valid_classroom(
+            classroom_id='test_id',
+            name='math',
+            url_fragment='math',
+            topic_id_to_prerequisite_topic_ids={
+                self.public_topic_id_1: [],
+                self.private_topic_id: []
+            },
+            course_details='Course details for classroom.',
+            topic_list_intro='Topics covered for classroom'
+        )
+        # Create an unpublished classroom with a url_fragment that does not
+        # match 'math'.
+        self.save_new_valid_classroom(
+            classroom_id='history', name='history', url_fragment='history',
+            topic_id_to_prerequisite_topic_ids={self.public_topic_id_2: []},
+            is_published=False
+        )
+        # Create a published classroom with a url_fragment that does not match
+        # 'math'.
+        self.save_new_valid_classroom(
+            classroom_id='science', name='science', url_fragment='science',
+            topic_id_to_prerequisite_topic_ids={self.public_topic_id_2: []}
+        )
+        self.logout()
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
+        topic_summary_dict = (
+            topic_fetchers.get_topic_summary_by_id(
+                self.public_topic_id_1
+            ).to_dict()
+        )
+        public_topic_1_summary_dict = dict(
+            topic_summary_dict,
+            **{'is_published': True}
+        )
+
+        topic_summary_dict = (
+            topic_fetchers.get_topic_summary_by_id(
+                self.private_topic_id
+            ).to_dict()
+        )
+        private_topic_summary_dict = dict(
+            topic_summary_dict,
+            **{'is_published': False}
+        )
+
+        # Should return classroom with 'test_id', but count all
+        # public_classrooms ('science' and 'test_id').
+        expected_dict = {
+            'classroom_id': 'test_id',
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_summary_dicts': [
+                public_topic_1_summary_dict, private_topic_summary_dict
+            ],
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom',
+            'teaser_text': 'Teaser Text',
+            'thumbnail_data': dummy_thumbnail_data.to_dict(),
+            'banner_data': dummy_banner_data.to_dict(),
+            'is_published': True,
+            'public_classrooms_count': 2
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
+
     def test_get_fails_for_invalid_classroom_name(self) -> None:
         self.get_json(
             '%s/%s' % (
@@ -291,14 +429,6 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
     def test_get_classroom_id_to_classroom_name(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        physics_classroom = classroom_config_services.get_classroom_by_id(
-            self.physics_classroom_id
-        )
-        # TODO (#20845): Here we use MyPy ignore because we have a
-        # Test that checks if the index is None, it returns 0. The MyPy ignore
-        # Can be removed once the index for the math classroom is populated.
-        physics_classroom.index = None # type: ignore[assignment]
-        classroom_config_services.update_classroom(physics_classroom)
         classroom_id_to_classroom_name = [
             {
                 'classroom_id': self.physics_classroom.classroom_id,
@@ -378,6 +508,118 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
                     params=params, expect_errors=False,
                     upload_files=[thumbnail, banner]
         )
+
+        self.logout()
+
+    def test_update_classroom_thumbnail_data_only(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_HANDLER_URL, self.physics_classroom_id)
+        csrf_token = self.get_new_csrf_token()
+
+        self.physics_classroom_dict['thumbnail_data']['filename'] = 'update.svg'
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename1', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename1', raw_banner_image)
+        self.testapp.put(
+            classroom_handler_url,
+            params=params, expect_errors=False,
+            upload_files=[thumbnail, banner]
+        )
+
+        # Check physics classroom data updated correctly.
+        physics_classroom = classroom_config_services.get_classroom_by_id(
+            self.physics_classroom_id
+        )
+        self.assertEqual(
+            physics_classroom.to_dict(), self.physics_classroom_dict)
+
+        # Check new thumbnail image uploaded correctly.
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_CLASSROOM, self.physics_classroom_id)
+        self.assertTrue(fs.isfile('thumbnail/update.svg'))
+        self.assertTrue(fs.isfile('thumbnail/update_compressed.svg'))
+        self.assertTrue(fs.isfile('thumbnail/update_micro.svg'))
+
+        updated_thumbnail_img = fs.get('thumbnail/update.svg')
+        self.assertEqual(raw_thumbnail_image, updated_thumbnail_img)
+
+        # Check new banner image is not uploaded.
+        self.assertFalse(fs.isfile('image/update.png'))
+
+        self.logout()
+
+    def test_update_classroom_banner_data_only(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_HANDLER_URL, self.physics_classroom_id)
+        csrf_token = self.get_new_csrf_token()
+
+        self.physics_classroom_dict['banner_data']['filename'] = 'update.png'
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename1', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename1', raw_banner_image)
+        self.testapp.put(
+            classroom_handler_url,
+            params=params, expect_errors=False,
+            upload_files=[thumbnail, banner]
+        )
+
+        # Check physics classroom data updated correctly.
+        physics_classroom = classroom_config_services.get_classroom_by_id(
+            self.physics_classroom_id
+        )
+        self.assertEqual(
+            physics_classroom.to_dict(), self.physics_classroom_dict)
+
+        # Check new banner image uploaded correctly.
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_CLASSROOM, self.physics_classroom_id)
+        self.assertTrue(fs.isfile('image/update.png'))
+        self.assertTrue(fs.isfile('image/update_compressed.png'))
+        self.assertTrue(fs.isfile('image/update_micro.png'))
+
+        updated_banner_img = fs.get('image/update.png')
+        self.assertEqual(raw_banner_image, updated_banner_img)
+
+        # Check new thumbnail image is not uploaded.
+        self.assertFalse(fs.isfile('thumbnail/update.svg'))
 
         self.logout()
 
@@ -659,14 +901,9 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        classroom1 = self.save_new_valid_classroom(
+        self.save_new_valid_classroom(
             'classroom1', 'history', 'history'
         )
-        # TODO (#20845): Here we use MyPy ignore because we have a
-        # Test that checks if the index is None, it returns 0. The MyPy ignore
-        # Can be removed once the index for the math classroom is populated.
-        classroom1.index = None # type: ignore[assignment]
-        classroom_config_services.update_classroom(classroom1)
         self.save_new_valid_classroom(
             'classroom2', 'english', 'english'
         )

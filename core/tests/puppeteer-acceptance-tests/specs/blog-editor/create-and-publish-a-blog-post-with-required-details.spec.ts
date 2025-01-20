@@ -43,9 +43,17 @@ describe('Blog Editor', function () {
       await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
         'This is a test blog post'
       );
+      await blogPostEditor.expectScreenshotToMatch(
+        'blogEditorPageWithPublishedBlogPostTitle',
+        __dirname
+      );
 
       await blogPostEditor.deletePublishedBlogPostWithTitle(
         'This is a test blog post'
+      );
+      await blogPostEditor.expectScreenshotToMatch(
+        'blogEditorPageWithBlogPostDeletedMessage',
+        __dirname
       );
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
     },

@@ -25,12 +25,13 @@ import {LessonCardModule} from 'components/summary-tile/lesson-card.module';
 import {CardDisplayComponent} from './card-display/card-display.component';
 import {ClassroomButtonComponent} from './classroom-button/classroom-button.component';
 import {ContentToggleButtonComponent} from './content-toggle-button/content-toggle-button.component';
+import {GoalListComponent} from './goal-list/goal-list.component';
 import {SkillCardModule} from './skill-card/skill-card.module';
 import {LearnerStorySummaryTileComponent} from 'components/summary-tile/learner-story-summary-tile.component';
 import {LearnerTopicGoalsSummaryTileComponent} from 'components/summary-tile/learner-topic-goals-summary-tile.component';
-import {ProgressTabComponent} from './progress-tab.component';
+import {OldProgressTabComponent} from './old-progress-tab.component';
 import {GoalsTabComponent} from './goals-tab.component';
-import {CommunityLessonsTabComponent} from './community-lessons-tab.component';
+import {ProgressTabComponent} from './progress-tab.component';
 import {LearnerTopicSummaryTileComponent} from 'components/summary-tile/learner-topic-summary-tile.component';
 import {HomeTabComponent} from './home-tab.component';
 import {LearnerGroupsTabComponent} from './learner-groups-tab.component';
@@ -46,6 +47,7 @@ import {ToastrModule} from 'ngx-toastr';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import {MatDialogModule} from '@angular/material/dialog';
+import {NgCircleProgressModule} from 'ng-circle-progress';
 @NgModule({
   imports: [
     CommonModule,
@@ -60,22 +62,35 @@ import {MatDialogModule} from '@angular/material/dialog';
         component: LearnerDashboardPageRootComponent,
       },
     ]),
+    NgCircleProgressModule.forRoot({
+      radius: 16,
+      outerStrokeWidth: 2,
+      innerStrokeWidth: 2,
+      space: -2,
+      innerStrokeColor: '#e7e8ea',
+      outerStrokeColor: '#00645c',
+      showBackground: false,
+      showSubtitle: false,
+      titleFontSize: '11',
+      titleColor: '#00645c',
+    }),
   ],
   declarations: [
     AddGoalsModalComponent,
     CardDisplayComponent,
     ClassroomButtonComponent,
     ContentToggleButtonComponent,
+    GoalListComponent,
     LearnerDashboardPageComponent,
     LearnerDashboardPageRootComponent,
     LearnerStorySummaryTileComponent,
     LearnerTopicGoalsSummaryTileComponent,
-    ProgressTabComponent,
+    OldProgressTabComponent,
     GoalsTabComponent,
     HomeTabComponent,
     LearnerGroupsTabComponent,
     LearnerTopicSummaryTileComponent,
-    CommunityLessonsTabComponent,
+    ProgressTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
@@ -87,15 +102,16 @@ import {MatDialogModule} from '@angular/material/dialog';
     CardDisplayComponent,
     ClassroomButtonComponent,
     ContentToggleButtonComponent,
+    GoalListComponent,
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     LearnerTopicGoalsSummaryTileComponent,
-    ProgressTabComponent,
+    OldProgressTabComponent,
     GoalsTabComponent,
     HomeTabComponent,
     LearnerGroupsTabComponent,
     LearnerTopicSummaryTileComponent,
-    CommunityLessonsTabComponent,
+    ProgressTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,

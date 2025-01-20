@@ -80,13 +80,14 @@ var TopicsAndSkillsDashboardPage = function () {
   var topicFilterKeywordField = $('.e2e-test-select-keyword-dropdown');
   var topicFilterClassroomField = $('.e2e-test-select-classroom-dropdown');
   var topicsListItem = $('.e2e-test-topics-list-item');
-  var topicsListItemsSelector = function () {
-    return $$('.e2e-test-topics-list-item');
+  var topicsListItemsSelector = async function () {
+    await waitFor.pageToFullyLoad();
+    return await $$('.e2e-test-topics-list-item');
   };
   var topicNameField = $('.e2e-test-new-topic-name-field');
   var topicNameFieldElement = $('.e2e-test-topic-name-field');
-  var topicNamesSelector = function () {
-    return $$('.e2e-test-topic-name');
+  var topicNamesSelector = async function () {
+    return await $$('.e2e-test-topic-name');
   };
   var topicPageTitleFragmentField = $('.e2e-test-new-page-title-fragm-field');
   var topicResetFilters = $('.e2e-test-topic-filter-reset');
@@ -362,7 +363,8 @@ var TopicsAndSkillsDashboardPage = function () {
       topicFilterKeywordField,
       'Topic Dashboard keyword filter parent taking too long to appear.'
     );
-    var filterKeywordInput = topicFilterKeywordField.$(
+
+    var filterKeywordInput = await topicFilterKeywordField.$(
       '.e2e-test-multi-selection-input'
     );
 

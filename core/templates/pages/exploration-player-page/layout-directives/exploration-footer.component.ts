@@ -18,7 +18,6 @@
  */
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
@@ -64,7 +63,6 @@ export class ExplorationFooterComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   iframed!: boolean;
-  windowIsNarrow!: boolean;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
   isVisible: boolean = true;
@@ -125,12 +123,6 @@ export class ExplorationFooterComponent {
       this.userService.getUserInfoAsync().then(userInfo => {
         this.userIsLoggedIn = userInfo.isLoggedIn();
       });
-      this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-      this.directiveSubscriptions.add(
-        this.windowDimensionsService.getResizeEvent().subscribe(evt => {
-          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-        })
-      );
       if (
         !this.contextService.isInQuestionPlayerMode() ||
         this.contextService.getQuestionPlayerIsManuallySet()
@@ -442,10 +434,3 @@ export class ExplorationFooterComponent {
     return this.learnerHasViewedLessonInfoTooltip;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaExplorationFooter',
-    downgradeComponent({component: ExplorationFooterComponent})
-  );

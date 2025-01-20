@@ -63,6 +63,8 @@ export class HomeTabComponent {
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
+  currentGoalIds: Set<string> = new Set();
+  storySummariesWithAvailableNodes: Set<string> = new Set();
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -76,6 +78,7 @@ export class HomeTabComponent {
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
+    this.currentGoalIds = new Set(this.currentGoals.map(g => g.id));
 
     if (allGoals.length !== 0) {
       var allGoalIds = [];
@@ -86,6 +89,22 @@ export class HomeTabComponent {
       for (var uniqueGoalId of uniqueGoalIds) {
         var index = allGoalIds.indexOf(uniqueGoalId);
         this.continueWhereYouLeftOffList.push(allGoals[index]);
+      }
+    }
+
+    // TODO(#18384): Test cases - current lesson is last lesson.
+    for (let i = 0; i < this.continueWhereYouLeftOffList.length; i++) {
+      let currentStorySummary =
+        this.continueWhereYouLeftOffList[i].getCanonicalStorySummaryDicts();
+      for (let j = 0; j < currentStorySummary.length; j++) {
+        if (
+          currentStorySummary[j].getAllNodes().length - 1 >
+          currentStorySummary[j].getCompletedNodeTitles().length
+        ) {
+          this.storySummariesWithAvailableNodes.add(
+            currentStorySummary[j].getId()
+          );
+        }
       }
     }
 
@@ -171,6 +190,28 @@ export class HomeTabComponent {
     this.siteAnalyticsService.registerNewClassroomLessonEngagedWithEvent(
       classroomName,
       topicName
+    );
+  }
+
+  getTotalInProgressLessons(): number {
+    const totalStories = this.partiallyLearntTopicsList.reduce((acc, curr) => {
+      let availableStories = 0;
+      for (let i = 0; i < curr.getCanonicalStorySummaryDicts().length; i++) {
+        let currentStory = curr.getCanonicalStorySummaryDicts()[i];
+        if (
+          currentStory.getAllNodes().length >
+          currentStory.getCompletedNodeTitles().length
+        ) {
+          availableStories++;
+        }
+      }
+      return acc + availableStories;
+    }, 0);
+
+    return (
+      totalStories +
+      this.incompleteExplorationsList.length +
+      this.incompleteCollectionsList.length
     );
   }
 }

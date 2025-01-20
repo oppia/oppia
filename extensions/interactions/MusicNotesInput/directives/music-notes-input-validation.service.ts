@@ -26,6 +26,7 @@ import {
 } from 'interactions/base-interaction-validation.service';
 import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
   providedIn: 'root',
@@ -48,11 +49,38 @@ export class MusicNotesInputValidationService {
     answerGroups: AnswerGroup[],
     defaultOutcome: Outcome
   ): Warning[] {
-    return this.getCustomizationArgsWarnings(customizationArgs).concat(
-      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups,
-        defaultOutcome,
-        stateName
+    var partialWarningsList: Warning[] = [];
+
+    for (
+      var ansGroupIdx = 0;
+      ansGroupIdx < answerGroups.length;
+      ansGroupIdx++
+    ) {
+      const answerGroup = answerGroups[ansGroupIdx];
+      const groupId = String(ansGroupIdx + 1);
+      // Specific edge case for when HasLengthInclusivelyBetween is used.
+      for (var ruleIdx = 0; ruleIdx < answerGroup.rules.length; ruleIdx++) {
+        var rule = answerGroup.rules[ruleIdx];
+        if (rule.type === 'HasLengthInclusivelyBetween') {
+          if (rule.inputs.a > rule.inputs.b) {
+            partialWarningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message:
+                `The rule in response group ${groupId} is invalid. ` +
+                `${rule.inputs.a} is more than ${rule.inputs.b}`,
+            });
+          }
+        }
+      }
+    }
+
+    return partialWarningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs).concat(
+        this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+          answerGroups,
+          defaultOutcome,
+          stateName
+        )
       )
     );
   }

@@ -20,7 +20,6 @@ from core import feconf
 from core.constants import constants
 from core.domain import classroom_config_services
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -144,13 +143,13 @@ class TopicPageDataHandlerTests(
             }],
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [{
-                u'thumbnail_filename': u'image.svg',
-                u'thumbnail_bg_color': u'#FFFFFF',
-                u'thumbnail_size_in_bytes': 21131,
-                u'skill_ids': [self.skill_id_2],
-                u'id': 1,
-                u'title': u'subtopic_name',
-                u'url_fragment': u'subtopic-name'}],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': '#FFFFFF',
+                'thumbnail_size_in_bytes': 21131,
+                'skill_ids': [self.skill_id_2],
+                'id': 1,
+                'title': 'subtopic_name',
+                'url_fragment': 'subtopic-name'}],
             'degrees_of_mastery': {
                 self.skill_id_1: None,
                 self.skill_id_2: None
@@ -176,33 +175,18 @@ class TopicPageDataHandlerTests(
         self.assertDictContainsSubset(expected_dict, json_response)
 
     @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
-                'testadmin@example.com'
-            ),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
-        ]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_get_with_user_logged_in(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
         self.login(self.NEW_USER_EMAIL)
-        admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
-            )
-        )
-        assert isinstance(admin_email_address, str)
-        messages = self._get_sent_email_messages(admin_email_address)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 0)
         json_response = self.get_json(
             '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
-        messages = self._get_sent_email_messages(admin_email_address)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (
@@ -238,13 +222,13 @@ class TopicPageDataHandlerTests(
             }],
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [{
-                u'thumbnail_filename': u'image.svg',
-                u'thumbnail_bg_color': u'#FFFFFF',
-                u'thumbnail_size_in_bytes': 21131,
-                u'skill_ids': [self.skill_id_2],
-                u'id': 1,
-                u'title': u'subtopic_name',
-                u'url_fragment': u'subtopic-name'}],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': '#FFFFFF',
+                'thumbnail_size_in_bytes': 21131,
+                'skill_ids': [self.skill_id_2],
+                'id': 1,
+                'title': 'subtopic_name',
+                'url_fragment': 'subtopic-name'}],
             'degrees_of_mastery': {
                 self.skill_id_1: 0.3,
                 self.skill_id_2: 0.5

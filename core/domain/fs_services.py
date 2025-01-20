@@ -31,7 +31,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_identity_services
     from mypy_imports import storage_services
-    from proto_files import text_classifier_pb2
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
@@ -337,40 +336,6 @@ def save_original_and_compressed_versions_of_image(
     if not fs.isfile(micro_image_filepath):
         fs.commit(
             micro_image_filepath, micro_image_content, mimetype=mimetype)
-
-
-def save_classifier_data(
-    exp_id: str,
-    job_id: str,
-    classifier_data_proto: text_classifier_pb2.TextClassifierFrozenModel
-) -> None:
-    """Store classifier model data in a file.
-
-    Args:
-        exp_id: str. The id of the exploration.
-        job_id: str. The id of the classifier training job model.
-        classifier_data_proto: Object. Protobuf object of the classifier data
-            to be stored.
-    """
-    filepath = '%s-classifier-data.pb.xz' % (job_id)
-    fs = GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
-    content = utils.compress_to_zlib(
-        classifier_data_proto.SerializeToString())
-    fs.commit(
-        filepath, content, mimetype='application/octet-stream')
-
-
-def delete_classifier_data(exp_id: str, job_id: str) -> None:
-    """Delete the classifier data from file.
-
-    Args:
-        exp_id: str. The id of the exploration.
-        job_id: str. The id of the classifier training job model.
-    """
-    filepath = '%s-classifier-data.pb.xz' % (job_id)
-    fs = GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
-    if fs.isfile(filepath):
-        fs.delete(filepath)
 
 
 def copy_images(

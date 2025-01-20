@@ -120,7 +120,7 @@ module.exports = {
         {
           matchingUrlPattern: '^http://localhost:8181/privacy-policy$',
           assertions: {
-            'categories:accessibility': ['error', {minScore: 0.98}],
+            'categories:accessibility': ['error', {minScore: 1}],
           },
         },
         {
@@ -151,7 +151,7 @@ module.exports = {
         {
           matchingUrlPattern: '^http://localhost:8181/terms$',
           assertions: {
-            'categories:accessibility': ['error', {minScore: 0.98}],
+            'categories:accessibility': ['error', {minScore: 1}],
           },
         },
         {

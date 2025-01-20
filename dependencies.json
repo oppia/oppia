@@ -1,267 +1,256 @@
 {
-  "dependencies": {
-    "proto": {
-      "oppiaMlProto": {
-        "version": "0.0.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/oppia/oppia-ml-proto/archive/0.0.0.zip",
-        "rootDirPrefix": "oppia-ml-proto-",
-        "targetDirPrefix": "oppia-ml-proto-"
+  "frontendDependencies": {
+    "angular": {
+      "version": "1.8.2",
+      "downloadFormat": "files",
+      "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2",
+      "targetDirPrefix": "angularjs-",
+      "files": [
+        "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
+        "angular-animate.min.js", "angular-animate.min.js.map", "angular-resource.js",
+        "angular-resource.min.js", "angular-resource.min.js.map", "angular-route.js",
+        "angular-route.min.js", "angular-route.min.js.map", "angular-sanitize.js",
+        "angular-sanitize.min.js", "angular-sanitize.min.js.map", "angular-aria.js",
+        "angular-aria.min.js", "angular-aria.min.js.map", "angular-touch.js",
+        "angular-touch.min.js", "angular-touch.min.js.map"
+      ],
+      "bundle": {
+        "js": [
+          "angular-animate.js", "angular-sanitize.js",
+          "angular-touch.js", "angular-aria.js"
+        ]
       }
     },
-    "frontend": {
-      "angular": {
-        "version": "1.8.2",
-        "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2",
-        "targetDirPrefix": "angularjs-",
-        "files": [
-          "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
-          "angular-animate.min.js", "angular-animate.min.js.map", "angular-resource.js",
-          "angular-resource.min.js", "angular-resource.min.js.map", "angular-route.js",
-          "angular-route.min.js", "angular-route.min.js.map", "angular-sanitize.js",
-          "angular-sanitize.min.js", "angular-sanitize.min.js.map", "angular-aria.js",
-          "angular-aria.min.js", "angular-aria.min.js.map", "angular-touch.js",
-          "angular-touch.min.js", "angular-touch.min.js.map"
+    "lamejs": {
+      "version": "1.2.0",
+      "downloadFormat": "zip",
+      "url": "https://github.com/zhuker/lamejs/archive/1.2.0.zip",
+      "rootDirPrefix": "lamejs-",
+      "targetDirPrefix": "lamejs-"
+    },
+    "angularTest": {
+      "version": "1.8.2",
+      "downloadFormat": "files",
+      "url": "https://code.angularjs.org/1.8.2",
+      "targetDirPrefix": "angularjs-",
+      "files": ["angular-mocks.js"]
+    },
+    "angularTranslate": {
+      "version": "2.18.1",
+      "downloadFormat": "files",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1",
+      "rootDirPrefix": "bower-angular-translate-",
+      "targetDirPrefix": "bower-angular-translate-",
+      "files": ["angular-translate.min.js"],
+      "bundle": {
+        "js": ["angular-translate.min.js"]
+      }
+    },
+    "angularTranslateLoader": {
+      "version": "2.18.1",
+      "downloadFormat": "files",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files",
+      "rootDirPrefix": "bower-angular-translate-loader-static-files-",
+      "targetDirPrefix": "bower-angular-translate-loader-static-files-",
+      "files": ["angular-translate-loader-static-files.min.js"],
+      "bundle": {
+        "js": ["angular-translate-loader-static-files.min.js"]
+      }
+    },
+    "angularDragAndDrop": {
+      "version": "2.1.0",
+      "downloadFormat": "zip",
+      "url": "https://github.com/marceljuenemann/angular-drag-and-drop-lists/archive/2.1.0.zip",
+      "rootDirPrefix": "angular-drag-and-drop-lists-",
+      "targetDirPrefix": "angular-drag-and-drop-lists-"
+    },
+    "angularStorageCookiesRev": {
+      "version": "2.18.1",
+      "downloadFormat": "files",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie",
+      "rootDirPrefix": "bower-angular-translate-storage-cookie-",
+      "targetDirPrefix": "bower-angular-translate-storage-cookie-",
+      "files": ["angular-translate-storage-cookie.min.js"],
+      "bundle": {
+        "js": ["angular-translate-storage-cookie.min.js"]
+      }
+    },
+    "messageFormat": {
+      "version": "2.0.5",
+      "downloadFormat": "zip",
+      "url": "https://github.com/messageformat/messageformat/archive/v2.0.5.zip",
+      "targetDirPrefix": "messageformat-",
+      "rootDirPrefix": "messageformat-",
+      "bundle": {
+        "js": ["messageformat.js"]
+      }
+    },
+    "angularTranslateInterpolationMessageFormat": {
+      "version": "2.18.1",
+      "downloadFormat": "files",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat",
+      "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
+      "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
+      "files": ["angular-translate-interpolation-messageformat.min.js"],
+      "bundle": {
+        "js": ["angular-translate-interpolation-messageformat.min.js"]
+      }
+    },
+    "popperJs": {
+      "version": "1.15.0",
+      "downloadFormat": "zip",
+      "url": "https://github.com/floating-ui/floating-ui/archive/v1.15.0.zip",
+      "rootDirPrefix": "floating-ui-",
+      "targetDirPrefix": "popperJs-",
+      "bundle": {
+        "js": ["dist/umd/popper.js"]
+      }
+    },
+    "bootstrap": {
+      "version": "4.3.1",
+      "downloadFormat": "zip",
+      "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
+      "rootDir": "bootstrap-4.3.1-dist",
+      "targetDirPrefix": "bootstrap-",
+      "bundle": {
+        "css": ["css/bootstrap.css"],
+        "js": ["js/bootstrap.js"]
+      }
+    },
+    "bowerAngularTranslateLoaderPartial": {
+      "version": "2.18.1",
+      "downloadFormat": "files",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial",
+      "rootDirPrefix": "bower-angular-translate-loader-partial-",
+      "targetDirPrefix": "bower-angular-translate-loader-partial-",
+      "files": ["angular-translate-loader-partial.min.js"],
+      "bundle": {
+        "js": ["angular-translate-loader-partial.min.js"]
+      }
+    },
+    "bowerMaterial": {
+      "version": "1.1.19",
+      "downloadFormat": "zip",
+      "url": "https://github.com/angular/bower-material/archive/v1.1.19.zip",
+      "rootDirPrefix": "bower-material-",
+      "targetDirPrefix": "bower-material-",
+      "files": ["angular-material.css", "angular-material.js"],
+      "bundle": {
+        "js": ["angular-material.js"]
+      }
+    },
+    "fontAwesome": {
+      "version": "5.9.0",
+      "downloadFormat": "zip",
+      "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/5.9.0/fontawesome-free-5.9.0-web.zip",
+      "rootDir": "fontawesome-free-5.9.0-web",
+      "targetDir": "fontawesome-free-5.9.0-web",
+      "bundle": {
+        "css": [
+          "css/fontawesome.min.css",
+          "css/brands.min.css",
+          "css/regular.min.css",
+          "css/solid.min.css"
         ],
-        "bundle": {
-          "js": [
-            "angular-animate.js", "angular-sanitize.js",
-            "angular-touch.js", "angular-aria.js"
-          ]
-        }
-      },
-      "lamejs": {
-        "version": "1.2.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/zhuker/lamejs/archive/1.2.0.zip",
-        "rootDirPrefix": "lamejs-",
-        "targetDirPrefix": "lamejs-"
-      },
-      "angularTest": {
-        "version": "1.8.2",
-        "downloadFormat": "files",
-        "url": "https://code.angularjs.org/1.8.2",
-        "targetDirPrefix": "angularjs-",
-        "files": ["angular-mocks.js"]
-      },
-      "angularTranslate": {
-        "version": "2.18.1",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1",
-        "rootDirPrefix": "bower-angular-translate-",
-        "targetDirPrefix": "bower-angular-translate-",
-        "files": ["angular-translate.min.js"],
-        "bundle": {
-          "js": ["angular-translate.min.js"]
-        }
-      },
-      "angularTranslateLoader": {
-        "version": "2.18.1",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files",
-        "rootDirPrefix": "bower-angular-translate-loader-static-files-",
-        "targetDirPrefix": "bower-angular-translate-loader-static-files-",
-        "files": ["angular-translate-loader-static-files.min.js"],
-        "bundle": {
-          "js": ["angular-translate-loader-static-files.min.js"]
-        }
-      },
-      "angularDragAndDrop": {
-        "version": "2.1.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/marceljuenemann/angular-drag-and-drop-lists/archive/2.1.0.zip",
-        "rootDirPrefix": "angular-drag-and-drop-lists-",
-        "targetDirPrefix": "angular-drag-and-drop-lists-"
-      },
-      "angularStorageCookiesRev": {
-        "version": "2.18.1",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie",
-        "rootDirPrefix": "bower-angular-translate-storage-cookie-",
-        "targetDirPrefix": "bower-angular-translate-storage-cookie-",
-        "files": ["angular-translate-storage-cookie.min.js"],
-        "bundle": {
-          "js": ["angular-translate-storage-cookie.min.js"]
-        }
-      },
-      "messageFormat": {
-        "version": "2.0.5",
-        "downloadFormat": "zip",
-        "url": "https://github.com/messageformat/messageformat/archive/v2.0.5.zip",
-        "targetDirPrefix": "messageformat-",
-        "rootDirPrefix": "messageformat-",
-        "bundle": {
-          "js": ["messageformat.js"]
-        }
-      },
-      "angularTranslateInterpolationMessageFormat": {
-        "version": "2.18.1",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat",
-        "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
-        "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
-        "files": ["angular-translate-interpolation-messageformat.min.js"],
-        "bundle": {
-          "js": ["angular-translate-interpolation-messageformat.min.js"]
-        }
-      },
-      "popperJs": {
-        "version": "1.15.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/floating-ui/floating-ui/archive/v1.15.0.zip",
-        "rootDirPrefix": "floating-ui-",
-        "targetDirPrefix": "popperJs-",
-        "bundle": {
-          "js": ["dist/umd/popper.js"]
-        }
-      },
-      "bootstrap": {
-        "version": "4.3.1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
-        "rootDir": "bootstrap-4.3.1-dist",
-        "targetDirPrefix": "bootstrap-",
-        "bundle": {
-          "css": ["css/bootstrap.css"],
-          "js": ["js/bootstrap.js"]
-        }
-      },
-      "bowerAngularTranslateLoaderPartial": {
-        "version": "2.18.1",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial",
-        "rootDirPrefix": "bower-angular-translate-loader-partial-",
-        "targetDirPrefix": "bower-angular-translate-loader-partial-",
-        "files": ["angular-translate-loader-partial.min.js"],
-        "bundle": {
-          "js": ["angular-translate-loader-partial.min.js"]
-        }
-      },
-      "bowerMaterial": {
-        "version": "1.1.19",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-material/archive/v1.1.19.zip",
-        "rootDirPrefix": "bower-material-",
-        "targetDirPrefix": "bower-material-",
-        "files": ["angular-material.css", "angular-material.js"],
-        "bundle": {
-          "js": ["angular-material.js"]
-        }
-      },
-      "fontAwesome": {
-        "version": "5.9.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/5.9.0/fontawesome-free-5.9.0-web.zip",
-        "rootDir": "fontawesome-free-5.9.0-web",
-        "targetDir": "fontawesome-free-5.9.0-web",
-        "bundle": {
-          "css": [
-            "css/fontawesome.min.css",
-            "css/brands.min.css",
-            "css/regular.min.css",
-            "css/solid.min.css"
-          ],
-          "fontsPath": "webfonts"
-        }
-      },
-      "angularUiLeaflet": {
-        "version": "1.0.3",
-        "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/angular-ui/ui-leaflet/v1.0.3/dist",
-        "rootDirPrefix": "angular-ui-leaflet-",
-        "targetDirPrefix": "angular-ui-leaflet-",
-        "files": ["ui-leaflet.min.no-header.js"]
-      },
-      "angular-simple-logger": {
-        "version": "0.1.7",
-        "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/nmccready/angular-simple-logger/0.1.7/dist",
-        "rootDirPrefix": "angular-simple-logger-",
-        "targetDirPrefix": "angular-simple-logger-",
-        "files": ["angular-simple-logger.min.js"]
-      },
-      "jquery": {
-        "version": "3.5.1",
-        "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1",
-        "rootDirPrefix": "jquery-",
-        "targetDirPrefix": "jquery-",
-        "files": ["jquery.js", "jquery.min.js"]
-      },
-      "jqueryUI": {
-        "version": "1.12.1",
-        "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1",
-        "rootDirPrefix": "jqueryui-",
-        "targetDirPrefix": "jqueryui-",
-        "files": ["jquery-ui.min.js"]
-      },
-      "jqueryUITouchPunch": {
-        "version": "0.3.1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/Bantam/jquery-ui-touch-punch-improved/archive/0.3.1.zip",
-        "rootDirPrefix": "jquery-ui-touch-punch-improved-",
-        "targetDirPrefix": "jquery-ui-touch-punch-"
-      },
-      "mathJax": {
-        "version": "2.7.5",
-        "downloadFormat": "zip",
-        "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
-        "rootDirPrefix": "MathJax-",
-        "targetDirPrefix": "MathJax-"
-      },
-      "select2": {
-        "version": "4.0.3",
-        "downloadFormat": "zip",
-        "url": "https://github.com/select2/select2/archive/4.0.3.zip",
-        "rootDirPrefix": "select2-",
-        "targetDirPrefix": "select2-",
-        "bundle": {
-          "css": ["dist/css/select2.css"]
-        }
-      },
-      "ckeditor": {
-        "version": "4.12.1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/ckeditor/ckeditor4-releases/archive/4.12.1.zip",
-        "rootDirPrefix": "ckeditor4-releases-",
-        "targetDirPrefix": "ckeditor-"
-      },
-      "ckeditorBootstrapCK": {
-        "version": "1.0.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.zip",
-        "rootDirPrefix": "BootstrapCK4-Skin-",
-        "targetDirPrefix": "ckeditor-bootstrapck-"
-      },
-      "uiBootstrap": {
-        "version": "2.5.0",
-        "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages",
-        "rootDirPrefix": "ui-bootstrap-",
-        "targetDirPrefix": "ui-bootstrap-",
-        "files": ["ui-bootstrap-tpls-2.5.0.js", "ui-bootstrap-tpls-2.5.0.min.js"],
-        "bundle": {
-          "js": ["ui-bootstrap-tpls-2.5.0.js"]
-        }
-      },
-      "uiCodemirror": {
-        "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
-        "downloadFormat": "zip",
-        "url": "https://github.com/oppia/ui-codemirror/archive/5d04fa5c991f915e4578be5f1175e22d94696633.zip",
-        "rootDirPrefix": "ui-codemirror-",
-        "targetDir": "ui-codemirror-5d04fa"
-      },
-      "uiTree": {
-        "version": "",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
-        "rootDirPrefix": "angular-ui-tree-master",
-        "targetDirPrefix": "ui-tree-2.22.6",
-        "bundle": {
-          "css": ["dist/angular-ui-tree.min.css"]
-        }
+        "fontsPath": "webfonts"
+      }
+    },
+    "angularUiLeaflet": {
+      "version": "1.0.3",
+      "downloadFormat": "files",
+      "url": "https://raw.githubusercontent.com/angular-ui/ui-leaflet/v1.0.3/dist",
+      "rootDirPrefix": "angular-ui-leaflet-",
+      "targetDirPrefix": "angular-ui-leaflet-",
+      "files": ["ui-leaflet.min.no-header.js"]
+    },
+    "angular-simple-logger": {
+      "version": "0.1.7",
+      "downloadFormat": "files",
+      "url": "https://raw.githubusercontent.com/nmccready/angular-simple-logger/0.1.7/dist",
+      "rootDirPrefix": "angular-simple-logger-",
+      "targetDirPrefix": "angular-simple-logger-",
+      "files": ["angular-simple-logger.min.js"]
+    },
+    "jquery": {
+      "version": "3.5.1",
+      "downloadFormat": "files",
+      "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1",
+      "rootDirPrefix": "jquery-",
+      "targetDirPrefix": "jquery-",
+      "files": ["jquery.js", "jquery.min.js"]
+    },
+    "jqueryUI": {
+      "version": "1.12.1",
+      "downloadFormat": "files",
+      "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1",
+      "rootDirPrefix": "jqueryui-",
+      "targetDirPrefix": "jqueryui-",
+      "files": ["jquery-ui.min.js"]
+    },
+    "jqueryUITouchPunch": {
+      "version": "0.3.1",
+      "downloadFormat": "zip",
+      "url": "https://github.com/Bantam/jquery-ui-touch-punch-improved/archive/0.3.1.zip",
+      "rootDirPrefix": "jquery-ui-touch-punch-improved-",
+      "targetDirPrefix": "jquery-ui-touch-punch-"
+    },
+    "mathJax": {
+      "version": "2.7.5",
+      "downloadFormat": "zip",
+      "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
+      "rootDirPrefix": "MathJax-",
+      "targetDirPrefix": "MathJax-"
+    },
+    "select2": {
+      "version": "4.0.3",
+      "downloadFormat": "zip",
+      "url": "https://github.com/select2/select2/archive/4.0.3.zip",
+      "rootDirPrefix": "select2-",
+      "targetDirPrefix": "select2-",
+      "bundle": {
+        "css": ["dist/css/select2.css"]
+      }
+    },
+    "ckeditor": {
+      "version": "4.12.1",
+      "downloadFormat": "zip",
+      "url": "https://github.com/ckeditor/ckeditor4-releases/archive/4.12.1.zip",
+      "rootDirPrefix": "ckeditor4-releases-",
+      "targetDirPrefix": "ckeditor-"
+    },
+    "ckeditorBootstrapCK": {
+      "version": "1.0.0",
+      "downloadFormat": "zip",
+      "url": "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.zip",
+      "rootDirPrefix": "BootstrapCK4-Skin-",
+      "targetDirPrefix": "ckeditor-bootstrapck-"
+    },
+    "uiBootstrap": {
+      "version": "2.5.0",
+      "downloadFormat": "files",
+      "url": "https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages",
+      "rootDirPrefix": "ui-bootstrap-",
+      "targetDirPrefix": "ui-bootstrap-",
+      "files": ["ui-bootstrap-tpls-2.5.0.js", "ui-bootstrap-tpls-2.5.0.min.js"],
+      "bundle": {
+        "js": ["ui-bootstrap-tpls-2.5.0.js"]
+      }
+    },
+    "uiCodemirror": {
+      "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
+      "downloadFormat": "zip",
+      "url": "https://github.com/oppia/ui-codemirror/archive/5d04fa5c991f915e4578be5f1175e22d94696633.zip",
+      "rootDirPrefix": "ui-codemirror-",
+      "targetDir": "ui-codemirror-5d04fa"
+    },
+    "uiTree": {
+      "version": "",
+      "downloadFormat": "zip",
+      "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
+      "rootDirPrefix": "angular-ui-tree-master",
+      "targetDirPrefix": "ui-tree-2.22.6",
+      "bundle": {
+        "css": ["dist/angular-ui-tree.min.css"]
       }
     }
   }

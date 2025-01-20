@@ -23,7 +23,6 @@ import io
 import os
 import re
 import ssl
-import tarfile
 import tempfile
 from urllib import request as urlrequest
 import zipfile
@@ -31,6 +30,7 @@ import zipfile
 from core.tests import test_utils
 from typing import BinaryIO, Final, NoReturn, Tuple
 
+from . import common
 from . import install_dependencies_json_packages
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
@@ -80,7 +80,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             install_dependencies_json_packages, 'TMP_UNZIP_PATH',
             MOCK_TMP_UNZIP_PATH)
         self. dir_exists_swap = self.swap(
-            install_dependencies_json_packages,
+            common,
             'ensure_directory_exists', mock_ensure_directory_exists)
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
         self.remove_swap = self.swap(os, 'remove', mock_remove)
@@ -179,29 +179,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.check_function_calls, self.expected_check_function_calls)
         self.assertEqual(exists_arr, [False, True])
 
-    def test_download_and_untar_files(self) -> None:
-        exists_arr = []
-        def mock_exists(_path: str) -> bool:
-            exists_arr.append(False)
-            return False
-        def mock_extractall(_self: zipfile.ZipFile, _path: str) -> None:
-            self.check_function_calls['extractall_is_called'] = True
-
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        extract_swap = self.swap(
-            tarfile.TarFile, 'extractall', mock_extractall)
-        unzip_swap = self.swap(
-            install_dependencies_json_packages, 'TMP_UNZIP_PATH', os.path.join(
-                RELEASE_TEST_DIR, 'tmp_unzip.tar.gz'))
-
-        with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
-            with self.remove_swap, self.rename_swap, unzip_swap, extract_swap:
-                install_dependencies_json_packages.download_and_untar_files(
-                    'source url', 'target dir', 'zip root', 'target root')
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls)
-        self.assertEqual(exists_arr, [False])
-
     def test_get_file_contents(self) -> None:
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = 'Testing install third party file.'
@@ -275,33 +252,30 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         print_swap = self.swap(builtins, 'print', mock_print)
         with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_dependencies_json_packages.test_dependencies_syntax(
-                'tar', {
+                'zip', {
                     'version': '4.7.1',
-                    'downloadFormat': 'tar',
+                    'downloadFormat': 'zip',
                     'url': (
-                        'https://python.org/packages/beautifulsoup4-4.7.1.zip'
+                        'https://python.org/packages/beautifulsoup4-4.7.1.tar'
                         '#md5=321d'),
-                    'tarRootDirPrefix': 'beautifulsoup4-',
                     'rootDirPrefix': 'beautifulsoup4-',
                     'targetDirPrefix': 'beautifulsoup4-'})
         self.assertTrue(
-            'This url https://python.org/packages/beautifulsoup4-4.7.1.zip is '
-            'invalid for tar file format.' in print_arr)
+            'This url https://python.org/packages/beautifulsoup4-4.7.1.tar is '
+            'invalid for zip file format.' in print_arr)
 
     def test_validate_dependencies_with_correct_syntax(self) -> None:
         def mock_return_json(
             _path: str
         ) -> install_dependencies_json_packages.DependenciesDict:
             return {
-                'dependencies': {
-                    'frontend': {
-                        'mathJax': {
-                            'url': 'https://github.com/mathjax/2.7.5',
-                            'files': ['MathJax-2.7.5.jar'],
-                            'version': '2.7.5',
-                            'targetDirPrefix': 'MathJax-',
-                            'downloadFormat': 'files'
-                        }
+                'frontendDependencies': {
+                    'mathJax': {
+                        'url': 'https://github.com/mathjax/2.7.5',
+                        'files': ['MathJax-2.7.5.jar'],
+                        'version': '2.7.5',
+                        'targetDirPrefix': 'MathJax-',
+                        'downloadFormat': 'files'
                     }
                 }
             }
@@ -316,13 +290,11 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             _path: str
         ) -> install_dependencies_json_packages.DependenciesDict:
             return {
-                'dependencies': {
-                    'frontend': {
-                        'mathJax': {
-                            'version': '2.7.5',
-                            'url': 'https://github.com/mathjax/2.7.5.zip',
-                            'targetDirPrefix': 'MathJax-'
-                        }
+                'frontendDependencies': {
+                    'mathJax': {
+                        'version': '2.7.5',
+                        'url': 'https://github.com/mathjax/2.7.5.zip',
+                        'targetDirPrefix': 'MathJax-'
                     }
                 }
             }
@@ -343,50 +315,38 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'validate_dependencies_is_called': False,
             'download_files_is_called': False,
             'download_and_unzip_files_is_called': False,
-            'download_and_untar_files_is_called': False,
         }
         expected_check_function_calls = {
             'validate_dependencies_is_called': True,
             'download_files_is_called': True,
             'download_and_unzip_files_is_called': True,
-            'download_and_untar_files_is_called': True
         }
         def mock_return_json(
             _path: str
         ) -> install_dependencies_json_packages.DependenciesDict:
             return {
-                'dependencies': {
-                    'oppiaTools': {
-                        'bleach': {
-                            'version': '3.1.0',
-                            'downloadFormat': 'zip',
-                            'url': 'https://github.com/bleach/v3.1.0.zip',
-                            'rootDirPrefix': 'bleach-',
-                            'targetDirPrefix': 'bleach-'
-                        },
-                        'graphy': {
-                            'version': '1.0.0',
-                            'downloadFormat': 'tar',
-                            'url': 'https://pypi/Graphy/Graphy-1.0.0.tar.gz',
-                            'tarRootDirPrefix': 'Graphy-',
-                            'rootDirPrefix': 'graphy-',
-                            'targetDirPrefix': 'graphy-'
-                        },
-                        'bootstrap': {
-                            'version': '4.3.1',
-                            'downloadFormat': 'zip',
-                            'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
-                            'rootDir': 'bootstrap-4.3.1-dist',
-                            'targetDir': 'bootstrap'
-                        },
-                        'angularTest': {
-                            'version': '1.8.2',
-                            'downloadFormat': 'files',
-                            'url': 'https://code.angularjs.org/1.8.2',
-                            'targetDirPrefix': 'angularjs-',
-                            'files': ['angular-mocks.js']
-                        },
-                    }
+                'frontendDependencies': {
+                    'bleach': {
+                        'version': '3.1.0',
+                        'downloadFormat': 'zip',
+                        'url': 'https://github.com/bleach/v3.1.0.zip',
+                        'rootDirPrefix': 'bleach-',
+                        'targetDirPrefix': 'bleach-'
+                    },
+                    'bootstrap': {
+                        'version': '4.3.1',
+                        'downloadFormat': 'zip',
+                        'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
+                        'rootDir': 'bootstrap-4.3.1-dist',
+                        'targetDir': 'bootstrap'
+                    },
+                    'angularTest': {
+                        'version': '1.8.2',
+                        'downloadFormat': 'files',
+                        'url': 'https://code.angularjs.org/1.8.2',
+                        'targetDirPrefix': 'angularjs-',
+                        'files': ['angular-mocks.js']
+                    },
                 }
             }
 
@@ -405,13 +365,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             unused_target_root_name: str
         ) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
-        def mock_download_and_untar_files(
-            unused_source_url: str,
-            unused_target_parent_dir: str,
-            unused_tar_root_name: str,
-            unused_target_root_name: str
-        ) -> None:
-            check_function_calls['download_and_untar_files_is_called'] = True
         return_json_swap = self.swap(
             install_dependencies_json_packages, 'return_json', mock_return_json)
         validate_swap = self.swap(
@@ -425,12 +378,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         unzip_files_swap = self.swap(
             install_dependencies_json_packages, 'download_and_unzip_files',
             mock_download_and_unzip_files)
-        untar_files_swap = self.swap(
-            install_dependencies_json_packages, 'download_and_untar_files',
-            mock_download_and_untar_files)
 
         with validate_swap, return_json_swap, download_files_swap:
-            with unzip_files_swap, untar_files_swap:
+            with unzip_files_swap:
                 install_dependencies_json_packages.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -575,27 +525,3 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     'https://example.com', output_path, enforce_https=False)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
-
-    def test_ensure_directory_exists_with_existing_dir(self) -> None:
-        check_function_calls = {
-            'makedirs_gets_called': False
-        }
-        def mock_makedirs(unused_dirpath: str) -> None:
-            check_function_calls['makedirs_gets_called'] = True
-        with self.swap(os, 'makedirs', mock_makedirs):
-            install_dependencies_json_packages.ensure_directory_exists(
-                'assets')
-        self.assertEqual(
-            check_function_calls, {'makedirs_gets_called': False})
-
-    def test_ensure_directory_exists_with_non_existing_dir(self) -> None:
-        check_function_calls = {
-            'makedirs_gets_called': False
-        }
-        def mock_makedirs(unused_dirpath: str) -> None:
-            check_function_calls['makedirs_gets_called'] = True
-        with self.swap(os, 'makedirs', mock_makedirs):
-            install_dependencies_json_packages.ensure_directory_exists(
-                'test-dir')
-        self.assertEqual(
-            check_function_calls, {'makedirs_gets_called': True})

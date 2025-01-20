@@ -16,7 +16,7 @@
  * @fileoverview Backend Api Service for access validation.
  */
 
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -74,12 +74,18 @@ export class AccessValidationBackendApiService {
   COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
+  SKILL_EDITOR_ACCESS_VALIDATION_URL =
+    '/access_validation_handler/can_access_skill_editor/<skill_id>';
+
   COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/' +
     'can_access_collection_editor_page/<collection_id>';
 
   CLASSROOMS_PAGE_ACCESS_VALIDATION =
     '/access_validation_handler/can_access_classrooms_page';
+
+  EXPLORATION_PLAYER_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_exploration_player_page/<exploration_id>';
 
   REVIEW_TESTS_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_review_tests_page/<classroom_url_fragment>/<topic_url_fragment>/<story_url_fragment>'; // eslint-disable-line max-len
@@ -97,6 +103,22 @@ export class AccessValidationBackendApiService {
       }
     );
     return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToExplorationPlayerPage(
+    explorationId: string,
+    version: string | null
+  ): Promise<void> {
+    const url = this.urlInterpolationService.interpolateUrl(
+      this.EXPLORATION_PLAYER_PAGE_ACCESS_VALIDATOR,
+      {
+        exploration_id: explorationId,
+      }
+    );
+
+    const params = version ? new HttpParams().set('v', version) : undefined;
+
+    return this.http.get<void>(url, {params}).toPromise();
   }
 
   validateAccessToReviewTestPage(
@@ -240,6 +262,17 @@ export class AccessValidationBackendApiService {
     return this.http
       .get<void>(this.LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR)
       .toPromise();
+  }
+
+  validateAccessToSkillEditorPage(skillId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.SKILL_EDITOR_ACCESS_VALIDATION_URL,
+      {
+        skill_id: skillId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
   }
 
   validateAccessToDiagnosticTestPlayerPage(): Promise<void> {

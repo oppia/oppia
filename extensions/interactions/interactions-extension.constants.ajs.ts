@@ -34,13 +34,3 @@ angular
     'NOTE_NAMES_TO_MIDI_VALUES',
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES
   );
-
-// Minimum confidence required for a predicted answer group to be shown to user.
-// Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
-// however value need not be in those bounds.
-angular
-  .module('oppia')
-  .constant(
-    'TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD',
-    InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD
-  );

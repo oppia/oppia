@@ -71,7 +71,7 @@ export class QuestionValidationService {
       !this.responsesService.shouldHideDefaultAnswerGroup() &&
       interaction.defaultOutcome?.feedback._html.length === 0
     ) {
-      return 'Please enter a feedback for the default outcome.';
+      return "Please enter feedback for the '[All other answers]' outcome.";
     }
     if (interaction.hints.length === 0) {
       return 'At least 1 hint should be specified';

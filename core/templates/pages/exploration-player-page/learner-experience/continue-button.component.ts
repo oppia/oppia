@@ -18,7 +18,6 @@
  */
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
@@ -39,10 +38,3 @@ export class ContinueButtonComponent {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaContinueButton',
-    downgradeComponent({component: ContinueButtonComponent})
-  );

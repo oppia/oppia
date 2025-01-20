@@ -2,11 +2,11 @@
   <div class="d-flex justify-content-between">
     <p class="card-display-heading"> {{ headingI18n | translate }} </p>
     <div class="card-display-arrow-button-container" *ngIf="arrowButtonVisibility">
-      <button [disabled]="currentShift === 0" class="px-0 card-display-arrow-button" (click)="moveCard(currentShift - 1)">
-        <span [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'right' : 'left')"></span>
+      <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'right' : 'left')" [disabled]="currentShift === 0" class="px-0 card-display-arrow-button" (click)="moveCard(currentShift - 1)">
+        <span aria-hidden="true" [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'right' : 'left')"></span>
       </button>
-      <button [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="px-0 card-display-arrow-button" (click)="moveCard(currentShift + 1)">
-        <span [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'left' : 'right')"></span>
+      <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'left' : 'right')" [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="px-0 card-display-arrow-button" (click)="moveCard(currentShift + 1)">
+        <span aria-hidden="true" [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'left' : 'right')"></span>
       </button>
     </div>
   </div>
@@ -15,7 +15,7 @@
     <ng-content></ng-content>
   </div>
   <!--TODO(#18384): Delete I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON key-->
-  <oppia-content-toggle-button *ngIf="toggleButtonVisibility" (contentToggleEmitter)="handleToggleState($event)"> </oppia-content-toggle-button>
+  <oppia-content-toggle-button [ngClass]="mt-4" *ngIf="toggleButtonVisibility" (contentToggleEmitter)="handleToggleState($event)"> </oppia-content-toggle-button>
 </div>
 
 <style>

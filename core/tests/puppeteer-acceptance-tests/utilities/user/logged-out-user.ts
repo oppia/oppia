@@ -355,7 +355,7 @@ const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
 const mobileNavbarButtonSelector = '.text-uppercase';
-const skipLinkSelector = '.e2e-test-skip-link';
+const mainContentSelector = '.e2e-test-main-content';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
 const lessonLanguageSelector = '.oppia-content-language-selector';
@@ -530,16 +530,9 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.clickOn(button),
-    ]);
+    await this.clickAndWaitForNavigation(button);
 
-    expect(this.page.url())
-      .withContext(
-        `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
+    expect(this.page.url()).toBe(expectedDestinationPageUrl);
   }
 
   /**
@@ -558,14 +551,13 @@ export class LoggedOutUser extends BaseUser {
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
-
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url())
-      .withContext(
+    if (newTabPage === null) {
+      throw new Error(
         `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
+      );
+    }
+    expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage.close();
   }
 
   /**
@@ -821,10 +813,8 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(readOurBlogButton),
-    ]);
+    await this.clickAndWaitForNavigation(readOurBlogButton);
+
     if (this.page.url() !== blogUrl) {
       throw new Error(
         `The Read Our Blog button should open the Blog page,
@@ -972,10 +962,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Forum page using the oppia website footer.
    */
   async clickOnForumLinkInFooter(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn(footerForumlink),
-    ]);
+    await this.clickAndWaitForNavigation(footerForumlink);
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -1105,9 +1092,11 @@ export class LoggedOutUser extends BaseUser {
     );
     const newTabPage = await newTarget.page();
     await newTabPage?.waitForNetworkIdle();
-
-    expect(newTabPage?.url()).toContain(googleSignUpUrl);
-    await newTabPage?.close();
+    if (newTabPage === null) {
+      throw new Error('The "create on here" link did not open a new tab');
+    }
+    expect(newTabPage.url()).toContain(googleSignUpUrl);
+    await newTabPage.close();
   }
 
   /**
@@ -1161,10 +1150,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForXPath(
       '//a[contains(text(),"discover more ways to get involved")]'
     );
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn('discover more ways to get involved'),
-    ]);
+    await this.clickAndWaitForNavigation('discover more ways to get involved');
 
     expect(this.page.url()).toBe(contactUrl);
   }
@@ -3895,7 +3881,7 @@ export class LoggedOutUser extends BaseUser {
         expectedFocusedElement = await this.page.$(searchInputSelector);
         break;
       case 's':
-        expectedFocusedElement = await this.page.$(skipLinkSelector);
+        expectedFocusedElement = await this.page.$(mainContentSelector);
         break;
       case 'c':
         expectedFocusedElement = await this.page.$(

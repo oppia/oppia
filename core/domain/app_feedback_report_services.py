@@ -723,7 +723,7 @@ def edit_ticket_name(
 ) -> None:
     """Updates the ticket name.
 
-    Returns:
+    Args:
         ticket: AppFeedbackReportTicket. The domain object for a ticket.
         new_name: str. The new name to assign the ticket.
     """
@@ -736,7 +736,7 @@ def _save_ticket(
 ) -> None:
     """Saves the ticket to persistent storage.
 
-    Returns:
+    Args:
         ticket: AppFeedbackReportTicket. The domain object to save to storage.
     """
     model_class = app_feedback_report_models.AppFeedbackReportTicketModel

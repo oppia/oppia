@@ -869,13 +869,13 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             state_reference_3, 'exp id 1.2.3:this_is first_state version 1.1')
         exp_id_4 = '123'
-        state_name_4 = u'टेक्स्ट'
+        state_name_4 = 'टेक्स्ट'
         state_reference_4 = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_4, state_name_4)) # pylint: disable=line-too-long
         self.assertEqual(
             state_reference_4, '123:%s' % (state_name_4))
         exp_id_5 = '1234'
-        state_name_5 = u'Klüft'
+        state_name_5 = 'Klüft'
         state_reference_5 = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_5, state_name_5)) # pylint: disable=line-too-long
         self.assertEqual(
@@ -953,7 +953,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
 
     def test_save_and_get_model_instance_for_unicode_state_names(self) -> None:
         exp_id = '123'
-        state_name = u'टेक्स्ट'
+        state_name = 'टेक्स्ट'
         state_reference = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) # pylint: disable=line-too-long
         self.assertEqual(
