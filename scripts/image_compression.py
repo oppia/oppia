@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import logging
 import pathlib
 import subprocess
 import tempfile
@@ -95,8 +96,8 @@ def compress_images(
                                 f'({(1 - new_size/original_size)*100:.1f}%)'
                             )
                     else:
-                        print(
-                            'Compressed image > original image'
+                        logging.info(
+                            f'Compressed image > original image'
                         )
                         continue
         except Exception as e:
