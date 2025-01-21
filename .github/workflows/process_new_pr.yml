@@ -1,0 +1,127 @@
+name: Assign Reviewers for Contributors
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions: {}
+
+jobs:
+  check_contributor_and_reviewers:
+    name: Check Contributor Status and Assigned Reviewers
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: read
+    outputs:
+      is_new_contributor: ${{ steps.check-new-contributor.outputs.result }}
+      has_reviewers: ${{ steps.check-reviewers.outputs.has_reviewers }}
+      has_teams: ${{ steps.check-reviewers.outputs.has_teams }}
+      author: ${{ steps.set-env.outputs.author }}
+      repo: ${{ steps.set-env.outputs.repo }}
+      owner: ${{ steps.set-env.outputs.owner }}
+      pr_number: ${{ steps.set-env.outputs.pr_number }}
+    steps:
+      - name: Extract PR Metadata
+        id: set-env
+        shell: bash
+        run: |
+          echo "author=${{ github.event.pull_request.user.login }}" >> $GITHUB_OUTPUT
+          echo "repo=${{ github.event.repository.name }}" >> $GITHUB_OUTPUT
+          echo "owner=${{ github.event.repository.owner.login }}" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+      - name: Check if PR Author is a New Contributor
+        id: check-new-contributor
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const author = '${{ github.event.pull_request.user.login }}';
+            const owner = '${{ github.event.repository.owner.login }}';
+            const repo = '${{ github.event.repository.name }}';
+            
+            try {
+              const { data } = await github.rest.search.issuesAndPullRequests({
+                q: `repo:${owner}/${repo} type:pr is:merged author:${author}`,
+              });
+              return data.total_count === 0;
+            } catch (error) {
+              console.error('Error checking contributor status:', error);
+              return false;
+            }
+      - name: Check for Assigned Reviewers and Teams
+        id: check-reviewers
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const hasReviewers = pr.requested_reviewers?.length > 0;
+            const hasTeams = pr.requested_teams?.length > 0;
+            core.setOutput('has_reviewers', hasReviewers);
+            core.setOutput('has_teams', hasTeams);
+  manage_reviewers_and_comments:
+    name: Assign Reviewers and Post Comments
+    needs: check_contributor_and_reviewers
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-setup-python
+
+      - name: Assign PR Reviewers as Assignees
+        if: needs.check_contributor_and_reviewers.outputs.has_reviewers == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = '${{ needs.check_contributor_and_reviewers.outputs.owner }}';
+            const repo = '${{ needs.check_contributor_and_reviewers.outputs.repo }}';
+            const pr_number = parseInt('${{ needs.check_contributor_and_reviewers.outputs.pr_number }}');
+            
+            try {
+              const { data: pr } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: pr_number
+              });
+              
+              const reviewers = pr.requested_reviewers.map(r => r.login);
+              
+              if (reviewers.length > 0) {
+                await github.rest.issues.addAssignees({
+                  owner,
+                  repo,
+                  issue_number: pr_number,
+                  assignees: reviewers
+                });
+                console.log(`Assigned reviewers: ${reviewers.join(", ")}`);
+              }
+            } catch (error) {
+              console.error('Error assigning reviewers:', error);
+              throw error;
+            }
+      - name: Notify Team if No Reviewers are Assigned
+        if: needs.check_contributor_and_reviewers.outputs.has_reviewers == 'false' && needs.check_contributor_and_reviewers.outputs.has_teams == 'false'
+        uses: ./.github/actions/post-comment
+        with:
+          owner: ${{ needs.check_contributor_and_reviewers.outputs.owner }}
+          repo: ${{ needs.check_contributor_and_reviewers.outputs.repo }}
+          issue_number: ${{ needs.check_contributor_and_reviewers.outputs.pr_number }}
+          message: "@oppia/dev-workflow-reviewers, could you please review this PR? No individual reviewers or teams were assigned. Thank you!"
+
+      - name: Post PTAL Syntax Comment for New Contributors
+        if: needs.check_contributor_and_reviewers.outputs.is_new_contributor == 'true'
+        uses: ./.github/actions/post-comment
+        with:
+          owner: ${{ needs.check_contributor_and_reviewers.outputs.owner }}
+          repo: ${{ needs.check_contributor_and_reviewers.outputs.repo }}
+          issue_number: ${{ needs.check_contributor_and_reviewers.outputs.pr_number }}
+          message: >
+            Hello @${{ needs.check_contributor_and_reviewers.outputs.author }}! Thank you for making a PR. 
+            Please ensure your PR is assigned to the correct reviewers -- check the "Assignees" section in the sidebar on the right. Typically, this should match the "Reviewers" section.
+            If it's not correct, you can leave a comment with the syntax `@reviewer_username PTAL` to request that a specific reviewer be assigned.
+            Thanks!
