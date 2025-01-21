@@ -101,6 +101,13 @@ jobs:
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
         run: >
+          VIDEO_RECORDING_IS_ENABLED=0
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_e2e_tests --skip-install
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
+      - name: Run E2E Test ${{ matrix.suite.name }}
+        if: ${{ failure() }}
+        run: >
           VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
           python -m scripts.run_e2e_tests --skip-install
