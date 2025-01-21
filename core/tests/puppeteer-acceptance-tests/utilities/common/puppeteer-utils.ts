@@ -24,8 +24,10 @@ import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-m
 import {showMessage} from './show-message';
 
 var path = require('path');
+var fs = require('fs');
 
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
+import {PuppeteerScreenRecorder} from 'puppeteer-screen-recorder';
 expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
@@ -68,6 +70,8 @@ export class BaseUser {
   email: string = '';
   username: string = '';
   startTimeInMilliseconds: number = -1;
+  screenRecorder!: PuppeteerScreenRecorder;
+  specName: string = '';
 
   constructor() {}
 
@@ -82,7 +86,7 @@ export class BaseUser {
 
     const headless = process.env.HEADLESS === 'true';
     const mobile = process.env.MOBILE === 'true';
-    const specName = process.env.SPEC_NAME;
+    this.specName = process.env.SPEC_NAME ?? '';
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -106,7 +110,7 @@ export class BaseUser {
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
         if (!mobile) {
           TestToModulesMatcher.setGoldenFilePath(
-            `core/tests/test-modules-mappings/acceptance/${specName}.txt`
+            `core/tests/test-modules-mappings/acceptance/${this.specName}.txt`
           );
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
@@ -130,6 +134,11 @@ export class BaseUser {
         } else {
           this.page.setViewport({width: 1920, height: 1080});
         }
+
+        if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
+          await this.setupVideoRecording();
+        }
+
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -453,6 +462,9 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
+    if (this.screenRecorder) {
+      await this.screenRecorder.stop();
+    }
     await this.browserObject.close();
   }
 
@@ -758,6 +770,49 @@ export class BaseUser {
     await newPage.bringToFront();
     this.page = newPage;
     return newPage;
+  }
+
+  /**
+   * This function sets up video recording for the current test.
+   */
+  async setupVideoRecording(): Promise<void> {
+    const outputFileName =
+      `${this.specName}-${new Date().toISOString()}.mp4`.replace(
+        /[^a-z0-9.-]/gi,
+        '_'
+      );
+
+    const outputDir = testConstants.TEST_VIDEO_DIR;
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, {recursive: true});
+    }
+
+    // Skip if there is no page object.
+    if (!this.page) {
+      return;
+    }
+
+    const config = {
+      followNewTab: true,
+      fps: 25,
+      ffmpeg_Path: null,
+      videoFrame: {
+        width: this.page.viewport()?.width || 1920,
+        height: this.page.viewport()?.height || 1080,
+      },
+      aspectRatio: '16:9',
+    };
+
+    this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
+    await this.screenRecorder.start(path.join(outputDir, outputFileName));
+
+    // Ensure recording is stopped when the test fails.
+    process.on('SIGTERM', async () => {
+      await this.screenRecorder.stop();
+    });
+    process.on('SIGINT', async () => {
+      await this.screenRecorder.stop();
+    });
   }
 }
 
