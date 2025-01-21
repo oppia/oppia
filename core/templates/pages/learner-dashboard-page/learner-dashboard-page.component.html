@@ -72,9 +72,9 @@
         <li>
           <button aria-label="Go to progress tab"
                   class="align-items-center d-inline-flex e2e-test-community-lessons-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
-                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
-                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)"
-                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
+                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)"
+                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)">
             <span aria-hidden="true" class="fas fa-chart-line fa-lg"></span>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate }}
           </button>
@@ -144,28 +144,28 @@
                            [learnerDashboardRedesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
           </oppia-goals-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !windowIsNarrow">
-          <oppia-progress-tab [completedStoriesList]="completedStoriesList"
+        <div *ngIf="!isShowRedesignedLearnerDashboardActive() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !windowIsNarrow">
+          <oppia-old-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList"
                               (setActiveSection)="setActiveSection($event)">
-          </oppia-progress-tab>
+          </oppia-old-progress-tab>
         </div>
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && windowIsNarrow">
-          <oppia-progress-tab [completedStoriesList]="completedStoriesList"
+        <div *ngIf="!isShowRedesignedLearnerDashboardActive() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && windowIsNarrow">
+          <oppia-old-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList"
                               [activeSubsection]="activeSubsection"
                               (setActiveSection)="setActiveSection($event)">
-          </oppia-progress-tab>
+          </oppia-old-progress-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS && LEARNER_GROUP_FEATURE_IS_ENABLED">
           <oppia-learner-groups-tab [username]="username"
                                     (setActiveSection)="setActiveSection($event)">
           </oppia-learner-groups-tab>
         </div>
-        <div class="w-100" *ngIf="(isShowRedesignedLearnerDashboardActive() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || ((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communityLessonsDataLoaded">
-          <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
+        <div class="w-100" *ngIf="(isShowRedesignedLearnerDashboardActive() && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS) || ((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communityLessonsDataLoaded">
+          <oppia-progress-tab [incompleteExplorationsList]="incompleteExplorationsList"
                                        [incompleteCollectionsList]="incompleteCollectionsList"
                                        [completedExplorationsList]="completedExplorationsList"
                                        [completedCollectionsList]="completedCollectionsList"
@@ -176,8 +176,9 @@
                                        [learntTopicsList]="learntTopicsList"
                                        [completedToIncompleteCollections]="completedToIncompleteCollections"
                                        [learnerDashboardRedesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
-                                       [currentGoals]="topicsToLearn">
-          </oppia-community-lessons-tab>
+                                       [currentGoals]="topicsToLearn"
+                                       [subtopicMasteries]="subtopicMasteries">
+          </oppia-progress-tab>
         </div>
       </div>
     </div>

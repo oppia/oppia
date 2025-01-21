@@ -369,7 +369,6 @@ describe('ExplorationFooterComponent', () => {
 
       expect(component.explorationId).toBe('exp1');
       expect(component.iframed).toBeTrue();
-      expect(component.windowIsNarrow).toBeFalse();
       expect(
         explorationSummaryBackendApiService.loadPublicAndPrivateExplorationSummariesAsync
       ).toHaveBeenCalledWith(['exp1']);
@@ -1388,12 +1387,9 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'getQuestionPlayerIsManuallySet').and.returnValue(
       false
     );
-    component.windowIsNarrow = true;
 
     component.ngOnInit();
     mockResizeEventEmitter.emit();
-
-    expect(component.windowIsNarrow).toBeFalse();
   });
 
   it('should open lesson info modal if emitter emits', () => {

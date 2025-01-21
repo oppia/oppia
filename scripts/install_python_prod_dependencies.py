@@ -35,7 +35,6 @@ from . import common
 MismatchType = Dict[str, Tuple[Optional[str], Optional[str]]]
 ValidatedMismatchType = Dict[str, Tuple[str, Optional[str]]]
 
-# This is the version that is set in install_prerequisites.sh.
 GIT_DIRECT_URL_REQUIREMENT_PATTERN: Final = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
