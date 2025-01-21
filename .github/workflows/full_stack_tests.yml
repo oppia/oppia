@@ -100,15 +100,11 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
-        uses: oppia/retry@a9fb265410e634c84ee90f3e87f323fde0541037
-        with:
-          max_attempts: 2
-          substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
-          command: >
-            VIDEO_RECORDING_IS_ENABLED=0
-            xvfb-run -a --server-args="-screen 0, 1285x1000x24"
-            python -m scripts.run_e2e_tests --skip-install
-            --skip-build --suite=${{ matrix.suite.name }} --prod_env
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_e2e_tests --skip-install
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4

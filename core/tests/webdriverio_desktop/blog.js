@@ -83,7 +83,7 @@ describe('Blog Pages functionality', function () {
       await blogPages.expectNumberOfBlogPostsToBe(1);
       await blogPages.navigateToBlogPostPage('Published Blog Post Title');
       await blogPages.expectBlogPostPageTitleToBe('Published Blog Post Title');
-      await blogPages.expectBlogAuthorDetailsToBeVisible('secondUser');
+      await blogPages.expectBlogAuthorDetailsToBeVisible('secondUser2');
       await blogPages.expectNumberOfRecommendationPostsToBe(0);
       await blogPages.navigateToBlogHomePageWithBackButton();
       await users.logout();
