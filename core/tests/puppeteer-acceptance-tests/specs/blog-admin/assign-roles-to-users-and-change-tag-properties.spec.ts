@@ -56,7 +56,7 @@ describe('Blog Admin', function () {
 
       await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
-        'guestUsr1',
+        'guestUsr2',
         BLOG_RIGHTS.BLOG_ADMIN
       );
       await superAdmin.expectUserToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
