@@ -105,7 +105,7 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
           python -m scripts.run_e2e_tests --skip-install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Run E2E Test ${{ matrix.suite.name }}
+      - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
         run: >
           VIDEO_RECORDING_IS_ENABLED=1
@@ -158,7 +158,24 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=0
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          python -m scripts.run_acceptance_tests 
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
+      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
+        if: ${{ failure() }}
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          python -m scripts.run_acceptance_tests 
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
+      - name: Uploading test recordings as Artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: webdriverio-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance # TODO: update-path
       - name: Uploading generated test to angular module mapping as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4

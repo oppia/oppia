@@ -234,5 +234,9 @@ export default {
     'Software',
     'Art and Design',
   ],
-  DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
+  DEFAULT_SPEC_TIMEOUT_MSECS: 300000, // The video recording path below is relative to the oppia/ folder's
+  // root path.
+  TEST_VIDEO_DIR: path.resolve(
+    '../oppia_full_stack_test_video_recordings/acceptance'
+  ),
 };
