@@ -1,0 +1,108 @@
+name: Assign Reviewers on PTAL Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+jobs:
+  check_comment_and_pr:
+    name: Validate Comment and PR
+    if: github.event.issue.pull_request != null
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: read
+    outputs:
+      should_assign: ${{ steps.check-ptal-syntax.outputs.should_assign }}
+      reviewers: ${{ steps.extract-reviewers.outputs.reviewers }}
+      pr_number: ${{ steps.set-pr-info.outputs.pr_number }}
+      repo: ${{ steps.set-pr-info.outputs.repo }}
+      owner: ${{ steps.set-pr-info.outputs.owner }}
+      current_assignees: ${{ steps.get-current-assignees.outputs.assignees }}
+    steps:
+      - name: Set PR Information
+        id: set-pr-info
+        shell: bash
+        run: |
+          echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          echo "repo=${{ github.event.repository.name }}" >> $GITHUB_OUTPUT
+          echo "owner=${{ github.event.repository.owner.login }}" >> $GITHUB_OUTPUT
+
+      - name: Extract Reviewers from Comment
+        id: extract-reviewers
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comment = context.payload.comment.body;
+            const reviewers = Array.from(comment.matchAll(/@([\w-]+)/g), match => match[1]);
+            core.setOutput('reviewers', JSON.stringify(reviewers));
+
+      - name: Check PTAL Syntax
+        id: check-ptal-syntax
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comment = context.payload.comment.body;
+            const ptalRegex = /\b(ptal|take a pass|please review)\b/i;
+            const containsPtal = ptalRegex.test(comment);
+            const hasReviewers = '${{ steps.extract-reviewers.outputs.reviewers }}' !== '[]';
+            core.setOutput('should_assign', containsPtal && hasReviewers);
+
+      - name: Get Current Assignees
+        id: get-current-assignees
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.issue.number
+            });
+            core.setOutput('assignees', JSON.stringify(pr.data.assignees.map(a => a.login)));
+
+  manage_assignees_and_comments:
+    name: Update Assignees and Post Comments
+    needs: check_comment_and_pr
+    if: needs.check_comment_and_pr.outputs.should_assign == 'true'
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Update PR Assignees
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = '${{ needs.check_comment_and_pr.outputs.owner }}';
+            const repo = '${{ needs.check_comment_and_pr.outputs.repo }}';
+            const pr_number = parseInt('${{ needs.check_comment_and_pr.outputs.pr_number }}');
+            const reviewers = JSON.parse('${{ needs.check_comment_and_pr.outputs.reviewers }}');
+            const currentAssignees = JSON.parse('${{ needs.check_comment_and_pr.outputs.current_assignees }}');
+            
+            try {
+              const newAssignees = [...new Set([...currentAssignees, ...reviewers])];
+              
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: pr_number,
+                assignees: newAssignees
+              });
+              
+              console.log(`Updated assignees: ${newAssignees.join(", ")}`);
+            } catch (error) {
+              console.error('Error updating assignees:', error);
+              throw error;
+            }
+
+      - name: Post Confirmation Comment
+        uses: ./.github/actions/post-comment
+        with:
+          issue_number: ${{ needs.check_comment_and_pr.outputs.pr_number }}
+          repo: ${{ needs.check_comment_and_pr.outputs.repo }}
+          owner: ${{ needs.check_comment_and_pr.outputs.owner }}
+          message: "Reviewers assigned: ${{ format('@{0}', join(fromJson(needs.check_comment_and_pr.outputs.reviewers), ', @')) }}."
