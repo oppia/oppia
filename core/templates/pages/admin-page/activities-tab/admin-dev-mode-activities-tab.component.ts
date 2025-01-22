@@ -24,6 +24,7 @@ import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {Story} from 'domain/story/story.model';
 
 @Component({
   selector: 'oppia-admin-dev-mode-activities-tab',
@@ -36,8 +37,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyExpsToPublish: number = 0;
   numDummyExpsToGenerate: number = 0;
   numDummySuggestionQuesToGenerate: number = 0;
+  numDummyChaptersToGenerate: number = 0;
+  storyList: Story[] = [];
   skillList: SkillSummary[] = [];
   selectedOption: string = '';
+  selectedStoryForChapter: string = '';
   numDummyTranslationOpportunitiesToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
@@ -251,6 +255,27 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
+  generateDummyChapters(selectedStoryForChapter: string) {
+    const selectedIndex = Number(selectedStoryForChapter);
+    let selectedStory = this.storyList[selectedIndex];
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService
+      .generateDummyChaptersAsync(
+        selectedStory.getId(),
+        this.numDummyChaptersToGenerate
+      )
+      .then(
+        () => {
+          this.setStatusMessage.emit('Dummy chapters generated successfully.');
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
+    this.adminTaskManagerService.finishTask();
+  }
+
   generateNewBlogPost(blogPostTitle: string): void {
     if (!blogPostTitle) {
       this.setStatusMessage.emit('Internal error: blogPostTitle is empty');
@@ -321,6 +346,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.demoExplorationIds = adminDataObject.demoExplorationIds;
     this.reloadingAllExplorationPossible = true;
     this.skillList = adminDataObject.skillList;
+    this.storyList = adminDataObject.storyList;
   }
 
   ngOnInit(): void {
