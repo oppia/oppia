@@ -150,7 +150,6 @@ export class ExplorationMetadataModalComponent
 
     let metadataList: string[] = [];
     const savePromises: Promise<void>[] = [];
-
     if (this.explorationTitleService.hasChanged()) {
       metadataList.push('title');
       savePromises.push(
