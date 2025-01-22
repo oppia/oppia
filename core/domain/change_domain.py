@@ -228,36 +228,18 @@ class BaseChange:
         if cmd_spec is None:
             raise utils.ValidationError(f'Unknown command: {cmd_name}')
 
-        # Handle each command type explicitly
-        if cmd_name == feconf.CMD_DELETE_COMMIT:
-            # Delete command has no additional attributes
-            pass
-        
-        elif cmd_name == 'edit_state':
-            # Handle edit_state command
-            state_name = change_dict.get('state_name')
-            if not isinstance(state_name, str):
-                raise utils.ValidationError('state_name must be a string')
-            self.state_name = state_name
+        for attr_name in cmd_spec['required_attribute_names']:
+            value = change_dict.get(attr_name)
+            if value is None:
+                raise utils.ValidationError(
+                    f'Required attribute {attr_name} is missing')
+            self.__dict__[attr_name] = value
 
-            description = change_dict.get('description')
-            if description is not None and not isinstance(description, str):
-                raise utils.ValidationError('description must be a string')
-            self.description = description
-            
-        else:
-            # Generic attribute handling for other commands
-            for attr_name in cmd_spec['required_attribute_names']:
-                value = change_dict.get(attr_name)
-                if value is None:
-                    raise utils.ValidationError(
-                        f'Required attribute {attr_name} is missing')
+        # Handle optional attributes
+        for attr_name in cmd_spec['optional_attribute_names']:
+            value = change_dict.get(attr_name)
+            if value is not None:
                 self.__dict__[attr_name] = value
-
-            for attr_name in cmd_spec['optional_attribute_names']:
-                value = change_dict.get(attr_name)
-                if value is not None:
-                    self.__dict__[attr_name] = value
     
     def validate_dict(
         self, change_dict: Mapping[str, AcceptableChangeDictTypes]
