@@ -375,7 +375,7 @@ const watchAVideoButtonInThanksForSubscribe =
 const readOurBlogButtonInThanksForSubscribe =
   '.e2e-test-thanks-for-subscribe-read-blog-btn';
 const readBlogUrl = testConstants.URLs.ReadBlogLink;
-
+const watchVideoLink = testConstants.URLs.WatchVideoLink;
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -2531,7 +2531,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
-    if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
+    if (!url.includes(watchVideoLink)) {
       throw new Error(
         `The Watch A Video button should open the right page,
           but it opens ${url} instead.`

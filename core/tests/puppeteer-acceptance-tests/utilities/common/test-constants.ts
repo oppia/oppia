@@ -123,6 +123,7 @@ export default {
     LessonCreatorLinkedInUrl:
       'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
     ReadBlogLink: 'https://medium.com/oppia-org',
+    WatchVideoLink: 'https://www.youtube.com/watch?v=OConyxG7HaM',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
