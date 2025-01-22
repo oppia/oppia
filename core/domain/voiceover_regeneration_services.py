@@ -160,20 +160,24 @@ def synthesize_voiceover_for_html_string(
         )
     )
 
+    is_cached_model_used_for_voiceovers = False
+
     if cached_model is not None:
+        error_details = None
         if cached_model.plaintext == parsed_text:
             audio_offset_list = (
                 cached_model.audio_offset_list)
             filename = cached_model.voiceover_filename
             binary_audio_data = fs.get('%s/%s' % ('audio', filename))
-            error_details = None
+            is_cached_model_used_for_voiceovers = True
 
-    try:
-        binary_audio_data, audio_offset_list, error_details = (
-            azure_speech_synthesis_services.regenerate_speech_from_text(
-                parsed_text, language_accent_code))
-    except Exception as e:
-        error_details = e
+    if not is_cached_model_used_for_voiceovers:
+        try:
+            binary_audio_data, audio_offset_list, error_details = (
+                azure_speech_synthesis_services.regenerate_speech_from_text(
+                    parsed_text, language_accent_code))
+        except Exception as e:
+            error_details = e
 
     if error_details:
         raise Exception(error_details)
@@ -183,7 +187,7 @@ def synthesize_voiceover_for_html_string(
     tempbuffer.seek(0)
     audio = mp3.MP3(tempbuffer)
     tempbuffer.close()
-    mimetype = "audio/mpeg"
+    mimetype = 'audio/mpeg'
     # For a strange, unknown reason, the audio variable must be
     # deleted before opening cloud storage. If not, cloud storage
     # throws a very mysterious error that entails a mutagen
