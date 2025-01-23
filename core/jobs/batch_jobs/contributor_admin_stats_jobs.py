@@ -388,34 +388,38 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             '%s.%s' % (language_code, contributor_user_id)
         )
 
-        by_topic_id = lambda m: m.topic_id
-
-        exp_ids_with_translation_suggestions = set(
-            sorted([v.target_id for v in general_suggestion_stats]))
+        exp_ids_with_translation_suggestions = sorted(
+            set([v.target_id for v in general_suggestion_stats]))
         
         topic_ids_with_translation_submissions_list = []
         with datastore_services.get_ndb_context():
             for exp_id in exp_ids_with_translation_suggestions:
                 story_id = exp_services.get_story_id_linked_to_exploration(
                     exp_id)
-                story = story_fetchers.get_story_by_id(story_id)
-                topic_ids_with_translation_submissions_list.append(
-                    story.corresponding_topic_id)
+                if story_id is not None:
+                    story = story_fetchers.get_story_by_id(story_id)
+                    if story is not None:
+                        topic_ids_with_translation_submissions_list.append(
+                            story.corresponding_topic_id)
         
-        topic_ids_with_translation_submissions = set(
-            sorted(topic_ids_with_translation_submissions_list))
+        topic_ids_with_translation_submissions = sorted(
+            set(topic_ids_with_translation_submissions_list))
         
-        topic_ids_with_contribution_stats = set(
-            sorted([v.topic_id for v in translation_contribution_stats]))
+        topic_ids_with_contribution_stats = sorted(
+            set([v.topic_id for v in translation_contribution_stats]))
 
         for stat in translation_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 translation_contribution_stats.remove(stat)
 
-        valid_topic_ids_with_contribution_stats = set(
-            sorted([v.topic_id for v in translation_contribution_stats]))
+        valid_topic_ids_with_contribution_stats = sorted(
+            set([v.topic_id for v in translation_contribution_stats]))
 
+        # We only generate total contribution stats model if there exists a
+        # valid contribution stats model for each pair of language code and
+        # topic id, a contributor submitted a translation suggestion to.
+        # Otherwise we return the debugging logs.
         if topic_ids_with_translation_submissions != (
             valid_topic_ids_with_contribution_stats):
 
@@ -433,9 +437,14 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                         '- %s\n' % exp_id)
                     story_id = exp_services.get_story_id_linked_to_exploration(
                         exp_id)
-                    story = story_fetchers.get_story_by_id(story_id)
-                    debug_logs += (
-                        '-- Topic ID: %s\n' % story.corresponding_topic_id)
+                    if story_id is not None:
+                        debug_logs += (
+                            '-- Story ID: %s\n' % story_id)
+                        story = story_fetchers.get_story_by_id(story_id)
+                        if story is not None:
+                            debug_logs += (
+                                '---- Topic ID: %s\n' % (
+                                    story.corresponding_topic_id))
             
             debug_logs += (
                 'Unique topic IDs with contribution stats: \n')
@@ -668,8 +677,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         by_topic_id = lambda m: m.topic_id
 
-        skill_ids_with_question_suggestions = set(
-            sorted([v.target_id for v in general_suggestion_stats]))
+        skill_ids_with_question_suggestions = sorted(
+            set([v.target_id for v in general_suggestion_stats]))
 
         topic_ids_with_question_submissions_list = []
         with datastore_services.get_ndb_context():
@@ -681,19 +690,19 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     topic_ids_with_question_submissions_list.append(
                         topic_assignment.topic_id)
 
-        topic_ids_with_question_submissions = set(
-            sorted(topic_ids_with_question_submissions_list))
+        topic_ids_with_question_submissions = sorted(
+            set(topic_ids_with_question_submissions_list))
 
-        topic_ids_with_contribution_stats = set(
-            sorted([v.topic_id for v in question_contribution_stats]))
+        topic_ids_with_contribution_stats = sorted(
+            set([v.topic_id for v in question_contribution_stats]))
 
         for stat in question_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 question_contribution_stats.remove(stat)
 
-        valid_topic_ids_with_contribution_stats = set(
-            sorted([v.topic_id for v in question_contribution_stats]))
+        valid_topic_ids_with_contribution_stats = sorted(
+            set([v.topic_id for v in question_contribution_stats]))
 
         # We only generate total contribution stats model if there exists a
         # valid contribution stats model for each topic id, a contributor

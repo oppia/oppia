@@ -227,6 +227,25 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             contribution_dates=self.CONTRIBUTION_DATES
         )
 
+        self.translation_contribution_model_6 = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            language_code='hi',
+            contributor_user_id='user4',
+            topic_id='topic2',
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
         self.translation_review_model_1 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
             language_code=self.LANGUAGE_CODE,
@@ -618,6 +637,36 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id='user3',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+        self.translation_suggestion_in_review_model_user4 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_2,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user4',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user4',
             final_reviewer_id='reviewer_2',
             change_cmd=self.change_cmd,
             score_category=self.score_category,
@@ -1427,7 +1476,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
         self.assertEqual(100, len(question_model.recent_review_outcomes))
 
-    def test_job_does_not_creates_stats_if_contribution_stats_model_does_not_exist_for_a_suggestion(self) -> None: # pylint: disable=line-too-long
+    def test_job_does_not_creates_stats_if_contribution_stats_model_does_not_exist_for_a_question_suggestion(self) -> None: # pylint: disable=line-too-long
         self.question_contribution_model_1.update_timestamps()
         self.question_contribution_model_2.update_timestamps()
         self.question_contribution_model_5.update_timestamps()
@@ -1461,7 +1510,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                     'with question suggestion: \n- exp1\n-- Topic ID: topic1\n'
                     '-- Topic ID: topic2\nUnique topic IDs with contribution '
                     'stats: \n- topic1\nUnique valid topic IDs with '
-                    'contribution stats: \n- topic1\n')),
+                    'contribution stats: \n- topic1\n'))
         ])
 
         # Check for QuestionSubmitterTotalContributionStatsModel.
@@ -1485,6 +1534,91 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.assertEqual(
             ['accepted', 'accepted_with_edits', 'rejected'],
             question_submitter_total_stats.recent_review_outcomes
+        )
+
+    def test_job_does_not_creates_stats_if_contribution_stats_model_does_not_exist_for_a_translation_suggestion(self) -> None: # pylint: disable=line-too-long
+        self.translation_contribution_model_1.update_timestamps()
+        self.translation_contribution_model_2.update_timestamps()
+        self.translation_contribution_model_4.update_timestamps()
+        self.translation_contribution_model_6.update_timestamps()
+        self.translation_suggestion_rejected_model_user1.update_timestamps()
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
+        self.translation_suggestion_accepted_model.update_timestamps()
+        self.translation_suggestion_in_review_model_user4.update_timestamps()
+        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+        self.topic_model_3.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.exp_3.update_timestamps()
+        self.story_1.update_timestamps()
+        self.story_2.update_timestamps()
+        self.story_3.update_timestamps()
+        self.exp_context_1.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.exp_context_3.update_timestamps()
+
+        self.put_multi([
+            self.translation_contribution_model_1,
+            self.translation_contribution_model_2,
+            self.translation_contribution_model_4,
+            self.translation_contribution_model_6,
+            self.translation_suggestion_rejected_model_user1,
+            self.translation_suggestion_accepted_with_edits_model,
+            self.translation_suggestion_accepted_model,
+            self.translation_suggestion_in_review_model_user4,
+            self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats, # pylint: disable=line-too-long
+            self.topic_model_1,
+            self.topic_model_2,
+            self.topic_model_3,
+            self.exp_1,
+            self.exp_2,
+            self.exp_3,
+            self.story_1,
+            self.story_2,
+            self.story_3,
+            self.exp_context_1,
+            self.exp_context_2,
+            self.exp_context_3,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Translation Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Translation submitter ID: user4, Language code: hi\n'
+                    'Unique exp IDs with translation suggestion: \n- exp1\n-- '
+                    'Story ID: story1\n---- Topic ID: topic1\n- exp2\n-- '
+                    'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
+                    'IDs with contribution stats: \n- topic2\nUnique valid '
+                    'topic IDs with contribution stats: \n- topic2\n'))
+        ])
+
+        # Check for TranslationSubmitterTotalContributionStatsModel.
+        translation_submitter_all_models = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get_all()
+        )
+        self.assertEqual(1, translation_submitter_all_models.count())
+
+        translation_submitter_total_stats = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get('hi', 'user1')
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_submitter_total_stats is not None
+        self.assertItemsEqual(
+            ['topic1', 'topic2', 'topic3'],
+            translation_submitter_total_stats
+            .topic_ids_with_translation_submissions
+        )
+        self.assertEqual(
+            ['accepted', 'accepted_with_edits', 'rejected'],
+            translation_submitter_total_stats.recent_review_outcomes
         )
 
 
@@ -1687,5 +1821,67 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                     'with question suggestion: \n- exp1\n-- Topic ID: topic1\n'
                     '-- Topic ID: topic2\nUnique topic IDs with contribution '
                     'stats: \n- topic1\nUnique valid topic IDs with '
-                    'contribution stats: \n- topic1\n')),
+                    'contribution stats: \n- topic1\n'))
+        ])
+
+    def test_job_does_not_audits_stats_if_contribution_stats_model_does_not_exist_for_a_translation_suggestion(self) -> None: # pylint: disable=line-too-long
+        self.translation_contribution_model_1.update_timestamps()
+        self.translation_contribution_model_2.update_timestamps()
+        self.translation_contribution_model_4.update_timestamps()
+        self.translation_contribution_model_6.update_timestamps()
+        self.translation_suggestion_rejected_model_user1.update_timestamps()
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
+        self.translation_suggestion_accepted_model.update_timestamps()
+        self.translation_suggestion_in_review_model_user4.update_timestamps()
+        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+        self.topic_model_3.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.exp_3.update_timestamps()
+        self.story_1.update_timestamps()
+        self.story_2.update_timestamps()
+        self.story_3.update_timestamps()
+        self.exp_context_1.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.exp_context_3.update_timestamps()
+
+        self.put_multi([
+            self.translation_contribution_model_1,
+            self.translation_contribution_model_2,
+            self.translation_contribution_model_4,
+            self.translation_contribution_model_6,
+            self.translation_suggestion_rejected_model_user1,
+            self.translation_suggestion_accepted_with_edits_model,
+            self.translation_suggestion_accepted_model,
+            self.translation_suggestion_in_review_model_user4,
+            self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats, # pylint: disable=line-too-long
+            self.topic_model_1,
+            self.topic_model_2,
+            self.topic_model_3,
+            self.exp_1,
+            self.exp_2,
+            self.exp_3,
+            self.story_1,
+            self.story_2,
+            self.story_3,
+            self.exp_context_1,
+            self.exp_context_2,
+            self.exp_context_3,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Translation Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Translation submitter ID: user4, Language code: hi\n'
+                    'Unique exp IDs with translation suggestion: \n- exp1\n-- '
+                    'Story ID: story1\n---- Topic ID: topic1\n- exp2\n-- '
+                    'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
+                    'IDs with contribution stats: \n- topic2\nUnique valid '
+                    'topic IDs with contribution stats: \n- topic2\n'))
         ])
