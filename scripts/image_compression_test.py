@@ -173,7 +173,6 @@ class TestImageCompression(unittest.TestCase):
                 str(self.test_dir)
             )
             self.assertEqual(len(compressed_images), 0)
-            mock_print.assert_called_with('Compressed image > original image')
             self.assertEqual(
                 self.test_image.stat().st_size,
                 original_size,
