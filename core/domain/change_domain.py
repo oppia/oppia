@@ -204,16 +204,26 @@ class BaseChange:
         all_allowed_commands = (
             self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS)
 
-        cmd_attribute_names = []
+        cmd_spec = None
         for cmd in all_allowed_commands:
             if cmd['name'] == cmd_name:
-                cmd_attribute_names = (
-                    cmd['required_attribute_names'] + cmd[
-                        'optional_attribute_names'])
+                cmd_spec = cmd
                 break
 
-        for attribute_name in cmd_attribute_names:
-            setattr(self, attribute_name, change_dict.get(attribute_name))
+        if cmd_spec is None:
+            raise utils.ValidationError(f'Unknown command: {cmd_name}')
+
+        for attr_name in cmd_spec['required_attribute_names']:
+            value = change_dict.get(attr_name)
+            if value is None:
+                raise utils.ValidationError(
+                    f'Required attribute {attr_name} is missing')
+            self.__dict__[attr_name] = value
+
+        for attr_name in cmd_spec['optional_attribute_names']:
+            value = change_dict.get(attr_name)
+            if value is not None:
+                self.__dict__[attr_name] = value
 
     def validate_dict(
         self, change_dict: Mapping[str, AcceptableChangeDictTypes]
