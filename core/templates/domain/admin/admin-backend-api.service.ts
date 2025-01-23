@@ -33,10 +33,7 @@ import {
   SkillSummary,
   SkillSummaryBackendDict,
 } from 'domain/skill/skill-summary.model';
-import {
-  Story,
-  StoryBackendDict,
-} from 'domain/story/story.model';
+import {Story, StoryBackendDict} from 'domain/story/story.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface UserRolesBackendResponse {

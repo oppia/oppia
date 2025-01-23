@@ -255,7 +255,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  generateDummyChapters(selectedStoryForChapter: string) {
+  generateDummyChapters(selectedStoryForChapter: string): void {
     const selectedIndex = Number(selectedStoryForChapter);
     let selectedStory = this.storyList[selectedIndex];
     this.adminTaskManagerService.startTask();

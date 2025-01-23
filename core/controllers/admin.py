@@ -411,10 +411,11 @@ class AdminHandler(
             story_references = topic.get_all_story_references()
             for story_reference in story_references:
                 story_ids.append(story_reference.story_id)
-                
+
         story_dicts = [
             story.to_dict() for story in
-            story_fetchers.get_stories_by_ids(story_ids)
+            story_fetchers.get_stories_by_ids(story_ids) if
+            story is not None
         ]
 
         platform_params_dicts = (
@@ -1807,7 +1808,8 @@ class AdminHandler(
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': 'Introduction',
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                        'property_name': exp_domain
+                                         .STATE_PROPERTY_INTERACTION_ID,
                         'new_value': 'EndExploration'
                     }),
                     exp_domain.ExplorationChange({
@@ -1817,6 +1819,10 @@ class AdminHandler(
                                          .STATE_PROPERTY_INTERACTION_CUST_ARGS,
                         'new_value': {
                             'recommendedExplorationIds': {
+                                # Here we use MyPy ignore because the value of 'value'
+                                # is a List[Any] empty list as it is the EndExploration,
+                                # but the type of 'value' is defined as
+                                # Dict[str, UnionOfCustomizationArgsDictValues].
                                 'value': [] # type: ignore[dict-item]
                             }
                         }
@@ -1833,7 +1839,7 @@ class AdminHandler(
                 exp_services.update_exploration(
                     self.user_id, new_exp_id,
                     change_list, 'Change Interaction')
-                
+
                 exp_ids_to_publish.append(new_exp_id)
                 rights_manager.publish_exploration(
                     self.user, new_exp_id)
@@ -1857,8 +1863,10 @@ class AdminHandler(
                     node_index = int(story.story_contents.next_node_id[5:]) + i
                     node_id = f'{story_domain.NODE_ID_PREFIX}{node_index}'
 
-                chapter_title = 'dummy chapter ' + ''.join(random.choices(
-                    string.ascii_lowercase, k=22))
+                random_suffix = ''.join(
+                    random.choices(string.ascii_lowercase, k=22)
+                )
+                chapter_title = f"dummy chapter {random_suffix}"
 
                 change_list = [
                     story_domain.StoryChange({
@@ -1877,7 +1885,7 @@ class AdminHandler(
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
                         'property_name': story_domain
-                                         .STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
+                                         .STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, # pylint: disable=line-too-long
                         'new_value': 'thumbnail.svg',
                         'node_id': node_id,
                         'old_value': 'thumbnail_filename'
@@ -1885,7 +1893,7 @@ class AdminHandler(
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
                         'property_name': story_domain
-                                         .STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
+                                         .STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR, # pylint: disable=line-too-long
                         'new_value': '#B3D8F1',
                         'node_id': node_id,
                         'old_value': 'thumbnail_bg_color'
@@ -1899,7 +1907,7 @@ class AdminHandler(
             if (
                 not story_services
                     .is_story_published_and_present_in_topic(story)
-                ): 
+                ):
                 topic_id = story.corresponding_topic_id
                 topic_services.publish_story(
                     topic_id, story_id, str(self.user_id))

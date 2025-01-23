@@ -768,15 +768,12 @@ describe('Admin dev mode activities tab', () => {
     });
 
     it(
-      'should show error message when dummy chapters' +
-        ' are not generated',
+      'should show error message when dummy chapters' + ' are not generated',
       async () => {
         spyOn(
           adminBackendApiService,
           'generateDummyChaptersAsync'
-        ).and.returnValue(
-          Promise.reject('Dummy chapters not generated.')
-        );
+        ).and.returnValue(Promise.reject('Dummy chapters not generated.'));
         spyOn(component.setStatusMessage, 'emit');
 
         component.numDummyChaptersToGenerate = 2;
