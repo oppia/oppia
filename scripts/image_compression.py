@@ -97,7 +97,7 @@ def compress_images(
                             )
                     else:
                         logging.info(
-                            f'Compressed image > original image'
+                            'Compressed image > original image'
                         )
                         continue
         except Exception as e:
