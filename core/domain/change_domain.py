@@ -207,18 +207,14 @@ class BaseChange:
         Raises:
             ValidationError. The given change_dict is not valid.
         """
-        # Validate the change dictionary first
         self.validate_dict(change_dict)
 
-        # Get and set command name
         cmd_name = change_dict['cmd']
         self.cmd = cmd_name
 
-        # Get allowed commands
         all_allowed_commands = (
             self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS)
 
-        # Find the command specification
         cmd_spec = None
         for cmd in all_allowed_commands:
             if cmd['name'] == cmd_name:
@@ -235,7 +231,6 @@ class BaseChange:
                     f'Required attribute {attr_name} is missing')
             self.__dict__[attr_name] = value
 
-        # Handle optional attributes
         for attr_name in cmd_spec['optional_attribute_names']:
             value = change_dict.get(attr_name)
             if value is not None:
