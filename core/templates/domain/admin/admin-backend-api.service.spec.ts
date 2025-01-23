@@ -1509,6 +1509,62 @@ describe('Admin backend api service', () => {
     expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
   }));
 
+  it('should generate dummy chapters', fakeAsync(() => {
+    let action = 'generate_dummy_chapters';
+    let storyId = 'story_id';
+    let numberOfChapters = 5;
+    let payload = {
+      action: action,
+      story_id: storyId,
+      num_dummy_chapters_to_generate: numberOfChapters,
+    };
+
+    abas
+      .generateDummyChaptersAsync(storyId, numberOfChapters)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should handle generate dummy chapters request failure', fakeAsync(() => {
+    let action = 'generate_dummy_chapters';
+    let storyId = 'story_id';
+    let numberOfChapters = 5;
+    let payload = {
+      action: action,
+      story_id: storyId,
+      num_dummy_chapters_to_generate: numberOfChapters,
+    };
+
+    abas
+      .generateDummyChaptersAsync(storyId, numberOfChapters)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      {
+        error: 'Failed to get data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }));
+
   it('should handle generate dummy blog request failure', fakeAsync(() => {
     let action = 'generate_dummy_blog_post';
     let blogPostTitle = 'Education';

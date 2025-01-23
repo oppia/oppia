@@ -301,6 +301,48 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_dummy_chapter_generation_fail_without_story_id(# pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'story_id\' must be provided when the '
+            'action is generate_dummy_chapters.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_chapters',
+                    'story_id': None,
+                    'num_dummy_chapters_to_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_dummy_chapter_generation_fail_without_num_dummy_chapters_to_generate( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_chapters_to_generate\' must be provided'
+            ' when the action is generate_dummy_chapters.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_chapters',
+                    'story_id': 'story_id', 
+                    'num_dummy_chapters_to_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
     def test_without_topic_id_action_regenerate_topic_is_not_performed(
         self
     ) -> None:
@@ -1498,6 +1540,161 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
                 self.QUESTION_ADMIN_EMAIL),
                 feconf.SUGGESTION_TYPE_ADD_QUESTION)
         self.assertNotEqual(len(generated_question_suggestions), 12)
+        self.logout()
+
+
+class GenerateDummyChaptersTest(test_utils.GenericTestBase):
+    """Test the conditions for generation of dummy chapters."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL,
+            self.CURRICULUM_ADMIN_USERNAME,
+            is_super_admin=True)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME,
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+    def test_generate_dummy_chapters(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description',
+            'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), story
+        )
+
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), 'topic', 'story_id'
+        )
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 7
+            }, csrf_token=csrf_token)
+
+        generated_chapters_count = len(story.story_contents.nodes)
+        self.assertNotEqual(generated_chapters_count, 7)
+        self.logout()
+
+    def test_cannot_generate_dummy_chapters_in_prod_mode(# pylint: disable=line-too-long
+            self
+        ) -> None:
+        self.login(
+            self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy chapters in production.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description',
+            'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), story
+        )
+
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), 'topic', 'story_id'
+        )
+
+        with assert_raises_regex, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_chapters',
+                    'story_id': 'story', 
+                    'num_dummy_chapters_to_generate': 7
+                }, csrf_token=csrf_token)
+
+        generated_chapters_count = len(story.story_contents.nodes)
+        self.assertNotEqual(generated_chapters_count, 7)
+        self.logout()
+
+    def test_raises_error_if_not_curriculum_admin(# pylint: disable=line-too-long
+            self
+        ) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(user_email, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'User \'user1\' must be a curriculum admin'
+            ' in order to generate chapters.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description',
+            'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), story
+        )
+
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), 'topic', 'story_id'
+        )
+
+        with assert_raises_regex:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_chapters',
+                    'story_id': 'story',
+                    'num_dummy_chapters_to_generate': 7
+                }, csrf_token=csrf_token)
+
+        generated_chapters_count = len(story.story_contents.nodes)
+        self.assertNotEqual(generated_chapters_count, 7)
         self.logout()
 
 

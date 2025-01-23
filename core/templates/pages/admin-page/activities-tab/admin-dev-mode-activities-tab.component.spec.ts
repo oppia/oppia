@@ -53,6 +53,13 @@ describe('Admin dev mode activities tab', () => {
         description: 'Skill1',
       },
     ],
+    storyList: [
+      {
+        id: 'story_id',
+        title: 'story_title',
+        description: 'description',
+      },
+    ],
   } as AdminPageData;
   let mockConfirmResult: (val: boolean) => void;
 
@@ -732,6 +739,56 @@ describe('Admin dev mode activities tab', () => {
         fixture.whenStable().then(() => {
           expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
             'Server error: Dummy suggestion questions not generated.'
+          );
+        });
+      }
+    );
+  });
+
+  describe('.generateDummyChapters', () => {
+    it('should generate dummy chapters', async () => {
+      spyOn(
+        adminBackendApiService,
+        'generateDummyChaptersAsync'
+      ).and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.numDummyChaptersToGenerate = 2;
+
+      component.generateDummyChapters('0');
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy chapters generated successfully.'
+        );
+      });
+    });
+
+    it(
+      'should show error message when dummy chapters' +
+        ' are not generated',
+      async () => {
+        spyOn(
+          adminBackendApiService,
+          'generateDummyChaptersAsync'
+        ).and.returnValue(
+          Promise.reject('Dummy chapters not generated.')
+        );
+        spyOn(component.setStatusMessage, 'emit');
+
+        component.numDummyChaptersToGenerate = 2;
+
+        component.generateDummyChapters('0');
+
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Processing...'
+        );
+        fixture.whenStable().then(() => {
+          expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+            'Server error: Dummy chapters not generated.'
           );
         });
       }
