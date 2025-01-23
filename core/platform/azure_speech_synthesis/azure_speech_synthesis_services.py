@@ -74,8 +74,8 @@ class WordBoundaryCollection:
     for each word and punctuation from Azure-generated speech synthesis.
     """
 
-    def __init__(self):
-        self.audio_offset_list = []
+    def __init__(self) -> None:
+        self.audio_offset_list: List[Dict[str, Union[str, float]]] = []
 
     def word_boundary_event(self, event: speechsdk.SessionEventArgs) -> None:
         """Handles the word boundary events during speech synthesis.
@@ -85,7 +85,7 @@ class WordBoundaryCollection:
                 (in milliseconds) for each token (word or punctuation) in
                 the synthesized speech.
         """
-        audio_offset_record = {
+        audio_offset_record: Dict[str, Union[str, float]] = {
             'token': '',
             'audio_offset_msecs': 0.0
         }
@@ -136,8 +136,9 @@ def get_azure_voicecode_from_language_accent_code(
         autogeneratable_language_accent_list = json.loads(
             f.read())
 
-    return autogeneratable_language_accent_list[
+    voice_code: str = autogeneratable_language_accent_list[
         language_accent_code]['voice_code']
+    return voice_code
 
 
 def convert_plaintext_to_ssml_content(
@@ -200,6 +201,9 @@ def regenerate_speech_from_text(
             in milliseconds for the token in the synthesized speech.
             - str|None: A string describing any error encountered during
             speech synthesis. None, if synthesis is successful.
+
+    Raises:
+        Exception. The mailgun api key is not stored in cloud secrets.
     """
 
     # Azure text-to-speech API key.
@@ -223,7 +227,8 @@ def regenerate_speech_from_text(
     speech_synthesizer = speechsdk.SpeechSynthesizer(
         speech_config=speech_config, audio_config=None)
 
-    word_boundary_collection_instance = WordBoundaryCollection()
+    word_boundary_collection_instance: WordBoundaryCollection = (
+        WordBoundaryCollection())
     speech_synthesizer.synthesis_word_boundary.connect(
         word_boundary_collection_instance.word_boundary_event)
 

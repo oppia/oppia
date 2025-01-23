@@ -569,7 +569,7 @@ class CachedAutomaticVoiceoversModel(base_models.BaseModel):
     def generate_id(
         language_accent_code: str,
         hash_code: str,
-        provider: int,
+        provider: str,
     ) -> str:
         """Generates the ID for CachedAutomaticVoiceoversModel.
 

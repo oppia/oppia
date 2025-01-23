@@ -24,6 +24,7 @@ from core.platform import models
 from core.platform.azure_speech_synthesis import azure_speech_synthesis_services
 from core.tests import test_utils
 import azure.cognitiveservices.speech as speechsdk
+from typing import Dict, List, Union
 
 
 secrets_services = models.Registry.import_secrets_services()
@@ -125,7 +126,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         language_accent_code = 'en-US'
 
         mock_audio_data = b''
-        mock_word_boundaries = []
+        mock_word_boundaries: List[Dict[str, Union[str, float]]] = []
         mock_error_details = (
             'WebSocket upgrade failed: Authentication error (401). '
             'Please check subscription information and region name. USP state: '

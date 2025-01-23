@@ -35,12 +35,13 @@ from typing import Dict, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import speech_synthesis_services
     from mypy_imports import voiceover_models
 
 (voiceover_models,) = models.Registry.import_models([
     models.Names.VOICEOVER])
 
-azure_speech_synthesis_services = (
+speech_synthesis_services = (
     models.Registry.import_azure_speech_synthesis_services())
 
 
@@ -103,7 +104,7 @@ def parse_html(html_content: str) -> str:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 
-    text_content = soup.get_text(
+    text_content: str = soup.get_text(
         separator=feconf.OPPIA_CONTENT_TAG_DELIMITER, strip=True)
 
     return text_content
@@ -160,6 +161,8 @@ def synthesize_voiceover_for_html_string(
         )
     )
 
+    audio_offset_list: List[Dict[str, Union[str, float]]] = []
+
     is_cached_model_used_for_voiceovers = False
 
     if cached_model is not None:
@@ -174,10 +177,10 @@ def synthesize_voiceover_for_html_string(
     if not is_cached_model_used_for_voiceovers:
         try:
             binary_audio_data, audio_offset_list, error_details = (
-                azure_speech_synthesis_services.regenerate_speech_from_text(
+                speech_synthesis_services.regenerate_speech_from_text(
                     parsed_text, language_accent_code))
         except Exception as e:
-            error_details = e
+            error_details = str(e)
 
     if error_details:
         raise Exception(error_details)

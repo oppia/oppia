@@ -26,6 +26,8 @@ from core.domain import voiceover_regeneration_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict, List, Union
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
@@ -134,8 +136,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
 
         cached_model = (
             voiceover_models.CachedAutomaticVoiceoversModel.get(
-                cached_model_id, strict=False)
-        )
+                cached_model_id))
 
         self.assertIsNotNone(cached_model)
         self.assertEqual(cached_model.hash_code, parsed_text_hash_code)
@@ -153,7 +154,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         filename = 'content_0-en-US-asdjytdyop.mp3'
 
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
-        audio_offset_list = [
+        audio_offset_list: List[Dict[str, Union[str, float]]] = [
             {'token': 'This', 'audio_offset_msecs': 0.0},
             {'token': 'is', 'audio_offset_msecs': 100.0},
             {'token': 'from', 'audio_offset_msecs': 200.0},
@@ -211,7 +212,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             {'token': 'cached', 'audio_offset_msecs': 300.0},
             {'token': 'model', 'audio_offset_msecs': 400.0}
         ]
-        audio_offset_list_2 = [
+        audio_offset_list_2: List[Dict[str, Union[str, float]]] = [
             {'token': 'This', 'audio_offset_msecs': 0.0},
             {'token': 'is', 'audio_offset_msecs': 100.0},
             {'token': 'a', 'audio_offset_msecs': 200.0},
@@ -255,8 +256,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         reteived_cached_model = (
             voiceover_models.CachedAutomaticVoiceoversModel.get(
-                cached_model_id, strict=False)
-        )
+                cached_model_id))
 
         self.assertIsNotNone(reteived_cached_model)
         self.assertEqual(
