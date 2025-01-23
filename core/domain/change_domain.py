@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Mapping, Union, TypedDict, Optional, cast
+from typing import Any, Dict, List, Mapping, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -185,17 +185,6 @@ class BaseChange:
         'deprecated_values': {}
     }]
 
-    class EditStateCommand(TypedDict):
-        cmd: str
-        state_name: str
-        description: Optional[str]
-    
-    class DeleteCommand(TypedDict):
-        cmd: str
-    
-    # Define the possible command types
-    CommandDict = Union[EditStateCommand, DeleteCommand]
-
     def __init__(
         self, change_dict: Mapping[str, AcceptableChangeDictTypes]
     ) -> None:
@@ -220,7 +209,7 @@ class BaseChange:
             if cmd['name'] == cmd_name:
                 cmd_spec = cmd
                 break
-        
+
         if cmd_spec is None:
             raise utils.ValidationError(f'Unknown command: {cmd_name}')
 
@@ -235,7 +224,7 @@ class BaseChange:
             value = change_dict.get(attr_name)
             if value is not None:
                 self.__dict__[attr_name] = value
-    
+
     def validate_dict(
         self, change_dict: Mapping[str, AcceptableChangeDictTypes]
     ) -> None:
