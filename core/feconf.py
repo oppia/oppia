@@ -414,10 +414,10 @@ IMAGE_FORMAT_SVG = 'svg'
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
-    'jpg': ['jpg', 'jpeg'],
-    'png': ['png'],
-    'gif': ['gif'],
-    'svg': ['svg']
+    IMAGE_FORMAT_JPEG: ['jpg', 'jpeg'],
+    IMAGE_FORMAT_PNG: ['png'],
+    IMAGE_FORMAT_GIF: ['gif'],
+    IMAGE_FORMAT_SVG: ['svg']
 }
 
 # An array containing the image formats that can be compressed.
