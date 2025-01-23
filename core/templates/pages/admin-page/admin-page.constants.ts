@@ -38,6 +38,8 @@ export const AdminPageConstants = {
   ADMIN_BANNED_USERS_HANDLER: '/bannedusershandler',
   ADMIN_UPDATE_BLOG_POST_DATA_HANDLER: '/updateblogpostdatahandler',
   ADMIN_REGENERATE_TOPIC_SUMMARIES_URL: '/regenerate_topic_summaries_handler',
+  AUTOMATIC_VOICEOVER_ADMIN_CONTROL_URL:
+    '/automatic_voiceover_admin_control_handler',
 
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#/activities',
