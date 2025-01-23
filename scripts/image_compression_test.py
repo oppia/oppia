@@ -167,7 +167,6 @@ class TestImageCompression(unittest.TestCase):
         mock_result = MockCompletedProcess(returncode=1, stderr=b'Mock error')
         with (
             mock.patch('subprocess.run', return_value=mock_result),
-            mock.patch('builtins.print') as mock_print
         ):
             compressed_images = image_compression.compress_images(
                 str(self.test_dir)
