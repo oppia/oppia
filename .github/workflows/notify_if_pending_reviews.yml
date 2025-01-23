@@ -19,8 +19,8 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Notify reviewers
         # SHA1 hash of the develop commit.
         uses: oppia/stale-review-request-notifier@48e428b1f531a0b1dc24beb361cd4352af0a084d

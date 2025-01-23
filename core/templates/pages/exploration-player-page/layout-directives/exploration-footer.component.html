@@ -26,12 +26,10 @@
           <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
         </div>
       </button>
-      <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
-      </oppia-hint-and-solution-buttons>
     </div>
     <div class="col-sm-7">
       <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
-        <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
+        <oppia-hint-and-solution-buttons *ngIf="hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
         <div class="hint-container">
           <div class="hint-box hint-box-add-ons" *ngIf="isVisible && isTooltipVisible()">
@@ -122,7 +120,7 @@
     font-size: 17px;
     height: 40px;
     margin-right: 10px;
-    min-width: 395px;
+    min-width: 350px;
     padding: 20px 10px 20px 10px;
     position: relative;
     text-align: center;
@@ -183,4 +181,18 @@
       -webkit-transform: translateY(0);
     }
   }
+
+  @media (max-width: 475px) {
+
+    .hint-box-add-ons::after {
+    margin-left: 141px;
+  }
+  .hint-box-add-ons::before {
+    margin-left: 139px;
+  }
+
+  .hint-box {
+    font-size: 14px;
+  }
+}
 </style>
