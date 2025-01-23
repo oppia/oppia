@@ -40,7 +40,11 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import topic_models
 
-(exp_models, story_models, suggestion_models, topic_models) = models.Registry.import_models([
+(
+    exp_models,
+    story_models,
+    suggestion_models,
+    topic_models) = models.Registry.import_models([
     models.Names.EXPLORATION,
     models.Names.STORY,
     models.Names.SUGGESTION,
@@ -659,7 +663,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 2, 2))
 
-        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats = self.create_model(
+        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats = self.create_model( # pylint: disable=line-too-long
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,

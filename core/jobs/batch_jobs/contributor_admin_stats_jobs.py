@@ -316,7 +316,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             Iterable[suggestion_models.TranslationContributionStatsModel],
         translation_general_suggestions_stats:
             Iterable[suggestion_models.GeneralSuggestionModel]) -> Tuple[
-        Optional[suggestion_models.TranslationSubmitterTotalContributionStatsModel],
+        Optional[
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel],
         Optional[str]]:
         """Transforms TranslationContributionStatsModel and
         GeneralSuggestionModel to
@@ -389,8 +390,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         )
 
         exp_ids_with_translation_suggestions = sorted(
-            set([v.target_id for v in general_suggestion_stats]))
-        
+            {v.target_id for v in general_suggestion_stats})
+
         topic_ids_with_translation_submissions_list = []
         with datastore_services.get_ndb_context():
             for exp_id in exp_ids_with_translation_suggestions:
@@ -401,12 +402,12 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     if story is not None:
                         topic_ids_with_translation_submissions_list.append(
                             story.corresponding_topic_id)
-        
+
         topic_ids_with_translation_submissions = sorted(
             set(topic_ids_with_translation_submissions_list))
-        
+
         topic_ids_with_contribution_stats = sorted(
-            set([v.topic_id for v in translation_contribution_stats]))
+            {v.topic_id for v in translation_contribution_stats})
 
         for stat in translation_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
@@ -414,7 +415,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 translation_contribution_stats.remove(stat)
 
         valid_topic_ids_with_contribution_stats = sorted(
-            set([v.topic_id for v in translation_contribution_stats]))
+            {v.topic_id for v in translation_contribution_stats})
 
         # We only generate total contribution stats model if there exists a
         # valid contribution stats model for each pair of language code and
@@ -427,10 +428,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             debug_logs = (
                 'Translation submitter ID: %s, Language code: %s\n' % (
                     contributor_user_id, language_code))
-            
+
             debug_logs += (
                 'Unique exp IDs with translation suggestion: \n')
-            
+
             with datastore_services.get_ndb_context():
                 for exp_id in exp_ids_with_translation_suggestions:
                     debug_logs += (
@@ -445,13 +446,13 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                             debug_logs += (
                                 '---- Topic ID: %s\n' % (
                                     story.corresponding_topic_id))
-            
+
             debug_logs += (
                 'Unique topic IDs with contribution stats: \n')
             for topic_id in topic_ids_with_contribution_stats:
                 debug_logs += (
                     '- %s\n' % topic_id)
-            
+
             debug_logs += (
                 'Unique valid topic IDs with contribution stats: \n')
             for topic_id in valid_topic_ids_with_contribution_stats:
@@ -486,12 +487,14 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             first_contribution_date = min(
                 v.contribution_dates[0] for v in translation_contribution_stats)
             last_contribution_date = max(
-                v.contribution_dates[-1] for v in translation_contribution_stats)
+                v.contribution_dates[-1] for v in (
+                    translation_contribution_stats))
 
             # Weights of overall_accuracy as documented in
             # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
             overall_accuracy = round(
-                accepted_translations_count / submitted_translations_count * 100, 2
+                (accepted_translations_count / submitted_translations_count) * (
+                    100), 2
             )
 
             with datastore_services.get_ndb_context():
@@ -678,7 +681,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         by_topic_id = lambda m: m.topic_id
 
         skill_ids_with_question_suggestions = sorted(
-            set([v.target_id for v in general_suggestion_stats]))
+            {v.target_id for v in general_suggestion_stats})
 
         topic_ids_with_question_submissions_list = []
         with datastore_services.get_ndb_context():
@@ -694,7 +697,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             set(topic_ids_with_question_submissions_list))
 
         topic_ids_with_contribution_stats = sorted(
-            set([v.topic_id for v in question_contribution_stats]))
+            {v.topic_id for v in question_contribution_stats})
 
         for stat in question_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
@@ -702,7 +705,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 question_contribution_stats.remove(stat)
 
         valid_topic_ids_with_contribution_stats = sorted(
-            set([v.topic_id for v in question_contribution_stats]))
+            {v.topic_id for v in question_contribution_stats})
 
         # We only generate total contribution stats model if there exists a
         # valid contribution stats model for each topic id, a contributor
