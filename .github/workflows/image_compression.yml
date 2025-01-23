@@ -1,11 +1,11 @@
 name: Image Compression Check
-permissions: read-all
 on:
   merge_group:
     types: [checks_requested]
   push:
     branches:
-      - develop 
+      - develop
+      - issue#21274
       - release-*
   pull_request:
     branches:
@@ -13,19 +13,15 @@ on:
       - release-*
 
 jobs:
-  run_compression:
-    name: Run Image Compression Checks
+  prepare_and_run_compression_check:
+    name: Prepare Environment
     runs-on: ubuntu-22.04
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}  
-          token: ${{ secrets.BOT_TOKEN }}  
 
       - name: Setup Python 3.9.20
         uses: actions/setup-python@v4
@@ -41,14 +37,6 @@ jobs:
       - name: Add GraphicsMagick to PATH
         run: echo "$(dirname $(which gm))" >> $GITHUB_PATH
 
-      - name: Merge develop branch into the current branch
-        uses: ./.github/actions/merge
-
-      - name: Initialize Containers
-        run: |
-          make build
-          make stop
-
       - name: Run Image Compression Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         id: compression
@@ -56,8 +44,26 @@ jobs:
           make image_compression_check
           echo "changes_made=$(git status --porcelain | grep -c "M" || echo "0")" >> $GITHUB_ENV
 
-      - name: Commit and push if images were compressed
-        if: steps.compression.outputs.changes_made != '0'
+  commit_and_push:
+    name: Commit Compressed Images
+    needs: prepare_and_run_compression_check
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pull-requests: write
+    if: ${{ needs.prepare_and_run_compression_check.outputs.changes_made != '0' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}  
+          token: ${{ secrets.BOT_TOKEN }}  
+
+      - name: Merge develop branch into the current branch
+        uses: ./.github/actions/merge
+
+      - name: Commit and push compressed images
         run: |
           git config --local user.email "bot@oppia.org"
           git config --local user.name "Oppia Bot"
@@ -70,7 +76,7 @@ jobs:
           git push -u origin feat#21274 --no-verify
           
       - name: Comment on PR
-        if: steps.compression.outputs.changes_made != '0' && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         run: |
           PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
           curl -X POST \
@@ -79,8 +85,16 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments \
             -d '{"body":"🤖 I have compressed some images in this PR to optimize file sizes. The changes have been automatically committed. Please review the changes and make sure everything looks correct."}'
         
-      - name: Report failure if compression fails on develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+  report_failure:
+    name: Report Compression Failure
+    needs: [prepare_and_run_compression_check]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+
+    steps:
+      - name: Send Webhook Notification
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "Image compression check failed on the upstream develop branch."
