@@ -316,6 +316,23 @@ export class NumberWithUnitsObjectFactory {
 
     const unitsObj = this.unitsFactory.fromRawInputString(units);
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
+    var duplicatedUnit = this.unitsFactory.getDuplicatedUnit(units);
+
+    var correctedFormats = this.unitsFactory.getCorrectedFormat(unitsObj);
+
+    var containMultipleSlash = this.unitsFactory.getMultipleSlash(units);
+
+    if (duplicatedUnit) {
+      throw new Error(
+        `Your answer has a repeated unit: "${duplicatedUnit}". Try rewriting it as "${correctedFormats}".`
+      );
+    }
+
+    if (containMultipleSlash) {
+      throw new Error(
+        `Your answer contains more than one slash ("/"). Try rewriting it as "${correctedFormats}".`
+      );
+    }
   }
 
   fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
