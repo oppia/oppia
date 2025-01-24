@@ -315,7 +315,6 @@ export class NumberWithUnitsObjectFactory {
     }
 
     const unitsObj = this.unitsFactory.fromRawInputString(units);
-    return new NumberWithUnits(type, real, fractionObj, unitsObj);
     var duplicatedUnit = this.unitsFactory.getDuplicatedUnit(units);
 
     var correctedFormats = this.unitsFactory.getCorrectedFormat(unitsObj);
@@ -333,6 +332,7 @@ export class NumberWithUnitsObjectFactory {
         `Your answer contains more than one slash ("/"). Try rewriting it as "${correctedFormats}".`
       );
     }
+    return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
   fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
