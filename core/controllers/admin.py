@@ -233,7 +233,9 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     num_dummy_translation_opportunities_to_generate: Optional[int]
     data: Optional[str]
     num_dummy_stories_to_generate: Optional[int]
+    num_dummy_chapters_to_generate: Optional[int]
     topic_id: Optional[str]
+    story_id: Optional[str]
     platform_param_name: Optional[str]
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
@@ -1884,11 +1886,7 @@ class AdminHandler(
                                          .STATE_PROPERTY_INTERACTION_CUST_ARGS,
                         'new_value': {
                             'recommendedExplorationIds': {
-                                # Here we use MyPy ignore because the value of 'value'
-                                # is a List[Any] empty list as it is the EndExploration,
-                                # but the type of 'value' is defined as
-                                # Dict[str, UnionOfCustomizationArgsDictValues].
-                                'value': [] # type: ignore[dict-item]
+                                'value': []
                             }
                         }
                     }),
@@ -1931,7 +1929,7 @@ class AdminHandler(
                 random_suffix = ''.join(
                     random.choices(string.ascii_lowercase, k=22)
                 )
-                chapter_title = f"dummy chapter {random_suffix}"
+                chapter_title = f'dummy chapter {random_suffix}'
 
                 change_list = [
                     story_domain.StoryChange({

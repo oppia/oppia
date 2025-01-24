@@ -31,6 +31,7 @@ import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-pa
 import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {Story} from 'domain/story/story.model';
 import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 
 describe('Admin backend api service', () => {
@@ -119,6 +120,47 @@ describe('Admin backend api service', () => {
         skill_model_last_updated: 1711790151229.944,
       },
     ],
+    story_list: [
+      {
+        id: 'storyid',
+        title: 'dummy story',
+        description: 'description',
+        notes: 'notes',
+        story_contents: [
+          {
+            initial_node_id: 'node_1',
+            nodes: [
+              {
+                id: 'node_1',
+                title: 'dummy node',
+                description: '',
+                destinationNodeIds: ['node_2'],
+                prerequisiteSkillIds: ['ByBjUvYOITCJ'],
+                acquiredSkillIds: ['TybOaLMmNeO1'],
+                outline: '',
+                outlineIsFinalized: false,
+                explorationId: null,
+                thumbnailBgColor: null,
+                thumbnailFilename: null,
+                status: '',
+                plannedPublicationDateMsecs: null,
+                lastModifiedMsecs: null,
+                firstPublicationDateMsecs: null,
+                unpublishingReason: null
+              }
+            ],
+            next_node_id: 'node_2'
+          }
+        ],
+        language_code: 'en',
+        version: 1,
+        corresponding_topic_id: 'VqgPTpt7JyJy',
+        thumbnail_bg_color: null,
+        thumbnail_filename: null,
+        url_fragment: 'a',
+        meta_tag_content: 'fragm'
+      },
+    ]
   };
   let adminDataObject: AdminPageData;
 
@@ -148,6 +190,9 @@ describe('Admin backend api service', () => {
       ),
       skillList: adminBackendResponse.skill_list.map(dict =>
         SkillSummary.createFromBackendDict(dict)
+      ),
+      storyList: adminBackendResponse.story_list.map(dict =>
+        Story.createFromBackendDict(dict)
       ),
     };
 
