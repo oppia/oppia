@@ -20,6 +20,7 @@ import io
 import logging
 import operator
 import random
+import string
 
 from core import feconf
 from core import utils
@@ -230,6 +231,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     skill_id: Optional[str]
     num_dummy_translation_opportunities_to_generate: Optional[int]
     data: Optional[str]
+    num_dummy_stories_to_generate: Optional[int]
     topic_id: Optional[str]
     platform_param_name: Optional[str]
     commit_message: Optional[str]
@@ -262,6 +264,7 @@ class AdminHandler(
                         'generate_dummy_blog_post',
                         'generate_dummy_classroom',
                         'generate_dummy_question_suggestions',
+                        'generate_dummy_stories',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
@@ -310,6 +313,12 @@ class AdminHandler(
                 'default_value': None
             },
             'num_dummy_translation_opportunities_to_generate': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
+            'num_dummy_stories_to_generate': {
                 'schema': {
                     'type': 'int'
                 },
@@ -454,6 +463,10 @@ class AdminHandler(
                 the action is generate_dummy_question_suggestions.
             Exception. The num_dummy_question_suggestions_generate must be 
                 provided when the action is generate_dummy_question_suggestions.
+            Exception. The topic_id must be provided when
+                the action is generate_dummy_stories.
+            Exception. The num_dummy_question_stories must be 
+                provided when the action is generate_dummy_stories.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -550,6 +563,25 @@ class AdminHandler(
                     )
                 self._generate_dummy_question_suggestions(
                     skill_id, num_dummy_question_suggestions_generate)
+            elif action == 'generate_dummy_stories':
+                topic_id = self.normalized_payload.get('topic_id')
+                if topic_id is None:
+                    raise Exception(
+                        'The \'topic_id\' must be provided when'
+                        ' the action is generate_dummy_stories.'
+                    )
+                num_dummy_stories_to_generate = (
+                    self.normalized_payload.get(
+                        'num_dummy_stories_to_generate')
+                )
+                if num_dummy_stories_to_generate is None:
+                    raise Exception(
+                        'The \'num_dummy_stories_to_generate\' must'
+                        ' be provided when the action is '
+                        'generate_dummy_stories.'
+                    )
+                self._generate_dummy_stories(
+                    topic_id, num_dummy_stories_to_generate)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
                 if data is None:
@@ -1715,6 +1747,40 @@ class AdminHandler(
         else:
             raise Exception(
                 'Cannot generate dummy question suggestion in production.')
+
+    def _generate_dummy_stories(
+            self, topic_id: str,
+            num_dummy_stories_to_generate: int) -> None:
+        """Generates and loads the database with a specified number of
+            stories for the selected topic.
+
+        Raises:
+            Exception. Cannot load stories in production mode.
+            Exception. User does not have enough rights to generate data.
+        """
+        if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception((
+                    'User \'%s\' must be a curriculum admin'
+                    ' in order to generate stories.'
+                    ) % self.username)
+            for i in range(num_dummy_stories_to_generate):
+                story_id = story_services.get_new_story_id()
+                url_fragment = ''.join(random.choices(
+                    string.ascii_lowercase, k=10))
+                story = story_domain.Story.create_default_story(
+                    story_id, f'dummy_title{i}', 'description',
+                    topic_id, url_fragment, 'dummy_meta',
+                    'thumbnail.svg', '#B3D8F1')
+                story_services.save_new_story(str(self.user_id), story)
+                topic_services.add_canonical_story(
+                    str(self.user_id), topic_id, story_id)
+                topic_services.publish_story(
+                    topic_id, story_id, str(self.user_id)
+                )
+        else:
+            raise Exception(
+                'Cannot generate dummy stories in production.')
 
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
