@@ -876,6 +876,8 @@
 	"I18N_INTERACTIONS_TERMS_LIMIT": "Error message shown below the input field for the ratio input interaction.",
 	"I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT": "Alert message shown when invalid tags and attributes have been stripped from the uploaded SVG",
 	"I18N_JOIN_LEARNER_GROUP_BUTTON": "Text appearing in the button in learner group invitation modal on learner dashboard. - Clicking this button will allow the learner to join the group.",
+	"I18N_LANGUAGE_BANNER_BUTTON_TEXT": "Text on confirmation button indicating the user understands the message.",
+	"I18N_LANGUAGE_BANNER_LANG_INFO": "Text to inform the user that language selection is available.",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Text for the site language selector. - When the user selects a different language, the site (not the explorations) is translated into that language.",
 	"I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING": "Good afternoon greeting on the learner dashboard.\n{{Identical|Good}}",
 	"I18N_LEARNER_DASHBOARD_ALL": "Section in the learner dashboard that displays both completed and incomplete explorations.\n\n{{Identical|All}}",

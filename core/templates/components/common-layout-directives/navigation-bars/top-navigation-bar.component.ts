@@ -50,6 +50,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
+import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 import './top-navigation-bar.component.css';
 
@@ -187,7 +188,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private focusManagerService: FocusManagerService,
     private platformFeatureService: PlatformFeatureService,
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
+    private languageBannerService: LanguageBannerService
   ) {}
 
   ngOnInit(): void {
@@ -387,6 +389,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   changeLanguage(languageCode: string): void {
     this.i18nService.updateUserPreferredLanguage(languageCode);
+    this.languageBannerService.markLanguageBannerAsDismissed();
   }
 
   isLanguageRTL(): boolean {
