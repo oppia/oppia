@@ -317,15 +317,15 @@
             </i>
           </div>
           <div [hidden]="!impactReportSubmenuIsShown">
-            <div>
-              <a tabindex="-1" target="_blank" rel="noopener" [href]="IMPACT_REPORT_LINK_2023" class="oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-2023-button">
-                <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_IMPACT_REPORT_2023' | translate }}</span>
-                <i class="fas fa-external-link-alt launch-icon"></i>
-              </a>
-            </div>
-            <div>
-              <a tabindex="-1" target="_blank" rel="noopener" [href]="IMPACT_REPORT_LINK_2022" class="oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-2022-button">
-                <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_IMPACT_REPORT_2022' | translate }}</span>
+            <div *ngFor="let report of impactReports">
+              <a tabindex="-1" 
+                 target="_blank" 
+                 rel="noopener" 
+                 [href]="report.link" 
+                 [class]="report.className">
+                <span class="oppia-sidebar-submenu-title">
+                  {{ report.translationKey | translate }}
+                </span>
                 <i class="fas fa-external-link-alt launch-icon"></i>
               </a>
             </div>
