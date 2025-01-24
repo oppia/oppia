@@ -16,7 +16,7 @@
  * @fileoverview Component for exploration metadata modal.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatChipInputEvent} from '@angular/material/chips';
@@ -48,6 +48,7 @@ export class ExplorationMetadataModalComponent
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
   categoryLocalValue!: string;
   objectiveHasBeenPreviouslyEdited!: boolean;
   requireTitleToBeSpecified!: boolean;
@@ -72,7 +73,8 @@ export class ExplorationMetadataModalComponent
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     super(ngbActiveModal);
   }
@@ -116,7 +118,6 @@ export class ExplorationMetadataModalComponent
           ) ||
           !value.match(tagRegex)
         ) {
-          // Clear the input value.
           event.input.value = '';
           this.tagIsInvalid = true;
           return;
@@ -125,7 +126,6 @@ export class ExplorationMetadataModalComponent
         this.explorationTags.push(value.toLowerCase());
       }
     }
-
     // Clear the input value.
     event.input.value = '';
     this.tagIsInvalid = false;
@@ -148,6 +148,7 @@ export class ExplorationMetadataModalComponent
       return;
     }
 
+    // Record any fields that have changed.
     let metadataList: string[] = [];
     const savePromises: Promise<void>[] = [];
     if (this.explorationTitleService.hasChanged()) {
@@ -248,8 +249,6 @@ export class ExplorationMetadataModalComponent
         }
       );
 
-      // If the current category is not in the dropdown, add it
-      // as the first option.
       if (
         !categoryIsInSelect2 &&
         this.explorationCategoryService.savedMemento
@@ -264,11 +263,8 @@ export class ExplorationMetadataModalComponent
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
     this.explorationTags = this.explorationTagsService.displayed as string[];
 
-    // This logic has been used here to
-    // solve ExpressionChangedAfterItHasBeenCheckedError error.
-    setTimeout(() => {
-      this.isValueHasbeenUpdated = true;
-    });
+    this.isValueHasbeenUpdated = true;
+    this.changeDetectorRef.detectChanges();
   }
 }
 
