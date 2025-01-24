@@ -315,6 +315,7 @@ export class NumberWithUnitsObjectFactory {
     }
 
     const unitsObj = this.unitsFactory.fromRawInputString(units);
+
     var duplicatedUnit = this.unitsFactory.getDuplicatedUnit(units);
 
     var correctedFormats = this.unitsFactory.getCorrectedFormat(unitsObj);
