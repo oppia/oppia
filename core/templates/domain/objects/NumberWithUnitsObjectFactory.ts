@@ -319,14 +319,17 @@ export class NumberWithUnitsObjectFactory {
     var correctedFormats = this.unitsFactory.getCorrectedFormat(unitsObj);
     var containMultipleSlash = this.unitsFactory.getMultipleSlash(units);
     if (duplicatedUnit) {
-      throw new Error(`Your answer has a repeated unit: "${duplicatedUnit}". Try rewriting it as "${correctedFormats}".`);
+      throw new Error(
+        `Your answer has a repeated unit: "${duplicatedUnit}". Try rewriting it as "${correctedFormats}".`
+      );
     }
-    
-    if (containMultipleSlash) { 
-      throw new Error( `Your answer contains more than one slash ('/'). Try rewriting it as "${correctedFormats}".`);
+
+    if (containMultipleSlash) {
+      throw new Error(
+        `Your answer contains more than one slash ("/"). Try rewriting it as "${correctedFormats}".`
+      );
     }
-    
-    
+
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
