@@ -24,7 +24,7 @@ from core import feconf
 from core import utils
 from core.domain import state_domain
 
-from typing import Dict, Optional, Tuple, TypedDict, List, Union
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 
 class EntityVoiceoversDict(TypedDict):
@@ -197,33 +197,35 @@ class EntityVoiceovers:
                 if voiceover is not None:
                     voiceover.validate()
 
-        for content_id, word_audio_offset_dict in (
+        for content_id, audio_offset_list in (
                 self.automated_voiceovers_audio_offsets_msecs.items()):
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
                     'content_id must be a string, received %s' % content_id)
 
-            if 'token' not in word_audio_offset_dict:
-                raise utils.ValidationError(
-                    'Missing key `token` in word audio offset data.')
+            for token_audio_offset_dict in audio_offset_list:
+                if 'token' not in token_audio_offset_dict:
+                    raise utils.ValidationError(
+                        'Missing key `token` in word audio offset data.')
 
-            if 'audio_offset_msecs' not in word_audio_offset_dict:
-                raise utils.ValidationError(
-                    'Missing key `audio_offset_msecs` in word audio offset '
-                    'data.'
-            )
+                if 'audio_offset_msecs' not in token_audio_offset_dict:
+                    raise utils.ValidationError(
+                        'Missing key `audio_offset_msecs` in word audio offset '
+                        'data.'
+                )
 
-            token = word_audio_offset_dict['token'],
-            audio_offset_msecs = word_audio_offset_dict['audio_offset_msecs']
+                token = token_audio_offset_dict['token']
+                audio_offset_msecs = token_audio_offset_dict[
+                    'audio_offset_msecs']
 
-            if not isinstance(token, str):
-                raise utils.ValidationError(
-                    'Token must be a string, received %s' % token)
+                if not isinstance(token, str):
+                    raise utils.ValidationError(
+                        'Token must be a string, received %s' % token)
 
-            if not isinstance(audio_offset_msecs, float):
-                raise utils.ValidationError(
-                    'audio_offset_msecs must be a string, received %s' %
-                    audio_offset_msecs)
+                if not isinstance(audio_offset_msecs, float):
+                    raise utils.ValidationError(
+                        'audio_offset_msecs must be a string, received %s' %
+                        audio_offset_msecs)
 
     def add_new_content_id_without_voiceovers(
         self,

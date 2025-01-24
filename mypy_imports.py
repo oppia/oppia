@@ -26,6 +26,8 @@ from __future__ import annotations
 from core.platform.app_identity import (
     gae_app_identity_services as app_identity_services)
 from core.platform.auth import firebase_auth_services as platform_auth_services
+from core.platform.azure_speech_synthesis import (
+    dev_mode_azure_speech_synthesis_services as speech_synthesis_services)
 from core.platform.bulk_email import (
     dev_mode_bulk_email_services as bulk_email_services)
 from core.platform.cache import redis_cache_services as memory_cache_services
@@ -104,6 +106,7 @@ __all__ = [
     'secrets_services',
     'skill_models',
     'stats_models',
+    'speech_synthesis_services',
     'story_models',
     'storage_services',
     'subtopic_models',

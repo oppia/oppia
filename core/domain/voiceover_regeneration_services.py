@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Service functions related to automatic voiceover regenration using Azure."""
+"""Service functions related to automatic voiceover regenration using the cloud
+services.
+"""
 
 from __future__ import annotations
 
@@ -38,12 +40,13 @@ from typing import Dict, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import speech_synthesis_services
     from mypy_imports import voiceover_models
 
 (voiceover_models,) = models.Registry.import_models([
     models.Names.VOICEOVER])
 
-azure_speech_synthesis_services = (
+speech_synthesis_services = (
     models.Registry.import_azure_speech_synthesis_services())
 
 
@@ -106,7 +109,7 @@ def parse_html(html_content: str) -> str:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 
-    text_content = soup.get_text(
+    text_content: str = soup.get_text(
         separator=feconf.OPPIA_CONTENT_TAG_DELIMITER, strip=True)
 
     return text_content
@@ -136,8 +139,8 @@ def synthesize_voiceover_for_html_string(
         stores a float value representing the associated time offset in the
         audio in msecs.
         Note: This field only contains the audio offset for automated
-        voiceovers that are synthesized from Azure. These audio offsets are not
-        provided or stored for manual voiceovers.
+        voiceovers that are synthesized from using cloud service. These audio
+        offsets are not provided or stored for manual voiceovers.
 
     Raises:
         Exception. Error encountered during automatic voiceover regeneration.
@@ -149,7 +152,7 @@ def synthesize_voiceover_for_html_string(
 
     parsed_text = parse_html(content_html)
 
-    hash_code = (
+    content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.
         generate_hash_from_text(parsed_text)
     )
@@ -157,27 +160,33 @@ def synthesize_voiceover_for_html_string(
     cached_model = (
         voiceover_models.CachedAutomaticVoiceoversModel.
         get_cached_automatic_voiceover_model(
-            hash_code,
+            content_hash_code,
             language_accent_code,
             feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER
         )
     )
     cached_model = None
 
+    audio_offset_list: List[Dict[str, Union[str, float]]] = []
+
+    is_cached_model_used_for_voiceovers = False
+
     if cached_model is not None:
+        error_details = None
         if cached_model.plaintext == parsed_text:
             audio_offset_list = (
                 cached_model.audio_offset_list)
-            voiceover_filename = cached_model.voiceover_filename
-            binary_audio_data = fs.get('%s/%s' % ('audio', voiceover_filename))
-            error_details = None
+            filename = cached_model.voiceover_filename
+            binary_audio_data = fs.get('%s/%s' % ('audio', filename))
+            is_cached_model_used_for_voiceovers = True
 
-    try:
-        binary_audio_data, audio_offset_list, error_details = (
-            azure_speech_synthesis_services.regenerate_speech_from_text(
-                parsed_text, language_accent_code))
-    except Exception as e:
-        error_details = e
+    if not is_cached_model_used_for_voiceovers:
+        try:
+            binary_audio_data, audio_offset_list, error_details = (
+                speech_synthesis_services.regenerate_speech_from_text(
+                    parsed_text, language_accent_code))
+        except Exception as e:
+            error_details = str(e)
 
     if error_details:
         raise Exception(error_details)
@@ -187,8 +196,7 @@ def synthesize_voiceover_for_html_string(
     tempbuffer.seek(0)
     audio = mp3.MP3(tempbuffer)
     tempbuffer.close()
-
-    mimetype = "audio/mpeg"
+    mimetype = 'audio/mpeg'
     # For a strange, unknown reason, the audio variable must be
     # deleted before opening cloud storage. If not, cloud storage
     # throws a very mysterious error that entails a mutagen
@@ -202,6 +210,10 @@ def synthesize_voiceover_for_html_string(
     if cached_model is not None:
         if cached_model.plaintext != parsed_text:
             if len(parsed_text) < len(cached_model.plaintext):
+                # Since the current text is shorter than the one in the cached
+                # model, there is a higher likelihood of repetition in
+                # other content. Thus, updating the cached model to store the
+                # current data.
                 cached_model.plaintext = parsed_text
                 cached_model.voiceover_filename = voiceover_filename
                 cached_model.audio_offset_list = audio_offset_list
