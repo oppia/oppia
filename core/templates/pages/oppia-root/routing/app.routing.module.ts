@@ -56,6 +56,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/contributor-dashboard-page/contributor-dashboard-page.module'
+      ).then(m => m.ContributorDashboardPageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () =>
       import('pages/moderator-page/moderator-page.module').then(
