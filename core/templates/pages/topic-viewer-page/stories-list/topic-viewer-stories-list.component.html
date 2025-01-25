@@ -22,10 +22,9 @@
         <div class="mobile-breadcrumbs">
           <i class="fa fa-angle-left" *ngIf="!isLanguageRTL()"></i>
           <i class="fa fa-angle-right" *ngIf="isLanguageRTL()"></i>
-          <a [href]="'/learn/' + (classroomName | lowercase)" [innerHTML]="'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName }" *ngIf="classroomName"></a>
-          <a href="/learn" *ngIf="!classroomName">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
+          <a [href]="'/learn/' + classroomUrlFragment" [innerHTML]="'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName }" *ngIf="classroomUrlFragment"></a>
+          <a href="/learn" *ngIf="!classroomUrlFragment">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
         </div>
-      </div>
       <h1 class="tab-title" tabindex="0">
         <span class="e2e-test-preview-topic-title" *ngIf="!isHackyTopicNameTranslationDisplayed()">
           {{ topicName }}
@@ -53,3 +52,5 @@
     </mat-card>
   </div>
 </div>
+
+
