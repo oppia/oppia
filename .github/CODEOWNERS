@@ -139,6 +139,8 @@
 /core/templates/services/iso-datepicker-adapter.service.ts @oppia/contributor-experience-team
 /core/templates/services/html-parsing.service.ts @oppia/contributor-experience-team
 /core/templates/services/html-parsing.service.spec.ts @oppia/contributor-experience-team
+/core/templates/services/translation-validation.service.ts @oppia/contributor-experience-team
+/core/templates/services/translation-validation.service.spec.ts @oppia/contributor-experience-team
 
 
 # Core documentation
