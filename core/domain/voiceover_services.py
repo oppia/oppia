@@ -32,7 +32,7 @@ from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence, cast, Optional
+from typing import Dict, List, Optional, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover

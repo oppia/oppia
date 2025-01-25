@@ -18,10 +18,9 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 from core.platform import models
-from core.platform.azure_speech_synthesis import dev_mode_azure_speech_synthesis_services
+from core.platform.azure_speech_synthesis import (
+    dev_mode_azure_speech_synthesis_services)
 from core.tests import test_utils
 
 
