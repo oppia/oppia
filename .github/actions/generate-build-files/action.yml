@@ -8,7 +8,7 @@ runs:
       uses: actions/download-artifact@v4
       continue-on-error: true
       with:
-        name: build_files
+        name: cached_build_files
         path: /home/runner/work/oppia
     - name: Unzip build files
       if: steps.download_artifact.outcome != 'failure'
@@ -47,7 +47,7 @@ runs:
       if: steps.download_artifact.outcome == 'failure'
       uses: actions/upload-artifact@v4
       with:
-        name: build_files
+        name: cached_build_files
         path: /home/runner/work/oppia/build_files.zip
         retention-days: 7
         overwrite: true
