@@ -3776,7 +3776,11 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             'file!@#$name.png',
             'file你好.png',
             'file..name.png',
-            'malicious.php.svg'
+            'malicious.php.svg',
+            'test_file.jpeg1',
+            'image.PNG123',
+            'file.jpg9',
+            'invalid.exe'
         ]
 
         filename_prefix = 'image'
@@ -3816,6 +3820,46 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         self.logout()
 
+    def test_filename_regex_matches_accepted_extensions(self) -> None:
+        """Test that filename regex pattern matches all accepted image extensions."""
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename_prefix = 'image'
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        response = self.post_json(
+            publish_url, {
+                'image': 'img',
+                'filename': 'valid_image.png',
+                'filename_prefix': filename_prefix
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200,
+            upload_files=[('image', 'unused_filename', raw_image)]
+        )
+
+        self.assertEqual(response['filename'], 'valid_image.png')
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id
+        )
+        filepath = '%s/%s' % (filename_prefix, 'valid_image.png')
+        self.assertTrue(fs.isfile(filepath))
+
+        self.logout()
 
 class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
     """Test fetching all translations of a given entity in bulk."""
