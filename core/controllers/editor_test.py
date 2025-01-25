@@ -3823,6 +3823,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
     def test_filename_regex_matches_accepted_extensions(self) -> None:
         """Test that filename regex pattern matches all
         accepted image extensions."""
+
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
