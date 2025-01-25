@@ -27,6 +27,7 @@ import {
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
 import {
   ContributionDetails,
   ContributionsAndReview,
@@ -1485,6 +1486,101 @@ describe('Contributions and review component', () => {
           expect(more).toEqual(false);
         });
       });
+
+      it('should not overwrite previously fetched data', fakeAsync(() => {
+        const mockSuggestions: Record<
+          string,
+          {suggestion: Suggestion; details: ContributionDetails}
+        > = {};
+        const totalOpportunitiesToBeFetched =
+          AppConstants.OPPORTUNITIES_PAGE_SIZE + 2;
+        for (let i = 1; i <= totalOpportunitiesToBeFetched; i++) {
+          mockSuggestions[`suggestion_${i}`] = {
+            suggestion: {
+              change_cmd: {
+                skill_id: 'string',
+                content_html: 'string',
+                translation_html: 'html',
+                question_dict: {
+                  question_state_data: {
+                    content: {
+                      html: 'html',
+                    },
+                  },
+                },
+                skill_difficulty: ['Medium'],
+              },
+              target_id: 'string;,',
+              suggestion_id: 'suggestion_id',
+              author_name: 'string;',
+              status: 'review',
+              suggestion_type: 'string',
+              exploration_content_html: 'html',
+            },
+            details: {
+              skill_description: 'skill_description',
+              topic_name: 'topic_name',
+              story_title: 'story_title',
+              chapter_title: 'chapter_title',
+              skill_rubrics: [],
+            },
+          };
+        }
+
+        getReviewableQuestionSuggestionsAsyncSpy.and.returnValues(
+          Promise.resolve({
+            suggestionIdToDetails: Object.fromEntries(
+              Object.entries(mockSuggestions).slice(
+                0,
+                AppConstants.OPPORTUNITIES_PAGE_SIZE
+              ) // First AppConstants.OPPORTUNITIES_PAGE_SIZE suggestions.
+            ),
+            more: true,
+          }),
+          Promise.resolve({
+            suggestionIdToDetails: Object.fromEntries(
+              Object.entries(mockSuggestions).slice(
+                AppConstants.OPPORTUNITIES_PAGE_SIZE,
+                totalOpportunitiesToBeFetched
+              ) // Remaining suggestions.
+            ),
+            more: false,
+          })
+        );
+
+        component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
+
+        // First call to loadContributions, should get AppConstants.OPPORTUNITIES_PAGE_SIZE questions and "more" flag true.
+        component.loadContributions(true).then(({opportunitiesDicts, more}) => {
+          const availableQuestionSuggestions = Object.keys(
+            component.contributions
+          ).length;
+          const expectedQuestionSuggestions =
+            AppConstants.OPPORTUNITIES_PAGE_SIZE;
+          const fetchedQuestionSuggestions = opportunitiesDicts.length;
+          expect(availableQuestionSuggestions).toBe(
+            expectedQuestionSuggestions
+          );
+          expect(fetchedQuestionSuggestions).toBe(expectedQuestionSuggestions);
+          expect(more).toBe(true);
+
+          component
+            .loadContributions(false)
+            .then(({opportunitiesDicts, more}) => {
+              const updatedAvailableQuestionSuggestions = Object.keys(
+                component.contributions
+              ).length;
+              const newlyFetchedQuestionSuggestions = opportunitiesDicts.length;
+              expect(updatedAvailableQuestionSuggestions).toBe(
+                totalOpportunitiesToBeFetched
+              );
+              expect(newlyFetchedQuestionSuggestions).toBe(
+                totalOpportunitiesToBeFetched - availableQuestionSuggestions
+              );
+              expect(more).toBe(false);
+            });
+        });
+      }));
     });
 
     it('should load reviewable translation opportunities correctly', () => {

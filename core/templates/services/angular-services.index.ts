@@ -452,6 +452,7 @@ import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-ad
 import { SubtopicViewerAuthGuard } from 'pages/subtopic-viewer-page/subtopic-viewer-auth.guard';
 import { StoryEditorPageAuthGuard } from 'pages/story-editor-page/story-editor-page-auth.guard';
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
+import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -672,6 +673,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['IsLoggedInGuard', IsLoggedInGuard],
   ['IsNewLessonPlayerGuard', IsNewLessonPlayerGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
+  ['LanguageBannerService', LanguageBannerService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerAnswerDetailsBackendApiService',
     LearnerAnswerDetailsBackendApiService],

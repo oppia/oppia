@@ -196,6 +196,36 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container">
+      <h3>Generate Stories (only curriculum admins)</h3>
+      <span class="row">
+        <label for="label-stories-to-generate">Number of stories to generate</label>
+        <input class="form-control form-inline oppia-form-inline"
+               [(ngModel)]="numDummyStoriesToGenerate"
+               placeholder="Stories to generate" type="number" min="0"
+               id="label-stories-to-generate">
+
+        <label for="label-target-topic-selection">Select topic for stories</label>
+        <select id="label-target-topic-selection" class="form-control" (change)="selectedTopicForStory=$event.target.value">
+          <option selected [value]="''">Choose...</option>
+          <option *ngFor=" let topic of topicList; let i = index" [value]="i">{{topic.name}}</option>
+        </select>
+
+        <p class="instruction">Note: To generate story, first generate topics and assign yourself
+           curriculum admin role.
+        </p>
+
+        <button type="button"
+                class="btn btn-primary oppia-generate-exploration-text"
+                (click)="generateDummyStories(selectedTopicForStory)"
+                [disabled]="!numDummyStoriesToGenerate || !selectedTopicForStory">
+          Generate Stories
+        </button>
+      </span>
+    </div>
+  </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container ml-0">
       <h3>Generate dummy blog post.</h3>
       <div class="row" *ngFor="let title of DUMMY_BLOG_POST_TITLES">
