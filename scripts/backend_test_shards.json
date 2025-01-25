@@ -303,7 +303,10 @@
         "core.platform.storage.cloud_storage_emulator_test",
         "core.platform.storage.dev_mode_storage_services_test",
         "core.platform.storage.cloud_storage_services_test",
-        "core.domain.contribution_stats_services_test"
+        "core.domain.contribution_stats_services_test",
+        "core.domain.voiceover_regeneration_services_test",
+        "core.platform.azure_speech_synthesis.azure_speech_synthesis_services_test",
+        "core.platform.azure_speech_synthesis.dev_mode_azure_speech_synthesis_services_test"
     ],
     "5": [
         "core.controllers.suggestion_test",
