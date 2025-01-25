@@ -219,7 +219,7 @@ oppia-library-page .button-alignment-div {
   overflow: hidden;
   position: relative;
 }
-.oppia-library-container {
+.oppia-library-wrapper {
   background-color: #afd2eb;
   min-height: 100vh;
 }
