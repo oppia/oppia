@@ -240,8 +240,7 @@ var TopicEditorPage = function () {
   };
 
   this.expectTitleOfSubtopicWithIndexToMatch = async function (title, index) {
-    var subtopicList = await subtopicsSelector();
-    var subtopic = await subtopicList[index];
+    var subtopic = await subtopicsSelector()[index];
     var text = await action.getText('Subtopic Text', subtopic);
     expect(text).toEqual(title);
   };
@@ -272,11 +271,6 @@ var TopicEditorPage = function () {
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function (count) {
-    await this.scrollToBottom();
-    waitFor.visibilityOf(
-      addSubtopicButton,
-      'Add subtopic button taking too long to appear.'
-    );
     var uncategorizedSkillItems = await $$('.e2e-test-skill-item');
     expect(uncategorizedSkillItems.length).toEqual(count);
   };
@@ -293,8 +287,8 @@ var TopicEditorPage = function () {
   };
 
   this.expectNumberOfSubtopicsToBe = async function (count) {
-    var subtopicList = await subtopicsSelector();
-    expect(subtopicList.length).toEqual(count);
+    var subtopics = await subtopicsSelector();
+    expect(subtopics.length).toEqual(count);
   };
 
   this.addSubtopic = async function (title, urlFragment, imgPath, htmlContent) {
@@ -523,8 +517,7 @@ var TopicEditorPage = function () {
   };
 
   this.navigateToSubtopicWithIndex = async function (subtopicIndex) {
-    var subtopicList = await subtopicsSelector();
-    var subtopic = await subtopicList[subtopicIndex];
+    var subtopic = await subtopicsSelector()[subtopicIndex];
     await action.click('Subtopic', subtopic);
     await waitFor.pageToFullyLoad();
   };

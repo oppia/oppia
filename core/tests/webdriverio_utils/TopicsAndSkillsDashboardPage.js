@@ -320,6 +320,10 @@ var TopicsAndSkillsDashboardPage = function () {
       }
     }
     await browser.switchToWindow(newHandle);
+    await waitFor.visibilityOf(
+      topicNameFieldElement,
+      'Topic Editor is taking too long to appear.'
+    );
     if (shouldCloseTopicEditor) {
       await browser.closeWindow();
       await browser.switchToWindow(parentHandle);
