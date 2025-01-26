@@ -272,6 +272,10 @@ var TopicEditorPage = function () {
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function (count) {
+    await waitFor.visibilityOf(
+      uncategorizedSkillCard,
+      'Uncategorized skills taking too long to appear.'
+    );
     var uncategorizedSkillItems = await $$('.e2e-test-skill-item');
     expect(uncategorizedSkillItems.length).toEqual(count);
   };
