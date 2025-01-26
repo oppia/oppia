@@ -321,7 +321,7 @@ export class UnitsObjectFactory {
   getMultipleSlash(units: string): string {
     let slashCount = (units.match(/\//g) || []).length;
 
-    return slashCount > 1 ? '/' : '';
+    return slashCount > 1;
   }
 
   getCorrectedFormat(units: {
