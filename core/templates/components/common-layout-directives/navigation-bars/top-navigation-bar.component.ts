@@ -71,7 +71,20 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
+  impactReports = [
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2023,
+      translationKey: 'I18N_TOPNAV_IMPACT_REPORT_2023',
+      className:
+        'dropdown-item nav-link oppia-navbar-tab-content about-link oppia-navbar-impactreport-submenu-tab-content oppia-impact-report-btn e2e-test-navbar-impact-report-2023-button',
+    },
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2022,
+      translationKey: 'I18N_TOPNAV_IMPACT_REPORT_2022',
+      className:
+        'dropdown-item nav-link oppia-navbar-tab-content about-link oppia-navbar-impactreport-submenu-tab-content oppia-impact-report-btn e2e-test-navbar-impact-report-2022-button',
+    },
+  ];
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
