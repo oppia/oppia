@@ -1,11 +1,11 @@
 name: Image Compression Check
+permissions: read-all
 on:
   merge_group:
     types: [checks_requested]
   push:
     branches:
       - develop
-      - issue#21274
       - release-*
   pull_request:
     branches:
@@ -66,7 +66,7 @@ jobs:
       - name: Commit and push compressed images
         run: |
           git config --local user.email "bot@oppia.org"
-          git config --local user.name "Oppia Bot"
+          git config --local user.name "Oppia-Image-Compression-Bot"
           git add -A
           git commit -m "chore: Compress images via CI
           Automated image compression to optimize file sizes.
