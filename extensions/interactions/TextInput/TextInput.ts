@@ -16,8 +16,6 @@
  * @fileoverview Requires for TextInput interaction.
  */
 
-require('interactions/TextInput/text-input-prediction.service.ts');
-
 require('interactions/TextInput/directives/text-input-rules.service.ts');
 require('interactions/TextInput/directives/text-input-validation.service.ts');
 require(

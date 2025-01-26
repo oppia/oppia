@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -165,6 +165,12 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.answer = parseInt(answer, 10);
     this.currentInteractionService.updateCurrentAnswer(this.answer);
+  }
+
+  @HostListener('document:keydown.enter', ['$event'])
+  handleEnterKey(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.submitAnswer();
   }
 
   submitAnswer(): void {

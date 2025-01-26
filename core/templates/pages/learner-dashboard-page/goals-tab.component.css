@@ -380,11 +380,26 @@
   }
 }
 
+.oppia-learner-dash-button--add-goals {
+  flex-shrink: 0;
+  gap: 0 8px;
+}
+
+.oppia-learner-dash-button-delete-goals {
+  background-color: #fff;
+  color: #00645c;
+}
+
+.oppia-learner-dash-button-delete-goals:hover {
+  color: #429488;
+}
+
 .oppia-learner-dash-goals-add-circle {
   background-color: #00645c;
   border-radius: 50%;
   color: #fff;
   display: inline-block;
+  flex-shrink: 0;
   height: 48px;
   line-height: 48px;
   text-align: center;
@@ -404,11 +419,11 @@
   color: #429488;
 }
 
-.oppia-learner-dash-goals-text {
+.oppia-learner-dash-goals-heading {
   color: #333;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 18px;
-  width: 80%;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 0;
 }
 
 .oppia-learner-dash-goals-modal {
@@ -418,21 +433,36 @@
   width: 75%;
 }
 
-@media screen and (max-width: 576px) {
-  .oppia-learner-dash-goals-add-circle {
-    height: 32px;
-    line-height: 32px;
-    text-align: center;
-    width: 32px;
-  }
+.oppia-learner-dash-goals-section {
+  background-color: #fff;
+  border-radius: 4px;
+}
 
+.oppia-learner-dash-goals-text {
+  color: #333;
+  flex-grow: 1;
+  font-size: 18px;
+}
+
+@media screen and (max-width: 500px) {
   .oppia-learner-dash-button--add-goals {
     flex-direction: row-reverse;
+  }
+
+  .oppia-learner-dash-goals-add-circle {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    width: 40px;
   }
 
   .oppia-learner-dash-goals-modal {
     height: 452px;
     max-width: 328px;
     width: 80%;
+  }
+
+  .oppia-learner-dash-goals-text {
+    font-size: 14px;
   }
 }

@@ -52,7 +52,7 @@
   padding: 10px;
 }
 .oppia-cookie-banner-container {
-  background: rgb(0,0,0,0.9);
+  background: rgb(0, 0, 0, 0.9);
   bottom: 0;
   color: #fff;
   font-family: 'Roboto', Arial, sans-serif;
@@ -84,13 +84,13 @@
   width: 168px;
 }
 
-@media(max-width: 1024px) {
+@media (max-width: 1024px) {
   .oppia-cookie-banner-container .oppia-cookie-banner {
     width: 80vw;
   }
 }
 
-@media(max-width: 500px) {
+@media (max-width: 500px) {
   .oppia-cookie-banner-container .oppia-cookie-banner {
     padding: 15px 24px 0 24px;
     width: 90vw;

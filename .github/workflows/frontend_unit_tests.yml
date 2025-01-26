@@ -1,0 +1,103 @@
+name: Frontend unit tests
+permissions: read-all
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  generate-job-strategy-matrix:
+    name: Generate job strategy matrix
+    runs-on: ubuntu-22.04
+    outputs:
+      job-strategy-matrix: ${{ steps.generate.outputs.job-strategy-matrix }}
+    steps:
+      - name: Generate job strategy matrix
+        id: generate
+        env:
+          standard-test-runs: 2
+          flakes-test-runs: 10
+        run: |
+          if ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+          then
+            JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.flakes-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
+            echo "job-strategy-matrix=$JOB_STRATEGY_MATRIX" >> $GITHUB_OUTPUT
+          else
+            JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.standard-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
+            echo "job-strategy-matrix=$JOB_STRATEGY_MATRIX" >> $GITHUB_OUTPUT
+          fi
+  frontend-karma-tests:
+    name: Run all tests
+    needs: generate-job-strategy-matrix
+    runs-on: ubuntu-22.04
+    strategy:
+      max-parallel: 25
+      matrix:
+        num_runs: ${{ fromJson(needs.generate-job-strategy-matrix.outputs.job-strategy-matrix) }}
+      fail-fast: false
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Describe filesystem
+        run: |
+          pwd
+          ls /home/runner/work
+          ls /home/runner/work/oppia
+          ls /home/runner/work/oppia/oppia
+          echo $GITHUB_WORKSPACE
+      - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      - name: Run frontend tests (attempt ${{ matrix.num_runs }})
+        id: run_frontend_tests
+        run: python -m scripts.run_frontend_tests --check_coverage
+      - name: Leave a comment on the PR if workflow failed
+        if: ${{ steps.run_frontend_tests.outputs.WORKFLOW_STATUS == 'failure' }}
+        uses: ./.github/actions/post-comment
+        with:
+          owner: ${{ github.event.repository.owner.login }}
+          repo: ${{ github.event.repository.name }}
+          issue_number: ${{ github.event.number }}
+          message: >
+            🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like
+            the frontend tests are failing on your PR. Please look at the logs
+            and follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
+            to fix them, or report the error as a flake.
+
+            You might also find the
+            [instructions for debugging frontend tests](https://github.com/oppia/oppia/wiki/Debug-frontend-tests)
+            helpful.
+
+            Thanks!
+      - name: Upload frontend coverage reports as an artifact
+        if: ${{ steps.run_frontend_tests.outputs.WORKFLOW_STATUS == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-${{ matrix.num_runs }}
+          path: /home/runner/work/oppia/karma_coverage_reports
+    permissions:
+      pull-requests: write
+  report-failure:
+    name: Report failure
+    needs: frontend-karma-tests
+    runs-on: ubuntu-22.04
+    if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Report failure if failed on oppia/oppia develop branch
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A frontend test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

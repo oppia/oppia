@@ -297,7 +297,7 @@ describe('Exploration Metadata Modal Component', () => {
     }));
 
     it('should initialize component properties after Component is initialized', fakeAsync(() => {
-      let TOTAL_CATEGORIES = 42;
+      let TOTAL_CATEGORIES = 44;
       expect(component.objectiveHasBeenPreviouslyEdited).toBe(false);
       expect(component.requireTitleToBeSpecified).toBe(true);
       expect(component.requireObjectiveToBeSpecified).toBe(true);

@@ -554,10 +554,10 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
                     topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2
+            '1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2
         }
         degrees_of_mastery_2 = {
-            u'2': self.degree_of_mastery_5
+            '2': self.degree_of_mastery_5
         }
         self.assertEqual(
             response_json['subtopic_mastery_dict'], {
@@ -575,12 +575,12 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
                     topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
-            u'2': self.degree_of_mastery_3
+            '1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
+            '2': self.degree_of_mastery_3
         }
         degrees_of_mastery_2 = {
-            u'1': self.degree_of_mastery_3,
-            u'2': self.degree_of_mastery_5
+            '1': self.degree_of_mastery_3,
+            '2': self.degree_of_mastery_5
         }
         self.assertEqual(
             response_json['subtopic_mastery_dict'], {
@@ -597,12 +597,12 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
                     topic_id_1, topic_id_2])
             })
         degrees_of_mastery_1 = {
-            u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
-            u'2': self.degree_of_mastery_3
+            '1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
+            '2': self.degree_of_mastery_3
         }
         degrees_of_mastery_2 = {
-            u'1': (self.degree_of_mastery_3 + self.degree_of_mastery_4) / 2,
-            u'2': self.degree_of_mastery_5
+            '1': (self.degree_of_mastery_3 + self.degree_of_mastery_4) / 2,
+            '2': self.degree_of_mastery_5
         }
         self.assertEqual(
             response_json['subtopic_mastery_dict'], {

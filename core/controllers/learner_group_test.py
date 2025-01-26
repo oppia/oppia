@@ -477,9 +477,9 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': self.EXP_ID_1,
             'status': 'Published',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
-            'first_publication_date_msecs': 200,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
+            'first_publication_date_msecs': 200.0,
             'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
@@ -497,9 +497,9 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': self.EXP_ID_0,
             'status': 'Published',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
-            'first_publication_date_msecs': 200,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
+            'first_publication_date_msecs': 200.0,
             'unpublishing_reason': None
         }
         self.node_3: story_domain.StoryNodeDict = {
@@ -517,9 +517,9 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': self.EXP_ID_7,
             'status': 'Published',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
-            'first_publication_date_msecs': 200,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
+            'first_publication_date_msecs': 200.0,
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [
@@ -725,9 +725,9 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'outline_is_finalized': False,
             'exploration_id': self.EXP_ID_1,
             'status': 'Published',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
-            'first_publication_date_msecs': 200,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
+            'first_publication_date_msecs': 200.0,
             'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
@@ -745,9 +745,9 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'outline_is_finalized': False,
             'exploration_id': self.EXP_ID_0,
             'status': 'Published',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
-            'first_publication_date_msecs': 200,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
+            'first_publication_date_msecs': 200.0,
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [

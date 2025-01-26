@@ -28,13 +28,9 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import incoming_app_feedback_report
 from core.domain import blog_services
-from core.domain import classifier_domain
-from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -53,7 +49,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Optional, TypedDict, Union
+from typing import Dict, Final, List, Union
 import webapp2
 import webtest
 
@@ -1795,11 +1791,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
-        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -1836,8 +1828,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        assert isinstance(self.system_email_address, str)
-        self.login(self.system_email_address)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2294,11 +2285,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
-        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2333,8 +2320,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        assert isinstance(self.system_email_address, str)
-        self.login(self.system_email_address)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
@@ -2431,11 +2417,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
-        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2472,8 +2454,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        assert isinstance(self.system_email_address, str)
-        self.login(self.system_email_address)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2634,11 +2615,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.system_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(self.system_email_address, str)
-        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -2656,8 +2633,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_primary_admin_can_delete_any_user(self) -> None:
-        assert isinstance(self.system_email_address, str)
-        self.login(self.system_email_address)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -7178,162 +7154,6 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
-
-
-class MockHandlerNormalizedPayloadDict(TypedDict):
-    """Type for the MockHandler's normalized_payload dictionary."""
-
-    signature: str
-    vm_id: str
-    message: bytes
-
-
-class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
-    """Tests for oppia_ml_access decorator."""
-
-    class MockHandler(
-        base.OppiaMLVMHandler[
-            MockHandlerNormalizedPayloadDict, Dict[str, str]
-        ]
-    ):
-        REQUIRE_PAYLOAD_CSRF_CHECK = False
-        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'vm_id': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                },
-                'message': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                },
-                'signature': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                }
-            }
-        }
-
-        def extract_request_message_vm_id_and_signature(
-            self
-        ) -> classifier_domain.OppiaMLAuthInfo:
-            """Returns message, vm_id and signature retrived from incoming
-            request.
-
-            Returns:
-                OppiaMLAuthInfo. Message at index 0, vm_id at index 1 and
-                signature at index 2.
-            """
-            assert self.normalized_payload is not None
-            signature = self.normalized_payload['signature']
-            vm_id = self.normalized_payload['vm_id']
-            message = self.normalized_payload['message']
-            return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
-
-        @acl_decorators.is_from_oppia_ml
-        def post(self) -> None:
-            self.render_json({'job_id': 'new_job'})
-
-    def _mock_get_secret(self, name: str) -> Optional[str]:
-        """Mock for the get_secret function.
-
-        Args:
-            name: str. The name of the secret to retrieve the value.
-
-        Returns:
-            Optional[str]. The value of the secret.
-        """
-        if name == 'VM_ID':
-            return 'vm_default'
-        elif name == 'SHARED_SECRET_KEY':
-            return '1a2b3c4e'
-        return None
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
-
-    def test_unauthorized_vm_cannot_fetch_jobs(self) -> None:
-        payload = {}
-        payload['vm_id'] = 'fake_vm'
-        secret = 'fake_secret'
-        payload['message'] = json.dumps('malicious message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-        swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            self._mock_get_secret,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
-
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
-            self.post_json(
-                '/ml/nextjobhandler', payload,
-                expected_status_int=401)
-
-    def test_default_vm_id_raises_exception_in_prod_mode(self) -> None:
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('malicious message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-        with self.swap(self, 'testapp', self.mock_testapp):
-            with self.swap(constants, 'DEV_MODE', False):
-                self.post_json(
-                    '/ml/nextjobhandler', payload, expected_status_int=401)
-
-    def test_that_invalid_signature_raises_exception(self) -> None:
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('malicious message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'), 'message'.encode('utf-8'), payload['vm_id'])
-        swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            self._mock_get_secret,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
-
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
-            self.post_json(
-                '/ml/nextjobhandler', payload, expected_status_int=401)
-
-    def test_that_no_excpetion_is_raised_when_valid_vm_access(self) -> None:
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-        swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            self._mock_get_secret,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
-
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
-            json_response = self.post_json('/ml/nextjobhandler', payload)
-
-        self.assertEqual(json_response['job_id'], 'new_job')
 
 
 class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):

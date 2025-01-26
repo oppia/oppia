@@ -70,16 +70,13 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         self
     ) -> None:
         def mock_run_cmd(unused_cmd: str) -> str:
-            return 'scripts/setup.py\nscripts/setup_gae.py'
+            return 'scripts/install_third_party_libs.py'
         with self.swap(common, 'run_cmd', mock_run_cmd):
             actual_scripts = (
                 repo_specific_changes_fetcher.get_setup_scripts_changes_status(
                     'release_tag'))
         expected_scripts = {
-            'scripts/setup.py': True,
-            'scripts/setup_gae.py': True,
-            'scripts/install_third_party_libs.py': False,
-            'scripts/install_third_party.py': False
+            'scripts/install_third_party_libs.py': True,
         }
         self.assertEqual(actual_scripts, expected_scripts)
 

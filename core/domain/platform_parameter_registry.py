@@ -350,6 +350,57 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
+    ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
+    'Default content for the email sent after an exploration is '
+    'unpublished by a moderator. These emails are only sent if the '
+    'functionality is enabled in feconf.py. Leave this field blank '
+    'if emails should not be sent.',
+    platform_parameter_domain.DataTypes.STRING,
+    default=(
+        'I\'m writing to inform you that I have unpublished the above '
+        'exploration.')
+)
+
+Registry.create_platform_parameter(
+    ParamName.EMAIL_SENDER_NAME,
+    'The default sender name for outgoing emails.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='Site Admin'
+)
+
+Registry.create_platform_parameter(
+    ParamName.EMAIL_FOOTER,
+    'The footer to append to all outgoing emails. (This should '
+    'be written in HTML and include an unsubscribe link.)',
+    platform_parameter_domain.DataTypes.STRING,
+    default=(
+        'You can change your email preferences via the '
+        '<a href="%s%s">Preferences</a> page.' % (
+            feconf.OPPIA_SITE_URL,
+            feconf.PREFERENCES_URL)
+    )
+)
+
+Registry.create_platform_parameter(
+    ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+    'Content of email sent after a new user signs up. Set the email '
+    'subject. These emails are only sent if the functionality is enabled '
+    'in feconf.py.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='THIS IS A PLACEHOLDER.'
+)
+
+Registry.create_platform_parameter(
+    ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+    'Content of email sent after a new user signs up. (The email body '
+    'should be written with HTML and not include a salutation or footer.) '
+    'These emails are only sent if the functionality is enabled in '
+    'feconf.py.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
+)
+
+Registry.create_platform_parameter(
     ParamName.PROMO_BAR_ENABLED,
     'Whether the promo bar should be enabled for all users',
     platform_parameter_domain.DataTypes.BOOL
@@ -463,30 +514,75 @@ Registry.create_platform_parameter(
     ParamName.SYSTEM_EMAIL_ADDRESS,
     'Email address used for system issued actions.',
     platform_parameter_domain.DataTypes.STRING,
-    # TODO(release-scripts#130): Update post the first trial release.
-    default=feconf.SYSTEM_EMAIL_ADDRESS
+    default='system@example.com'
 )
 
 Registry.create_platform_parameter(
     ParamName.SYSTEM_EMAIL_NAME,
     'Email name for system issued actions.',
     platform_parameter_domain.DataTypes.STRING,
-    # TODO(release-scripts#130): Update post the first trial release.
-    default=feconf.SYSTEM_EMAIL_NAME
+    default='.'
 )
 
 Registry.create_platform_parameter(
     ParamName.ADMIN_EMAIL_ADDRESS,
     'Email address used for admin issued actions.',
     platform_parameter_domain.DataTypes.STRING,
-    # TODO(release-scripts#130): Update post the first trial release.
-    default=feconf.ADMIN_EMAIL_ADDRESS
+    default='testadmin@example.com'
 )
 
 Registry.create_platform_parameter(
     ParamName.NOREPLY_EMAIL_ADDRESS,
     'Email address used for mails sent by Oppia.',
     platform_parameter_domain.DataTypes.STRING,
-    # TODO(release-scripts#130): Update post the first trial release.
-    default=feconf.NOREPLY_EMAIL_ADDRESS
+    default='noreply@example.com'
+)
+
+Registry.create_platform_parameter(
+    ParamName.MAILCHIMP_AUDIENCE_ID,
+    'Audience ID of the mailing list for Oppia in Mailchimp.',
+    platform_parameter_domain.DataTypes.STRING,
+    default=''
+)
+
+Registry.create_platform_parameter(
+    ParamName.MAILCHIMP_USERNAME,
+    'Username of the mailing list for Oppia in Mailchimp.',
+    platform_parameter_domain.DataTypes.STRING,
+    default=''
+)
+
+Registry.create_platform_parameter(
+    ParamName.MAILGUN_DOMAIN_NAME,
+    'Domain name for Mailgun email API.',
+    platform_parameter_domain.DataTypes.STRING,
+    default=''
+)
+
+Registry.create_platform_parameter(
+    ParamName.ES_CLOUD_ID,
+    'ID for elastic search service.',
+    platform_parameter_domain.DataTypes.STRING,
+    default=''
+)
+
+Registry.create_platform_parameter(
+    ParamName.ES_USERNAME,
+    'Username for elastic search service.',
+    platform_parameter_domain.DataTypes.STRING,
+    default=''
+)
+
+Registry.create_platform_parameter(
+    ParamName.OPPIA_PROJECT_ID,
+    'Project ID of oppia server.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='dev-project-id'
+)
+
+Registry.create_platform_parameter(
+    ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+    'Oppia site URL used in emails.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='http://localhost:8181'
 )

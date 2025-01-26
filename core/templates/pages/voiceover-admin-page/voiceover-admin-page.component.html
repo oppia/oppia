@@ -66,7 +66,7 @@
   </div>
 </mat-card>
 
-<mat-card class="oppia-page-card oppia-long-text-card">
+<mat-card class="oppia-page-card oppia-long-text-card" *ngIf="isLabelingVoiceArtistFeatureEnabled()">
   <h3>Label manual voiceovers</h3>
 
   <p *ngIf="voiceArtistsDataCount == 0">

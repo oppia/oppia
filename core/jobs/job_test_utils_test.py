@@ -97,8 +97,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # 'assert_called' is accessed on 'run' function and currently
         # MyPy does not support for extra attributes on functions of
         # Callable types. So, once this 'assert_called' method is
-        # replaced with some more standard method, we can remove this
-        # todo from here.
+        # replaced with some more standard method, we can remove this todo.
         self.job.run.assert_called() # type: ignore[attr-defined]
 
     def test_put_multi(self) -> None:
@@ -116,8 +115,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # 'return_value' is accessed on 'run' function and currently
         # MyPy does not support for extra attributes on functions of
         # Callable types. So, once this 'return_value' attribute is
-        # replaced with some more standard method, we can remove this
-        # todo from here.
+        # replaced with some more standard method, we can remove this todo.
         self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce a non-empty PCollection.
             self.pipeline | beam.Create([123]) | beam.Map(lambda x: x))
@@ -129,8 +127,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # 'return_value' is accessed on 'run' function and currently
         # MyPy does not support for extra attributes on functions of
         # Callable types. So, once this 'return_value' attribute is
-        # replaced with some more standard method, we can remove this
-        # todo from here.
+        # replaced with some more standard method, we can remove this todo.
         self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce an empty PCollection.
             self.pipeline | beam.Create([]) | beam.Map(lambda x: x))

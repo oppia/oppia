@@ -183,31 +183,31 @@ def clean_math_expression(math_expression: str) -> str:
         str. The correctly formatted string representing the math expression.
     """
     unicode_to_text = {
-        u'\u221a': 'sqrt',
-        u'\xb7': '*',
-        u'\u03b1': 'alpha',
-        u'\u03b2': 'beta',
-        u'\u03b3': 'gamma',
-        u'\u03b4': 'delta',
-        u'\u03b5': 'epsilon',
-        u'\u03b6': 'zeta',
-        u'\u03b7': 'eta',
-        u'\u03b8': 'theta',
-        u'\u03b9': 'iota',
-        u'\u03ba': 'kappa',
-        u'\u03bb': 'lambda',
-        u'\u03bc': 'mu',
-        u'\u03bd': 'nu',
-        u'\u03be': 'xi',
-        u'\u03c0': 'pi',
-        u'\u03c1': 'rho',
-        u'\u03c3': 'sigma',
-        u'\u03c4': 'tau',
-        u'\u03c5': 'upsilon',
-        u'\u03c6': 'phi',
-        u'\u03c7': 'chi',
-        u'\u03c8': 'psi',
-        u'\u03c9': 'omega',
+        '\u221a': 'sqrt',
+        '\xb7': '*',
+        '\u03b1': 'alpha',
+        '\u03b2': 'beta',
+        '\u03b3': 'gamma',
+        '\u03b4': 'delta',
+        '\u03b5': 'epsilon',
+        '\u03b6': 'zeta',
+        '\u03b7': 'eta',
+        '\u03b8': 'theta',
+        '\u03b9': 'iota',
+        '\u03ba': 'kappa',
+        '\u03bb': 'lambda',
+        '\u03bc': 'mu',
+        '\u03bd': 'nu',
+        '\u03be': 'xi',
+        '\u03c0': 'pi',
+        '\u03c1': 'rho',
+        '\u03c3': 'sigma',
+        '\u03c4': 'tau',
+        '\u03c5': 'upsilon',
+        '\u03c6': 'phi',
+        '\u03c7': 'chi',
+        '\u03c8': 'psi',
+        '\u03c9': 'omega',
     }
     inverse_trig_fns_mapping = {
         'asin': 'arcsin',
@@ -2489,70 +2489,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     outcome.dest_if_really_stuck = other_state_name
 
         del self.states[state_name]
-
-    def get_trainable_states_dict(
-        self,
-        old_states: Dict[str, state_domain.State],
-        exp_versions_diff: ExplorationVersionsDiff
-    ) -> Dict[str, List[str]]:
-        """Retrieves the state names of all trainable states in an exploration
-        segregated into state names with changed and unchanged answer groups.
-        In this method, the new_state_name refers to the name of the state in
-        the current version of the exploration whereas the old_state_name refers
-        to the name of the state in the previous version of the exploration.
-
-        Args:
-            old_states: dict. Dictionary containing all State domain objects.
-            exp_versions_diff: ExplorationVersionsDiff. An instance of the
-                exploration versions diff class.
-
-        Returns:
-            dict. The trainable states dict. This dict has three keys
-            representing state names with changed answer groups and
-            unchanged answer groups respectively.
-        """
-        trainable_states_dict: Dict[str, List[str]] = {
-            'state_names_with_changed_answer_groups': [],
-            'state_names_with_unchanged_answer_groups': []
-        }
-        new_states = self.states
-
-        for new_state_name, new_state in new_states.items():
-            if not new_state.can_undergo_classification():
-                continue
-
-            old_state_name = new_state_name
-            if new_state_name in exp_versions_diff.new_to_old_state_names:
-                old_state_name = exp_versions_diff.new_to_old_state_names[
-                    new_state_name]
-
-            # The case where a new state is added. When this happens, the
-            # old_state_name will be equal to the new_state_name and it will not
-            # be present in the exploration's older version.
-            if old_state_name not in old_states:
-                trainable_states_dict[
-                    'state_names_with_changed_answer_groups'].append(
-                        new_state_name)
-                continue
-            old_state = old_states[old_state_name]
-            old_training_data = old_state.get_training_data()
-            new_training_data = new_state.get_training_data()
-
-            # Check if the training data and interaction_id of the state in the
-            # previous version of the exploration and the state in the new
-            # version of the exploration match. If any of them are not equal,
-            # we create a new job for the state in the current version.
-            if new_training_data == old_training_data and (
-                    new_state.interaction.id == old_state.interaction.id):
-                trainable_states_dict[
-                    'state_names_with_unchanged_answer_groups'].append(
-                        new_state_name)
-            else:
-                trainable_states_dict[
-                    'state_names_with_changed_answer_groups'].append(
-                        new_state_name)
-
-        return trainable_states_dict
 
     def get_metadata(self) -> ExplorationMetadata:
         """Gets the ExplorationMetadata domain object for the exploration."""

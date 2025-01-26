@@ -35,6 +35,12 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.open_access
     def get(self, **kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
+        url = self.request.uri
+        if 'explore' in url or 'embed' in url:
+            self.render_template(
+                'oppia-root.mainpage.html', iframe_restriction=None)
+            return
+
         self.render_template('oppia-root.mainpage.html')
 
 

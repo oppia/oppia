@@ -35,6 +35,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'email_footer',
                             'email_sender_name',
                             'enable_admin_notifications_for_reviewer_shortage',
+                            'es_cloud_id',
+                            'es_username',
                             'high_bounce_rate_task_minimum_exploration_starts',
                             (
                                 'high_bounce_rate_task_state_bounce_'
@@ -44,6 +46,9 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                                 'high_bounce_rate_task_state_bounce_rate_'
                                 'obsoletion_threshold'
                             ),
+                            'mailchimp_audience_id',
+                            'mailchimp_username',
+                            'mailgun_domain_name',
                             'max_number_of_suggestions_per_reviewer',
                             'max_number_of_tags_assigned_to_blog_post',
                             (
@@ -51,6 +56,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                                 'is_enabled'
                             ),
                             'noreply_email_address',
+                            'oppia_project_id',
+                            'oppia_site_url_for_emails',
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'record_playthrough_probability',

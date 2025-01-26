@@ -279,7 +279,7 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
       let text: string = value[1];
-      if (text === '') {
+      if (!text.trim()) {
         value[1] = url;
         text = url;
       } else {
@@ -438,13 +438,6 @@ export class RteHelperModalComponent {
               this.extractVideoIdFromVideoUrl(
                 this.tmpCustomizationArgs[i].value.toString()
               );
-          }
-        } else if (this.componentId === this.COMPONENT_ID_LINK) {
-          if (caName === 'text') {
-            // Set the link `text` to the link `url` if the `text` is empty.
-            this.tmpCustomizationArgs[i].value =
-              this.tmpCustomizationArgs[i].value ||
-              this.tmpCustomizationArgs[i - 1].value;
           }
         }
         (

@@ -26,7 +26,6 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {
   ContributionOpportunitiesBackendApiService,
@@ -169,12 +168,3 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'translationLanguageSelector',
-  downgradeComponent({
-    component: TranslationLanguageSelectorComponent,
-    inputs: ['activeLanguageCode'],
-    outputs: ['setActiveLanguageCode'],
-  })
-);

@@ -45,7 +45,6 @@ from core.controllers import base
 from core.domain import auth_domain
 from core.domain import blog_services
 from core.domain import caching_domain
-from core.domain import classifier_domain
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import collection_domain
@@ -55,7 +54,6 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_services
-from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import object_registry
 from core.domain import param_domain
@@ -81,7 +79,6 @@ from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
-from proto_files import text_classifier_pb2
 from scripts import common
 
 import elasticsearch
@@ -557,9 +554,9 @@ class ElasticSearchStub:
         Args:
             index_name: str. The index that was not found.
 
-        Returns:
+        Raises:
             elasticsearch.NotFoundError. A manually-constructed error
-            indicating that the index was not found.
+                indicating that the index was not found.
         """
         raise elasticsearch.NotFoundError(
             404, 'index_not_found_exception', {
@@ -760,7 +757,7 @@ class ElasticSearchStub:
             'total': index_size,
             'batches': 1,
             'requests_per_second': -1.0,
-            'retries': {u'search': 0, u'bulk': 0},
+            'retries': {'search': 0, 'bulk': 0},
             'timed_out': False,
             'deleted': index_size
         }
@@ -2954,7 +2951,7 @@ version: 1
             url: str. The URL to fetch the response.
             expected_status_int_list: list(int). A list of integer status code
                 to expect.
-            http_method: str. The http method by which the request is to be 
+            http_method: str. The http method by which the request is to be
                 sent.
             params: dict. A dictionary that will be encoded into a query string.
 
@@ -4327,7 +4324,8 @@ class EmailMessageMock:
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
             Dict[str, Dict[str, Union[str, int]]]
-        ] = None
+        ] = None,
+        attachments: Optional[List[Dict[str, str]]] = None
     ) -> None:
         """Inits a mock email message with all the necessary data.
 
@@ -4358,6 +4356,9 @@ class EmailMessageMock:
                     subject = 'Hey, %recipient.first%'
                 For more information about this format, see:
                 https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
+            attachments: list(dict)|None. Optional argument. A list of
+                dictionaries, where each dictionary includes the keys `filename`
+                and `path` with their corresponding values.
         """
         self.sender = sender_email
         self.to = recipient_email
@@ -4367,6 +4368,7 @@ class EmailMessageMock:
         self.bcc = bcc
         self.reply_to = reply_to
         self.recipient_variables = recipient_variables
+        self.attachments = attachments
 
 
 class GenericEmailTestBase(GenericTestBase):
@@ -4406,7 +4408,8 @@ class GenericEmailTestBase(GenericTestBase):
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
             Dict[str, Dict[str, Union[str, int]]]
-        ] = None
+        ] = None,
+        attachments: Optional[List[Dict[str, str]]] = None
     ) -> bool:
         """Mocks sending an email to each email in recipient_emails.
 
@@ -4437,6 +4440,9 @@ class GenericEmailTestBase(GenericTestBase):
                     subject = 'Hey, %recipient.first%'
                 For more information about this format, see:
                 https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
+            attachments: list(dict)|None. Optional argument. A list of
+                dictionaries, where each dictionary includes the keys `filename`
+                and `path` with their corresponding values.
 
         Returns:
             bool. Whether the emails are sent successfully.
@@ -4449,7 +4455,8 @@ class GenericEmailTestBase(GenericTestBase):
             sender_email, recipient_emails, subject, plaintext_body, html_body,
             bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
             recipient_variables=(
-                recipient_variables if recipient_variables else None))
+                recipient_variables if recipient_variables else None),
+            attachments=attachments if attachments else None)
         for recipient_email in recipient_emails:
             self.emails_dict[recipient_email].append(new_email)
         return True
@@ -4479,90 +4486,6 @@ class GenericEmailTestBase(GenericTestBase):
 
 
 EmailTestBase = GenericEmailTestBase
-
-
-class ClassifierTestBase(GenericEmailTestBase):
-    """Base class for classifier test classes that need common functions
-    for related to reading classifier data and mocking the flow of the
-    storing the trained models through post request.
-
-    This class is derived from GenericEmailTestBase because the
-    TrainedClassifierHandlerTests test suite requires email services test
-    functions in addition to the classifier functions defined below.
-    """
-
-    # Here we use type Any because method 'post_blob' can return a JSON
-    # dict which can contain different types of values. So, to allow every
-    # type of value we used Any here.
-    def post_blob(
-        self, url: str, payload: bytes, expected_status_int: int = 200
-    ) -> Dict[str, Any]:
-        """Post a BLOB object to the server; return the received object.
-
-        Note that this method should only be used for
-        classifier.TrainedClassifierHandler handler and for no one else. The
-        reason being, we don't have any general mechanism for security for
-        transferring binary data. TrainedClassifierHandler implements a
-        specific mechanism which is restricted to the handler.
-
-        Args:
-            url: str. The URL to which BLOB object in payload should be sent
-                through a post request.
-            payload: bytes. Binary data which needs to be sent.
-            expected_status_int: int. The status expected as a response of post
-                request.
-
-        Returns:
-            dict. Parsed JSON response received upon invoking the post request.
-        """
-        data = payload
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-        response = self._send_post_request(
-            self.testapp, url, data,
-            expect_errors, expected_status_int=expected_status_int,
-            headers={'content-type': 'application/octet-stream'})
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-
-        self.assertEqual(response.status_int, expected_status_int)
-        # Here we use type Any because the 'result' is a JSON result dict
-        # that can contain different types of values. So, to allow every type
-        # of value we used Any here.
-        result: Dict[str, Any] = self._parse_json_response(
-            response,
-            expect_errors
-        )
-        return result
-
-    def _get_classifier_data_from_classifier_training_job(
-        self, classifier_training_job: classifier_domain.ClassifierTrainingJob
-    ) -> text_classifier_pb2.TextClassifierFrozenModel:
-        """Retrieves classifier training job from GCS using metadata stored in
-        classifier_training_job.
-
-        Args:
-            classifier_training_job: ClassifierTrainingJob. Domain object
-                containing metadata of the training job which is used to
-                retrieve the trained model.
-
-        Returns:
-            FrozenModel. Protobuf object containing classifier data.
-        """
-        filename = classifier_training_job.classifier_data_filename
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id)
-        classifier_data = utils.decompress_from_zlib(fs.get(filename))
-        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
-        classifier_data_proto.ParseFromString(classifier_data)
-        return classifier_data_proto
 
 
 class FunctionWrapper:

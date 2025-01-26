@@ -50,7 +50,6 @@ from core.storage.base_model import gae_models as base_models
 from core.storage.beam_job import gae_models as beam_job_models
 from core.storage.blog import gae_models as blog_models
 from core.storage.blog_statistics import gae_models as blog_stats_models
-from core.storage.classifier import gae_models as classifier_models
 from core.storage.classroom import gae_models as classroom_models
 from core.storage.collection import gae_models as collection_models
 from core.storage.config import gae_models as config_models
@@ -84,7 +83,6 @@ __all__ = [
     'blog_models',
     'blog_stats_models',
     'bulk_email_services',
-    'classifier_models',
     'classroom_models',
     'collection_models',
     'config_models',

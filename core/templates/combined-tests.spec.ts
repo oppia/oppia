@@ -84,7 +84,7 @@ jasmine.getEnv().addReporter({
 // Known failing files are exempted (#6960).
 // TODO(#6960): Fix the tests that broke down after introduction of Webpack due
 //              to templateCache.
-// The '@nodelib' and 'openapi3-ts' are excluded from the tests since they are
+// The '@bcoe', '@nodelib' and 'openapi3-ts' are excluded from the tests since they are
 // coming from third party library.
 const context = require.context('../../', true, /(:?)/);
 context.keys().forEach(context);

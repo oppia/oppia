@@ -452,7 +452,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(blog_services.check_can_edit_blog_post(
             user_info_a, None))
 
-        user_info_b.actions.append(u'EDIT_ANY_BLOG_POST')
+        user_info_b.actions.append('EDIT_ANY_BLOG_POST')
         self.assertTrue(blog_services.check_can_edit_blog_post(
             user_info_b, blog_post_rights))
 

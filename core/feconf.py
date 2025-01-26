@@ -83,7 +83,6 @@ check_dev_mode_is_true()
 
 # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
 OPPIA_IS_DOCKERIZED = bool(os.environ.get('OPPIA_IS_DOCKERIZED', False))
-CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -146,7 +145,6 @@ class ValidModelNames(enum.Enum):
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
-    CLASSIFIER = 'classifier'
     CLASSROOM = 'classroom'
     COLLECTION = 'collection'
     CONFIG = 'CONFIG'
@@ -171,42 +169,6 @@ class ValidModelNames(enum.Enum):
     VOICEOVER = 'voiceover'
 
 
-# A mapping of interaction ids to classifier properties.
-# TODO(#10217): As of now we support only one algorithm per interaction.
-# However, we do have the necessary storage infrastructure to support multiple
-# algorithms per interaction. Hence, whenever we find a secondary algorithm
-# candidate for any of the supported interactions, the logical functions to
-# support multiple algorithms need to be implemented.
-
-
-class ClassifierDict(TypedDict):
-    """Representing INTERACTION_CLASSIFIER_MAPPING dict values."""
-
-    algorithm_id: str
-    algorithm_version: int
-
-
-INTERACTION_CLASSIFIER_MAPPING: Dict[str, ClassifierDict] = {
-    'TextInput': {
-        'algorithm_id': 'TextClassifier',
-        'algorithm_version': 1
-    },
-}
-
-# Classifier job time to live (in mins).
-CLASSIFIER_JOB_TTL_MINS = 5
-TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
-TRAINING_JOB_STATUS_FAILED = 'FAILED'
-TRAINING_JOB_STATUS_NEW = 'NEW'
-TRAINING_JOB_STATUS_PENDING = 'PENDING'
-
-ALLOWED_TRAINING_JOB_STATUSES: List[str] = [
-    TRAINING_JOB_STATUS_COMPLETE,
-    TRAINING_JOB_STATUS_FAILED,
-    TRAINING_JOB_STATUS_NEW,
-    TRAINING_JOB_STATUS_PENDING
-]
-
 # Allowed formats of how HTML is present in rule specs.
 HTML_RULE_VARIABLE_FORMAT_SET = 'set'
 HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
@@ -229,14 +191,6 @@ MAX_CHARS_IN_BLOG_POST_URL = (
     + len('-')
     + constants.BLOG_POST_ID_LENGTH
 )
-
-ALLOWED_TRAINING_JOB_STATUS_CHANGES: Dict[str, List[str]] = {
-    TRAINING_JOB_STATUS_COMPLETE: [],
-    TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
-    TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
-                                  TRAINING_JOB_STATUS_FAILED],
-    TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
-}
 
 # Allowed formats of how HTML is present in rule specs.
 HTML_RULE_VARIABLE_FORMAT_SET = 'set'
@@ -278,15 +232,6 @@ MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
 # The maximum number of goals allowed in the learner goals of the learner.
 MAX_CURRENT_GOALS_COUNT = 5
-
-# The minimum number of training samples required for training a classifier.
-MIN_TOTAL_TRAINING_EXAMPLES = 50
-
-# The minimum number of assigned labels required for training a classifier.
-MIN_ASSIGNED_LABELS = 2
-
-# Default label for classification algorithms.
-DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -460,11 +405,6 @@ DEFAULT_ABBREVIATED_TOPIC_NAME = ''
 # Default content id for the subtopic page's content.
 DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
 
-# Default ID of VM which is used for training classifier.
-DEFAULT_VM_ID = 'vm_default'
-# Shared secret key for default VM.
-DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
-
 IMAGE_FORMAT_JPEG = 'jpeg'
 IMAGE_FORMAT_PNG = 'png'
 IMAGE_FORMAT_GIF = 'gif'
@@ -585,8 +525,8 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.4.3'
-OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
+OPPIA_VERSION = '3.4.4'
+OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -680,9 +620,7 @@ BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
 BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
 BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
-BULK_EMAIL_INTENT_ML_JOB_FAILURE = 'bulk_email_ml_job_failure'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
-EMAIL_INTENT_ML_JOB_FAILURE = 'email_ml_job_failure'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
@@ -830,40 +768,40 @@ LINEAR_INTERACTION_IDS = ['Continue']
 # either a YAML file or a directory (depending on whether it ends in .yaml).
 # These explorations can be found under data/explorations.
 DEMO_EXPLORATIONS = {
-    u'0': 'welcome',
-    u'1': 'multiples.yaml',
+    '0': 'welcome',
+    '1': 'multiples.yaml',
     # Exploration with ID 2 was removed as it contained string values inside
     # NumericInput interaction.
-    u'3': 'root_linear_coefficient_theorem',
-    u'4': 'three_balls',
-    u'6': 'boot_verbs.yaml',
-    u'7': 'hola.yaml',
+    '3': 'root_linear_coefficient_theorem',
+    '4': 'three_balls',
+    '6': 'boot_verbs.yaml',
+    '7': 'hola.yaml',
     # Exploration with ID 8 was removed as it contained string values inside
     # NumericInput interaction.
-    u'9': 'pitch_perfect.yaml',
-    u'10': 'test_interactions',
-    u'11': 'modeling_graphs',
-    u'12': 'protractor_test_1.yaml',
-    u'13': 'solar_system',
-    u'14': 'about_oppia.yaml',
-    u'15': 'classifier_demo_exploration.yaml',
-    u'16': 'all_interactions',
-    u'17': 'audio_test',
+    '9': 'pitch_perfect.yaml',
+    '10': 'test_interactions',
+    '11': 'modeling_graphs',
+    '12': 'protractor_test_1.yaml',
+    '13': 'solar_system',
+    '14': 'about_oppia.yaml',
+    '15': 'classifier_demo_exploration.yaml',
+    '16': 'all_interactions',
+    '17': 'audio_test',
     # Exploration with ID 18 was used for testing CodeClassifier functionality
     # which has been removed (#10060).
-    u'19': 'example_exploration_in_collection1.yaml',
-    u'20': 'example_exploration_in_collection2.yaml',
-    u'21': 'example_exploration_in_collection3.yaml',
-    u'22': 'protractor_mobile_test_exploration.yaml',
-    u'23': 'rating_test.yaml',
-    u'24': 'learner_flow_test.yaml',
-    u'25': 'exploration_player_test.yaml',
-    u'26': 'android_interactions',
+    '19': 'example_exploration_in_collection1.yaml',
+    '20': 'example_exploration_in_collection2.yaml',
+    '21': 'example_exploration_in_collection3.yaml',
+    '22': 'protractor_mobile_test_exploration.yaml',
+    '23': 'rating_test.yaml',
+    '24': 'learner_flow_test.yaml',
+    '25': 'exploration_player_test.yaml',
+    '26': 'android_interactions',
 }
 
 DEMO_COLLECTIONS = {
-    u'0': 'welcome_to_collections.yaml',
-    u'1': 'learner_flow_test_collection.yaml'
+    '0': 'welcome_to_collections.yaml',
+    '1': 'learner_flow_test_collection.yaml'
 }
 
 # IDs of explorations which should not be displayable in either the learner or
@@ -901,6 +839,8 @@ ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
+AUTOMATIC_VOICEOVER_ADMIN_CONTROL_URL = (
+    '/automatic_voiceover_admin_control_handler')
 DIAGNOSTIC_TEST_PLAYER_PAGE_URL = '/diagnostic-test-player'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
@@ -1145,8 +1085,6 @@ MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with app.constants.ts.
-ENABLE_ML_CLASSIFIERS = False
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
