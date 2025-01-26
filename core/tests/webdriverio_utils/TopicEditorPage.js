@@ -273,7 +273,7 @@ var TopicEditorPage = function () {
 
   this.expectNumberOfUncategorizedSkillsToBe = async function (count) {
     await waitFor.visibilityOf(
-      uncategorizedSkillCard,
+      $('.e2e-test-skill-item'),
       'Uncategorized skills taking too long to appear.'
     );
     var uncategorizedSkillItems = await $$('.e2e-test-skill-item');
