@@ -318,7 +318,7 @@ export class UnitsObjectFactory {
     return '';
   }
 
-  getMultipleSlash(units: string): string {
+  getMultipleSlash(units: string): boolean {
     let slashCount = (units.match(/\//g) || []).length;
 
     return slashCount > 1;
