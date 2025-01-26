@@ -60,6 +60,7 @@ const saveResponseButton = 'button.e2e-test-add-new-response';
 const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
 const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
 const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
@@ -330,6 +331,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(equalsRuleButtonText);
     await this.type(floatTextField, '3');
     await this.clickOn(answersInGroupAreCorrectToggle);
+    await this.clickOn(openAnswerGroupFeedBackEditor);
+    await this.type(richTextAreaField, 'Good job!');
     await this.clickOn(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
