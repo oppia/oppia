@@ -176,7 +176,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: webdriverio-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
       - name: Uploading generated test to angular module mapping as an artifact
         if: ${{ failure() }}

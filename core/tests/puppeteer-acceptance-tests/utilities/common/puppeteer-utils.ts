@@ -800,7 +800,6 @@ export class BaseUser {
         width: this.page.viewport()?.width || 1920,
         height: this.page.viewport()?.height || 1080,
       },
-      aspectRatio: '16:9',
     };
 
     this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
