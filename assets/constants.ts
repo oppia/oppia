@@ -7580,6 +7580,26 @@ export default {
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": []
     },
+    "TOPIC_EDITOR": {
+      "ROUTE": "topic_editor/:topic_id",
+      "TITLE": "Topic Editor",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Edit and manage topics with the Topic Editor in Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Edit and manage topics with the Topic Editor in Oppia."
+        }
+      ]
+    },
     "SPLASH": {
       "ROUTE": "",
       "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",

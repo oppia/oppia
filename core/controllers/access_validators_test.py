@@ -857,6 +857,55 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.logout()
 
 
+class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
+    """Checks the access to the topic editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+    def test_access_topic_editor_page_with_curriculum_admin_right(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
+                expected_status_int=200)
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
+        self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        invalid_topic_id = 'p3MBT4ndlCTX'
+
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                invalid_topic_id),
+                expected_status_int=404)
+        self.logout()
+
+    def test_access_topic_editor_page_without_curriculum_admin_right(
+            self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=401)
+
+
 class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
     """Checks the access to the skill editor page and its rendenring"""
 
