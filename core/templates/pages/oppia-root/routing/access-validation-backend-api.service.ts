@@ -189,7 +189,9 @@ export class AccessValidationBackendApiService {
       }
     );
     const params = new HttpParams().set(
-      'selected_subtopic_ids', selectedSubtopicIds);
+      'selected_subtopic_ids',
+      selectedSubtopicIds
+    );
     return this.http.get<void>(url, {params}).toPromise();
   }
 
