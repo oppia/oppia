@@ -245,6 +245,11 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CollectionEditorAccessValidationPage
     ),
+     get_redirect_route(
+        r'%s/can_access_exploration_editor_page/<exploration_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ExplorationEditorAccessValidationHandlerPage
+    ),
 
     get_redirect_route(
         r'%s/can_access_story_editor_page/<story_id>' %
@@ -804,9 +809,6 @@ URLS = [
         question_editor.EditableQuestionDataHandler),
 
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
-        editor.ExplorationPage),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
@@ -1264,13 +1266,17 @@ URLS.extend((
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+      get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
-      oppia_root.OppiaRootPage
+        oppia_root.OppiaRootPage
     ),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         oppia_root.OppiaRootPage
-    )
+    ),
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work
