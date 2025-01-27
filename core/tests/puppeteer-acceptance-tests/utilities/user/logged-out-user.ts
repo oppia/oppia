@@ -366,6 +366,15 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const getStartedHeader = '.e2e-test-get-started-page';
 
+const newsletterEmailInputField = '.e2e-test-newsletter-input';
+const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
+const newsletterSubscriptionThanksMessage =
+  '.e2e-test-thanks-subscribe-message';
+const watchAVideoButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-watch-video-btn';
+const readOurBlogButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-read-blog-btn';
+const readBlogUrl = testConstants.URLs.ReadBlogLink;
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -2474,6 +2483,84 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
+  }
+
+  /**
+   * Function to submit an email to the newsletter input field.
+   * @param {string} email - The email to submit.
+   */
+  async submitEmailForNewsletter(email: string): Promise<void> {
+    await this.waitForElementToBeClickable(newsletterEmailInputField);
+    await this.type(newsletterEmailInputField, email);
+    await this.clickOn(newsletterSubscribeButton);
+  }
+
+  /**
+   * Function to check for presence of Thanks Message to verify Newsletter Subscription.
+   */
+  async expectNewsletterSubscriptionThanksMessage(): Promise<void> {
+    await this.page.waitForSelector(newsletterSubscriptionThanksMessage);
+    const thanksMessage = await this.page.$eval(
+      newsletterSubscriptionThanksMessage,
+      element => element.textContent
+    );
+
+    if (!thanksMessage || !thanksMessage.includes('Thanks for subscribing!')) {
+      throw new Error('Thank you message does not exist or incorrect');
+    }
+
+    showMessage('Subscribed to newsletter successfully');
+  }
+
+  /**
+   * Function to verify the Watch a Video button after subscribing to newsletter.
+   */
+  async clickWatchAVideoButton(): Promise<void> {
+    await this.page.waitForSelector(watchAVideoButtonInThanksForSubscribe);
+    const buttonText = await this.page.$eval(
+      watchAVideoButtonInThanksForSubscribe,
+      element => (element as HTMLElement).innerText
+    );
+    if (buttonText !== 'Watch a video') {
+      throw new Error('The Watch A Video button does not exist!');
+    }
+    await Promise.all([
+      this.clickAndWaitForNavigation(watchAVideoButtonInThanksForSubscribe),
+    ]);
+    await this.waitForPageToFullyLoad();
+
+    const url = this.page.url();
+    if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
+      throw new Error(
+        `The Watch A Video button should open the right page,
+          but it opens ${url} instead.`
+      );
+    }
+    showMessage('The Watch A Video button opens the right page.');
+  }
+
+  /**
+   * Function to verify the Read Blog button after subscribing to newsletter.
+   */
+  async clickReadBlogButton(): Promise<void> {
+    await this.page.waitForSelector(readOurBlogButtonInThanksForSubscribe);
+    const buttonText = await this.page.$eval(
+      readOurBlogButtonInThanksForSubscribe,
+      element => (element as HTMLElement).innerText
+    );
+    if (buttonText !== 'Read our blog') {
+      throw new Error('The Read Our Blog button does not exist!');
+    }
+    await this.clickAndWaitForNavigation(readOurBlogButtonInThanksForSubscribe);
+
+    if (this.page.url() !== readBlogUrl) {
+      throw new Error(
+        `The Read Our Blog button should open the Blog page,
+          but it opens ${this.page.url()} instead.`
+      );
+    } else {
+      showMessage('The Read Our Blog button opens the Blog page.');
+    }
   }
 
   /**
