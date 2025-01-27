@@ -876,6 +876,8 @@
 	"I18N_INTERACTIONS_TERMS_LIMIT": "المنشئ حدد عدد المصطلحات في الإجابة ليكون <[termsCount]>",
 	"I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT": "تمت إزالة بعض العلامات والسمات غير الصالحة من الصورة التي تم تحميلها. إذا بدت صورتك مشوهة ، يرجى <a href=\"<[issueURL]>\" target=\"_blank\">اخبارنا</a> ، ثم حاول تحميل SVG مختلف.",
 	"I18N_JOIN_LEARNER_GROUP_BUTTON": "انضم إلى المجموعة",
+	"I18N_LANGUAGE_BANNER_BUTTON_TEXT": "حسنا!",
+	"I18N_LANGUAGE_BANNER_LANG_INFO": "يمكنك تغيير لغة الموقع في أي وقت في شريط التنقل.",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "أظهر أوبيا ب:",
 	"I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING": "مساء الخير",
 	"I18N_LEARNER_DASHBOARD_ALL": "الكل",
