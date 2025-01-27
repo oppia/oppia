@@ -46,12 +46,6 @@ build: ## Builds the all docker setup.
 	$(MAKE) install_hooks
 	docker compose build
 
-inactive_issue_checker:
-	python -m pip install --upgrade pip
-	python -m pip install PyGithub
-	python -m pip install requests
-	python scripts/inactive_issue_checker.py
-
 run-devserver: ## Runs the dev-server
 # TODO(#19888): Implement a more efficient method for connecting the folders rather than resorting to copying using docker cp.
 	docker compose up angular-build -d
