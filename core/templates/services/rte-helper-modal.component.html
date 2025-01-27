@@ -8,6 +8,7 @@
            class="oppia-customization-arg-editor">
         <strong>{{ customizationArgSpec.description }}</strong>
         <div class="oppia-customization-arg-editor-inner">
+          <!-- Autofocus is applied to the first editor (ind === 0), ensuring the first form control receives focus when the form is loaded. -->
           <schema-based-editor [formControlName]="ind"
                                [schema]="customizationArgSpec.schema"
                                [attr.autofocus]="ind === 0 ? '' : null">
