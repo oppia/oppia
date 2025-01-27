@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for mathjax directive
+ */
+
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MathJaxDirective} from './mathjax.directive';
@@ -29,6 +33,7 @@ import {By} from '@angular/platform-browser';
 class MockCompA {
   expr: string = '/frac{x}{y}';
 }
+
 const mockMathJaxHub = {
   Queue: () => {
     return;
@@ -43,6 +48,7 @@ describe('MathJax directive', () => {
   let fixture: ComponentFixture<MockCompA>;
   let mockInsertScriptService: jasmine.SpyObj<InsertScriptService>;
   const originalMathJax = window.MathJax;
+
   beforeEach(waitForAsync(() => {
     mockInsertScriptService = jasmine.createSpyObj('InsertScriptService', [
       'loadScript',
@@ -73,7 +79,7 @@ describe('MathJax directive', () => {
     window.MathJax = originalMathJax;
   });
 
-  it('should re render math expr when expr changes', waitForAsync(() => {
+  it('should re-render math expr when expr changes', waitForAsync(() => {
     const spy = spyOn(mockMathJaxHub, 'Queue');
     component.expr = '/frac{z}{y}';
     fixture.detectChanges();
