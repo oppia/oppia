@@ -876,6 +876,8 @@
     "I18N_INTERACTIONS_TERMS_LIMIT": "The creator has specified the number of terms in the answer to be <[termsCount]>",
     "I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT": "Some invalid tags and attributes have been removed from the uploaded image. If your image looks distorted, please <a href=\"<[issueURL]>\" target=\"_blank\">let us know</a>, then try uploading a different SVG.",
     "I18N_JOIN_LEARNER_GROUP_BUTTON": "Join Group",
+    "I18N_LANGUAGE_BANNER_BUTTON_TEXT": "Got it!",
+    "I18N_LANGUAGE_BANNER_LANG_INFO": "You can change the site language at any time in the navigation bar.",
     "I18N_LANGUAGE_FOOTER_VIEW_IN": "View Oppia in:",
     "I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING": "Good Afternoon",
     "I18N_LEARNER_DASHBOARD_ALL": "All",
