@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - develop
+      - issue#21294
       - release-*
   pull_request:
     branches:
@@ -28,8 +29,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install requests
         python scripts/inactive_issue_checker.py
       
     - name: Report failure if failed on oppia/oppia develop branch
