@@ -277,6 +277,12 @@ URLS = [
         access_validators.ManageOwnAccountValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_topic_editor/<topic_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicEditorAccessValidationPage
+    ),
+
+    get_redirect_route(
         r'%s/does_profile_exist/<username>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ProfileExistsValidationHandler),
@@ -952,9 +958,6 @@ URLS = [
         collection_editor.CollectionUnpublishHandler),
 
     get_redirect_route(
-        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
-        topic_editor.TopicEditorPage),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableTopicDataHandler),
     get_redirect_route(
@@ -1250,6 +1253,10 @@ URLS.extend((
     ),
     get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(

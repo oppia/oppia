@@ -78,8 +78,6 @@ module.exports = {
     practice_session:
       commonPrefix +
       '/pages/practice-session-page/practice-session-page.import.ts',
-    topic_editor:
-      commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
   },
 
   /**
@@ -190,18 +188,6 @@ module.exports = {
         commonPrefix +
         '/pages/practice-session-page/' +
         'practice-session-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['topic_editor'],
-      filename: 'topic-editor-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/topic-editor-page/' +
-        'topic-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),
