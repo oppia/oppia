@@ -34,7 +34,7 @@ jobs:
 
             const fs = require('fs');
             const path = require('path');
-            const userWhitelistPath = path.join(process.env.GITHUB_WORKSPACE, 'userwhitelist.json');
+            const userWhitelistPath = path.join(process.env.GITHUB_WORKSPACE, 'userWhitelist.json');
             
             let authorizedUsers = new Set();
             let releaseCoordinators = [];
