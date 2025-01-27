@@ -71,6 +71,9 @@ export class AccessValidationBackendApiService {
   BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_blog_author_profile_page/<author_username>'; // eslint-disable-line max-len
 
+  TOPIC_EDITOR_ACCESS_VALIDATOR_URL =
+    '/access_validation_handler/can_access_topic_editor/<topic_id>';
+
   COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
@@ -222,6 +225,17 @@ export class AccessValidationBackendApiService {
       this.COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE,
       {
         collection_id: collectionId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToTopicEditorPage(topicId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.TOPIC_EDITOR_ACCESS_VALIDATOR_URL,
+      {
+        topic_id: topicId,
       }
     );
 
