@@ -441,6 +441,7 @@ import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-ad
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { ExplorationPlayerPageAuthGuard } from 'pages/exploration-player-page/exploration-player-page-auth.guard';
+import { TopicEditorAuthGuard } from 'pages/topic-editor-page/topic-editor-auth.guard';
 import { TopicsAndSkillsDashboardAuthGuard } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
@@ -452,6 +453,7 @@ import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-ad
 import { SubtopicViewerAuthGuard } from 'pages/subtopic-viewer-page/subtopic-viewer-auth.guard';
 import { StoryEditorPageAuthGuard } from 'pages/story-editor-page/story-editor-page-auth.guard';
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
+import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -672,6 +674,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['IsLoggedInGuard', IsLoggedInGuard],
   ['IsNewLessonPlayerGuard', IsNewLessonPlayerGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
+  ['LanguageBannerService', LanguageBannerService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerAnswerDetailsBackendApiService',
     LearnerAnswerDetailsBackendApiService],
@@ -865,6 +868,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicCreationService', TopicCreationService],
   ['TopicEditorRoutingService', TopicEditorRoutingService],
+  ['TopicEditorAuthGuard', TopicEditorAuthGuard],
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicViewerAccessGuard', TopicViewerAccessGuard],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],

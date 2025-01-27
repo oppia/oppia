@@ -75,8 +75,6 @@ module.exports = {
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
     lightweight_oppia_root:
       commonPrefix + '/pages/lightweight-oppia-root/index.ts',
-    topic_editor:
-      commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
   },
 
   /**
@@ -177,18 +175,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       lightweight: true,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['topic_editor'],
-      filename: 'topic-editor-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/topic-editor-page/' +
-        'topic-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
