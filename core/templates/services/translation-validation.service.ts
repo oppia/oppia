@@ -75,6 +75,9 @@ export class TranslationValidationService {
         const attribute = element.attributes[
           type as keyof NamedNodeMap
         ] as Attr;
+        if (!attribute) {
+          return null;
+        }
         const attributeValue = attribute.value;
         return attributeValue.substring(
           textWrapperLength,

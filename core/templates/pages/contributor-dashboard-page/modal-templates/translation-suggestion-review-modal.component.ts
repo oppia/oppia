@@ -23,6 +23,7 @@ import {
   ViewChild,
   ElementRef,
   Input,
+  SimpleChanges,
 } from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
@@ -33,6 +34,7 @@ import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import {UserService} from 'services/user.service';
+import {TranslationValidationService} from 'services/translation-validation.service';
 import {ValidatorsService} from 'services/validators.service';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {AppConstants} from 'app.constants';
@@ -45,7 +47,6 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {HtmlParsingService} from 'services/html-parsing.service';
 
 interface HTMLSchema {
   type: string;
@@ -164,7 +165,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   hasQueuedSuggestion: boolean = false;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   isUndoFeatureEnabled: boolean = false;
-  initialImageCount: number = 0;
+  hasIncompleteTranslationError: boolean = false;
 
   @Input() altTextIsDisplayed: boolean = false;
 
@@ -210,7 +211,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     private validatorsService: ValidatorsService,
     private snackBar: MatSnackBar,
     private platformFeatureService: PlatformFeatureService,
-    private htmlParsingService: HtmlParsingService
+    private translationValidationService: TranslationValidationService
   ) {}
 
   ngOnInit(): void {
@@ -252,8 +253,25 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.refreshActiveContributionState();
     const originalContentHtml = this.activeSuggestion.change_cmd
       .content_html as string;
-    this.initialImageCount =
-      this.htmlParsingService.countImageTags(originalContentHtml);
+    const domParser = new DOMParser();
+    const originalElements = domParser.parseFromString(
+      this.activeSuggestion.change_cmd.content_html as string,
+      'text/html'
+    );
+    const translatedElements = domParser.parseFromString(
+      this.translationHtml,
+      'text/html'
+    );
+
+    const translationError =
+      this.translationValidationService.validateTranslation(
+        originalElements.getElementsByTagName('*'),
+        translatedElements.getElementsByTagName('*')
+      );
+
+    this.hasIncompleteTranslationError =
+      translationError.hasUntranslatedElements;
+
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
     // the translation is not received from the editor when the translation
@@ -374,26 +392,50 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
-  isImageCountMismatched(): boolean {
-    const originalContentHtml = this.activeSuggestion.change_cmd.content_html;
-    const updatedTranslationHtml = this.editedContent.html;
-    return this.htmlParsingService.isImageCountMismatched(
-      originalContentHtml as string,
-      updatedTranslationHtml
+  isComponentsMismatched(): boolean {
+    const domParser = new DOMParser();
+    const originalElements = domParser.parseFromString(
+      this.activeSuggestion.change_cmd.content_html as string,
+      'text/html'
     );
+    const updatedElements = domParser.parseFromString(
+      this.editedContent.html,
+      'text/html'
+    );
+
+    const translationError =
+      this.translationValidationService.validateTranslation(
+        originalElements.getElementsByTagName('*'),
+        updatedElements.getElementsByTagName('*')
+      );
+    this.hasIncompleteTranslationError =
+      translationError.hasUntranslatedElements;
+
+    return translationError.hasUntranslatedElements;
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['editedContent'] && this.editedContent) {
+      this.isComponentsMismatched();
+
+      if (!this.hasIncompleteTranslationError) {
+        this.errorMessage = '';
+        this.errorFound = false;
+      }
+    }
   }
 
   get isUpdateDisabled(): boolean {
-    return this.startedEditing && this.isImageCountMismatched();
+    return this.startedEditing && this.isComponentsMismatched();
   }
 
   updateSuggestion(): void {
     const updatedTranslation = this.editedContent.html;
     const suggestionId = this.activeSuggestion.suggestion_id;
 
-    if (this.isImageCountMismatched()) {
+    if (this.isComponentsMismatched()) {
       this.errorMessage =
-        'The number of images in the translation must match the original content.';
+        'The number of components in the translation must match the original content.';
       this.errorFound = true;
       return;
     }

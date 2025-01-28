@@ -39,6 +39,7 @@ import {
 } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {UserService} from 'services/user.service';
+import {TranslationValidationService} from 'services/translation-validation.service';
 import {AppConstants} from 'app.constants';
 import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
 import {
@@ -193,7 +194,8 @@ export class TranslationModalComponent {
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly wds: WindowDimensionsService
+    private readonly wds: WindowDimensionsService,
+    private readonly translationValidationService: TranslationValidationService
   ) {}
 
   public get expansionTabType(): typeof ExpansionTabType {
@@ -455,122 +457,6 @@ export class TranslationModalComponent {
     );
   }
 
-  getElementAttributeTexts(
-    elements: HTMLCollectionOf<Element>,
-    type: string
-  ): string[] {
-    const textWrapperLength = 6;
-    const attributes = Array.from(elements, function (element: Element) {
-      // A sample element would be as <oppia-noninteractive-image alt-with-value
-      // ="&amp;quot;Image description&amp;quot;" caption-with-value=
-      // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;
-      // img_2021029_210552_zbmdt94_height_54_width_490.png&amp;quot;">
-      // </oppia-noninteractive-image>
-      if (element.localName === 'oppia-noninteractive-image') {
-        const attribute = element.attributes[
-          type as keyof NamedNodeMap
-        ] as Attr;
-        const attributeValue = attribute.value;
-        return attributeValue.substring(
-          textWrapperLength,
-          attributeValue.length - textWrapperLength
-        );
-      }
-    });
-    // Typecasted to string[] because Array.from() returns
-    // (string | undefined)[] and we need to remove the undefined elements.
-    return attributes.filter(attributeValues => attributeValues) as string[];
-  }
-
-  getImageAttributeTexts(
-    htmlElements: HTMLCollectionOf<Element>
-  ): ImageDetails {
-    return {
-      filePaths: this.getElementAttributeTexts(
-        htmlElements,
-        'filepath-with-value'
-      ),
-      alts: this.getElementAttributeTexts(htmlElements, 'alt-with-value'),
-      descriptions: this.getElementAttributeTexts(
-        htmlElements,
-        'caption-with-value'
-      ),
-    };
-  }
-
-  hasSomeDuplicateElements(
-    originalElements: string[],
-    translatedElements: string[]
-  ): boolean {
-    // This regular expression matches a number, optionally negative, with an
-    // optional decimal number followed by zero or more operators (including
-    // equals sign) and number pairs. It also allows for whitespace between
-    // numbers and operators. Examples 1+1=2 1+1 1*1=1.
-    const mathEquationRegex = new RegExp(
-      /(?:(?:^|[-+_*/=])(?:\s*-?\d+(\.\d+)?(?:[eE][+-]?\d+)?\s*))+$/
-    );
-    if (originalElements.length === 0) {
-      return false;
-    }
-    const hasMatchingTranslatedElement = (element: string) =>
-      translatedElements.includes(element) &&
-      originalElements.length > 0 &&
-      !mathEquationRegex.test(element);
-    return originalElements.some(hasMatchingTranslatedElement);
-  }
-
-  isTranslationCompleted(
-    originalElements: HTMLCollectionOf<Element>,
-    translatedElements: HTMLCollectionOf<Element>
-  ): boolean {
-    // Checks if there are custom tags present in the original content but not
-    // in the translated content.
-    const filteredOriginalElements = Array.from(originalElements, el =>
-      el.tagName.toLowerCase()
-    )
-      .filter(tagName =>
-        this.ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION.includes(tagName)
-      )
-      .sort();
-    const filteredTranslatedElements = Array.from(translatedElements, el =>
-      el.tagName.toLowerCase()
-    )
-      .filter(tagName =>
-        this.ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION.includes(tagName)
-      )
-      .sort();
-    return isEqual(filteredOriginalElements, filteredTranslatedElements);
-  }
-
-  validateTranslation(
-    textToTranslate: HTMLCollectionOf<Element>,
-    translatedText: HTMLCollectionOf<Element>
-  ): TranslationError {
-    const translatedElements: ImageDetails =
-      this.getImageAttributeTexts(translatedText);
-    const originalElements: ImageDetails =
-      this.getImageAttributeTexts(textToTranslate);
-
-    const hasDuplicateAltTexts = this.hasSomeDuplicateElements(
-      originalElements.alts,
-      translatedElements.alts
-    );
-    const hasDuplicateDescriptions = this.hasSomeDuplicateElements(
-      originalElements.descriptions,
-      translatedElements.descriptions
-    );
-    const hasUntranslatedElements = !this.isTranslationCompleted(
-      textToTranslate,
-      translatedText
-    );
-
-    return new TranslationError(
-      hasDuplicateAltTexts,
-      hasDuplicateDescriptions,
-      hasUntranslatedElements
-    );
-  }
-
   translatedTextCanBeSubmitted(): boolean {
     if (!this.isSetOfStringDataFormat()) {
       const domParser = new DOMParser();
@@ -583,10 +469,11 @@ export class TranslationModalComponent {
         'text/html'
       );
 
-      const translationError = this.validateTranslation(
-        originalElements.getElementsByTagName('*'),
-        translatedElements.getElementsByTagName('*')
-      );
+      const translationError =
+        this.translationValidationService.validateTranslation(
+          originalElements.getElementsByTagName('*'),
+          translatedElements.getElementsByTagName('*')
+        );
 
       this.hasImgTextError =
         translationError.hasDuplicateAltTexts ||

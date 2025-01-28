@@ -30,8 +30,8 @@
 </div>
 
 
-<div *ngIf="initialImageCount > 0 && isUpdateDisabled" tabindex="0" class="alert alert-danger oppia-units-input-error">
-  <strong>Warning:</strong> Please ensure the number of images in your translation matches
+<div *ngIf="hasIncompleteTranslationError && startedEditing" tabindex="0" class="alert alert-danger oppia-units-input-error">
+  <strong>Warning:</strong> Please ensure all components (images, math formulas, concept cards) in your translation match
   the original content to proceed.
 </div>
 
@@ -108,7 +108,7 @@
         <button class="btn btn-success ml-2"
                 *ngIf="startedEditing"
                 (click)="updateSuggestion()"
-                [disabled]="initialImageCount > 0 && isUpdateDisabled">
+                [disabled]="isUpdateDisabled">
           Update
         </button>
       </div>
