@@ -16,7 +16,7 @@
  * @fileoverview Component for exploration metadata modal.
  */
 
-import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatChipInputEvent} from '@angular/material/chips';
@@ -267,10 +267,3 @@ export class ExplorationMetadataModalComponent
     this.changeDetectorRef.detectChanges();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationMetadataModal',
-  downgradeComponent({
-    component: ExplorationMetadataModalComponent,
-  }) as angular.IDirectiveFactory
-);
