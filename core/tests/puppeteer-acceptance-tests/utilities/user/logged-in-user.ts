@@ -119,6 +119,7 @@ const mobileCompletedLessonSection = '.community-lessons-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+const matFormTextSelector = '.oppia-form-text';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -802,12 +803,24 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Updates the user's subject interests in preference page.
-   * @param {string[]} interests - The new interests to set for the user.
+   * @param {string[]} interests - The new interests to set for the user after each interest is entered in the input field, followed by pressing the Enter key.
    */
-  async updateSubjectInterests(interests: string[]): Promise<void> {
+  async updateSubjectInterestsWithEnterKey(interests: string[]): Promise<void> {
     for (const interest of interests) {
       await this.type(subjectInterestsInputSelector, interest);
       await this.page.keyboard.press('Enter');
+    }
+  }
+  /**
+   * Updates the user's subject interests in preference page.
+   * @param {string[]} interests - The new interests to set for the user when focus is moved to the next input or anywhere on the page.
+   */
+  async updateSubjectInterestsByBlurringField(
+    interests: string[]
+  ): Promise<void> {
+    for (const interest of interests) {
+      await this.type(subjectInterestsInputSelector, interest);
+      await this.page.click(matFormTextSelector);
     }
   }
 
