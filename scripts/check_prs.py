@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Script to monitor pull requests"""
+"""Script to monitor pull requests in a GitHub repository."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ from typing import List
 
 import requests  # pylint: disable=import-error
 
-
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -146,13 +146,19 @@ def main() -> None:  # pragma: no cover
             )
 
         # Check for inactivity
-        if last_commit_time < now - timedelta(days=7):
+
+        if last_commit_time < now - timedelta(days=0):
             comment_on_pr(
                 pr_number,
                 "This pull request has been inactive for over 7 days. Please update.",
             )
 
         if last_commit_time < now - timedelta(days=10):
+            comment_on_pr(
+                pr_number,
+                "This pull request has been inactive for over 10 days and will now be closed. "
+                "Please reopen if you plan to continue working on it.",
+             )
             logger.info(f"Closing stale pull request #{pr_number}")
             close_pr(pr_number)
 
