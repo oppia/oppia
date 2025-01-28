@@ -79,13 +79,23 @@ describe('Topic editor functionality', function () {
     );
     await topicEditorPage.saveTopic('Added subtopic.');
     await users.logout();
+    await users.login('creator@topicEditor.com');
+    await topicEditorPage.get(topicId);
+    await topicEditorPage.addSubtopic(
+      'Subtopic 2',
+      'subtopic-two',
+      '../data/test2_svg.svg',
+      'Subtopic content'
+    );
+    await topicEditorPage.saveTopic('Added subtopic.');
+    await users.logout();
 
     await users.login('creator@topicEditor.com');
     await topicEditorPage.get(topicId);
-    await topicEditorPage.expectNumberOfSubtopicsToBe(1);
+    await topicEditorPage.expectNumberOfSubtopicsToBe(2);
     await topicEditorPage.deleteSubtopicWithIndex(0);
     await topicEditorPage.saveTopic('Deleted subtopic.');
-    await topicEditorPage.expectNumberOfSubtopicsToBe(0);
+    await topicEditorPage.expectNumberOfSubtopicsToBe(1);
   });
 
   it('should create a question for a skill in the topic', async function () {
