@@ -254,7 +254,19 @@ class PracticeSessionAccessValidationPage(
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _: str) -> None:
         """Handles GET requests."""
-        pass
+
+        subtopics = self.normalized_request.get('selected_subtopic_ids')
+        topicUrlFragment = self.request.route_kwargs.get('topic_url_fragment')
+
+        topic = topic_fetchers.get_topic_by_url_fragment(topicUrlFragment)
+        subtopics_ids = [subtopic.id for subtopic in topic.subtopics]
+
+        if not subtopics:
+            raise self.NotFoundException
+
+        for id in subtopics:
+            if id not in subtopics_ids:
+                raise self.NotFoundException
 
 
 class ProfileExistsValidationHandler(

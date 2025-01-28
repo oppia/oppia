@@ -42,9 +42,9 @@ export class PracticeSessionAccessGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     const selectedSubtopicIds = route.queryParams.selected_subtopic_ids;
-    let classroomUrlFragment =
+    const classroomUrlFragment =
       route.paramMap.get('classroom_url_fragment') || '';
-    let topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
+    const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
     return new Promise<boolean>(resolve => {
       this.accessValidationBackendApiService
         .validateAccessToPracticeSessionPage(
@@ -58,7 +58,7 @@ export class PracticeSessionAccessGuard implements CanActivate {
         .catch(err => {
           this.router
             .navigate([
-              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${err.status}`,
             ])
             .then(() => {
               this.location.replaceState(state.url);
