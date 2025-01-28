@@ -3007,7 +3007,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     });
 
-    // TODO This has to be discussed with the team.
+    // This has to be discussed with the team.
     //  it('should handle malformed HTML content', () => {
     //   expect(component.initialSuggestionId).toBeDefined();
     //   expect(component.suggestionIdToContribution).toBeDefined();
