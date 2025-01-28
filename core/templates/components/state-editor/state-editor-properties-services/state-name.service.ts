@@ -55,7 +55,6 @@ export class StateNameService {
 
   init(): void {
     this.setStateNameSavedMemento(null);
-    this.setStateNameEditorVisibility(false);
   }
 }
 

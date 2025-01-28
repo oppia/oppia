@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
@@ -74,10 +73,3 @@ export class StateTranslationStatusGraphComponent {
     this.routerService.onCenterGraph.emit();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateTranslationStatusGraph',
-  downgradeComponent({
-    component: StateTranslationStatusGraphComponent,
-  }) as angular.IDirectiveFactory
-);
