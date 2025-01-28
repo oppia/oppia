@@ -150,43 +150,38 @@ export class ExplorationMetadataModalComponent
 
     // Record any fields that have changed.
     let metadataList: string[] = [];
-    const savePromises: Promise<void>[] = [];
     if (this.explorationTitleService.hasChanged()) {
       metadataList.push('title');
-      savePromises.push(
-        Promise.resolve(this.explorationTitleService.saveDisplayedValue())
-      );
     }
     if (this.explorationObjectiveService.hasChanged()) {
       metadataList.push('objective');
-      savePromises.push(
-        Promise.resolve(this.explorationObjectiveService.saveDisplayedValue())
-      );
     }
     if (this.explorationCategoryService.hasChanged()) {
       metadataList.push('category');
-      savePromises.push(
-        Promise.resolve(this.explorationCategoryService.saveDisplayedValue())
-      );
     }
     if (this.explorationLanguageCodeService.hasChanged()) {
       metadataList.push('language');
-      savePromises.push(
-        Promise.resolve(
-          this.explorationLanguageCodeService.saveDisplayedValue()
-        )
-      );
     }
     if (this.explorationTagsService.hasChanged()) {
       metadataList.push('tags');
-      savePromises.push(
-        Promise.resolve(this.explorationTagsService.saveDisplayedValue())
-      );
     }
 
-    Promise.all(savePromises).then(() => {
+    // Save all the displayed values.
+    this.explorationTitleService.saveDisplayedValue();
+    this.explorationObjectiveService.saveDisplayedValue();
+    this.explorationCategoryService.saveDisplayedValue();
+    this.explorationLanguageCodeService.saveDisplayedValue();
+    this.explorationTagsService.saveDisplayedValue();
+
+    // TODO(#20338): Get rid of the $timeout here.
+    // It's currently used because there is a race condition: the
+    // saveDisplayedValue() calls above result in autosave calls.
+    // These race with the discardDraft() call that
+    // will be called when the draft changes entered here
+    // are properly saved to the backend.
+    setTimeout(() => {
       this.ngbActiveModal.close(metadataList);
-    });
+    }, 500);
   }
 
   areRequiredFieldsFilled(): boolean {
@@ -202,6 +197,7 @@ export class ExplorationMetadataModalComponent
       this.alertsService.addWarning('Please specify a category');
       return false;
     }
+
     return true;
   }
 
