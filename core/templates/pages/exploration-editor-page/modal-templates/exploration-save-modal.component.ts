@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   NgbActiveModal,
   NgbModal,
@@ -83,10 +82,3 @@ export class ExplorationSaveModalComponent extends ConfirmOrCancelModal {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationSaveModal',
-  downgradeComponent({
-    component: ExplorationSaveModalComponent,
-  }) as angular.IDirectiveFactory
-);
