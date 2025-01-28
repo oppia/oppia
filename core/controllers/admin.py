@@ -49,10 +49,12 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import search_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -64,7 +66,6 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import voiceover_services
 from core.domain import wipeout_service
-
 from typing import Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
@@ -1188,11 +1189,11 @@ class AdminHandler(
                     subtopic_page_domain.SubtopicPage
                     .create_default_subtopic_page(1, topic_id))
             else:
-                skill = skill_services.skill_fetchers.get_skill_by_id(skill_id)
+                skill = skill_fetchers.get_skill_by_id(skill_id)
                 question_1 = question_services.get_question_by_id(question_id_1)
                 question_2 = question_services.get_question_by_id(question_id_2)
                 question_3 = question_services.get_question_by_id(question_id_3)
-                story = story_services.story_fetchers.get_story_by_id(story_id)
+                story = story_fetchers.get_story_by_id(story_id)
 
             # Generating the explorations to be added to the story.
             exploration_ids_to_publish = []
