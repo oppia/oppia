@@ -271,8 +271,8 @@ class PracticeSessionAccessValidationPage(
         if not subtopics:
             raise self.NotFoundException
 
-        for id in subtopics:
-            if id not in subtopics_ids:
+        for subtopic_id in subtopics:
+            if int(subtopic_id) not in subtopics_ids:
                 raise self.NotFoundException
 
 
