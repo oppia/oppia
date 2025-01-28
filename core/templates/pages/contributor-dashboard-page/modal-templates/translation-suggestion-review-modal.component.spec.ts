@@ -2711,7 +2711,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     expect(result).toEqual(expectedHtmlString);
   });
 
-  fdescribe('Translation Suggestion Review Modal - Component Validation', () => {
+  describe('Translation Suggestion Review Modal - Component Validation', () => {
     const htmlWithComponents = `
     <p>Content with components</p>
     <oppia-noninteractive-image
@@ -3007,6 +3007,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     });
 
+    // TODO This has to be discussed with the team.
     //  it('should handle malformed HTML content', () => {
     //   expect(component.initialSuggestionId).toBeDefined();
     //   expect(component.suggestionIdToContribution).toBeDefined();

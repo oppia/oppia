@@ -251,8 +251,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.allContributions = this.suggestionIdToContribution;
     this.allContributions[this.activeSuggestionId] = this.activeContribution;
     this.refreshActiveContributionState();
-    const originalContentHtml = this.activeSuggestion.change_cmd
-      .content_html as string;
+    this.activeSuggestion.change_cmd.content_html as string;
     const domParser = new DOMParser();
     const originalElements = domParser.parseFromString(
       this.activeSuggestion.change_cmd.content_html as string,
@@ -414,8 +413,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     return translationError.hasUntranslatedElements;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['editedContent'] && this.editedContent) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.editedContent && this.editedContent) {
       this.isComponentsMismatched();
 
       if (!this.hasIncompleteTranslationError) {

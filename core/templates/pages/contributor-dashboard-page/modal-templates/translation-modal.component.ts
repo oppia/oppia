@@ -16,8 +16,6 @@
  * @fileoverview Component for the translation modal.
  */
 
-import isEqual from 'lodash/isEqual';
-
 import {
   ChangeDetectorRef,
   Component,
