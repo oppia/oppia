@@ -268,6 +268,8 @@ jobs:
       - lighthouse_performance_test
     if: always()
     runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -295,8 +297,6 @@ jobs:
         run: |
           exit 1
         shell: bash
-    permissions:
-      pull-requests: write
   trigger_build_and_deploy:
     name: Trigger build and deploy
     needs: [check_workflow_statuses]
