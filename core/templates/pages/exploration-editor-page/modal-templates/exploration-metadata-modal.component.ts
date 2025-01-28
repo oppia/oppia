@@ -16,7 +16,7 @@
  * @fileoverview Component for exploration metadata modal.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatChipInputEvent} from '@angular/material/chips';
@@ -150,38 +150,43 @@ export class ExplorationMetadataModalComponent
 
     // Record any fields that have changed.
     let metadataList: string[] = [];
+    const savePromises: Promise<void>[] = [];
     if (this.explorationTitleService.hasChanged()) {
       metadataList.push('title');
+      savePromises.push(
+        Promise.resolve(this.explorationTitleService.saveDisplayedValue())
+      );
     }
     if (this.explorationObjectiveService.hasChanged()) {
       metadataList.push('objective');
+      savePromises.push(
+        Promise.resolve(this.explorationObjectiveService.saveDisplayedValue())
+      );
     }
     if (this.explorationCategoryService.hasChanged()) {
       metadataList.push('category');
+      savePromises.push(
+        Promise.resolve(this.explorationCategoryService.saveDisplayedValue())
+      );
     }
     if (this.explorationLanguageCodeService.hasChanged()) {
       metadataList.push('language');
+      savePromises.push(
+        Promise.resolve(
+          this.explorationLanguageCodeService.saveDisplayedValue()
+        )
+      );
     }
     if (this.explorationTagsService.hasChanged()) {
       metadataList.push('tags');
+      savePromises.push(
+        Promise.resolve(this.explorationTagsService.saveDisplayedValue())
+      );
     }
 
-    // Save all the displayed values.
-    this.explorationTitleService.saveDisplayedValue();
-    this.explorationObjectiveService.saveDisplayedValue();
-    this.explorationCategoryService.saveDisplayedValue();
-    this.explorationLanguageCodeService.saveDisplayedValue();
-    this.explorationTagsService.saveDisplayedValue();
-
-    // TODO(#20338): Get rid of the $timeout here.
-    // It's currently used because there is a race condition: the
-    // saveDisplayedValue() calls above result in autosave calls.
-    // These race with the discardDraft() call that
-    // will be called when the draft changes entered here
-    // are properly saved to the backend.
-    setTimeout(() => {
+    Promise.all(savePromises).then(() => {
       this.ngbActiveModal.close(metadataList);
-    }, 500);
+    });
   }
 
   areRequiredFieldsFilled(): boolean {
@@ -197,7 +202,6 @@ export class ExplorationMetadataModalComponent
       this.alertsService.addWarning('Please specify a category');
       return false;
     }
-
     return true;
   }
 
@@ -263,3 +267,10 @@ export class ExplorationMetadataModalComponent
     this.changeDetectorRef.detectChanges();
   }
 }
+
+angular.module('oppia').directive(
+  'oppiaExplorationMetadataModal',
+  downgradeComponent({
+    component: ExplorationMetadataModalComponent,
+  }) as angular.IDirectiveFactory
+);
