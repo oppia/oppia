@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the topic editor tab directive.
+ * @fileoverview Unit tests for the topic editor tab component.
  */
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
@@ -41,7 +41,7 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {EntityCreationService} from 'pages/topic-editor-page/services/entity-creation.service';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {TopicEditorTabComponent} from './topic-editor-tab.directive';
+import {TopicEditorTabComponent} from './topic-editor-tab.component';
 import {ContextService} from 'services/context.service';
 import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
 import {ChangeSubtopicAssignmentModalComponent} from '../modal-templates/change-subtopic-assignment-modal.component';

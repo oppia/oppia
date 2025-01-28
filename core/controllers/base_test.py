@@ -542,7 +542,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 params=None,
                 expected_status_int=500)
 
-        self.assertRegexpMatches(
+        self.assertRegex(
             logs[0],
             'uh-oh: request GET /')
 

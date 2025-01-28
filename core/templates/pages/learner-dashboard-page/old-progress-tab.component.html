@@ -1,0 +1,448 @@
+<div class="progress-tab">
+  <div tabindex="0"
+       class="skill-proficiency"
+       [ngClass]="{'empty-section': emptySkillProficiency}"
+       [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}"
+       *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
+    <div class="skill-proficiency-heading">
+      <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROGRESS_SECTION' | translate">
+      </p>
+      <a aria-label="Progress" class="info-tooltip" href="#/" tabindex="-1">
+        <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
+        <span>
+          <div class="badge-info">
+            <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image">
+            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_GOLD_BADGE' | translate">
+            </p>
+            <p class="badge-percent">
+              100%
+            </p>
+          </div>
+          <div class="badge-info">
+            <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image">
+            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_SILVER_BADGE' | translate">
+            </p>
+            <p class="badge-percent">
+              80-99%
+            </p>
+          </div>
+          <div class="badge-info">
+            <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image">
+            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_BRONZE_BADGE' | translate">
+            </p>
+            <p class="badge-percent">
+              60-79%
+            </p>
+          </div>
+        </span>
+      </a>
+    </div>
+    <div *ngIf="emptySkillProficiency" class="empty-skill-proficiency-section">
+      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
+      </p>
+      <a id="setting-a-goal-link" (click)="changeActiveSection()" tabindex="0" (keydown.enter)="changeActiveSection()">
+        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL' | translate"
+           class="empty-skill-proficiency">
+        </p>
+      </a>
+      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL' | translate">
+      </p>
+    </div>
+    <div *ngIf="!emptySkillProficiency">
+      <div *ngFor="let tile of topicMastery; index as i" class="skill-proficiency-content">
+        <div class="skill-proficiency-topic-tile" [ngStyle]="displaySkills[i] && {'border-bottom': 'none', 'margin-bottom': '0'}" *ngIf="tile[1].practiceTabIsDisplayed">
+          <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] === 100">
+          <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 80 && tile[0] <= 99">
+          <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 60 && tile[0] <= 79">
+          <img [src]="emptyBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] > 0 && tile[0] <= 59">
+          <span class="skill-proficiency-topic-title e2e-test-skill-proficiency-topic-title">
+          {{tile[1].name}}
+          </span>
+          <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')"
+               alt="dropdown button"
+               class="oppia-svg-dropdown-image"
+               role="button" tabindex="0"
+               (keydown.enter)="showSkills(i)"
+               (click)="showSkills(i)"
+               *ngIf="!displaySkills[i]">
+          <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')"
+               alt="up button"
+               class="oppia-svg-up-image"
+               role="button"
+               tabindex="0"
+               (keydown.enter)="showSkills(i)"
+               (click)="showSkills(i)"
+               *ngIf="displaySkills[i]">
+          <div *ngIf="tile[0] > 0">
+            <div class="circle-border" [ngStyle]="{'background-image': calculateCircularProgress(i)}">
+              <div class="circle">
+              </div>
+            </div>
+            <span class="progress-text">
+              <p class="progress-translate" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate">
+              </p>
+              {{tile[0]}}%
+            </span>
+          </div>
+        </div>
+        <div class="skill-proficiency-skill-content" *ngIf="displaySkills[i]">
+          <p class="skills-text" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILLS' | translate">
+          </p>
+          <practice-tab [topicName]="tile[1].name"
+                        [subtopicsList]="tile[1].subtopics"
+                        [displayArea]="'progressTab'"
+                        [topicUrlFragment]="tile[1].urlFragment"
+                        [classroomUrlFragment]="tile[1].classroomUrlFragment"
+                        [subtopicMastery]="subtopicMastery[tile[1].id]">
+          </practice-tab>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div tabindex="0" class="completed-stories e2e-test-compeleted-stories-section" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+       *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
+    <div class="completed-stories-heading">
+      <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
+      </p>
+      <span class="completed-stories-length">
+        {{completedStoriesList.length}}
+      </span>
+      <img [src]="getStaticImageUrl('/learner_dashboard/star.svg')" alt="star image" class="oppia-svg-star-image">
+    </div>
+    <div class="scroll-content">
+      <div class="completed-stories-content" [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
+        <div *ngFor="let tile of completedStoriesList" class="story-tile">
+          <oppia-learner-story-summary-tile [storySummary]="tile"
+                                            [displayArea]="progressTab">
+          </oppia-learner-story-summary-tile>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div tabindex="0" class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+    *ngIf="windowIsNarrow && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
+    <div class="completed-stories-heading">
+      <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
+      </p>
+    </div>
+    <div class="empty-completed-stories-content">
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_STORIES_SECTION' | translate">
+      </p>
+    </div>
+  </div>
+</div>
+<style>
+  .progress-tab .completed-stories {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    margin-top: 15px;
+    min-height: 342px;
+    opacity: 1;
+    padding: 0 0 30px 40px;
+    width: 736px;
+  }
+  .progress-tab .empty-completed-stories {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    margin-top: 15px;
+    min-height: 206px;
+    opacity: 1;
+    padding: 0 0 30px 40px;
+    width: 360px;
+  }
+  .progress-tab .skill-proficiency {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    min-height: 220px;
+    opacity: 1;
+    padding: 0 30px 30px 40px;
+    width: 736px;
+  }
+  #setting-a-goal-link {
+    color: #00645c;
+    font-weight: bold;
+  }
+  .progress-tab .empty-section {
+    padding: 0 113px 30px 40px;
+  }
+  .progress-tab .completed-stories .completed-stories-title,
+  .progress-tab .empty-completed-stories .completed-stories-title,
+  .progress-tab .skill-proficiency-title {
+    color: #00645c;
+    display: inline-block;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 24px;
+    letter-spacing: 0;
+    opacity: 1;
+    text-align: left;
+  }
+  .progress-tab .empty-section .skill-proficiency-title {
+    margin-bottom: 0;
+  }
+  .progress-tab .empty-skill-proficiency-section {
+    font-size: 18px;
+  }
+  .progress-tab .empty-skill-proficiency {
+    display: inline;
+    font-size: 18px;
+    margin-bottom: 0;
+    text-align: left;
+  }
+  .oppia-badge-image {
+    margin-right: 12px;
+    width: 32px;
+  }
+  .oppia-badge-image-for-topic {
+    bottom: 6px;
+    float: left;
+    margin-right: 20px;
+    position: relative;
+    width: 31px;
+  }
+  .progress-tab .skill-proficiency-topic-tile {
+    border-bottom: 1px solid;
+    height: 43px;
+    margin-bottom: 16px;
+    width: 656px;
+  }
+  .progress-tab .skill-proficiency-topic-title {
+    color: #333;
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: 0;
+    opacity: 1;
+    position: relative;
+    text-align: left;
+  }
+  .progress-tab .progress-text {
+    bottom: 20px;
+    color: #00645c;
+    float: right;
+    font-size: 14px;
+    letter-spacing: 0;
+    opacity: 1;
+    position: relative;
+    right: 20px;
+    text-align: left;
+  }
+  .progress-tab .circle {
+    background-color: #fff;
+    border-radius: 100%;
+    height: 16px;
+    left: 6px;
+    position: relative;
+    text-align: center;
+    top: 6px;
+    width: 16px;
+  }
+  .progress-tab .circle-border {
+    background-color: #00645c;
+    border-radius: 100%;
+    bottom: 24px;
+    display: inline-block;
+    height: 28px;
+    left: 230px;
+    margin-left: 30%;
+    position: relative;
+    text-align: center;
+    width: 28px;
+  }
+  .progress-tab .info-tooltip {
+    display: inline-block;
+    opacity: 1;
+    position: relative;
+    text-decoration: none;
+  }
+  .progress-tab .info-tooltip span {
+    background: white;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    color: black;
+    display: none;
+  }
+  .progress-tab .progress-translate {
+    display: inline-block;
+  }
+  .progress-tab .info-tooltip span img {
+    float: left;
+    margin: 0 8px 8px 0;
+  }
+  .progress-tab .info-tooltip:hover span {
+    border: 0.5px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 3px 6px #00000029;
+    display: block;
+    height: 155px;
+    margin-left: 32px;
+    padding: 9px 16px;
+    position: absolute;
+    top: -37px;
+    width: 157px;
+    z-index: 2;
+  }
+  .progress-tab .badge-type {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 0;
+    text-align: left;
+  }
+  .progress-tab .badge-percent {
+    color: #555;
+    font-size: 12px;
+    font-style: italic;
+    text-align: left;
+  }
+  .progress-tab .badge-info {
+    background-color: #fff;
+    color: #000;
+    margin-bottom: 16px;
+  }
+  .progress-tab .completed-stories-content {
+    display: inline-block;
+  }
+  .progress-tab .story-tile {
+    display: inline-block;
+    padding: 0 30px 0 0;
+  }
+  .progress-tab .empty-completed-stories-content {
+    font-size: 16px;
+    padding: 0 32px 0 0;
+  }
+  .progress-tab .completed-stories .completed-stories-heading,
+  .progress-tab .empty-completed-stories .completed-stories-heading,
+  .progress-tab .skill-proficiency-heading {
+    padding: 32px 0;
+  }
+  .progress-tab .completed-stories-length {
+    bottom: 3px;
+    font-size: 18px;
+    margin: 0 4px 0 12px;
+    position: relative;
+  }
+  .progress-tab .oppia-svg-star-image {
+    bottom: 4px;
+    filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
+    position: relative;
+    width: 20px;
+  }
+  .progress-tab .skills-text {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 0;
+    text-align: left;
+    text-transform: uppercase;
+  }
+  .progress-tab .oppia-svg-dropdown-image,
+  .progress-tab .oppia-svg-up-image {
+    bottom: 5px;
+    float: right;
+    position: relative;
+    top: 2px;
+    width: 30px;
+  }
+  .progress-tab .oppia-svg-info-image {
+    bottom: 3px;
+    left: 10px;
+    position: relative;
+    width: 20px;
+  }
+  @media screen and (min-width: 768px) and (max-width: 950px) {
+    .progress-tab .completed-stories {
+      margin-top: 35px;
+      padding: 0 0 30px 25px;
+      position: relative;
+      right: 20px;
+      width: 555px;
+    }
+    .progress-tab .empty-completed-stories {
+      position: relative;
+      right: 25px;
+      width: 555px;
+    }
+    .progress-tab .circle-border {
+      left: 88px;
+    }
+    .progress-tab .scroll-content {
+      overflow: scroll;
+    }
+    .progress-tab .oppia-story-completion {
+      overflow: hidden;
+    }
+    .progress-tab .skill-proficiency {
+      position: relative;
+      right: 21px;
+      width: 555px;
+    }
+    .progress-tab .skill-proficiency-topic-tile {
+      width: 455px;
+    }
+    .progress-tab .skills-text {
+      font-size: 18px;
+    }
+    .progress-tab .skill-proficiency-title {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+  }
+  @media screen and (max-width: 767px) {
+    .progress-tab .empty-completed-stories {
+      margin: auto;
+    }
+    .progress-tab .completed-stories {
+      margin: auto;
+      margin-top: 35px;
+      padding: 0 0 30px 25px;
+      width: 360px;
+    }
+    .progress-tab .skill-proficiency {
+      margin: auto;
+      width: 360px;
+    }
+    .progress-tab .skill-proficiency-topic-tile {
+      height: 52px;
+      width: 280px;
+    }
+    .progress-tab .circle-border {
+      display: none;
+    }
+    .progress-tab .skill-proficiency-topic-title {
+      font-size: 16px;
+    }
+    .progress-tab .skills-text {
+      display: none;
+    }
+    .progress-tab .progress-text {
+      display: contents;
+      font-style: italic;
+    }
+    .progress-tab .skill-proficiency-title,
+    .progress-tab .completed-stories-title {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+    .progress-tab .story-tile {
+      padding: 0 14px 0 0;
+    }
+    .progress-tab .scroll-content {
+      overflow: scroll;
+    }
+    .progress-tab .skill-proficiency-heading {
+      padding: 23px 0;
+    }
+    .progress-tab .oppia-story-completion {
+      overflow: hidden;
+    }
+    .progress-tab .empty-section {
+      padding: 0 50px 30px 40px;
+    }
+  }
+  @media(max-width: 430px) {
+    .progress-tab .empty-completed-stories {
+      width: 355px;
+    }
+  }
+</style>

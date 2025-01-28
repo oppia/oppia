@@ -11,11 +11,12 @@
         </label>
         <div class="oppia-newsletter-input">
           <input type="email"
+                 class="e2e-test-newsletter-input"
                  [(ngModel)]="emailAddress"
                  [ngModelOptions]="{standalone: true}"
                  required="true"
                  aria-labelledby="email">
-          <button class="oppia-footer-newsletter-button"
+          <button class="oppia-footer-newsletter-button e2e-test-newsletter-subscribe-btn"
                   [disabled]="!validateEmailAddress()"
                   (click)="subscribeToMailingList()">
             <span>{{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}</span>

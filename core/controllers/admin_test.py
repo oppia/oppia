@@ -50,6 +50,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
@@ -62,13 +63,15 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import user_models
+    from mypy_imports import voiceover_models
 
 (
     audit_models, blog_models, exp_models, opportunity_models,
-    user_models
+    user_models, voiceover_models
 ) = models.Registry.import_models([
     models.Names.AUDIT, models.Names.BLOG, models.Names.EXPLORATION,
-    models.Names.OPPORTUNITY, models.Names.USER
+    models.Names.OPPORTUNITY, models.Names.USER,
+    models.Names.VOICEOVER
 ])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -274,6 +277,48 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     'action': 'generate_dummy_question_suggestions',
                     'skill_id': 'N8daS2n2aoQr',
                     'num_dummy_question_suggestions_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_dummy_story_generation_fail_without_topic_id(# pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'topic_id\' must be provided when the '
+            'action is generate_dummy_stories.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_stories',
+                    'topic_id': None,
+                    'num_dummy_stories_to_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_dummy_story_generation_fail_without_num_dummy_stories_to_generate( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_stories_to_generate\' must be provided'
+            ' when the action is generate_dummy_stories.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_stories',
+                    'topic_id': 'topic', 
+                    'num_dummy_stories_to_generate': None
                 }, csrf_token=csrf_token)
 
         self.logout()
@@ -1498,8 +1543,115 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
         self.logout()
 
 
+class GenerateDummyStoriesTest(test_utils.GenericTestBase):
+    """Test the conditions for generation of dummy stories."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL,
+            self.CURRICULUM_ADMIN_USERNAME,
+            is_super_admin=True)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME,
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+    def test_generate_dummy_stories(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_stories',
+                'topic_id': 'topic',
+                'num_dummy_stories_to_generate': 5
+            }, csrf_token=csrf_token)
+
+        generated_stories_count = len(topic.get_all_story_references())
+        self.assertNotEqual(generated_stories_count, 5)
+        self.logout()
+
+    def test_cannot_generate_dummy_stories_in_prod_mode(# pylint: disable=line-too-long
+            self
+        ) -> None:
+        self.login(
+            self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy stories in production.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        with assert_raises_regex, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_stories',
+                    'topic_id': 'topic', 
+                    'num_dummy_stories_to_generate': 5
+                }, csrf_token=csrf_token)
+
+        generated_stories_count = len(topic.get_all_story_references())
+        self.assertNotEqual(generated_stories_count, 5)
+        self.logout()
+
+    def test_raises_error_if_not_curriculum_admin(# pylint: disable=line-too-long
+            self
+        ) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(user_email, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'User \'user1\' must be a curriculum admin'
+            ' in order to generate stories.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        with assert_raises_regex:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_stories',
+                    'topic_id': 'topic', 
+                    'num_dummy_stories_to_generate': 5
+                }, csrf_token=csrf_token)
+
+        generated_stories_count = len(topic.get_all_story_references())
+        self.assertNotEqual(generated_stories_count, 5)
+        self.logout()
+
+
 class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
-    """Checks the conditions for generation of dummy translation 
+    """Checks the conditions for generation of dummy translation
     opportunities."""
 
     def setUp(self) -> None:
@@ -1548,7 +1700,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         response = self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_translation_opportunities',
-                'num_dummy_translation_opportunities_to_generate': 
+                'num_dummy_translation_opportunities_to_generate':
                     'invalid_type'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -3366,4 +3518,72 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             response['error'],
             'At \'http://localhost/interactions\' these errors are happening:\n'
             'Missing key in handler args: exp_id.'
+        )
+
+
+class AutomaticVoiceoverAdminControlHandlerTests(test_utils.GenericTestBase):
+    """Tests for admin config for automatic voiceovers."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, 'testsuper')
+        self.voiceover_autogeneration_policy_model = (
+            voiceover_models.VoiceoverAutogenerationPolicyModel(
+                id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID)
+        )
+        self.voiceover_autogeneration_policy_model.language_codes_mapping = {}
+        (
+            self.voiceover_autogeneration_policy_model.
+            autogenerated_voiceovers_are_enabled
+        ) = True
+        self.voiceover_autogeneration_policy_model.update_timestamps()
+        self.voiceover_autogeneration_policy_model.put()
+
+    def test_handler_should_be_able_to_return_azure_config(self) -> None:
+        response = self.get_json(
+            '/automatic_voiceover_admin_control_handler',
+            expected_status_int=200)
+        self.assertTrue(
+            response['autogenerated_voiceovers_are_enabled'])
+
+    def test_admin_should_be_able_to_update_config(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        voiceover_services.update_admin_config_for_voiceover_autogeneration(
+            False)
+        self.assertFalse(
+            voiceover_services.
+            is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
+
+        self.post_json(
+            '/automatic_voiceover_admin_control_handler', {
+                'autogenerated_voiceovers_are_enabled': True
+            }, csrf_token=csrf_token)
+
+        self.assertTrue(
+            voiceover_services.
+            is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
+        self.logout()
+
+    def test_non_admin_should_not_be_able_to_update_config(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+
+        voiceover_services.update_admin_config_for_voiceover_autogeneration(
+            False)
+        self.assertFalse(
+            voiceover_services.
+            is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
+
+        self.post_json(
+            '/automatic_voiceover_admin_control_handler', {
+                'autogenerated_voiceovers_are_enabled': 'true'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertFalse(
+            voiceover_services.
+            is_voiceover_autogeneration_using_cloud_service_enabled()
         )

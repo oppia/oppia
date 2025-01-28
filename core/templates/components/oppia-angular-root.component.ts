@@ -207,7 +207,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       CkEditorInitializerService.ckEditorInitializer(
         OppiaAngularRootComponent.rteHelperService,
         this.htmlEscaperService,
-        OppiaAngularRootComponent.contextService,
+        this.contextService,
         this.ngZone
       );
     });

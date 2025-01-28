@@ -120,6 +120,26 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate whether user can view any topic editor', fakeAsync(() => {
+    let topicId = 'topicId';
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/access_validation_handler/can_access_topic_editor/' + topicId
+    );
+
+    avbas.validateAccessToTopicEditorPage(topicId).then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_topic_editor/' + topicId
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate whether user profile exists', fakeAsync(() => {
     let username = 'test_username';
 
@@ -325,6 +345,24 @@ describe('Access validation backend api service', () => {
     const req = httpTestingController.expectOne(
       '/access_validation_handler/' +
         'can_access_collection_editor_page/collection_id'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should validate access to exploration editor page', fakeAsync(() => {
+    let explorationId = 'exploration_id';
+    avbas
+      .validateAccessToExplorationEditorPage(explorationId)
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/' +
+        'can_access_exploration_editor_page/exploration_id'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({});
