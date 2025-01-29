@@ -22,14 +22,14 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {StoriesListComponent} from './topic-viewer-stories-list.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 describe('Topic Viewer Stories List Component', () => {
   let component: StoriesListComponent;
   let fixture: ComponentFixture<StoriesListComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let windowDimensionsService: WindowDimensionsService;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -147,15 +147,31 @@ describe('Topic Viewer Stories List Component', () => {
 
   it('should generate the correct classroom URL using UrlInterpolationService', () => {
     spyOn(urlInterpolationService, 'interpolateUrl').and.callThrough();
-  
-    component.classroomUrlFragment = 'math';
-    expect(component.getClassroomUrl()).toBe('/learn/math');
-  
+
+    const classroomNames = [
+      'classroomA',
+      'classroomB',
+      'random-subject',
+      'any-classroom',
+    ];
+
+    classroomNames.forEach(classroom => {
+      component.classroomUrlFragment = classroom;
+      expect(component.getClassroomUrl()).toBe(`/learn/${classroom}`);
+
+      expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
+        '/learn/<classroom>',
+        {classroom: classroom}
+      );
+    });
+
     component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
-  
-    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
-      '/learn/<classroom>', { classroom: 'math' }
-    );
-  });  
+
+    component.classroomUrlFragment = null as any;
+    expect(component.getClassroomUrl()).toBe('/learn');
+
+    component.classroomUrlFragment = undefined as any;
+    expect(component.getClassroomUrl()).toBe('/learn');
+  });
 });
