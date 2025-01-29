@@ -26,8 +26,7 @@ import {
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 import './topic-viewer-stories-list.component.css';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'stories-list',
@@ -110,9 +109,9 @@ export class StoriesListComponent implements OnInit {
 
   getClassroomUrl(): string {
     if (this.classroomUrlFragment) {
-      return this.urlInterpolationService.interpolateUrl(
-        '/learn/<classroom>', { classroom: this.classroomUrlFragment }
-      );
+      return this.urlInterpolationService.interpolateUrl('/learn/<classroom>', {
+        classroom: this.classroomUrlFragment,
+      });
     }
     return '/learn';
   }
