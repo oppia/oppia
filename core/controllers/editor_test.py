@@ -3736,6 +3736,15 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
         self.logout()
 
+    def test_regex_pattern_matches_accepted_extensions(self) -> None:
+        """Test that regex pattern updates with changes to accepted extensions."""
+        with self.swap(
+            feconf, 'ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS',
+            {'test': ['abc', 'xyz']}
+        ):
+            pattern = utils.get_image_filename_regex_pattern()
+            self.assertEqual(pattern, r'^[a-zA-Z0-9\-_]+\.(abc|xyz)$')
+
     def test_rejects_invalid_filenames(self) -> None:
         """Test that invalid filenames are rejected during image upload."""
         self.login(self.EDITOR_EMAIL)
