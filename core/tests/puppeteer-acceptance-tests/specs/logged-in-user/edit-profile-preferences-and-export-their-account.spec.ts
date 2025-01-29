@@ -50,7 +50,7 @@ describe('Logged-in User', function () {
         'math',
         'science',
       ]);
-      await loggedInUser1.updateSubjectInterestsByBlurringField([
+      await loggedInUser1.updateSubjectInterestsWhenBlurringField([
         'art',
         'history',
       ]);
