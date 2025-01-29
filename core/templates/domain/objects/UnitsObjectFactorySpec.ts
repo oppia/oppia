@@ -317,6 +317,6 @@ describe('UnitsObjectFactory', () => {
   });
 
   it('should return slash if count more than one or an empty string', () => {
-    expect(units.getMultipleSlash('2 km/s/kg')).toEqual(true);
+    expect(units.hasMultipleSlashes('2 km/s/kg')).toEqual(true);
   });
 });
