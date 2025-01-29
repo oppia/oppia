@@ -812,10 +812,12 @@ export class LoggedInUser extends BaseUser {
     }
   }
   /**
-   * Updates the user's subject interests in preference page.
-   * @param {string[]} interests - The new interests to set for the user when focus is moved to the next input or anywhere on the page.
-   */
-  async updateSubjectInterestsByBlurringField(
+  * Updates the user's subject interests in the preferences page
+  * when the input field loses focus.
+  *
+  * @param {string[]} interests - The new interests to set for the user when the input field is blurred (i.e., focus is moved away).
+  */
+  async updateSubjectInterestsWhenBlurringField(
     interests: string[]
   ): Promise<void> {
     for (const interest of interests) {
