@@ -211,7 +211,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/can_access_practice_session_page/%s/%s/practice/session' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
-            expected_status_int=400)    
+            expected_status_int=400)
 
     def test_get_fails_when_selected_subtopic_ids_contains_non_integer(self) -> None: # pylint: disable=line-too-long
         self.get_html_response(
