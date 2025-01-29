@@ -149,7 +149,7 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
     );
   }
   onBlur(): void {
-  // `nativeElement.value` represents the current value of the input field in the DOM.
+    // `nativeElement.value` represents the current value of the input field in the DOM.
     const value = this.subjectInterestInput.nativeElement.value.trim();
 
     if (value && this.isValidInput(value)) {
