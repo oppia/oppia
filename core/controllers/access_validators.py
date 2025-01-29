@@ -256,23 +256,22 @@ class PracticeSessionAccessValidationPage(
         """Handles GET requests."""
 
         assert self.normalized_request is not None
-        subtopics = self.normalized_request.get('selected_subtopic_ids')
-        topicUrlFragment = self.request.route_kwargs.get('topic_url_fragment')
+        subtopics = self.normalized_request.get(
+            'selected_subtopic_ids')
 
-        if not isinstance(topicUrlFragment, str):
-            raise self.InvalidInputException('Invalid topic URL fragment.')
+        if not isinstance(subtopics, list) or not all(
+                isinstance(s, int) for s in subtopics):
+            raise self.InvalidInputException('Invalid subtopic IDs')
 
-        topic = topic_fetchers.get_topic_by_url_fragment(topicUrlFragment)
-        if topic is None:
-            raise self.NotFoundException
+        topic_url_fragment = self.request.route_kwargs.get(
+            'topic_url_fragment')
+        topic = topic_fetchers.get_topic_by_url_fragment(
+            topic_url_fragment)
 
-        subtopics_ids = [subtopic.id for subtopic in topic.subtopics]
-
-        if not subtopics:
-            raise self.NotFoundException
+        subtopics_ids = {subtopic.id for subtopic in topic.subtopics}
 
         for subtopic_id in subtopics:
-            if int(subtopic_id) not in subtopics_ids:
+            if subtopic_id not in subtopics_ids:
                 raise self.NotFoundException
 
 

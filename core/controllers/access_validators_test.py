@@ -170,7 +170,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                         classroom_id=classroom_id_1,
                         name='math',
                         url_fragment='math',
-                        course_details='Math course  details',
+                        course_details='Math course details',
                         teaser_text='Math teaser text',
                         topic_list_intro='Start with our first topic.',
                         topic_id_to_prerequisite_topic_ids=(
@@ -194,14 +194,54 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 params={'selected_subtopic_ids': '[1,2]'},
             expected_status_int=200)
 
+    def test_get_fails_when_subtopics_not_provided(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+                expected_status_int=400)
+
+    def test_get_fails_when_subtopic_id_is_invalid(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+                params={'selected_subtopic_ids': '[999]'},
+                expected_status_int=404)
+
+    def test_get_fails_when_selected_subtopic_ids_is_none(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            expected_status_int=400)
+
+    def test_get_fails_when_selected_subtopic_ids_contains_non_integer(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            params={'selected_subtopic_ids': '["invalid"]'},
+            expected_status_int=400)
+
+    def test_get_succeeds_with_valid_subtopic_ids(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+                params={'selected_subtopic_ids': '[1,2]'},
+                expected_status_int=200)
+
     def test_no_user_can_access_unpublished_topic_practice_session_page(
         self
     ) -> None:
         self.get_html_response(
             '%s/can_access_practice_session_page/staging/%s/practice/session' % ( # pylint: disable=line-too-long
-                ACCESS_VALIDATION_HANDLER_PREFIX, 'privateo-topic-name'),
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'private-topic-name'),
                 params={'selected_subtopic_ids': '[1,2]'},
             expected_status_int=302)
+
+    def test_invalid_topic_url_fragment_raises_exception(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 12345),
+                params={'selected_subtopic_ids': '[1,2]'},
+            expected_status_int=400)
 
     def test_get_fails_when_topic_doesnt_exist(self) -> None:
         self.get_html_response(
