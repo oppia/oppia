@@ -115,8 +115,7 @@ describe('Enable correctness feedback and set correctness', function () {
       await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
       await explorationEditorMainTab.moveToState('End');
       await explorationEditorMainTab.setInteraction('EndExploration');
-
-      await waitForClickable(explorationEditorPage.explorationCard);
+      await waitFor.waitForClickable(explorationEditorPage.explorationCard);
 
       // Go back to mark the solution as correct.
       await explorationEditorPage.navigateToMainTab();
