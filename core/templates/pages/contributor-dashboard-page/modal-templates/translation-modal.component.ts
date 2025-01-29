@@ -93,25 +93,6 @@ export interface ImageDetails {
   alts: string[];
   descriptions: string[];
 }
-export class TranslationError {
-  constructor(
-    private _hasDuplicateAltTexts: boolean,
-    private _hasDuplicateDescriptions: boolean,
-    private _hasUntranslatedElements: boolean
-  ) {}
-
-  get hasDuplicateDescriptions(): boolean {
-    return this._hasDuplicateDescriptions;
-  }
-
-  get hasDuplicateAltTexts(): boolean {
-    return this._hasDuplicateAltTexts;
-  }
-
-  get hasUntranslatedElements(): boolean {
-    return this._hasUntranslatedElements;
-  }
-}
 
 @Component({
   selector: 'oppia-translation-modal',
