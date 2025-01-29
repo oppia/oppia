@@ -22,6 +22,8 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {StoriesListComponent} from './topic-viewer-stories-list.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+
 
 describe('Topic Viewer Stories List Component', () => {
   let component: StoriesListComponent;
@@ -32,12 +34,14 @@ describe('Topic Viewer Stories List Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [StoriesListComponent, MockTranslatePipe],
+      providers: [UrlInterpolationService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     fixture = TestBed.createComponent(StoriesListComponent);
     component = fixture.componentInstance;
     component.canonicalStorySummaries = [];
@@ -140,4 +144,18 @@ describe('Topic Viewer Stories List Component', () => {
     );
     expect(component.isLanguageRTL()).toBeTrue();
   });
+
+  it('should generate the correct classroom URL using UrlInterpolationService', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl').and.callThrough();
+  
+    component.classroomUrlFragment = 'math';
+    expect(component.getClassroomUrl()).toBe('/learn/math');
+  
+    component.classroomUrlFragment = '';
+    expect(component.getClassroomUrl()).toBe('/learn');
+  
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
+      '/learn/<classroom>', { classroom: 'math' }
+    );
+  });  
 });
