@@ -319,7 +319,7 @@ export class NumberWithUnitsObjectFactory {
 
     var correctedFormats = this.unitsFactory.getCorrectedFormat(unitsObj);
 
-    var containMultipleSlash = this.unitsFactory.getMultipleSlash(units);
+    var containMultipleSlashes = this.unitsFactory.getMultipleSlash(units);
 
     if (duplicatedUnit) {
       throw new Error(
