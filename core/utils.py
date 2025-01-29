@@ -1442,8 +1442,8 @@ def unescape_html(escaped_html_data: str) -> str:
 
 
 def get_image_filename_regex_pattern() -> str:
-    """ Returns regex pattern for valid image filenames
-    based on accepted extensions.
+    """ Returns regex pattern for valid image
+    filenames based on accepted extensions.
     """
     extensions = []
     for _, exts in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.items():
