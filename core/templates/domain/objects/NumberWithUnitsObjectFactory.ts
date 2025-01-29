@@ -327,7 +327,7 @@ export class NumberWithUnitsObjectFactory {
       );
     }
 
-    if (containMultipleSlash) {
+    if (containMultipleSlashes) {
       throw new Error(
         `Your answer contains more than one slash ("/"). Try rewriting it as "${correctedFormats}".`
       );
