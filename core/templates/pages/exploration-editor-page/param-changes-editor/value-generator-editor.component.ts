@@ -27,7 +27,6 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {CopierComponent} from 'value_generators/templates/copier.component';
 import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
 
@@ -92,10 +91,3 @@ export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaValueGeneratorEditor',
-  downgradeComponent({
-    component: ValueGeneratorEditorComponent,
-  }) as angular.IDirectiveFactory
-);

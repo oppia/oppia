@@ -81,7 +81,8 @@ export class baseInteractionValidationService {
       }
       if (
         answerGroup.outcome.dest === stateName &&
-        answerGroup.outcome.labelledAsCorrect
+        answerGroup.outcome.labelledAsCorrect &&
+        stateName !== null
       ) {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
@@ -122,7 +123,8 @@ export class baseInteractionValidationService {
     if (
       defaultOutcome &&
       defaultOutcome.dest === stateName &&
-      defaultOutcome.labelledAsCorrect
+      defaultOutcome.labelledAsCorrect &&
+      stateName !== null
     ) {
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,

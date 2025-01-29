@@ -90,7 +90,7 @@ describe('FractionInputValidationService', () => {
 
     customizationArgs = {
       requireSimplestForm: {
-        value: true,
+        value: false,
       },
       allowImproperFraction: {
         value: true,
@@ -121,7 +121,7 @@ describe('FractionInputValidationService', () => {
       {
         rule_type: 'IsExactlyEqualTo',
         inputs: {
-          f: createFractionDict(false, 0, 1, 1),
+          f: createFractionDict(false, 0, 2, 2),
         },
       },
       'FractionInput'
@@ -151,7 +151,7 @@ describe('FractionInputValidationService', () => {
       {
         rule_type: 'IsGreaterThan',
         inputs: {
-          f: createFractionDict(true, 0, 1, 1),
+          f: createFractionDict(true, 0, 2, 2),
         },
       },
       'FractionInput'
@@ -181,7 +181,7 @@ describe('FractionInputValidationService', () => {
       {
         rule_type: 'IsLessThan',
         inputs: {
-          f: createFractionDict(false, 0, 2, 1),
+          f: createFractionDict(false, 0, 4, 2),
         },
       },
       'FractionInput'
@@ -345,6 +345,38 @@ describe('FractionInputValidationService', () => {
     ]);
   });
 
+  it('should check input validity if require simplest form', function () {
+    customizationArgs.requireSimplestForm.value = true;
+    answerGroups[0].rules = [
+      lessThanTwoRule,
+      equalsOneRule,
+      equivalentToOneAndSimplestFormRule,
+      greaterThanMinusOneRule,
+      equivalentToOneRule,
+    ];
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    const expectedWarnings = answerGroups[0].rules.map(
+      (_: AnswerGroup, index: number) => ({
+        type: WARNING_TYPES.ERROR,
+        message:
+          `Learner answer ${index + 1} from Oppia response 1 will never be matched` +
+          ' because it is not in simplest form.',
+      })
+    );
+    var warningsMessages = warnings.map(warning => warning.message);
+    var expectedWarningsMessages = expectedWarnings.map(
+      warning => warning.message
+    );
+    expectedWarningsMessages.forEach(message => {
+      expect(warningsMessages).toContain(message);
+    });
+  });
+
   it('should not catch equals followed by equivalent as redundant', function () {
     answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
     var warnings = validatorService.getAllWarnings(
@@ -443,24 +475,6 @@ describe('FractionInputValidationService', () => {
           'Learner answer 2 from Oppia response 1 will never be ' +
           'matched because it is made redundant by answer 1 from ' +
           'Oppia response 1.',
-      },
-    ]);
-  });
-
-  it('should catch redundant rules caused by exactly equals', () => {
-    answerGroups[0].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState,
-      customizationArgs,
-      answerGroups,
-      goodDefaultOutcome
-    );
-    expect(warnings).toEqual([
-      {
-        type: WARNING_TYPES.ERROR,
-        message:
-          'Learner answer 1 from Oppia response 1 will never be matched ' +
-          'because it is not in simplest form.',
       },
     ]);
   });
@@ -660,7 +674,6 @@ describe('FractionInputValidationService', () => {
     'should allow equivalent fractions with if not requireSimplestForm ' +
       'and rules are IsExactlyEqualTo',
     () => {
-      customizationArgs.requireSimplestForm.value = false;
       answerGroups[1] = cloneDeep(answerGroups[0]);
       answerGroups[0].rules = [equalsOneRule];
       answerGroups[1].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
@@ -678,7 +691,6 @@ describe('FractionInputValidationService', () => {
     'should allow if numerator and denominator should equal the same value ' +
       'and are set in different rules',
     () => {
-      customizationArgs.requireSimplestForm.value = false;
       answerGroups[1] = cloneDeep(answerGroups[0]);
       answerGroups[0].rules = [numeratorEqualsFiveRule];
       answerGroups[1].rules = [denominatorEqualsFiveRule];
@@ -693,7 +705,6 @@ describe('FractionInputValidationService', () => {
   );
 
   it('should correctly check validity of HasFractionalPartExactlyEqualTo rule', () => {
-    customizationArgs.requireSimplestForm.value = false;
     answerGroups[0].rules = [HasFractionalPartExactlyEqualToOneAndHalfRule];
     var warnings = validatorService.getAllWarnings(
       currentState,
