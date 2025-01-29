@@ -23,6 +23,7 @@ export enum KNOWN_SCRIPTS {
   DONORBOX = 'DONORBOX',
   UNKNOWN = 'UNKNOWN',
   MATHJAX = 'MATHJAX',
+  PENCILCODE = 'PENCILCODE',
 }
 
 @Injectable({
@@ -71,6 +72,9 @@ export class InsertScriptService {
         case KNOWN_SCRIPTS.MATHJAX:
           scriptElement.src =
             '/third_party/static/MathJax-2.7.5/MathJax.js?config=default';
+          break;
+        case KNOWN_SCRIPTS.PENCILCODE:
+          scriptElement.src = 'https://pencilcode.net/lib/pencilcodeembed.js';
           break;
         default:
           return false;
