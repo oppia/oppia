@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - develop
-      - isssue#21294
+      - issue#21294
       - release-*
   pull_request:
     branches:
