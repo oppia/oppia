@@ -116,6 +116,8 @@ describe('Enable correctness feedback and set correctness', function () {
       await explorationEditorMainTab.moveToState('End');
       await explorationEditorMainTab.setInteraction('EndExploration');
 
+      await waitForClickable(explorationEditorPage.explorationCard);
+
       // Go back to mark the solution as correct.
       await explorationEditorPage.navigateToMainTab();
       await explorationEditorMainTab.moveToState('First');
