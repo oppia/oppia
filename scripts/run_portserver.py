@@ -470,8 +470,8 @@ class Server:
 
     @staticmethod
     def handle_connection(
-        connection: socket.SocketType,
-        handler: Callable[[bytes], socket.SocketType]
+        connection: socket.socket,
+        handler: Callable[[bytes], socket.socket]
     ) -> None:
         """Handle a socket connection.
 
@@ -490,7 +490,7 @@ class Server:
         connection.sendall(cast(Buffer, response))
         connection.close()
 
-    def _start_server(self, path: str) -> socket.SocketType:
+    def _start_server(self, path: str) -> socket.socket:
         """Start the server bound to a socket file.
 
         Args:
@@ -513,7 +513,7 @@ class Server:
         sock.listen(self.max_backlog)
         return sock
 
-    def _get_socket(self) -> socket.SocketType:
+    def _get_socket(self) -> socket.socket:
         """Get a new socket.
 
         Returns:

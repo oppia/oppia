@@ -23,10 +23,10 @@ import mimetypes
 from core import feconf
 
 import redis
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional, Union, Any
 
 
-REDIS_CLIENT = redis.StrictRedis(
+REDIS_CLIENT = redis.StrictRedis[Any](
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,

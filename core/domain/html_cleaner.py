@@ -67,7 +67,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_ALLOWLIST: Final = {
+ATTRS_ALLOWLIST: Dict[str, Union[bool, List[str]]] = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
