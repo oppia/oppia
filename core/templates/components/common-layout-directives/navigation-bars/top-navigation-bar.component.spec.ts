@@ -44,7 +44,7 @@ import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback
 import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {I18nService} from 'i18n/i18n.service';
-import {CookieService} from 'ngx-cookie';
+import {CookieService, CookieModule} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {AppConstants} from 'app.constants';
@@ -152,7 +152,7 @@ describe('TopNavigationBarComponent', () => {
     mockResizeEmitter = new EventEmitter();
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgbModule],
+      imports: [HttpClientTestingModule, NgbModule, CookieModule.forRoot()],
       declarations: [TopNavigationBarComponent, MockTranslatePipe],
       providers: [
         NavigationService,

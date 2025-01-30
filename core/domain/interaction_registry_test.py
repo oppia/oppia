@@ -24,7 +24,6 @@ import os
 from core import feconf
 from core import schema_utils
 from core import utils
-from core.domain import exp_services
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
@@ -63,15 +62,6 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
     def test_no_dependencies_in_non_exploration_pages(self) -> None:
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain(no=['dependency_html.html'])
-
-    def test_dependencies_loaded_in_exploration_editor(self) -> None:
-
-        exp_services.load_demo('0')
-
-        # Ensure that dependencies are added in the exploration editor page.
-        response = self.get_html_response('/create/0')
-        response.mustcontain('dependency_html.html')
-
         self.logout()
 
 

@@ -48,6 +48,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/exploration-editor-page/exploration-editor-page.module'
+      ).then(m => m.ExplorationEditorPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_EDITOR.ROUTE,
     loadChildren: () =>
       import('pages/story-editor-page/story-editor-page.module').then(
@@ -125,6 +133,14 @@ const routes: Route[] = [
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
       ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/topic-editor-page/topic-editor-page.module').then(
+        m => m.TopicEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE,
