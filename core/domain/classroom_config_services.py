@@ -102,7 +102,9 @@ def get_classroom_from_classroom_model(
         classroom_model.teaser_text,
         classroom_model.topic_list_intro,
         classroom_model.topic_id_to_prerequisite_topic_ids,
-        classroom_model.is_published, thumbnail_data, banner_data,
+        classroom_model.is_published,
+        classroom_model.is_diagnostic_test_enabled,
+        thumbnail_data, banner_data,
         classroom_model.index
     )
 
@@ -274,6 +276,7 @@ def create_new_classroom(
         classroom.topic_list_intro,
         classroom.topic_id_to_prerequisite_topic_ids,
         classroom.is_published,
+        classroom.is_diagnostic_test_enabled,
         classroom.thumbnail_data.filename,
         classroom.thumbnail_data.bg_color,
         classroom.thumbnail_data.size_in_bytes,
@@ -303,6 +306,7 @@ def create_new_default_classroom(
         teaser_text='', course_details='', topic_list_intro='',
         topic_id_to_prerequisite_topic_ids={},
         is_published=feconf.DEFAULT_CLASSROOM_PUBLICATION_STATUS,
+        is_diagnostic_test_enabled=feconf.DEFAULT_CLASSROOM_DIAGNOSTIC_TEST_STATUS,
         thumbnail_data=classroom_config_domain.ImageData('', '', 0),
         banner_data=classroom_config_domain.ImageData('', '', 0),
         index=classroom_count
@@ -320,6 +324,7 @@ def create_new_default_classroom(
         classroom.topic_list_intro,
         classroom.topic_id_to_prerequisite_topic_ids,
         classroom.is_published,
+        classroom.is_diagnostic_test_enabled,
         classroom.thumbnail_data.filename,
         classroom.thumbnail_data.bg_color,
         classroom.thumbnail_data.size_in_bytes,

@@ -146,7 +146,7 @@
             </div>
           </div>
 
-          <div class="row oppia-classroom-input-container">
+            <div class="row oppia-classroom-input-container"></div>
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Publication Status</strong>
             </span>
@@ -156,16 +156,65 @@
               </span>
               <div class="oppia-on-off-switch" *ngIf="!classroomViewerMode">
                 <input *ngIf="tempClassroomData.getIsPublished()" type="checkbox" class="sr-only" aria-label="Change classroom publication status" checked (click)="togglePublicationStatus()">
-                <input span *ngIf="tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" checked (click)="togglePublicationStatus()">
+                <input *ngIf="tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="publication-switch" checked (click)="togglePublicationStatus()">
                 <input *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="sr-only" (click)="togglePublicationStatus()" aria-label="Change classroom publication status">
-                <input span *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" (click)="togglePublicationStatus()">
-                <label class="oppia-on-off-switch-label e2e-test-toggle-classroom-publication-status-btn" for="edits-switch">
+                <input *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="publication-switch" (click)="togglePublicationStatus()">
+                <label class="oppia-on-off-switch-label e2e-test-toggle-classroom-publication-status-btn" for="publication-switch">
                   <span class="oppia-on-off-switch-inner"></span>
                   <span class="oppia-on-off-switch-main"></span>
                 </label>
               </div>
             </div>
-          </div>
+            </div>
+
+            <div class="row oppia-classroom-input-container">
+              <span class="col-lg-3 col-md-3 col-sm-3">
+                <strong>Diagnostic Test Status</strong>
+              </span>
+              <div>
+                <span *ngIf="classroomViewerMode"></span>
+                  {{ tempClassroomData.getIsDiagnosticTestEnabled() ? 'Enabled' : 'Disabled' }}
+                </span>
+                <div class="oppia-on-off-switch" *ngIf="!classroomViewerMode"></div>
+              <input 
+                *ngIf="tempClassroomData.getIsDiagnosticTestEnabled()" 
+                type="checkbox" 
+                class="sr-only" 
+                aria-label="Toggle diagnostic test status" 
+                checked 
+                (click)="toggleDiagnosticTestStatus()">
+
+              <input 
+                *ngIf="tempClassroomData.getIsDiagnosticTestEnabled()" 
+                type="checkbox" 
+                class="oppia-on-off-switch-checkbox" 
+                id="diagnostic-switch" 
+                checked 
+                (click)="toggleDiagnosticTestStatus()">
+
+              <input 
+                *ngIf="!tempClassroomData.getIsDiagnosticTestEnabled()" 
+                type="checkbox" 
+                class="sr-only" 
+                (click)="toggleDiagnosticTestStatus()" 
+                aria-label="Toggle diagnostic test status">
+
+              <input 
+                *ngIf="!tempClassroomData.getIsDiagnosticTestEnabled()" 
+                type="checkbox" 
+                class="oppia-on-off-switch-checkbox" 
+                id="diagnostic-switch" 
+                (click)="toggleDiagnosticTestStatus()">
+
+              <label 
+                class="oppia-on-off-switch-label e2e-test-toggle-diagnostic-test-status-btn" 
+                for="diagnostic-switch">
+                <span class="oppia-on-off-switch-inner"></span>
+                <span class="oppia-on-off-switch-main"></span>
+              </label>
+              </div>
+            </div>
+            </div>
 
           <div class="topic-and-prerequisites-container">
             <hr>
