@@ -79,6 +79,16 @@ def get_mypy_cmd(files: Optional[List[str]]) -> List[str]:
     return cmd
 
 
+def install_stubs() -> None:
+    """Install mypy stubs."""
+
+    mypy_cmd = ['mypy', '--install-types']
+    process = subprocess.Popen(
+        mypy_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    print(stdout.decode('utf-8'))
+    print(stderr.decode('utf-8'))
+
 def main(args: Optional[List[str]] = None) -> int:
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -89,6 +99,7 @@ def main(args: Optional[List[str]] = None) -> int:
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
+    install_stubs()
     mypy_cmd = get_mypy_cmd(parsed_args.files)
 
     print('Starting Mypy type checks.')
