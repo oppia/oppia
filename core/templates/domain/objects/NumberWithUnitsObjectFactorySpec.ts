@@ -343,7 +343,7 @@ describe('NumberWithUnitsObjectFactory', () => {
         'Your answer has a repeated unit: "m". Try rewriting it as "m^2".'
       );
 
-      // Complex expressions like "((m)/(s^2))(m/kg)".
+      // Check complex expressions like "((m)/(s^2))(m/kg)".
 
       expect(() => {
         nwuof.fromRawInputString('2 ((m)/(s^2))(m/kg)');
