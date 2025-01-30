@@ -115,11 +115,14 @@ describe('Enable correctness feedback and set correctness', function () {
       await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
       await explorationEditorMainTab.moveToState('End');
       await explorationEditorMainTab.setInteraction('EndExploration');
+      await explorationEditorPage.explorationCard.waitForExist({
+        timeout: DEFAULT_WAIT_TIME_MSECS,
+        timeoutMsg: 'Exploration card did not appear in time',
+      });
       await waitFor.elementToBeClickable(
         explorationEditorPage.explorationCard,
         'Exploration card is not clickable'
       );
-      
       // Go back to mark the solution as correct.
       await explorationEditorPage.navigateToMainTab();
       await explorationEditorMainTab.moveToState('First');
