@@ -86,27 +86,6 @@ SCHEMA_FOR_VERSION = {
 }
 
 
-class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """The editor page for a single exploration."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': SCHEMA_FOR_EXPLORATION_ID
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_play_exploration
-    def get(self, unused_exploration_id: str) -> None:
-        """Renders an exploration editor page.
-
-        Args:
-            unused_exploration_id: str. The unused exploration ID.
-        """
-
-        self.render_template('exploration-editor-page.mainpage.html')
-
-
 class ExplorationHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of ExplorationHandler's
     normalized_request dictionary.

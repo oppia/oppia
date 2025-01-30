@@ -17,7 +17,6 @@
  */
 
 import {Component, Injector, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -261,9 +260,3 @@ export class TeachOppiaModalComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-angular.module('oppia').factory(
-  'oppiaTeachOppiaModal',
-  downgradeComponent({
-    component: TeachOppiaModalComponent,
-  }) as angular.IDirectiveFactory
-);
