@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -68,10 +67,3 @@ export class ExplorationGraphModalComponent
     this.graphData = this.graphDataService.getGraphData();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaPostPublishModal',
-  downgradeComponent({
-    component: ExplorationGraphModalComponent,
-  }) as angular.IDirectiveFactory
-);
