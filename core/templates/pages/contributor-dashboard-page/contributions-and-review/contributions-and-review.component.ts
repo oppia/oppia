@@ -608,7 +608,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   loadContributions(
     shouldResetOffset: boolean
   ): Promise<GetOpportunitiesResponse> {
-    this.contributions = {};
+    if (shouldResetOffset) {
+      this.contributions = {};
+    }
     if (!this.activeTabType || !this.activeTabSubtype) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
@@ -725,6 +727,16 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       this.translationTopicService.onActiveTopicChanged.subscribe(() => {
         this.activeExplorationId = null;
       })
+    );
+
+    this.directiveSubscriptions.add(
+      this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.subscribe(
+        suggestionIds => {
+          suggestionIds.forEach(suggestionId => {
+            delete this.contributions[suggestionId];
+          });
+        }
+      )
     );
 
     this.userService.getUserInfoAsync().then(userInfo => {
