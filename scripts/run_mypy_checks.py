@@ -82,7 +82,8 @@ def get_mypy_cmd(files: Optional[List[str]]) -> List[str]:
 def install_stubs() -> None:
     """Install mypy stubs."""
 
-    mypy_cmd = ['mypy', '--install-types']
+    print('Installing mypy types')
+    mypy_cmd = ['mypy', '--install-types', '--non-interactive']
     process = subprocess.Popen(
         mypy_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
