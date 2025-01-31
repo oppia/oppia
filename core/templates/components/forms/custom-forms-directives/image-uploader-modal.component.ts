@@ -93,19 +93,21 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   initializeCropper(): void {
-    const imageElement = this.croppableImageRef.nativeElement;
-    if (this.windowIsNarrow) {
-      this.cropper = new Cropper(imageElement, {
-        minContainerWidth: 200,
-        minContainerHeight: 200,
-        aspectRatio: this._getAspectRatio(),
-      });
-    } else {
-      this.cropper = new Cropper(imageElement, {
-        minContainerWidth: 500,
-        minContainerHeight: 350,
-        aspectRatio: this._getAspectRatio(),
-      });
+    if (this.croppableImageRef) {
+      const imageElement = this.croppableImageRef.nativeElement;
+      if (this.windowIsNarrow) {
+        this.cropper = new Cropper(imageElement, {
+          minContainerWidth: 200,
+          minContainerHeight: 200,
+          aspectRatio: this._getAspectRatio(),
+        });
+      } else {
+        this.cropper = new Cropper(imageElement, {
+          minContainerWidth: 500,
+          minContainerHeight: 350,
+          aspectRatio: this._getAspectRatio(),
+        });
+      }
     }
   }
 

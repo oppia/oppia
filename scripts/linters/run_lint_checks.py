@@ -63,14 +63,9 @@ import subprocess
 import sys
 import threading
 
+from core import utils
+from scripts import common
 from typing import Dict, List, Optional, Set, Tuple
-# TODO(#15567): This can be removed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common  # isort:skip pylint: disable=wrong-import-position
-
-from core import feconf  # isort:skip
-from core import utils  # isort:skip
 
 # Install third party dependencies before proceeding.
 from . import codeowner_linter  # isort:skip
@@ -82,8 +77,7 @@ from . import linter_utils  # isort:skip
 from . import other_files_linter  # isort:skip
 from . import python_linter  # isort:skip
 from .. import concurrent_task_utils  # isort:skip
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from .. import install_third_party_libs  # isort:skip
+from .. import install_third_party_libs  # isort:skip
 
 OTHER_SHARD_NAME = 'other'
 
@@ -484,8 +478,7 @@ def _get_all_filepaths(
                 namespace=namespace)
     else:
         all_filepaths = _get_changed_filepaths()
-    # TODO(#12912): The pylint complains about 'pattern' being used out of the
-    # comprehension, which is not true, this needs to be investigated and fixed.
+
     all_matching_filepaths = [
         filename for filename in all_filepaths if not
         any(
@@ -639,8 +632,7 @@ def main(args: Optional[List[str]] = None) -> None:
         namespace=namespace
     )
 
-    if not feconf.OPPIA_IS_DOCKERIZED:
-        install_third_party_libs.main()
+    install_third_party_libs.main()
 
     print('Starting Linter....')
 
@@ -672,8 +664,8 @@ def main(args: Optional[List[str]] = None) -> None:
         if file_extension_type in ('js', 'ts'):
             if len(files['.js'] + files['.ts']) == 0:
                 continue
-        elif (not file_extension_type == 'other' and not
-              len(files['.%s' % file_extension_type])):
+        elif (not file_extension_type == 'other' and
+              not files['.%s' % file_extension_type]):
             continue
         custom_linter, third_party_linter = _get_linters_for_file_extension(
             file_extension_type, namespace, files)

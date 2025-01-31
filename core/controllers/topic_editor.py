@@ -173,11 +173,10 @@ class TopicEditorStoryHandler(
             for node in nodes:
                 if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
                     published_chapters_count += 1
-                if node.planned_publication_date is not None:
+                if node.planned_publication_date_msecs is not None:
                     current_time_msecs = utils.get_current_time_in_millisecs()
                     planned_publication_date_msecs = (
-                        utils.get_time_in_millisecs(
-                            node.planned_publication_date))
+                        node.planned_publication_date_msecs)
                     if node.is_node_upcoming():
                         upcoming_chapters_count += 1
                         upcoming_chapters_expected_days.append((int)((
@@ -313,41 +312,6 @@ class TopicEditorStoryHandler(
         self.render_json({
             'storyId': new_story_id
         })
-
-
-class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """The editor page for a single topic."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'topic_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id: str) -> None:
-        """Displays the topic editor page.
-
-        Args:
-            topic_id: str. The ID of the topic.
-
-        Raises:
-            Exception. The topic with the given id doesn't exist.
-        """
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-
-        if topic is None:
-            raise self.NotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
-
-        self.render_template('topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(

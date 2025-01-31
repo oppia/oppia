@@ -23,6 +23,7 @@ import collections
 import contextlib
 import io
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -78,9 +79,11 @@ class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
     def tearDown(self) -> None:
-        super().tearDown()
         build.safe_delete_directory_tree(TEST_DIR)
         build.safe_delete_directory_tree(EMPTY_DIR)
+        pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
+        pathlib.Path.unlink(pathlib.Path('mock_app_dev.yaml'), missing_ok=True)
+        super().tearDown()
 
     def test_minify_func_with_invalid_filepath(self) -> None:
         """Tests minify_func with an invalid filepath."""
@@ -200,7 +203,7 @@ class BuildTests(test_utils.GenericTestBase):
         """
 
         # Test when both lists contain single directory.
-        build.ensure_directory_exists(EMPTY_DIR)
+        common.ensure_directory_exists(EMPTY_DIR)
         source_dir_file_count = build.get_file_count(EMPTY_DIR)
         assert source_dir_file_count == 0
         target_dir_file_count = build.get_file_count(MOCK_ASSETS_DEV_DIR)
@@ -393,7 +396,7 @@ class BuildTests(test_utils.GenericTestBase):
         directory with given extensions.
         """
         filepaths: List[str] = []
-        build.ensure_directory_exists(MOCK_ASSETS_DEV_DIR)
+        common.ensure_directory_exists(MOCK_ASSETS_DEV_DIR)
         extensions: Tuple[str, ...] = ('.json', '.svg',)
 
         self.assertEqual(len(filepaths), 0)
@@ -587,7 +590,7 @@ class BuildTests(test_utils.GenericTestBase):
         build_dir_tasks.clear()
 
         # Test for building only new files when staging dir exists.
-        build.ensure_directory_exists(
+        common.ensure_directory_exists(
             extensions_dirnames_to_dirpaths['staging_dir'])
         self.assertEqual(len(build_dir_tasks), 0)
 
@@ -598,7 +601,7 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_directory_tree(TEST_DIR)
 
         # Build all files and save to final directory.
-        build.ensure_directory_exists(
+        common.ensure_directory_exists(
             extensions_dirnames_to_dirpaths['staging_dir'])
         build._execute_tasks(build_dir_tasks)  # pylint: disable=protected-access
         self.assertEqual(threading.active_count(), 1)
@@ -629,7 +632,7 @@ class BuildTests(test_utils.GenericTestBase):
         setattr(temp_file, 'name', temp_file_name)
         with utils.open_file(
             '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
-            tmp.write(u'Some content.')
+            tmp.write('Some content.')
 
         extensions_dirnames_to_dirpaths = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
@@ -655,7 +658,7 @@ class BuildTests(test_utils.GenericTestBase):
         build_dir_tasks.clear()
 
         # Test for building only new files when staging dir exists.
-        build.ensure_directory_exists(
+        common.ensure_directory_exists(
             extensions_dirnames_to_dirpaths['staging_dir'])
         self.assertEqual(len(build_dir_tasks), 0)
 
@@ -667,7 +670,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(always_rebuilt_filepaths), sorted(
                 ['base.py', 'CodeRepl.py', '__init__.py', 'some_file.js',
-                 'DragAndDropSortInput.py', 'code_repl_prediction.html']))
+                 'DragAndDropSortInput.py', 'randomfile.html']))
         self.assertGreater(len(always_rebuilt_filepaths), 0)
 
         # Test that 'some_file.js' is not rebuilt, i.e it is built for the first
@@ -686,7 +689,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_get_recently_changed_filenames(self) -> None:
         """Test get_recently_changed_filenames detects file recently added."""
         # Create an empty folder.
-        build.ensure_directory_exists(EMPTY_DIR)
+        common.ensure_directory_exists(EMPTY_DIR)
         # Get hashes from ASSETS_DEV_DIR to simulate a folder with built files.
         assets_hashes = build.get_file_hashes(MOCK_ASSETS_DEV_DIR)
         recently_changed_filenames: List[str] = []
@@ -746,7 +749,7 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
         with utils.open_file(mock_yaml_filepath, 'w') as tmp:
-            tmp.write(u'Initial content in mock_app.yaml')
+            tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
@@ -827,7 +830,7 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', 'some_file.txt')
         with utils.open_file('some_file.txt', 'w') as tmp:
-            tmp.write(u'Some content.')
+            tmp.write('Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
 
         build.safe_delete_file('some_file.txt')

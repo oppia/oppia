@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -120,10 +119,3 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNewLessonPlayerPage',
-  downgradeComponent({
-    component: NewLessonPlayerPageComponent,
-  }) as angular.IDirectiveFactory
-);

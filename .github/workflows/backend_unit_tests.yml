@@ -1,0 +1,193 @@
+name: Backend unit tests
+permissions: read-all
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  run_backend_associated_test_file_checks:
+    name: Verify associated test files
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Run backend associated test file check
+        run: python -m scripts.check_backend_associated_test_file
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Some backend files lack an associated test file."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  run_tests:
+    name: Shard ${{ matrix.shard }}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        shard: [1, 2, 3, 4, 5]
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Run backend test shard
+        id: run_backend_test_shard
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_backend_tests --generate_coverage_report --generate_time_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ steps.run_backend_test_shard.outputs.WORKFLOW_STATUS == 'failure' && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A backend test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+      - name: Upload time report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ format('backend_test_time_shard_{0}', matrix.shard) }}
+          path: backend_test_time_report.json
+          retention-days: 1
+      - name: Upload coverage report
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ format('backend_test_coverage_shard_{0}', matrix.shard) }}
+          include-hidden-files: true
+          path: .coverage
+          retention-days: 1
+  check_combined_coverage:
+    name: Check coverage
+    needs: run_tests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Download coverage report for shard 1
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_coverage_shard_1
+          path: coverage/coverage_1
+      - name: Download coverage report for shard 2
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_coverage_shard_2
+          path: coverage/coverage_2
+      - name: Download coverage report for shard 3
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_coverage_shard_3
+          path: coverage/coverage_3
+      - name: Download coverage report for shard 4
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_coverage_shard_4
+          path: coverage/coverage_4
+      - name: Download coverage report for shard 5
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_coverage_shard_5
+          path: coverage/coverage_5
+      - name: Move coverage reports from artifact folders to coverage folder
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        shell: bash
+        run: |
+          for i in {1..5}; do cp coverage/coverage_$i/.coverage coverage/.coverage.$i; done
+      - name: Combine coverage reports
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        shell: bash
+        run: coverage combine coverage/.coverage.*
+      - name: Check coverage
+        id: check_backend_coverage
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        shell: bash
+        run: python -m scripts.check_backend_test_coverage
+      - name: Leave a comment on the PR if workflow failed
+        if: ${{ steps.check_backend_coverage.outputs.WORKFLOW_STATUS == 'failure' }}
+        uses: ./.github/actions/post-comment
+        with:
+          owner: ${{ github.event.repository.owner.login }}
+          repo: ${{ github.event.repository.name }}
+          issue_number: ${{ github.event.number }}
+          message: >
+            🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like
+            the backend coverage tests are failing on your PR. Please follow
+            [these instructions](https://github.com/oppia/oppia/wiki/Backend-tests#coverage-reports)
+            to fix the missing coverage.
+
+            Thanks!
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ steps.check_backend_coverage.outputs.WORKFLOW_STATUS == 'failure' && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Backend coverage checks failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+    permissions:
+      pull-requests: write
+  check_backend_test_times:
+    name: Check test times
+    needs: run_tests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Download time report for shard 1
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_time_shard_1
+          path: backend_test_time_reports_artifacts/backend_test_time_1
+      - name: Download time report for shard 2
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_time_shard_2
+          path: backend_test_time_reports_artifacts/backend_test_time_2
+      - name: Download time report for shard 3
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_time_shard_3
+          path: backend_test_time_reports_artifacts/backend_test_time_3
+      - name: Download time report for shard 4
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_time_shard_4
+          path: backend_test_time_reports_artifacts/backend_test_time_4
+      - name: Download time report for shard 5
+        uses: actions/download-artifact@v4
+        with:
+          name: backend_test_time_shard_5
+          path: backend_test_time_reports_artifacts/backend_test_time_5
+      - name: Move time reports from artifact folders to backend_test_time_reports folder
+        shell: bash
+        run: |
+          mkdir -p backend_test_time_reports
+          for i in {1..5}; do cp backend_test_time_reports_artifacts/backend_test_time_$i/backend_test_time_report.json backend_test_time_reports/backend_test_time_report_$i.json; done
+      - name: Check test times
+        run: python -m scripts.check_backend_test_times
+        shell: bash
+      - name: Upload test times artifact
+        if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend_test_times
+          path: backend_test_times.txt
+          retention-days: 7

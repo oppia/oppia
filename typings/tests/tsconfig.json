@@ -24,7 +24,6 @@
       "app-events/*": ["../../core/templates/app-events/*"],
       "pages/*": ["../../core/templates/pages/*"],
       "services/*": ["../../core/templates/services/*"],
-      "classifiers/*": ["../../extensions/classifiers/*"],
       "interactions/*": ["../../extensions/interactions/*"],
       "rich_text_components/*": ["../../extensions/rich_text_components/*"],
       "objects/*": ["../../extensions/objects/*"],

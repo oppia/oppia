@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 from unittest import mock
 
@@ -27,7 +26,6 @@ from core.domain import fs_services
 from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
-from proto_files import text_classifier_pb2
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
@@ -348,55 +346,6 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             destination_fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
         self.assertTrue(
             destination_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
-
-
-class FileSystemClassifierDataTests(test_utils.GenericTestBase):
-    """Unit tests for storing, reading and deleting classifier data."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
-        self.classifier_data_proto = (
-            text_classifier_pb2.TextClassifierFrozenModel())
-        self.classifier_data_proto.model_json = json.dumps({
-            'param1': 40,
-            'param2': [34.2, 54.13, 95.23],
-            'submodel': {
-                'param1': 12
-            }
-        })
-
-    def test_save_and_get_classifier_data(self) -> None:
-        """Test that classifier data is stored and retrieved correctly."""
-        fs_services.save_classifier_data(
-            'exp_id', 'job_id', self.classifier_data_proto)
-        filepath = 'job_id-classifier-data.pb.xz'
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
-        classifier_data = utils.decompress_from_zlib(fs.get(filepath))
-        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
-        classifier_data_proto.ParseFromString(classifier_data)
-        self.assertEqual(
-            classifier_data_proto.model_json,
-            self.classifier_data_proto.model_json)
-
-    def test_remove_classifier_data(self) -> None:
-        """Test that classifier data is removed upon deletion."""
-        fs_services.save_classifier_data(
-            'exp_id', 'job_id', self.classifier_data_proto)
-        self.assertTrue(self.fs.isfile('job_id-classifier-data.pb.xz'))
-        fs_services.delete_classifier_data('exp_id', 'job_id')
-        self.assertFalse(self.fs.isfile('job_id-classifier-data.pb.xz'))
-
-    def test_delete_non_existent_classifier_data(self) -> None:
-        """Test that delete_classifier_data does not raise an error when trying
-        to delete non-existent classifier data.
-        """
-        filepath = 'job_id_2-classifier-data.pb.xz'
-        self.assertFalse(self.fs.isfile(filepath))
-        fs_services.delete_classifier_data('exp_id', 'job_id_2')
-        self.assertFalse(self.fs.isfile(filepath))
 
 
 class GetStaticAssetUrlTests(test_utils.GenericTestBase):

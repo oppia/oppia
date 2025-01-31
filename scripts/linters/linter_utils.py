@@ -117,10 +117,6 @@ class BaseLinter(abc.ABC):
 
     @abc.abstractmethod
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
-        """Perform all the lint checks and returns the messages returned by all
-        the checks.
-
-        Returns:
-            list(TaskResult). A list of TaskResult objects representing the
-            results of the lint checks.
+        """Perform all the lint checks and returns a list of TaskResult objects
+        representing the results of the lint checks.
         """

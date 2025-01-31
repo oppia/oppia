@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
@@ -167,15 +166,21 @@ export class ExplorationMetadataModalComponent
     }
 
     // Save all the displayed values.
-    Promise.all([
-      this.explorationTitleService.saveDisplayedValueAsync(),
-      this.explorationObjectiveService.saveDisplayedValueAsync(),
-      this.explorationCategoryService.saveDisplayedValueAsync(),
-      this.explorationLanguageCodeService.saveDisplayedValueAsync(),
-      this.explorationTagsService.saveDisplayedValueAsync(),
-    ]).then(() => {
+    this.explorationTitleService.saveDisplayedValue();
+    this.explorationObjectiveService.saveDisplayedValue();
+    this.explorationCategoryService.saveDisplayedValue();
+    this.explorationLanguageCodeService.saveDisplayedValue();
+    this.explorationTagsService.saveDisplayedValue();
+
+    // TODO(#20338): Get rid of the $timeout here.
+    // It's currently used because there is a race condition: the
+    // saveDisplayedValue() calls above result in autosave calls.
+    // These race with the discardDraft() call that
+    // will be called when the draft changes entered here
+    // are properly saved to the backend.
+    setTimeout(() => {
       this.ngbActiveModal.close(metadataList);
-    });
+    }, 500);
   }
 
   areRequiredFieldsFilled(): boolean {
@@ -262,10 +267,3 @@ export class ExplorationMetadataModalComponent
     });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationMetadataModal',
-  downgradeComponent({
-    component: ExplorationMetadataModalComponent,
-  }) as angular.IDirectiveFactory
-);

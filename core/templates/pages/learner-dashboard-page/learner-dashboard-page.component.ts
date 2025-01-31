@@ -32,7 +32,10 @@ import {AppConstants} from 'app.constants';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ProfileSummary} from 'domain/user/profile-summary.model';
-import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {
+  LearnerDashboardBackendApiService,
+  SubtopicMasterySummaryBackendDict,
+} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import {SuggestionModalForLearnerDashboardService} from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
@@ -172,6 +175,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
   LEARNER_GROUP_FEATURE_IS_ENABLED: boolean = false;
+  totalLessonsInPlaylists: (LearnerExplorationSummary | CollectionSummary)[] =
+    [];
+  subtopicMasteries: Record<string, SubtopicMasterySummaryBackendDict> = {};
 
   constructor(
     private alertsService: AlertsService,
@@ -241,6 +247,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           this.activeSection =
             LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS;
         }
+
+        return this.getSubtopicMasteryData();
       },
       errorResponseStatus => {
         if (
@@ -259,16 +267,63 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
     });
 
-    this.getExplorationAndCollectionData();
+    let dashboardCollectionsDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
+    dashboardCollectionsDataPromise.then(
+      responseData => {
+        this.completedCollectionsList = responseData.completedCollectionsList;
+        this.incompleteCollectionsList = responseData.incompleteCollectionsList;
+        this.completedToIncompleteCollections =
+          responseData.completedToIncompleteCollections;
+        this.collectionPlaylist = responseData.collectionPlaylist;
+      },
+      errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+        ) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard collections data'
+          );
+        }
+      }
+    );
+
+    let dashboardExplorationsDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
+    dashboardExplorationsDataPromise.then(
+      responseData => {
+        this.completedExplorationsList = responseData.completedExplorationsList;
+        this.incompleteExplorationsList =
+          responseData.incompleteExplorationsList;
+        this.subscriptionsList = responseData.subscriptionList;
+        this.explorationPlaylist = responseData.explorationPlaylist;
+      },
+      errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+        ) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard explorations data'
+          );
+        }
+      }
+    );
 
     Promise.all([
       userInfoPromise,
+      dashboardCollectionsDataPromise,
+      dashboardExplorationsDataPromise,
       dashboardTopicAndStoriesDataPromise,
       learnerGroupFeatureIsEnabledPromise,
     ])
       .then(() => {
         setTimeout(() => {
           this.loaderService.hideLoadingScreen();
+          this.communityLessonsDataLoaded = true;
+          this.totalLessonsInPlaylists = [
+            ...this.explorationPlaylist,
+            ...this.collectionPlaylist,
+          ];
           // So that focus is applied after the loading screen has dissapeared.
           this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
         }, 0);
@@ -501,63 +556,27 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return this.platFeatService.status.ShowRedesignedLearnerDashboard.isEnabled;
   }
 
-  getExplorationAndCollectionData(): void {
-    let dashboardCollectionsDataPromise =
-      this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
-    dashboardCollectionsDataPromise.then(
-      responseData => {
-        this.completedCollectionsList = responseData.completedCollectionsList;
-        this.incompleteCollectionsList = responseData.incompleteCollectionsList;
-        this.completedToIncompleteCollections =
-          responseData.completedToIncompleteCollections;
-        this.collectionPlaylist = responseData.collectionPlaylist;
-      },
-      errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-        ) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard collections data'
-          );
-        }
-      }
-    );
+  getDashboardTabHeading(): string {
+    switch (this.activeSection) {
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .HOME:
+        return 'I18N_LEARNER_DASHBOARD_HOME_SECTION_HEADING';
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .PROGRESS:
+        return 'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING';
+      case LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .GOALS:
+        return 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING';
+      default:
+        return `No valid I18N key for heading of ${this.activeSection}`;
+    }
+  }
 
-    let dashboardExplorationsDataPromise =
-      this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
-    dashboardExplorationsDataPromise.then(
-      responseData => {
-        this.completedExplorationsList = responseData.completedExplorationsList;
-        this.incompleteExplorationsList =
-          responseData.incompleteExplorationsList;
-        this.subscriptionsList = responseData.subscriptionList;
-        this.explorationPlaylist = responseData.explorationPlaylist;
-      },
-      errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-        ) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard explorations data'
-          );
-        }
-      }
-    );
-
-    Promise.all([
-      dashboardCollectionsDataPromise,
-      dashboardExplorationsDataPromise,
-    ])
-      .then(() => {
-        setTimeout(() => {
-          this.loaderService.hideLoadingScreen();
-          this.communityLessonsDataLoaded = true;
-          // So that focus is applied after the loading screen has dissapeared.
-          this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
-        }, 0);
-      })
-      .catch(errorResponse => {
-        // This is placed here in order to satisfy Unit tests.
-      });
+  async getSubtopicMasteryData(): Promise<void> {
+    this.subtopicMasteries =
+      await this.learnerDashboardBackendApiService.fetchSubtopicMastery([
+        ...this.partiallyLearntTopicsList.map(topic => topic.id),
+        ...this.learntTopicsList.map(topic => topic.id),
+      ]);
   }
 }

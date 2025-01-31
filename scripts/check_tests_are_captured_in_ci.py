@@ -29,9 +29,7 @@ from typing import List, TypedDict
 
 
 E2E_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI = ['full']
-ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI = [
-    'exploration-editor/manage-exploration-misconceptions'
-]
+ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI: List[str] = []
 
 
 CI_TEST_SUITE_CONFIGS_DIRECTORY = os.path.join(
@@ -66,8 +64,11 @@ def get_acceptance_test_suites_from_ci_config_file() -> List[TestSuiteDict]:
         ACCEPTANCE_CI_TEST_SUITE_CONFIG_FILE_PATH, 'r', encoding='utf-8'
     ) as f:
         acceptance_test_suite_config = json.load(f)
-        acceptance_test_suites: List[TestSuiteDict] = (
-            acceptance_test_suite_config['suites'])
+        acceptance_test_suites: List[TestSuiteDict] = []
+        for key in acceptance_test_suite_config.keys():
+            acceptance_test_suites.extend(
+                acceptance_test_suite_config.get(key)
+            )
     return sorted(
         acceptance_test_suites,
         key=lambda x: x['name']

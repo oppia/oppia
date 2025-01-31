@@ -144,11 +144,28 @@ describe('Exploration Editor', function () {
     }
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createAndPublishTopic(
-      'Test Topic 1',
+    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+
+    await curriculumAdmin.createSubtopicForTopic(
       'Test Subtopic 1',
-      'Test Skill 1'
+      'test-subtopic-one',
+      'Test Topic 1'
     );
+
+    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
+    await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
+    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
+      'Test Skill 1',
+      'Test Subtopic 1',
+      'Test Topic 1'
+    );
+    await curriculumAdmin.addSkillToDiagnosticTest(
+      'Test Skill 1',
+      'Test Topic 1'
+    );
+
+    await curriculumAdmin.publishDraftTopic('Test Topic 1');
+
     await curriculumAdmin.openSkillEditor('Test Skill 1');
     await curriculumAdmin.addMisconception(
       'Addition Misconception',
@@ -163,11 +180,10 @@ describe('Exploration Editor', function () {
     );
     await curriculumAdmin.publishUpdatedSkill('Update');
 
-    await curriculumAdmin.publishDraftTopic('Test Topic 1');
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Test Story 1',
       'test-story-one',
-      'Test Chapter',
+      'Test Chapter 1',
       explorationId,
       'Test Topic 1'
     );
@@ -221,6 +237,10 @@ describe('Exploration Editor', function () {
   it(
     'should tag answer group with misconception.',
     async function () {
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
       await explorationEditor.tagAnswerGroupWithMisconception(
         1,
         'Addition Misconception',
@@ -237,10 +257,14 @@ describe('Exploration Editor', function () {
   it(
     'should change tagged misconception for response group',
     async function () {
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
       await explorationEditor.changeTaggedAnswerGroupMisconception(
         1,
         'Subtraction Misconception',
-        false
+        true
       );
       await explorationEditor.verifyMisconceptionPresentForState(
         'Addition Misconception',

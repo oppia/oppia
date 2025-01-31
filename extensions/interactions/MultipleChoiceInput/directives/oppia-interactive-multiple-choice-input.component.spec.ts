@@ -343,4 +343,20 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       'I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE'
     );
   });
+
+  it('should call submitAnswer when Enter key is pressed', () => {
+    component.answer = 1;
+    spyOn(component, 'submitAnswer');
+    spyOn(currentInteractionService, 'onSubmit').and.callThrough();
+    spyOn(currentInteractionService, 'showNoResponseError');
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+
+    component.handleEnterKey(event);
+
+    expect(component.submitAnswer).toHaveBeenCalled();
+    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(
+      currentInteractionService.showNoResponseError
+    ).not.toHaveBeenCalled();
+  });
 });

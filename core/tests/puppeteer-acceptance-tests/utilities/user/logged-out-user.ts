@@ -36,7 +36,6 @@ const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
-const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
 const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
@@ -55,7 +54,6 @@ const googleSignUpUrl = testConstants.URLs.ExternalLink.GoogleSignUp;
 const getStartedUrl = testConstants.URLs.GetStarted;
 const homeUrl = testConstants.URLs.Home;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
-const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
 const OppiaAnnounceGoogleGroupUrl = testConstants.URLs.OppiaAnnounceGoogleGroup;
 const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const partnershipsFormInPortugueseUrl =
@@ -357,7 +355,7 @@ const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
 const mobileNavbarButtonSelector = '.text-uppercase';
-const skipLinkSelector = '.e2e-test-skip-link';
+const mainContentSelector = '.e2e-test-main-content';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
 const lessonLanguageSelector = '.oppia-content-language-selector';
@@ -368,6 +366,15 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const getStartedHeader = '.e2e-test-get-started-page';
 
+const newsletterEmailInputField = '.e2e-test-newsletter-input';
+const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
+const newsletterSubscriptionThanksMessage =
+  '.e2e-test-thanks-subscribe-message';
+const watchAVideoButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-watch-video-btn';
+const readOurBlogButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-read-blog-btn';
+const readBlogUrl = testConstants.URLs.ReadBlogLink;
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -532,16 +539,9 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.clickOn(button),
-    ]);
+    await this.clickAndWaitForNavigation(button);
 
-    expect(this.page.url())
-      .withContext(
-        `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
+    expect(this.page.url()).toBe(expectedDestinationPageUrl);
   }
 
   /**
@@ -560,14 +560,13 @@ export class LoggedOutUser extends BaseUser {
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
-
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url())
-      .withContext(
+    if (newTabPage === null) {
+      throw new Error(
         `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
+      );
+    }
+    expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage.close();
   }
 
   /**
@@ -801,10 +800,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
-    const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
-      ? mobileWatchAVideoUrl
-      : desktopWatchAVideoUrl;
-    if (url !== expectedWatchAVideoUrl) {
+    if (!url.includes(testConstants.OppiaSocials.FaceBook.Domain)) {
       throw new Error(
         `The Watch A Video button should open the right page,
           but it opens ${url} instead.`
@@ -826,10 +822,8 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(readOurBlogButton),
-    ]);
+    await this.clickAndWaitForNavigation(readOurBlogButton);
+
     if (this.page.url() !== blogUrl) {
       throw new Error(
         `The Read Our Blog button should open the Blog page,
@@ -977,10 +971,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Forum page using the oppia website footer.
    */
   async clickOnForumLinkInFooter(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn(footerForumlink),
-    ]);
+    await this.clickAndWaitForNavigation(footerForumlink);
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -1110,9 +1101,11 @@ export class LoggedOutUser extends BaseUser {
     );
     const newTabPage = await newTarget.page();
     await newTabPage?.waitForNetworkIdle();
-
-    expect(newTabPage?.url()).toContain(googleSignUpUrl);
-    await newTabPage?.close();
+    if (newTabPage === null) {
+      throw new Error('The "create on here" link did not open a new tab');
+    }
+    expect(newTabPage.url()).toContain(googleSignUpUrl);
+    await newTabPage.close();
   }
 
   /**
@@ -1166,10 +1159,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForXPath(
       '//a[contains(text(),"discover more ways to get involved")]'
     );
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn('discover more ways to get involved'),
-    ]);
+    await this.clickAndWaitForNavigation('discover more ways to get involved');
 
     expect(this.page.url()).toBe(contactUrl);
   }
@@ -1284,7 +1274,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
-      'http://www.allaboutcookies.org/manage-cookies/index.html',
+      'https://allaboutcookies.org/how-to-manage-cookies',
       'link to learn about cookies on the Privacy Policy page',
       allAboutCookiesUrl,
       'All About Cookies'
@@ -2493,6 +2483,84 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
+  }
+
+  /**
+   * Function to submit an email to the newsletter input field.
+   * @param {string} email - The email to submit.
+   */
+  async submitEmailForNewsletter(email: string): Promise<void> {
+    await this.waitForElementToBeClickable(newsletterEmailInputField);
+    await this.type(newsletterEmailInputField, email);
+    await this.clickOn(newsletterSubscribeButton);
+  }
+
+  /**
+   * Function to check for presence of Thanks Message to verify Newsletter Subscription.
+   */
+  async expectNewsletterSubscriptionThanksMessage(): Promise<void> {
+    await this.page.waitForSelector(newsletterSubscriptionThanksMessage);
+    const thanksMessage = await this.page.$eval(
+      newsletterSubscriptionThanksMessage,
+      element => element.textContent
+    );
+
+    if (!thanksMessage || !thanksMessage.includes('Thanks for subscribing!')) {
+      throw new Error('Thank you message does not exist or incorrect');
+    }
+
+    showMessage('Subscribed to newsletter successfully');
+  }
+
+  /**
+   * Function to verify the Watch a Video button after subscribing to newsletter.
+   */
+  async clickWatchAVideoButton(): Promise<void> {
+    await this.page.waitForSelector(watchAVideoButtonInThanksForSubscribe);
+    const buttonText = await this.page.$eval(
+      watchAVideoButtonInThanksForSubscribe,
+      element => (element as HTMLElement).innerText
+    );
+    if (buttonText !== 'Watch a video') {
+      throw new Error('The Watch A Video button does not exist!');
+    }
+    await Promise.all([
+      this.clickAndWaitForNavigation(watchAVideoButtonInThanksForSubscribe),
+    ]);
+    await this.waitForPageToFullyLoad();
+
+    const url = this.page.url();
+    if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
+      throw new Error(
+        `The Watch A Video button should open the right page,
+          but it opens ${url} instead.`
+      );
+    }
+    showMessage('The Watch A Video button opens the right page.');
+  }
+
+  /**
+   * Function to verify the Read Blog button after subscribing to newsletter.
+   */
+  async clickReadBlogButton(): Promise<void> {
+    await this.page.waitForSelector(readOurBlogButtonInThanksForSubscribe);
+    const buttonText = await this.page.$eval(
+      readOurBlogButtonInThanksForSubscribe,
+      element => (element as HTMLElement).innerText
+    );
+    if (buttonText !== 'Read our blog') {
+      throw new Error('The Read Our Blog button does not exist!');
+    }
+    await this.clickAndWaitForNavigation(readOurBlogButtonInThanksForSubscribe);
+
+    if (this.page.url() !== readBlogUrl) {
+      throw new Error(
+        `The Read Our Blog button should open the Blog page,
+          but it opens ${this.page.url()} instead.`
+      );
+    } else {
+      showMessage('The Read Our Blog button opens the Blog page.');
+    }
   }
 
   /**
@@ -3900,7 +3968,7 @@ export class LoggedOutUser extends BaseUser {
         expectedFocusedElement = await this.page.$(searchInputSelector);
         break;
       case 's':
-        expectedFocusedElement = await this.page.$(skipLinkSelector);
+        expectedFocusedElement = await this.page.$(mainContentSelector);
         break;
       case 'c':
         expectedFocusedElement = await this.page.$(

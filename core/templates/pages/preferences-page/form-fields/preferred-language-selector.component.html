@@ -1,6 +1,6 @@
 <mat-form-field class="language-field">
   <mat-select placeholder="{{ entity | titlecase }}"
-              class="e2e-test-{{ entity.replace(' ', '-') | lowercase }}-selector"
+              class="{{ e2eTestClass }}"
               [value]="preferredLanguageCode"
               (valueChange)="updateLanguage($event)">
     <mat-option>

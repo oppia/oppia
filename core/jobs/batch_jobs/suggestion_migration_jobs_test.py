@@ -30,8 +30,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Union
-from typing_extensions import Final
+from typing import Dict, Final, Union
 
 MYPY = False
 if MYPY:

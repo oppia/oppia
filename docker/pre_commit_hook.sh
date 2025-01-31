@@ -91,7 +91,7 @@ GIT_USEREMAIL=$(git config user.email)
 # We need to pass git username and email to the container, so that it can
 # configure git user.name and user.email for the commit which is checked in 
 # pre-commit hook.
-docker compose run -T --no-deps --entrypoint "/bin/sh -c \
+docker compose run -T --no-deps --rm --entrypoint "/bin/sh -c \
 'git config user.name $GIT_USERNAME && git config user.email $GIT_USEREMAIL \
 && python3 $PYTHON_PRE_COMMIT_SYMLINK $@'" dev-server
 

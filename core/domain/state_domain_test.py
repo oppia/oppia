@@ -863,29 +863,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_dict, state_dict)
 
-    def test_can_undergo_classification(self) -> None:
-        """Test the can_undergo_classification() function."""
-        exploration_id = 'eid'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[Tuple[str, bytes]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-            assets_list)
-
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        state_with_training_data = exploration.states['Home']
-        state_without_training_data = exploration.states['End']
-
-        # A state with 786 training examples.
-        self.assertTrue(
-            state_with_training_data.can_undergo_classification())
-
-        # A state with no training examples.
-        self.assertFalse(
-            state_without_training_data.can_undergo_classification())
-
     def test_get_training_data(self) -> None:
         """Test retrieval of training data."""
         exploration_id = 'eid'
@@ -902,8 +879,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         expected_training_data = [{
             'answer_group_index': 1,
-            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
-                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+            'answers': ['cheerful', 'merry', 'ecstatic', 'glad',
+                        'overjoyed', 'pleased', 'thrilled', 'smile']}]
 
         observed_training_data = state.get_training_data()
 
@@ -3041,10 +3018,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
-            'correct_answer': u'hello_world!',
+            'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': u'<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>'
             }
         }
         # Ruling out the possibility of None for mypy type checking.

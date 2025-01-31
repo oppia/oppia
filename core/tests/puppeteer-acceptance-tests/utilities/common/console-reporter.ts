@@ -75,6 +75,10 @@ const CONSOLE_ERRORS_TO_IGNORE = [
   new RegExp(
     /https:\/\/content\.googleapis\.com\/drive\/v2internal\/viewerimpressions\?key=[^&]+&alt=json/
   ),
+  // Error related to Donorbox ReCaptcha not being iframe-able in
+  // acceptance tests. This is outside our control because it is
+  // controlled by Donorbox.
+  escapeRegExp("[Report Only] Refused to frame 'https://www.recaptcha.net/'"),
 ];
 
 const CONSOLE_ERRORS_TO_FIX = [

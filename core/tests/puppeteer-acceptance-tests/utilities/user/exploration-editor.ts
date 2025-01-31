@@ -24,10 +24,11 @@ import {error} from 'console';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
-const imageToUpload = testConstants.data.blogPostThumbnailImage;
+const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
@@ -97,6 +98,7 @@ const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = 'button.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
 const modifyExistingTranslationsButton = '.e2e-test-modify-translations-button';
+const leaveTranslationsAsIsButton = '.e2e-test-leave-translations-as-is';
 const activeTranslationTab = '.e2e-test-active-translation-tab';
 
 const stateNodeSelector = '.e2e-test-node-label';
@@ -146,8 +148,10 @@ const skillNameInput = '.e2e-test-skill-name-input';
 const skillItem = '.e2e-test-skills-list-item';
 const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
 const deleteSkillButton = 'i.skill-delete-button';
+const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
 
 const misconceptionDiv = '.misconception-list-item';
+const misconceptionTitle = '.e2e-test-misconception-title';
 const optionalMisconceptionDiv = '.optional-misconception-list-item';
 const inapplicableMisconceptionDiv = '.optional-misconception-list-no-action';
 const optionalMisconceptionOptionsButton =
@@ -156,6 +160,7 @@ const misconceptionApplicableToggle =
   '.e2e-test-misconception-applicable-toggle';
 const responseGroupDiv = '.e2e-test-response-tab';
 const misconceptionEditorTab = '.e2e-test-open-misconception-editor';
+const toggleResponseTab = '.e2e-test-response-tab-toggle';
 
 const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
@@ -403,6 +408,23 @@ export class ExplorationEditor extends BaseUser {
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
       showMessage(`welcome modal not found: ${error.message}`);
+    }
+  }
+
+  /**
+   * Function to close editor navigation dropdown. Can be done by clicking
+   * on the dropdown toggle.
+   */
+  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
+    try {
+      await this.page.waitForSelector(dropdownToggleIcon, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dropdownToggleIcon);
+      showMessage('Editor navigation closed successfully.');
+    } catch (error) {
+      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -993,6 +1015,13 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveOutcomeDestButton);
   }
 
+  async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
+    await this.clickOn(openOutcomeDestButton);
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, cardName);
+    await this.clickOn(saveOutcomeDestButton);
+  }
+
   /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
@@ -1097,7 +1126,6 @@ export class ExplorationEditor extends BaseUser {
       default:
         throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
-
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
@@ -1122,6 +1150,12 @@ export class ExplorationEditor extends BaseUser {
         });
     } else {
       await this.clickOn(addAnotherResponseButton);
+      // The waitForNetworkIdle method waits for the response
+      // to the "Save Draft" request from change-list.service.ts
+      // to get executed, the Add Response modal to fully appear
+      // and all the fields in it to become clickable before
+      // moving on to next steps.
+      await this.waitForNetworkIdle();
     }
   }
 
@@ -1132,7 +1166,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
   async editDefaultResponseFeedback(
-    defaultResponseFeedback?: string,
+    defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
@@ -1228,6 +1262,13 @@ export class ExplorationEditor extends BaseUser {
    * @param skillName - Name of the skill to be linked to state.
    */
   async addSkillToState(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(mobileToggleSkillCard);
+      }
+    }
     await this.clickOn(addSkillButton);
     await this.type(skillNameInput, skillName);
     await this.clickOn(skillItem);
@@ -1245,15 +1286,41 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isOptional: boolean
   ): Promise<void> {
+    let expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
     let responseTabs = await this.page.$$(responseGroupDiv);
+
     await responseTabs[responseIndex].click();
     await this.clickOn('Tag with misconception');
-    if (!isOptional) {
-      await this.clickOn(misconceptionName);
-    } else {
-      await this.clickOn(`(Optional) ${misconceptionName}`);
+
+    await this.page.waitForSelector(misconceptionTitle, {
+      timeout: 5000,
+      visible: true,
+    });
+    const misconceptionTitles = await this.page.$$(misconceptionTitle);
+    for (const misconceptionTitle of misconceptionTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        misconceptionTitle
+      );
+      if (title.trim() === expectedTitle) {
+        await misconceptionTitle.click();
+      }
     }
+
     await this.clickOn('Done');
+    await this.page.waitForSelector(leaveTranslationsAsIsButton, {
+      visible: true,
+    });
+    await this.clickOn(leaveTranslationsAsIsButton);
   }
 
   /**
@@ -1267,15 +1334,38 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isOptional: boolean
   ): Promise<void> {
+    let expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
     let responseTabs = await this.page.$$(responseGroupDiv);
     await responseTabs[responseIndex].click();
     await this.clickOn(misconceptionEditorTab);
-    if (!isOptional) {
-      await this.clickOn(misconceptionName);
-    } else {
-      await this.clickOn(`(Optional) ${misconceptionName}`);
+    await this.page.waitForSelector(misconceptionTitle, {
+      timeout: 5000,
+      visible: true,
+    });
+    const misconceptionTitles = await this.page.$$(misconceptionTitle);
+    for (const misconceptionTitle of misconceptionTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        misconceptionTitle
+      );
+      if (title.trim() === expectedTitle) {
+        await misconceptionTitle.click();
+      }
     }
     await this.clickOn('Save Misconception');
+    await this.page.waitForSelector(leaveTranslationsAsIsButton, {
+      visible: true,
+    });
+    await this.clickOn(leaveTranslationsAsIsButton);
   }
 
   /**
@@ -1288,6 +1378,13 @@ export class ExplorationEditor extends BaseUser {
     isPresent: boolean
   ): Promise<void> {
     try {
+      if (this.isViewportAtMobileWidth()) {
+        const element = await this.page.$(responseGroupDiv);
+        // If the responses were collapsed in mobile view.
+        if (!element) {
+          await this.clickOn(toggleResponseTab);
+        }
+      }
       await this.page.waitForSelector(misconceptionDiv, {
         timeout: 5000,
         visible: true,
@@ -1302,7 +1399,7 @@ export class ExplorationEditor extends BaseUser {
         if (title.trim() === misconceptionName) {
           if (!isPresent) {
             throw new Error(
-              `The misconception ${misconceptionName} is present, which was not expected`
+              `The misconception ${misconceptionName} is present, should be absent.`
             );
           }
           return;
@@ -1311,14 +1408,12 @@ export class ExplorationEditor extends BaseUser {
 
       if (isPresent) {
         throw new Error(
-          `The misconception ${misconceptionName} is not present, which was expected`
+          `The misconception ${misconceptionName} is not present.`
         );
       }
     } catch (error) {
       if (isPresent) {
-        throw new Error(
-          `The misconception ${misconceptionName} is not present, which was expected`
-        );
+        throw new Error('No misconceptions found.');
       }
     }
 
@@ -1334,6 +1429,13 @@ export class ExplorationEditor extends BaseUser {
   async toggleMisconceptionApplicableStatus(
     misconceptionName: string
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
     await this.page.waitForSelector(optionalMisconceptionDiv, {
       timeout: 5000,
       visible: true,
@@ -1378,7 +1480,17 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isApplicable: boolean
   ): Promise<void> {
-    await this.verifyMisconceptionPresentForState(misconceptionName, true);
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
+    if (!isApplicable) {
+      await this.page.waitForSelector(inapplicableMisconceptionDiv);
+    }
+
     const inapplicableMisconceptions = await this.page.$$(
       inapplicableMisconceptionDiv
     );
@@ -1408,6 +1520,13 @@ export class ExplorationEditor extends BaseUser {
    * Removes the attached skill from the current state card.
    */
   async removeSkillFromState(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(mobileToggleSkillCard);
+      }
+    }
     await this.clickOn(deleteSkillButton);
     await this.clickOn('Delete skill');
   }

@@ -25,7 +25,6 @@ from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.domain import fs_services
-from core.domain import image_validation_services
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services
 
@@ -339,19 +338,11 @@ class BlogPostHandler(
         raw_image = self.normalized_request['image']
         thumbnail_filename = self.normalized_payload['thumbnail_filename']
         try:
-            file_format = image_validation_services.validate_image_and_filename(
-                raw_image, thumbnail_filename, feconf.ENTITY_TYPE_BLOG_POST)
+            fs_services.validate_and_save_image(
+              raw_image, thumbnail_filename, 'thumbnail',
+              feconf.ENTITY_TYPE_BLOG_POST, blog_post_id)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
-
-        entity_id = blog_post_id
-        filename_prefix = 'thumbnail'
-
-        image_is_compressible = (
-            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-        fs_services.save_original_and_compressed_versions_of_image(
-            thumbnail_filename, feconf.ENTITY_TYPE_BLOG_POST, entity_id,
-            raw_image, filename_prefix, image_is_compressible)
 
         self.render_json(self.values)
 

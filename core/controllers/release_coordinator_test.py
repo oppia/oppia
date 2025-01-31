@@ -24,6 +24,7 @@ from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry
 from core.domain import feature_flag_services
 from core.domain import platform_parameter_list
+from core.domain import user_services
 from core.tests import test_utils
 
 
@@ -79,12 +80,159 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         self.delete_json('/memorycachehandler')
 
         response = self.get_json('/memorycachehandler')
-        # Cache contains platform parameters post flushing since user services
-        # are accessed in call to get json and platform parameters are again
-        # cached.
-        self.assertEqual(
-            response['total_keys_stored'],
-            len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST))
+        self.assertEqual(response['total_keys_stored'], 0)
+
+
+class UserGroupHandlerTest(test_utils.GenericTestBase):
+    """Tests for UserGroupHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.signup('user1@email.com', 'user1')
+        self.signup('user2@email.com', 'user2')
+        self.signup('user3@email.com', 'user3')
+        self.signup('user4@email.com', 'user4')
+        self.signup('user5@email.com', 'user5')
+
+        user_services.create_new_user_group(
+            'USERGROUP1', ['user1', 'user2', 'user3'])
+        user_services.create_new_user_group(
+            'USERGROUP2', ['user1', 'user4'])
+
+        self.add_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+    def test_get_user_group_data(self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
+        response_dict_user_groups = response_dict['user_group_dicts']
+
+        self.assertEqual(len(response_dict_user_groups), 2)
+
+    def test_deleting_user_group_successfully_updates_user_groups_data(
+        self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
+        response_dict_user_groups = response_dict['user_group_dicts']
+
+        self.assertEqual(len(response_dict_user_groups), 2)
+
+        self.delete_json(
+            feconf.USER_GROUPS_HANDLER_URL,
+            {
+                'user_group_id': response_dict_user_groups[0].get(
+                    'user_group_id')
+            }
+        )
+        response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
+        response_dict_user_groups = response_dict['user_group_dicts']
+        self.assertEqual(len(response_dict_user_groups), 1)
+        self.logout()
+
+    def test_deleting_invalid_user_group_results_in_error(self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        assert_raises_regex_error = self.assertRaisesRegex(
+            Exception,
+            'User group with id USER_GROUP_5_ID does not exist.'
+        )
+        with assert_raises_regex_error:
+            self.delete_json(
+                feconf.USER_GROUPS_HANDLER_URL, {
+                    'user_group_id': 'USER_GROUP_5_ID'
+                })
+        self.logout()
+
+    def test_updating_invalid_user_group_results_in_error(self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
+        response_dict_user_groups = response_dict['user_group_dicts']
+
+        self.assertEqual(len(response_dict_user_groups), 2)
+
+        assert_raises_regex_error = self.assertRaisesRegex(
+            Exception,
+            'User group USERGROUP3 does not exist.'
+        )
+
+        with assert_raises_regex_error:
+            self.put_json(
+                feconf.USER_GROUPS_HANDLER_URL, {
+                    'user_group_id': 'USER_GROUP_5_ID',
+                    'name': 'USERGROUP3',
+                    'member_usernames': ['user1id', 'user2id', 'user5id']
+                }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_user_group_changes_correctly_updates_returned_by_getter(
+        self
+    ) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
+        response_dict_user_groups = response_dict['user_group_dicts']
+
+        self.assertEqual(len(response_dict_user_groups), 2)
+
+        self.put_json(
+            feconf.USER_GROUPS_HANDLER_URL, {
+                'user_group_id': response_dict_user_groups[0].get(
+                    'user_group_id'),
+                'name': 'USERGROUP3',
+                'member_usernames': ['user1', 'user2', 'user5']
+            }, csrf_token=csrf_token)
+
+        response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
+        response_dict_user_groups = response_dict['user_group_dicts']
+
+        self.assertEqual(len(response_dict_user_groups), 2)
+
+        self.logout()
+
+    def test_create_new_user_group(self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
+        response_dict_user_groups = response_dict['user_group_dicts']
+
+        self.assertEqual(len(response_dict_user_groups), 2)
+
+        self.post_json(
+            feconf.USER_GROUPS_HANDLER_URL, {
+                'name': 'USERGROUP4',
+                'member_usernames': ['user1', 'user2', 'user3']
+            }, csrf_token=csrf_token)
+
+        response_dict = self.get_json(feconf.USER_GROUPS_HANDLER_URL)
+        response_dict_user_groups = response_dict['user_group_dicts']
+
+        self.assertEqual(len(response_dict_user_groups), 3)
+
+    def test_create_new_user_group_with_invalid_users_raises_error(
+        self) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with self.assertRaisesRegex(
+            Exception,
+            r'Following users of user-group USERGROUP4 does '
+            r'not exist: \[\'user6\']\.'
+        ):
+            self.post_json(
+                feconf.USER_GROUPS_HANDLER_URL, {
+                    'name': 'USERGROUP4',
+                    'member_usernames': ['user1', 'user2', 'user6']
+                }, csrf_token=csrf_token)
 
 
 class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
@@ -95,6 +243,15 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.signup('user1@email.com', 'user1')
+        self.signup('user2@email.com', 'user2')
+        self.signup('user3@email.com', 'user3')
+        self.signup('user4@email.com', 'user4')
+
+        user_services.create_new_user_group(
+            'USERGROUP1', ['user1', 'user2', 'user3'])
+        user_services.create_new_user_group(
+            'USERGROUP2', ['user1', 'user4'])
 
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
@@ -121,7 +278,9 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_get_handler_includes_all_feature_flags(self) -> None:
+    def test_get_handler_includes_all_feature_flags_and_user_groups(
+        self
+    ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_flag_services,
@@ -155,6 +314,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                             'last_updated': None
                         }
                     ])
+                self.assertEqual(
+                    len(response_dict['user_group_dicts']), 2)
         self.logout()
 
     def test_post_with_flag_changes_updates_feature_flags(self) -> None:

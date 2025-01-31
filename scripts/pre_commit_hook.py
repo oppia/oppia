@@ -34,13 +34,20 @@ import shutil
 import subprocess
 import sys
 
-from typing import Final, List, Optional, Tuple
-
-# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
+# When executing Python scripts using `python -m ...` from oppia/oppia,
+# Python adds the repository root to sys.path. See the documentation at
+#
+#   https://docs.python.org/3.9/library/sys.html#sys.path
+#
+# However, when git executes pre_commit_hook.py from its symlink in
+# /.git/hooks, the shebang #!/usr/bin/env python at the top of this file
+# causes the python interpreter to execute this hook directly rather than
+# as a discovered module. So, Python instead adds /.git/hooks to sys.path,
+# rather than the opipa/oppia root. To correct this problem, we add the
+# current working directory to sys.path.
 sys.path.append(os.getcwd())
-from scripts import common  # isort:skip # pylint: disable=wrong-import-position
+from core import feconf  # isort:skip # pylint: disable=wrong-import-position
+from typing import Final, List, Optional, Tuple  # isort:skip  # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')
@@ -57,6 +64,8 @@ KEYS_UPDATED_IN_CONSTANTS: Final = [
     b'FIREBASE_CONFIG_APP_ID', b'FIREBASE_CONFIG_AUTH_DOMAIN',
     b'FIREBASE_CONFIG_MESSAGING_SENDER_ID', b'FIREBASE_CONFIG_PROJECT_ID',
     b'FIREBASE_CONFIG_STORAGE_BUCKET', b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID']
+NPX_CMD: Final = 'npx' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
+    os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx')
 
 
 def install_hook() -> None:
@@ -91,13 +100,11 @@ def install_hook() -> None:
             print('Copied file to .git/hooks directory')
 
     print('Making pre-commit hook file executable ...')
-    if not common.is_windows_os():
-        _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
-
-        if not err_chmod_cmd:
-            print('pre-commit hook file is now executable!')
-        else:
-            raise ValueError(err_chmod_cmd)
+    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
+    if not err_chmod_cmd:
+        print('pre-commit hook file is now executable!')
+    else:
+        raise ValueError(err_chmod_cmd)
 
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
@@ -185,7 +192,7 @@ def check_changes_in_config() -> None:
 
 def run_prettier() -> None:
     """Runs prettier formatter."""
-    subprocess.run('npx lint-staged', shell=True, check=True)
+    subprocess.run([NPX_CMD, 'lint-staged'], check=True)
 
 
 def main(args: Optional[List[str]] = None) -> None:

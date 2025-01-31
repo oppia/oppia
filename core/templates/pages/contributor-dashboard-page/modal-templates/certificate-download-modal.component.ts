@@ -18,7 +18,6 @@
 
 import {Component, Input} from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {
@@ -75,16 +74,16 @@ export class CertificateDownloadModalComponent {
   }
 
   validateDate(): void {
-    if (
-      !this.fromDate ||
-      !this.toDate ||
-      new Date(this.fromDate) >= new Date(this.toDate)
-    ) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const toDate = new Date(this.toDate);
+    toDate.setHours(0, 0, 0, 0);
+    if (!this.fromDate || !this.toDate || new Date(this.fromDate) >= toDate) {
       this.errorsFound = true;
       this.errorMessage = 'Invalid date range.';
       return;
     }
-    if (new Date() < new Date(this.toDate)) {
+    if (toDate >= today) {
       this.errorsFound = true;
       this.errorMessage =
         "Please select a 'To' date that is earlier than " + "today's date";
@@ -321,10 +320,3 @@ export class CertificateDownloadModalComponent {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'certificateDownloadModal',
-    downgradeComponent({component: CertificateDownloadModalComponent})
-  );

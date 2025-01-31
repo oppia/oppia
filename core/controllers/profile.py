@@ -649,8 +649,7 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             user_data_json_string = (
                 'There was an error while exporting '
                 'data. Please contact %s to export your data.'
-                % platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
+                % feconf.ADMIN_EMAIL_ADDRESS
             )
             user_images = []
 
@@ -837,7 +836,9 @@ class UserInfoHandler(
         # to be None, but to narrow down the type and handle the None
         # case gracefully, we are returning if self.user_id is None.
         if self.user_id is None:
-            return self.render_json({})
+            self.render_json({})
+            return
+
         assert self.normalized_payload is not None
         user_has_viewed_lesson_info_modal_once = self.normalized_payload[
             'user_has_viewed_lesson_info_modal_once']

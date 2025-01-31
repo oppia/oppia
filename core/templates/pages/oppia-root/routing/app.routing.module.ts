@@ -48,6 +48,30 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/exploration-editor-page/exploration-editor-page.module'
+      ).then(m => m.ExplorationEditorPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/story-editor-page/story-editor-page.module').then(
+        m => m.StoryEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/contributor-dashboard-page/contributor-dashboard-page.module'
+      ).then(m => m.ContributorDashboardPageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () =>
       import('pages/moderator-page/moderator-page.module').then(
@@ -72,6 +96,21 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.ROUTE,
+    loadChildren: () =>
+      import('pages/creator-dashboard-page/creator-dashboard-page.module').then(
+        m => m.CreatorDashboardPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_VIEWER.ROUTE,
+    loadChildren: () =>
+      import('pages/topic-viewer-page/topic-viewer-page.module').then(
+        m => m.TopicViewerPageModule
+      ),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
     loadChildren: () =>
       import('pages/email-dashboard-pages/email-dashboard-page.module').then(
@@ -94,6 +133,14 @@ const routes: Route[] = [
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
       ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/topic-editor-page/topic-editor-page.module').then(
+        m => m.TopicEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE,
@@ -195,6 +242,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
     pathMatch: 'full',
+    canActivate: [IsLoggedInGuard],
     loadChildren: () =>
       import('pages/delete-account-page/delete-account-page.module').then(
         m => m.DeleteAccountPageModule
@@ -220,6 +268,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
     pathMatch: 'full',
+    canActivate: [IsLoggedInGuard],
     loadChildren: () =>
       import('pages/feedback-updates-page/feedback-updates-page.module').then(
         m => m.FeedbackUpdatesPageModule
@@ -417,6 +466,16 @@ const routes: Route[] = [
       ),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .TOPICS_AND_SKILLS_DASHBOARD.ROUTE,
+    loadChildren: () =>
+      import(
+        // eslint-disable-next-line max-len
+        'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module'
+      ).then(m => m.TopicsAndSkillsDashboardPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOICEOVER_ADMIN.ROUTE,
     loadChildren: () =>
       import('pages/voiceover-admin-page/voiceover-admin-page.module').then(
@@ -431,6 +490,14 @@ const routes: Route[] = [
       import('pages/collection-player-page/collection-player-page.module').then(
         m => m.CollectionPlayerPageModule
       ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/skill-editor-page/skill-editor-page.module').then(
+        m => m.SkillEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE,
@@ -469,6 +536,13 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
 
 // Error routes.
 routes.push(
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/error-pages/error-iframed-page/error-iframed-page.module'
+      ).then(m => m.ErrorIframedPageModule),
+  },
   // Route to register all the custom error pages on oppia.
   {
     path: `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/:status_code`,

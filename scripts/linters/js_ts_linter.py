@@ -26,7 +26,7 @@ import subprocess
 
 import esprima
 
-from typing import Dict, Final, List, Tuple, Union
+from typing import Dict, Final, List, Optional, Tuple, Union
 
 from . import linter_utils
 from .. import common
@@ -86,7 +86,7 @@ def _parse_js_or_ts_file(
 
 def _get_expression_from_node_if_one_exists(
     parsed_node: esprima.nodes.Node, possible_component_names: List[str]
-) -> esprima.nodes.Node:
+) -> Optional[esprima.nodes.Node]:
     """This function first checks whether the parsed node represents
     the required angular component that needs to be derived by checking if
     it's in the 'possible_component_names' list. If yes, then it will return
@@ -102,11 +102,11 @@ def _get_expression_from_node_if_one_exists(
             etc.
 
     Returns:
-        expression: dict or None. Expression part of the node if the node
+        expression: Optional[Node]. Expression part of the node if the node
         represents a component else None.
     """
     if parsed_node.type != 'ExpressionStatement':
-        return
+        return None
     # Separate the expression part of the node which is the actual
     # content of the node.
     expression = parsed_node.expression
@@ -115,7 +115,7 @@ def _get_expression_from_node_if_one_exists(
     # and not an 'AssignmentExpression'.
     # For example, func() is a CallExpression.
     if expression.type != 'CallExpression':
-        return
+        return None
     # Check whether the expression belongs to a 'MemberExpression' which
     # represents a computed expression or an Identifier which represents
     # a static expression.
@@ -125,11 +125,11 @@ def _get_expression_from_node_if_one_exists(
     # Another example of a MemberExpression within a CallExpression is
     # 'thing.func()' where 'thing.func' is the callee of the CallExpression.
     if expression.callee.type != 'MemberExpression':
-        return
+        return None
     # Get the component in the JS file.
     component = expression.callee.property.name
     if component not in possible_component_names:
-        return
+        return None
     return expression
 
 

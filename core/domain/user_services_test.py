@@ -33,7 +33,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
@@ -574,10 +573,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
         self.assertEqual(admin_settings.user_id, user_id)
-        self.assertEqual(
-            admin_settings.email,
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+        self.assertEqual(admin_settings.email, feconf.SYSTEM_EMAIL_ADDRESS)
         self.assertEqual(admin_settings.roles, roles)
         self.assertFalse(admin_settings.banned)
         self.assertEqual(admin_settings.username, 'admin')
@@ -726,13 +722,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     'email@example.com', 'Android'))
 
     @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            )
-        ]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
@@ -820,13 +810,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
     @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            )
-        ]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_get_and_set_user_email_preferences_with_error(self) -> None:
         auth_id = 'someUser'
@@ -1791,6 +1775,185 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         assert user_settings is not None
         self.assertTrue(user_settings.deleted)
 
+    def _signup_test_users_and_create_user_groups(self) -> None:
+        """Signup multiple users and create multiple user groups."""
+        self.signup('user1@email.com', 'user1')
+        self.signup('user2@email.com', 'user2')
+        self.signup('user3@email.com', 'user3')
+        self.signup('user4@email.com', 'user4')
+        user_services.create_new_user_group(
+            'USERGROUP1', ['user1', 'user2', 'user3'])
+        user_services.create_new_user_group(
+            'USERGROUP2', ['user1', 'user2'])
+
+    def test_get_all_user_groups(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+
+        user_groups_data = user_services.get_all_user_groups()
+        if user_groups_data[0].name == 'USERGROUP1':
+            self.assertEqual(
+                user_groups_data[0].member_usernames,
+                ['user1', 'user2', 'user3']
+            )
+        else:
+            self.assertEqual(
+                user_groups_data[0].member_usernames, ['user1', 'user2'])
+
+        user_services.delete_user_group(user_groups_data[0].user_group_id)
+        user_services.delete_user_group(user_groups_data[1].user_group_id)
+
+    def test_delete_given_user_group(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        self.assertEqual(len(user_groups_data), 2)
+
+        user_services.delete_user_group(user_groups_data[0].user_group_id)
+        user_services.delete_user_group(user_groups_data[1].user_group_id)
+
+        user_groups_data = user_services.get_all_user_groups()
+        self.assertEqual(user_groups_data, [])
+
+    def test_deleting_user_group_raises_error_when_not_exists(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        self.assertEqual(len(user_groups_data), 2)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'User group with id INVALID_USER_GROUP_ID does not exist.'
+        ):
+            user_services.delete_user_group('INVALID_USER_GROUP_ID')
+
+    def test_add_new_user_group(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        self.assertEqual(len(user_groups_data), 2)
+
+        user_services.create_new_user_group('USERGROUP3', [])
+        user_services.create_new_user_group('USERGROUP4', ['user1', 'user2'])
+
+        user_groups_data = user_services.get_all_user_groups()
+        self.assertEqual(len(user_groups_data), 4)
+
+        user_services.delete_user_group(user_groups_data[0].user_group_id)
+        user_services.delete_user_group(user_groups_data[1].user_group_id)
+        user_services.delete_user_group(user_groups_data[2].user_group_id)
+        user_services.delete_user_group(user_groups_data[3].user_group_id)
+
+    def test_update_existing_user_group_name(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+
+        user_groups_data = user_services.get_all_user_groups()
+        self.assertTrue(
+            user_groups_data[0].name in ['USERGROUP1', 'USERGROUP2'])
+        user_group_id = user_groups_data[0].user_group_id
+
+        user_services.update_user_group(
+            user_groups_data[0].user_group_id,
+            'USERGROUP3',
+            ['user1', 'user2']
+        )
+
+        user_groups_data = user_services.get_all_user_groups()
+        if user_groups_data[0].user_group_id == user_group_id:
+            self.assertEqual(user_groups_data[0].name, 'USERGROUP3')
+        else:
+            self.assertEqual(user_groups_data[1].name, 'USERGROUP3')
+        user_services.delete_user_group(user_groups_data[0].user_group_id)
+        user_services.delete_user_group(user_groups_data[1].user_group_id)
+
+    def test_update_existing_user_group_users(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        first_user_group_id = user_groups_data[0].user_group_id
+        second_user_group_id = user_groups_data[1].user_group_id
+        user_services.update_user_group(
+            first_user_group_id, 'USERGROUP1', ['user1', 'user2'])
+        user_services.update_user_group(
+            second_user_group_id, 'USERGROUP2', ['user3', 'user4'])
+
+        user_groups_data = user_services.get_all_user_groups()
+
+        if user_groups_data[0].name == 'USERGROUP1':
+            self.assertEqual(
+                user_groups_data[0].member_usernames, ['user1', 'user2'])
+        else:
+            self.assertEqual(
+                user_groups_data[1].member_usernames, ['user3', 'user4'])
+
+        user_services.delete_user_group(first_user_group_id)
+        user_services.delete_user_group(second_user_group_id)
+
+    def test_update_existing_user_group_users_with_empty_list(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        first_user_group_id = user_groups_data[0].user_group_id
+        second_user_group_id = user_groups_data[1].user_group_id
+
+        user_services.update_user_group(first_user_group_id, 'USERGROUP1', [])
+        user_services.update_user_group(second_user_group_id, 'USERGROUP2', [])
+
+        user_groups_data = user_services.get_all_user_groups()
+        for user_group in user_groups_data:
+            self.assertEqual(user_group.member_usernames, [])
+
+        user_services.delete_user_group(first_user_group_id)
+        user_services.delete_user_group(second_user_group_id)
+
+    def test_user_group_trying_to_update_not_exists_raise_error(
+        self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        with self.assertRaisesRegex(
+            Exception,
+            'User group INVALID_USER_GROUP does not exist.'
+        ):
+            user_services.update_user_group(
+                'INVALID_USER_GROUP_ID',
+                'INVALID_USER_GROUP',
+                ['user1', 'user2', 'user3']
+            )
+        user_services.delete_user_group(user_groups_data[0].user_group_id)
+        user_services.delete_user_group(user_groups_data[1].user_group_id)
+
+    def test_user_group_containing_duplicate_users_raises_error(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        user_services.update_user_group(
+            user_groups_data[0].user_group_id,
+            'USERGROUP1',
+            ['user1', 'user2']
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            r'Users list of user-group USERGROUP1 contains '
+            r'duplicates: \[\'user2\']\.'
+        ):
+            user_services.update_user_group(
+                user_groups_data[0].user_group_id,
+                'USERGROUP1',
+                ['user1', 'user2', 'user2']
+            )
+
+    def test_user_group_containing_invalid_user_raises_exception(self) -> None:
+        self._signup_test_users_and_create_user_groups()
+        user_groups_data = user_services.get_all_user_groups()
+        user_services.update_user_group(
+            user_groups_data[0].user_group_id,
+            'USERGROUP1',
+            ['user1', 'user2']
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            r'Following users of user-group USERGROUP1 '
+            r'does not exist: \[\'user5\', \'user6\']\.'
+        ):
+            user_services.update_user_group(
+                user_groups_data[0].user_group_id,
+                'USERGROUP1',
+                ['user1', 'user2', 'user5', 'user6']
+            )
+
     def test_mark_user_for_deletion_deletes_user_auth_details_entry(
         self
     ) -> None:
@@ -2691,7 +2854,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                'new_state_name': u'¡Hola! αβγ',
+                'new_state_name': '¡Hola! αβγ',
             })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)

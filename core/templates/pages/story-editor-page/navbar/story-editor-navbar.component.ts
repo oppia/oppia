@@ -29,7 +29,6 @@ import {StoryUpdateService} from 'domain/story/story-update.service';
 import {StoryEditorSaveModalComponent} from '../modal-templates/story-editor-save-modal.component';
 import {StoryEditorUnpublishModalComponent} from '../modal-templates/story-editor-unpublish-modal.component';
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DraftChapterConfirmationModalComponent} from '../modal-templates/draft-chapter-confirmation-modal.component';
@@ -494,10 +493,3 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaStoryEditorNavbar',
-    downgradeComponent({component: StoryEditorNavbarComponent})
-  );

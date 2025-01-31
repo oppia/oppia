@@ -2,9 +2,12 @@ name: Revert Wiki Changes Made Through the Web Interface
 on:
   gollum:
   workflow_dispatch:
+permissions: read-all
 jobs:
   revert:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
       - name: Retrieve authentication token
         id: get-token

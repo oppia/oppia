@@ -18,7 +18,6 @@
 
 import {AppConstants} from 'app.constants';
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {
@@ -244,10 +243,3 @@ export class ContributorDashboardPageComponent implements OnInit {
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
   }
 }
-
-angular.module('oppia').directive(
-  'contributorDashboardPage',
-  downgradeComponent({
-    component: ContributorDashboardPageComponent,
-  }) as angular.IDirectiveFactory
-);

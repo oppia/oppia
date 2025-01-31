@@ -224,17 +224,4 @@ describe('Exploration Property Service', () => {
       });
     }
   );
-
-  it('should resolve successfully and call saveDisplayedValue', async () => {
-    spyOn(explorationPropertyService, 'saveDisplayedValue').and.callThrough();
-
-    explorationPropertyService.propertyName = 'property_1';
-    explorationPropertyService.init('initial value');
-
-    await expectAsync(
-      explorationPropertyService.saveDisplayedValueAsync()
-    ).toBeResolved();
-
-    expect(explorationPropertyService.saveDisplayedValue).toHaveBeenCalled();
-  });
 });

@@ -26,6 +26,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -43,7 +44,7 @@ import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback
 import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {I18nService} from 'i18n/i18n.service';
-import {CookieService} from 'ngx-cookie';
+import {CookieService, CookieModule} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {AppConstants} from 'app.constants';
@@ -151,7 +152,7 @@ describe('TopNavigationBarComponent', () => {
     mockResizeEmitter = new EventEmitter();
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgbModule],
+      imports: [HttpClientTestingModule, NgbModule, CookieModule.forRoot()],
       declarations: [TopNavigationBarComponent, MockTranslatePipe],
       providers: [
         NavigationService,
@@ -486,6 +487,24 @@ describe('TopNavigationBarComponent', () => {
     expect(component.truncateNavbar()).toBe(undefined);
     expect(component.checkIfI18NCompleted).not.toHaveBeenCalled();
     expect(document.querySelector).not.toHaveBeenCalled();
+  });
+
+  it('should show logo and language dropdown when component is embedded', () => {
+    expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
+      '/assets/images/logo/288x128_logo_white.webp'
+    );
+    expect(component.getStaticImageUrl('/logo/288x128_logo_white.png')).toBe(
+      '/assets/images/logo/288x128_logo_white.png'
+    );
+
+    component.pageIsIframed = true;
+
+    fixture.detectChanges();
+
+    const languageChangeElement = fixture.debugElement.query(
+      By.css('.oppia-language-dropdown-button')
+    );
+    expect(languageChangeElement).toBeTruthy();
   });
 
   it(

@@ -226,7 +226,7 @@ describe('Story node editor component', () => {
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
-            planned_publication_date_msecs: 168960000000,
+            planned_publication_date_msecs: 168960000000.0,
           },
           {
             id: 'node_2',
@@ -309,21 +309,56 @@ describe('Story node editor component', () => {
   it('should fetch the descriptions for prerequisite skills', fakeAsync(() => {
     component.prerequisiteSkillIds = ['1', '2', '3'];
 
-    component.getPrerequisiteSkillsDescription();
+    component.getSkillsDescription(
+      component.prerequisiteSkillIds,
+      component.prerequisiteSkillIdToSummaryMap
+    );
     tick();
 
-    expect(component.skillIdToSummaryMap).toEqual({
+    expect(component.prerequisiteSkillIdToSummaryMap).toEqual({
       1: 'test',
       2: 'test2',
       3: 'test3',
     });
   }));
 
-  it('should call Alerts Service if getting skill desc. fails', fakeAsync(() => {
+  it('should fetch the descriptions for acquired skills', fakeAsync(() => {
+    component.acquiredSkillIds = ['1', '2', '3'];
+
+    component.getSkillsDescription(
+      component.acquiredSkillIds,
+      component.acquiredSkillIdToSummaryMap
+    );
+    tick();
+
+    expect(component.acquiredSkillIdToSummaryMap).toEqual({
+      1: 'test',
+      2: 'test2',
+      3: 'test3',
+    });
+  }));
+
+  it('should call Alerts Service if getting acquired skill description fails', fakeAsync(() => {
+    component.acquiredSkillIds = ['2'];
+    let alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+
+    component.getSkillsDescription(
+      component.acquiredSkillIds,
+      component.acquiredSkillIdToSummaryMap
+    );
+    tick();
+
+    expect(alertsSpy).toHaveBeenCalled();
+  }));
+
+  it('should call Alerts Service if getting prerequisite skill description fails', fakeAsync(() => {
     component.prerequisiteSkillIds = ['2'];
     let alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
-    component.getPrerequisiteSkillsDescription();
+    component.getSkillsDescription(
+      component.prerequisiteSkillIds,
+      component.prerequisiteSkillIdToSummaryMap
+    );
     tick();
 
     expect(alertsSpy).toHaveBeenCalled();
@@ -376,6 +411,14 @@ describe('Story node editor component', () => {
     component.togglePrerequisiteSkillsList();
 
     expect(component.prerequisiteSkillIsShown).toBeFalse();
+  });
+
+  it('should toggle acquired skill list', () => {
+    component.acquiredSkillIsShown = true;
+
+    component.toggleAcquiredSkillsList();
+
+    expect(component.acquiredSkillIsShown).toBeFalse();
   });
 
   it('should call StoryUpdate service to set story thumbnail filename', () => {

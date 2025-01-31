@@ -18,13 +18,13 @@
 
 from __future__ import annotations
 
-import base64
-import urllib
+import logging
 
 from core import feconf
-from core import utils
+from core.domain import email_services
 from core.platform import models
 
+import requests
 from typing import Dict, List, Optional, Union
 
 MYPY = False
@@ -32,6 +32,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
+
+# Timeout in seconds for mailgun requests.
+TIMEOUT_SECS = 60
 
 
 def send_email_to_recipients(
@@ -43,7 +46,8 @@ def send_email_to_recipients(
     bcc: Optional[List[str]] = None,
     reply_to: Optional[str] = None,
     recipient_variables: Optional[
-        Dict[str, Dict[str, Union[str, float]]]] = None
+        Dict[str, Dict[str, Union[str, float]]]] = None,
+    attachments: Optional[List[Dict[str, str]]] = None
 ) -> bool:
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.
@@ -70,10 +74,13 @@ def send_email_to_recipients(
                 recipient_variables =
                     {"bob@example.com": {"first":"Bob", "id":1},
                      "alice@example.com": {"first":"Alice", "id":2}}
-                subject = 'Hey, %recipient.first%’
+                subject = 'Hey, %recipient.first%'
             More info about this format at:
-            https://documentation.mailgun.com/en/
-                latest/user_manual.html#batch-sending.
+                https://documentation.mailgun.com/en/latest/user_manual.html
+                #batch-sending.
+        attachments: list(dict)|None. Optional argument. A list of
+            dictionaries, where each dictionary includes the keys `filename`
+            and `path` with their corresponding values.
 
     Raises:
         Exception. The mailgun api key is not stored in
@@ -87,24 +94,37 @@ def send_email_to_recipients(
     mailgun_api_key: Optional[str] = secrets_services.get_secret(
         'MAILGUN_API_KEY')
     if mailgun_api_key is None:
-        raise Exception('Mailgun API key is not available.')
+        email_msg = email_services.convert_email_to_loggable_string(
+            sender_email, recipient_emails, subject, plaintext_body, html_body,
+            bcc, reply_to, recipient_variables
+        )
+        raise Exception(
+            'Mailgun API key is not available. '
+            'Here is the email that failed sending: %s' % email_msg)
 
     if not feconf.MAILGUN_DOMAIN_NAME:
-        raise Exception('Mailgun domain name is not set.')
+        email_msg = email_services.convert_email_to_loggable_string(
+            sender_email, recipient_emails, subject, plaintext_body, html_body,
+            bcc, reply_to, recipient_variables
+        )
+        raise Exception(
+            'Mailgun domain name is not set. '
+            'Here is the email that failed sending: %s' % email_msg)
 
     # To send bulk emails we pass list of recipients in 'to' paarameter of
     # post data. Maximum limit of recipients per request is 1000.
     # For more detail check following link:
-    # https://documentation.mailgun.com/user_manual.html#batch-sending
+    # https://documentation.mailgun.com/docs/mailgun/user-manual/
+    # sending-messages/#batch-sending.
     recipient_email_lists = [
         recipient_emails[i:i + 1000]
         for i in range(0, len(recipient_emails), 1000)]
     for email_list in recipient_email_lists:
         data = {
             'from': sender_email,
-            'subject': subject.encode('utf-8'),
-            'text': plaintext_body.encode('utf-8'),
-            'html': html_body.encode('utf-8'),
+            'subject': subject,
+            'text': plaintext_body,
+            'html': html_body,
             'to': email_list[0] if len(email_list) == 1 else email_list
         }
 
@@ -118,28 +138,32 @@ def send_email_to_recipients(
         # email to each recipient (This is intended to be a workaround for
         # sending individual emails).
         data['recipient_variables'] = recipient_variables or {}
-
-        # The b64encode accepts and returns bytes, so we first need to encode
-        # the MAILGUN_API_KEY to bytes, then decode the returned bytes back
-        # to string.
-        base64_mailgun_api_key = base64.b64encode(
-            b'api:%b' % mailgun_api_key.encode('utf-8')
-        ).strip().decode('utf-8')
-        auth_str = 'Basic %s' % base64_mailgun_api_key
-        header = {'Authorization': auth_str}
         server = 'https://api.mailgun.net/v3/%s/messages' % (
             feconf.MAILGUN_DOMAIN_NAME
         )
-        # The 'ascii' is used here, because only ASCII char are allowed in url,
-        # also the docs recommend this approach:
-        # https://docs.python.org/3.7/library/urllib.request.html#urllib-examples
-        encoded_url = urllib.parse.urlencode(data).encode('ascii')
-        req = urllib.request.Request(server, encoded_url, header)
-        resp = utils.url_open(req)
-        # The function url_open returns a file_like object that can be queried
-        # for the status code of the url query. If it is not 200, the mail query
-        # failed so we return False (this function did not complete
-        # successfully).
-        if resp.getcode() != 200:
+
+       # Adding attachments to the email.
+        files = [(
+            'attachment',
+            (attachment['filename'], open(attachment['path'], 'rb')))
+            for attachment in attachments
+        ] if attachments else []
+
+        response = requests.post(
+            server,
+            auth=('api', mailgun_api_key),
+            data=data,
+            files=(files or None),
+            timeout=TIMEOUT_SECS
+        )
+
+        for _, (_, file_obj) in files:
+            file_obj.close()
+
+        if response.status_code != 200:
+            logging.error(
+                'Failed to send email: %s - %s.'
+                % (response.status_code, response.text))
             return False
+
     return True

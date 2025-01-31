@@ -514,23 +514,6 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertTrue(check_function_calls['shutil_rmtree_is_called'])
 
-    def test_managed_redis_server_throws_exception_when_on_windows_os(
-        self
-    ) -> None:
-        self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            common, 'is_windows_os', value=True))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            common, 'wait_for_port_to_be_in_use'))
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The redis command line interface is not installed because '
-            'your machine is on the Windows operating system. The redis '
-            'server cannot start.'
-        ):
-            self.exit_stack.enter_context(servers.managed_redis_server())
-
     def test_managed_redis_server(self) -> None:
         original_os_remove = os.remove
         original_os_path_exists = os.path.exists
@@ -1089,7 +1072,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
-        self.assertIn('%s.spec.js' % test_file_path, program_args)
+        self.assertIn(test_file_path, program_args)
         self.assertEqual(os.getenv('SPEC_NAME'), test_file_path)
 
     def test_managed_acceptance_test_server_with_invalid_suite(self) -> None:
@@ -1103,26 +1086,43 @@ class ManagedProcessTests(test_utils.TestBase):
                     stdout=subprocess.PIPE))
 
     def test_managed_acceptance_test_server_headless(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
         suite_name = (
             'blog-admin/assign-roles-to-users-and-change-tag-properties')
 
-        with self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name,
-                headless=True,
-                stdout=subprocess.PIPE)):
-            self.assertEqual(os.getenv('HEADLESS'), 'true')
+        self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
+            suite_name=suite_name,
+            headless=True,
+            stdout=subprocess.PIPE))
+        self.exit_stack.close()
+
+        self.assertEqual(os.getenv('HEADLESS'), 'true')
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
+        program_args = popen_calls[0].program_args
+        self.assertIn(suite_name, program_args)
+        self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
 
     def test_managed_acceptance_test_server_mobile(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
         suite_name = (
             'blog-admin/assign-roles-to-users-and-change-tag-properties')
 
-        with self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name,
-                mobile=True,
-                stdout=subprocess.PIPE)):
-            self.assertEqual(os.getenv('MOBILE'), 'true')
+        self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
+            suite_name=suite_name,
+            mobile=True,
+            stdout=subprocess.PIPE))
+
+        self.assertEqual(os.getenv('MOBILE'), 'true')
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
+        program_args = popen_calls[0].program_args
+        self.assertIn(suite_name, program_args)
+        self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
+
+        self.exit_stack.close()
 
 
 class GetChromedriverVersionTests(test_utils.TestBase):

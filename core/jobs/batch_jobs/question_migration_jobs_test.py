@@ -26,8 +26,7 @@ from core.jobs.batch_jobs import question_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = True
 if MYPY:

@@ -2702,7 +2702,6 @@ class Outcome(translation_domain.BaseTranslatableObject):
                 outcome.
         """
         # Id of the destination state.
-        # TODO(#20411): Check that this state actually exists.
         self.dest = dest
         # An optional destination state to redirect the learner to
         # strengthen their concepts corresponding to a particular card.
@@ -3841,25 +3840,6 @@ class State(translation_domain.BaseTranslatableObject):
                     'answers': answers
                 })
         return state_training_data_by_answer_group
-
-    def can_undergo_classification(self) -> bool:
-        """Checks whether the answers for this state satisfy the preconditions
-        for a ML model to be trained.
-
-        Returns:
-            bool. True, if the conditions are satisfied.
-        """
-        training_examples_count = 0
-        labels_count = 0
-        training_examples_count += len(
-            self.interaction.confirmed_unclassified_answers)
-        for answer_group in self.interaction.answer_groups:
-            training_examples_count += len(answer_group.training_data)
-            labels_count += 1
-        if (training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES
-                and (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
-            return True
-        return False
 
     @classmethod
     def convert_state_dict_to_yaml(

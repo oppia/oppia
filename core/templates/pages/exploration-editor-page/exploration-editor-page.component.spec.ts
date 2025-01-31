@@ -34,7 +34,6 @@ import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactor
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import {StateClassifierMappingService} from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import {AlertsService} from 'services/alerts.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {ContextService} from 'services/context.service';
@@ -210,7 +209,6 @@ describe('Exploration editor page component', () => {
     param_changes: [],
     auto_tts_enabled: {},
     edits_allowed: true,
-    state_classifier_mapping: [],
     user: {},
     version: '1',
     rights: {},
@@ -298,7 +296,6 @@ describe('Exploration editor page component', () => {
         ParamSpecsObjectFactory,
         RouterService,
         SiteAnalyticsService,
-        StateClassifierMappingService,
         StateEditorRefreshService,
         StateEditorService,
         StateTopAnswersStatsBackendApiService,

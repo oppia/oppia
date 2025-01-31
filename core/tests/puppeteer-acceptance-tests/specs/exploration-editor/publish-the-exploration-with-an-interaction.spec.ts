@@ -59,8 +59,9 @@ describe('Exploration Creator', function () {
       await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
       await explorationEditor.addImageInteraction();
       await explorationEditor.editDefaultResponseFeedback('Wrong.');
-
       await explorationEditor.addHintToState('Initial coordinate');
+      await explorationEditor.saveExplorationDraft();
+
       // Add a new card with an end interaction.
       await explorationEditor.navigateToCard(CARD_NAME.LAST_CARD);
       await explorationEditor.updateCardContent('Congratulations!');
