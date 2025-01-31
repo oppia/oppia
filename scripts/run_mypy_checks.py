@@ -66,26 +66,17 @@ def get_mypy_cmd(files: Optional[List[str]]) -> List[str]:
     mypy_cmd = 'mypy'
 
     if files:
-        cmd = [mypy_cmd, '--config-file', CONFIG_FILE_PATH] + files
+        cmd = [
+            mypy_cmd, '--install-types', '--non-interactive', '--config-file',
+            CONFIG_FILE_PATH
+        ] + files
     else:
         excluded_files_regex = '|'.join(EXCLUDED_DIRECTORIES)
         cmd = [
-            mypy_cmd, '--exclude', excluded_files_regex,
-            '--config-file', CONFIG_FILE_PATH, '.'
+            mypy_cmd, '--install-types', '--non-interactive', '--exclude',
+            excluded_files_regex, '--config-file', CONFIG_FILE_PATH, '.'
         ]
     return cmd
-
-
-def install_stubs() -> None:
-    """Install mypy stubs."""
-
-    print('Installing mypy types')
-    mypy_cmd = ['mypy', '--install-types', '--non-interactive']
-    process = subprocess.Popen(
-        mypy_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    print(stdout.decode('utf-8'))
-    print(stderr.decode('utf-8'))
 
 
 def main(args: Optional[List[str]] = None) -> int:
@@ -98,7 +89,6 @@ def main(args: Optional[List[str]] = None) -> int:
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    install_stubs()
     mypy_cmd = get_mypy_cmd(parsed_args.files)
 
     print('Starting Mypy type checks.')
