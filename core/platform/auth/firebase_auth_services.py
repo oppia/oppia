@@ -63,7 +63,7 @@ from core.platform import models
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import List, Optional, Tuple
+from typing import List, Optional
 import webapp2
 
 MYPY = False

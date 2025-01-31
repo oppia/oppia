@@ -29,7 +29,7 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Dict, List, TypedDict, Union, cast, Callable
+from typing import Callable, Dict, List, TypedDict, Union, cast
 
 
 class ComponentsDict(TypedDict):
@@ -67,7 +67,9 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_ALLOWLIST: Dict[str, Union[List[str], Callable[[str, str, str], bool]]] = {
+ATTRS_ALLOWLIST: Dict[
+    str, Union[List[str], Callable[[str, str, str], bool]]
+] = {
     'a': filter_a,
     'b': [],
     'blockquote': [],

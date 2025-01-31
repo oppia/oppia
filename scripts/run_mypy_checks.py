@@ -87,6 +87,7 @@ def install_stubs() -> None:
     print(stdout.decode('utf-8'))
     print(stderr.decode('utf-8'))
 
+
 def main(args: Optional[List[str]] = None) -> int:
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)

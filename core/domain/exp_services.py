@@ -3019,8 +3019,9 @@ def get_user_exploration_data(
     version: Optional[int] = None
 ) -> UserExplorationDataDict:
     """Returns a description of the given exploration."""
-    exp_user_data: Optional[user_models.ExplorationUserDataModel] = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
+    exp_user_data: Optional[user_models.ExplorationUserDataModel] = (
+        user_models.ExplorationUserDataModel.get(user_id, exploration_id)
+    )
     is_valid_draft_version = (
         is_version_of_draft_valid(
             exploration_id, exp_user_data.draft_change_list_exp_version)

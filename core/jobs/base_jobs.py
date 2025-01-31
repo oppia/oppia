@@ -60,7 +60,7 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import Dict, List, Tuple, Type, cast # isort: skip
+from typing import Dict, List, Tuple, Type # isort: skip
 
 
 class JobMetaclass(type):

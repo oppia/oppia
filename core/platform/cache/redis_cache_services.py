@@ -22,10 +22,10 @@ from core import feconf
 from core.domain import caching_domain
 
 import redis
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 # Redis client for our own implementation of caching.
-OPPIA_REDIS_CLIENT = redis.StrictRedis[str](
+OPPIA_REDIS_CLIENT = redis.StrictRedis[str](  # pylint: disable=unsubscriptable-object
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.OPPIA_REDIS_DB_INDEX,
@@ -33,7 +33,7 @@ OPPIA_REDIS_CLIENT = redis.StrictRedis[str](
 )
 
 # Redis client for the Cloud NDB cache.
-CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis[str](
+CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis[str](  # pylint: disable=unsubscriptable-object
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.CLOUD_NDB_REDIS_DB_INDEX

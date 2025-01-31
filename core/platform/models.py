@@ -24,7 +24,7 @@ from types import ModuleType  # pylint: disable=import-only-modules
 from core import feconf
 from core.constants import constants
 
-from typing import List, Sequence, Tuple, Type
+from typing import List, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -231,7 +231,9 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names: List[feconf.ValidModelNames] = [name for name in Names if name != Names.BASE_MODEL]
+        model_names: List[feconf.ValidModelNames] = [
+            name for name in Names if name != Names.BASE_MODEL
+        ]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod

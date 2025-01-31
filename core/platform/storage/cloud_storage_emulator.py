@@ -26,7 +26,7 @@ import redis
 from typing import Dict, List, Mapping, Optional, Union
 
 
-REDIS_CLIENT = redis.StrictRedis[bytes](
+REDIS_CLIENT = redis.StrictRedis[bytes](  # pylint: disable=unsubscriptable-object
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,

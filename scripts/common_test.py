@@ -40,7 +40,7 @@ from core import utils
 from core.tests import test_utils
 from scripts import servers
 
-from typing import Generator, List, Literal, NoReturn, Tuple, TextIO
+from typing import Generator, List, Literal, NoReturn, TextIO, Tuple
 import yaml
 
 from . import common

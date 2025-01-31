@@ -3283,7 +3283,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            
+
             last_logged_in = user_services.get_user_settings(
                     self.viewer_id).last_logged_in
             # Ruling out the possibility of None for mypy type checking.
