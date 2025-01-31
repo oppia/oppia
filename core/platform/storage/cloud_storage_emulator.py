@@ -25,10 +25,12 @@ from core import feconf
 import redis
 from typing import TYPE_CHECKING, Dict, List, Mapping, Optional, Union
 
-if TYPE_CHECKING:
-    redis.StrictRedis = redis.StrictRedis[bytes]
+if TYPE_CHECKING:  # pragma: no cover
+    strictRedis = redis.StrictRedis[bytes]
+else:
+    strictRedis = redis.StrictRedis
 
-REDIS_CLIENT = redis.StrictRedis(
+REDIS_CLIENT = strictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,
