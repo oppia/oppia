@@ -405,6 +405,7 @@ def managed_ng_build(
     """Returns context manager to start/stop the ng compiler gracefully.
 
     Args:
+        project_name: str. The project to be built.
         use_prod_env: bool. Whether to compile for use in production.
         watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
             change.

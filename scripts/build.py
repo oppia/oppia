@@ -695,7 +695,7 @@ def build_using_ng(project_name: str) -> None:
         use_prod_env=True, watch_mode=False, project_name=project_name)
     with managed_ng_build_process as p:
         p.wait()
-    if(project_name == 'oppia-angular'):
+    if project_name == 'oppia-angular':
         assert get_file_count('dist/oppia-angular-prod') > 0, (
             'angular generated bundle should be non-empty')
     else:

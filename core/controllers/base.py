@@ -88,13 +88,13 @@ def load_template(
     Returns:
         str. The HTML file content.
     """
-    path=''
+    path = ''
     if is_maintenance_page:
-        path=feconf.FRONTEND_MAINTENANCE_DIR
+        path = feconf.FRONTEND_MAINTENANCE_DIR
     elif template_is_aot_compiled:
-        path=feconf.FRONTEND_AOT_DIR
-    else: 
-        path=feconf.FRONTEND_TEMPLATES_DIR
+        path = feconf.FRONTEND_AOT_DIR
+    else:
+        path = feconf.FRONTEND_TEMPLATES_DIR
     filepath = os.path.join(
         (path),
         filename
@@ -319,7 +319,7 @@ class BaseHandler(
         if (
             not self._is_requested_path_currently_accessible_to_user()
         ):
-            self.render_template('maintenance.html',is_maintenance_page=True)
+            self.render_template('maintenance.html', is_maintenance_page=True)
             return
 
         if self.user_is_scheduled_for_deletion:

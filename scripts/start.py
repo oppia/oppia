@@ -165,13 +165,17 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             stack.enter_context(servers.managed_cloud_datastore_emulator(
                 clear_datastore=not parsed_args.save_datastore))
 
-        project_name = 'oppia-maintenance' if parsed_args.maintenance_mode else 'oppia-angular'
+        if parsed_args.maintenance_mode:
+            project_name = 'oppia-maintenance'
+        else:
+            project_name = 'oppia-angular'
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
             # We need to create an empty hashes.json file for the build so that
             # we don't get the error "assets/hashes.json file doesn't exist".
             build.save_hashes_to_file({})
-            stack.enter_context(servers.managed_ng_build(watch_mode=True, project_name=project_name))
+            stack.enter_context(servers.managed_ng_build(watch_mode=True,
+                project_name=project_name))
             stack.enter_context(servers.managed_webpack_compiler(
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
                 watch_mode=True))
