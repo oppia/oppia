@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 @Component({
@@ -40,10 +39,3 @@ export class SkillEditorNavbarBreadcrumbComponent {
     return truncatedDescription;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaSkillEditorNavbarBreadcrumb',
-    downgradeComponent({component: SkillEditorNavbarBreadcrumbComponent})
-  );

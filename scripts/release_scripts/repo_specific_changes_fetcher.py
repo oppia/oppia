@@ -105,10 +105,7 @@ def get_setup_scripts_changes_status(
         indicating whether or not the script is modified since the release
         against which diff is being checked.
     """
-    setup_script_filepaths = [
-        'scripts/%s' % item for item in [
-            'setup.py', 'setup_gae.py', 'install_third_party_libs.py',
-            'install_third_party.py']]
+    setup_script_filepaths = ['scripts/install_third_party_libs.py']
     changed_filenames = _get_changed_filenames_since_tag(
         release_tag_to_diff_against)
     changes_dict = {

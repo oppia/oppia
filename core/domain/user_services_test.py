@@ -2854,7 +2854,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                'new_state_name': u'¡Hola! αβγ',
+                'new_state_name': '¡Hola! αβγ',
             })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)

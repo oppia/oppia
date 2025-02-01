@@ -16,7 +16,7 @@
  * @fileoverview Component for the miscellaneous tab in the admin panel.
  */
 
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -27,7 +27,7 @@ import {AdminTaskManagerService} from '../services/admin-task-manager.service';
   selector: 'oppia-admin-misc-tab',
   templateUrl: './admin-misc-tab.component.html',
 })
-export class AdminMiscTabComponent {
+export class AdminMiscTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
   DATA_EXTRACTION_QUERY_HANDLER_URL: string =
     '/explorationdataextractionhandler';
@@ -60,12 +60,22 @@ export class AdminMiscTabComponent {
   message: string = '';
   expIdToGetInteractionIdsFor!: string;
   explorationInteractionIds: string[] = [];
+  voiceoverAutogenerationIsEnabled!: boolean;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
     private adminTaskManagerService: AdminTaskManagerService,
     private windowRef: WindowRef
   ) {}
+
+  ngOnInit(): void {
+    this.adminBackendApiService
+      .getAdminConfigForAutomaticVoiceoversAsync()
+      .then(voiceoverAutogenerationIsEnabled => {
+        this.voiceoverAutogenerationIsEnabled =
+          voiceoverAutogenerationIsEnabled;
+      });
+  }
 
   clearSearchIndex(): void {
     if (
@@ -281,6 +291,24 @@ export class AdminMiscTabComponent {
     this.setStatusMessage.emit('Communicating with Firebase server...');
     this.adminBackendApiService
       .revokeSuperAdminPrivilegesAsync(this.usernameToRevoke)
+      .then(
+        () => {
+          this.setStatusMessage.emit('Success!');
+        },
+        errorResponse => {
+          this.setStatusMessage.emit(
+            'Server error: ' + errorResponse.error.error
+          );
+        }
+      );
+  }
+
+  updateAutomaticVoiceoverSynthesisUsingAzure(): void {
+    this.setStatusMessage.emit('Communicating with Firebase server...');
+    this.adminBackendApiService
+      .updateAutomaticVoiceoverSynthesisConfigAsync(
+        this.voiceoverAutogenerationIsEnabled
+      )
       .then(
         () => {
           this.setStatusMessage.emit('Success!');

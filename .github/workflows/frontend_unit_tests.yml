@@ -1,4 +1,5 @@
 name: Frontend unit tests
+permissions: read-all
 on:
   merge_group:
     types: [checks_requested]
@@ -11,6 +12,9 @@ on:
       - develop
       - release-*
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
 jobs:
   generate-job-strategy-matrix:
     name: Generate job strategy matrix
@@ -44,10 +48,8 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-      - name: Merge develop and set up Python
-        uses: ./.github/actions/merge-develop-and-setup-python
-        with:
-          use_cache: false
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Describe filesystem
         run: |
           pwd
@@ -57,16 +59,35 @@ jobs:
           echo $GITHUB_WORKSPACE
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - name: Initialize Docker containers
-        uses: ./.github/actions/install-oppia-dependencies-docker
       - name: Run frontend tests (attempt ${{ matrix.num_runs }})
-        run: make run_tests.frontend PYTHON_ARGS="--check_coverage"
-      - name: Upload fronted coverage reports as an artifact
-        if: ${{ failure() }}
+        id: run_frontend_tests
+        run: python -m scripts.run_frontend_tests --check_coverage
+      - name: Leave a comment on the PR if workflow failed
+        if: ${{ steps.run_frontend_tests.outputs.WORKFLOW_STATUS == 'failure' }}
+        uses: ./.github/actions/post-comment
+        with:
+          owner: ${{ github.event.repository.owner.login }}
+          repo: ${{ github.event.repository.name }}
+          issue_number: ${{ github.event.number }}
+          message: >
+            🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like
+            the frontend tests are failing on your PR. Please look at the logs
+            and follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
+            to fix them, or report the error as a flake.
+
+            You might also find the
+            [instructions for debugging frontend tests](https://github.com/oppia/oppia/wiki/Debug-frontend-tests)
+            helpful.
+
+            Thanks!
+      - name: Upload frontend coverage reports as an artifact
+        if: ${{ steps.run_frontend_tests.outputs.WORKFLOW_STATUS == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
+    permissions:
+      pull-requests: write
   report-failure:
     name: Report failure
     needs: frontend-karma-tests
@@ -74,7 +95,7 @@ jobs:
     if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Report failure if failed on oppia/oppia develop branch
         uses: ./.github/actions/send-webhook-notification
         with:

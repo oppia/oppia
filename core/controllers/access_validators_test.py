@@ -21,9 +21,13 @@ import datetime
 from core import feature_flag_list
 from core import feconf
 from core.constants import constants
+from core.domain import caching_services
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -41,8 +45,10 @@ from typing import Final
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
+    from mypy_imports import skill_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 ACCESS_VALIDATION_HANDLER_PREFIX: Final = (
     feconf.ACCESS_VALIDATION_HANDLER_PREFIX
@@ -853,6 +859,114 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.logout()
 
 
+class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
+    """Checks the access to the topic editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+    def test_access_topic_editor_page_with_curriculum_admin_right(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
+                expected_status_int=200)
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
+        self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        invalid_topic_id = 'p3MBT4ndlCTX'
+
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                invalid_topic_id),
+                expected_status_int=404)
+        self.logout()
+
+    def test_access_topic_editor_page_without_curriculum_admin_right(
+            self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=401)
+
+
+class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
+    """Checks the access to the skill editor page and its rendenring"""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
+
+    def test_access_skill_editor_page_without_logging_in(self) -> None:
+        self.get_json(
+            '%s/can_access_skill_editor/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=401
+        )
+
+    def test_access_skill_editor_page_with_guest_user(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_skill_editor/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=401
+        )
+        self.logout()
+
+    def test_access_skill_editor_page_with_curriculum_admin(
+            self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_skill_editor/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_skill_editor_page_fails(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        skill_model = skill_models.SkillModel.get(self.skill_id)
+        skill_model.delete(self.admin_id, 'Delete skill model.')
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_SKILL, None, [self.skill_id])
+        self.get_json(
+            '%s/can_access_skill_editor/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=404
+        )
+        self.logout()
+
+
 class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
     """Test for collection editor page access validation"""
 
@@ -910,6 +1024,54 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
         )
 
 
+class ExplorationEditorPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase):
+    """Checks the access to the exploration editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.guest_username = 'guest'
+        self.guest_email = 'guest@example.com'
+        self.signup(self.guest_email, self.guest_username)
+        self.owner_id = self.get_user_id_from_email(self.guest_email)
+        self.exp_id = 'unpub_eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+    def test_access_exploration_editor_page_without_logging_in(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.exp_id
+            ), expected_status_int=404
+        )
+
+    def test_access_exploration_editor_page_after_logging_in(self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.exp_id
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_get_with_disabled_exp_id_raises_error_not_logged_in(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                feconf.DISABLED_EXPLORATION_IDS[0]),
+            expected_status_int=404)
+
+    def test_get_with_disabled_exp_id_raises_err_after_logging_in(self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                feconf.DISABLED_EXPLORATION_IDS[0]),
+            expected_status_int=404)
+        self.logout()
+
+
 class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the story editor page and its rendering."""
 
@@ -937,8 +1099,7 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/can_access_story_editor_page/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id
-            ), expected_status_int=302
-        )
+            ), expected_status_int=302)
 
     def test_access_story_editor_page_with_curriculum_admin(
             self) -> None:
@@ -995,8 +1156,8 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': self.exp_id,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }

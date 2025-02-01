@@ -33,7 +33,7 @@ from typing import (
     Dict, Final, Generator, List, Optional, Pattern, Set, Tuple, TypedDict
 )
 
-from .. import docstrings_checker
+from . import docstrings_checker
 
 # List of punctuation symbols that can be used at the end of
 # comments and docstrings.
@@ -1292,7 +1292,6 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
         'types',
         'typing',
         'mypy_imports',
-        'typing_extensions'
     ]
 
     # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -1929,9 +1928,8 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             ' comment with clear justification. The format of the comment'
             ' should be -> Here we use MyPy ignore because ...',
             'mypy-ignore-used',
-            'MyPy ignores (except for \'type: ignore[no-untyped-call]\')'
-            ' should be accompanied by proper comments. The format of'
-            ' comments should be -> Here we use MyPy ignore because ...'
+            'MyPy ignores should be accompanied by proper comments. The format '
+            ' of comments should be -> Here we use MyPy ignore because ...'
         ),
         'C0046': (
             'Extra comment is present for MyPy type: ignore. Please'
@@ -2045,8 +2043,6 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
                             args=tuple(encountered_prohibited_error_codes),
                             node=node
                         )
-                    if ['no-untyped-call'] == encountered_error_codes:
-                        continue
                     if (
                         type_ignore_comment_present and
                         line_num <= (
@@ -2843,7 +2839,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
             bool. Whether the parent class of given class is BaseHandler.
         """
         for ancestor_node in node.ancestors():
-            if ancestor_node.name == u'BaseHandler':
+            if ancestor_node.name == 'BaseHandler':
                 return True
         return False
 

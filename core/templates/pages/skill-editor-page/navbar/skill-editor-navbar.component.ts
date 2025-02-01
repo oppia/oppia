@@ -28,7 +28,6 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-skill-editor-navbar',
@@ -165,10 +164,3 @@ export class SkillEditorNavabarComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillEditorNavbar',
-  downgradeComponent({
-    component: SkillEditorNavabarComponent,
-  }) as angular.IDirectiveFactory
-);

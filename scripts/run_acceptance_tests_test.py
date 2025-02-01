@@ -266,7 +266,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             [line.decode('utf-8') for line in lines],
-            ['sample', u'✓', 'output']
+            ['sample', '✓', 'output']
         )
 
     def test_start_tests_skip_build(self) -> None:

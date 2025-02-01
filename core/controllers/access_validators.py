@@ -27,6 +27,9 @@ from core.domain import blog_services
 from core.domain import classroom_config_services
 from core.domain import feature_flag_services
 from core.domain import learner_group_services
+from core.domain import skill_domain
+from core.domain import skill_fetchers
+from core.domain import topic_fetchers
 from core.domain import user_services
 
 from typing import Dict, Optional, TypedDict
@@ -613,6 +616,45 @@ class BlogAuthorProfilePageAccessValidationHandler(
             )
 
 
+class SkillEditorPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to skill editor page"""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_edit_skill
+    def get(self, skill_id: str) -> None:
+        """Renders skill editor page.
+
+        Args:
+            skill_id: str. The skill ID.
+
+        Raises:
+            Exception. The skill with the given ID doesn't exist.
+        """
+        skill_domain.Skill.require_valid_skill_id(skill_id)
+
+        skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+
+        if skill is None:
+            raise self.NotFoundException(
+                'The skill with the given id doesn\'t exist.')
+
+
 class CollectionEditorAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -631,6 +673,69 @@ class CollectionEditorAccessValidationPage(
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
+
+
+class ExplorationEditorAccessValidationHandlerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
+    """The editor page for a single exploration."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_play_exploration
+    def get(self, unused_exploration_id: str) -> None:
+        """Renders an exploration editor page.
+
+        Args:
+            unused_exploration_id: str. The unused exploration ID.
+        """
+        pass
+
+
+class TopicEditorAccessValidationPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """The editor page for a single topic."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_view_any_topic_editor
+    def get(self, topic_id: str) -> None:
+        """Displays the topic editor page.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            NotFoundException. If the topic with the given ID doesn't exist.
+        """
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+
+        if topic is None:
+            raise self.NotFoundException(
+                Exception('The topic with the given id doesn\'t exist.'))
 
 
 class StoryEditorAccessValidationHandlerPage(

@@ -135,28 +135,6 @@ class EditorTests(BaseEditorControllerTests):
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
 
-    def test_editor_page(self) -> None:
-        """Test access to editor pages for the sample exploration."""
-
-        # Check that non-editors can access, but not edit, the editor page.
-        response = self.get_html_response('/create/0')
-        self.assertIn(
-            b'<exploration-editor-page></exploration-editor-page>',
-            response.body)
-        self.assert_cannot_edit('0')
-
-        # Log in as an editor.
-        self.login(self.EDITOR_EMAIL)
-
-        # Check that it is now possible to access and edit the editor page.
-        response = self.get_html_response('/create/0')
-        self.assertIn(
-            b'<exploration-editor-page></exploration-editor-page>',
-            response.body)
-        self.assert_can_edit('0')
-
-        self.logout()
-
     def test_that_default_exploration_cannot_be_published(self) -> None:
         """Test that publishing a default exploration raises an error
         due to failing strict validation.
@@ -784,7 +762,7 @@ solicit_answer_details: false
         exp_id = 'eid'
         self.save_new_valid_exploration(
             exp_id, owner_id,
-            title=u'¡Hola!',
+            title='¡Hola!',
             category='This is just a test category',
             objective='')
 
@@ -799,7 +777,7 @@ solicit_answer_details: false
             'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(zf_saved.namelist(), [u'Hola.yaml'])
+        self.assertEqual(zf_saved.namelist(), ['Hola.yaml'])
 
         self.logout()
 
@@ -1340,12 +1318,6 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                     'html': '<p>ABC</p>'
                 },
             })], 'Change objective and init state content')
-
-    def test_get_with_disabled_exploration_id_raises_error(self) -> None:
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.EDITOR_URL_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
-            expected_status_int=404)
 
     def test_check_revert_valid(self) -> None:
         """Test if an old exploration version is valid."""

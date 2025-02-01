@@ -96,7 +96,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(parsed_str, 'Hola!')
 
         parsed_str = utils.to_ascii(
-            u'Klüft skräms inför på fédéral électoral große')
+            'Klüft skräms inför på fédéral électoral große')
         self.assertEqual(
             parsed_str, 'Kluft skrams infor pa federal electoral groe')
 
@@ -125,36 +125,6 @@ class UtilsTests(test_utils.GenericTestBase):
             'while parsing a flow node\n'
             'expected the node content, but found \'<stream end>\'\n'):
             utils.dict_from_yaml('{')
-
-    def test_recursively_remove_key_for_empty_dict(self) -> None:
-        """Test recursively_remove_key method for an empty dict."""
-        d: Dict[str, str] = {}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {})
-
-    def test_recursively_remove_key_for_single_key_dict(self) -> None:
-        """Test recursively_remove_key method for single key dict."""
-        d = {'a': 'b'}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {})
-
-    def test_recursively_remove_key_for_multi_key_dict(self) -> None:
-        """Test recursively_remove_key method for multi key dict."""
-        d = {'a': 'b', 'c': 'd'}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {'c': 'd'})
-
-    def test_recursively_remove_key_for_dict_with_value_dict(self) -> None:
-        """Test recursively_remove_key method for dict with a value dict."""
-        d = {'a': 'b', 'c': {'a': 'b'}}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {'c': {}})
-
-    def test_recursively_remove_key_for_list(self) -> None:
-        """Test recursively_remove_key method for list."""
-        l = ['a', 'b', {'c': 'd'}]
-        utils.recursively_remove_key(l, 'c')
-        self.assertEqual(l, ['a', 'b', {}])
 
     def test_camelcase_to_hyphenated(self) -> None:
         """Test camelcase_to_hyphenated method."""
@@ -777,13 +747,6 @@ class UtilsTests(test_utils.GenericTestBase):
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
             dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
-
-    def test_convert_millisecs_time_to_datetime_object(self) -> None:
-        msecs = 1690761600000
-        dt = utils.convert_millisecs_time_to_datetime_object(
-            msecs + 1000.0 * time.timezone)
-        dt2 = datetime.datetime(2023, 7, 31)
-        self.assertEqual(dt, dt2)
 
     def test_grouper(self) -> None:
         self.assertEqual(

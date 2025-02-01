@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 /**
@@ -27,10 +26,3 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 export class LoginRequiredModalContent {
   constructor(public readonly activeModal: NgbActiveModal) {}
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'loginRequiredModalContent',
-    downgradeComponent({component: LoginRequiredModalContent})
-  );
