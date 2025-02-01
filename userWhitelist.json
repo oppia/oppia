@@ -1,0 +1,39 @@
+{
+  "releaseCoordinators": [
+    "aks681",
+    "vojtechjelinek",
+    "DubeySandeep",
+    "BenHenning",
+    "kevintab95",
+    "seanlip",
+    "U8NWXD",
+    "gp201",
+    "Priyansh61",
+    "SanjaySajuJacob",
+    "sagangwee",
+    "chris7716"
+  ],
+  "goodFirstIssue": [
+    "U8NWXD",
+    "kevintab95",
+    "seanlip",
+    "ankita240796",
+    "DubeySandeep",
+    "bansalnitish",
+    "vojtechjelinek",
+    "marianazangrossi",
+    "brianrodri",
+    "nithusha21",
+    "aks681",
+    "srijanreddy98"
+  ],
+  "teamLeads": {
+    "onboardingTeam": "DubeySandeep",
+    "releaseTeam": "vojtechjelinek",
+    "welfareTeam": "DubeySandeep"
+  },
+  "oppiaMaintainers": "oppia/core-maintainers",
+  "oppiaReleaseCoordinators": "oppia/release-coordinators",
+  "oppiaDevWorkflowTeam": "oppia/dev-workflow-team",
+  "serverJobAdmins": ["vojtechjelinek", "DubeySandeep", "kevintab95"]
+}
