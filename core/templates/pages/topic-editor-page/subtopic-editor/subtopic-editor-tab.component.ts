@@ -18,7 +18,6 @@
 
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
@@ -349,10 +348,3 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSubtopicEditorTab',
-  downgradeComponent({
-    component: SubtopicEditorTabComponent,
-  }) as angular.IDirectiveFactory
-);
