@@ -224,8 +224,8 @@ class EntityVoiceovers:
 
                 if not isinstance(audio_offset_msecs, float):
                     raise utils.ValidationError(
-                        'audio_offset_msecs must be a string, received %s' %
-                        audio_offset_msecs)
+                        'audio_offset_msecs must be a floating value, '
+                        'received %s' % audio_offset_msecs)
 
     def add_new_content_id_without_voiceovers(
         self,

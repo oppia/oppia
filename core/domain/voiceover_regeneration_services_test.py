@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import os
+from unittest import mock
 
 from core import feconf
 from core.domain import fs_services
@@ -267,3 +268,30 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             reteived_cached_model.language_accent_code, language_accent_code)
         self.assertEqual(
             reteived_cached_model.plaintext, parsed_text_2)
+
+    @mock.patch(
+        'core.platform.azure_speech_synthesis.'
+        'dev_mode_azure_speech_synthesis_services.regenerate_speech_from_text',
+        side_effect=Exception('Mocked exception during voicever regeneration')
+    )
+    def test_should_raise_exception_if_regeneration_failed(
+        self, _: mock.Mock
+    ) -> None:
+        content_html = '<p> This is a test text </p>'
+        exploration_id = 'exp_id'
+        language_accent_code = 'en-US'
+        filename = 'content_0-en-US-asdjytdyop.mp3'
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Mocked exception during voicever regeneration'
+        ):
+            (
+                voiceover_regeneration_services.
+                synthesize_voiceover_for_html_string(
+                    exploration_id,
+                    content_html,
+                    language_accent_code,
+                    filename
+                )
+            )

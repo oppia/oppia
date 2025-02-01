@@ -64,3 +64,28 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
         self.assertTrue(isinstance(result_binary_data, bytes))
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertIsNone(result_error)
+
+    def test_should_select_default_language_as_english_and_return_correctly(
+        self
+    ) -> None:
+        plaintext = 'This is a test text'
+
+        # For a non-existent language accent code, the default English will be
+        # selected.
+        language_accent_code = 'non-existent'
+
+        mock_word_boundaries = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0},
+        ]
+
+        result_binary_data, result_audio_offsets, result_error = (
+            dev_mode_azure_speech_synthesis_services.
+            regenerate_speech_from_text(plaintext, language_accent_code))
+
+        self.assertTrue(isinstance(result_binary_data, bytes))
+        self.assertEqual(result_audio_offsets, mock_word_boundaries)
+        self.assertIsNone(result_error)
