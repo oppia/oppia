@@ -71,9 +71,6 @@ module.exports = {
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
     lightweight_oppia_root:
       commonPrefix + '/pages/lightweight-oppia-root/index.ts',
-    practice_session:
-      commonPrefix +
-      '/pages/practice-session-page/practice-session-page.import.ts',
   },
 
   /**
@@ -157,18 +154,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       lightweight: true,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['practice_session'],
-      filename: 'practice-session-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/practice-session-page/' +
-        'practice-session-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],

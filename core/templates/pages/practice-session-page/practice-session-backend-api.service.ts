@@ -16,7 +16,6 @@
  * @fileoverview Service to get data of Practice Sessions page.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -53,10 +52,3 @@ export class PracticeSessionsBackendApiService {
     return this._fetchPracticeSessionsData(storyUrlFragment);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PracticeSessionsBackendApiService',
-    downgradeInjectable(PracticeSessionsBackendApiService)
-  );
