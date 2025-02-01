@@ -18,7 +18,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   StateParamChangesService,
   // eslint-disable-next-line max-len
@@ -40,9 +39,3 @@ export class StateParamChangesEditorComponent implements OnInit {
     this.spcs = this.stateParamChangesService;
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'stateParamChangesEditor',
-    downgradeComponent({component: StateParamChangesEditorComponent})
-  );
