@@ -1,0 +1,127 @@
+name: Pull Request Label Management
+
+on:
+  pull_request_target:
+    types: [labeled, unlabeled]
+
+permissions: {}
+
+jobs:
+  process-labels:
+    name: Process Label Actions
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Handle label changes
+        uses: actions/github-script@v7
+        id: main-script
+        env:
+          VALID_LABELS: >
+            PR: Affects datastore layer,
+            PR: Needs to be hotfixed,
+            dependencies,
+            stale
+        with:
+          script: |
+            const event = context.payload;
+            const action = event.action;
+            const label = event.label?.name || '';
+            const sender = event.sender?.login || '';
+            const fs = require('fs');
+            const path = require('path');
+            const userWhitelistPath = path.join(process.env.GITHUB_WORKSPACE, 'userWhitelist.json');
+            
+            let authorizedUsers = new Set();
+            let releaseCoordinators = [];
+            try {
+              const users = JSON.parse(fs.readFileSync(userWhitelistPath, 'utf8'));
+              authorizedUsers = new Set([
+                ...users.releaseCoordinators,
+                ...users.serverJobAdmins
+              ]);
+              releaseCoordinators = users.releaseCoordinators || [];
+            } catch (error) {
+              core.error(`Failed to load userwhitelist.json: ${error.message}`);
+              return;
+            }
+            const validLabels = new Set(
+              process.env.VALID_LABELS
+                .split(',')
+                .map(l => l.trim())
+                .filter(l => l)
+            );
+            const sanitizedLabel = label.replace(/[^a-zA-Z0-9 _:-]/g, '').trim();
+            
+            let restoredDatastore = false;
+            let assignedHotfix = false;
+            // datastore label removal
+            if (action === 'unlabeled' && sanitizedLabel === 'PR: Affects datastore layer') {
+              const userAllowed = authorizedUsers.has(sender);
+              if (!userAllowed) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  labels: [sanitizedLabel]
+                });
+                restoredDatastore = true;
+              }
+            }
+            // hotfix label addition
+            if (action === 'labeled' && sanitizedLabel === 'PR: Needs to be hotfixed') {
+              const validUsers = releaseCoordinators.filter(u => u); // Use only releaseCoordinators
+              if (validUsers.length > 0) {
+                const randomUser = validUsers[Math.floor(Math.random() * validUsers.length)];
+                await github.rest.issues.addAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  assignees: [randomUser]
+                });
+                assignedHotfix = true;
+              }
+            }
+            // Validate label 
+            if (action === 'labeled') {
+              const isCustomPRLabel = sanitizedLabel.startsWith('PR:') && !validLabels.has(sanitizedLabel);
+              
+              if (!validLabels.has(sanitizedLabel) && !isCustomPRLabel) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.issue.number,
+                    name: sanitizedLabel
+                  });
+                  
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.issue.number,
+                    body: `Removed invalid label: ${sanitizedLabel}. Please use approved labels only.`
+                  });
+                } catch (error) {
+                  core.error(`Error handling invalid label: ${error.message}`);
+                }
+              }
+            }
+            if (restoredDatastore) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: 'Unauthorized removal of "PR: Affects datastore layer" detected. Label restored.'
+              });
+            }
+            if (assignedHotfix) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: 'PR marked as hotfix. Assigned release coordinators for review.'
+              });
+            }
