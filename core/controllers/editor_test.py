@@ -3763,7 +3763,10 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             'test_file.jpeg1',
             'image.PNG123',
             'file.jpg9',
-            'invalid.exe'
+            'invalid.exe',
+            'invalid.svg.exe',
+            'svg.exe',
+            '.svg',
         ]
 
         filename_prefix = 'image'
