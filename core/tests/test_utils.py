@@ -241,7 +241,8 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
 
 def mock_load_template(
     filename: str,
-    template_is_aot_compiled: bool = False
+    template_is_aot_compiled: bool = False,
+    is_maintenance_page: bool = False
 ) -> str:
     """Mock for load_template function. This mock is required for backend tests
     since we do not have webpack compilation before backend tests. The folder to
@@ -255,6 +256,8 @@ def mock_load_template(
             returned.
         template_is_aot_compiled: bool. False by default. Use
             True when the template is compiled by angular AoT compiler.
+        is_maintenance_page: bool. False by default. Use
+            True when the template is for the maintenance page.
 
     Returns:
         str. The contents of the given file.
@@ -264,6 +267,9 @@ def mock_load_template(
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
+    if is_maintenance_page:
+        filepath = get_filepath_from_filename(
+            'maintenance-index', 'src')
     if template_is_aot_compiled:
         filepath = get_filepath_from_filename(
             filename, 'src')
