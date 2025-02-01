@@ -1,0 +1,96 @@
+name: Check Issue Labels
+
+on:
+  issues:
+    types:
+      - labeled
+
+permissions: {}
+
+jobs:
+  check-label:
+    runs-on: ubuntu-22.04
+    permissions:
+     issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate issue label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const labelName = context.payload.label?.name || '';
+            const username = context.actor || '';
+            const issueNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            console.log("Label Name:", labelName);
+            console.log("Username:", username);
+            console.log("Issue Number:", issueNumber);
+            const isValidLabelName = /^[\w\s-:]+$/.test(labelName); 
+            if (!isValidLabelName) {
+              console.error("Invalid label name:", labelName);
+              return;
+            }
+            if (!Number.isInteger(issueNumber) || issueNumber <= 0) {
+              console.error("Invalid issue number:", issueNumber);
+              return;
+            }
+            const isValidUsername = /^[a-zA-Z0-9-]+$/.test(username);
+            if (!isValidUsername) {
+              console.error("Invalid username:", username);
+              return;
+            }
+            // Load allowed users from userwhitelist.json
+            let allowedUsers = [];
+            try {
+              const userWhitelistPath = path.join(process.env.GITHUB_WORKSPACE, 'userWhitelist.json');
+              const userWhitelist = JSON.parse(fs.readFileSync(userWhitelistPath, 'utf8'));
+              allowedUsers = userWhitelist.goodFirstIssue || [];
+            } catch (error) {
+              console.error("Error loading or parsing userWhitelist.json:", error);
+              return; // Exit if the file is missing or invalid
+            }
+            const goodFirstIssueUsers = new Set(allowedUsers);
+            const prLabels = new Set(["dependencies", "stale"]);
+            async function removeLabelAndComment(label, comment) {
+              console.log(`Removing label: ${label}`);
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                name: label
+              }).catch(err => console.error(`Error removing label: ${err.message}`));
+              console.log(`Creating comment: ${comment}`);
+              const escapeHTML = (str) =>
+                str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+              const sanitizedComment = escapeHTML(comment);
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: sanitizedComment
+              }).catch(err => console.error(`Error creating comment: ${err.message}`));
+            }
+            // only allowlisted users can add "good first issue" label
+            if (labelName === "good first issue") {
+              console.log("Checking if user is allowed...");
+              if (!goodFirstIssueUsers.has(username)) {
+                await removeLabelAndComment(
+                  labelName,
+                  `Hi @${username}, only users from the 'goodFirstIssue' team can add the 'good first issue' label. Please reach out to them if needed. Thanks!`
+                );
+              } else {
+                console.log("User is allowed to add the 'good first issue' label.");
+              }
+            }
+            // PR-related labels are not added to issues
+            if (prLabels.has(labelName) || labelName.startsWith("PR:")) {
+              await removeLabelAndComment(
+                labelName,
+                `Hi @${username}, the '${labelName}' label should only be used in pull requests. I'm removing the label. You can learn more about labels [here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#labeling-issues-and-pull-requests). Thanks!`
+              );
+            }
