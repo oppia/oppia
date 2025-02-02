@@ -25,7 +25,7 @@ from datetime import timedelta, timezone
 
 import requests
 
-from scripts import pr_monitor  # pylint: disable=import-error
+from scripts import pr_monitor  
 
 
 class PullRequestMonitorTests(unittest.TestCase):
