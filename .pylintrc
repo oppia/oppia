@@ -101,12 +101,14 @@ allowed-type-ignore-error-codes=
     dict-item,
     func-returns-value,
     index,
+    literal-required,
     list-item,
     misc,
     override,
     return,
     type-arg,
     typeddict-item,
+    typeddict-unknown-key,
     union-attr
 
 ignore-imports=yes
