@@ -362,7 +362,7 @@ describe('Skill editor page', () => {
   });
 
   it(
-    "should show 'confirm question modal exit' modal and navigate to " +
+    "should show 'confirm question exit' modal and navigate to " +
       'main editor tab when user confirms',
     fakeAsync(() => {
       skillEditorRoutingService.questionIsBeingCreated = true;
@@ -381,7 +381,7 @@ describe('Skill editor page', () => {
   );
 
   it(
-    "should show 'confirm question modal exit' modal and navigate to " +
+    "should show 'confirm question exit' modal and navigate to " +
       'preview editor tab when user confirms',
     fakeAsync(() => {
       skillEditorRoutingService.questionIsBeingCreated = true;
@@ -400,7 +400,7 @@ describe('Skill editor page', () => {
   );
 
   it(
-    "should show 'confirm question modal exit' modal and should not navigate to " +
+    "should show 'confirm question exit' modal and should not navigate to " +
       'preview editor tab when user cancels',
     fakeAsync(() => {
       skillEditorRoutingService.questionIsBeingCreated = true;
@@ -410,26 +410,6 @@ describe('Skill editor page', () => {
         } as NgbModalRef;
       });
       component.selectPreviewTab();
-      tick();
-      spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
-        'questions'
-      );
-      expect(component.getActiveTabName()).toBe('questions');
-      skillEditorRoutingService.questionIsBeingCreated = false;
-    })
-  );
-
-  it(
-    "should show 'confirm question modal exit' modal and should not navigate to " +
-      'main editor tab when user cancels',
-    fakeAsync(() => {
-      skillEditorRoutingService.questionIsBeingCreated = true;
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          result: Promise.reject(),
-        } as NgbModalRef;
-      });
-      component.selectMainTab();
       tick();
       spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
         'questions'

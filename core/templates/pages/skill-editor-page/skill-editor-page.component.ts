@@ -61,7 +61,7 @@ export class SkillEditorPageComponent implements OnInit {
     return this.skillEditorRoutingService.getActiveTabName();
   }
 
-  selectMainTab(): void {
+  navigationWithConfirmation(navigateFunction: () => void): void {
     if (this.skillEditorRoutingService.questionIsBeingCreated) {
       const modalRef = this.ngbModal.open(ConfirmQuestionExitModalComponent, {
         backdrop: 'static',
@@ -69,7 +69,7 @@ export class SkillEditorPageComponent implements OnInit {
       });
       modalRef.result.then(
         () => {
-          this.skillEditorRoutingService.navigateToMainTab();
+          navigateFunction();
           this.skillEditorRoutingService.creatingNewQuestion(false);
         },
         () => {
@@ -79,30 +79,20 @@ export class SkillEditorPageComponent implements OnInit {
         }
       );
     } else {
-      this.skillEditorRoutingService.navigateToMainTab();
+      navigateFunction();
     }
   }
 
+  selectMainTab(): void {
+    this.navigationWithConfirmation(() => {
+      this.skillEditorRoutingService.navigateToMainTab();
+    });
+  }
+
   selectPreviewTab(): void {
-    if (this.skillEditorRoutingService.questionIsBeingCreated) {
-      const modalRef = this.ngbModal.open(ConfirmQuestionExitModalComponent, {
-        backdrop: 'static',
-        keyboard: false,
-      });
-      modalRef.result.then(
-        () => {
-          this.skillEditorRoutingService.navigateToPreviewTab();
-          this.skillEditorRoutingService.creatingNewQuestion(false);
-        },
-        () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        }
-      );
-    } else {
+    this.navigationWithConfirmation(() => {
       this.skillEditorRoutingService.navigateToPreviewTab();
-    }
+    });
   }
 
   selectQuestionsTab(): void {
