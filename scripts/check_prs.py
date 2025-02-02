@@ -24,7 +24,6 @@ from typing import List
 
 import requests  # pylint: disable=import-error
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
