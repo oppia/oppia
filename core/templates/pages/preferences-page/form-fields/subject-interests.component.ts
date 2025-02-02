@@ -155,8 +155,8 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
     if (value && this.isValidInput(value)) {
       this.subjectInterests.push(value);
       this.subjectInterestInput.nativeElement.value = '';
+      this.onChange(this.subjectInterests);
     }
-    this.onChange(this.subjectInterests);
   }
 
   onInput(event: Event): void {
@@ -165,9 +165,12 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
 
     if (!inputValue) {
       this.formCtrl.markAsPristine();
-    } else if (this.isValidInput(inputValue)) {
-      this.formCtrl.markAsDirty();
+      return;
     }
-    this.onChange(this.subjectInterests);
+
+    if (this.isValidInput(inputValue)) {
+      this.formCtrl.markAsDirty();
+      this.onChange(this.subjectInterests);
+    }
   }
 }
