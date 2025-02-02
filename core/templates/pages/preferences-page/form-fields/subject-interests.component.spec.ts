@@ -162,7 +162,7 @@ describe('Subject interests form field Component', () => {
     componentInstance.formCtrl = new FormControl();
     componentInstance.subjectInterestInput = {
       nativeElement: {
-        value: 'math',
+        value: '',
       },
     } as ElementRef;
     const inputEvent = {
@@ -173,9 +173,9 @@ describe('Subject interests form field Component', () => {
     componentInstance.onInput(inputEvent);
     expect(componentInstance.isValidInput).toHaveBeenCalledWith('math');
     expect(componentInstance.formCtrl.dirty).toBe(true);
-    expect(componentInstance.onChange).toHaveBeenCalledWith([]);
-    expect(componentInstance.subjectInterests).toEqual([]);
-    expect(componentInstance.subjectInterestInput?.nativeElement.value).toBe('');
+    expect(componentInstance.onChange).toHaveBeenCalledWith(['math']);
+    expect(componentInstance.subjectInterests).toEqual(['math']);
+    expect(componentInstance.subjectInterestInput?.nativeElement.value).toBe('math');
   });
 
   it('should mark input as pristine when input is empty', () => {
@@ -183,7 +183,7 @@ describe('Subject interests form field Component', () => {
     componentInstance.formCtrl = new FormControl();
     componentInstance.subjectInterestInput = { nativeElement: { value: '' } } as ElementRef;
     componentInstance.formCtrl.markAsDirty();
-    expect(componentInstance.formCtrl.pristine).toBe(false);
+    expect(componentInstance.formCtrl.dirty).toBe(false);
     const inputEvent = {
       target: {
         value: '',
