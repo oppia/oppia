@@ -103,6 +103,7 @@ allowed-type-ignore-error-codes=
     index,
     literal-required,
     list-item,
+    method-assign,
     misc,
     override,
     return,
