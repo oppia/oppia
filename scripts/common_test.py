@@ -85,7 +85,8 @@ class CommonTests(test_utils.GenericTestBase):
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: True, expected_kwargs=[])
         swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[])
+            servers, 'managed_ng_build', mock_context_manager, expected_args=[],
+            expected_kwargs=[{'project_name': 'oppia-angular'}])
         with self.print_swap, swap_ng_build, swap_isdir:
             common.run_ng_compilation()
 

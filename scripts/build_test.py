@@ -1139,7 +1139,11 @@ class BuildTests(test_utils.GenericTestBase):
 
         ng_build_swap = self.swap_with_checks(
             servers, 'managed_ng_build', mock_managed_ng_build,
-            expected_kwargs=[{'use_prod_env': True, 'watch_mode': False}])
+            expected_kwargs=[{
+                'use_prod_env': True,
+                'watch_mode': False,
+                'project_name': 'oppia-angular'
+            }])
         get_file_count_swap = self.swap_with_checks(
             build, 'get_file_count', mock_get_file_count,
             expected_args=[('dist/oppia-angular-prod',)])
@@ -1162,7 +1166,11 @@ class BuildTests(test_utils.GenericTestBase):
 
         ng_build_swap = self.swap_with_checks(
             servers, 'managed_ng_build', mock_managed_ng_build,
-            expected_kwargs=[{'use_prod_env': True, 'watch_mode': False}])
+            expected_kwargs=[{
+                'use_prod_env': True,
+                'watch_mode': False,
+                'project_name': 'oppia-angular'
+            }])
         get_file_count_swap = self.swap_with_checks(
             build, 'get_file_count', mock_get_file_count,
             expected_args=[('dist/oppia-angular-prod',)])
