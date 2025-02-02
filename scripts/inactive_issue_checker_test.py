@@ -1,9 +1,13 @@
 # coding: utf-8
+#
 # Copyright 2023 The Oppia Authors. All Rights Reserved.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# http://www.apache.org/licenses/LICENSE-2.0
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +54,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
             'body': ''
         }]
         self.mock_get.return_value = mock_issues_response
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
 
         self.assertEqual(self.mock_get.call_count, 1)
@@ -63,7 +67,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
         mock_issues_response.json.return_value = [None, 'not_a_dict', {}]
         self.mock_get.return_value = mock_issues_response
 
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
         self.assertEqual(self.mock_get.call_count, 1)
         self.mock_delete.assert_not_called()
@@ -83,7 +87,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
             unittest.mock.Mock(json=lambda: []),
         ]
 
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
 
         self.assertEqual(self.mock_get.call_count, 2)
@@ -110,7 +114,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
             unittest.mock.Mock(json=lambda: []),
             unittest.mock.Mock(json=lambda: [])
         ]
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
 
         self.assertTrue(self.mock_get.called)
@@ -139,7 +143,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
         mock_delete_response = unittest.mock.Mock(status_code=500)
         self.mock_delete.return_value = mock_delete_response
 
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
 
         self.mock_delete.assert_called_once()
@@ -172,7 +176,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
         self.mock_delete.return_value = mock_delete_response
         self.mock_post.return_value = unittest.mock.Mock()
 
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
 
         self.mock_delete.assert_called_once()
@@ -199,7 +203,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
             unittest.mock.Mock(json=lambda: [{'body': 'This fixes issue #3'}])
         ]
 
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
 
         self.mock_delete.assert_not_called()
@@ -226,7 +230,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
             unittest.mock.Mock(json=lambda: [])
         ]
 
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
 
         self.mock_delete.assert_not_called()
@@ -254,7 +258,7 @@ class TestCheckInactiveIssues(unittest.TestCase):
         ]
         self.mock_delete.side_effect = requests.RequestException(
             'Connection error')
-        inactive_issue_checker.inactive_issue_checker(
+        inactive_issue_checker.check_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
 
         self.mock_delete.assert_called_once()
