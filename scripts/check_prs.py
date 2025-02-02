@@ -22,7 +22,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import List
 
-import requests  # pylint: disable=import-error
+import requests 
 
 logging.basicConfig(
     level=logging.INFO,
