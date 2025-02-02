@@ -87,8 +87,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             return MockCompilerContextManager()
         env = os.environ.copy()
         env['PIP_NO_DEPS'] = 'True'
-        self.swap_ng_build = self.swap(
-            servers, 'managed_ng_build', mock_context_manager)
+        self.swap_ng_build = self.swap_with_checks(
+            servers,
+            'managed_ng_build',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
+            expected_kwargs=[{'project_name': 'oppia-angular'}]
+        )
         self.swap_webpack_compiler = self.swap(
             servers, 'managed_webpack_compiler', mock_context_manager)
         self.swap_redis_server = self.swap(

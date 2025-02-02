@@ -1408,7 +1408,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
 
-    project_name='oppia-angular'
+    project_name = 'oppia-angular'
     if options.maintenance_mode and options.prod_env:
         project_name = 'oppia-maintenance'
     elif options.maintenance_mode and not options.prod_env:

@@ -82,13 +82,19 @@ class StartTests(test_utils.GenericTestBase):
             servers,
             'managed_ng_build',
             lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{'watch_mode': True, 'project_name': 'oppia-angular'}]
+            expected_kwargs=[{
+                'watch_mode': True,
+                'project_name': 'oppia-angular'
+            }]
         )
         self.swap_ng_build_maintenance = self.swap_with_checks(
             servers,
             'managed_ng_build',
             lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{'watch_mode': True, 'project_name': 'oppia-maintenance'}]
+            expected_kwargs=[{
+                'watch_mode': True,
+                'project_name': 'oppia-maintenance'
+            }]
         )
         self.swap_redis_server = self.swap(
             servers, 'managed_redis_server', mock_context_manager)
@@ -190,7 +196,9 @@ class StartTests(test_utils.GenericTestBase):
         swap_check_port_in_use = self.swap_with_checks(
             common, 'is_port_in_use', lambda _: False,
             expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
-        with self.swap_cloud_datastore_emulator, swap_build, self.swap_ng_build_maintenance:
+        with (
+            self.swap_cloud_datastore_emulator,
+            swap_build, self.swap_ng_build_maintenance):
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_create_server, self.swap_webpack_compiler:
                     with self.swap_extend_index_yaml, self.swap_dev_appserver:

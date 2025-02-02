@@ -1149,7 +1149,7 @@ class BuildTests(test_utils.GenericTestBase):
             expected_args=[('dist/oppia-angular-prod',)])
 
         with ng_build_swap, get_file_count_swap:
-            build.build_using_ng()
+            build.build_using_ng(project_name='oppia-angular')
 
     def test_build_using_ng_command_with_incorrect_filecount_fails(
         self
@@ -1180,7 +1180,7 @@ class BuildTests(test_utils.GenericTestBase):
                 AssertionError,
                 'angular generated bundle should be non-empty'
             ):
-                build.build_using_ng()
+                build.build_using_ng(project_name='oppia-angular')
 
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
