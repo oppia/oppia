@@ -25,12 +25,12 @@ import redis
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
-    strictRedis = redis.StrictRedis[str]
+    StrictRedis = redis.StrictRedis[str]
 else:
-    strictRedis = redis.StrictRedis
+    StrictRedis = redis.StrictRedis
 
 # Redis client for our own implementation of caching.
-OPPIA_REDIS_CLIENT = strictRedis(
+OPPIA_REDIS_CLIENT = StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.OPPIA_REDIS_DB_INDEX,
@@ -38,7 +38,7 @@ OPPIA_REDIS_CLIENT = strictRedis(
 )
 
 # Redis client for the Cloud NDB cache.
-CLOUD_NDB_REDIS_CLIENT = strictRedis(
+CLOUD_NDB_REDIS_CLIENT = StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.CLOUD_NDB_REDIS_DB_INDEX

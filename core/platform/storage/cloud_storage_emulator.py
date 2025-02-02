@@ -26,11 +26,11 @@ import redis
 from typing import TYPE_CHECKING, Dict, List, Mapping, Optional, Union
 
 if TYPE_CHECKING:  # pragma: no cover
-    strictRedis = redis.StrictRedis[bytes]
+    StrictRedis = redis.StrictRedis[bytes]
 else:
-    strictRedis = redis.StrictRedis
+    StrictRedis = redis.StrictRedis
 
-REDIS_CLIENT = strictRedis(
+REDIS_CLIENT = StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,
