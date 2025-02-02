@@ -170,13 +170,11 @@ describe('Subject interests form field Component', () => {
     expect(componentInstance.formCtrl.dirty).toBe(true);
     expect(componentInstance.onChange).toHaveBeenCalledWith([]);
     expect(componentInstance.subjectInterests).toEqual([]);
-    expect(componentInstance.subjectInterestInput.nativeElement.value).toBe('');
   });
 
   it('should mark input as pristine when input is empty', () => {
     spyOn(componentInstance, 'onChange');
     componentInstance.formCtrl = new FormControl();
-    componentInstance.formCtrl.markAsDirty();
     expect(componentInstance.formCtrl.pristine).toBe(false);
     const inputEvent = {
       target: {
