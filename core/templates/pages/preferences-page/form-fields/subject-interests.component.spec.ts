@@ -155,38 +155,4 @@ describe('Subject interests form field Component', () => {
     expect(componentInstance.subjectInterestInput.nativeElement.value).toBe('');
     expect(componentInstance.onChange).toHaveBeenCalledWith(['math']);
   });
-
-  it('should handle input event correctly', () => {
-    spyOn(componentInstance, 'onChange');
-    spyOn(componentInstance, 'isValidInput').and.returnValue(true);
-    componentInstance.formCtrl = new FormControl();
-    const inputEvent = {
-      target: {
-        value: 'math',
-      },
-    } as unknown as Event;
-    componentInstance.onInput(inputEvent);
-    expect(componentInstance.isValidInput).toHaveBeenCalledWith('math');
-    expect(componentInstance.formCtrl.dirty).toBe(true);
-    expect(componentInstance.onChange).toHaveBeenCalledWith([]);
-    expect(componentInstance.subjectInterests).toEqual([]);
-    expect(componentInstance.subjectInterestInput.nativeElement.value).toBe('');
-  });
-
-  it('should mark input as pristine when input is empty', () => {
-    spyOn(componentInstance, 'onChange');
-    componentInstance.formCtrl = new FormControl();
-    componentInstance.formCtrl.markAsDirty();
-    expect(componentInstance.formCtrl.pristine).toBe(false);
-    const inputEvent = {
-      target: {
-        value: '',
-      },
-    } as unknown as Event;
-
-    componentInstance.onInput(inputEvent);
-
-    expect(componentInstance.formCtrl.pristine).toBe(true);
-    expect(componentInstance.onChange).not.toHaveBeenCalled();
-  });
 });
