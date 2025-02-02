@@ -144,7 +144,7 @@ def main() -> None:  # pragma: no cover
 
         # Check for inactivity
 
-        if last_commit_time < now - timedelta(days=0):
+        if last_commit_time < now - timedelta(days=7):
             comment_on_pr(
                 pr_number,
                 "This pull request has been inactive for over 7 days. Please update.",
