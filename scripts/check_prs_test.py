@@ -176,13 +176,12 @@ class PullRequestMonitorTests(unittest.TestCase):
         pr_monitor.get_issue = mock.Mock(return_value=self.mock_issue)
         pr_monitor.unassign_author = mock.Mock()
 
-        # Execute main workflow
         pr_monitor.main()
 
-        # Verify active PR handling
+        # active PR handling
         pr_monitor.comment_on_pr.assert_not_called()
 
-        # Verify warning PR handling
+        # warning PR handling
         pr_monitor.comment_on_pr.assert_any_call(
             2, '@test_user Please assign a reviewer to this pull request.'
         )
@@ -190,7 +189,7 @@ class PullRequestMonitorTests(unittest.TestCase):
             2, 'This pull request has been inactive for over 7 days. Please update.'
         )
 
-        # Verify stale PR handling
+        # stale PR handling
         pr_monitor.close_pr.assert_called_once_with(3)
         pr_monitor.unassign_author.assert_called_once_with(456, 'test_user')
 
