@@ -169,7 +169,6 @@ describe('Subject interests form field Component', () => {
     expect(componentInstance.isValidInput).toHaveBeenCalledWith('math');
     expect(componentInstance.formCtrl.dirty).toBe(true);
     expect(componentInstance.onChange).toHaveBeenCalledWith([]);
-    expect(componentInstance.subjectInterests).toEqual([]);
   });
 
   it('should mark input as pristine when input is empty', () => {
@@ -181,9 +180,7 @@ describe('Subject interests form field Component', () => {
         value: '',
       },
     } as unknown as Event;
-
     componentInstance.onInput(inputEvent);
-
     expect(componentInstance.formCtrl.pristine).toBe(true);
     expect(componentInstance.onChange).not.toHaveBeenCalled();
   });

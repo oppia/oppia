@@ -167,8 +167,6 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
       this.formCtrl.markAsPristine();
     } else if (this.isValidInput(inputValue)) {
       this.formCtrl.markAsDirty();
-    } else {
-      this.formCtrl.markAsPristine();
     }
     this.onChange(this.subjectInterests);
   }
