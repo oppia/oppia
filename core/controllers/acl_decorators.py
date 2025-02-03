@@ -2918,7 +2918,7 @@ def can_edit_question(
             raise self.NotFoundException
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
-        
+
         if (role_services.ACTION_EDIT_QUESTION_IN_MANAGED_TOPIC
                 in self.user.actions):
             skills = question_services.get_skills_linked_to_question(

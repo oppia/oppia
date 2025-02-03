@@ -2938,6 +2938,7 @@ class InteractionsByExplorationIdHandler(
 
         self.render_json({'interaction_ids': interaction_ids})
 
+
 class QuestionAdminRoleHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of QuestionAdmin's normalized_payload
     dictionary.
@@ -2975,6 +2976,7 @@ class QuestionAdminRoleHandler(
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
         """Adds or removes the question role for a user.
+
         Raises:
             NotFoundException. User with given username does not exist.
         """

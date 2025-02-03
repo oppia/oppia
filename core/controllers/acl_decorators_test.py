@@ -6397,7 +6397,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
             owner_id=self.admin_id,
             name='other_topic',
             abbreviated_name='other_topic',
-            url_fragment='other-topic') 
+            url_fragment='other-topic')
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
