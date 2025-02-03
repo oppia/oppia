@@ -252,6 +252,18 @@ export class SkillsListComponent {
         if (!topicIds) {
           return;
         }
+        topicIds.forEach(topicId => {
+          let topicIndex = this.editableTopicSummaries.findIndex(
+            topic => topic.id === topicId
+          );
+          if (topicIndex !== -1) {
+            (
+              this.editableTopicSummaries[topicIndex] as CreatorTopicSummary & {
+                isSelected: boolean;
+              }
+            ).isSelected = false;
+          }
+        });
       }
     );
   }

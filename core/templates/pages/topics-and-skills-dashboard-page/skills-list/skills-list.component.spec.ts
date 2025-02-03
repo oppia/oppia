@@ -479,6 +479,7 @@ describe('Skills List Component', () => {
     );
 
     tick(500);
+    expect(componentInstance.editableTopicSummaries[0].isSelected).toBe(false);
     mockNgbModal.cancelCallbackTopics = undefined;
     componentInstance.assignSkillToTopic(
       AugmentedSkillSummary.createFromBackendDict(
