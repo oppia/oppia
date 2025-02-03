@@ -18,9 +18,9 @@ from __future__ import annotations
 
 import datetime
 import unittest
-from unittest import mock
-from datetime import timedelta, timezone
+from datetime import datetime as dt, timedelta, timezone
 from typing import Any, Dict
+from unittest import mock
 
 import requests
 
@@ -32,7 +32,8 @@ class PullRequestMonitorTests(unittest.TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.mock_headers = {
+        # Here we use type Any to mock complex API response structures
+        self.mock_headers: Dict[str, Any] = {
             'Authorization': 'Bearer test_token',
             'Accept': 'application/vnd.github.v3+json'
         }
@@ -143,10 +144,10 @@ class PullRequestMonitorTests(unittest.TestCase):
 
     @mock.patch('scripts.check_prs.datetime')
     def test_main_workflow(self, mock_datetime: Any) -> None:
-        mock_now = datetime.datetime(2024, 1, 15, tzinfo=timezone.utc)
+        # Here we use type Any for datetime mock flexibility
+        mock_now = dt(2024, 1, 15, tzinfo=timezone.utc)
         mock_datetime.now.return_value = mock_now
-        mock_datetime.side_effect = lambda *args, **kw: datetime.datetime(*args, **kw)
-        mock_datetime.strptime.side_effect = datetime.datetime.strptime
+        mock_datetime.strptime.side_effect = dt.strptime
 
         active_pr = dict(
             self.mock_pr,
@@ -165,21 +166,27 @@ class PullRequestMonitorTests(unittest.TestCase):
             updated_at='2024-01-01T00:00:00Z'
         )
 
-        with mock.patch('scripts.check_prs.get_prs', return_value=[active_pr, warning_pr, stale_pr]):
-            with mock.patch('scripts.check_prs.get_pr_commits', return_value=[]):
-                with mock.patch('scripts.check_prs.comment_on_pr') as mock_comment:
-                    with mock.patch('scripts.check_prs.close_pr') as mock_close:
-                        with mock.patch('scripts.check_prs.unassign_author') as mock_unassign:
-                            pr_monitor.main()
+        with mock.patch('scripts.check_prs.get_prs',
+                       return_value=[active_pr, warning_pr, stale_pr]), \
+             mock.patch('scripts.check_prs.get_pr_commits',
+                        return_value=[]), \
+             mock.patch('scripts.check_prs.comment_on_pr') as mock_comment, \
+             mock.patch('scripts.check_prs.close_pr') as mock_close, \
+             mock.patch('scripts.check_prs.unassign_author') as mock_unassign:
 
-                            mock_comment.assert_any_call(
-                                2, '@test_user Please assign a reviewer to this pull request.'
-                            )
-                            mock_comment.assert_any_call(
-                                2, 'This pull request has been inactive for over 7 days. Please update.'
-                            )
-                            mock_close.assert_called_once_with(3)
-                            mock_unassign.assert_called_once_with(456, 'test_user')
+            pr_monitor.main()
+
+            mock_comment.assert_any_call(
+                2,
+                '@test_user Please assign a reviewer to this pull request.'
+            )
+            mock_comment.assert_any_call(
+                2,
+                'This pull request has been inactive for over 7 days. '
+                'Please update.'
+            )
+            mock_close.assert_called_once_with(3)
+            mock_unassign.assert_called_once_with(456, 'test_user')
 
     def test_missing_environment_variables(self) -> None:
         with mock.patch.dict('os.environ', clear=True):
@@ -213,6 +220,7 @@ class PullRequestMonitorTests(unittest.TestCase):
             pr_monitor.main()
             mock_close.assert_called_once()
             self.assertEqual(mock_comment.call_count, 2)
+
 
 if __name__ == '__main__':
     unittest.main()
