@@ -97,14 +97,14 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'image.svg',
             feconf.ENTITY_TYPE_EXPLORATION,
             'The svg tag does not contains the \'xmlns\' attribute.')
-
+        corrupted_image_data = (
+            b'\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff')
         self._assert_image_validation_error(
-            b'not an image',
+            corrupted_image_data,
             'image.png',
             feconf.ENTITY_TYPE_EXPLORATION,
             'Image not recognized'
         )
-
         self._assert_image_validation_error(
             self.raw_image,
             '.png',
@@ -128,6 +128,17 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'image.pdf',
             feconf.ENTITY_TYPE_EXPLORATION,
             'Expected a filename ending in .png'
+        )
+        bmp_image_data = (
+            b'BM\x1a\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00'
+            b'\x0c\x00\x00\x00\x01\x00\x01\x00\x01\x00\x18\x00\xff\xff\xff'
+            b'\x00\x00\x00'
+        )
+        self._assert_image_validation_error(
+            bmp_image_data,
+            'image.png',
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'Image uses unsupported format'
         )
         base64_encoded_string = 'SGVsbG8gV29ybGQh'
         self._assert_image_validation_error(
