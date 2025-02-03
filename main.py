@@ -377,6 +377,9 @@ URLS = [
         r'/translationcoordinatorrolehandler',
         admin.TranslationCoordinatorRoleHandler),
     get_redirect_route(
+        r'/questionadminrolehandler',
+        admin.QuestionAdminRoleHandler),
+    get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',

@@ -21,21 +21,29 @@ export interface TopicRightsBackendDict {
   published: boolean;
   can_publish_topic: boolean;
   can_edit_topic: boolean;
+  can_edit_question: boolean;
 }
 
 export class TopicRights {
   _published: boolean;
   _canPublishTopic: boolean;
   _canEditTopic: boolean;
+  _canEditQuestion: boolean;
 
   constructor(
     published: boolean,
     canPublishTopic: boolean,
-    canEditTopic: boolean
+    canEditTopic: boolean,
+    canEditQuestion: boolean
   ) {
     this._published = published;
     this._canPublishTopic = canPublishTopic;
     this._canEditTopic = canEditTopic;
+    this._canEditQuestion = canEditQuestion;
+  }
+
+  canEditQuestion(): boolean {
+    return this._canEditQuestion;
   }
 
   canEditTopic(): boolean {
@@ -77,6 +85,7 @@ export class TopicRights {
     this._published = otherTopicRights.isPublished();
     this._canEditTopic = otherTopicRights.canEditTopic();
     this._canPublishTopic = otherTopicRights.canPublishTopic();
+    this._canEditQuestion = otherTopicRights.canEditQuestion();
   }
 
   // This function takes a JSON object which represents a backend
@@ -87,7 +96,8 @@ export class TopicRights {
     return new TopicRights(
       topicRightsBackendObject.published,
       topicRightsBackendObject.can_publish_topic,
-      topicRightsBackendObject.can_edit_topic
+      topicRightsBackendObject.can_edit_topic,
+      topicRightsBackendObject.can_edit_question
     );
   }
 }

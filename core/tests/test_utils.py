@@ -2695,6 +2695,19 @@ version: 1
                     'action': 'assign',
                     'topic_id': topic_id
                 }, csrf_token=self.get_new_csrf_token())
+    def set_question_admins(
+        self, question_admin_usernames: List[str]
+    ) -> None:
+        """Sets role of given users as QUESTION_ADMIN.
+        Args:
+            question_admin_usernames: list(str). List of usernames.
+        """
+        with self.super_admin_context():
+            for username in question_admin_usernames:
+                self.put_json('/questionadminrolehandler', {
+                    'username': username,
+                    'action': 'assign'
+                }, csrf_token=self.get_new_csrf_token())
 
     def set_translation_coordinators(
         self, translation_coordinator_usernames: List[str], language_id: str
