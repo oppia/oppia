@@ -126,10 +126,6 @@ module.exports = {
       statusCode: 500,
     }),
     new HtmlWebpackPlugin({
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['oppia_root'],
       filename: 'oppia-root.mainpage.html',
       meta: defaultMeta,

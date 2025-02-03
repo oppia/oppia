@@ -73,7 +73,8 @@ class HelperFunctionTests(test_utils.GenericTestBase):
                 '"Loading | Oppia"',
                 base.load_template(
                     'oppia-root.mainpage.html',
-                    template_is_aot_compiled=False
+                    template_is_aot_compiled=False,
+                    is_maintenance_page=False
                 )
             )
 
