@@ -68,8 +68,7 @@ export class CreatorTopicSummary {
     public totalUpcomingChaptersCount: number,
     public totalOverdueChaptersCount: number,
     public totalChaptersCounts: number[],
-    public publishedChaptersCounts: number[],
-    public isSelected?: boolean
+    public publishedChaptersCounts: number[]
   ) {}
 
   static createFromBackendDict(
