@@ -89,13 +89,14 @@ def validate_image_and_filename(
     else:
         # Verify that the data is recognized as an image.
         file_details = filetype.guess(raw_image)
+        if not file_details:
+            raise utils.ValidationError('Image not recognized')
         if (
-            file_details is None or
             file_details.extension not in
             feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS
         ):
             raise utils.ValidationError(
-                'Image not recognized or uses unsupported format'
+                'Image uses unsupported format'
             )
 
         file_format = file_details.extension
