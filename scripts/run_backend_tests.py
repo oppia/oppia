@@ -144,6 +144,11 @@ _PARSER.add_argument(
     '--verbose',
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
+_PARSER.add_argument(
+    '--skip-install',
+    help='optional; if specified, skips the installation of '
+    'third party libraries',
+    action='store_true')
 
 
 def run_shell_cmd(
@@ -414,6 +419,8 @@ def check_test_results(
 def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
 
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
