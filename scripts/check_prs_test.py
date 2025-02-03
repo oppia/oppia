@@ -17,15 +17,14 @@
 from __future__ import annotations
 
 import datetime
-import os
 import unittest
 from unittest import mock
-from typing import Any, Dict, List
 from datetime import timedelta, timezone
+from typing import Any
 
 import requests
 
-from scripts import pr_monitor  
+from scripts import check_prs as pr_monitor
 
 
 class PullRequestMonitorTests(unittest.TestCase):
@@ -57,7 +56,7 @@ class PullRequestMonitorTests(unittest.TestCase):
             'state': 'open'
         }
 
-        patcher = mock.patch('scripts.pr_monitor.requests')
+        patcher = mock.patch('scripts.check_prs.requests')
         self.mock_requests = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -142,7 +141,7 @@ class PullRequestMonitorTests(unittest.TestCase):
                 result = pr_monitor.extract_issue_numbers(body)
                 self.assertEqual(result, expected)
 
-    @mock.patch('scripts.pr_monitor.datetime')
+    @mock.patch('scripts.check_prs.datetime')
     def test_main_workflow(self, mock_datetime: Any) -> None:
         # Setup test data
         mock_now = datetime.datetime(2024, 1, 15, tzinfo=timezone.utc)
@@ -198,12 +197,12 @@ class PullRequestMonitorTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 pr_monitor.main()
 
-    @mock.patch('scripts.pr_monitor.get_prs')
+    @mock.patch('scripts.check_prs.get_prs')
     def test_empty_repository_state(self, mock_get_prs: Any) -> None:
         mock_get_prs.return_value = []
-        pr_monitor.main()  
+        pr_monitor.main()
 
-    @mock.patch('scripts.pr_monitor.get_pr_commits')
+    @mock.patch('scripts.check_prs.get_pr_commits')
     def test_pr_with_multiple_commits(self, mock_get_commits: Any) -> None:
         mock_get_commits.return_value = [
             {'commit': {'committer': {'date': '2024-01-05T00:00:00Z'}}},
@@ -213,13 +212,14 @@ class PullRequestMonitorTests(unittest.TestCase):
         pr_monitor.handle_inactive_pr(pr)
         pr_monitor.comment_on_pr.assert_not_called()
 
-    @mock.patch('scripts.pr_monitor.close_pull_request')
+    @mock.patch('scripts.check_prs.close_pr')
     def test_pr_closing_failure(self, mock_close_pr: Any) -> None:
-        mock_close_pr.return_value = False
+        mock_close_pr.side_effect = requests.HTTPError('Error')
         pr = dict(
             self.mock_pr,
             updated_at='2024-01-01T00:00:00Z',
             body='Fixes #456'
         )
-        pr_monitor.handle_inactive_pr(pr)
+        with self.assertRaises(requests.HTTPError):
+            pr_monitor.handle_inactive_pr(pr)
         pr_monitor.unassign_author.assert_not_called()
