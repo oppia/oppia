@@ -246,9 +246,12 @@ export class SkillsListComponent {
           }
         }
       },
-      () => {
+      (topicIds?: string[]) => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
+        if (!topicIds) {
+          return;
+        }
       }
     );
   }
