@@ -52,9 +52,8 @@ def get_prs() -> List[Dict[str, Any]]:
         timeout=10
     )
     response.raise_for_status()
-    prs = cast(List[Dict[str, Any]], response.json())
-    logger.info('Found %d open PRs', len(prs))
-    return prs
+    # Here we use type Any for API response flexibility
+    return cast(List[Dict[str, Any]], response.json())
 
 
 def get_pr_commits(pr_number: int) -> List[Dict[str, Any]]:
@@ -63,9 +62,8 @@ def get_pr_commits(pr_number: int) -> List[Dict[str, Any]]:
     url = f'{GITHUB_API_URL}/repos/{REPO}/pulls/{pr_number}/commits'
     response = requests.get(url, headers=HEADERS, timeout=10)
     response.raise_for_status()
-    commits = cast(List[Dict[str, Any]], response.json())
-    logger.info('Found %d commits in PR #%d', len(commits), pr_number)
-    return commits
+    # Here we use type Any for commit data structure flexibility
+    return cast(List[Dict[str, Any]], response.json())
 
 
 def comment_on_pr(pr_number: int, message: str) -> None:
@@ -100,6 +98,7 @@ def get_issue(issue_number: int) -> Dict[str, Any]:
     url = f'{GITHUB_API_URL}/repos/{REPO}/issues/{issue_number}'
     response = requests.get(url, headers=HEADERS, timeout=10)
     response.raise_for_status()
+    # Here we use type Any for issue data structure flexibility
     return cast(Dict[str, Any], response.json())
 
 
@@ -145,8 +144,9 @@ def main() -> None:  # pragma: no cover
         commits = get_pr_commits(pr_number)
         last_commit_time = updated_at
         if commits:
+            last_commit = commits[-1]['commit']['committer']['date']
             last_commit_time = datetime.strptime(
-                commits[-1]['commit']['committer']['date'], '%Y-%m-%dT%H:%M:%SZ'
+                last_commit, '%Y-%m-%dT%H:%M:%SZ'
             ).replace(tzinfo=timezone.utc)
 
         logger.info(
@@ -167,14 +167,16 @@ def main() -> None:  # pragma: no cover
         if last_commit_time < now - timedelta(days=7):
             comment_on_pr(
                 pr_number,
-                'This pull request has been inactive for over 7 days. Please update.',
+                'This pull request has been inactive for over 7 days. '
+                'Please update.'
             )
 
         if last_commit_time < now - timedelta(days=10):
             comment_on_pr(
                 pr_number,
-                'This pull request has been inactive for over 10 days and will now be closed. '
-                'Please reopen if you plan to continue working on it.',
+                'This pull request has been inactive for over 10 days and '
+                'will now be closed. Please reopen if you plan to continue '
+                'working on it.'
             )
             logger.info('Closing stale pull request #%d', pr_number)
             close_pr(pr_number)
