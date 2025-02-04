@@ -58,6 +58,7 @@ import argparse
 import fnmatch
 import multiprocessing
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -76,6 +77,7 @@ from . import js_ts_linter  # isort:skip
 from . import linter_utils  # isort:skip
 from . import other_files_linter  # isort:skip
 from . import python_linter  # isort:skip
+from . import image_compression_lint
 from .. import concurrent_task_utils  # isort:skip
 from .. import install_third_party_libs  # isort:skip
 
@@ -714,6 +716,26 @@ def main(args: Optional[List[str]] = None) -> None:
 
     for task in tasks_third_party:
         failed = _get_task_output(lint_messages, failed, task)
+    
+    # image compression lint test. 
+    repo_path = pathlib.Path('./assets')
+    compressible_images = image_compression_lint.check_compressible_images(repo_path)
+
+    if compressible_images:
+        print('\nThe following images could be compressed further:')
+        total_potential_savings = 0
+        
+        for image in compressible_images:
+            savings = image['current_size'] - image['potential_size']
+            total_potential_savings += savings
+            print(f'\n{image["path"]}:')
+
+        failed = True
+        # Return non-zero exit code to indicate lint failure
+        exit(1)
+    else:
+        print('All images are optimally compressed.')
+        exit(0)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
