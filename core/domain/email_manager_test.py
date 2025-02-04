@@ -57,6 +57,7 @@ EMAIL_FOOTER = (
     'You can change your email preferences via the <a href="http://loca'
     'lhost:8181/preferences">Preferences</a> page.'
 )
+DEV_OPPIA_SITE_URL = 'http://localhost:8181'
 
 
 class EmailToAdminTest(test_utils.EmailTestBase):
@@ -2633,7 +2634,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
-            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com')
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_that_email_not_sent_if_user_can_not_receive_emails(self) -> None:
@@ -2658,7 +2660,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_that_translation_submitter_acceptance_ranking_email_is_sent(
@@ -2714,7 +2717,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_that_question_submitter_acceptance_ranking_email_is_sent(
@@ -2770,7 +2774,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_that_translation_reviewer_review_ranking_email_is_sent(
@@ -2826,7 +2831,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_that_question_reviewer_review_ranking_email_is_sent(
@@ -2882,7 +2888,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_that_translation_reviewer_edit_ranking_email_is_sent(
@@ -2938,7 +2945,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_that_question_reviewer_edit_ranking_email_is_sent(
@@ -3218,7 +3226,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_not_sent_if_reviewer_email_does_not_exist(self) -> None:
@@ -3268,7 +3277,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
@@ -3294,7 +3304,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_question_waiting_a_day_for_review(
@@ -3331,7 +3342,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3363,7 +3374,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_question_waiting_days_for_review(
@@ -3400,7 +3412,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3432,7 +3444,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_question_waiting_an_hour_for_review(
@@ -3469,7 +3482,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3502,7 +3515,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_question_waiting_hours_for_review(
@@ -3539,7 +3553,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3572,7 +3586,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_question_waiting_a_minute_for_review(
@@ -3609,7 +3624,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3641,7 +3656,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_question_waiting_minutes_for_review(
@@ -3678,7 +3694,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3710,7 +3726,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_question_waiting_seconds_for_review(
@@ -3747,7 +3764,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3779,7 +3796,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_multi_questions_waiting_for_a_review(
@@ -3825,7 +3843,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                  platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value))
@@ -3857,7 +3875,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_multi_reviewers_with_multi_question_suggestions(
@@ -3918,7 +3937,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -3945,7 +3964,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -3987,7 +4006,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_a_day_for_review(
@@ -4026,7 +4046,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4059,7 +4079,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_days_for_review(
@@ -4096,7 +4117,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4129,7 +4150,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_an_hour_for_review(
@@ -4168,7 +4190,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4201,7 +4223,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_hours_for_review(
@@ -4240,7 +4263,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4273,7 +4296,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_a_min_for_review(
@@ -4312,7 +4336,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4345,7 +4369,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_mins_for_review(
@@ -4384,7 +4409,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4417,7 +4442,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_secs_for_review(
@@ -4456,7 +4482,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4489,7 +4515,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_reviewer_with_multi_translation_waiting_for_review(
@@ -4535,7 +4562,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4568,7 +4595,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_multi_reviewers_with_multi_translations_suggestions(
@@ -4629,7 +4657,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4656,7 +4684,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4698,7 +4726,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_multi_reviewers_with_multi_suggestions_waiting(
@@ -4759,7 +4788,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -4786,7 +4815,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'Thanks again, and happy reviewing!<br>'
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 platform_parameter_registry.Registry.get_platform_parameter(
                     param_list.ParamName.EMAIL_FOOTER.value
                 ).default_value)
@@ -5064,7 +5093,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True), # pylint: disable=line-too-long
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_not_sent_if_admin_email_does_not_exist(self) -> None:
@@ -5154,7 +5184,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_admin_if_question_has_waited_too_long_for_a_review(
@@ -5197,8 +5228,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5232,7 +5263,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_admin_if_multiple_questions_have_waited_for_review(
@@ -5284,8 +5316,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5319,7 +5351,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_admin_if_translation_has_waited_too_long_for_review(
@@ -5362,8 +5395,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5397,7 +5430,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_admin_if_multi_translations_have_waited_for_review(
@@ -5449,8 +5483,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5484,7 +5518,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_admin_if_multi_suggestion_types_waiting_for_review(
@@ -5544,8 +5579,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.log_new_error_ctx:
@@ -5612,7 +5647,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_multiple_admins(self) -> None:
@@ -5653,8 +5689,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
         expected_email_html_body_admin_2 = (
             'Hi user2,'
@@ -5681,8 +5717,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Thanks so much - we appreciate your help!<br>'
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL))
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL))
 
         with self.log_new_error_ctx:
             with self.swap(
@@ -5922,7 +5958,8 @@ class NotifyReviewersNewSuggestionsTests(
             (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL),
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_days_for_review(
@@ -5976,7 +6013,7 @@ class NotifyReviewersNewSuggestionsTests(
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             messages[0].html, (expected_email_html_body % (
-                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL)))
+                DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL)))
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(
@@ -6214,7 +6251,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_not_sent_if_admin_email_does_not_exist(self) -> None:
@@ -6242,7 +6280,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_admin_if_question_suggestions_need_reviewers(
@@ -6269,7 +6308,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6295,7 +6334,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_admins_if_question_suggestions_need_reviewers(
@@ -6322,7 +6362,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -6340,7 +6380,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6372,7 +6412,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_admin_email_sent_if_translations_need_reviewers_for_one_lang(
@@ -6398,7 +6439,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6424,7 +6465,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_admin_emails_sent_if_translations_need_reviewers_for_one_lang(
@@ -6450,7 +6492,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -6467,7 +6509,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6499,7 +6541,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_admin_email_sent_if_translations_need_reviewers_for_multi_lang(
@@ -6532,7 +6575,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6558,7 +6601,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_admin_emails_sent_if_translations_need_reviewers_for_multi_lang(
@@ -6591,7 +6635,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -6613,7 +6657,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -6645,7 +6689,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             (param_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_to_admins_if_mutli_suggestion_types_needing_reviewers(
@@ -6682,7 +6727,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
         expected_email_html_body_for_admin_2 = (
@@ -6704,7 +6749,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'Thanks so much - we appreciate your help!<br><br>'
             'Best Wishes!<br>'
             '- The Oppia Contributor Dashboard Team' % (
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL, feconf.OPPIA_SITE_URL,
+                DEV_OPPIA_SITE_URL, feconf.ADMIN_URL, DEV_OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
@@ -8036,7 +8081,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         [
             (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_not_sent_if_no_overdue_or_upcoming_chapters(self) -> None:
@@ -8055,7 +8101,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_if_chapters_are_overdue(self) -> None:
@@ -8074,7 +8121,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             '</ul></li>'
             '</ol>'
             'Regards,<br> Oppia Foundation'
-        ) % (feconf.OPPIA_SITE_URL, feconf.STORY_EDITOR_URL_PREFIX)
+        ) % (DEV_OPPIA_SITE_URL, feconf.STORY_EDITOR_URL_PREFIX)
         expected_email_subject = 'Chapter Publication Notifications'
 
         email_manager.send_reminder_mail_to_notify_curriculum_admins(
@@ -8112,7 +8159,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
-            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com')
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_sent_if_chapters_are_upcoming(self) -> None:
@@ -8137,7 +8185,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             'Regards,<br> Oppia Foundation'
         ) % (
             str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS),
-            feconf.OPPIA_SITE_URL,
+            DEV_OPPIA_SITE_URL,
             feconf.STORY_EDITOR_URL_PREFIX
         )
         expected_email_subject = 'Chapter Publication Notifications'

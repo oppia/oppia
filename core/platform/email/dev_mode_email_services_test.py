@@ -61,6 +61,7 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/html
                 Data length: %d
+                Html content: %s
 
             Bcc: None
             Reply_to: None
@@ -70,7 +71,7 @@ class EmailTests(test_utils.GenericTestBase):
             Attachments: None
             """ % (
                 self.system_email_address, self.admin_email_address,
-                'subject', 4, 4))
+                'subject', 4, 4, 'html'))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
             'You are not currently sending out real emails since this is a '
@@ -120,6 +121,7 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/html
                 Data length: %d
+                Html content: %s
 
             Bcc: %s
             Reply_to: %s
@@ -129,7 +131,7 @@ class EmailTests(test_utils.GenericTestBase):
             Attachments: %s
             """ % (
                 self.system_email_address, recipient_email_list_str,
-                'subject', 4, 4, bcc_email_list_str, '123',
+                'subject', 4, 4, 'html', bcc_email_list_str, '123',
                 len(recipient_variables), 'attachment.txt'))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (

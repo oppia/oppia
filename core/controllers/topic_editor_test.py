@@ -565,8 +565,7 @@ class TopicEditorTests(
 
         # Check that admins can access the editable topic data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        messages = self._get_sent_email_messages(
-            self.admin_email_address)
+        messages = self._get_sent_email_messages('testadmin@example.com')
         self.assertEqual(len(messages), 0)
         json_response = self.get_json(
             '%s/%s' % (
@@ -584,8 +583,7 @@ class TopicEditorTests(
             'Skill Description',
             json_response['skill_id_to_description_dict'][self.skill_id])
 
-        messages = self._get_sent_email_messages(
-            self.admin_email_address)
+        messages = self._get_sent_email_messages('testadmin@example.com')
         expected_email_html_body = (
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (

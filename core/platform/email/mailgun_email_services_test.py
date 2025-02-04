@@ -312,6 +312,7 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/html
                 Data length: 13
+                Html content: Hi abc,<br> 😂
 
             Bcc: None
             Reply_to: None
@@ -350,6 +351,7 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/html
                 Data length: 13
+                Html content: Hi abc,<br> 😂
 
             Bcc: None
             Reply_to: None

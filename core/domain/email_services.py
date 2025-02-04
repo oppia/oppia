@@ -294,9 +294,10 @@ def convert_email_to_loggable_string(
         Body:
             Content-type: text/html
             Data length: %d
+            Html content: %s
         """ % (
             sender_email, recipient_email_list_str, subject,
-            len(plaintext_body), len(html_body)))
+            len(plaintext_body), len(html_body), textwrap.dedent(html_body)))
     optional_msg_description = (
         """
         Bcc: %s

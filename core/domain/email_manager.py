@@ -245,8 +245,8 @@ ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA: Dict[str, str] = {
     'question_template': (
         'There have been <b>question suggestions</b> created on the '
         '<a href="%s%s">Contributor Dashboard page</a> where there are not '
-        'enough reviewers.<br><br>' % (
-            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
+        'enough reviewers.<br><br>'
+    )
 }
 
 ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
@@ -1792,16 +1792,21 @@ def _send_suggestions_waiting_too_long_email(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
     assert isinstance(noreply_email_address, str)
 
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
             logging.error(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
-            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            curriculum_admin_usernames[index], oppia_site_url,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
-            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
+            oppia_site_url, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
             list_of_suggestion_descriptions)
 
         _send_email(
@@ -1865,10 +1870,16 @@ def send_reviewer_notifications(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
         assert isinstance(noreply_email_address, str)
 
+
+        oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+        )
+        assert isinstance(oppia_site_url, str)
+
         for reviewer_id in reviewer_ids:
             reviewer_username = user_services.get_username(reviewer_id)
             email_body = email_body_template % (
-                reviewer_username, feconf.OPPIA_SITE_URL,
+                reviewer_username, oppia_site_url,
                 feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
                     suggestion_descriptions))
 
@@ -1939,6 +1950,11 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         logging.error('There were no admins to notify.')
         return
 
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     if feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
             suggestion_types_needing_reviewers):
         translation_suggestions_needing_reviewers_paragraphs = []
@@ -1953,7 +1969,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                     'one_language_template'] % (
                         utils.get_supported_audio_language_description(
                             language_codes_that_need_reviewers.pop()),
-                        feconf.OPPIA_SITE_URL,
+                        oppia_site_url,
                         feconf.CONTRIBUTOR_DASHBOARD_URL))
 
         else:
@@ -1968,7 +1984,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             translation_suggestions_needing_reviewers_paragraphs.append(
                 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'multi_language_template'] % (
-                        feconf.OPPIA_SITE_URL,
+                        oppia_site_url,
                         feconf.CONTRIBUTOR_DASHBOARD_URL,
                         html_for_languages_that_need_more_reviewers))
         translation_suggestions_needing_reviewers_html = ''.join(
@@ -1985,7 +2001,9 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         question_suggestions_needing_reviewers_paragraphs = []
         question_suggestions_needing_reviewers_paragraphs.append(
             ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
-                'question_template'])
+                'question_template'] % (
+                    oppia_site_url, feconf.CONTRIBUTOR_DASHBOARD_URL
+                ))
         question_suggestions_needing_reviewers_html = ''.join(
             question_suggestions_needing_reviewers_paragraphs)
         user_ids = []
@@ -2024,13 +2042,18 @@ def _send_reviews_needed_email_to_admins(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
     assert isinstance(noreply_email_address, str)
 
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
             logging.error(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
-            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            curriculum_admin_usernames[index], oppia_site_url,
             feconf.ADMIN_URL, suggestions_needing_reviewers_html)
 
         _send_email(
@@ -2104,6 +2127,11 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
     assert isinstance(noreply_email_address, str)
 
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     for index, reviewer_id in enumerate(reviewer_ids):
         if not reviewers_suggestion_email_infos[index]:
             logging.info(
@@ -2126,7 +2154,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
         email_body = email_body_template % (
             reviewer_usernames[index],
-            feconf.OPPIA_SITE_URL,
+            oppia_site_url,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             ''.join(suggestion_descriptions),
             email_footer
@@ -2165,6 +2193,11 @@ def send_mail_to_notify_contributor_ranking_achievement(
         contributor_ranking_email_info.contributor_user_id
     ).can_receive_email_updates
 
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     if can_user_receive_email:
         email_template = CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION[
             contributor_ranking_email_info.contribution_type][
@@ -2182,14 +2215,14 @@ def send_mail_to_notify_contributor_ranking_achievement(
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
                     language,
-                    feconf.OPPIA_SITE_URL,
+                    oppia_site_url,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
             )
         else:
             email_body = email_template['email_body_template'] % (
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
-                    feconf.OPPIA_SITE_URL,
+                    oppia_site_url,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
             )
 
@@ -2240,12 +2273,18 @@ def send_reminder_mail_to_notify_curriculum_admins(
     chapters_are_upcoming = False
 
     overdue_stories_html = ''
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     for overdue_story in chapter_notifications_list:
         if len(overdue_story.overdue_chapters) == 0:
             continue
         chapters_are_overdue = True
         story_link = ('%s%s/%s' % (
-            str(feconf.OPPIA_SITE_URL),
+            oppia_site_url,
             str(feconf.STORY_EDITOR_URL_PREFIX),
             overdue_story.id
         ))
@@ -2267,7 +2306,7 @@ def send_reminder_mail_to_notify_curriculum_admins(
             continue
         chapters_are_upcoming = True
         story_link = ('%s%s/%s' % (
-            str(feconf.OPPIA_SITE_URL),
+            oppia_site_url,
             str(feconf.STORY_EDITOR_URL_PREFIX),
             upcoming_story.id
         ))
