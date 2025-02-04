@@ -32,8 +32,3 @@ const loggerService = new LoggerService();
 platformBrowserDynamic()
   .bootstrapModule(LighweightAppModule)
   .catch(err => loggerService.error(err));
-
-// This prevents angular pages to cause side effects to hybrid pages.
-// TODO(#13080): Remove window.name statement from import.ts files
-// after migration is complete.
-window.name = '';

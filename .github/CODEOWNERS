@@ -54,7 +54,6 @@
 /core/templates/components/oppia-angular-root.component.* @oppia/lace-frontend-reviewers
 /core/templates/modules/ @oppia/lace-frontend-reviewers
 /core/templates/pages/common-imports.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/mock-ajs.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/pages/lightweight-oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/i18n/ @oppia/lace-frontend-reviewers
