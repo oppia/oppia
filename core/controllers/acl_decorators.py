@@ -48,23 +48,16 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 
-from typing import (TYPE_CHECKING, Any, Callable, Dict, List, Optional, Type,
-                    TypeVar)
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
 # Note: '_SelfBaseHandlerType' is a private type variable because it is only
 # supposed to denote the 'self' argument of the handler function that the
 # decorator is decorating. So, do not make it public type variable in future.
 
-if TYPE_CHECKING:
-    # Here we use type Any because type parameters for generic type
-    # "BaseHandler" is missing, hence used Any to type annotate "BaseHandler"
-    # class.
-    BaseHandler = base.BaseHandler[Any, Any]
-else:
-    BaseHandler = base.BaseHandler
-
-
-_SelfBaseHandlerType = Type[BaseHandler]
+# Here we use type Any because type parameters for generic type
+# "BaseHandler" is missing, hence used Any to type annotate "BaseHandler"
+# class.
+_SelfBaseHandlerType = Type[base.BaseHandler[Any, Any]] # pylint: disable-all
 # Note: '_GenericHandlerFunctionReturnType' is a private type variable because
 # it is only supposed to denote the return type of handler function that the
 # decorator is decorating. So, do not make it public type variable in future.
