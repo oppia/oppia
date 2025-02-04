@@ -125,7 +125,7 @@ def get_azure_voicecode_from_language_accent_code(
             code should be retrieved.
 
     Returns:
-        str. The azure voice code associated with the given language accent
+        str. The Azure voice code associated with the given language accent
         code.
     """
     file_path = os.path.join(
@@ -203,7 +203,7 @@ def regenerate_speech_from_text(
             speech synthesis. None, if synthesis is successful.
 
     Raises:
-        Exception. The mailgun api key is not stored in cloud secrets.
+        Exception. The Azure API key is not stored in cloud secrets.
     """
 
     # Azure text-to-speech API key.

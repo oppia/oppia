@@ -21,7 +21,6 @@ speech-service/index-text-to-speech.
 
 from __future__ import annotations
 
-import logging
 import os
 
 from core import feconf
@@ -38,14 +37,14 @@ LANGUAGE_CODE_TO_VOICEOVER_FILENAMES: Dict[str, str] = {
 
 
 def regenerate_speech_from_text(
-    plaintext: str,
+    _: str,
     language_accent_code: str
 ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
     """The method provides mock data to simulate the Azure text-to-speech
     synthesis service in the development environment.
 
     Args:
-        plaintext: str. The plaintext that needs to be synthesized into speech.
+        _: str. The plaintext that needs to be synthesized into speech.
         language_accent_code: str. The language accent code in which the speech
             is to be synthesized.
 
@@ -59,13 +58,12 @@ def regenerate_speech_from_text(
             - str|None: A string describing any error encountered during
             speech synthesis. None, if synthesis is successful.
     """
-    logging.info('Text for voiceover synthesis: %s.' % plaintext)
     language_code = (
         voiceover_services.get_language_code_from_language_accent_code(
             language_accent_code))
 
     if language_code not in LANGUAGE_CODE_TO_VOICEOVER_FILENAMES:
-        # Deafult language code.
+        # Default language code.
         language_code = 'en'
 
     assert isinstance(language_code, str)
