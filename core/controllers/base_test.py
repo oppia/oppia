@@ -725,7 +725,10 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        response = self.get_html_response('/url_handler?current_url=/',is_maintenance_page=True)
+        response = self.get_html_response(
+            '/url_handler?current_url=/',
+            is_maintenance_page=True
+        )
         self.assertIn(b'<oppia-maintenance-page>', response.body)
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)

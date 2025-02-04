@@ -322,6 +322,7 @@ def mock_load_template_for_maintenance_mode(
     with utils.open_file(filepath, 'r') as f:
         return f.read()
 
+
 def check_image_png_or_webp(image_string: str) -> bool:
     """Checks if the image is in png or webp format only.
 
@@ -2921,7 +2922,9 @@ version: 1
         # only produced after webpack compilation which is not performed during
         # backend tests.
         if is_maintenance_page:
-            with self.swap(base, 'load_template', mock_load_template_for_maintenance_mode):
+            with self.swap(
+                base, 'load_template',
+                mock_load_template_for_maintenance_mode):
                 response = self.testapp.get(
                     url,
                     params=params,
