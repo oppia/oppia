@@ -2636,7 +2636,9 @@ version: 1
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)
 
-            response = self.get_html_response(feconf.SIGNUP_URL, is_maintenance_page=is_maintenance_page)
+            response = self.get_html_response(
+                feconf.SIGNUP_URL,
+                is_maintenance_page=is_maintenance_page)
             self.assertEqual(response.status_int, 200)
             self.assertNotIn('<oppia-maintenance-page>', response)
 
@@ -2877,13 +2879,15 @@ version: 1
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
-        with self.swap(base, 'load_template', mock_load_template):
+        with self.swap(
+                base, 'load_template',
+                mock_load_template(is_maintenance_page=is_maintenance_page)
+            ):
             response = self.testapp.get(
                 url,
                 params=params,
                 expect_errors=expect_errors,
                 status=expected_status_int,
-                is_maintenance_page=is_maintenance_page
             )
 
         if expect_errors:
