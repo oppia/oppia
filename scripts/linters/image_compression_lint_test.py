@@ -16,31 +16,32 @@
 
 """Unit tests for scripts/linters/image_compression_lint.py."""
 
+from __future__ import annotations
+
 import os
 import pathlib
-import unittest
-from unittest.mock import Mock, mock_open, MagicMock
-from PIL import Image
 import tempfile
-import subprocess
+import unittest
 
-from image_compression_lint import check_compressible_images, CompressibleImageInfo
+from image_compression_lint import check_compressible_images
+from PIL import Image
+from unittest.mock import Mock
 
 
 class TestImageCompressionLint(unittest.TestCase):
     """Test the image compression linting script."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.test_dir = tempfile.mkdtemp()
 
-    def _create_test_image(self, filename, size=(100, 100)):
+    def _create_test_image(self, filename: str, size: tuple[int, int] = (100, 100)) -> str:
         """Helper method to create a test image."""
         full_path = os.path.join(self.test_dir, filename)
         test_image = Image.new('RGB', size, color='red')
         test_image.save(full_path)
         return full_path
 
-    def test_check_compressible_images_png(self):
+    def test_check_compressible_images_png(self) -> None:
         png_path = self._create_test_image('test.png')
         mock_path = pathlib.Path(png_path)
 
@@ -60,7 +61,7 @@ class TestImageCompressionLint(unittest.TestCase):
                         self.assertEqual(results[0]['current_size'], 1000)
                         self.assertEqual(results[0]['potential_size'], 500)
 
-    def test_check_compressible_images_jpg(self):
+    def test_check_compressible_images_jpg(self) -> None:
         jpg_path = self._create_test_image('test.jpg')
         mock_path = pathlib.Path(jpg_path)
 
@@ -77,7 +78,7 @@ class TestImageCompressionLint(unittest.TestCase):
                         self.assertEqual(len(results), 1)
                         self.assertEqual(results[0]['path'], mock_path)
 
-    def test_check_compressible_images_unsupported_extension(self):
+    def test_check_compressible_images_unsupported_extension(self) -> None:
         txt_path = os.path.join(self.test_dir, 'test.txt')
         with open(txt_path, 'w') as f:
             f.write('test')
@@ -86,7 +87,7 @@ class TestImageCompressionLint(unittest.TestCase):
 
         self.assertEqual(len(results), 0)
 
-    def test_check_compressible_images_compression_failed(self):
+    def test_check_compressible_images_compression_failed(self) -> None:
         png_path = self._create_test_image('test.png')
         mock_path = pathlib.Path(png_path)
 
@@ -97,7 +98,7 @@ class TestImageCompressionLint(unittest.TestCase):
                 results = check_compressible_images(self.test_dir)
                 self.assertEqual(len(results), 0)
 
-    def test_check_compressible_images_image_open_error(self):
+    def test_check_compressible_images_image_open_error(self) -> None:
         png_path = self._create_test_image('test.png')
         mock_path = pathlib.Path(png_path)
 

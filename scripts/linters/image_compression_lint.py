@@ -22,8 +22,8 @@ import logging
 import pathlib
 import subprocess
 import tempfile
-from typing import List, TypedDict
 
+from typing import List, TypedDict
 from PIL import Image
 
 class CompressibleImageInfo(TypedDict):
