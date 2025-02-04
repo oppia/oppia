@@ -2615,7 +2615,8 @@ version: 1
         self,
         email: str,
         username: str,
-        is_super_admin: bool = False
+        is_super_admin: bool = False,
+        is_maintenance_page: bool = False
     ) -> None:
         """Complete the signup process for the user with the given username.
 
@@ -2623,6 +2624,8 @@ version: 1
             email: str. Email of the given user.
             username: str. Username of the given user.
             is_super_admin: bool. Whether the user is a super admin.
+            is_maintenance_page: bool. alse by default. Use True when the
+                template is for the maintenance page.
         """
         user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
@@ -2633,7 +2636,7 @@ version: 1
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)
 
-            response = self.get_html_response(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL, is_maintenance_page=is_maintenance_page)
             self.assertEqual(response.status_int, 200)
             self.assertNotIn('<oppia-maintenance-page>', response)
 
@@ -2848,7 +2851,8 @@ version: 1
         url: str,
         expected_content_type: str,
         params: Optional[Dict[str, Union[str, int, bool]]] = None,
-        expected_status_int: int = 200
+        expected_status_int: int = 200,
+        is_maintenance_page: bool = False
     ) -> webtest.TestResponse:
         """Get a response, transformed to a Python object.
 
@@ -2858,6 +2862,8 @@ version: 1
             params: dict. A dictionary that will be encoded into a query string.
             expected_status_int: int. The integer status code to expect. Will be
                 200 if not specified.
+            is_maintenance_page: bool. False by default. Use True when the
+                template is for the maintenance page.
 
         Returns:
             webtest.TestResponse. The test response.
@@ -2876,7 +2882,8 @@ version: 1
                 url,
                 params=params,
                 expect_errors=expect_errors,
-                status=expected_status_int
+                status=expected_status_int,
+                is_maintenance_page=is_maintenance_page
             )
 
         if expect_errors:
@@ -2900,7 +2907,8 @@ version: 1
     def get_html_response(
         self, url: str,
         params: Optional[Dict[str, Union[str, int, bool]]] = None,
-        expected_status_int: int = 200
+        expected_status_int: int = 200,
+        is_maintenance_page: bool = False
     ) -> webtest.TestResponse:
         """Get a HTML response, transformed to a Python object.
 
@@ -2909,13 +2917,16 @@ version: 1
             params: dict. A dictionary that will be encoded into a query string.
             expected_status_int: int. The integer status code to expect. Will
                 be 200 if not specified.
+            is_maintenance_page: bool. False by default. Use True when the
+                template is for the maintenance page.
 
         Returns:
             webtest.TestResponse. The test response.
         """
         return self._get_response(
             url, 'text/html', params=params,
-            expected_status_int=expected_status_int)
+            expected_status_int=expected_status_int,
+            is_maintenance_page=is_maintenance_page)
 
     def get_custom_response(
         self,
