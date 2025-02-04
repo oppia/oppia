@@ -21,17 +21,28 @@ from __future__ import annotations
 import datetime
 import logging
 import os
-from typing import List, Dict, Any
+
 import requests
+from typing import List, TypedDict
 
 INACTIVE_DAYS = 7
 REPO_OWNER = 'oppia'
 REPO_NAME = 'oppia'
 
-def identify_inactive_issues(
-    github_token: str, repo_owner: str, repo_name: str
-) -> List[Dict[str, Any]]:
-    """Identifies inactive issues in the given repository.
+
+class InactiveIssue(TypedDict):
+    """Type for storing inactive issue information."""
+
+    number: int
+    assignee: str
+
+
+def get_inactive_issues(
+    github_token: str,
+    repo_owner: str,
+    repo_name: str
+) -> List[InactiveIssue]:
+    """Identifies inactive issues that need unassignment.
 
     Args:
         github_token: str. The GitHub token for authentication.
@@ -39,19 +50,29 @@ def identify_inactive_issues(
         repo_name: str. The name of the repository.
 
     Returns:
-        List of dictionaries containing information about inactive issues.
-        Each dictionary contains 'issue_number' and 'assignee_login'.
+        List[InactiveIssue]. A list of issues that need unassignment.
     """
     headers = {
         'Authorization': f'token {github_token}',
         'Accept': 'application/vnd.github.v3+json',
     }
     repo_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}'
-    inactive_issues = []
+    inactive_issues: List[InactiveIssue] = []
 
     issues_url = f'{repo_url}/issues?state=open'
     response = requests.get(issues_url, headers=headers, timeout=10)
     issues = response.json()
+
+    collaborators_url = f'{repo_url}/collaborators'
+    collaborators_response = requests.get(
+        collaborators_url, headers=headers, timeout=10
+    )
+    collaborators = collaborators_response.json()
+    collaborator_logins = {c['login'] for c in collaborators}
+
+    pulls_url = f'{repo_url}/pulls?state=open'
+    pulls_response = requests.get(pulls_url, headers=headers, timeout=10)
+    pull_requests = pulls_response.json()
 
     for issue in issues:
         if not issue or not isinstance(
@@ -62,7 +83,29 @@ def identify_inactive_issues(
         assignee_login = issue['assignee']['login']
         logging.info('Checking issue #%s', issue_number)
 
-        # Check events for last activity
+        if assignee_login in collaborator_logins:
+            logging.info(
+                'Skipping issue #%s as %s is a collaborator.',
+                issue_number, assignee_login
+            )
+            continue
+
+        related_pull_requests = [
+            pr for pr in pull_requests
+            if pr.get('body') and issue_number in {
+                int(word.strip('#'))
+                for word in pr.get('body', '').split()
+                if word.strip('#').isdigit()
+            }
+        ]
+
+        if related_pull_requests:
+            logging.info(
+                'Skipping issue #%s as there are related open pull requests.',
+                issue_number
+            )
+            continue
+
         events_url = issue['events_url']
         events_response = requests.get(events_url, headers=headers, timeout=10)
         events = events_response.json()
@@ -82,64 +125,32 @@ def identify_inactive_issues(
             (now - last_activity_date).total_seconds() / 86400
         )
 
-        # Skip if assignee is a collaborator
-        collaborators_url = f'{repo_url}/collaborators'
-        collaborators_response = requests.get(
-            collaborators_url, headers=headers, timeout=10
-        )
-        collaborators = collaborators_response.json()
-
-        if any(
-            collaborator['login'] == assignee_login for collaborator
-            in collaborators
-        ):
-            logging.info(
-                'Skipping issue #%s as %s is a collaborator.',
-                issue_number, assignee_login
-            )
-            continue
-
-        # Check for related pull requests
-        pulls_url = f'{repo_url}/pulls?state=open'
-        pulls_response = requests.get(pulls_url, headers=headers, timeout=10)
-        pull_requests = pulls_response.json()
-        related_pull_requests = [
-            pull_request for pull_request in pull_requests
-            if pull_request.get('body') and issue_number in {
-                int(word.strip('#'))
-                for word in pull_request.get('body', '').split()
-                if word.strip('#').isdigit()
-            }
-        ]
-
-        if related_pull_requests:
-            logging.info(
-                'Skipping issue #%s as there are related open pull requests.',
-                issue_number
-            )
-            continue
-
         if days_since_activity > INACTIVE_DAYS:
             inactive_issues.append({
-                'issue_number': issue_number,
-                'assignee_login': assignee_login
+                'number': issue_number,
+                'assignee': assignee_login
             })
+            logging.info(
+                'Issue #%s has been inactive for %d days',
+                issue_number, days_since_activity
+            )
 
     return inactive_issues
+
 
 def unassign_inactive_issues(
     github_token: str,
     repo_owner: str,
     repo_name: str,
-    inactive_issues: List[Dict[str, Any]]
+    inactive_issues: List[InactiveIssue]
 ) -> None:
-    """Unassigns inactive issues and posts comments.
+    """Unassigns the specified inactive issues and posts comments.
 
     Args:
         github_token: str. The GitHub token for authentication.
         repo_owner: str. The owner of the repository.
         repo_name: str. The name of the repository.
-        inactive_issues: List[Dict[str, Any]]. List of inactive issues to unassign.
+        inactive_issues: List[InactiveIssue]. List of issues to unassign.
     """
     headers = {
         'Authorization': f'token {github_token}',
@@ -148,8 +159,8 @@ def unassign_inactive_issues(
     repo_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}'
 
     for issue in inactive_issues:
-        issue_number = issue['issue_number']
-        assignee_login = issue['assignee_login']
+        issue_number = issue['number']
+        assignee_login = issue['assignee']
 
         try:
             assignees_url = f'{repo_url}/issues/{issue_number}/assignees'
@@ -157,7 +168,7 @@ def unassign_inactive_issues(
                 assignees_url,
                 headers=headers,
                 json={'assignees': [assignee_login]},
-                timeout=10
+                timeout=10,
             )
 
             if unassign_response.status_code == 200:
@@ -192,7 +203,22 @@ def unassign_inactive_issues(
                 issue_number, error
             )
 
+
 if __name__ == '__main__': # pragma: no cover
     GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
-    inactive_issues = identify_inactive_issues(GITHUB_TOKEN, REPO_OWNER, REPO_NAME)
-    unassign_inactive_issues(GITHUB_TOKEN, REPO_OWNER, REPO_NAME, inactive_issues)
+    all_inactive_issues = get_inactive_issues(
+        GITHUB_TOKEN, REPO_OWNER, REPO_NAME
+    )
+    if all_inactive_issues:
+        logging.info('The following issues will be unassigned:')
+        for inactive_issue in all_inactive_issues:
+            logging.info(
+                'Issue #%s (assignee: %s)',
+                inactive_issue['number'], inactive_issue['assignee']
+            )
+    else:
+        logging.info('No inactive issues found that need unassignment.')
+
+    unassign_inactive_issues(
+        GITHUB_TOKEN, REPO_OWNER, REPO_NAME, all_inactive_issues
+    )
