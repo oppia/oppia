@@ -239,6 +239,63 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
     return matches[0] if matches else None
 
 
+def mock_render_template(
+        self,
+        filepath: str,
+        iframe_restriction: Optional[str] = 'DENY',
+        *,
+        template_is_aot_compiled: bool = False,
+        is_maintenance_page: bool = False
+
+    ) -> None:
+        """Prepares an HTML response to be sent to the client.
+
+        Args:
+            filepath: str. The template filepath.
+            iframe_restriction: str or None. Possible values are
+                'DENY' and 'SAMEORIGIN':
+
+                DENY: Strictly prevents the template to load in an iframe.
+                SAMEORIGIN: The template can only be displayed in a frame
+                    on the same origin as the page itself.
+            template_is_aot_compiled: bool. False by default. Use
+                True when the template is compiled by angular AoT compiler.
+            is_maintenance_page: bool. False by default. Use true to render
+                maintenance page.
+
+        Raises:
+            Exception. Invalid iframe restriction value.
+        """
+
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
+        self.response.cache_control.no_store = True
+        self.response.cache_control.must_revalidate = True
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        if iframe_restriction is not None:
+            if iframe_restriction == 'SAMEORIGIN':
+                self.response.headers['Content-Security-Policy'] = (
+                    'frame-ancestors \'self\'')
+            elif iframe_restriction == 'DENY':
+                self.response.headers['Content-Security-Policy'] = (
+                    'frame-ancestors \'none\'')
+            else:
+                raise Exception(
+                    'Invalid iframe restriction value: %s' % iframe_restriction)
+
+        self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
+        self.response.pragma = 'no-cache'
+        self.response.write(mock_load_template(
+            filepath,
+            template_is_aot_compiled=template_is_aot_compiled,
+            is_maintenance_page=is_maintenance_page
+        ))
+        return self.response
+
+
 def mock_load_template(
     filename: str,
     template_is_aot_compiled: bool = False,
@@ -258,48 +315,6 @@ def mock_load_template(
             True when the template is compiled by angular AoT compiler.
         is_maintenance_page: bool. False by default. Use
             True when the template is for the maintenance page.
-
-    Returns:
-        str. The contents of the given file.
-
-    Raises:
-        Exception. No file exists for the given file name.
-    """
-    filepath = get_filepath_from_filename(
-        filename, os.path.join('core', 'templates', 'pages'))
-    if is_maintenance_page:
-        filepath = get_filepath_from_filename(
-            'maintenance-index', 'src')
-    if template_is_aot_compiled:
-        filepath = get_filepath_from_filename(
-            filename, 'src')
-    if filepath is None:
-        raise Exception(
-            'No file exists for the given file name.'
-        )
-    with utils.open_file(filepath, 'r') as f:
-        return f.read()
-
-
-def mock_load_template_for_maintenance_mode(
-    filename: str,
-    template_is_aot_compiled: bool = False,
-    is_maintenance_page: bool = True
-) -> str:
-    """Mock for load_template function (only for maintenance mode). This mock is
-    required for backend tests since we do not have webpack compilation before 
-    backend tests. The folder to search templates is webpack_bundles which is
-    generated after webpack compilation. Since this folder will be missing,
-    load_template function will return an error. So, we use a mock for
-    load_template which returns the html file from the source directory instead.
-
-    Args:
-        filename: str. The name of the file for which template is to be
-            returned.
-        template_is_aot_compiled: bool. False by default. Use
-            True when the template is compiled by angular AoT compiler.
-        is_maintenance_page: bool. True by default. Use
-            False when the template is not for the maintenance page.
 
     Returns:
         str. The contents of the given file.
@@ -2922,15 +2937,8 @@ version: 1
         # only produced after webpack compilation which is not performed during
         # backend tests.
         if is_maintenance_page:
-            with self.swap(
-                base, 'load_template',
-                mock_load_template_for_maintenance_mode):
-                response = self.testapp.get(
-                    url,
-                    params=params,
-                    expect_errors=expect_errors,
-                    status=expected_status_int,
-                )
+            response = mock_render_template(mock_load_template(
+                is_maintenance_page=is_maintenance_page))
         else:
             with self.swap(base, 'load_template', mock_load_template):
                 response = self.testapp.get(
