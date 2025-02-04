@@ -26,6 +26,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import unittest.mock
 
 from core import feconf
 from core import utils
@@ -1003,3 +1004,35 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         self.assertIn('Task result', results[0].messages)
         self.assertEqual(len(results[0].messages), 1)
+    def test_skip_install_skips_third_party_installation(self) -> None:
+        from scripts import run_backend_tests
+        mock_install = unittest.mock.Mock()
+        swap_install = self.swap(
+            install_third_party_libs, 'main', mock_install)
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *_: (100, 0, 0, {}))
+        swap_coverage = self.swap(
+            run_backend_tests, 'check_coverage',
+            lambda *_: ('', 100.0))
+        with swap_install, self.swap_redis_server:
+            with self.swap_cloud_datastore_emulator, swap_check_results:
+                with swap_coverage, self.swap_execute_task:
+                    run_backend_tests.main(args=['--skip-install'])
+        mock_install.assert_not_called()
+    def test_third_party_installed_when_no_skip_flag(self) -> None:
+        from scripts import run_backend_tests
+        mock_install = unittest.mock.Mock()
+        swap_install = self.swap(
+            install_third_party_libs, 'main', mock_install)
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *_: (100, 0, 0, {}))
+        swap_coverage = self.swap(
+            run_backend_tests, 'check_coverage',
+            lambda *_: ('', 100.0))
+        with swap_install, self.swap_redis_server:
+            with self.swap_cloud_datastore_emulator, swap_check_results:
+                with swap_coverage, self.swap_execute_task:
+                    run_backend_tests.main(args=[])
+        mock_install.assert_called_once()
