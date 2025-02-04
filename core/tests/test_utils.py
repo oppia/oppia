@@ -281,6 +281,47 @@ def mock_load_template(
         return f.read()
 
 
+def mock_load_template_for_maintenance_mode(
+    filename: str,
+    template_is_aot_compiled: bool = False,
+    is_maintenance_page: bool = True
+) -> str:
+    """Mock for load_template function (only for maintenance mode). This mock is
+    required for backend tests since we do not have webpack compilation before 
+    backend tests. The folder to search templates is webpack_bundles which is
+    generated after webpack compilation. Since this folder will be missing,
+    load_template function will return an error. So, we use a mock for
+    load_template which returns the html file from the source directory instead.
+
+    Args:
+        filename: str. The name of the file for which template is to be
+            returned.
+        template_is_aot_compiled: bool. False by default. Use
+            True when the template is compiled by angular AoT compiler.
+        is_maintenance_page: bool. True by default. Use
+            False when the template is not for the maintenance page.
+
+    Returns:
+        str. The contents of the given file.
+
+    Raises:
+        Exception. No file exists for the given file name.
+    """
+    filepath = get_filepath_from_filename(
+        filename, os.path.join('core', 'templates', 'pages'))
+    if is_maintenance_page:
+        filepath = get_filepath_from_filename(
+            'maintenance-index', 'src')
+    if template_is_aot_compiled:
+        filepath = get_filepath_from_filename(
+            filename, 'src')
+    if filepath is None:
+        raise Exception(
+            'No file exists for the given file name.'
+        )
+    with utils.open_file(filepath, 'r') as f:
+        return f.read()
+
 def check_image_png_or_webp(image_string: str) -> bool:
     """Checks if the image is in png or webp format only.
 
@@ -2879,16 +2920,22 @@ version: 1
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
-        with self.swap(
-                base, 'load_template',
-                mock_load_template(is_maintenance_page=is_maintenance_page)
-            ):
-            response = self.testapp.get(
-                url,
-                params=params,
-                expect_errors=expect_errors,
-                status=expected_status_int,
-            )
+        if is_maintenance_page:
+            with self.swap(base, 'load_template', mock_load_template_for_maintenance_mode):
+                response = self.testapp.get(
+                    url,
+                    params=params,
+                    expect_errors=expect_errors,
+                    status=expected_status_int,
+                )
+        else:
+            with self.swap(base, 'load_template', mock_load_template):
+                response = self.testapp.get(
+                    url,
+                    params=params,
+                    expect_errors=expect_errors,
+                    status=expected_status_int,
+                )
 
         if expect_errors:
             self.assertTrue(response.status_int >= 400)
