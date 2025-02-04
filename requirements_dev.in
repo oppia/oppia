@@ -14,6 +14,7 @@ pycodestyle==2.10.0
 pylint==2.17.2
 pylint-quotes==0.2.3
 pyyaml==6.0
+requests==2.31.0
 rcssmin==1.1.1
 webtest==3.0.0
 xmltodict==0.13.0
