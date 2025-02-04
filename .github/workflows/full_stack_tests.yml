@@ -170,7 +170,7 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
           python -m scripts.run_acceptance_tests 
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Uploading test recordings as Artifacts
+      - name: Uploading Desktop test recordings as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
@@ -184,6 +184,19 @@ jobs:
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
+      - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
+        if: ${{ failure() }}
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          python -m scripts.run_acceptance_tests --skip-build 
+          --suite=${{ matrix.suite.name }} --prod_env --mobile
+      - name: Uploading Mobile test recordings as Artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
       - name: Uploading webpack bundles as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
