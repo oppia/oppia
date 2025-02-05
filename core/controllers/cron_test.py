@@ -969,7 +969,11 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'), # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com') # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'http://localhost:8181'
+            )
         ]
     )
     def test_email_sent_to_admin_if_notifying_admins_about_suggestions_enabled(
