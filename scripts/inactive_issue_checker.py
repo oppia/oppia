@@ -23,18 +23,19 @@ import logging
 import os
 
 import requests
-from typing import List, TypedDict
+from typing import List
 
 INACTIVE_DAYS = 7
 REPO_OWNER = 'oppia'
 REPO_NAME = 'oppia'
 
 
-class InactiveIssue(TypedDict):
-    """Type for storing inactive issue information."""
+class InactiveIssue:
+    """Represents an inactive issue with its number and assignee."""
 
-    number: int
-    assignee: str
+    def __init__(self, number: int, assignee: str):
+        self.number = number
+        self.assignee = assignee
 
 
 def get_inactive_issues(
@@ -128,10 +129,10 @@ def get_inactive_issues(
         )
 
         if days_since_activity > INACTIVE_DAYS:
-            inactive_issues.append({
-                'number': issue_number,
-                'assignee': assignee_login
-            })
+            inactive_issues.append(InactiveIssue(
+                number=issue_number,
+                assignee=assignee_login
+            ))
             logging.info(
                 'Issue #%s has been inactive for %d days',
                 issue_number, days_since_activity
@@ -161,8 +162,8 @@ def unassign_inactive_issues(
     repo_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}'
 
     for issue in inactive_issues:
-        issue_number = issue['number']
-        assignee_login = issue['assignee']
+        issue_number = issue.number
+        assignee_login = issue.assignee
 
         try:
             assignees_url = f'{repo_url}/issues/{issue_number}/assignees'
@@ -218,7 +219,7 @@ if __name__ == '__main__': # pragma: no cover
         for inactive_issue in all_inactive_issues:
             logging.info(
                 'Issue #%s (assignee: %s)',
-                inactive_issue['number'], inactive_issue['assignee']
+                inactive_issue.number, inactive_issue.assignee
             )
     else:
         logging.info('No inactive issues found that need unassignment.')

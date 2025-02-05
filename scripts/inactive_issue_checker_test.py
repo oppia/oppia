@@ -150,10 +150,9 @@ class TestInactiveIssueChecker(unittest.TestCase):
         mock_delete_response = unittest.mock.Mock(status_code=500)
         self.mock_delete.return_value = mock_delete_response
 
-        inactive_issues = [{
-            'number': 1,
-            'assignee': 'user123'
-        }]
+        inactive_issues = [
+            inactive_issue_checker.InactiveIssue(number=1, assignee='user123')
+        ]
 
         inactive_issue_checker.unassign_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo', inactive_issues)
@@ -200,10 +199,9 @@ class TestInactiveIssueChecker(unittest.TestCase):
             'Connection error'
         )
 
-        inactive_issues = [{
-            'number': 1,
-            'assignee': 'test_user'
-        }]
+        inactive_issues = [
+            inactive_issue_checker.InactiveIssue(number=1, assignee='test_user')
+        ]
 
         inactive_issue_checker.unassign_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo', inactive_issues)
