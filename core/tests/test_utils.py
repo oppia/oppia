@@ -42,6 +42,7 @@ from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import auth_domain
+from core.controllers import base
 from core.domain import blog_services
 from core.domain import caching_domain
 from core.domain import classroom_config_domain
@@ -197,6 +198,68 @@ class ResultDocumentDict(TypedDict):
     _type: str
     _index: str
     _source: Dict[str, str]
+
+
+def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
+    """Returns filepath using the filename. Different files are present in
+    different subdirectories in the rootdir. So, we walk through the rootdir and
+    match the all the filenames with the given filename.  When a match is found
+    the function returns the complete path of the filename by using
+    os.path.join(root, filename).
+    For example exploration-editor-page.mainpage.html is present in
+    core/templates/pages/exploration-editor-page and error-page.mainpage.html
+    is present in core/templates/pages/error-pages. So we walk through
+    core/templates/pages and a match for exploration-editor-page.component.html
+    is found in exploration-editor-page subdirectory and a match for
+    error-page.directive.html is found in error-pages subdirectory.
+    Args:
+        filename: str. The name of the file.
+        rootdir: str. The directory to search the file in.
+    Returns:
+        str | None. The path of the file if file is found otherwise
+        None.
+    Raises:
+        Exception. Multiple files found with given file name.
+    """
+    matches = list(itertools.chain.from_iterable(
+        (os.path.join(subdir, f) for f in filenames if f == filename)
+        for subdir, _, filenames in os.walk(rootdir)))
+    if len(matches) > 1:
+        raise Exception('Multiple files found with name: %s' % filename)
+    return matches[0] if matches else None
+
+
+def mock_load_template(
+    filename: str,
+    template_is_aot_compiled: bool = False
+) -> str:
+    """Mock for load_template function. This mock is required for backend tests
+    since we do not have webpack compilation before backend tests. The folder to
+    search templates is webpack_bundles which is generated after webpack
+    compilation. Since this folder will be missing, load_template function will
+    return an error. So, we use a mock for load_template which returns the html
+    file from the source directory instead.
+    Args:
+        filename: str. The name of the file for which template is to be
+            returned.
+        template_is_aot_compiled: bool. False by default. Use
+            True when the template is compiled by angular AoT compiler.
+    Returns:
+        str. The contents of the given file.
+    Raises:
+        Exception. No file exists for the given file name.
+    """
+    filepath = get_filepath_from_filename(
+        filename, os.path.join('core', 'templates', 'pages'))
+    if template_is_aot_compiled:
+        filepath = get_filepath_from_filename(
+            filename, 'src')
+    if filepath is None:
+        raise Exception(
+            'No file exists for the given file name.'
+        )
+    with utils.open_file(filepath, 'r') as f:
+        return f.read()
 
 
 def check_image_png_or_webp(image_string: str) -> bool:
@@ -2785,12 +2848,17 @@ version: 1
 
         expect_errors = expected_status_int >= 400
 
-        response = self.testapp.get(
-            url,
-            params=params,
-            expect_errors=expect_errors,
-            status=expected_status_int
-        )
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles is
+        # only produced after webpack compilation which is not performed during
+        # backend tests.
+        with self.swap(base, 'load_template', mock_load_template):
+            response = self.testapp.get(
+                url,
+                params=params,
+                expect_errors=expect_errors,
+                status=expected_status_int
+            )
 
         if expect_errors:
             self.assertTrue(response.status_int >= 400)
@@ -2886,12 +2954,18 @@ version: 1
                 params, dict,
                 msg='Expected params to be a dict, received %s' % params)
 
-        if http_method == 'GET':
-            response = self.testapp.get(
-                url, params=params, expect_errors=True
-            )
+        # This swap is required to ensure that the templates are fetched from
+        # source directory instead of webpack_bundles since webpack_bundles is
+        # only produced after webpack compilation which is not performed during
+        # backend tests.
+        with self.swap(base, 'load_template', mock_load_template):
 
-        elif http_method == 'POST':
+            if http_method == 'GET':
+                response = self.testapp.get(
+                    url, params=params, expect_errors=True
+                )
+
+        if http_method == 'POST':
             response = self.testapp.post(
                 url, params=params, expect_errors=True
             )
