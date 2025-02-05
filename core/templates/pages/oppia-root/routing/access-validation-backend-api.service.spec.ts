@@ -143,7 +143,7 @@ describe('Access validation backend api service', () => {
   it('should validate access to practice session page', fakeAsync(() => {
     let classroomUrlFragment = 'classroom';
     let topicUrlFragment = 'topic';
-    let selectedSubtopicIds = [1, 2, 3];
+    let selectedSubtopicIds = '[1,2,3]';
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/access_validation_handler/can_access_practice_session_page/' +
