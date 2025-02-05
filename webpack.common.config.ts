@@ -66,8 +66,6 @@ module.exports = {
   },
   entry: {
     error: commonPrefix + '/pages/error-pages/error-page.import.ts',
-    maintenance:
-      commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
     lightweight_oppia_root:
       commonPrefix + '/pages/lightweight-oppia-root/index.ts',
@@ -126,15 +124,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       statusCode: 500,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['maintenance'],
-      filename: 'maintenance-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['oppia_root'],
