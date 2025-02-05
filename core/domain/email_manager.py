@@ -1838,6 +1838,11 @@ def send_reviewer_notifications(
         logging.error('This app cannot send emails to users.')
         return
 
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     for language_code, suggestions in suggestions_by_language.items():
         reviewer_ids = reviewer_ids_by_language[language_code]
 
@@ -1869,12 +1874,6 @@ def send_reviewer_notifications(
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
         assert isinstance(noreply_email_address, str)
-
-
-        oppia_site_url = platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
-        )
-        assert isinstance(oppia_site_url, str)
 
         for reviewer_id in reviewer_ids:
             reviewer_username = user_services.get_username(reviewer_id)
@@ -2041,7 +2040,6 @@ def _send_reviews_needed_email_to_admins(
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
     assert isinstance(noreply_email_address, str)
-
 
     oppia_site_url = platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
