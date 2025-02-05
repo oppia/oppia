@@ -139,17 +139,24 @@ describe('Select Skill Modal', () => {
   });
 
   it('should keep Done button disabled when no skill is selected', () => {
-    const buttonElement: HTMLButtonElement = fixture.debugElement.query(
-      By.css('.e2e-test-confirm-skill-selection-button')
-    ).nativeElement;
+    fixture.detectChanges();
+
+    const buttonDebugElement = fixture.debugElement.query(By.css('.e2e-test-confirm-skill-selection-button'));
+    expect(buttonDebugElement).not.toBeNull();
+
+    const buttonElement: HTMLButtonElement = buttonDebugElement.nativeElement;
+
     expect(buttonElement.disabled).toBe(true);
   });
 
   it('should activate Done button when a skill is chosen', () => {
     componentInstance.setSelectedSkillId('skillId3');
+    fixture.detectChanges();
+
     const buttonElement: HTMLButtonElement = fixture.debugElement.query(
       By.css('.e2e-test-confirm-skill-selection-button')
     ).nativeElement;
+
     expect(buttonElement.disabled).toBe(false);
   });
 });
