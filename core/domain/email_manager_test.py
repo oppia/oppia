@@ -5959,7 +5959,7 @@ class NotifyReviewersNewSuggestionsTests(
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'testadmin@example.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com'),
             (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
-            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL),
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL), # pylint: disable=line-too-long
         ]
     )
     def test_email_sent_to_reviewer_with_translation_waiting_days_for_review(
