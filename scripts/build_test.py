@@ -1130,7 +1130,9 @@ class BuildTests(test_utils.GenericTestBase):
 
         @contextlib.contextmanager
         def mock_managed_ng_build(
-            use_prod_env: bool, watch_mode: bool # pylint: disable=unused-argument
+            use_prod_env: bool,
+            watch_mode: bool,
+            project_name: str # pylint: disable=unused-argument
         ) -> Iterator[scripts_test_utils.PopenStub]:
             yield scripts_test_utils.PopenStub()
 
@@ -1150,6 +1152,20 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ng_build_swap, get_file_count_swap:
             build.build_using_ng(project_name='oppia-angular')
+        
+        ng_build_swap = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_managed_ng_build,
+            expected_kwargs=[{
+                'use_prod_env': True,
+                'watch_mode': False,
+                'project_name': 'oppia-maintenance'
+            }])
+        get_file_count_swap = self.swap_with_checks(
+            build, 'get_file_count', mock_get_file_count,
+            expected_args=[('dist/oppia-maintenance',)])
+
+        with ng_build_swap, get_file_count_swap:
+            build.build_using_ng(project_name='oppia-maintenance')
 
     def test_build_using_ng_command_with_incorrect_filecount_fails(
         self

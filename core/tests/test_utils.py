@@ -2936,17 +2936,13 @@ version: 1
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
-        if is_maintenance_page:
-            response = mock_render_template(mock_load_template(
-                is_maintenance_page=is_maintenance_page))
-        else:
-            with self.swap(base, 'load_template', mock_load_template):
-                response = self.testapp.get(
-                    url,
-                    params=params,
-                    expect_errors=expect_errors,
-                    status=expected_status_int,
-                )
+        with self.swap(base, 'load_template', mock_load_template):
+            response = self.testapp.get(
+                url,
+                params=params,
+                expect_errors=expect_errors,
+                status=expected_status_int,
+            )
 
         if expect_errors:
             self.assertTrue(response.status_int >= 400)
