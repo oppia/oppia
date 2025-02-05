@@ -184,6 +184,10 @@ class TasksTests(test_utils.EmailTestBase):
             (
                 platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'http://localhost:8181'
             )
         ]
     )
