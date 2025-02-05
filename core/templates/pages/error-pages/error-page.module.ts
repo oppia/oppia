@@ -25,7 +25,6 @@ import { ToastrModule } from 'ngx-toastr';
 
 import { ErrorPageComponent } from './error-page.component';
 import { ErrorPageRootComponent } from './error-page-root.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
@@ -38,7 +37,6 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
         component: ErrorPageRootComponent,
       },
     ]),
-    SharedComponentsModule,
     TranslateModule,
     ToastrModule.forRoot(toastrConfig),
   ],
