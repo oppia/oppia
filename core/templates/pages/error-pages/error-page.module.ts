@@ -16,14 +16,17 @@
  * @fileoverview Module for the error page.
  */
 
-import {NgModule} from '@angular/core';
-import {HttpClientModule} from '@angular/common/http';
-import {CommonModule} from '@angular/common';
+import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { ToastrModule } from 'ngx-toastr';
 
-import {ErrorPageComponent} from './error-page.component';
-import {ErrorPageRootComponent} from './error-page-root.component';
-import {RouterModule} from '@angular/router';
-import {ErrorPageSharedModule} from './error-page-shared.module';
+import { ErrorPageComponent } from './error-page.component';
+import { ErrorPageRootComponent } from './error-page-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -35,9 +38,13 @@ import {ErrorPageSharedModule} from './error-page-shared.module';
         component: ErrorPageRootComponent,
       },
     ]),
-    ErrorPageSharedModule,
+    SharedComponentsModule,
+    TranslateModule,
+    ToastrModule.forRoot(toastrConfig),
   ],
+  declarations: [ErrorPageComponent, ErrorPageRootComponent],
   entryComponents: [ErrorPageComponent, ErrorPageRootComponent],
   bootstrap: [ErrorPageRootComponent],
+  exports: [ErrorPageComponent, ErrorPageRootComponent],
 })
 export class ErrorPageModule {}
