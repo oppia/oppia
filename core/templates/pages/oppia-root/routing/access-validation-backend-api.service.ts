@@ -191,7 +191,7 @@ export class AccessValidationBackendApiService {
   validateAccessToPracticeSessionPage(
     classroomUrlFragment: string,
     topicUrlFragment: string,
-    selectedSubtopicIds: number[]
+    selectedSubtopicIds: string
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.PRACTICE_SESSION_PAGE_ACCESS_VALIDATOR,
@@ -202,7 +202,7 @@ export class AccessValidationBackendApiService {
     );
     const params = new HttpParams().set(
       'selected_subtopic_ids',
-      JSON.stringify(selectedSubtopicIds)
+      selectedSubtopicIds
     );
     return this.http.get<void>(url, {params}).toPromise();
   }
