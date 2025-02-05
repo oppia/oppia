@@ -41,7 +41,6 @@ from core import feconf
 from core import schema_utils
 from core import utils
 from core.constants import constants
-from core.controllers import base
 from core.domain import auth_domain
 from core.domain import blog_services
 from core.domain import caching_domain
@@ -2785,6 +2784,13 @@ version: 1
             self.assertIsInstance(params, dict)
 
         expect_errors = expected_status_int >= 400
+
+        response = self.testapp.get(
+            url,
+            params=params,
+            expect_errors=expect_errors,
+            status=expected_status_int
+        )
 
         if expect_errors:
             self.assertTrue(response.status_int >= 400)
