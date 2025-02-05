@@ -78,6 +78,26 @@ class HelperFunctionTests(test_utils.GenericTestBase):
             )
 
 
+class UniqueTemplateNamesTests(test_utils.GenericTestBase):	
+    """Tests to ensure that all template filenames in	
+    core/templates/pages have unique filenames. This is required	
+    for the backend tests to work correctly since they fetch templates	
+    from this directory based on name of the template. For details, refer	
+    get_filepath_from_filename function in test_utils.py.	
+    """	
+
+    def test_template_filenames_are_unique(self) -> None:	
+        templates_dir = os.path.join(	
+            'core', 'templates', 'pages')	
+        all_template_names: List[str] = []	
+        for root, _, filenames in os.walk(templates_dir):	
+            template_filenames = [	
+                filename for filename in filenames if filename.endswith(	
+                    '.html')]	
+            all_template_names = all_template_names + template_filenames	
+        self.assertEqual(len(all_template_names), len(set(all_template_names)))	
+
+
 class BaseHandlerTests(test_utils.GenericTestBase):
 
     TEST_LEARNER_EMAIL: Final = 'test.learner@example.com'

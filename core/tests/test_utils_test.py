@@ -36,7 +36,6 @@ from core.tests import test_utils
 
 import elasticsearch
 from typing import Callable, Final, List, OrderedDict, Tuple
-from typing import Callable, Final, OrderedDict
 import webapp2
 
 email_services = models.Registry.import_email_services()

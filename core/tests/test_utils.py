@@ -41,8 +41,8 @@ from core import feconf
 from core import schema_utils
 from core import utils
 from core.constants import constants
-from core.domain import auth_domain
 from core.controllers import base
+from core.domain import auth_domain
 from core.domain import blog_services
 from core.domain import caching_domain
 from core.domain import classroom_config_domain
@@ -206,18 +206,22 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
     match the all the filenames with the given filename.  When a match is found
     the function returns the complete path of the filename by using
     os.path.join(root, filename).
+
     For example exploration-editor-page.mainpage.html is present in
     core/templates/pages/exploration-editor-page and error-page.mainpage.html
     is present in core/templates/pages/error-pages. So we walk through
     core/templates/pages and a match for exploration-editor-page.component.html
     is found in exploration-editor-page subdirectory and a match for
     error-page.directive.html is found in error-pages subdirectory.
+
     Args:
         filename: str. The name of the file.
         rootdir: str. The directory to search the file in.
+
     Returns:
         str | None. The path of the file if file is found otherwise
         None.
+
     Raises:
         Exception. Multiple files found with given file name.
     """
@@ -239,13 +243,16 @@ def mock_load_template(
     compilation. Since this folder will be missing, load_template function will
     return an error. So, we use a mock for load_template which returns the html
     file from the source directory instead.
+
     Args:
         filename: str. The name of the file for which template is to be
             returned.
         template_is_aot_compiled: bool. False by default. Use
             True when the template is compiled by angular AoT compiler.
+
     Returns:
         str. The contents of the given file.
+
     Raises:
         Exception. No file exists for the given file name.
     """
