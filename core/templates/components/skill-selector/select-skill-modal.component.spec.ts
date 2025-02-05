@@ -22,6 +22,7 @@ import {MatCardModule} from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatRadioModule} from '@angular/material/radio';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {By} from '@angular/platform-browser';
 import {
   CategorizedSkills,
   SelectSkillModalComponent,
@@ -135,5 +136,20 @@ describe('Select Skill Modal', () => {
     // Selecting a skill which is not already linked.
     componentInstance.setSelectedSkillId('skillId3');
     expect(componentInstance.isSaveButtonEnabled()).toBe(true);
+  });
+
+  it('should disable Done button if no skills are selected', () => {
+    const buttonElement: HTMLButtonElement = fixture.debugElement.query(
+      By.css('.e2e-test-confirm-skill-selection-button')
+    ).nativeElement;
+    expect(buttonElement.disabled).toBe(true);
+  });
+
+  it('should enable Done button if at least one skill is selected', () => {
+    componentInstance.setSelectedSkillId('skillId3');
+    const buttonElement: HTMLButtonElement = fixture.debugElement.query(
+      By.css('.e2e-test-confirm-skill-selection-button')
+    ).nativeElement;
+    expect(buttonElement.disabled).toBe(false);
   });
 });

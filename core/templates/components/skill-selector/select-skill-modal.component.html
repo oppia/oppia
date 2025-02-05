@@ -16,20 +16,17 @@
 </div>
 <div class="modal-footer">
   <div>
+    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
     <span [matTooltip]="errorMessage"
           matTooltipClass="oppia-mat-tooltip-list"
           [matTooltipDisabled]="isSaveButtonEnabled()"
           class="w-100">
       <button class="btn btn-success e2e-test-confirm-skill-selection-button"
               (click)="confirm()"
-              [disabled]="!isSaveButtonEnabled()">
+              [disabled]="!selectedSkillId || !isSaveButtonEnabled()">
         Done
-        <i class="fas fa-exclamation-triangle story-save-draft-warning"
-           *ngIf="!isSaveButtonEnabled()">
-        </i>
       </button>
     </span>
-    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   </div>
 </div>
 
