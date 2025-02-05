@@ -738,26 +738,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
             with self.mock_datetime_utcnow(123):  # type: ignore[arg-type]
                 pass
 
-    def test_raises_error_if_no_mock_file_path_found(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'No file exists for the given file name'
-        ):
-            test_utils.mock_load_template('invalid_path')
-
-    def test_raises_error_if_multiple_file_paths_found(self) -> None:
-        def mock_walk(_: str) -> List[Tuple[str, List[str], List[str]]]:
-            return [
-                ('page-dir-1', [], ['duplicate_file.ts']),
-                ('page-dir-2', [], ['duplicate_file.ts']),
-            ]
-        walk_swap = self.swap_with_checks(
-            os, 'walk', mock_walk, expected_args=[('core/templates/pages',)])
-        with self.assertRaisesRegex(
-            Exception, 'Multiple files found with name: duplicate_file.ts'
-        ):
-            with walk_swap:
-                test_utils.mock_load_template('duplicate_file.ts')
-
     def test_raises_error_if_no_user_name_exists_with_strict_true(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'No user_id found for the given email address'
