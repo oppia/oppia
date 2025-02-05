@@ -68,7 +68,9 @@ def get_inactive_issues(
         collaborators_url, headers=headers, timeout=10
     )
     collaborators = collaborators_response.json()
-    collaborator_logins = {c['login'] for c in collaborators}
+    collaborator_logins = set()
+    for c in collaborators:
+        collaborator_logins.add(c['login'])
 
     pulls_url = f'{repo_url}/pulls?state=open'
     pulls_response = requests.get(pulls_url, headers=headers, timeout=10)

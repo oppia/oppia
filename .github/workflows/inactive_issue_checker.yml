@@ -1,5 +1,5 @@
 name: Check Inactive Issues
-permissions: read-all
+permissions: {}
 on:
   merge_group:
     types: [checks_requested]
