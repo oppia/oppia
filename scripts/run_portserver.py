@@ -59,7 +59,7 @@ import threading
 
 from core import utils
 from typing import Callable, Deque, Final, List, Optional, Sequence, cast
-from typing_extensions import Buffer
+from typing_extensions import Buffer # pylint: disable=import-only-modules
 
 _PROTOCOLS: Final = [
     (socket.SOCK_STREAM, socket.IPPROTO_TCP),
@@ -487,6 +487,9 @@ class Server:
         """
         request = connection.recv(Server.message_size)
         response = handler(request)
+        # Here we use cast because response is of type socket and
+        # connection.sendall is expecting Buffer type hence casting it with
+        # Buffer type.
         connection.sendall(cast(Buffer, response))
         connection.close()
 

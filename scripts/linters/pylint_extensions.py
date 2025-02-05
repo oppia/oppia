@@ -2174,8 +2174,8 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         'C0048': (
             'cast function is used. If the cast is really needed, then please'
             ' add a proper comment with clear justification why cast function'
-            ' is needed. The format of the comment should be -> Here use cast'
-            ' because ...',
+            ' is needed. The format of the comment should be -> Here we use'
+            ' cast because ...',
             'cast-func-used',
             'Casting of any value should be done with a proper explanation in'
             ' the code comment.'
