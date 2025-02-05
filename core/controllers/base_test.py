@@ -618,7 +618,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_html_response(
-            '/community-library', expected_status_int=200)
+            '/community-library', expected_status_int=302)
 
         self.assertIn(b'<oppia-maintenance-page>', response.body)
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
@@ -723,8 +723,9 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        response = self.get_html_response('/url_handler?current_url=/')
-        self.assertIn(b'<oppia-maintenance-page>', response.body)
+        response = self.get_html_response(
+            '/url_handler?current_url=/', expected_status_int=302)
+        self.assertIn(b'302 Moved Temporarily', response.body)
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
