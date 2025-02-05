@@ -16,7 +16,7 @@
  * @fileoverview Component for exploration metadata modal.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
@@ -71,7 +71,8 @@ export class ExplorationMetadataModalComponent
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     super(ngbActiveModal);
   }
@@ -148,28 +149,28 @@ export class ExplorationMetadataModalComponent
 
     // Record any fields that have changed.
     let metadataList: string[] = [];
-    const savePromises: Promise<void>[] = [];
+    const metadataSavePromises: Promise<void>[] = [];
     if (this.explorationTitleService.hasChanged()) {
       metadataList.push('title');
-      savePromises.push(
+      metadataSavePromises.push(
         Promise.resolve(this.explorationTitleService.saveDisplayedValue())
       );
     }
     if (this.explorationObjectiveService.hasChanged()) {
       metadataList.push('objective');
-      savePromises.push(
+      metadataSavePromises.push(
         Promise.resolve(this.explorationObjectiveService.saveDisplayedValue())
       );
     }
     if (this.explorationCategoryService.hasChanged()) {
       metadataList.push('category');
-      savePromises.push(
+      metadataSavePromises.push(
         Promise.resolve(this.explorationCategoryService.saveDisplayedValue())
       );
     }
     if (this.explorationLanguageCodeService.hasChanged()) {
       metadataList.push('language');
-      savePromises.push(
+      metadataSavePromises.push(
         Promise.resolve(
           this.explorationLanguageCodeService.saveDisplayedValue()
         )
@@ -177,12 +178,12 @@ export class ExplorationMetadataModalComponent
     }
     if (this.explorationTagsService.hasChanged()) {
       metadataList.push('tags');
-      savePromises.push(
+      metadataSavePromises.push(
         Promise.resolve(this.explorationTagsService.saveDisplayedValue())
       );
     }
 
-    Promise.all(savePromises).then(() => {
+    Promise.all(metadataSavePromises).then(() => {
       this.ngbActiveModal.close(metadataList);
     });
   }
@@ -262,5 +263,6 @@ export class ExplorationMetadataModalComponent
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
     this.explorationTags = this.explorationTagsService.displayed as string[];
     this.isValueHasbeenUpdated = true;
+    this.changeDetectorRef.detectChanges();
   }
 }
