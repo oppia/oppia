@@ -138,14 +138,14 @@ describe('Select Skill Modal', () => {
     expect(componentInstance.isSaveButtonEnabled()).toBe(true);
   });
 
-  it('should disable Done button if no skills are selected', () => {
+  it('should keep Done button disabled when no skill is selected', () => {
     const buttonElement: HTMLButtonElement = fixture.debugElement.query(
       By.css('.e2e-test-confirm-skill-selection-button')
     ).nativeElement;
     expect(buttonElement.disabled).toBe(true);
   });
 
-  it('should enable Done button if at least one skill is selected', () => {
+  it('should activate Done button when a skill is chosen', () => {
     componentInstance.setSelectedSkillId('skillId3');
     const buttonElement: HTMLButtonElement = fixture.debugElement.query(
       By.css('.e2e-test-confirm-skill-selection-button')
