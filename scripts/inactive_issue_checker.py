@@ -208,6 +208,8 @@ def unassign_inactive_issues(
 
 if __name__ == '__main__': # pragma: no cover
     GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
+    DEASSIGN_INACTIVE_CONTRIBUTOR = os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS']
+
     all_inactive_issues = get_inactive_issues(
         GITHUB_TOKEN, REPO_OWNER, REPO_NAME
     )
@@ -221,6 +223,9 @@ if __name__ == '__main__': # pragma: no cover
     else:
         logging.info('No inactive issues found that need unassignment.')
 
-    unassign_inactive_issues(
-        GITHUB_TOKEN, REPO_OWNER, REPO_NAME, all_inactive_issues
-    )
+    if DEASSIGN_INACTIVE_CONTRIBUTOR:
+        unassign_inactive_issues(
+            GITHUB_TOKEN, REPO_OWNER, REPO_NAME, all_inactive_issues
+        )
+    else:
+        logging.info('Unassignment is currently disabled.')

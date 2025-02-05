@@ -27,7 +27,8 @@ import requests
 
 
 class TestInactiveIssueChecker(unittest.TestCase):
-    
+    """Test the inactive issue checker script."""
+
     def setUp(self) -> None:
         self.current_time = datetime.datetime.now(datetime.timezone.utc)
         self.mock_get_patcher = unittest.mock.patch('requests.get')
@@ -49,35 +50,35 @@ class TestInactiveIssueChecker(unittest.TestCase):
             'events_url': 'mock_events_url',
             'assignee': None
         }]
-        
+
         mock_collaborators_response = unittest.mock.Mock()
         mock_collaborators_response.json.return_value = []
-        
+
         mock_pulls_response = unittest.mock.Mock()
         mock_pulls_response.json.return_value = []
-        
+
         self.mock_get.side_effect = [
             mock_issues_response,
             mock_collaborators_response,
             mock_pulls_response
         ]
-        
+
         inactive_issues = inactive_issue_checker.get_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
-        
+
         self.assertEqual(len(inactive_issues), 0)
         self.assertEqual(self.mock_get.call_count, 3)
 
     def test_invalid_issue_format(self) -> None:
         mock_issues_response = unittest.mock.Mock()
         mock_issues_response.json.return_value = [None, 'not_a_dict', {}]
-        
+
         mock_collaborators_response = unittest.mock.Mock()
         mock_collaborators_response.json.return_value = []
-        
+
         mock_pulls_response = unittest.mock.Mock()
         mock_pulls_response.json.return_value = []
-        
+
         self.mock_get.side_effect = [
             mock_issues_response,
             mock_collaborators_response,
@@ -86,7 +87,7 @@ class TestInactiveIssueChecker(unittest.TestCase):
 
         inactive_issues = inactive_issue_checker.get_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
-        
+
         self.assertEqual(len(inactive_issues), 0)
         self.assertEqual(self.mock_get.call_count, 3)
 
@@ -107,7 +108,7 @@ class TestInactiveIssueChecker(unittest.TestCase):
 
         inactive_issues = inactive_issue_checker.get_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
-        
+
         self.assertEqual(len(inactive_issues), 0)
         self.assertEqual(self.mock_get.call_count, 4)
 
@@ -124,25 +125,27 @@ class TestInactiveIssueChecker(unittest.TestCase):
                 'event': 'assigned'
             }]
         }]
-        
+
         mock_collaborators_response = unittest.mock.Mock()
-        mock_collaborators_response.json.return_value = [{'login': 'other_user'}]
-        
+        mock_collaborators_response.json.return_value = [
+            {'login': 'other_user'}
+        ]
+
         mock_pulls_response = unittest.mock.Mock()
         mock_pulls_response.json.return_value = []
-        
+
         self.mock_get.side_effect = [
             mock_issues_response,
             mock_collaborators_response,
             mock_pulls_response,
             unittest.mock.Mock(json=lambda: [])
         ]
-        
+
         inactive_issues = inactive_issue_checker.get_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
-        
+
         self.assertEqual(len(inactive_issues), 0)
-    
+
     def test_error_during_unassignment(self) -> None:
         mock_delete_response = unittest.mock.Mock(status_code=500)
         self.mock_delete.return_value = mock_delete_response
@@ -171,13 +174,15 @@ class TestInactiveIssueChecker(unittest.TestCase):
                 'event': 'assigned'
             }]
         }]
-        
+
         mock_collaborators_response = unittest.mock.Mock()
         mock_collaborators_response.json.return_value = []
-        
+
         mock_pulls_response = unittest.mock.Mock()
-        mock_pulls_response.json.return_value = [{'body': 'This fixes issue #3'}]
-        
+        mock_pulls_response.json.return_value = [
+            {'body': 'This fixes issue #3'}
+        ]
+
         self.mock_get.side_effect = [
             mock_issues_response,
             mock_collaborators_response,
@@ -187,11 +192,13 @@ class TestInactiveIssueChecker(unittest.TestCase):
 
         inactive_issues = inactive_issue_checker.get_inactive_issues(
             'mock_token', 'mock_owner', 'mock_repo')
-        
+
         self.assertEqual(len(inactive_issues), 0)
 
     def test_exception_handling_in_unassignment(self) -> None:
-        self.mock_delete.side_effect = requests.RequestException('Connection error')
+        self.mock_delete.side_effect = requests.RequestException(
+            'Connection error'
+        )
 
         inactive_issues = [{
             'number': 1,
@@ -203,6 +210,7 @@ class TestInactiveIssueChecker(unittest.TestCase):
 
         self.mock_delete.assert_called_once()
         self.mock_post.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()

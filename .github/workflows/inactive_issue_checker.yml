@@ -27,8 +27,9 @@ jobs:
     - name: Check inactive issues
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEASSIGN_INACTIVE_CONTRIBUTORS: ${{ secrets.DEASSIGN_INACTIVE_CONTRIBUTORS }}
       run: |
-        python scripts/inactive_issue_checker.py
+        python -m scripts.inactive_issue_checker
       
     - name: Report failure if failed on oppia/oppia develop branch
       if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
