@@ -131,25 +131,22 @@ describe('Select Skill Modal', () => {
     ];
 
     componentInstance.setSelectedSkillId('skillId1');
-    expect(componentInstance.isSaveButtonEnabled()).toBe(false);
+    expect(componentInstance.isConfirmButtonDisabled()).toBe(false);
 
     // Selecting a skill which is not already linked.
     componentInstance.setSelectedSkillId('skillId3');
-    expect(componentInstance.isSaveButtonEnabled()).toBe(true);
+    expect(componentInstance.isConfirmButtonDisabled()).toBe(true);
   });
 
   it('should keep Done button disabled when no skill is selected', () => {
-    const buttonElement: HTMLButtonElement = fixture.debugElement.query(
-      By.css('.e2e-test-confirm-skill-selection-button')
-    ).nativeElement;
-    expect(buttonElement.disabled).toBe(false);
+    componentInstance.selectedSkillId = '';
+    fixture.detectChanges();
+    expect(componentInstance.isConfirmButtonDisabled()).toBe(true);
   });
 
-  it('should keep Done button disabled when no skill is selected', () => {
-    componentInstance.setSelectedSkillId('skillId3');
-    const buttonElement: HTMLButtonElement = fixture.debugElement.query(
-      By.css('.e2e-test-confirm-skill-selection-button')
-    ).nativeElement;
-    expect(buttonElement.disabled).toBe(false);
+  it('should activate Done button when a skill is chosen', () => {
+    componentInstance.selectedSkillId = 'skillId3';
+    fixture.detectChanges();
+    expect(componentInstance.isConfirmButtonDisabled()).toBe(false);
   });
 });
