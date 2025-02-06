@@ -363,7 +363,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         # Upload the BMP image.
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
-            {'filename': 'test.bmp'},
+            {'filename': 'test.png'},
             csrf_token=csrf_token,
             expected_status_int=400,
             upload_files=[('image', 'unused_filename', bmp_image_data)]
