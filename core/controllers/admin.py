@@ -54,8 +54,8 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
-from core.domain import story_services
 from core.domain import story_fetchers
+from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
@@ -1871,7 +1871,7 @@ class AdminHandler(
                     objective='Dummy Objective')
                 exp_services.save_new_exploration(self.user_id, exploration)
 
-                change_list = [
+                exp_change_list = [
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': 'Introduction',
@@ -1893,15 +1893,16 @@ class AdminHandler(
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': 'Introduction',
-                        'property_name': exp_domain
-                                         .STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME, # pylint: disable=line-too-long
+                        'property_name':
+                        (exp_domain
+                         .STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
                         'new_value': None
                     }),
                 ]
 
                 exp_services.update_exploration(
                     self.user_id, new_exp_id,
-                    change_list, 'Change Interaction')
+                    exp_change_list, 'Change Interaction')
 
                 exp_ids_to_publish.append(new_exp_id)
                 rights_manager.publish_exploration(
@@ -1921,17 +1922,19 @@ class AdminHandler(
                 raw_image, 'thumbnail', False)
 
             for i, exp_id in enumerate(exp_ids_to_publish):
+                suffix = i + 1
                 node_id = f'{story_domain.NODE_ID_PREFIX}{i + 1}'
                 if story.story_contents is not None:
                     node_index = int(story.story_contents.next_node_id[5:]) + i
+                    suffix = node_index
                     node_id = f'{story_domain.NODE_ID_PREFIX}{node_index}'
 
-                random_suffix = ''.join(
-                    random.choices(string.ascii_lowercase, k=22)
-                )
-                chapter_title = f'dummy chapter {random_suffix}'
+                # random_suffix = ''.join(
+                #     random.choices(string.ascii_lowercase, k=22)
+                # )
+                chapter_title = f'dummy chapter {suffix}'
 
-                change_list = [
+                story_change_list = [
                     story_domain.StoryChange({
                         'cmd': 'add_story_node',
                         'title': chapter_title,
@@ -1947,23 +1950,25 @@ class AdminHandler(
                     }),
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
-                        'property_name': story_domain
-                                         .STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, # pylint: disable=line-too-long
+                        'property_name':
+                        (story_domain
+                         .STORY_NODE_PROPERTY_THUMBNAIL_FILENAME),
                         'new_value': 'thumbnail.svg',
                         'node_id': node_id,
                         'old_value': 'thumbnail_filename'
                     }),
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
-                        'property_name': story_domain
-                                         .STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR, # pylint: disable=line-too-long
+                        'property_name':
+                        (story_domain
+                         .STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR),
                         'new_value': '#B3D8F1',
                         'node_id': node_id,
                         'old_value': 'thumbnail_bg_color'
                     }),
                 ]
                 topic_services.update_story_and_topic_summary(
-                    self.user_id, story_id, change_list,
+                    self.user_id, story_id, story_change_list,
                     'add node', story.corresponding_topic_id
                 )
 
