@@ -184,7 +184,7 @@ def main() -> None:  # pragma: no cover
 
             for issue_number in extract_issue_numbers(pr_body):
                 issue = get_issue(issue_number)
-                if any(a['login'] == author for a in issue.get('assignees')):
+                if any(a['login'] == author for a in issue.get('assignees',[])):
                     unassign_author(issue_number, author)
 
     logger.info('Pull request monitoring complete.')
