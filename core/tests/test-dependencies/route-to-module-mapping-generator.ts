@@ -53,11 +53,6 @@ const ROUTING_MODULE_FILE_PATHS = [
 // the routes are removed from the webpack configuration.
 const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([]);
 
-// List of page modules which aren't scraped from routing modules. These page modules are manually
-// added to the list of page modules. These modules are not covered by the routing module scraping
-// or the manual route to module mapping since they don't have any concrete path associated with them.
-const MANUAL_PAGE_MODULES = [];
-
 /**
  * Extends two maps while avoiding duplicates.
  */
@@ -363,5 +358,5 @@ export const getPageModulesCoveredByRouteMapping = (): string[] => {
 export const getPageModules = (): string[] => {
   const pageModulesCoveredByRouteMapping =
     getPageModulesCoveredByRouteMapping();
-  return [...pageModulesCoveredByRouteMapping, ...MANUAL_PAGE_MODULES];
+  return [...pageModulesCoveredByRouteMapping];
 };
