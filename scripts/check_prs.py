@@ -1,4 +1,4 @@
-# Copyright 2023 The Oppia Authors. All Rights Reserved.
+# Copyright 2025 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@ from __future__ import annotations
 import logging
 import os
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
 from typing import Any, Dict, List, cast
 
 import requests
@@ -52,7 +54,8 @@ def get_prs() -> List[Dict[str, Any]]:
         timeout=10
     )
     response.raise_for_status()
-    # Here we use type Any for API response flexibility
+    # Here we use type Any because the GitHub API response structure is dynamic
+    # and not strictly typed, allowing for flexible data handling.
     return cast(List[Dict[str, Any]], response.json())
 
 
@@ -62,7 +65,8 @@ def get_pr_commits(pr_number: int) -> List[Dict[str, Any]]:
     url = f'{GITHUB_API_URL}/repos/{REPO}/pulls/{pr_number}/commits'
     response = requests.get(url, headers=HEADERS, timeout=10)
     response.raise_for_status()
-    # Here we use type Any for commit data structure flexibility
+    # Here we use cast because the commits' structure is known to be a list of
+    # dictionaries as per GitHub API documentation.
     return cast(List[Dict[str, Any]], response.json())
 
 
@@ -98,7 +102,8 @@ def get_issue(issue_number: int) -> Dict[str, Any]:
     url = f'{GITHUB_API_URL}/repos/{REPO}/issues/{issue_number}'
     response = requests.get(url, headers=HEADERS, timeout=10)
     response.raise_for_status()
-    # Here we use type Any for issue data structure flexibility
+    # Here we use type Any because the issue data can vary based on GitHub's API
+    # and may include unpredictable fields.
     return cast(Dict[str, Any], response.json())
 
 
