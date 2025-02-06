@@ -16,15 +16,13 @@
 
 from __future__ import annotations
 
+import datetime
 import logging
 import os
 import re
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
-from typing import Any, Dict, List, cast
 
 import requests
+from typing import Any, Dict, List, cast
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,7 +34,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Constants
+
 GITHUB_API_URL = 'https://api.github.com'
 REPO = os.getenv('GITHUB_REPOSITORY')
 HEADERS = {
@@ -55,7 +53,7 @@ def get_prs() -> List[Dict[str, Any]]:
     )
     response.raise_for_status()
     # Here we use type Any because the GitHub API response structure is dynamic
-    # and not strictly typed, allowing for flexible data handling.
+    # Here use cast because strictly typed, allowing for flexible data handling.
     return cast(List[Dict[str, Any]], response.json())
 
 
@@ -65,8 +63,8 @@ def get_pr_commits(pr_number: int) -> List[Dict[str, Any]]:
     url = f'{GITHUB_API_URL}/repos/{REPO}/pulls/{pr_number}/commits'
     response = requests.get(url, headers=HEADERS, timeout=10)
     response.raise_for_status()
-    # Here we use cast because the commits' structure is known to be a list of
-    # dictionaries as per GitHub API documentation.
+    # Here use cast because the commits' structure is known to be a list of
+    # Here we use type Any because dictionaries as per GitHub API documentation.
     return cast(List[Dict[str, Any]], response.json())
 
 
@@ -102,8 +100,8 @@ def get_issue(issue_number: int) -> Dict[str, Any]:
     url = f'{GITHUB_API_URL}/repos/{REPO}/issues/{issue_number}'
     response = requests.get(url, headers=HEADERS, timeout=10)
     response.raise_for_status()
-    # Here we use type Any because the issue data can vary based on GitHub's API
-    # and may include unpredictable fields.
+    # Here use cast because the commits' structure is known to be a list of
+    # Here we use type Any because dictionaries as per GitHub API documentation.
     return cast(Dict[str, Any], response.json())
 
 
@@ -140,12 +138,10 @@ def main() -> None:  # pragma: no cover
         author = pr['user']['login']
         pr_body = pr.get('body', '')
 
-        # Parse timezone-aware datetime
         updated_at = datetime.strptime(
             pr['updated_at'], '%Y-%m-%dT%H:%M:%SZ'
         ).replace(tzinfo=timezone.utc)
 
-        # Fetch last commit time
         commits = get_pr_commits(pr_number)
         last_commit_time = updated_at
         if commits:
@@ -161,14 +157,12 @@ def main() -> None:  # pragma: no cover
             now - last_commit_time
         )
 
-        # Check for assigned reviewers
         if not pr['assignees']:
             comment_on_pr(
                 pr_number,
                 f'@{author} Please assign a reviewer to this pull request.',
             )
 
-        # Check for inactivity
         if last_commit_time < now - timedelta(days=7):
             comment_on_pr(
                 pr_number,
@@ -186,10 +180,9 @@ def main() -> None:  # pragma: no cover
             logger.info('Closing stale pull request #%d', pr_number)
             close_pr(pr_number)
 
-            # Unassign author from linked issues
             for issue_number in extract_issue_numbers(pr_body):
                 issue = get_issue(issue_number)
-                if any(a['login'] == author for a in issue.get('assignees', [])):
+                if any(a['login'] == author for a in issue.get('assignees')):
                     unassign_author(issue_number, author)
 
     logger.info('Pull request monitoring complete.')
