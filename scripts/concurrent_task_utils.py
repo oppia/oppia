@@ -29,7 +29,8 @@ LOG_LOCK: Final = threading.Lock()
 ALL_ERRORS: Final = []
 SUCCESS_MESSAGE_PREFIX: Final = 'SUCCESS '
 FAILED_MESSAGE_PREFIX: Final = 'FAILED '
-MAX_ATTEMPTS: Final = 3  
+MAX_ATTEMPTS: Final = 3
+
 
 def log(message: str, show_time: bool = False) -> None:
     """Logs a message to the terminal.
@@ -89,8 +90,6 @@ class TaskResult:
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    # Here we use type Any because the argument 'func' can accept any
-    # kind of function to create a task thread for it.
     def __init__(
         self,
         func: Callable[..., Any],
@@ -111,7 +110,7 @@ class TaskThread(threading.Thread):
         self.finished = False
         self.report_enabled = report_enabled
         self.errors_to_retry_on = errors_to_retry_on or []
-        self.num_attempts = 0 
+        self.num_attempts = 0
 
     def run(self) -> None:
         """Executes the task and retries on specified errors."""
@@ -120,12 +119,19 @@ class TaskThread(threading.Thread):
                 self.num_attempts += 1
                 try:
                     self.task_results = self.func()
-                    log(f"FINISHED {self.name}: {time.time() - self.start_time:.1f} secs", show_time=True)
-                    return  # Exit on success.
+                    log(
+                        f'FINISHED {self.name}: '
+                        f'{time.time() - self.start_time:.1f} secs',
+                        show_time=True
+                    )
+                    return
                 except Exception as e:
+                    # Check if the error is in the list of retryable errors.
                     if any(err in str(e) for err in self.errors_to_retry_on):
-                        log(f"Retrying {self.name} due to error: {e}. "
-                            f"Attempt {self.num_attempts}/{MAX_ATTEMPTS}.")
+                        log(
+                            f'Retrying {self.name} due to error: {e}. '
+                            f'Attempt {self.num_attempts}/{MAX_ATTEMPTS}.'
+                        )
                         if self.num_attempts >= MAX_ATTEMPTS:
                             self.exception = e
                             self.stacktrace = traceback.format_exc()
@@ -167,16 +173,8 @@ def _check_all_tasks(tasks: List[TaskThread]) -> None:
 def execute_tasks(
     tasks: List[TaskThread], semaphore: threading.Semaphore
 ) -> None:
-    """Starts all tasks and checks the results.
-    Runs no more than the allowable limit defined in the semaphore.
-
-    Args:
-        tasks: list(TaskThread). The tasks to run.
-        semaphore: threading.Semaphore. The object that controls how many tasks
-            can run at any time.
-    """
-    empty_tasks_list: List[TaskThread] = []
-    remaining_tasks: List[TaskThread] = empty_tasks_list + tasks
+    """Starts all tasks and checks the results."""
+    remaining_tasks: List[TaskThread] = tasks.copy()
     currently_running_tasks = []
 
     while remaining_tasks:
@@ -199,8 +197,6 @@ def execute_tasks(
     _check_all_tasks(currently_running_tasks)
 
 
-# Here we use type Any because the argument 'func' can accept any kind of
-# function to create a task thread for it.
 def create_task(
     func: Callable[..., Any],
     verbose: bool,
@@ -209,20 +205,7 @@ def create_task(
     report_enabled: bool = True,
     errors_to_retry_on: Optional[List[str]] = None
 ) -> TaskThread:
-    """Create a Task in its Thread.
-
-    Args:
-        func: Function. The function that is going to run.
-        verbose: bool. True if verbose mode is enabled.
-        semaphore: threading.Semaphore. The object that controls how many tasks
-            can run at any time.
-        name: str|None. Name of the task that is going to be created.
-        report_enabled: bool. Decide whether task result will print or not.
-        errors_to_retry_on: list(str)|None. List of error strings to retry on.
-
-    Returns:
-        task: TaskThread object. Created task.
-    """
-    task = TaskThread(func, verbose, semaphore, name, report_enabled, errors_to_retry_on)
+    """Create a Task in its Thread."""
+    task = TaskThread(
+        func, verbose, semaphore, name, report_enabled, errors_to_retry_on)
     return task
-
