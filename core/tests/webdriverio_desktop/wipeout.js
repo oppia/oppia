@@ -55,6 +55,7 @@ describe('When account is deleted it', function () {
     await workflow.addExplorationCollaborator('ExpCollaborator');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete2');
+    await users.logout();
 
     await users.login('ExpCollaborator@oppia.com');
     await general.openEditor(explorationId, false);
