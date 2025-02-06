@@ -86,10 +86,10 @@ const navbarLearnTabBasicMathematicsButton =
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
-const navbarAboutTabImpactReport2022Button =
-  'a.e2e-test-navbar-impact-report-button [year="2022"]';
 const navbarAboutTabImpactReport2023Button =
-  'a.e2e-test-navbar-impact-report-button [year="2023"]';
+  'a.e2e-test-navbar-impact-report-button-2023';
+const navbarAboutTabImpactReport2022Button =
+  'a.e2e-test-navbar-impact-report-button-2022';
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
@@ -136,9 +136,9 @@ const mobileSidebarBasicMathematicsButton =
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
 const mobileSidebarImpactReport2023Button =
-  'a.e2e-mobile-test-sidebar-impact-report-button [year="2023"]';
+  'a.e2e-mobile-test-sidebar-impact-report-button-2023';
 const mobileSidebarImpactReport2022Button =
-  'a.e2e-mobile-test-sidebar-impact-report-button [year="2022"]';
+  'a.e2e-mobile-test-sidebar-impact-report-button-2022';
 const mobileSidebarExpandAboutMenuButton =
   'div.e2e-mobile-test-sidebar-expand-about-menu';
 const mobileSidebarExpandImpactReportSubMenuButton =
