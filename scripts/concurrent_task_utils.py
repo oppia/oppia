@@ -175,7 +175,14 @@ def _check_all_tasks(tasks: List[TaskThread]) -> None:
 def execute_tasks(
     tasks: List[TaskThread], semaphore: threading.Semaphore
 ) -> None:
-    """Starts all tasks and checks the results."""
+    """Starts all tasks and checks the results.
+    Runs no more than the allowable limit defined in the semaphore.
+
+    Args:
+        tasks: list(TaskThread). The tasks to run.
+        semaphore: threading.Semaphore. The object that controls how many tasks
+            can run at any time.
+    """
     remaining_tasks: List[TaskThread] = tasks.copy()
     currently_running_tasks = []
 
