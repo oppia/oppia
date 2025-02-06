@@ -16,14 +16,12 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
+import datetime
 import logging
 import os
 import re
-
 import requests
+
 from typing import Any, Dict, List, cast
 
 logging.basicConfig(
@@ -54,8 +52,8 @@ def get_prs() -> List[Dict[str, Any]]:
         timeout=10
     )
     response.raise_for_status()
-    # Here we use type Any because the GitHub API response structure is dynamic
-    # Here use cast because strictly typed, allowing for flexible data handling.
+    # Here we use type Any because the GitHub API response structure is dynamic.
+    # Here use cast because the return type is explicitly annotated as a list of dicts.
     return cast(List[Dict[str, Any]], response.json())
 
 
@@ -65,8 +63,8 @@ def get_pr_commits(pr_number: int) -> List[Dict[str, Any]]:
     url = f'{GITHUB_API_URL}/repos/{REPO}/pulls/{pr_number}/commits'
     response = requests.get(url, headers=HEADERS, timeout=10)
     response.raise_for_status()
-    # Here use cast because the commits' structure is known to be a list of
-    # Here we use type Any because dictionaries as per GitHub API documentation.
+    # Here we use type Any because the commit data structure can vary.
+    # Here use cast because we expect a list of commit dictionaries.
     return cast(List[Dict[str, Any]], response.json())
 
 
@@ -102,8 +100,8 @@ def get_issue(issue_number: int) -> Dict[str, Any]:
     url = f'{GITHUB_API_URL}/repos/{REPO}/issues/{issue_number}'
     response = requests.get(url, headers=HEADERS, timeout=10)
     response.raise_for_status()
-    # Here use cast because the commits' structure is known to be a list of
-    # Here we use type Any because dictionaries as per GitHub API documentation.
+    # Here we use type Any because the issue data structure is complex and dynamic.
+    # Here use cast because we expect a dictionary representing the issue.
     return cast(Dict[str, Any], response.json())
 
 
@@ -133,24 +131,24 @@ def main() -> None:  # pragma: no cover
     """Main function to monitor and manage pull requests."""
     logger.info('Starting pull request monitoring...')
     prs = get_prs()
-    now = datetime.now(timezone.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     for pr in prs:
         pr_number = pr['number']
         author = pr['user']['login']
         pr_body = pr.get('body', '')
 
-        updated_at = datetime.strptime(
+        updated_at = datetime.datetime.strptime(
             pr['updated_at'], '%Y-%m-%dT%H:%M:%SZ'
-        ).replace(tzinfo=timezone.utc)
+        ).replace(tzinfo=datetime.timezone.utc)
 
         commits = get_pr_commits(pr_number)
         last_commit_time = updated_at
         if commits:
             last_commit = commits[-1]['commit']['committer']['date']
-            last_commit_time = datetime.strptime(
+            last_commit_time = datetime.datetime.strptime(
                 last_commit, '%Y-%m-%dT%H:%M:%SZ'
-            ).replace(tzinfo=timezone.utc)
+            ).replace(tzinfo=datetime.timezone.utc)
 
         logger.info(
             'PR #%d last activity: %s (%s ago)',
@@ -165,14 +163,14 @@ def main() -> None:  # pragma: no cover
                 f'@{author} Please assign a reviewer to this pull request.',
             )
 
-        if last_commit_time < now - timedelta(days=7):
+        if last_commit_time < now - datetime.timedelta(days=7):
             comment_on_pr(
                 pr_number,
                 'This pull request has been inactive for over 7 days. '
                 'Please update.'
             )
 
-        if last_commit_time < now - timedelta(days=10):
+        if last_commit_time < now - datetime.timedelta(days=10):
             comment_on_pr(
                 pr_number,
                 'This pull request has been inactive for over 10 days and '
@@ -184,7 +182,7 @@ def main() -> None:  # pragma: no cover
 
             for issue_number in extract_issue_numbers(pr_body):
                 issue = get_issue(issue_number)
-                if any(a['login'] == author for a in issue.get('assignees',[])):
+                if any(a['login'] == author for a in issue.get('assignees', [])):
                     unassign_author(issue_number, author)
 
     logger.info('Pull request monitoring complete.')
