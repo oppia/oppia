@@ -3013,6 +3013,10 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     REVIEWER_1_EMAIL: Final = 'reviewer1@community.org'
     REVIEWER_2_USERNAME: Final = 'reviewer2'
     REVIEWER_2_EMAIL: Final = 'reviewer2@community.org'
+    EMAIL_FOOTER: Final = (
+        'You can change your email preferences via the '
+        '<a href="http://localhost:8181/preferences">Preferences</a> page.'
+    )
 
     def _create_translation_suggestion_in_lang_with_html_and_datetime(
         self,
@@ -3343,9 +3347,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value))
+                EMAIL_FOOTER))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3413,9 +3415,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value))
+                EMAIL_FOOTER))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3483,9 +3483,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value))
+                EMAIL_FOOTER))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3554,9 +3552,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value))
+                EMAIL_FOOTER))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3625,9 +3621,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value))
+                EMAIL_FOOTER))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3695,9 +3689,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value))
+                EMAIL_FOOTER))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3765,9 +3757,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value))
+                EMAIL_FOOTER))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3844,9 +3834,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                 platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value))
+                EMAIL_FOOTER))
 
         with self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
@@ -3938,9 +3926,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
         )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
@@ -3965,9 +3951,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -4047,9 +4031,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -4118,9 +4100,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -4191,9 +4171,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -4264,9 +4242,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -4337,9 +4313,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
         )
 
         with self.log_new_error_ctx:
@@ -4410,9 +4384,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -4483,9 +4455,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -4563,9 +4533,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -4658,9 +4626,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
         )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
@@ -4685,9 +4651,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
         )
 
         with self.log_new_error_ctx:
@@ -4789,9 +4753,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
         )
         expected_email_html_body_reviewer_2 = (
             'Hi reviewer2,'
@@ -4816,9 +4778,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             '- The Oppia Contributor Dashboard Team'
             '<br><br>%s' % (
                 DEV_OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                platform_parameter_registry.Registry.get_platform_parameter(
-                    param_list.ParamName.EMAIL_FOOTER.value
-                ).default_value)
+                EMAIL_FOOTER)
             )
 
         with self.log_new_error_ctx:
@@ -5922,7 +5882,8 @@ class NotifyReviewersNewSuggestionsTests(
             (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'),
-            (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True) # pylint: disable=line-too-long
+            (param_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True), # pylint: disable=line-too-long
+            (param_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS, DEV_OPPIA_SITE_URL)
         ]
     )
     def test_email_not_sent_if_no_reviewers_to_notify(self) -> None:

@@ -275,6 +275,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             Body:
                 Content-type: text/html
                 Data length: %d
+                Html content: html
 
             Bcc: None
             Reply_to: None
