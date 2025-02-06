@@ -19,11 +19,11 @@
     <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
     <span [matTooltip]="errorMessage"
           matTooltipClass="oppia-mat-tooltip-list"
-          [matTooltipDisabled]="isSaveButtonEnabled()"
+          [matTooltipDisabled]="isDoneButtonDisabled()"
           class="w-100">
       <button class="btn btn-success e2e-test-confirm-skill-selection-button"
               (click)="confirm()"
-              [disabled]="isConfirmButtonDisabled()">
+              [disabled]="!selectedSkillId || !isSaveButtonEnabled()">
         Done
       </button>
     </span>
