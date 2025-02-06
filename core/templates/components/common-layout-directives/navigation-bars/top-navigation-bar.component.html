@@ -201,13 +201,14 @@
               </span>
               <ul class="oppia-navbar-impactreport-tab-content">
                 <li *ngFor="let report of impactReports">
-                  <a [class]="report.className"
+                  <a class="dropdown-item nav-link oppia-navbar-tab-content about-link oppia-navbar-impactreport-submenu-tab-content oppia-impact-report-btn e2e-test-navbar-impact-report-button"
                      [href]="report.link"
                      target="_blank"
                      (blur)="aboutDropdown.close()"
-                     rel="noopener">
+                     rel="noopener"
+                     [year]="report.year">
                     <span class="link">
-                      {{ report.text | translate }}
+                      {{ report.year | translate }}
                     </span>
                     <i class="fas fa-external-link-alt launch-icon"></i>
                   </a>

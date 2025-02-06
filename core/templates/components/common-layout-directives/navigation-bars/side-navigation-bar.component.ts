@@ -41,15 +41,11 @@ export class SideNavigationBarComponent {
   impactReports = [
     {
       link: AppConstants.IMPACT_REPORT_LINK_2023,
-      text: '2023',
-      className:
-        'oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-2023-button',
+      year: '2023',
     },
     {
       link: AppConstants.IMPACT_REPORT_LINK_2022,
-      text: '2022',
-      className:
-        'oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-2022-button',
+      year: '2022',
     },
   ];
   currentUrl!: string;

@@ -322,9 +322,10 @@
                  target="_blank"
                  rel="noopener"
                  [href]="report.link"
-                 [class]="report.className">
+                 class="oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-button"
+                 [year]="report.year">
                 <span class="oppia-sidebar-submenu-title">
-                  {{ report.text | translate }}
+                  {{ report.year | translate }}
                 </span>
                 <i class="fas fa-external-link-alt launch-icon"></i>
               </a>

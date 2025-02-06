@@ -86,10 +86,12 @@ const navbarLearnTabBasicMathematicsButton =
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
-const navbarAboutTabImpactReport2022Button =
-  'a.e2e-test-navbar-impact-report-2022-button';
-const navbarAboutTabImpactReport2023Button =
-  'a.e2e-test-navbar-impact-report-2023-button';
+const navbarAboutTabImpactReport2022Button = document.querySelector(
+  `a.e2e-test-navbar-impact-report-button [year="2022"]`
+);
+const navbarAboutTabImpactReport2023Button = document.querySelector(
+  `a.e2e-test-navbar-impact-report-button [year="2023"]`
+);
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
@@ -136,9 +138,9 @@ const mobileSidebarBasicMathematicsButton =
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
 const mobileSidebarImpactReport2023Button =
-  'a.e2e-mobile-test-sidebar-impact-report-2023-button';
+  'a.e2e-mobile-test-sidebar-impact-report-button [year="2023"]';
 const mobileSidebarImpactReport2022Button =
-  'a.e2e-mobile-test-sidebar-impact-report-2022-button';
+  'a.e2e-mobile-test-sidebar-impact-report-button [year="2022"]';
 const mobileSidebarExpandAboutMenuButton =
   'div.e2e-mobile-test-sidebar-expand-about-menu';
 const mobileSidebarExpandImpactReportSubMenuButton =
@@ -655,6 +657,14 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Impact Report.
    */
   async clickImpactReportButtonInAboutMenuOnNavbar(): Promise<void> {
+    impactReportButtons.forEach(button => {
+      if (button.textContent.includes('2022')) {
+        navbarAboutTabImpactReport2022Button = button;
+      }
+      if (button.textContent.includes('2023')) {
+        navbarAboutTabImpactReport2023Button = button;
+      }
+    });
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
