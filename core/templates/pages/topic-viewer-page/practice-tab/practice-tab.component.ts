@@ -20,7 +20,7 @@ import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
-
+import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -49,7 +49,7 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicName!: string;
   @Input() subtopicsList!: Subtopic[];
-  @Input() previewMode: boolean = false;
+  @Input() startButtonIsDisabled: boolean = false;
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
@@ -75,7 +75,8 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     private ngbModal: NgbModal,
     private translateService: TranslateService,
     private loaderService: LoaderService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private editableTopicBackendApiService: EditableTopicBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -101,11 +102,29 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       false
     );
     this.clientWidth = window.innerWidth;
-    if (this.displayArea === 'topicViewer' && !this.previewMode) {
+    if (
+      this.displayArea === 'topicViewer' &&
+      this.urlService.getPathname().startsWith('/learn')
+    ) {
       this.topicUrlFragment =
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
       this.classroomUrlFragment =
         this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    } else if (
+      this.displayArea === 'topicViewer' &&
+      this.urlService.getPathname().startsWith('/topic_editor')
+    ) {
+      this.topicId = this.urlService.getTopicIdFromUrl();
+      let topicDataPromise =
+        this.editableTopicBackendApiService.fetchTopicAsync(this.topicId);
+      topicDataPromise
+        .then(topicData => {
+          this.topicUrlFragment = topicData.topicDict.url_fragment;
+          this.classroomUrlFragment = topicData.classroomUrlFragment;
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
     this.topicNameTranslationKey =
       this.i18nLanguageCodeService.getTopicTranslationKey(
@@ -147,7 +166,7 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   }
 
   isStartButtonDisabled(): boolean {
-    if (this.previewMode) {
+    if (this.startButtonIsDisabled) {
       return true;
     }
     for (var idx in this.selectedSubtopicIndices) {
@@ -172,6 +191,9 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
         .then(questionCount => {
           this.questionsAreAvailable = questionCount > 0;
           this.questionsStatusCallIsComplete = true;
+          if (this.questionsAreAvailable) {
+            this.startButtonIsDisabled = false;
+          }
         });
     } else {
       this.questionsAreAvailable = false;
