@@ -220,7 +220,6 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
         test_target = "retryable_task"
         semaphore = threading.Semaphore(1)
 
-       
         task = concurrent_task_utils.create_task(
             func=mock_func,
             verbose=True,
@@ -232,7 +231,6 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
 
         task.run()  
 
-        
         self.assertEqual(task.num_attempts, 2)  
         self.assertTrue(task.finished)  
         self.assertIsNone(task.exception) 
@@ -247,7 +245,6 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
         test_target = "non_retryable_task"
         semaphore = threading.Semaphore(1)
 
-    
         task = concurrent_task_utils.create_task(
             func=mock_func,
             verbose=True,
@@ -259,11 +256,40 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
 
         task.run() 
 
- 
         self.assertEqual(task.num_attempts, 1)  
         self.assertTrue(task.finished) 
         self.assertIsNotNone(task.exception)  
         self.assertEqual(str(task.exception), "Non-retryable error") 
+
+    def test_create_task_exceeds_max_retries(self) -> None:
+        """Test that the task stops retrying after max attempts and raises the exception."""
+        call_count = 0
+
+        def mock_func() -> List[concurrent_task_utils.TaskResult]:
+            nonlocal call_count
+            call_count += 1
+            raise Exception("Error -11")  # Retryable error
+
+        test_target = "retryable_task_exceeds_max"
+        semaphore = threading.Semaphore(1)
+
+        task = concurrent_task_utils.create_task(
+            func=mock_func,
+            verbose=True,
+            semaphore=semaphore,
+            name=test_target,
+            report_enabled=False,
+            errors_to_retry_on=["Error -11"]
+        )
+
+        task.run()
+
+        # Verify the task attempted twice (initial attempt + 1 retry)
+        self.assertEqual(task.num_attempts, 2)
+        self.assertTrue(task.finished)
+        self.assertIsNotNone(task.exception)
+        self.assertEqual(str(task.exception), "Error -11")
+        self.assertEqual(call_count, 2)
 
     def test_create_task_with_bad_string_error(self) -> None:
         """Test for create_task method with bad string error."""
