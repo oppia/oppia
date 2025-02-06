@@ -207,7 +207,19 @@ def create_task(
     report_enabled: bool = True,
     errors_to_retry_on: Optional[List[str]] = None
 ) -> TaskThread:
-    """Create a Task in its Thread."""
+    """Create a Task in its Thread.
+
+    Args:
+        func: Function. The function that is going to run.
+        verbose: bool. True if verbose mode is enabled.
+        semaphore: threading.Semaphore. The object that controls how many tasks
+            can run at any time.
+        name: str|None. Name of the task that is going to be created.
+        report_enabled: bool. Decide whether task result will print or not.
+
+    Returns:
+        task: TaskThread object. Created task.
+    """
     task = TaskThread(
         func, verbose, semaphore, name, report_enabled, errors_to_retry_on)
     return task
