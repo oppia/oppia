@@ -22,7 +22,6 @@ import {MatCardModule} from '@angular/material/card';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatRadioModule} from '@angular/material/radio';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {By} from '@angular/platform-browser';
 import {
   CategorizedSkills,
   SelectSkillModalComponent,
@@ -140,13 +139,11 @@ describe('Select Skill Modal', () => {
 
   it('should keep Done button disabled when no skill is selected', () => {
     componentInstance.setSelectedSkillId('');
-    fixture.detectChanges();
     expect(componentInstance.isDoneButtonDisabled()).toBe(true);
   });
 
   it('should activate Done button when a skill is chosen', () => {
     componentInstance.setSelectedSkillId('skillId3');
-    fixture.detectChanges();
     expect(componentInstance.isDoneButtonDisabled()).toBe(false);
   });
 });
