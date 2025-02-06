@@ -120,7 +120,7 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       topicDataPromise
         .then(topicData => {
           this.topicUrlFragment = topicData.topicDict.url_fragment;
-          this.classroomUrlFragment = topicData.classroomUrlFragment;
+          this.classroomUrlFragment = topicData.classroomUrlFragment ?? '';
         })
         .catch(error => {
           console.error(error);
