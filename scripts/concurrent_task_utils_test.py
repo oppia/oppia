@@ -203,7 +203,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         )
 
 
-class TaskRetryBehaviorTests(test_utils.GenericTestBase):
+class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
     """Tests for retry behaviors in create_task method."""
 
     def test_create_task_with_retryable_errors(self) -> None:
