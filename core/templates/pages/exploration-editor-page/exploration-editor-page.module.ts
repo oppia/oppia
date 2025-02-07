@@ -16,40 +16,19 @@
  * @fileoverview Module for the exploration editor page.
  */
 
-import {APP_INITIALIZER, NgModule, StaticProvider} from '@angular/core';
-import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
-import {HttpClientModule} from '@angular/common/http';
-import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
-import {APP_BASE_HREF} from '@angular/common';
 
-import {JoyrideModule} from 'ngx-joyride';
+import {JoyrideModule, JoyrideService, LoggerService} from 'ngx-joyride';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatMenuModule} from '@angular/material/menu';
 import {SharedComponentsModule} from 'components/shared-component.module';
-import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
-import {
-  platformFeatureInitFactory,
-  PlatformFeatureService,
-} from 'services/platform-feature.service';
-import {RequestInterceptor} from 'services/request-interceptor.service';
 import {StateParamChangesEditorComponent} from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import {DeleteStateSkillModalComponent} from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
-import {SaveVersionMismatchModalComponent} from './modal-templates/save-version-mismatch-modal.component';
-import {SaveValidationFailModalComponent} from './modal-templates/save-validation-fail-modal.component';
-import {ChangesInHumanReadableFormComponent} from './changes-in-human-readable-form/changes-in-human-readable-form.component';
-import {LostChangesModalComponent} from './modal-templates/lost-changes-modal.component';
 import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {StateDiffModalComponent} from './modal-templates/state-diff-modal.component';
-import {PostPublishModalComponent} from './modal-templates/post-publish-modal.component';
-import {ExplorationPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
-import {EditorReloadingModalComponent} from './modal-templates/editor-reloading-modal.component';
-import {ConfirmDiscardChangesModalComponent} from './modal-templates/confirm-discard-changes-modal.component';
 import {CreateFeedbackThreadModalComponent} from './feedback-tab/templates/create-feedback-thread-modal.component';
-import {PreviewSummaryTileModalComponent} from './settings-tab/templates/preview-summary-tile-modal.component';
 import {WelcomeTranslationModalComponent} from './translation-tab/modal-templates/welcome-translation-modal.component';
 import {DeleteExplorationModalComponent} from './settings-tab/templates/delete-exploration-modal.component';
 import {RemoveRoleConfirmationModalComponent} from './settings-tab/templates/remove-role-confirmation-modal.component';
@@ -59,18 +38,11 @@ import {TransferExplorationOwnershipModalComponent} from './settings-tab/templat
 import {HelpModalComponent} from './modal-templates/help-modal.component';
 import {DeleteAudioTranslationModalComponent} from './translation-tab/modal-templates/delete-audio-translation-modal.component';
 import {TranslationTabBusyModalComponent} from './translation-tab/modal-templates/translation-tab-busy-modal.component';
-import {ConfirmDeleteStateModalComponent} from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import {PreviewSetParametersModalComponent} from './preview-tab/templates/preview-set-parameters-modal.component';
 import {CheckRevertExplorationModalComponent} from './history-tab/modal-templates/check-revert-exploration-modal.component';
 import {RevertExplorationModalComponent} from './history-tab/modal-templates/revert-exploration-modal.component';
 import {ExplorationMetadataDiffModalComponent} from './modal-templates/exploration-metadata-diff-modal.component';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
-import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
-import {ExplorationTitleEditorComponent} from './exploration-title-editor/exploration-title-editor.component';
-import {ExplorationObjectiveEditorComponent} from './exploration-objective-editor/exploration-objective-editor.component';
-import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {ExplorationSaveModalComponent} from './modal-templates/exploration-save-modal.component';
 import {EditorNavbarBreadcrumbComponent} from './editor-navigation/editor-navbar-breadcrumb.component';
 import {ExplorationGraphModalComponent} from './editor-tab/templates/modal-templates/exploration-graph-modal.component';
 import {ExplorationGraphComponent} from './editor-tab/graph-directives/exploration-graph.component';
@@ -102,23 +74,131 @@ import {ValueGeneratorEditorComponent} from './param-changes-editor/value-genera
 import {ParamChangesEditorComponent} from './param-changes-editor/param-changes-editor.component';
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
 import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover-card/modals/voiceover-removal-confirm-modal.component';
-import {ModifyTranslationsModalComponent} from './modal-templates/exploration-modify-translations-modal.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
+import {ExplorationPlayerViewerCommonModule} from 'pages/exploration-player-page/exploration-player-viewer-common.module';
+import {StateVersionHistoryModalComponent} from './modal-templates/state-version-history-modal.component';
+import {MetadataVersionHistoryModalComponent} from './modal-templates/metadata-version-history-modal.component';
+import {StateVersionHistoryComponent} from './editor-tab/state-version-history/state-version-history.component';
+import {ExplorationEditorPageRootComponent} from './exploration-editor-page-root.component';
+import {CommonModule} from '@angular/common';
+import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
+import 'third-party-imports/guppy.import';
+import 'third-party-imports/midi-js.import';
+import 'third-party-imports/skulpt.import';
+
+// Services used by the exploration editor page.
+import {AlertsService} from 'services/alerts.service';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
+import {ChangeListService} from './services/change-list.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {ContextService} from 'services/context.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {EditorFirstTimeEventsService} from './services/editor-first-time-events.service';
+import {EditabilityService} from 'services/editability.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {EventBusService} from 'app-events/event-bus.service';
+import {ExplorationAutomaticTextToSpeechService} from './services/exploration-automatic-text-to-speech.service';
+import {ExplorationCategoryService} from './services/exploration-category.service';
+import {ExplorationDataBackendApiService} from './services/exploration-data-backend-api.service';
+import {ExplorationDataService} from './services/exploration-data.service';
+import {ExplorationEditsAllowedBackendApiService} from './services/exploration-edits-allowed-backend-api.service';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {ExplorationInitStateNameService} from './services/exploration-init-state-name.service';
+import {ExplorationLanguageCodeService} from './services/exploration-language-code.service';
+import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
+import {ExplorationObjectiveService} from './services/exploration-objective.service';
+import {ExplorationParamChangesService} from './services/exploration-param-changes.service';
+import {ExplorationParamSpecsService} from './services/exploration-param-specs.service';
+import {ExplorationPropertyService} from './services/exploration-property.service';
+import {ExplorationRightsBackendApiService} from './services/exploration-rights-backend-api.service';
+import {ExplorationRightsService} from './services/exploration-rights.service';
+import {ExplorationSaveService} from './services/exploration-save.service';
+import {ExplorationStatesService} from './services/exploration-states.service';
+import {ExplorationTagsService} from './services/exploration-tags.service';
+import {ExplorationTitleService} from './services/exploration-title.service';
+import {ExplorationWarningsService} from './services/exploration-warnings.service';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {GraphDataService} from './services/graph-data.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {InteractionDetailsCacheService} from './editor-tab/services/interaction-details-cache.service';
+import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {LoaderService} from 'services/loader.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {ParameterMetadataService} from './services/parameter-metadata.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PopulateRuleContentIdsService} from './services/populate-rule-content-ids.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ResponsesService} from './editor-tab/services/responses.service';
+import {RouterService} from './services/router.service';
+import {RteHelperService} from 'services/rte-helper.service';
+import {SettingTabBackendApiService} from './services/setting-tab-backend-api.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {SolutionValidityService} from './editor-tab/services/solution-validity.service';
+import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
+import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import {StateEditorRefreshService} from './services/state-editor-refresh.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateHintsService} from 'components/state-editor/state-editor-properties-services/state-hints.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {StateLinkedSkillIdService} from 'components/state-editor/state-editor-properties-services/state-skill.service';
+import {StateNameService} from 'components/state-editor/state-editor-properties-services/state-name.service';
+import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
+import {StateSolicitAnswerDetailsService} from 'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {StateTutorialFirstTimeService} from './services/state-tutorial-first-time.service';
+import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {TranslationLanguageService} from './translation-tab/services/translation-language.service';
+import {TranslationStatusService} from './translation-tab/services/translation-status.service';
+import {TranslationTabActiveModeService} from './translation-tab/services/translation-tab-active-mode.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UserEmailPreferencesService} from './services/user-email-preferences.service';
+import {UserExplorationPermissionsService} from './services/user-exploration-permissions.service';
+import {UserService} from 'services/user.service';
+import {ValidatorsService} from 'services/validators.service';
+import {VersionHistoryBackendApiService} from './services/version-history-backend-api.service';
+import {VersionHistoryService} from './services/version-history.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ExplorationEditorPageRootComponent,
+        canActivate: [ExplorationEditorPageAuthGuard],
+      },
+    ]),
+    NgbModule,
     InteractionExtensionsModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
     MatMenuModule,
     FormsModule,
     MatPaginatorModule,
-    RouterModule.forRoot([]),
     JoyrideModule.forRoot(),
     SharedComponentsModule,
     ExplorationPlayerViewerCommonModule,
@@ -128,26 +208,16 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
   declarations: [
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
-    SaveVersionMismatchModalComponent,
-    SaveValidationFailModalComponent,
-    ChangesInHumanReadableFormComponent,
     VoiceoverRemovalConfirmModalComponent,
-    LostChangesModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
-    PostPublishModalComponent,
-    ConfirmDiscardChangesModalComponent,
-    ExplorationPublishModalComponent,
-    EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
-    PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
     HelpModalComponent,
-    ConfirmDeleteStateModalComponent,
     PreviewSetParametersModalComponent,
     CheckRevertExplorationModalComponent,
     RevertExplorationModalComponent,
@@ -155,10 +225,6 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
     ExplorationMetadataDiffModalComponent,
-    ExplorationTitleEditorComponent,
-    ExplorationObjectiveEditorComponent,
-    ExplorationMetadataModalComponent,
-    ExplorationSaveModalComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,
@@ -192,31 +258,21 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
     TranslationTabComponent,
     ExplorationEditorPageComponent,
     StateVersionHistoryComponent,
-    ModifyTranslationsModalComponent,
+    ExplorationEditorPageRootComponent,
   ],
   entryComponents: [
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
-    SaveVersionMismatchModalComponent,
-    SaveValidationFailModalComponent,
-    ChangesInHumanReadableFormComponent,
     VoiceoverRemovalConfirmModalComponent,
-    LostChangesModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
-    PostPublishModalComponent,
-    ConfirmDiscardChangesModalComponent,
-    ExplorationPublishModalComponent,
-    EditorReloadingModalComponent,
     CreateFeedbackThreadModalComponent,
-    PreviewSummaryTileModalComponent,
     DeleteExplorationModalComponent,
     RemoveRoleConfirmationModalComponent,
     ReassignRoleConfirmationModalComponent,
     ModeratorUnpublishExplorationModalComponent,
     TransferExplorationOwnershipModalComponent,
     HelpModalComponent,
-    ConfirmDeleteStateModalComponent,
     PreviewSetParametersModalComponent,
     CheckRevertExplorationModalComponent,
     RevertExplorationModalComponent,
@@ -224,10 +280,6 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
     ExplorationMetadataDiffModalComponent,
-    ExplorationTitleEditorComponent,
-    ExplorationObjectiveEditorComponent,
-    ExplorationMetadataModalComponent,
-    ExplorationSaveModalComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,
@@ -261,62 +313,99 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
     TranslationTabComponent,
     ExplorationEditorPageComponent,
     StateVersionHistoryComponent,
-    ModifyTranslationsModalComponent,
+    ExplorationEditorPageRootComponent,
   ],
   providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig,
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/',
-    },
+    AlertsService,
+    AnswerClassificationService,
+    AssetsBackendApiService,
+    AutosaveInfoModalsService,
+    ChangeListService,
+    ComputeGraphService,
+    ContextService,
+    CurrentInteractionService,
+    EditorFirstTimeEventsService,
+    EditabilityService,
+    EditableExplorationBackendApiService,
+    EntityTranslationsService,
+    EntityVoiceoversService,
+    EventBusService,
+    ExplorationAutomaticTextToSpeechService,
+    ExplorationCategoryService,
+    ExplorationDataBackendApiService,
+    ExplorationDataService,
+    ExplorationEditsAllowedBackendApiService,
+    ExplorationFeaturesService,
+    ExplorationHtmlFormatterService,
+    ExplorationInitStateNameService,
+    ExplorationLanguageCodeService,
+    ExplorationMetadataObjectFactory,
+    ExplorationNextContentIdIndexService,
+    ExplorationObjectiveService,
+    ExplorationParamChangesService,
+    ExplorationParamSpecsService,
+    ExplorationPropertyService,
+    ExplorationRightsBackendApiService,
+    ExplorationRightsService,
+    ExplorationSaveService,
+    ExplorationStatesService,
+    ExplorationTagsService,
+    ExplorationTitleService,
+    ExplorationWarningsService,
+    ExternalRteSaveService,
+    FocusManagerService,
+    GenerateContentIdService,
+    GraphDataService,
+    ImageLocalStorageService,
+    ImageUploadHelperService,
+    InteractionAttributesExtractorService,
+    InteractionDetailsCacheService,
+    InteractionRulesRegistryService,
+    InternetConnectivityService,
+    JoyrideService,
+    LanguageUtilService,
+    LoaderService,
+    LocalStorageService,
+    LoggerService,
+    ParameterMetadataService,
+    PlatformFeatureService,
+    PlayerPositionService,
+    PopulateRuleContentIdsService,
+    ReadOnlyExplorationBackendApiService,
+    ResponsesService,
+    RouterService,
+    RteHelperService,
+    SettingTabBackendApiService,
+    SiteAnalyticsService,
+    SkillBackendApiService,
+    SolutionValidityService,
+    StateCardIsCheckpointService,
+    StateContentService,
+    StateCustomizationArgsService,
+    StateEditorRefreshService,
+    StateEditorService,
+    StateHintsService,
+    StateInteractionIdService,
+    StateLinkedSkillIdService,
+    StateNameService,
+    StateParamChangesService,
+    StateSolicitAnswerDetailsService,
+    StateSolutionService,
+    StateTutorialFirstTimeService,
+    StatesObjectFactory,
+    TranslationLanguageService,
+    TranslationStatusService,
+    TranslationTabActiveModeService,
+    UrlInterpolationService,
+    UserEmailPreferencesService,
+    UserExplorationPermissionsService,
+    UserService,
+    ValidatorsService,
+    VersionHistoryBackendApiService,
+    VersionHistoryService,
+    VoiceoverBackendApiService,
+    VoiceoverPlayerService,
+    WindowDimensionsService,
   ],
 })
-class ExplorationEditorPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
-import {downgradeModule} from '@angular/upgrade/static';
-import {ToastrModule} from 'ngx-toastr';
-import {MyHammerConfig, toastrConfig} from 'pages/oppia-root/app.module';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
-import {ExplorationPlayerViewerCommonModule} from 'pages/exploration-player-page/exploration-player-viewer-common.module';
-import {StateVersionHistoryModalComponent} from './modal-templates/state-version-history-modal.component';
-import {MetadataVersionHistoryModalComponent} from './modal-templates/metadata-version-history-modal.component';
-import {StateVersionHistoryComponent} from './editor-tab/state-version-history/state-version-history.component';
-
-const bootstrapFnAsync = async (extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ExplorationEditorPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent,
-  }) as angular.IDirectiveFactory
-);
+export class ExplorationEditorPageModule {}
