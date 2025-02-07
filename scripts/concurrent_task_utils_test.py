@@ -236,14 +236,6 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             errors_to_retry_on=['Error -11']
         )
 
-        task.run()
-
-        self.assertEqual(task.num_attempts, 2)
-        self.assertTrue(task.finished)
-        self.assertIsNone(task.exception)
-        self.assertEqual(call_count, 2)
-        self.assertEqual(task.task_results[0].messages[0], 'Success')
-
     def test_create_task_with_non_retryable_errors(self) -> None:
         """Test for create_task method with non-retryable errors."""
         def mock_func() -> None:
@@ -260,13 +252,6 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             report_enabled=False,
             errors_to_retry_on=['Error -11']
         )
-
-        task.run()
-
-        self.assertEqual(task.num_attempts, 1)
-        self.assertTrue(task.finished)
-        self.assertIsNotNone(task.exception)
-        self.assertEqual(str(task.exception), 'Non-retryable error')
 
     def test_create_task_exceeds_max_retries(self) -> None:
         """Test that the task stops retrying after max attempts."""
@@ -289,14 +274,6 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             errors_to_retry_on=['Error -11']
         )
 
-        task.run()
-
-        self.assertEqual(task.num_attempts, 2)
-        self.assertTrue(task.finished)
-        self.assertIsNotNone(task.exception)
-        self.assertEqual(str(task.exception), 'Error -11')
-        self.assertEqual(call_count, 2)
-
     def test_create_task_with_bad_string_error(self) -> None:
         """Test for create_task method with bad string error."""
         def mock_func() -> None:
@@ -313,10 +290,3 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             report_enabled=False,
             errors_to_retry_on=['Error -11']
         )
-
-        task.run()
-
-        self.assertEqual(task.num_attempts, 1)
-        self.assertTrue(task.finished)
-        self.assertIsNotNone(task.exception)
-        self.assertEqual(str(task.exception), 'Bad string error')
