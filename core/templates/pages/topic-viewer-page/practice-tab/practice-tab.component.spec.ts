@@ -47,6 +47,14 @@ class MockUrlService {
   getClassroomUrlFragmentFromLearnerUrl() {
     return 'classroom_1';
   }
+
+  getPathname() {
+    return '/topic_editor';
+  }
+
+  getTopicIdFromUrl() {
+    return 'topic_id_1';
+  }
 }
 
 class MockWindowRef {
@@ -270,6 +278,8 @@ describe('Practice tab component', function () {
     function () {
       spyOn(loaderService, 'showLoadingScreen');
       component.selectedSubtopicIndices[0] = true;
+      component.topicUrlFragment = 'topic_1';
+      component.classroomUrlFragment = 'classroom_1';
 
       component.openNewPracticeSession();
 
