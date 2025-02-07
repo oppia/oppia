@@ -40,7 +40,6 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {StoryCreationBackendApiService} from 'components/entity-creation-services/story-creation-backend-api.service';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {PageTitleService} from 'services/page-title.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Topic} from 'domain/topic/topic-object.model';
@@ -49,7 +48,7 @@ import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearr
 
 @Component({
   selector: 'oppia-topic-editor-tab',
-  templateUrl: './topic-editor-tab.directive.html',
+  templateUrl: './topic-editor-tab.component.html',
 })
 export class TopicEditorTabComponent implements OnInit, OnDestroy {
   skillCreationIsAllowed: boolean;
@@ -681,10 +680,3 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTopicEditorTab',
-  downgradeComponent({
-    component: TopicEditorTabComponent,
-  }) as angular.IDirectiveFactory
-);
