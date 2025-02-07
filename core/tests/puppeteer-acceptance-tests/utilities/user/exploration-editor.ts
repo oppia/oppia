@@ -1733,28 +1733,30 @@ export class ExplorationEditor extends BaseUser {
 
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
-    numberToPublish: number = 5,
     category: string = 'Algebra'
   ): Promise<string | null> {
-    if (numberToPublish < 1) {
-      throw new Error(
-        'Number of explorations to publish can not be less than 1'
-      );
-    }
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
     await this.dismissWelcomeModal();
+    await this.navigateToSettingsTab();
+    await this.updateTitleTo(explorationTitle);
+    await this.navigateToEditorTab();
 
-    for (let i = 0; i < numberToPublish - 1; i++) {
-      await this.updateCardContent(`Content ${i}`);
-      await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    for (let i = 0; i < 2; i++) {
+      await Promise.all([
+        await this.updateCardContent(`Content ${i}`),
+        await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON),
+        await this.viewOppiaResponses(),
+      ]);
       await this.directLearnersToNewCard(`Card ${i + 1}`);
+      await this.navigateToCard(`Card ${i + 1}`);
     }
-    await this.updateCardContent(`Content ${numberToPublish - 1}`);
+    await this.updateCardContent('Content 2');
     await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
     await this.saveExplorationDraft();
-    return this.publishExplorationWithMetadata(
+
+    await this.navigateToCard('Introduction');
+    return await this.publishExplorationWithMetadata(
       `Exploration Title: ${explorationTitle}`,
       `Goals of ${explorationTitle}`,
       category
