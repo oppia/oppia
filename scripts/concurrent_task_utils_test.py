@@ -207,17 +207,20 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
 
     def test_create_task_with_retryable_errors(self) -> None:
         """Test for create_task method with retryable errors."""
-        call_count = 0  
+        call_count = 0
 
         def mock_func() -> List[concurrent_task_utils.TaskResult]:
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                raise Exception("Error -11")  
-            return [concurrent_task_utils.TaskResult(
-                name="mock_task", failed=False, trimmed_messages=[], messages=["Success"])]
+                raise Exception('Error -11')
+            return [
+                concurrent_task_utils.TaskResult(
+                    name='mock_task', failed=False, trimmed_messages=[], messages=['Success']
+                )
+            ]
 
-        test_target = "retryable_task"
+        test_target = 'retryable_task'
         semaphore = threading.Semaphore(1)
 
         task = concurrent_task_utils.create_task(
@@ -226,23 +229,23 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
             semaphore=semaphore,
             name=test_target,
             report_enabled=False,
-            errors_to_retry_on=["Error -11"]  
+            errors_to_retry_on=['Error -11']
         )
 
-        task.run()  
+        task.run()
 
-        self.assertEqual(task.num_attempts, 2)  
-        self.assertTrue(task.finished)  
-        self.assertIsNone(task.exception) 
-        self.assertEqual(call_count, 2)  
-        self.assertEqual(task.task_results[0].messages[0], "Success")  
+        self.assertEqual(task.num_attempts, 2)
+        self.assertTrue(task.finished)
+        self.assertIsNone(task.exception)
+        self.assertEqual(call_count, 2)
+        self.assertEqual(task.task_results[0].messages[0], 'Success')
 
     def test_create_task_with_non_retryable_errors(self) -> None:
         """Test for create_task method with non-retryable errors."""
         def mock_func() -> None:
-            raise Exception("Non-retryable error") 
+            raise Exception('Non-retryable error')
 
-        test_target = "non_retryable_task"
+        test_target = 'non_retryable_task'
         semaphore = threading.Semaphore(1)
 
         task = concurrent_task_utils.create_task(
@@ -251,15 +254,15 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
             semaphore=semaphore,
             name=test_target,
             report_enabled=False,
-            errors_to_retry_on=["Error -11"]  
+            errors_to_retry_on=['Error -11']
         )
 
-        task.run() 
+        task.run()
 
-        self.assertEqual(task.num_attempts, 1)  
-        self.assertTrue(task.finished) 
-        self.assertIsNotNone(task.exception)  
-        self.assertEqual(str(task.exception), "Non-retryable error") 
+        self.assertEqual(task.num_attempts, 1)
+        self.assertTrue(task.finished)
+        self.assertIsNotNone(task.exception)
+        self.assertEqual(str(task.exception), 'Non-retryable error')
 
     def test_create_task_exceeds_max_retries(self) -> None:
         """Test that the task stops retrying after max attempts and raises the exception."""
@@ -268,9 +271,9 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
         def mock_func() -> List[concurrent_task_utils.TaskResult]:
             nonlocal call_count
             call_count += 1
-            raise Exception("Error -11")  # Retryable error
+            raise Exception('Error -11')
 
-        test_target = "retryable_task_exceeds_max"
+        test_target = 'retryable_task_exceeds_max'
         semaphore = threading.Semaphore(1)
 
         task = concurrent_task_utils.create_task(
@@ -279,40 +282,37 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
             semaphore=semaphore,
             name=test_target,
             report_enabled=False,
-            errors_to_retry_on=["Error -11"]
+            errors_to_retry_on=['Error -11']
         )
 
         task.run()
 
-        # Verify the task attempted twice (initial attempt + 1 retry)
         self.assertEqual(task.num_attempts, 2)
         self.assertTrue(task.finished)
         self.assertIsNotNone(task.exception)
-        self.assertEqual(str(task.exception), "Error -11")
+        self.assertEqual(str(task.exception), 'Error -11')
         self.assertEqual(call_count, 2)
 
     def test_create_task_with_bad_string_error(self) -> None:
         """Test for create_task method with bad string error."""
         def mock_func() -> None:
-            raise Exception("Bad string error")  
+            raise Exception('Bad string error')
 
-        test_target = "bad_string_task"
+        test_target = 'bad_string_task'
         semaphore = threading.Semaphore(1)
 
-       
         task = concurrent_task_utils.create_task(
             func=mock_func,
             verbose=True,
             semaphore=semaphore,
             name=test_target,
             report_enabled=False,
-            errors_to_retry_on=["Error -11"]  
+            errors_to_retry_on=['Error -11']
         )
 
-        task.run() 
+        task.run()
 
-      
-        self.assertEqual(task.num_attempts, 1)  
-        self.assertTrue(task.finished) 
-        self.assertIsNotNone(task.exception)  
-        self.assertEqual(str(task.exception), "Bad string error") 
+        self.assertEqual(task.num_attempts, 1)
+        self.assertTrue(task.finished)
+        self.assertIsNotNone(task.exception)
+        self.assertEqual(str(task.exception), 'Bad string error')
