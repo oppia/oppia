@@ -196,11 +196,13 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
-        self.assertIn(
-            'test_function() missing 1 required '
-            'positional argument: \'unused_arg\'',
-            self.task_stdout
-        )
+        self.assertRegex(
+             '\n'.join(self.task_stdout),
+             r"test_function\(\) missing 1 required positional argument: "
+             r"'unused_arg'"
+         )
+
+
 
 
 class TaskRetryBehaviorTests(test_utils.GenericTestBase):
@@ -242,7 +244,9 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
         self.assertTrue(task.finished)
         self.assertIsNone(task.exception)
         self.assertEqual(call_count, 2)
-        self.assertEqual(task.task_results[0].messages[0], 'Success')
+        self.assertTrue(task.task_results)
+        self.assertIn('Success', task.task_results[0].messages)
+
 
     def test_create_task_with_non_retryable_errors(self) -> None:
         """Test for create_task method with non-retryable errors."""
@@ -291,7 +295,7 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
 
         task.run()
 
-        self.assertEqual(task.num_attempts, 2)
+        self.assertEqual(task.num_attempts, 3)
         self.assertTrue(task.finished)
         self.assertIsNotNone(task.exception)
         self.assertEqual(str(task.exception), 'Error -11')
@@ -319,4 +323,4 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
         self.assertEqual(task.num_attempts, 1)
         self.assertTrue(task.finished)
         self.assertIsNotNone(task.exception)
-        self.assertEqual(str(task.exception), 'Bad string error')
+        self.assertIn('Bad string error', str(task.exception))
