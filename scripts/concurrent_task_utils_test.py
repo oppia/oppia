@@ -202,6 +202,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             self.task_stdout
         )
 
+
 class TaskRetryBehaviorTests(test_utils.GenericTestBase):
     """Tests for retry behaviors in create_task method."""
 
@@ -216,7 +217,10 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
                 raise Exception('Error -11')
             return [
                 concurrent_task_utils.TaskResult(
-                    name='mock_task', failed=False, trimmed_messages=[], messages=['Success']
+                    name='mock_task', 
+                    failed=False, 
+                    trimmed_messages=[], 
+                    messages=['Success']
                 )
             ]
 
@@ -265,7 +269,7 @@ class TaskRetryBehaviorTests(test_utils.GenericTestBase):
         self.assertEqual(str(task.exception), 'Non-retryable error')
 
     def test_create_task_exceeds_max_retries(self) -> None:
-        """Test that the task stops retrying after max attempts and raises the exception."""
+        """Test that the task stops retrying after max attempts"""
         call_count = 0
 
         def mock_func() -> List[concurrent_task_utils.TaskResult]:
