@@ -225,6 +225,7 @@ def create_task(
             can run at any time.
         name: str|None. Name of the task that is going to be created.
         report_enabled: bool. Decide whether task result will print or not.
+        errors_to_retry_on: list of error messages
 
     Returns:
         task: TaskThread object. Created task.
