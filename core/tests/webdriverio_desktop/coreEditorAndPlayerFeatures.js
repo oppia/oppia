@@ -82,6 +82,7 @@ describe('Enable correctness feedback and set correctness', function () {
       'after the interaction is created',
     async function () {
       await workflow.createExploration(true);
+      await waitFor.pageToFullyLoad();
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setTitle(explorationTitle);
       await explorationEditorSettingsTab.setCategory('Algorithm');
@@ -116,10 +117,19 @@ describe('Enable correctness feedback and set correctness', function () {
       await explorationEditorMainTab.moveToState('End');
       await explorationEditorMainTab.setInteraction('EndExploration');
 
+      // Wait for page load before marking correct.
+      await waitFor.pageToFullyLoad();
+
       // Go back to mark the solution as correct.
       await explorationEditorPage.navigateToMainTab();
       await explorationEditorMainTab.moveToState('First');
       responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+
+      // Ensure response editor is visible before marking correct.
+      await waitFor.elementToBeClickable(
+        responseEditor,
+        'Response editor is not clickable'
+      );
       await responseEditor.markAsCorrect();
       await explorationEditorMainTab.expectTickMarkIsDisplayed();
       await explorationEditorPage.saveChanges();
