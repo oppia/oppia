@@ -206,6 +206,8 @@ def execute_tasks(
     _check_all_tasks(currently_running_tasks)
 
 
+# Here we use type Any because the argument 'func' can accept any kind of
+# function to create a task thread for it.
 def create_task(
     func: Callable[..., Any],
     verbose: bool,
