@@ -221,6 +221,11 @@ const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+
+enum INTERACTION_TYPES {
+  CONTINUE_BUTTON = 'Continue Button',
+  END_EXPLORATION = 'End Exploration',
+}
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -1722,6 +1727,36 @@ export class ExplorationEditor extends BaseUser {
     return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
+      category
+    );
+  }
+
+  async createAndPublishExplorationWithCards(
+    explorationTitle: string,
+    numberToPublish: number = 5,
+    category: string = 'Algebra'
+  ): Promise<string | null> {
+    if (numberToPublish < 1) {
+      throw new Error(
+        'Number of explorations to publish can not be less than 1'
+      );
+    }
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.dismissWelcomeModal();
+
+    for (let i = 0; i < numberToPublish - 1; i++) {
+      await this.updateCardContent(`Content ${i}`);
+      await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await this.directLearnersToNewCard(`Card ${i + 1}`);
+    }
+    await this.updateCardContent(`Content ${numberToPublish - 1}`);
+    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+    await this.saveExplorationDraft();
+    return this.publishExplorationWithMetadata(
+      `Exploration Title: ${explorationTitle}`,
+      `Goals of ${explorationTitle}`,
       category
     );
   }
