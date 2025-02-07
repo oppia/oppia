@@ -2919,22 +2919,20 @@ def can_edit_question(
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
 
-        if role_services.ACTION_EDIT_QUESTION_IN_MANAGED_TOPIC in self.user.actions:
-            skills = question_services.get_skills_linked_to_question(question_id)
-            skill_ids = {skill.id for skill in skills} if skills else set()
-
-            topic_rights_list = topic_fetchers.get_topic_rights_with_user(self.user_id) or []
-            managed_topic_ids = [topic_rights.id for topic_rights in topic_rights_list if topic_rights]
-
-            managed_topics = topic_fetchers.get_topics_by_ids(managed_topic_ids) or []
-    
+        if (role_services.ACTION_EDIT_QUESTION_IN_MANAGED_TOPIC
+                in self.user.actions):
+            skills = question_services.get_skills_linked_to_question(
+                question_id)
+            skill_ids = set(skill.id for skill in skills)
+            managed_topic_ids = [
+                 topic_rights.id for topic_rights in
+                topic_fetchers.get_topic_rights_with_user(self.user_id)]
+            managed_topics = topic_fetchers.get_topics_by_ids(managed_topic_ids)
             for topic in managed_topics:
-                if topic:
-                    skill_ids_in_topic = topic.get_all_skill_ids() or []
-                    if any(skill_id in skill_ids for skill_id in skill_ids_in_topic):
-                        if not callable(handler):
-                            raise TypeError("Handler must be callable")
-                        return handler(self, question_id, **kwargs)
+                if topic is not None:
+                    for skill_id in topic.get_all_skill_ids():
+                        if skill_id in skill_ids:
+                            return handler(self, question_id, **kwargs)
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this question.')
         raise self.UnauthorizedUserException(
@@ -3076,15 +3074,9 @@ def can_delete_question(
         if (role_services.ACTION_DELETE_ANY_QUESTION in
                 user_actions_info.actions):
             return handler(self, question_id, **kwargs)
-        if role_services.ACTION_DELETE_QUESTION_IN_MANAGED_TOPIC in user_actions_info.actions:
-            can_edit_func = can_edit_topic(handler)
-            
-            if not callable(can_edit_func):
-                raise TypeError("Expected a callable from can_edit_topic(handler)")
-            if not callable(handler):
-                raise TypeError("Handler must be callable")
-            
-            return can_edit_func(self, question_id, **kwargs)
+        if (role_services.ACTION_DELETE_QUESTION_IN_MANAGED_TOPIC in
+                user_actions_info.actions):
+            return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to delete the'
