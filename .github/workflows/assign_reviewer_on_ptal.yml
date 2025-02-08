@@ -1,71 +1,198 @@
-name: Assign Reviewers on PR Comment
+name: Assign Reviewers on PTAL Comment
 
 on:
   issue_comment:
     types: [created]
 
-permissions: read-all
-
 jobs:
   assign-reviewers:
-    if: github.event.issue.pull_request != null 
-    runs-on: ubuntu-latest
-    permissions:
+    if: github.event.issue.pull_request != null
+    runs-on: ubuntu-22.04
+    permissions: 
       pull-requests: write
       issues: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Assign Reviewers Based on PR Comment
-        uses: actions/github-script@v6
+      - name: reviewer assignment script
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const https = require('https');
+
+          // --------------------------------------------
+          // Helper function: Perform a GitHub API request
+          // --------------------------------------------
+          function githubApiRequest(method, path, body) {
+            return new Promise((resolve, reject) => {
+              const data = body ? JSON.stringify(body) : null;
+              const options = {
+                hostname: 'api.github.com',
+                path: path,
+                method: method,
+                headers: {
+                  'Authorization': `token ${process.env.GITHUB_TOKEN}`,
+                  'User-Agent': 'node.js',
+                  'Content-Type': 'application/json'
+                }
+              };
+
+              const req = https.request(options, res => {
+                let responseData = '';
+                res.on('data', chunk => {
+                  responseData += chunk;
+                });
+                res.on('end', () => {
+                  try {
+                    const parsed = JSON.parse(responseData);
+                    if (res.statusCode < 200 || res.statusCode >= 300) {
+                      return reject(new Error(`HTTP ${res.statusCode}: ${JSON.stringify(parsed)}`));
+                    }
+                    resolve(parsed);
+                  } catch (err) {
+                    reject(err);
+                  }
+                });
+              });
+
+              req.on('error', err => reject(err));
+              if (data) req.write(data);
+              req.end();
+            });
+          }
+
+          // --------------------------------------------
+          // Helper functions for sanitization
+          // --------------------------------------------
+          function sanitizeString(input, allowedRegex) {
+            if (typeof input !== 'string') return '';
+            const trimmed = input.trim();
+            return allowedRegex.test(trimmed) ? trimmed : '';
+          }
+
+          function sanitizeUsername(username) {
+            const allowedRegex = /^[\w-]+$/;
+            return sanitizeString(username, allowedRegex);
+          }
+
+          function sanitizeRepo(repo) {
+            const allowedRegex = /^[A-Za-z0-9_.-]+$/;
+            return sanitizeString(repo, allowedRegex);
+          }
+
+          function sanitizeOwner(owner) {
+            const allowedRegex = /^[A-Za-z0-9_.-]+$/;
+            return sanitizeString(owner, allowedRegex);
+          }
+
+          // --------------------------------------------
+          // Step 1: Retrieve and sanitize PR and repository info
+          // --------------------------------------------
+          const eventPath = process.env.GITHUB_EVENT_PATH;
+          if (!eventPath) {
+            console.error("GITHUB_EVENT_PATH is not defined.");
+            process.exit(1);
+          }
+          const eventData = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+
+          const prNumberRaw = eventData.issue && eventData.issue.number;
+          const prNumber = parseInt(prNumberRaw, 10);
+          if (isNaN(prNumber)) {
+            console.log('Invalid or missing PR number. Exiting.');
+            process.exit(0);
+          }
+          const repoRaw = eventData.repository && eventData.repository.name;
+          const ownerRaw = eventData.repository && eventData.repository.owner && eventData.repository.owner.login;
+          const repo = sanitizeRepo(repoRaw);
+          const owner = sanitizeOwner(ownerRaw);
+          if (!repo || !owner) {
+            console.log('Invalid repository or owner information. Exiting.');
+            process.exit(0);
+          }
+
+          // --------------------------------------------
+          // Step 2: Sanitize and extract reviewers from the comment
+          // --------------------------------------------
+          const commentRaw = eventData.comment && eventData.comment.body;
+          const comment = commentRaw ? commentRaw.trim() : '';
+          if (!comment) {
+            console.log('Empty comment. Nothing to do.');
+            process.exit(0);
+          }
+
+          // This regex matches one or more @mentions (optionally separated by commas)
+          // immediately followed by one of the trigger phrases.
+          const structuredRegex = /((?:@[\w-]+(?:\s*,\s*)?)+)\s*(ptal|take a pass|please review)\b/i;
+          const match = comment.match(structuredRegex);
+          if (!match) {
+            console.log('No valid PTAL trigger with a structured list of reviewers was found in the comment.');
+            process.exit(0);
+          }
+
+          // Extract and sanitize reviewer usernames.
+          const reviewersRaw = match[1];
+          const reviewerMatches = reviewersRaw.match(/@([\w-]+)/g);
+          let reviewers = [];
+          if (reviewerMatches) {
+            reviewers = reviewerMatches
+              .map(r => sanitizeUsername(r.substring(1)))
+              .filter(r => r !== '');
+          }
+          if (reviewers.length === 0) {
+            console.log('No valid reviewers found after sanitization. Exiting.');
+            process.exit(0);
+          }
+          console.log(`Reviewers extracted and sanitized: ${reviewers.join(', ')}`);
+
+          // --------------------------------------------
+          // Step 3: Get current assignees on the PR
+          // --------------------------------------------
+          (async () => {
+            let currentAssignees = [];
+            try {
+              const prData = await githubApiRequest('GET', `/repos/${owner}/${repo}/pulls/${prNumber}`);
+              currentAssignees = prData.assignees.map(a => sanitizeUsername(a.login));
+            } catch (error) {
+              console.error('Error fetching PR details:', error);
+              process.exit(1);
+            }
+
+            // --------------------------------------------
+            // Step 4: Merge current assignees with the new reviewers and update the PR
+            // --------------------------------------------
+            const newAssignees = Array.from(new Set([...currentAssignees, ...reviewers]));
+            console.log(`Updating PR #${prNumber} with the following assignees: ${newAssignees.join(', ')}`);
+            try {
+              await githubApiRequest('PATCH', `/repos/${owner}/${repo}/issues/${prNumber}`, { assignees: newAssignees });
+              console.log('Assignees updated successfully.');
+            } catch (error) {
+              console.error('Error updating PR assignees:', error);
+              process.exit(1);
+            }
+
+            // --------------------------------------------
+            // Step 5: Post a confirmation comment
+            // --------------------------------------------
+            const confirmationMessage = `Assigning Reviewers ${reviewers.map(u => '@' + u).join(', ')}. Thanks!`;
+            try {
+              await githubApiRequest('POST', `/repos/${owner}/${repo}/issues/${prNumber}/comments`, { body: confirmationMessage });
+              console.log('Posted confirmation comment successfully.');
+            } catch (error) {
+              console.error('Error posting confirmation comment:', error);
+              process.exit(1);
+            }
+          })();
+          EOF
+
+  report-failure:
+    needs: assign-reviewers
+    runs-on: ubuntu-22.04
+    if: ${{ always() && needs.assign-reviewers.result == 'failure' }}
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Report failure if workflow failed
+        uses: ./.github/actions/send-webhook-notification
         with:
-          script: |
-            const comment = context.payload.comment.body;
-            const prNumber = context.payload.issue.number;
-            const repoOwner = context.repo.owner;
-            const repoName = context.repo.repo;
-
-            // To extract reviewers and check for PTAL 
-            function parseReviewers(comment) {
-              const reviewers = Array.from(comment.matchAll(/@([\w-]+)/g), match => match[1]);
-              const ptalRegex = /\b(ptal|take a pass|please review)\b/i;
-              const containsPtal = ptalRegex.test(comment);
-              return { reviewers, containsPtal };
-            }
-            
-            // Parse the comment
-            const { reviewers, containsPtal } = parseReviewers(comment);
-            if (reviewers.length > 0 && containsPtal) {
-              console.log(`Reviewers found: ${reviewers.join(", ")}`);
-              console.log("PTAL detected, proceeding with reviewer assignment...");
-
-              // Get PR details to identify the author
-              const pr = await github.rest.pulls.get({
-                owner: repoOwner,
-                repo: repoName,
-                pull_number: prNumber
-              });
-              const author = pr.data.user.login;
-              const currentAssignees = pr.data.assignees.map(a => a.login);
-
-              // Unassign author 
-              const newAssignees = currentAssignees.filter(a => a !== author);
-
-              // Add reviewers
-              newAssignees.push(...reviewers);
-              await github.rest.issues.update({
-                owner: repoOwner,
-                repo: repoName,
-                issue_number: prNumber,
-                assignees: newAssignees
-              });
-              console.log(`Assigned reviewers: ${reviewers.join(", ")}.`);
-              console.log(`Unassigned the author: ${author}.`);
-              // Post a comment confirming the assignment
-              await github.rest.issues.createComment({
-                owner: repoOwner,
-                repo: repoName,
-                issue_number: prNumber,
-                body: `Reviewers assigned: ${reviewers.map(r => `@${r}`).join(", ")}. The author @${author} has been unassigned from the review.`
-              });
-            } else {
-              console.log("No valid reviewers or PTAL detected in the comment. Skipping assignment.");
-            }
+          message: "A typescript test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
