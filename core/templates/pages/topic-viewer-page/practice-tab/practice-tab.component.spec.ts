@@ -38,6 +38,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {LoaderService} from 'services/loader.service';
+import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
+import {Url} from 'url';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -89,9 +91,11 @@ describe('Practice tab component', function () {
   let fixture: ComponentFixture<PracticeTabComponent>;
   let windowRef: MockWindowRef;
   let questionBackendApiService: MockQuestionBackendApiService;
+  let editableTopicBackendApiService: EditableTopicBackendApiService;
   let ngbModal: NgbModal;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let loaderService: LoaderService;
+  let urlService: UrlService;
   let translateService: TranslateService;
 
   beforeEach(async(() => {
@@ -104,6 +108,7 @@ describe('Practice tab component', function () {
         NgbModal,
         I18nLanguageCodeService,
         LoaderService,
+        EditableTopicBackendApiService,
         UrlInterpolationService,
         {provide: UrlService, useClass: MockUrlService},
         {provide: WindowRef, useValue: windowRef},
@@ -163,6 +168,10 @@ describe('Practice tab component', function () {
     ngbModal = TestBed.inject(NgbModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     loaderService = TestBed.inject(LoaderService);
+    editableTopicBackendApiService = TestBed.inject(
+      EditableTopicBackendApiService
+    );
+    urlService = TestBed.inject(UrlService);
     translateService = TestBed.inject(TranslateService);
   });
 
@@ -275,21 +284,47 @@ describe('Practice tab component', function () {
   it(
     'should open a new practice session containing the selected subtopic' +
       ' when start button is clicked for topicViewer display area',
-    function () {
+    fakeAsync(() => {
       spyOn(loaderService, 'showLoadingScreen');
-      component.selectedSubtopicIndices[0] = true;
-      component.topicUrlFragment = 'topic_1';
-      component.classroomUrlFragment = 'classroom_1';
+      const mockTopicData = {
+        topicDict: {url_fragment: 'topic_1'},
+        classroomUrlFragment: 'classroom_1',
+      };
 
+      spyOn(editableTopicBackendApiService, 'fetchTopicAsync').and.returnValue(
+        Promise.resolve(mockTopicData)
+      );
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.topicUrlFragment).toBe('topic_1');
+      expect(component.classroomUrlFragment).toBe('classroom_1');
+      component.selectedSubtopicIndices[0] = true;
       component.openNewPracticeSession();
+      tick();
 
       expect(windowRef.nativeWindow.location.href).toBe(
         '/learn/classroom_1/topic_1/practice/session?' +
           'selected_subtopic_ids=%5B1%5D'
       );
       expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
-    }
+    })
   );
+
+  it('should log an error when topic fetch fails', fakeAsync(() => {
+    spyOn(editableTopicBackendApiService, 'fetchTopicAsync').and.returnValue(
+      Promise.reject('API error')
+    );
+
+    spyOn(console, 'error');
+
+    component.displayArea = 'topicViewer';
+    component.ngOnInit();
+    tick();
+
+    expect(console.error).toHaveBeenCalledWith('API error');
+  }));
 
   it('should check if questions exist for the selected subtopics', fakeAsync(() => {
     component.checkIfQuestionsExist([true]);
@@ -408,13 +443,20 @@ describe('Practice tab component', function () {
       ' when start button is clicked and learner agrees to continue',
     function () {
       spyOn(loaderService, 'showLoadingScreen');
-      component.displayArea = 'progressTab';
-      component.topicUrlFragment = 'topic_1';
-      component.classroomUrlFragment = 'classroom_1';
-      component.selectedSubtopicIndices[0] = true;
+      spyOn(urlService, 'getPathname').and.returnValue('/learn');
+      component.displayArea = 'topicViewer';
+      component.topicUrlFragment =
+        urlService.getTopicUrlFragmentFromLearnerUrl();
+      component.classroomUrlFragment =
+        urlService.getClassroomUrlFragmentFromLearnerUrl();
 
+      component.ngOnInit();
+      expect(component.topicUrlFragment).toBe('topic_1');
+
+      component.selectedSubtopicIndices[0] = true;
       component.openNewPracticeSession();
 
+      expect(component.classroomUrlFragment).toBe('classroom_1');
       expect(windowRef.nativeWindow.location.href).toBe(
         '/learn/classroom_1/topic_1/practice/session?' +
           'selected_subtopic_ids=%5B1%5D'
