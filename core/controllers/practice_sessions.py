@@ -26,59 +26,6 @@ from core.domain import topic_fetchers
 from typing import Dict, List, TypedDict
 
 
-class PracticeSessionsPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Renders the practice sessions page."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'selected_subtopic_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
-            }
-        }
-    }
-
-    @acl_decorators.can_access_topic_viewer_page
-    def get(self, _: str) -> None:
-        """Renders the practice session page."""
-
-        self.render_template('practice-session-page.mainpage.html')
-
-    def handle_exception(
-        self, exception: BaseException, unused_debug_mode: bool
-    ) -> None:
-        """Handles exceptions raised by this handler.
-
-        Args:
-            exception: Exception. The exception raised by the handler.
-            unused_debug_mode: bool. Whether the app is running in debug mode.
-        """
-        if isinstance(exception, self.InvalidInputException):
-            (
-                _,
-                _,
-                classroom_url_fragment,
-                topic_url_fragment,
-                _,
-                _
-            ) = self.request.path.split('/')
-            self.redirect(
-                '/learn/%s/%s/practice' % (
-                    classroom_url_fragment, topic_url_fragment
-                )
-            )
-            return
-        super().handle_exception(exception, unused_debug_mode)
-
-
 class PracticeSessionsPageDataHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of PracticeSessionsPageDataHandler's
     normalized_request dictionary.
