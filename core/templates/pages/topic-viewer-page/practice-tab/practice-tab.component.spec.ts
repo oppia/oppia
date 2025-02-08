@@ -39,7 +39,6 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {LoaderService} from 'services/loader.service';
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
-import {Url} from 'url';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
