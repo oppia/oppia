@@ -53,6 +53,7 @@ import {
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -100,7 +101,8 @@ export class TranslatorOverviewComponent implements OnInit {
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private localStorageService: LocalStorageService,
     private windowRef: WindowRef,
-    private voiceoverPlayerService: VoiceoverPlayerService
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
   ) {}
 
   canShowTabModeSwitcher(): boolean {
@@ -204,6 +206,7 @@ export class TranslatorOverviewComponent implements OnInit {
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
     this.localStorageService.setLastSelectedLanguageAccentCode('');
     this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+      console.log('Now updaing the accents...');
       this.updateLanguageAccentCodesDropdownOptions();
     });
   }
@@ -310,10 +313,14 @@ export class TranslatorOverviewComponent implements OnInit {
 
     this.voiceoverBackendApiService
       .fetchVoiceoverAdminDataAsync()
-      .then(voiceoverLanguages => {
-        this.languageAccentMasterList =
-          voiceoverLanguages.languageAccentMasterList;
-        this.languageCodesMapping = voiceoverLanguages.languageCodesMapping;
+      .then(response => {
+        this.voiceoverLanguageManagementService.init(
+          response.languageAccentMasterList,
+          response.autoGeneratableLanguageAccentCodes,
+          response.languageCodesMapping
+        );
+        this.languageAccentMasterList = response.languageAccentMasterList;
+        this.languageCodesMapping = response.languageCodesMapping;
         this.updateLanguageAccentCodesDropdownOptions();
         this.voiceoverPlayerService.languageAccentMasterList =
           this.languageAccentMasterList;
@@ -325,9 +332,10 @@ export class TranslatorOverviewComponent implements OnInit {
           this.updateLanguageAccentCodesDropdownOptions();
         });
 
-        let cloudSupportedLanguageAccentCodes = Object.keys(
-          this.languageCodesMapping[this.languageCode]
-        ).filter(key => this.languageCodesMapping[this.languageCode][key]);
+        let cloudSupportedLanguageAccentCodes =
+          this.voiceoverLanguageManagementService.getAutogeneratableLanguageAccents(
+            this.languageCode
+          );
 
         this.translationLanguageService.setCloudSupportedLanguageAccentCodes(
           cloudSupportedLanguageAccentCodes
@@ -371,15 +379,17 @@ export class TranslatorOverviewComponent implements OnInit {
 
     if (
       lastSelectedLanguageAccentCode !== 'undefined' &&
-      lastSelectedLanguageAccentCode !== ''
+      lastSelectedLanguageAccentCode !== '' &&
+      lastSelectedLanguageAccentCode !== 'null'
     ) {
       this.selectedLanguageAccentCode = lastSelectedLanguageAccentCode;
     } else {
       this.selectedLanguageAccentCode = firstLanguageAccentCode;
-      this.localStorageService.setLastSelectedLanguageAccentCode(
-        firstLanguageAccentCode
-      );
     }
+    console.log('----');
+    console.log(this.selectedLanguageAccentCode);
+    console.log(this.languageCode);
+    console.log('----');
     this.updateLanguageAccentCode(this.selectedLanguageAccentCode);
   }
 

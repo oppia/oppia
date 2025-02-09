@@ -42,7 +42,7 @@ interface VoiceoverAdminDataBackendDict {
       [languageAccentCode: string]: boolean;
     };
   };
-  cloud_supported_language_accent_codes: string[];
+  autogeneratable_language_accent_codes: string[];
 }
 
 interface EntityVoiceoversBulkBackendDict {
@@ -80,7 +80,7 @@ export interface LanguageCodesMapping {
 export interface VoiceoverAdminDataResponse {
   languageAccentMasterList: LanguageAccentMasterList;
   languageCodesMapping: LanguageCodesMapping;
-  cloudSupportedLanguageAccentCodes: string[];
+  autoGeneratableLanguageAccentCodes: string[];
 }
 
 export interface VoiceArtistIdToLanguageMapping {
@@ -120,13 +120,18 @@ export interface TokensWithDurationType {
 }
 
 interface RegenerateVoiceoverBackendResponse {
-  voiceover_dict: VoiceoverBackendDict;
+  filename: string;
+  duration_secs: number;
+  file_size_bytes: number;
+  needs_update: boolean;
+  sentence_tokens_with_durations: TokensWithDurationBackendType[];
 }
 
 export interface RegenerateVoiceoverResponse {
   filename: string;
   fileSizeBytes: number;
   durationSecs: number;
+  needsUpdate: boolean;
   sentenceTokenWithDurations: TokensWithDurationType[];
 }
 
@@ -151,8 +156,8 @@ export class VoiceoverBackendApiService {
             resolve({
               languageAccentMasterList: response.language_accent_master_list,
               languageCodesMapping: response.language_codes_mapping,
-              cloudSupportedLanguageAccentCodes:
-                response.cloud_supported_language_accent_codes,
+              autoGeneratableLanguageAccentCodes:
+                response.autogeneratable_language_accent_codes,
             });
           },
           errorResponse => {
@@ -232,16 +237,18 @@ export class VoiceoverBackendApiService {
 
   async generateAutotmaticVoiceoverAsync(
     explorationID: string,
+    explorationVersion: number,
     stateName: string,
     contentId: string,
     languageAccentCode: string
-  ): Promise<Voiceover> {
+  ): Promise<RegenerateVoiceoverResponse> {
     return new Promise((resolve, reject) => {
       this.http
         .put<RegenerateVoiceoverBackendResponse>(
           VoiceoverDomainConstants.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
           {
             exploration_id: explorationID,
+            exploration_version: explorationVersion,
             state_name: stateName,
             content_id: contentId,
             language_accent_code: languageAccentCode,
@@ -250,7 +257,21 @@ export class VoiceoverBackendApiService {
         .toPromise()
         .then(
           response => {
-            resolve(Voiceover.createFromBackendDict(response.voiceover_dict));
+            resolve({
+              filename: response.filename,
+              durationSecs: response.duration_secs,
+              fileSizeBytes: response.file_size_bytes,
+              needsUpdate: response.needs_update,
+              sentenceTokenWithDurations:
+                response.sentence_tokens_with_durations.map(
+                  tokenWithDuration => {
+                    return {
+                      token: tokenWithDuration.token,
+                      audioOffsetMsecs: tokenWithDuration.audio_offset_msecs,
+                    };
+                  }
+                ),
+            });
           },
           errorResponse => {
             reject(errorResponse?.error);

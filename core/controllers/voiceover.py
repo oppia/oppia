@@ -44,15 +44,15 @@ class VoiceoverAdminDataHandler(
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers())
 
-        cloud_supported_language_accent_codes = (
-            voiceover_services.get_cloud_supported_language_accent_codes())
+        autogeneratable_language_accent_codes = (
+            voiceover_services.get_autogeneratable_language_accent_codes())
 
         self.values.update({
             'language_accent_master_list':
                 language_accent_master_list,
             'language_codes_mapping': language_codes_mapping,
-            'cloud_supported_language_accent_codes':
-                cloud_supported_language_accent_codes
+            'autogeneratable_language_accent_codes':
+                autogeneratable_language_accent_codes
         })
         self.render_json(self.values)
 
@@ -294,6 +294,11 @@ class RegenerateAutomaticVoiceoverHandler(
                     'type': 'basestring'
                 }
             },
+            'exploration_version': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
             'state_name': {
                 'schema': {
                     'type': 'basestring'
@@ -320,15 +325,25 @@ class RegenerateAutomaticVoiceoverHandler(
         state_name = self.normalized_payload['state_name']
         content_id = self.normalized_payload['content_id']
         language_accent_code = self.normalized_payload['language_accent_code']
+        exploration_version = self.normalized_payload['exploration_version']
 
-        generated_voiceover_dict = (
+        generated_voiceover, sentence_tokens_with_durations = (
             voiceover_regeneration_services.
             regenerate_voiceover_for_exploration_content(
-                exploration_id, state_name, content_id, language_accent_code)
+                exploration_id,
+                exploration_version,
+                state_name,
+                content_id,
+                language_accent_code
+            )
         )
 
         self.values.update({
-            'voiceover_dict': generated_voiceover_dict
+            'filename': generated_voiceover.filename,
+            'duration_secs': generated_voiceover.duration_secs,
+            'file_size_bytes': generated_voiceover.file_size_bytes,
+            'needs_update': generated_voiceover.needs_update,
+            'sentence_tokens_with_durations': sentence_tokens_with_durations
         })
 
         self.render_json(self.values)

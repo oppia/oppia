@@ -92,7 +92,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
         );
         this.languageAccentMasterList = response.languageAccentMasterList;
         this.cloudSupportedLanguageAccentCodes =
-          response.cloudSupportedLanguageAccentCodes;
+          response.autoGeneratableLanguageAccentCodes;
         this.pageIsInitialized = true;
       });
     this.voiceoverBackendApiService

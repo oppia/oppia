@@ -491,11 +491,11 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
             json.loads(f.read()))
         return autogeneratable_language_accent_list
-    
 
-def get_cloud_supported_language_accent_codes() -> List[str]:
+
+def get_autogeneratable_language_accent_codes() -> List[str]:
     """The method returns the list of lanaguage accent codes that are supported
-    by cloud service for autogeneration..
+    by cloud service for autogeneration.
 
     Returns:
         List[str]. A list of language accent codes that are supported by the

@@ -519,7 +519,7 @@ OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
 # Resource region for the Azure Text-to-Speech service.
-AZURE_TEXT_TO_SPEECH_REGION = 'centralus'
+AZURE_TEXT_TO_SPEECH_REGION = 'centralindia'
 
 OPPIA_CONTENT_TAG_DELIMITER = '; '
 
