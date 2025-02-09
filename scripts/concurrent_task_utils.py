@@ -114,7 +114,7 @@ class TaskThread(threading.Thread):
         self.errors_to_retry_on = errors_to_retry_on or []
         self.num_attempts = 0
 
-def run(self) -> None:
+    def run(self) -> None:
     """Executes the task and retries on specified errors."""
     try:
         while self.num_attempts < MAX_ATTEMPTS:
@@ -141,7 +141,8 @@ def run(self) -> None:
                 log(
                     'FINISHED %s: %.1f secs' % (
                         self.name, time.time() - self.start_time),
-                    show_time=True)
+                    show_time=True
+                )
                 return
             except Exception as e:
                 if any(err in str(e) for err in self.errors_to_retry_on):
