@@ -649,13 +649,13 @@ class ElasticSearchStub:
             '_type': '_doc',
         }
 
-    def mock_exists(self, index: str, doc_id: str) -> bool:
+    def mock_exists(self, index: str, id: str) -> bool:
         """Checks whether a document with the given ID exists in the mock
         database.
 
         Args:
             index: str. The name of the index to check.
-            doc_id: str. The document id to check.
+            id: str. The document id to check.
 
         Returns:
             bool. Whether the document exists in the index.
@@ -665,15 +665,15 @@ class ElasticSearchStub:
         """
         if index not in self._DB:
             self._generate_index_not_found_error(index)
-        return any(d['id'] == doc_id for d in self._DB[index])
+        return any(d['id'] == id for d in self._DB[index])
 
-    def mock_delete(self, index: str, doc_id: str) -> ExistingIndexDict:
+    def mock_delete(self, index: str, id: str) -> ExistingIndexDict:
         """Deletes a document from an index in the mock database. Does nothing
         if the document is not in the index.
 
         Args:
             index: str. The name of the index to delete the document from.
-            doc_id: str. The document id to be deleted from the index.
+            id: str. The document id to be deleted from the index.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
@@ -681,11 +681,11 @@ class ElasticSearchStub:
         Raises:
             Exception. The document does not exist in the index.
             elasticsearch.NotFoundError. The given index name was not found, or
-                the given doc_id was not found in the given index.
+                the given id was not found in the given index.
         """
         if index not in self._DB:
             self._generate_index_not_found_error(index)
-        docs = [d for d in self._DB[index] if d['id'] != doc_id]
+        docs = [d for d in self._DB[index] if d['id'] != id]
         if len(self._DB[index]) != len(docs):
             self._DB[index] = docs
             return {
@@ -707,7 +707,7 @@ class ElasticSearchStub:
             404, {
                 '_index': index,
                 '_type': '_doc',
-                '_id': doc_id,
+                '_id': id,
                 '_version': 1,
                 'result': 'not_found',
                 '_shards': {
@@ -769,17 +769,16 @@ class ElasticSearchStub:
         self,
         body: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None,
         index: Optional[str] = None,
-        params: Optional[Dict[str, int]] = None
+        size: Optional[int] = None,
+        from_: Optional[int] = None
     ) -> SearchDocumentDict:
         """Searches and returns documents that match the given query.
 
         Args:
             body: dict|None. A dictionary search definition that uses Query DSL.
             index: str|None. The name of the index to search.
-            params: dict|None. A dict with two keys: `size` and `from`. The
-                corresponding values are ints which represent the number of
-                results to fetch, and the offset from which to fetch them,
-                respectively.
+            size: int|None. The number of results to fetch.
+            from_:int|None. The offset from which the results are to be fetched.
 
         Returns:
             dict. A dict representing the ElasticSearch response.
@@ -793,8 +792,9 @@ class ElasticSearchStub:
         # all indexes. We do not allow their use.
         assert index not in ['_all', '']
         assert index is not None
-        assert params is not None
-        assert sorted(params.keys()) == ['from', 'size']
+        assert size is not None
+        assert from_ is not None
+
 
         if index not in self._DB:
             self._generate_index_not_found_error(index)
@@ -852,9 +852,7 @@ class ElasticSearchStub:
             '_type': '_doc',
             '_index': index,
             '_source': doc
-        } for doc in result_docs[
-            params['from']: params['from'] + params['size']
-        ]]
+        } for doc in result_docs[from_: from_ + size]]
 
         return {
             'timed_out': False,
