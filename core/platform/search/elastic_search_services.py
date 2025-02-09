@@ -39,8 +39,10 @@ secrets_services = models.Registry.import_secrets_services()
 # where loading a exploration from local yaml file takes
 # longer than ElasticSearch expects.
 ES = elasticsearch.Elasticsearch(
-    hosts=([f"http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}"]
-            if feconf.ES_CLOUD_ID is None else None),
+    hosts=(
+        [f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}']
+        if feconf.ES_CLOUD_ID is None else None
+    ),
     cloud_id=feconf.ES_CLOUD_ID,
     basic_auth=(
         (feconf.ES_USERNAME, secrets_services.get_secret('ES_PASSWORD'))
@@ -96,11 +98,11 @@ def _fetch_response_from_elastic_search(
     num_docs_to_fetch = size + 1
     try:
         response = ES.search(
-            body=query_definition, index=index_name,
-            params={
-                'size': num_docs_to_fetch,
-                'from': offset
-            })
+            body=query_definition,
+            index=index_name,
+            size=num_docs_to_fetch,
+            from_=offset
+        )
     except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
         _create_index(index_name)
@@ -130,7 +132,7 @@ def _create_index(index_name: str) -> None:
         elasticsearch.RequestError. The index already exists.
     """
     assert isinstance(index_name, str)
-    ES.indices.create(index_name)
+    ES.indices.create(index=index_name)
 
 
 # Here we use type Any because the argument 'documents' represents the list of
@@ -160,11 +162,11 @@ def add_documents_to_index(
         assert 'id' in document
     for document in documents:
         try:
-            response = ES.index(index_name, document, id=document['id'])
+            response = ES.index(index=index_name, document=document, id=document['id'])
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and repeat the operation.
             _create_index(index_name)
-            response = ES.index(index_name, document, id=document['id'])
+            response = ES.index(index=index_name, document=document, id=document['id'])
 
         if response is None or response['_shards']['failed'] > 0:
             raise SearchException('Failed to add document to index.')
@@ -185,7 +187,7 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
 
     for doc_id in doc_ids:
         try:
-            document_exists_in_index = ES.exists(index_name, doc_id)
+            document_exists_in_index = ES.exists(index=index_name, id=doc_id)
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and set
             # document_exists_in_index to False.
@@ -193,7 +195,7 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
             document_exists_in_index = False
 
         if document_exists_in_index:
-            ES.delete(index_name, doc_id)
+            ES.delete(index=index_name, id=doc_id)
 
 
 def clear_index(index_name: str) -> None:
@@ -207,8 +209,8 @@ def clear_index(index_name: str) -> None:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
     # https://stackoverflow.com/questions/57778438/delete-all-documents-from-elasticsearch-index-in-python-3-x
     ES.delete_by_query(
-        index_name,
-        {
+        index=index_name,
+        query={
             'query':
                 {
                     'match_all': {}
