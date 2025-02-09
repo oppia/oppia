@@ -606,7 +606,7 @@ class ElasticSearchStub:
 
     def mock_index(
         self,
-        index_name: str,
+        index: str,
         document: Dict[str, str],
         id: Optional[str] = None  # pylint: disable=redefined-builtin
     ) -> ExistingIndexDict:
@@ -629,13 +629,13 @@ class ElasticSearchStub:
             elasticsearch.RequestError. An index with the given name already
                 exists.
         """
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        self._DB[index_name] = [
-            d for d in self._DB[index_name] if d['id'] != id]
-        self._DB[index_name].append(document)
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        self._DB[index] = [
+            d for d in self._DB[index] if d['id'] != id]
+        self._DB[index].append(document)
         return {
-            '_index': index_name,
+            '_index': index,
             '_shards': {
                 'total': 2,
                 'successful': 1,
