@@ -115,7 +115,7 @@ class TaskThread(threading.Thread):
         self.num_attempts = 0
 
     def run(self) -> None:
-    """Executes the task and retries on specified errors."""
+        """Executes the task and retries on specified errors."""
     try:
         while self.num_attempts < MAX_ATTEMPTS:
             self.num_attempts += 1
