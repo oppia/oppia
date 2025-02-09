@@ -111,7 +111,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             task.start()
             task.join()
         self.assertIn(
-            'test_function() missing 1 required positional argument: \'unused_arg\'',
+            'test_function() missing 1 required '
+            'positional argument: \'unused_arg\'',
             self.task_stdout
         )
 
@@ -121,8 +122,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
                 return concurrent_task_utils.TaskResult('name', True, [], [])
             def test_perform_all_check(
                 self
-            ) -> concurrent_task_utils.TaskResult:
-                return self.test_show()
+            ) -> List[concurrent_task_utils.TaskResult]:
+                return [self.test_show()]
 
         def test_func() -> HelperTests:
             return HelperTests()
@@ -137,7 +138,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             task.join()
         self.assertRegex(
             self.task_stdout[0],
-            r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  name check failed')
+            r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
+            'name check failed')
 
     def test_task_thread_with_task_report_disabled(self) -> None:
         class HelperTests:
@@ -146,8 +148,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
                     '', False, [], ['msg'])
             def test_perform_all_check(
                 self
-            ) -> concurrent_task_utils.TaskResult:
-                return self.test_show()
+            ) -> List[concurrent_task_utils.TaskResult]:
+                return [self.test_show()]
 
         def test_func() -> HelperTests:
             return HelperTests()
@@ -195,7 +197,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
         self.assertIn(
-            'test_function() missing 1 required positional argument: \'unused_arg\'',
+            'test_function() missing 1 required '
+            'positional argument: \'unused_arg\'',
             self.task_stdout
         )
 
