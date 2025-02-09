@@ -18,14 +18,15 @@
 API.
 """
 
-import ssl
-import certifi
 from __future__ import annotations
+import ssl
+
 
 from core import feconf
 from core.domain import search_services
 from core.platform import models
 
+import certifi
 import elasticsearch
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
