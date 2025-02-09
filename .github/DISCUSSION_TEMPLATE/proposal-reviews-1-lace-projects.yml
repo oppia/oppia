@@ -1,9 +1,9 @@
-title: "GSoC’23 Proposal Review | {{Project Name}} ({{Your Name}})"
+title: "GSoC’25 Proposal Review | {{Project Name}} ({{Your Name}})"
 body:
 - type: input
   attributes:
-    label: Google doc link to Proposal
-    description: "Please paste the google doc link to the proposal here."
+    label: Google Doc link to proposal
+    description: "Please paste the Google Doc link to the proposal here."
   validations:
     required: true
 - type: checkboxes
@@ -20,6 +20,7 @@ body:
     options:
       - "3.1: WHAT"
       - "3.2: HOW"
+      - "Both 3.1: WHAT and 3.2: HOW"
   validations:
     required: true
 - type: textarea
