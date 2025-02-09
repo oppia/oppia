@@ -111,8 +111,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             task.start()
             task.join()
         self.assertIn(
-            'test_function() missing 1 required '
-            'positional argument: \'unused_arg\'',
+            'test_function() missing 1 required positional argument: \'unused_arg\'',
             self.task_stdout
         )
 
@@ -122,8 +121,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
                 return concurrent_task_utils.TaskResult('name', True, [], [])
             def test_perform_all_check(
                 self
-            ) -> List[concurrent_task_utils.TaskResult]:
-                return [self.test_show()]
+            ) -> concurrent_task_utils.TaskResult:
+                return self.test_show()
 
         def test_func() -> HelperTests:
             return HelperTests()
@@ -138,8 +137,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             task.join()
         self.assertRegex(
             self.task_stdout[0],
-            r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
-            'name check failed')
+            r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  name check failed')
 
     def test_task_thread_with_task_report_disabled(self) -> None:
         class HelperTests:
@@ -148,8 +146,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
                     '', False, [], ['msg'])
             def test_perform_all_check(
                 self
-            ) -> List[concurrent_task_utils.TaskResult]:
-                return [self.test_show()]
+            ) -> concurrent_task_utils.TaskResult:
+                return self.test_show()
 
         def test_func() -> HelperTests:
             return HelperTests()
@@ -197,8 +195,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
         self.assertIn(
-            'test_function() missing 1 required '
-            'positional argument: \'unused_arg\'',
+            'test_function() missing 1 required positional argument: \'unused_arg\'',
             self.task_stdout
         )
 
@@ -231,7 +228,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             report_enabled=False,
             errors_to_retry_on=['Error -11']
         )
-
+        task.start_time = time.time()
         task.start()
         task.join()
 
@@ -253,7 +250,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             report_enabled=False,
             errors_to_retry_on=['Error -11']
         )
-
+        task.start_time = time.time()
         task.start()
         task.join()
 
@@ -278,15 +275,15 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             report_enabled=False,
             errors_to_retry_on=['Error -11']
         )
-
+        task.start_time = time.time()
         task.start()
         task.join()
 
-        self.assertEqual(task.num_attempts, 2)
+        self.assertEqual(task.num_attempts, 3)
         self.assertTrue(task.finished)
         self.assertIsNotNone(task.exception)
         self.assertEqual(str(task.exception), 'Error -11')
-        self.assertEqual(call_count, 2)
+        self.assertEqual(call_count, 3)
 
     def test_create_task_with_bad_string_error(self) -> None:
         def mock_func() -> None:
@@ -300,7 +297,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             report_enabled=False,
             errors_to_retry_on=['Error -11']
         )
-
+        task.start_time = time.time()
         task.start()
         task.join()
 
