@@ -2,7 +2,7 @@ title: "GSoC’25 Proposal Review | {{Project Name}} ({{Your Name}})"
 body:
 - type: input
   attributes:
-    label: Google Doc link to Proposal
+    label: Google Doc link to proposal
     description: "Please paste the Google Doc link to the proposal here."
   validations:
     required: true
