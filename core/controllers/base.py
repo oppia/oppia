@@ -720,9 +720,6 @@ class BaseHandler(
                 # has access to the path, not to the status code.
                 # That's why 404 status code is treated differently.
                 self.render_template('oppia-root.mainpage.html')
-            else:
-                self.render_template(
-                    'error-page-%s.mainpage.html' % values['status_code'])
         else:
             if return_type not in (
                     feconf.HANDLER_TYPE_JSON, feconf.HANDLER_TYPE_DOWNLOADABLE):

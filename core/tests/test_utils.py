@@ -225,12 +225,6 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
     Raises:
         Exception. Multiple files found with given file name.
     """
-    # This is required since error files are served according to error status
-    # code. The file served is error-page.mainpage.html but it is compiled and
-    # stored as error-page-{status_code}.mainpage.html.  So, we need to swap the
-    # name here to obtain the correct filepath.
-    if filename.startswith('error-page'):
-        filename = 'error-page.mainpage.html'
     matches = list(itertools.chain.from_iterable(
         (os.path.join(subdir, f) for f in filenames if f == filename)
         for subdir, _, filenames in os.walk(rootdir)))
