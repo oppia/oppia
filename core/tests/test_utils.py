@@ -704,7 +704,8 @@ class ElasticSearchStub:
             }
 
         raise elasticsearch.NotFoundError(
-            404, {
+            404,
+            body={
                 '_index': index,
                 '_type': '_doc',
                 '_id': id,

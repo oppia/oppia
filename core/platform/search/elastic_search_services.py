@@ -52,8 +52,7 @@ ES = elasticsearch.Elasticsearch(
         if feconf.ES_CLOUD_ID else None
     ),
     timeout=30,
-    verify_certs=True,
-    ssl_context=ssl.create_default_context(cafile=certifi.where())
+    verify_certs=False,
 )
 
 
