@@ -1806,7 +1806,7 @@ class TranslatableTopicNamesPerClassroomHandlerTest(
         response = self.get_json('/gettranslatabletopicnamesperclassroom')
         self.assertEqual(
             response,
-            {'topic_names_per_classRoom': []}
+            {'topic_names_per_classroom': []}
         )
 
     def test_no_topic_name_should_be_returned_when_topic_is_not_published(
@@ -1844,7 +1844,7 @@ class TranslatableTopicNamesPerClassroomHandlerTest(
         response = self.get_json('/gettranslatabletopicnamesperclassroom')
         self.assertEqual(
             response,
-            {'topic_names_per_classRoom': []}
+            {'topic_names_per_classroom': []}
         )
 
     def test_topic_name_should_be_returned_when_topic_is_published(
@@ -1885,9 +1885,9 @@ class TranslatableTopicNamesPerClassroomHandlerTest(
         response = self.get_json('/gettranslatabletopicnamesperclassroom')
         self.assertEqual(
             response,
-            {'topic_names_per_classRoom': [
+            {'topic_names_per_classroom': [
                 {
-                    'classRoom': 'Class 1',
+                    'classroom': 'Class 1',
                     'topics': ['topic 1']
                 }
             ]}
@@ -1968,17 +1968,17 @@ class TranslatableTopicNamesPerClassroomHandlerTest(
 
         response = self.get_json('/gettranslatabletopicnamesperclassroom')
         expected_response = {
-            'topic_names_per_classRoom': [
+            'topic_names_per_classroom': [
                 {
-                    'classRoom': '',
+                    'classroom': '',
                     'topics': ['topic 3']
                 },
                 {
-                    'classRoom': 'Class 1',
+                    'classroom': 'Class 1',
                     'topics': ['topic']
                 },
                 {
-                    'classRoom': 'Class 2', 
+                    'classroom': 'Class 2', 
                     'topics': ['topic 2']
                 }
             ]

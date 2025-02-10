@@ -57,8 +57,8 @@ export class TranslationTopicSelectorComponent implements OnInit {
     this.contributionOpportunitiesBackendApiService
       .fetchTranslatableTopicNamesPerClassroomAsync()
       .then(topicsPerClassroom => {
-        topicsPerClassroom.forEach(({classRoom, topics}) => {
-          this.topicsPerClassroomMap[classRoom] = topics;
+        topicsPerClassroom.forEach(({classroom, topics}) => {
+          this.topicsPerClassroomMap[classroom] = topics;
         });
       });
 

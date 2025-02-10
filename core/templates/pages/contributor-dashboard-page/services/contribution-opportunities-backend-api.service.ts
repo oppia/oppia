@@ -79,12 +79,12 @@ interface TopicNamesBackendDict {
 }
 
 interface TopicNamesPerClassroomDict {
-  classRoom: string;
+  classroom: string;
   topics: string[];
 }
 
 interface TopicNamesPerClassroomBackendDict {
-  topic_names_per_classRoom: TopicNamesPerClassroomDict[];
+  topic_names_per_classroom: TopicNamesPerClassroomDict[];
 }
 
 interface PreferredTranslationLanguageBackendDict {
@@ -277,11 +277,11 @@ export class ContributionOpportunitiesBackendApiService {
         )
         .toPromise();
 
-      const topicsPerClassroom = response.topic_names_per_classRoom.map(
-        ({classRoom, topics}) => ({
-          classRoom,
+      const topicsPerClassroom = response.topic_names_per_classroom.map(
+        ({classroom, topics}) => ({
+          classroom,
           topics:
-            classRoom === ''
+            classroom === ''
               ? [AppConstants.TOPIC_SENTINEL_NAME_ALL, ...topics]
               : topics,
         })

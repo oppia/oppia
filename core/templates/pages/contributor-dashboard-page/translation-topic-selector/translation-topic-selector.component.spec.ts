@@ -32,9 +32,9 @@ describe('Translation language selector', () => {
   let fixture: ComponentFixture<TranslationTopicSelectorComponent>;
 
   const topicsPerClassroomBackendDict = [
-    {classRoom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
-    {classRoom: 'Class 2', topics: ['Topic 3']},
-    {classRoom: '', topics: ['All', 'Topic 4']},
+    {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
+    {classroom: 'Class 2', topics: ['Topic 3']},
+    {classroom: '', topics: ['All', 'Topic 4']},
   ];
 
   let contributionOpportunitiesBackendApiServiceStub: Partial<ContributionOpportunitiesBackendApiService> =

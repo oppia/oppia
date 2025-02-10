@@ -871,7 +871,7 @@ class TranslatableTopicNamesHandler(
 class TranslatableTopicNamesPerClassroomHandlerDict(TypedDict):
     """A dictionary representing all topics associated to classroom."""
 
-    classRoom: str
+    classroom: str
     topics: List[str]
 
 
@@ -905,9 +905,9 @@ class TranslatableTopicNamesPerClassroomHandler(
                 classroom_name, []).append(summary.name)
 
         self.values = {
-            'topic_names_per_classRoom': [
+            'topic_names_per_classroom': [
                 TranslatableTopicNamesPerClassroomHandlerDict(
-                    classRoom=classroom, topics=topics)
+                    classroom=classroom, topics=topics)
                 for classroom, topics in topics_per_classroom.items()
             ]
         }
